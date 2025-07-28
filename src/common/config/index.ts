@@ -40,6 +40,7 @@ const POLYGON_PARTS = {
   billBoardStrokeColor: '#FFFF00'
 };
 const WFS = (window as any)._env_.WFS;
+const SHOW_GEOCODER = (window as any)._env_.SHOW_GEOCODER;
 
 const enrichBaseMaps = (baseMaps: IBaseMaps): IBaseMaps => {
   return {
@@ -232,7 +233,8 @@ const APP_CONFIG = {
       ZOOM_LEVEL: WFS.max.zoomLevel,
       CACHE_SIZE: WFS.max.cacheSize,
     }
-  }
+  },
+  SHOW_GEOCODER: SHOW_GEOCODER
 };
 
 export default APP_CONFIG;

@@ -58,6 +58,7 @@
   "general.empty.text": "ריק",
   "general.more.text": "עוד...",
   "general.missing.translation": "##MISSING_TRANSLATION##",
+  "general.search.placeholder": "חיפוש...",
   
   "terrain-provider.access.error": "מידע פני השטח לא זמין",
 
@@ -697,11 +698,13 @@
 
   "map.zoom.label": "zoom",
 
-  "debug-panel.title": "דיבאגר",
-  "debug-panel.wfs.title": "שכבות מידע",
-  "debug-panel.wfs.cache": "בזכרון",
-  "debug-panel.wfs.extent": "בתצוגה",
-  "debug-panel.empty": "לא נמצאו שכבות",
+  "geocoder-panel.show-feature-on-map": "הראה פיצ'ר",
+  "geocoder-panel.in-map-extent": "חיפוש בתצוגה",
+
+  "geocoder-panel.title.location": "מיקום",
+  "geocoder-panel.title.tiles": "טיילים",
+  "geocoder-panel.title.control": "שליטה",
+  "geocoder-panel.title.routes": "דרכים",
 
   "user-role.switch.user.text": "משתמש",
   "user-role.switch.admin.text": "מנהל",

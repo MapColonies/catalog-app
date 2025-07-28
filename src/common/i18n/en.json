@@ -58,6 +58,7 @@
   "general.empty.text": "Empty",
   "general.more.text": "more...",
   "general.missing.translation": "##MISSING_TRANSLATION##",
+  "general.search.placeholder": "Search...",
 
   "terrain-provider.access.error": "Unavailable terrain information",
 
@@ -698,6 +699,14 @@
   "debug-panel.wfs.cache": "Cache",
   "debug-panel.wfs.extent": "Extent",
   "debug-panel.empty": "No layers found",
+
+  "geocoder-panel.show-feature-on-map": "Show on map",
+  "geocoder-panel.in-map-extent": "Search in extent",
+
+  "geocoder-panel.title.location": "location",
+  "geocoder-panel.title.tiles": "tiles",
+  "geocoder-panel.title.control": "control",
+  "geocoder-panel.title.routes": "routes",
 
   "user-role.switch.user.text": "User",
   "user-role.switch.admin.text": "Admin",

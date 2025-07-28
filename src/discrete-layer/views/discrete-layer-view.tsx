@@ -34,6 +34,7 @@ import {
   IDrawingEvent
 } from '@map-colonies/react-components';
 import { IMapLegend } from '@map-colonies/react-components/dist/cesium-map/map-legend';
+import { GeocoderPanelProps } from '@map-colonies/react-components/dist/cesium-map/geocoder/geocoder-panel';
 import GPUInsufficiencyDetector from '../../common/components/gpu-insufficiency-detector/gpu-insufficiency-detector';
 // import { BrowserCompatibilityChecker } from '../../common/components/browser-compatibility-checker/browser-compatibility-checker';
 import CONFIG from '../../common/config';
@@ -259,6 +260,10 @@ const DiscreteLayerView: React.FC = observer(() => {
     WFS_CACHE: intl.formatMessage({ id: 'debug-panel.wfs.cache' }),
     WFS_EXTENT: intl.formatMessage({ id: 'debug-panel.wfs.extent' }),
     NO_DATA_LAYERS: intl.formatMessage({ id: 'debug-panel.empty' }),
+    SHOW_FEATURE_ON_MAP: intl.formatMessage({ id: 'geocoder-panel.show-feature-on-map' }),
+    IN_MAP_EXTENT: intl.formatMessage({ id: 'geocoder-panel.in-map-extent' }),
+    SEARCH_PLACEHOLDER: intl.formatMessage({ id: 'general.search.placeholder' }),
+    NO_RESULTS: intl.formatMessage({ id: 'results.nodata' }),
   }), [intl]);
   /* eslint-enable */
 
@@ -835,6 +840,77 @@ const DiscreteLayerView: React.FC = observer(() => {
   }, [activeTabView, actionsMenuDimensions]);
 
   const site = useMemo(() => currentSite(), []);
+
+   const GEOCODER_OPTIONS = [
+    {
+      baseUrl: 'https://vector-geocoding-geocoding-route-vector-dev.apps.j1lk3njp.eastus.aroapp.io',
+      endPoint: '/search/location/query',
+      method: 'GET',
+      params: {
+        dynamic: {
+          queryText: 'query',
+          geoContext: {
+            name: 'geo_context',
+            relatedParams: [["geo_context_mode", 'filter']]
+          }
+        },
+        static: [["limit", 6], ["disable_fuzziness", false]],
+      },
+      title: intl.formatMessage({ id: 'geocoder-panel.title.location' }),
+      geometryIconClassName: 'customIcon'
+    },
+    {
+      baseUrl: 'https://vector-geocoding-geocoding-route-vector-dev.apps.j1lk3njp.eastus.aroapp.io',
+      endPoint: '/search/control/tiles',
+      method: 'GET',
+      params: {
+        dynamic: {
+          queryText: 'tile',
+          geoContext: {
+            name: 'geo_context',
+            relatedParams: [['geo_context_mode', 'filter']],
+          }
+        },
+        static: [["limit", 6], ["disable_fuzziness", false]],
+      },
+      title: intl.formatMessage({ id: 'geocoder-panel.title.tiles' }),
+      geometryIconClassName: 'customIcon'
+    },
+    {
+      baseUrl: 'https://vector-geocoding-geocoding-route-vector-dev.apps.j1lk3njp.eastus.aroapp.io',
+      endPoint: '/search/control/items',
+      method: 'GET',
+      params: {
+        dynamic: {
+          queryText: 'command_name',
+          geoContext: {
+            name: 'geo_context',
+            relatedParams: [['geo_context_mode', 'filter']],
+          }
+        },
+        static: [["limit", 6], ["disable_fuzziness", false]],
+      },
+      title: intl.formatMessage({ id: 'geocoder-panel.title.control' }),
+      geometryIconClassName: 'customIcon'
+    },
+    {
+      baseUrl: 'https://vector-geocoding-geocoding-route-vector-dev.apps.j1lk3njp.eastus.aroapp.io',
+      endPoint: '/search/control/routes',
+      method: 'GET',
+      params: {
+        dynamic: {
+          queryText: 'command_name',
+          geoContext: {
+            name: 'geo_context',
+            relatedParams: [['geo_context_mode', 'filter']],
+          }
+        },
+        // "geo_context": { "bbox": [-180, -90, 180, 90] },
+      },
+      title: intl.formatMessage({ id: 'geocoder-panel.title.routes' }),
+      geometryIconClassName: 'customIcon'
+    },
+  ] satisfies GeocoderPanelProps['options'];
  
   return (
     <>
@@ -1013,6 +1089,7 @@ const DiscreteLayerView: React.FC = observer(() => {
         <Box className="mapAppContainer">
           <ActionsMenuDimensionsContext.Provider value={{actionsMenuDimensions, setActionsMenuDimensions}}>
             <CesiumMap
+              {...(CONFIG.SHOW_GEOCODER ? { geocoderPanel: GEOCODER_OPTIONS } : {})}
               mapMode2D={mapMode2D}
               projection={CONFIG.MAP.PROJECTION}  
               center={CONFIG.MAP.CENTER}
