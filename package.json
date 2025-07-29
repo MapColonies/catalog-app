@@ -14,11 +14,6 @@
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
     }
   },
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
-    }
-  },
   "scripts": {
     "postinstall": "patch-package",
     "scaffold:client": "node ./node_modules/mst-gql/generator/mst-gql-scaffold.js --roots LayerRasterRecord,Layer3DRecord,LayerDemRecord,EntityDescriptor,VectorBestRecord,QuantizedMeshBestRecord,PolygonPartRecord --outDir src/discrete-layer/models/ --format ts http://localhost:8080/graphql",
@@ -27,7 +22,6 @@
     "test": "react-scripts test --verbose",
     "test:coverage": "react-scripts test --verbose --coverage --watchAll",
     "eject": "react-scripts eject",
-    "release": "standard-version",
     "eslint:fix": "npx eslint --fix",
     "eslint:check": "npx eslint . --ext .ts,.tsx",
     "prettier:fix": "prettier --write .",
@@ -185,8 +179,6 @@
     "yup": "^0.32.11"
   },
   "devDependencies": {
-    "@map-colonies/standard-version-update-helm-version": "^2.0.1",
-    "@map-colonies/standard-version-update-openapi3-version": "^0.0.2",
     "@types/enzyme": "^3.10.5",
     "@types/enzyme-adapter-react-16": "^1.0.6",
     "@types/ol": "^6.3.1",
@@ -196,7 +188,6 @@
     "@typescript-eslint/parser": "^5.61.0",
     "@typescript-eslint/utils": "^5.61.0",
     "commitlint": "^9.1.0",
-    "cz-conventional-changelog": "^3.2.0",
     "enzyme": "^3.11.0",
     "enzyme-adapter-react-16": "^1.15.2",
     "eslint-config-react-app": "^7.0.1",
@@ -207,7 +198,6 @@
     "lint-staged": "^10.2.11",
     "prettier": "^2.0.5",
     "react-test-renderer": "^16.13.1",
-    "standard-version": "^8.0.2",
     "timezone-mock": "^1.1.3"
   },
   "browserslist": [
