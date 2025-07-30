@@ -1,8 +1,8 @@
 {{- $MAIN_OBJECT_BLOCK := "configValues" -}}
 {{- $COMPONENT_NAME := "backend" -}}
-{{- $DATA := include "discreteLayerClientData" . -}}
+{{- $DATA := include "catalogAppData" . -}}
 
-{{- define "discreteLayerClientData" -}}
+{{- define "catalogAppData" -}}
 {{- $CONFIG_MANAGER_OBJECT := include "common.tplvalues.getGlobalObject" (dict "objName" "configManagment" "context" .) | fromYaml }}
 {{- if not $CONFIG_MANAGER_OBJECT.enabled -}}
   REQUEST_PAYLOAD_LIMIT: {{ .Values.env.requestPayloadLimit | quote }}
