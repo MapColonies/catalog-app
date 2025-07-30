@@ -1,3 +1,3 @@
 #!/bin/bash
 
-docker build --rm --no-cache -t discretelayersclient:latest -f Dockerfile .
+docker build --rm --no-cache -t catalog-app:latest -f Dockerfile .
