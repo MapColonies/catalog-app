@@ -1,12 +1,12 @@
 {
-  "name": "discrete-layer-client",
+  "name": "catalog-app",
   "version": "2.23.10",
   "bugs": {
-    "url": "https://github.com/MapColonies/discrete-layer-client/issues"
+    "url": "https://github.com/MapColonies/catalog-app/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/MapColonies/discrete-layer-client.git"
+    "url": "https://github.com/MapColonies/catalog-app.git"
   },
   "license": "MIT",
   "husky": {
@@ -37,8 +37,8 @@
     "copyassets:components": "copyfiles -u 4 \"./node_modules/@map-colonies/react-components/dist/assets/**/*\" \"./public\"",
     "helm-update": "helm dependency update helm",
     "helm-assets": "npm run helm-update && tar -xzvf ./helm/charts/helm-common*.tgz --strip-components=1 helm-common/schemas",
-    "helm-install": "npm run helm-update && helm install -f 'helm/global.yaml' -f 'helm/values.yaml' discrete-layer-client helm",
-    "helm-uninstall": "helm uninstall discrete-layer-client"
+    "helm-install": "npm run helm-update && helm install -f 'helm/global.yaml' -f 'helm/values.yaml' catalog-app helm",
+    "helm-uninstall": "helm uninstall catalog-app"
   },
   "jest": {
     "transformIgnorePatterns": [
