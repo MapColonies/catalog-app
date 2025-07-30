@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.23.11](https://github.com/MapColonies/catalog-app/compare/v2.23.10...v2.23.11) (2025-07-30)
+
+
+### Bug Fixes
+
+* handle repo renaming ([#635](https://github.com/MapColonies/catalog-app/issues/635)) ([aca632a](https://github.com/MapColonies/catalog-app/commit/aca632a18ccc377aaf7f2b6e9992b128b705eb28))
+
 ### [2.23.10](https://github.com/MapColonies/discrete-layer-client/compare/v2.23.9...v2.23.10) (2025-07-22)
 
 
