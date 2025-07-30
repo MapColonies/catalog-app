@@ -250,10 +250,6 @@ const DiscreteLayerView: React.FC = observer(() => {
   /* eslint-disable */
   const mapSettingsLocale = useMemo(() => ({
     DIRECTION: intl.locale === 'he' ? 'rtl' : 'ltr',
-    MAP_SETTINGS_DIALOG_TITLE:  intl.formatMessage({ id: 'map-settings.dialog.title' }),
-    MAP_SETTINGS_SCENE_MODE_TITLE: intl.formatMessage({ id: 'map-settings.base-map.scene-mode.title' }),
-    MAP_SETTINGS_BASE_MAP_TITLE: intl.formatMessage({ id: 'map-settings.base-map.title' }),
-    MAP_SETTINGS_TERRAIN_TITLE: intl.formatMessage({ id: 'record-type.record_quantized_mesh.label' }),
     ZOOM_LABEL: intl.formatMessage({ id: 'map.zoom.label' }),
     DEBUG_PANEL_TITLE: intl.formatMessage({ id: 'debug-panel.title' }),
     WFS_TITLE: intl.formatMessage({ id: 'debug-panel.wfs.title' }),
@@ -265,6 +261,8 @@ const DiscreteLayerView: React.FC = observer(() => {
     '3D_SECTION': intl.formatMessage({ id: 'record-type.record_3d.label' }),
     DEM_SECTION: intl.formatMessage({ id: 'record-type.record_dem.label' }),
     VECTOR_SECTION: intl.formatMessage({ id: 'record-type.record_vector.label' }),
+    BASE_MAP_TITLE: intl.formatMessage({ id: 'map-settings.base-map.title' }),
+    TERRAIN_TITLE: intl.formatMessage({ id: 'record-type.record_quantized_mesh.label' }),
   }), [intl]);
   /* eslint-enable */
 

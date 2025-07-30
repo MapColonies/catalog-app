@@ -1,6 +1,6 @@
 import { CSSProperties, useEffect, useMemo, useRef } from 'react';
 import { useIntl } from 'react-intl';
-import { Box, GeoJSONFeature, getWMTSOptions, getXYZOptions, Legend, LegendItem, Map, TileLayer, TileWMTS, TileXYZ, useMap, useVectorSource, VectorLayer, VectorSource } from '@map-colonies/react-components';
+import { Box, GeoJSONFeature, getWMTSOptions, getXYZOptions, IBaseMap, Legend, LegendItem, Map, TileLayer, TileWMTS, TileXYZ, useMap, useVectorSource, VectorLayer, VectorSource } from '@map-colonies/react-components';
 import { Feature } from 'geojson';
 import { get, isEmpty } from 'lodash';
 import { FitOptions } from 'ol/View';
@@ -55,9 +55,9 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   const previewBaseMap = useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-array-constructor
     const olBaseMap = new Array();
-    let baseMap = store.discreteLayersStore.baseMaps?.maps.find((map) => map.isForPreview);
+    let baseMap = store.discreteLayersStore.baseMaps?.maps.find((map: IBaseMap) => map.isForPreview);
     if (!baseMap) {
-      baseMap = store.discreteLayersStore.baseMaps?.maps.find((map) => map.isCurrent);
+      baseMap = store.discreteLayersStore.baseMaps?.maps.find((map: IBaseMap) => map.isCurrent);
     }
     if (baseMap) {
       baseMap.baseRasterLayers.forEach((layer) => {

@@ -1,6 +1,6 @@
 import { CesiumGeographicTilingScheme, Proj } from '@map-colonies/react-components';
 import { IRasterLayer } from '@map-colonies/react-components/dist/cesium-map/layers-manager';
-import { IBaseMaps, IBaseMap } from '@map-colonies/react-components/dist/cesium-map/settings/settings';
+import { IBaseMaps, IBaseMap } from '@map-colonies/react-components/dist/cesium-map/map';
 import { LinkType } from '../models/link-type.enum';
 
 /*eslint-disable */
