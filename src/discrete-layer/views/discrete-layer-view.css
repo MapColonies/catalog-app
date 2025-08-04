@@ -242,6 +242,10 @@ body[dir='rtl'] .tabHeaderContainer .filterByCatalogEntitySelect {
   margin-right: 0;
 }
 
+.cesium-viewer .bottomToolsContainer > div {
+  height: 28px;;
+}
+
 .interactionsDisabled {
   position: relative;
   overflow: hidden;
