@@ -699,6 +699,8 @@
   "debug-panel.wfs.extent": "Extent",
   "debug-panel.empty": "No layers found",
 
+  "active-layers.title": "Active Layers",
+
   "user-role.switch.user.text": "User",
   "user-role.switch.admin.text": "Admin",
   "user-role.dialog.title.text": "Change User Role",
