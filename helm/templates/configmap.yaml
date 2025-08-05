@@ -40,7 +40,7 @@
   CONFIGURATION_MAP_ZOOM: {{ quote .Values.env.map.zoom }}
   CONFIGURATION_MAP_MAPMODE2D: {{ quote .Values.env.map.mapMode2D }}
   CONFIGURATION_MAP_USE_OPTIMIZED_TILE_REQUESTS: {{ quote .Values.env.map.useOptimizedTileRequests }}
-  CONFIGURATION_DEBUG_PANEL: {{ quote .Values.env.map.debugPanel }}
+  CONFIGURATION_MAP_DEBUG_PANEL: {{ quote .Values.env.map.debugPanel }}
   CONFIGURATION_BASEMAPS: {{ quote .Values.env.baseMaps }}
   CONFIGURATION_DEFAULT_TERRAIN_PROVIDER_URL: {{ quote .Values.env.defaultTerrainProviderUrl }}
   CONFIGURATION_WEB_TOOLS_URL: {{ quote .Values.env.webToolsUrl }}
