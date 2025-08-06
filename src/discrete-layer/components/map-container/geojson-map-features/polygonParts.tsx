@@ -97,8 +97,8 @@ export const PolygonParts: React.FC = observer(() => {
 
   const getFieldLabelTranslation = (fieldName: string): string => {
     let res = 'N/A';
-    const fieldTuple = polygonPartsFieldLabels.find((fieldTuple)=> fieldName.toLocaleLowerCase() === fieldTuple[0]?.toLocaleLowerCase());
-    if(fieldTuple){
+    const fieldTuple = polygonPartsFieldLabels.find((fieldTuple) => fieldName.toLocaleLowerCase() === fieldTuple[0]?.toLocaleLowerCase());
+    if (fieldTuple) {
       res = intl.formatMessage({ id: fieldTuple[1] as string })
     }
     return res;

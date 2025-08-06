@@ -1041,34 +1041,33 @@ const DiscreteLayerView: React.FC = observer(() => {
               }}
               debugPanel={CONFIG.MAP.DEBUG_PANEL}
             >
-                {activeTabView !== TabViews.EXPORT_LAYER && <CesiumDrawingsDataSource
-                
-                  drawings={activeTabView === TabViews.SEARCH_RESULTS ? drawEntities : []}
-                  drawingMaterial={DRAWING_MATERIAL_COLOR}
-                  drawState={{
-                    drawing: isDrawing,
-                    type: drawPrimitive.type,
-                    handler: drawPrimitive.handler,
-                  }}
-                  hollow={true}
-                  outlineWidth={5}
-                  material={ (DRAWING_FINAL_MATERIAL as unknown) as CesiumColor }
-                />}
+                {
+                  activeTabView !== TabViews.EXPORT_LAYER &&
+                  <CesiumDrawingsDataSource
+                    drawings={activeTabView === TabViews.SEARCH_RESULTS ? drawEntities : []}
+                    drawingMaterial={DRAWING_MATERIAL_COLOR}
+                    drawState={{
+                      drawing: isDrawing,
+                      type: drawPrimitive.type,
+                      handler: drawPrimitive.handler,
+                    }}
+                    hollow={true}
+                    outlineWidth={5}
+                    material={ (DRAWING_FINAL_MATERIAL as unknown) as CesiumColor }
+                  />
+                }
+
                 {memoizedLayers}
 
-                {activeTabView === TabViews.EXPORT_LAYER && <ExportDrawingHandler /> }
+                { activeTabView === TabViews.EXPORT_LAYER && <ExportDrawingHandler /> }
                 <Terrain/>
                 <ExtentUpdater/>
                 <WfsFeature />
                 <DemHeightsFeatureComponent />
                 <PolygonPartsFeature />
-                {
-                  poi && activeTabView === TabViews.SEARCH_RESULTS && <PoiEntity longitude={poi.lon} latitude={poi.lat}/>
-                }
-                {
-                  rect && <FlyTo setRect={setRect} layer={store.discreteLayersStore.selectedLayer as LayerMetadataMixedUnion}/>
-                }
-                {activeTabView === TabViews.EXPORT_LAYER && <ExportPolygonsRenderer />}
+                { poi && activeTabView === TabViews.SEARCH_RESULTS && <PoiEntity longitude={poi.lon} latitude={poi.lat}/> }
+                { rect && <FlyTo setRect={setRect} layer={store.discreteLayersStore.selectedLayer as LayerMetadataMixedUnion}/> }
+                { activeTabView === TabViews.EXPORT_LAYER && <ExportPolygonsRenderer /> }
             </CesiumMap>
           </ActionsMenuDimensionsContext.Provider>
           {/* <BrowserCompatibilityChecker />  Should talk about if we need it or not anymore. */}

@@ -80,7 +80,7 @@ if (!window._env_) {
         }
       },
       WFS: {
-        style: '{"color": "#45EB93", "fill": "#C4A346"}',
+        style: '{"color": "#01FF1F", "hover": "#24AEE9", "pointStroke": "#01FF1F"}',
         max: {
           pageSize: 300,
           zoomLevel: 14,
