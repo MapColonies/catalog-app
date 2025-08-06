@@ -268,10 +268,10 @@ const DiscreteLayerView: React.FC = observer(() => {
     return(
       <>
         <MapActionResolver />
-        <SelectedLayersContainer/>
-        <HighlightedLayer/>
-        <LayersFootprints/>
-        <PolygonParts/>
+        <SelectedLayersContainer />
+        <HighlightedLayer />
+        <LayersFootprints />
+        <PolygonParts />
       </>
     );
   }, []);
@@ -280,7 +280,6 @@ const DiscreteLayerView: React.FC = observer(() => {
     if (activeTabView !== targetViewIdx) {
       store.discreteLayersStore.setTabviewData(activeTabView);
       store.discreteLayersStore.restoreTabviewData(targetViewIdx);
-  
       if (activeTabView === TabViews.EXPORT_LAYER) {
         store.exportStore.setHasExportPreviewed(false);
       }
