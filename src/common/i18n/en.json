@@ -700,6 +700,8 @@
   "debug-panel.empty": "No layers found",
 
   "active-layers.title": "Active Layers",
+  "active-layers.imagery": "Imagery",
+  "active-layers.data": "Data",
 
   "user-role.switch.user.text": "User",
   "user-role.switch.admin.text": "Admin",

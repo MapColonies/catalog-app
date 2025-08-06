@@ -257,10 +257,8 @@ const DiscreteLayerView: React.FC = observer(() => {
     WFS_EXTENT: intl.formatMessage({ id: 'debug-panel.wfs.extent' }),
     NO_DATA_LAYERS: intl.formatMessage({ id: 'debug-panel.empty' }),
     ACTIVE_LAYERS_TITLE: intl.formatMessage({ id: 'active-layers.title' }),
-    RASTER_SECTION: intl.formatMessage({ id: 'record-type.record_raster.label' }),
-    '3D_SECTION': intl.formatMessage({ id: 'record-type.record_3d.label' }),
-    DEM_SECTION: intl.formatMessage({ id: 'record-type.record_dem.label' }),
-    VECTOR_SECTION: intl.formatMessage({ id: 'record-type.record_vector.label' }),
+    IMAGERY: intl.formatMessage({ id: 'active-layers.imagery' }),
+    DATA: intl.formatMessage({ id: 'active-layers.data' }),
     BASE_MAP_TITLE: intl.formatMessage({ id: 'map-settings.base-map.title' }),
     TERRAIN_TITLE: intl.formatMessage({ id: 'record-type.record_quantized_mesh.label' }),
   }), [intl]);

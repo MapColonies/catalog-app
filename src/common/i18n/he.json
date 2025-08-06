@@ -704,6 +704,8 @@
   "debug-panel.empty": "לא נמצאו שכבות",
 
   "active-layers.title": "שכבות פעילות",
+  "active-layers.imagery": "ראסטר",
+  "active-layers.data": "מידע",
 
   "user-role.switch.user.text": "משתמש",
   "user-role.switch.admin.text": "מנהל",
