@@ -131,7 +131,8 @@ const APP_CONFIG = {
     ZOOM: MAP.zoom as number,
     MAPMODE2D: MAP.mapMode2D,
     USE_OPTIMIZED_TILE_REQUESTS: MAP.useOptimizedTileRequests as boolean,
-    DEBUG_PANEL: MAP.debugPanel //TODO: check in case empty/undefined
+    SHOW_DEBUGGER_TOOL: MAP.showDebuggerTool,
+    SHOW_ACTIVE_LAYERS_TOOL: MAP.showActiveLayersTool
   },
   ACTIVE_LAYER: ACTIVE_LAYER, // | 'WMTS_LAYER' | 'WMS_LAYER' | 'XYZ_LAYER' | 'OSM_LAYER'
   ACTIVE_LAYER_PROPERTIES: ACTIVE_LAYER_PROPERTIES,

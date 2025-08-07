@@ -1040,7 +1040,8 @@ const DiscreteLayerView: React.FC = observer(() => {
                   imgText: intl.formatMessage({ id: 'map-legends.actions.img' }),
                 }
               }}
-              debugPanel={CONFIG.MAP.DEBUG_PANEL}
+              showDebuggerTool={CONFIG.MAP.SHOW_DEBUGGER_TOOL}
+              showActiveLayersTool={CONFIG.MAP.SHOW_ACTIVE_LAYERS_TOOL}
             >
                 {
                   activeTabView !== TabViews.EXPORT_LAYER &&

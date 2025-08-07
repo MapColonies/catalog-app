@@ -27,7 +27,8 @@ window._env_ = {
     zoom: {{ getv "/configuration/map/zoom" "14" }},
     mapMode2D: '{{ getv "/configuration/map/mapmode2d" "INFINITE_SCROLL" }}',
     useOptimizedTileRequests: {{ getv "/configuration/map/use/optimized/tile/requests" "false" }},
-    debugPanel: {{ getv "/configuration/map/debug/panel" "false" }},
+    showDebuggerTool: {{ getv "/configuration/map/show/debugger/tool" "false" }},
+    showActiveLayersTool: {{ getv "/configuration/map/show/active/layers/tool" "true" }},
   },
   LOGGER: {
     level: '{{ getv "/configuration/logger/level" "warn" }}',
