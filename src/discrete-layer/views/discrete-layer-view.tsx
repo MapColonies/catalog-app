@@ -250,6 +250,8 @@ const DiscreteLayerView: React.FC = observer(() => {
   /* eslint-disable */
   const mapSettingsLocale = useMemo(() => ({
     DIRECTION: intl.locale === 'he' ? 'rtl' : 'ltr',
+    METERS_UNIT: intl.formatMessage({ id: 'map.scale.units.meters' }),
+    KILOMETERS_UNIT: intl.formatMessage({ id: 'map.scale.units.kilometers' }),
     ZOOM_LABEL: intl.formatMessage({ id: 'map.zoom.label' }),
     DEBUG_PANEL_TITLE: intl.formatMessage({ id: 'debug-panel.title' }),
     WFS_TITLE: intl.formatMessage({ id: 'debug-panel.wfs.title' }),
@@ -259,6 +261,8 @@ const DiscreteLayerView: React.FC = observer(() => {
     ACTIVE_LAYERS_TITLE: intl.formatMessage({ id: 'active-layers.title' }),
     IMAGERY: intl.formatMessage({ id: 'active-layers.imagery' }),
     DATA: intl.formatMessage({ id: 'active-layers.data' }),
+    FLY_TO: intl.formatMessage({ id: 'action.flyTo.tooltip' }),
+    REMOVE: intl.formatMessage({ id: 'active-layers.remove' }),
     BASE_MAP_TITLE: intl.formatMessage({ id: 'map-settings.base-map.title' }),
     TERRAIN_TITLE: intl.formatMessage({ id: 'record-type.record_quantized_mesh.label' }),
   }), [intl]);

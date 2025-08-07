@@ -691,6 +691,9 @@
   "map-settings.base-map.scene-mode.title": "Scene Mode",
   "map-settings.dialog.title": "Map Settings",
 
+  "map.scale.units.meters": "m",
+  "map.scale.units.kilometers": "km",
+
   "map.zoom.label": "zoom",
 
   "debug-panel.title": "Debugger Tool",
@@ -702,6 +705,7 @@
   "active-layers.title": "Active Layers",
   "active-layers.imagery": "Imagery",
   "active-layers.data": "Data",
+  "active-layers.remove": "Remove",
 
   "user-role.switch.user.text": "User",
   "user-role.switch.admin.text": "Admin",

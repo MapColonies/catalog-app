@@ -695,7 +695,10 @@
   "map-settings.base-map.scene-mode.title": "מצב תצוגה",
   "map-settings.dialog.title": "הגדרות מפה",
 
-  "map.zoom.label": "zoom",
+  "map.scale.units.meters": "מ'",
+  "map.scale.units.kilometers": "קמ'",
+
+  "map.zoom.label": "זום",
 
   "debug-panel.title": "דיבאגר",
   "debug-panel.wfs.title": "שכבות מידע",
@@ -706,6 +709,7 @@
   "active-layers.title": "שכבות פעילות",
   "active-layers.imagery": "ראסטר",
   "active-layers.data": "מידע",
+  "active-layers.remove": "הסר",
 
   "user-role.switch.user.text": "משתמש",
   "user-role.switch.admin.text": "מנהל",
