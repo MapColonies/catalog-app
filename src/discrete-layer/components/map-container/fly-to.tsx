@@ -36,8 +36,7 @@ export const FlyTo: React.FC<FlyToProps> = ({ setRect, layer}): JSX.Element => {
       ).then(() => {
         mapViewer.entities.remove(rectangle);
       });
-    }
-    else{
+    } else {
       rect = generateFactoredLayerRectangle(layer);
       mapViewer.camera.flyTo({ destination: rect });
     }
