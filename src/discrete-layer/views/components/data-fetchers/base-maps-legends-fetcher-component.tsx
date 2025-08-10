@@ -61,7 +61,7 @@ export const BaseMapsLegendsFetcher: React.FC = observer(() => {
           },
         ],
       ],
-      ['VECTOR_TILES_GPS_1', []],
+      ['VECTOR_TILES_GPS', []],
       [
         'AZURE_RASTER_WMTS_FULL_IL',
         [
