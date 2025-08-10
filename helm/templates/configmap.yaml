@@ -42,6 +42,7 @@
   CONFIGURATION_MAP_USE_OPTIMIZED_TILE_REQUESTS: {{ quote .Values.env.map.useOptimizedTileRequests }}
   CONFIGURATION_MAP_SHOW_DEBUGGER_TOOL: {{ quote .Values.env.map.showDebuggerTool }}
   CONFIGURATION_MAP_SHOW_ACTIVE_LAYERS_TOOL: {{ quote .Values.env.map.showActiveLayersTool }}
+  CONFIGURATION_MAP_SHOW_GEOCODER_TOOL: {{ quote .Values.env.map.showGeocoderTool }}
   CONFIGURATION_BASEMAPS: {{ quote .Values.env.baseMaps }}
   CONFIGURATION_DEFAULT_TERRAIN_PROVIDER_URL: {{ quote .Values.env.defaultTerrainProviderUrl }}
   CONFIGURATION_WEB_TOOLS_URL: {{ quote .Values.env.webToolsUrl }}

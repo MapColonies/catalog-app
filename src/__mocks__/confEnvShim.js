@@ -33,6 +33,7 @@ if (!window._env_) {
         mapMode2D: 'ROTATE',
         showDebuggerTool: false,
         showActiveLayersTool: true,
+        showGeocoderTool: true,
       },
       LOGGER: {
         level: 'warn',

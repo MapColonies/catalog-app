@@ -58,6 +58,7 @@
   "general.empty.text": "Empty",
   "general.more.text": "more...",
   "general.missing.translation": "##MISSING_TRANSLATION##",
+  "general.search.placeholder": "Search...",
 
   "terrain-provider.access.error": "Unavailable terrain information",
 
@@ -65,6 +66,7 @@
   "action.tab-views.search-results.tooltip": "Search results tab",
   "action.tab-views.create-best.tooltip": "BEST draft creation/edit tab",
   "action.tab-views.export-layer.tooltip": "Export layer tab",
+
   "action.point.tooltip": "Search by POI",
   "action.box.tooltip": "Search by bounding box",
   "action.polygon.tooltip": "Search by bounding polygon",
@@ -207,7 +209,6 @@
   "catalog-filter.dateRangeField.validation-error": "Please select a valid date range",
   "catalog-filter.filterButton.text": "Search",
   "catalog-filter.clearFilterButton.text": "Clear",
-
   "catalog-filter.freeText.placeholder": "Free terms catalog search",
 
   "context-menu.title.tooltip": "Actions on topmost layer: ",
@@ -626,20 +627,18 @@
 
   "system-status.job.filter.status.all": "All",
 
-  "system-status.job-details.header.internalId": "Internal Id",
-  "system-status.job-details.header.extetnalId": "External Id",
-  "system-status.job-details.header.producerName": "Producer Name",
-
-  "system-status.export-details.link.label": "Link to files",
-  "system-status.export-details.description.label": "Description: ",
-  "system-status.export-details.no-description.text": "None",
-  "system-status.export-details.expirationDate": "Expiration Date",
-
   "system-status.job-priority-lowest": "Lowest",
   "system-status.job-priority-low": "Low",
   "system-status.job-priority-normal": "Normal",
   "system-status.job-priority-high": "High",
   "system-status.job-priority-highest": "Highest",
+  "system-status.job-details.header.internalId": "Internal Id",
+  "system-status.job-details.header.extetnalId": "External Id",
+  "system-status.job-details.header.producerName": "Producer Name",
+  "system-status.export-details.link.label": "Link to files",
+  "system-status.export-details.description.label": "Description: ",
+  "system-status.export-details.no-description.text": "None",
+  "system-status.export-details.expirationDate": "Expiration Date",
 
   "system-status.task.fields.type.label": "Task Type",
   "system-status.task.fields.status.label": "Status",
@@ -706,6 +705,13 @@
   "active-layers.imagery": "Imagery",
   "active-layers.data": "Data",
   "active-layers.remove": "Remove",
+
+  "geocoder-panel.show-feature-on-map": "Show on map",
+  "geocoder-panel.in-map-extent": "Search in extent",
+  "geocoder-panel.title.location": "location",
+  "geocoder-panel.title.tiles": "tiles",
+  "geocoder-panel.title.control": "control",
+  "geocoder-panel.title.routes": "routes",
 
   "user-role.switch.user.text": "User",
   "user-role.switch.admin.text": "Admin",
@@ -798,7 +804,6 @@
   "dem-heights-info.no-data.message": "No height data found for the selected position",
   "polygonParts-info.no-data.message": "No polygon parts data was found for the layer in the selected position",
   "polygonParts-info.part-to-large.message": "Polygon part too large for presentation",
-
 
   "export-layer.exportSuccessContainer.title": "Export request triggered",
   "export-layer.exportSuccessContainer.approve": "Copy and exit",

@@ -27,6 +27,7 @@ keys = [
   "/configuration/map/use/optimized/tile/requests",
   "/configuration/map/show/debugger/tool",
   "/configuration/map/show/active/layers/tool",
+  "/configuration/map/show/geocoder/tool",
   "/configuration/logger/http/host",
   "/configuration/logger/http/port",
   "/configuration/logger/http/path",

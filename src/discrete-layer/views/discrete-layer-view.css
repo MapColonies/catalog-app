@@ -293,3 +293,16 @@ body[dir='rtl'] .tabHeaderContainer .filterByCatalogEntitySelect {
 .badge_primary{
   background: var(--mdc-theme-primary);
 }
+
+.mdc-checkbox__native-control {
+  size: 4px;
+}
+
+.customIcon {
+  stroke: green;
+  fill: red;
+}
+
+body[dir='rtl'] .MuiBox-root .resultsContainer {
+  direction: ltr;
+}
