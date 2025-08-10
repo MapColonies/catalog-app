@@ -33,7 +33,7 @@ import {
   IDrawing,
   IDrawingEvent
 } from '@map-colonies/react-components';
-import { GeocoderPanelProps } from '@map-colonies/react-components/dist/cesium-map/geocoder/geocoder-panel';
+import { GeocoderOptions } from '@map-colonies/react-components/dist/cesium-map/geocoder/geocoder-panel';
 import { IMapLegend } from '@map-colonies/react-components/dist/cesium-map/legend';
 // import { BrowserCompatibilityChecker } from '../../common/components/browser-compatibility-checker/browser-compatibility-checker';
 import GPUInsufficiencyDetector from '../../common/components/gpu-insufficiency-detector/gpu-insufficiency-detector';
@@ -915,7 +915,7 @@ const DiscreteLayerView: React.FC = observer(() => {
       title: intl.formatMessage({ id: 'geocoder-panel.title.routes' }),
       geometryIconClassName: 'customIcon'
     },
-  ] satisfies GeocoderPanelProps['options'];
+  ] satisfies GeocoderOptions[];
  
   return (
     <>

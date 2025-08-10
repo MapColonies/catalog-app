@@ -708,10 +708,10 @@
 
   "geocoder-panel.show-feature-on-map": "Show on map",
   "geocoder-panel.in-map-extent": "Search in extent",
-  "geocoder-panel.title.location": "location",
-  "geocoder-panel.title.tiles": "tiles",
-  "geocoder-panel.title.control": "control",
-  "geocoder-panel.title.routes": "routes",
+  "geocoder-panel.title.location": "Location",
+  "geocoder-panel.title.tiles": "Tiles",
+  "geocoder-panel.title.control": "Control",
+  "geocoder-panel.title.routes": "Routes",
 
   "user-role.switch.user.text": "User",
   "user-role.switch.admin.text": "Admin",
