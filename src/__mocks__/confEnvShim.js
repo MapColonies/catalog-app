@@ -64,7 +64,7 @@ if (!window._env_) {
         injectionType: 'queryParam',
         tokenValue: 'TOKEN'
       },
-      SERVED_ENTITY_TYPES: 'RECORD_ALL,RECORD_RASTER,RECORD_3D,RECORD_DEM',
+      SERVED_ENTITY_TYPES: 'RECORD_ALL,RECORD_RASTER,RECORD_3D,RECORD_DEM,RECORD_VECTOR',
       WHATSNEW_URL: 'http://whatsnew-URL',
       SITES_CONFIG: '{"masters": [{ "dns": "http://localhost:3000", "isAlias": false }], "slaves": [{ "dns": "http://localhost:8090", "isAlias": false }], "generics": [{ "dns": "https://catalog.mapcolonies.net", "isAlias": false }]}',
       BFF_PATH: '/graphql',
@@ -82,6 +82,7 @@ if (!window._env_) {
       },
       WFS: {
         style: '{"color": "#01FF1F", "hover": "#24AEE9", "pointStroke": "#01FF1F"}',
+        keyField: 'id',
         max: {
           pageSize: 300,
           zoomLevel: 14,

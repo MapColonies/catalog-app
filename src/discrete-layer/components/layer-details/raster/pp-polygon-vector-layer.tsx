@@ -14,6 +14,7 @@ import CONFIG from '../../../../common/config';
 import { emphasizeByHTML } from '../../../../common/helpers/formatters';
 import { SetWithContentEquality } from '../../../../common/helpers/set';
 import { useEnums } from '../../../../common/hooks/useEnum.hook';
+import { area } from '../../../../common/utils/geo.tools';
 import { GetFeatureModelType, LayerRasterRecordModelType, useQuery, useStore } from '../../../models';
 import { IDispatchAction } from '../../../models/actionDispatcherStore';
 import { ILayerImage } from '../../../models/layerImage';
@@ -33,6 +34,7 @@ interface PolygonPartsVectorLayerProps {
 
 const START_PAGE = 0;
 const EXISTING_PART_BUFFER_METERS_TOLLERANCE = -1;
+const MINIMAL_POLYGON_AREA_METERS = 100;
 
 export const PolygonPartsByPolygonVectorLayer: React.FC<PolygonPartsVectorLayerProps> = observer(({layerRecord, maskFeature, partsToCheck, ingestionResolutionMeter}) => {
   const store = useStore();
@@ -147,13 +149,22 @@ export const PolygonPartsByPolygonVectorLayer: React.FC<PolygonPartsVectorLayerP
           }
   
           existingPolygonParts.forEach((existingPart: Feature) => {
-            const bufferedPart = buffer(part as Feature<Polygon>, EXISTING_PART_BUFFER_METERS_TOLLERANCE, { units: 'meters' });
-            const intersection = intersect(
-              bufferedPart.geometry as Polygon,
-              existingPart.geometry as Polygon
-            );
-            if (intersection && ingestionResolutionMeter > existingPart.properties?.resolutionMeter) {
-              interPartsSet.add(part);
+            let bufferedPart = buffer(part as Feature<Polygon>, EXISTING_PART_BUFFER_METERS_TOLLERANCE, { units: 'meters' });
+            // bufferedPart can be UNDEFINED in two cases:
+            // 1. SMALL polygon which is collapsed --> might be neglected 
+            // 2. NEAR WORLD-WIDE(closed to poles) polyogn due to turf calculations --> must be checked 
+            if(!bufferedPart && area(part as Feature<Polygon>) > MINIMAL_POLYGON_AREA_METERS){
+              bufferedPart = part as Feature<Polygon>;
+            }
+
+            if(bufferedPart){
+              const intersection = intersect(
+                bufferedPart.geometry as Polygon,
+                existingPart.geometry as Polygon
+              );
+              if (intersection && ingestionResolutionMeter > existingPart.properties?.resolutionMeter) {
+                interPartsSet.add(part);
+              }
             }
           })
         }

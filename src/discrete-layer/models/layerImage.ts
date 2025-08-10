@@ -4,6 +4,7 @@ import polygonToLine from '@turf/polygon-to-line';
 import bbox from '@turf/bbox';
 import bboxPolygon from '@turf/bbox-polygon';
 import convex from '@turf/convex';
+import { shrinkExtremeCoordinatesInOuterRing } from '../../common/utils/geo.tools';
 import { LayerMetadataMixedUnion } from './LayerMetadataMixedModelSelector';
 
 export type ILayerImage = LayerMetadataMixedUnion;
@@ -47,7 +48,7 @@ export const getLayerFootprint = (layer: ILayerImage, isBbox: boolean, isPolylin
       }
     };
   } else {
-    let geometry: Geometry = layer.footprint as Geometry;
+    let geometry: Geometry = shrinkExtremeCoordinatesInOuterRing(layer.footprint as Geometry, 0.999);
     if (isConvexHull) {
       // @ts-ignore
       geometry = isPolylined ? (polygonToLine(convex(geometry)) as Feature).geometry : (convex(geometry) as Feature).geometry;

@@ -59,6 +59,7 @@ keys = [
   "/configuration/polygonparts/max/pershape",
   "/configuration/polygonparts/max/vertices",
   "/configuration/wfs/style",
+  "/configuration/wfs/key/field",
   "/configuration/wfs/max/page/size",
   "/configuration/wfs/max/zoom/level",
   "/configuration/wfs/max/cache/size"

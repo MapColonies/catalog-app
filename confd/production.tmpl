@@ -79,6 +79,7 @@ window._env_ = {
   },
   WFS: {
     style: '{{ getv "/configuration/wfs/style" "{\"color\": \"#01FF1F\", \"hover\": \"#24AEE9\", \"pointStroke\": \"#01FF1F\"}" }}',
+    keyField: '{{ getv "/configuration/wfs/key/field" "id" }}',
     max: {
       pageSize: {{ getv "/configuration/wfs/max/page/size" "300" }},
       zoomLevel: {{ getv "/configuration/wfs/max/zoom/level" "14" }},

@@ -36,6 +36,7 @@ import {
  } from '@map-colonies/react-components';
 import CONFIG from '../../../../common/config';
 import { useEnums } from '../../../../common/hooks/useEnum.hook';
+import { shrinkExtremeCoordinatesInOuterRing } from '../../../../common/utils/geo.tools';
 import { EntityDescriptorModelType, LayerRasterRecordModelType, useStore } from '../../../models';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
 import { getFlatEntityDescriptors } from '../../layer-details/utils';
@@ -245,7 +246,6 @@ export const PolygonParts: React.FC = observer(() => {
     pageSize: CONFIG.WFS.MAX.PAGE_SIZE,//300,
     zoomLevel: SHOW_PP_ZOOM_LEVEL,//7
     maxCacheSize: CONFIG.WFS.MAX.CACHE_SIZE,//6000
-    keyField: 'id',
     labeling: {
       dataSourcePrefix: 'labels_',
       text: {
@@ -394,7 +394,11 @@ export const PolygonParts: React.FC = observer(() => {
         color: CONFIG.POLYGON_PARTS.STYLE.lowResolutionColor,//'#ff3401', // BRIGHT_RED
       },
     ];
-  
+
+    if (!mapViewer.dataSources.getByName(dataSource.name)[0]) {
+      return;
+    }
+
     const labelPos = [] as Feature<Point>[];
   
     dataSource?.entities.values.forEach((entity: CesiumCesiumEntity) => {
@@ -552,7 +556,7 @@ export const PolygonParts: React.FC = observer(() => {
                     type: 'Feature',
                     properties: {},
                     geometry: {
-                      ...activeLayer?.footprint,
+                      ...shrinkExtremeCoordinatesInOuterRing(activeLayer?.footprint,0.999),
                     },
                   }
                 ]
