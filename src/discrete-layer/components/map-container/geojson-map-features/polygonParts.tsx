@@ -215,7 +215,7 @@ export const PolygonParts: React.FC = observer(() => {
   const buildWFSUrl = (layer: ILayerImage) => {
     const token = CONFIG.ACCESS_TOKEN.TOKEN_VALUE;
     if(layer){
-      const url = layer.links?.find(link => link.protocol === 'WFS').url.split(/[?#]/)[0];
+      const url = layer.links?.find(link => link.protocol === 'WFS')?.url?.split(/[?#]/)[0];
       return `${url}?token=${token}`
     } else {
       return 'NO_CURRENT_LAYER';
