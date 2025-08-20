@@ -52,31 +52,24 @@ export const PolygonParts: React.FC = observer(() => {
   const ZOOM_LEVELS_TABLE = useZoomLevelsTable();
   const [zoomLevel, setZoomLevel] = useState(mapViewState.currentZoomLevel);
   const [activeLayer, setActiveLayer] = useState(store.discreteLayersStore.polygonPartsLayer);
-  const [showFootprint, setShowFootprint] = useState(false);
+  const [showParts, setShowParts] = useState(false);
 
   useEffect(() => {
     if (JSON.stringify(activeLayer) !== JSON.stringify(store.discreteLayersStore.polygonPartsLayer)) {
       setActiveLayer(store.discreteLayersStore.polygonPartsLayer);
-      if (store.discreteLayersStore.polygonPartsLayer === undefined) {
-        setShowFootprint(false);
-      }
     }
-    if (store.discreteLayersStore.polygonPartsLayer) {
-      if (zoomLevel !== mapViewState.currentZoomLevel) {
-        setZoomLevel(mapViewState.currentZoomLevel);
-      }
+    if (zoomLevel !== mapViewState.currentZoomLevel) {
+      setZoomLevel(mapViewState.currentZoomLevel);
     }
   }, [store.discreteLayersStore.polygonPartsLayer, mapViewState.currentZoomLevel]);
 
   useEffect(() => {
-    if (activeLayer) {
-      if (zoomLevel && zoomLevel < optionsPolygonParts.zoomLevel) {
-        setShowFootprint(false);
-      } else {
-        setShowFootprint(true);
-      }
+    if (zoomLevel && zoomLevel < optionsPolygonParts.zoomLevel) {
+      setShowParts(false);
+    } else {
+      setShowParts(true);
     }
-  }, [zoomLevel, activeLayer]);
+  }, [zoomLevel]);
 
   const polygonPartsFieldLabels = useMemo(
     () => {
@@ -551,7 +544,7 @@ export const PolygonParts: React.FC = observer(() => {
     <>
       {
         activeLayer && isOptionsObjValid() && (
-          showFootprint ? <CesiumWFSLayer
+          showParts ? <CesiumWFSLayer
               key={metaPolygonParts.id}
               options={optionsPolygonParts}
               meta={metaPolygonParts}
