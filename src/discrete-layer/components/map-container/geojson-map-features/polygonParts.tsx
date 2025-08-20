@@ -212,13 +212,23 @@ export const PolygonParts: React.FC = observer(() => {
     }
   };
 
+  const NOT_VALID = 'NOT_VALID';
+ 
+  const isOptionsObjValid = () => {
+    return optionsPolygonParts.url !== NOT_VALID && optionsPolygonParts.featureType !== NOT_VALID;
+  }
+
   const buildWFSUrl = (layer: ILayerImage) => {
     const token = CONFIG.ACCESS_TOKEN.TOKEN_VALUE;
     if(layer){
-      const url = layer.links?.find(link => link.protocol === 'WFS').url.split(/[?#]/)[0];
+      const url = layer.links?.find(link => link.protocol === 'WFS')?.url?.split(/[?#]/)[0];
+      if (!url) {
+        console.log(`[<PolygonParts>][buildWFSUrl] Layer ${layer.productName} does not have a WFS link`);
+        return NOT_VALID;
+      }
       return `${url}?token=${token}`
     } else {
-      return 'NO_CURRENT_LAYER';
+      return NOT_VALID;
     }
   };
 
@@ -232,7 +242,7 @@ export const PolygonParts: React.FC = observer(() => {
       featureType += ENUMS[(layer as LayerRasterRecordModelType).productType as string].realValue;
       return featureType;
     } else {
-      return 'NO_CURRENT_LAYER';
+      return NOT_VALID;
     }
   };
 
@@ -540,7 +550,7 @@ export const PolygonParts: React.FC = observer(() => {
   return (
     <>
       {
-        activeLayer && (
+        activeLayer && isOptionsObjValid() && (
           showFootprint ? <CesiumWFSLayer
               key={metaPolygonParts.id}
               options={optionsPolygonParts}
