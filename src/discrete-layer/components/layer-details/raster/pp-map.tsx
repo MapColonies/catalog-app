@@ -72,7 +72,10 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
           });
           olBaseMap.push(
             <TileLayer key={layer.id} options={{ opacity: layer.opacity }}>
-              <TileWMTS options={wmtsOptions} />
+              <TileWMTS options={{
+                ...wmtsOptions,
+                crossOrigin: 'anonymous'
+              }} />
             </TileLayer>
           );
         }
@@ -82,7 +85,10 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
           });
           olBaseMap.push(
             <TileLayer key={layer.id} options={{ opacity: layer.opacity }}>
-              <TileXYZ options={xyzOptions} />
+              <TileXYZ options={{
+                ...xyzOptions,
+                crossOrigin: 'anonymous'
+              }} />
             </TileLayer>
           )
         }
