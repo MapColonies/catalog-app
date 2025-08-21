@@ -1,5 +1,5 @@
-import { ColDef, ColGroupDef } from 'ag-grid-community';
-import React, { useContext, useEffect, useMemo } from 'react';
+import { ColDef, ColGroupDef, GetRowIdParams } from 'ag-grid-community';
+import React, { useCallback, useContext, useEffect, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import CONFIG from '../../../../common/config';
 import {
@@ -63,10 +63,11 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
   const onGridReady = (params: GridReadyEvent): void => {
     onGridReadyCB(params);
 
-    const sortModel = [
-      {colId: 'updated', sort: 'desc'}
-    ];
-    params.api.setSortModel(sortModel);
+    params.api.applyColumnState({
+      state: [
+        {colId: 'updated', sort: 'desc'}
+      ],
+    });
     params.api.sizeColumnsToFit();
   };
 
@@ -86,6 +87,7 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
     });
   }, [intl]);
 
+  const primitiveValueFormatter = (params:Record<string,unknown>):string => params.value as string || '';
   const defaultColDef = useMemo(
     () => [
       {
@@ -101,6 +103,7 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
             alignItems: 'center',
           },
         },
+        sortable: false,
       },
       {
         headerName: intl.formatMessage({
@@ -118,8 +121,9 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
         headerName: intl.formatMessage({
           id: 'system-status.job.fields.version.label',
         }),
-        width: 80,
+        width: 100,
         field: 'version',
+        valueFormatter: primitiveValueFormatter,
       },
       {
         headerName: intl.formatMessage({
@@ -129,6 +133,7 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
         field: 'type',
         filter: true,
         sortable: true,
+        valueFormatter: primitiveValueFormatter,
       },
       {
         headerName: intl.formatMessage({
@@ -174,6 +179,7 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
         cellRendererParams: {
           field: 'created',
         },
+        valueFormatter: primitiveValueFormatter,
         sortable: true,
         // @ts-ignore
         comparator: (valueA, valueB, nodeA, nodeB, isInverted): number =>
@@ -185,11 +191,12 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
         }),
         width: 140,
         field: 'updated',
-        sortable: true,
         cellRenderer: 'dateCellRenderer',
         cellRendererParams: {
           field: 'updated',
         },
+        valueFormatter: primitiveValueFormatter,
+        sortable: true,
         // @ts-ignore
         comparator: (valueA, valueB, nodeA, nodeB, isInverted): number =>
           valueA - valueB,
@@ -247,7 +254,12 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
         width: 160,
         field: 'status',
         cellRenderer: 'statusRenderer',
-        filter: 'jobDetailsStatusFilter',
+        filter: {
+          component: JobDetailsStatusFilter,
+          doesFilterPass: (params: any) => {
+              return params.model === params.handlerParams.getValue(params.node);
+          },
+        },
       },
       {
         pinned: 'right',
@@ -271,7 +283,7 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
       const renderersList = omitColDefsByRenderer.renderers;
 
       if (!(omitColDefsByRenderer.preserveColWidth ?? false)) {
-        colDef = defaultColDef.filter(colDef => !renderersList.includes(colDef.cellRenderer as string)); 
+        colDef = defaultColDef.filter(colDef => !renderersList.includes(colDef.cellRenderer as string)) as ColDef[]; 
       } else {
         colDef = defaultColDef.map(colDef => {
           if (renderersList.includes(colDef.cellRenderer as string)) {
@@ -283,10 +295,10 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
             })
           }
           return colDef;
-        });
+        }) as ColDef[];
       }
     } else {
-      colDef = defaultColDef;
+      colDef = defaultColDef as ColDef[];
     }
 
     if (typeof gridOptions.detailsRowCellRenderer === 'undefined') {
@@ -298,11 +310,13 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
 
   const baseGridOption: GridComponentOptions = {
       enableRtl: CONFIG.I18N.DEFAULT_LANGUAGE.toUpperCase() === 'HE',
+      enableFilterHandlers: true,
       suppressRowTransform: true,
       pagination: pagination,
       paginationPageSize: pageSize,
-      getRowNodeId: (data: JobModelType): string => {
-        return data.id;
+      paginationPageSizeSelector: false,//[pageSize, 20, 50, 100],
+      getRowId: (params: GetRowIdParams): string => {
+        return (params.data as JobModelType).id;
       },
       detailsRowCellRenderer: 'detailsRenderer',
       detailsRowHeight: 230,
@@ -311,32 +325,38 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
         id: 'results.nodata',
       }),
       loadingOverlayComponent: 'customLoadingOverlay',
-      frameworkComponents: {
-        jobDetailsStatusFilter: JobDetailsStatusFilter,
-        detailsRenderer: JobDetailsRenderer,
-        statusRenderer: StatusRenderer,
-        actionsRenderer: ActionsRenderer,
-        priorityRenderer: PriorityRenderer,
-        productTypeRenderer: JobProductTypeRenderer,
-        dateCellRenderer: DateCellRenderer,
-        tooltippedCellRenderer: TooltippedCellRenderer,
-        placeholderRenderer: PlaceholderCellRenderer,
-        customLoadingOverlay: Loading
+      components: {
+        jobDetailsStatusFilter: useCallback(JobDetailsStatusFilter, []),
+        detailsRenderer: useCallback(JobDetailsRenderer, []),
+        statusRenderer: useCallback(StatusRenderer, []),
+        actionsRenderer: useCallback(ActionsRenderer, []),
+        priorityRenderer: useCallback(PriorityRenderer, []),
+        productTypeRenderer: useCallback(JobProductTypeRenderer, []),
+        dateCellRenderer: useCallback(DateCellRenderer, []),
+        tooltippedCellRenderer: useCallback(TooltippedCellRenderer, []),
+        placeholderRenderer: useCallback(PlaceholderCellRenderer, []),
+        customLoadingOverlay: useCallback(Loading, [])
       },
       tooltipShowDelay: 0,
       tooltipMouseTrack: false,
-      rowSelection: 'single',
-      suppressCellSelection: true,
+      rowSelection: {
+        mode: 'singleRow',
+        checkboxes: false,
+        enableClickSelection: true, 
+      },
+      suppressCellFocus: true,
       singleClickEdit: true,
-      immutableData: true, //bounded to state/store managed there otherwise getting "unstable_flushDiscreteUpdates in AgGridReact"
-      // suppressRowClickSelection: true,
       suppressMenuHide: true, // Used to show filter icon at all times (not only when hovering the header).
-      unSortIcon: true, // Used to show un-sorted icon.
+      defaultColDef: {
+        unSortIcon: true,  
+      },
       onGridReady,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      detailsRowCellRendererPresencePredicate: (rowData: any) => {
-        const jobData = rowData as JobModelType;
-        return jobData.domain === 'RASTER';
+      context:{
+        detailsRowCellRendererPresencePredicate: (rowData: any) => {
+          const jobData = rowData as JobModelType;
+          return jobData.domain === 'RASTER';
+        }
       }
     };
 
