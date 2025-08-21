@@ -59,6 +59,8 @@ export const getIconStyle = (
 
     if (hasWFSLink) {
       resStyle = { [colorProperty]: POLYGON_PARTS_SHOWN_COLOR };
+    } else {
+      resStyle = { opacity: 0.5 };
     }
   }
   if (existPolygonParts(data) && !isPolygonPartsShown(data)) {
