@@ -73,5 +73,6 @@ export const getIconStyle = (
       };
     }
   }
+
   return resStyle;
 };
