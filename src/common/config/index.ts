@@ -70,31 +70,31 @@ const systemJobsPriorityOptions =
       label: 'system-status.job-priority-highest',
       value: '2000',
       icon: 'Priority-Highest-Monochrome',
-      iconColor: 'var(--mdc-theme-gc-priority-highest)',
+      iconcolor: 'var(--mdc-theme-gc-priority-highest)',
     },
     {
       label: 'system-status.job-priority-high',
       value: '1500',
       icon: 'Priority-High-Monochrome',
-      iconColor: 'var(--mdc-theme-gc-priority-high)',
+      iconcolor: 'var(--mdc-theme-gc-priority-high)',
     },
     {
       label: 'system-status.job-priority-normal',
       value: '1000',
       icon: 'Priority-Normal-Monochrome',
-      iconColor: 'var(--mdc-theme-gc-priority-normal)',
+      iconcolor: 'var(--mdc-theme-gc-priority-normal)',
     },
     {
       label: 'system-status.job-priority-low',
       value: '500',
       icon: 'Priority-Low-Monochrome',
-      iconColor: 'var(--mdc-theme-gc-priority-low)',
+      iconcolor: 'var(--mdc-theme-gc-priority-low)',
     },
     {
       label: 'system-status.job-priority-lowest',
       value: '0',
       icon: 'Priority-Lowest-Monochrome',
-      iconColor: 'var(--mdc-theme-gc-priority-lowest)',
+      iconcolor: 'var(--mdc-theme-gc-priority-lowest)',
     },
   ];
 

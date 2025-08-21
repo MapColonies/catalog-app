@@ -14,7 +14,7 @@ export const JobProductTypeRenderer: React.FC<IProductTypeCellRendererParams> = 
   const data = props.data as JobModelType;
 
   return (
-    <Box className="productTypeIconContainer" style={{ width: props.colDef.width }}>
+    <Box className="productTypeIconContainer" style={{ width: props.colDef?.width }}>
       <TypeIcon typeName={data.productType as string} style={props.style}/>
     </Box>
   );

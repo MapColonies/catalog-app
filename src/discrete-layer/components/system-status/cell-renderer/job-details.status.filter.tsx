@@ -1,8 +1,5 @@
 import React, {
-  forwardRef,
-  useImperativeHandle,
   useState,
-  useEffect,
   useCallback,
   useMemo,
 } from 'react';
@@ -12,26 +9,15 @@ import { useIntl } from 'react-intl';
 import { JobModelType, Status } from '../../../models';
 import { IDoesFilterPassParams, IFilterParams, } from 'ag-grid-community';
 
-export const JobDetailsStatusFilter = forwardRef((props: IFilterParams, ref) => {
+interface IFilterOnModelChange {
+  onModelChange: (model: any | null, additionalEventAttributes?: any) => void;
+}
+
+export const JobDetailsStatusFilter: React.FC<IFilterOnModelChange> = ({ onModelChange }) => {
   const intl = useIntl();
 
   const [filterStatus, setFilterStatus] = useState<string | Status>('');
 
-  useEffect(() => {
-    props.filterChangedCallback();
-  }, [props,filterStatus]);
-
-  useImperativeHandle(ref, () => {
-    return {
-      doesFilterPass(params: IDoesFilterPassParams): boolean {
-        return (params.data as JobModelType).status === filterStatus;
-      },
-
-      isFilterActive(): boolean {
-        return filterStatus !== '';
-      },
-    };
-  });
 
   const getStatusTranslation = useCallback((status: Status): string => {
     const statusText = intl.formatMessage({
@@ -42,8 +28,7 @@ export const JobDetailsStatusFilter = forwardRef((props: IFilterParams, ref) => 
   },[intl]);
 
   const getStatusOptions = useMemo((): JSX.Element => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const statuses: Record<string, any> = {};
+    const statuses: Record<string, string> = {};
 
     const showAllStatusesText = intl.formatMessage({
       id: 'system-status.job.filter.status.all',
@@ -56,20 +41,20 @@ export const JobDetailsStatusFilter = forwardRef((props: IFilterParams, ref) => 
 
     return (
       <Select
-        style={{ height: '180px', borderRadius: 0 }}
+        style={{ height: '180px', borderRadius: 0, width: '100%' }}
         enhanced
         placeholder={showAllStatusesText}
         options={statuses}
         onChange={(evt: React.ChangeEvent<HTMLSelectElement>): void => {
-          setFilterStatus(evt.currentTarget.value);
+          onModelChange(evt.currentTarget.value === '' ? null : evt.currentTarget.value)
         }}
       />
     );
   },[getStatusTranslation, intl]);
 
   return (
-    <Box style={{ height: '215px', width: '200px', overflow: 'hidden' }}>
+    <Box style={{ height: '230px', width: '200px', overflow: 'hidden' }}>
       {getStatusOptions}
     </Box>
   );
-});
+};

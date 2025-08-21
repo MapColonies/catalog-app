@@ -11,7 +11,7 @@ import { dateFormatter } from '../../../helpers/formatters';
 import './name.tooltip-renderer.css';
 
 export default forwardRef((props: ITooltipParams, ref) => {
-  const [data] = useState<ILayerImage>(props.api.getDisplayedRowAtIndex(props.rowIndex).data);
+  const [data] = useState<ILayerImage>(props.api.getDisplayedRowAtIndex(props?.rowIndex as number)?.data);
   const [layerRecordTypename] = useState<LayerRecordTypes>(data.__typename);
   const [color] = useState<string>(get(props, 'color', 'white'));
   const [infoTooltipMap] = useState<Map<LayerRecordTypes, FieldConfigModelType[]>>(get(props, 'infoTooltipMap'));

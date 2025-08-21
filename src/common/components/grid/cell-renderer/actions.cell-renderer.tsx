@@ -26,8 +26,9 @@ export const ActionsRenderer: React.FC<IActionsRendererParams> = (props) => {
         group: actionGroup.group.filter(action => {
           const { dependentField } = action;
           if (typeof dependentField === 'undefined') return true;
-
+          
           if (isDependentFieldWithValue(dependentField)) {
+            if (!(dependentField.field in data)) return true;
             return get(data, dependentField.field) === dependentField.expectedValue;
           }
                     

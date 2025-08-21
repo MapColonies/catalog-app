@@ -19,7 +19,7 @@ interface PriorityOption {
   label: string;
   value: string;
   icon: string;
-  iconColor: string;
+  iconcolor: string;
 }
 
 interface IPriorityCellRendererParams extends ICellRendererParams {
@@ -53,7 +53,7 @@ export const PriorityRenderer: React.FC<IPriorityCellRendererParams> = (
       (option: PriorityOption) => option.value === val
     ) as PriorityOption;
 
-    return { icon: selectedOption.icon, color: selectedOption.iconColor, label: selectedOption.label };
+    return { icon: selectedOption.icon, color: selectedOption.iconcolor, label: selectedOption.label };
   }, []);
 
   const [icon, setIcon] = useState(getIconObjForVal(value));

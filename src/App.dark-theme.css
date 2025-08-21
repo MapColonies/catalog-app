@@ -131,11 +131,20 @@
 
 .dark-theme .ag-theme-alpine-dark .ag-row-hover {
   border-radius: 100px;
+  background-color: var(--ag-row-hover-color);
 }
 
 .dark-theme .ag-theme-alpine-dark .ag-row-hover.ag-full-width-row {
   border-radius: unset;
   background-color: unset;
+}
+
+.dark-theme .ag-theme-alpine-dark .ag-row-hover:before {
+  background-color: unset
+}
+
+.dark-theme .ag-theme-alpine-dark .ag-cell-focus {
+  border: 0px solid;
 }
 
 .dark-theme
