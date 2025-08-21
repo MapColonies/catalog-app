@@ -52,31 +52,24 @@ export const PolygonParts: React.FC = observer(() => {
   const ZOOM_LEVELS_TABLE = useZoomLevelsTable();
   const [zoomLevel, setZoomLevel] = useState(mapViewState.currentZoomLevel);
   const [activeLayer, setActiveLayer] = useState(store.discreteLayersStore.polygonPartsLayer);
-  const [showFootprint, setShowFootprint] = useState(false);
+  const [showParts, setShowParts] = useState(false);
 
   useEffect(() => {
     if (JSON.stringify(activeLayer) !== JSON.stringify(store.discreteLayersStore.polygonPartsLayer)) {
       setActiveLayer(store.discreteLayersStore.polygonPartsLayer);
-      if (store.discreteLayersStore.polygonPartsLayer === undefined) {
-        setShowFootprint(false);
-      }
     }
-    if (store.discreteLayersStore.polygonPartsLayer) {
-      if (zoomLevel !== mapViewState.currentZoomLevel) {
-        setZoomLevel(mapViewState.currentZoomLevel);
-      }
+    if (zoomLevel !== mapViewState.currentZoomLevel) {
+      setZoomLevel(mapViewState.currentZoomLevel);
     }
   }, [store.discreteLayersStore.polygonPartsLayer, mapViewState.currentZoomLevel]);
 
   useEffect(() => {
-    if (activeLayer) {
-      if (zoomLevel && zoomLevel < optionsPolygonParts.zoomLevel) {
-        setShowFootprint(false);
-      } else {
-        setShowFootprint(true);
-      }
+    if (zoomLevel && zoomLevel < optionsPolygonParts.zoomLevel) {
+      setShowParts(false);
+    } else {
+      setShowParts(true);
     }
-  }, [zoomLevel, activeLayer]);
+  }, [zoomLevel]);
 
   const polygonPartsFieldLabels = useMemo(
     () => {
@@ -212,13 +205,23 @@ export const PolygonParts: React.FC = observer(() => {
     }
   };
 
+  const NOT_VALID = 'NOT_VALID';
+ 
+  const isOptionsObjValid = () => {
+    return optionsPolygonParts.url !== NOT_VALID && optionsPolygonParts.featureType !== NOT_VALID;
+  }
+
   const buildWFSUrl = (layer: ILayerImage) => {
     const token = CONFIG.ACCESS_TOKEN.TOKEN_VALUE;
     if(layer){
-      const url = layer.links?.find(link => link.protocol === 'WFS').url.split(/[?#]/)[0];
+      const url = layer.links?.find(link => link.protocol === 'WFS')?.url?.split(/[?#]/)[0];
+      if (!url) {
+        console.log(`[<PolygonParts>][buildWFSUrl] Layer ${layer.productName} does not have a WFS link`);
+        return NOT_VALID;
+      }
       return `${url}?token=${token}`
     } else {
-      return 'NO_CURRENT_LAYER';
+      return NOT_VALID;
     }
   };
 
@@ -232,7 +235,7 @@ export const PolygonParts: React.FC = observer(() => {
       featureType += ENUMS[(layer as LayerRasterRecordModelType).productType as string].realValue;
       return featureType;
     } else {
-      return 'NO_CURRENT_LAYER';
+      return NOT_VALID;
     }
   };
 
@@ -540,8 +543,8 @@ export const PolygonParts: React.FC = observer(() => {
   return (
     <>
       {
-        activeLayer && (
-          showFootprint ? <CesiumWFSLayer
+        activeLayer && isOptionsObjValid() && (
+          showParts ? <CesiumWFSLayer
               key={metaPolygonParts.id}
               options={optionsPolygonParts}
               meta={metaPolygonParts}

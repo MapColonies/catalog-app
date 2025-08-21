@@ -55,7 +55,11 @@ export const getIconStyle = (
     resStyle = { [colorProperty]: UNPUBLISHED_COLOR };
   }
   if (existPolygonParts(data) && isPolygonPartsShown(data)) {
-    resStyle = { [colorProperty]: POLYGON_PARTS_SHOWN_COLOR };
+    const hasWFS = (data.links as Array<Record<string, unknown>>)?.some(link => link.protocol === 'WFS')
+
+    if (hasWFS) {
+      resStyle = { [colorProperty]: POLYGON_PARTS_SHOWN_COLOR };
+    }
   }
   return resStyle;
 };
