@@ -535,6 +535,7 @@
   "validation-general.polygonParts.noValidGeometry": "Marked {numErrorParts} Plygon Parts contains not supported MULTIPOLYGON geometry.",
   "validation-general.polygonParts.resolutionCollision": "Marked {numErrorParts} Plygon Parts has resolution collision with parts already existing in that area",
   "validation-general.polygonParts.wfsServerError": "Service WFS of Polygon Parts returned error.",
+  "validation-general.polygonParts.wfsExtremelySmall": "Resolution cross-checking failed (likely due to extremely small polygons).",
   "validation-field.sourceDateEnd.min": "{fieldName} should be later than {value}",
   "validation-field.sourceDateStart.max": "{fieldName} should be earlier than {value}",
   "validation-field.productVersion.pattern": "{fieldName} does not comply with the format: major.minor",
