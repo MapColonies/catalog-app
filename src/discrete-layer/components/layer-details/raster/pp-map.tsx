@@ -137,7 +137,8 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
             return (feat && !isEmpty(feat.geometry)) ? <GeoJSONFeature 
               geometry={{...feat.geometry}} 
               fit={false}
-              featureStyle={featureStyle}/> : <></>
+              key={feat.id ?? idx}
+              featureStyle={featureStyle}/> : null
           })
         }
       </>
