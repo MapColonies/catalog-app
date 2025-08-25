@@ -55,11 +55,24 @@ export const getIconStyle = (
     resStyle = { [colorProperty]: UNPUBLISHED_COLOR };
   }
   if (existPolygonParts(data) && isPolygonPartsShown(data)) {
-    const hasWFS = (data.links as Array<Record<string, unknown>>)?.some(link => link.protocol === 'WFS')
+    const hasWFSLink = (data.links as Array<Record<string, unknown>>)?.some(link => link.protocol === 'WFS');
 
-    if (hasWFS) {
+    if (hasWFSLink) {
       resStyle = { [colorProperty]: POLYGON_PARTS_SHOWN_COLOR };
+    } else {
+      resStyle = { opacity: 0.5 };
     }
   }
+  if (existPolygonParts(data) && !isPolygonPartsShown(data)) {
+    const hasWFSLink = (data.links as Array<Record<string, unknown>>)?.some(link => link.protocol === 'WFS')
+
+    if (!hasWFSLink) {
+      resStyle = {
+        ...resStyle,
+        opacity: 0.5
+      };
+    }
+  }
+
   return resStyle;
 };
