@@ -67,6 +67,8 @@ export const PolygonPartsByPolygonVectorLayer: React.FC<PolygonPartsVectorLayerP
   };
 
   const getExistingPolygoParts = (feature: Feature | null | undefined, startIndex: number) => {
+    setDoneFetchingPP(false);
+
     setQuery(store.queryGetPolygonPartsFeature({ 
       data: {
         feature:  feature as GeojsonFeatureInput,
@@ -255,7 +257,7 @@ export const PolygonPartsByPolygonVectorLayer: React.FC<PolygonPartsVectorLayerP
               geometry={{...feat.geometry}} 
               fit={false}
               featureStyle={illegalStyle}
-            /> : <></>
+            /> : null
           }
         )}
       </VectorSource>
