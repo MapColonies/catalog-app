@@ -298,11 +298,6 @@ body[dir='rtl'] .tabHeaderContainer .filterByCatalogEntitySelect {
   size: 4px;
 }
 
-.customIcon {
-  stroke: green;
-  fill: red;
-}
-
 body[dir='rtl'] .MuiBox-root .resultsContainer {
   direction: ltr;
 }

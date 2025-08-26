@@ -861,8 +861,7 @@ const DiscreteLayerView: React.FC = observer(() => {
         },
         static: [["limit", 6], ["disable_fuzziness", false]],
       },
-      title: intl.formatMessage({ id: 'geocoder-panel.title.location' }),
-      geometryIconClassName: 'customIcon'
+      title: intl.formatMessage({ id: 'geocoder-panel.title.location' })
     },
     {
       baseUrl: 'https://vector-geocoding-geocoding-route-vector-dev.apps.j1lk3njp.eastus.aroapp.io',
@@ -878,8 +877,7 @@ const DiscreteLayerView: React.FC = observer(() => {
         },
         static: [["limit", 6], ["disable_fuzziness", false]],
       },
-      title: intl.formatMessage({ id: 'geocoder-panel.title.tiles' }),
-      geometryIconClassName: 'customIcon'
+      title: intl.formatMessage({ id: 'geocoder-panel.title.tiles' })
     },
     {
       baseUrl: 'https://vector-geocoding-geocoding-route-vector-dev.apps.j1lk3njp.eastus.aroapp.io',
@@ -895,8 +893,7 @@ const DiscreteLayerView: React.FC = observer(() => {
         },
         static: [["limit", 6], ["disable_fuzziness", false]],
       },
-      title: intl.formatMessage({ id: 'geocoder-panel.title.control' }),
-      geometryIconClassName: 'customIcon'
+      title: intl.formatMessage({ id: 'geocoder-panel.title.control' })
     },
     {
       baseUrl: 'https://vector-geocoding-geocoding-route-vector-dev.apps.j1lk3njp.eastus.aroapp.io',
@@ -912,8 +909,7 @@ const DiscreteLayerView: React.FC = observer(() => {
         },
         // "geo_context": { "bbox": [-180, -90, 180, 90] },
       },
-      title: intl.formatMessage({ id: 'geocoder-panel.title.routes' }),
-      geometryIconClassName: 'customIcon'
+      title: intl.formatMessage({ id: 'geocoder-panel.title.routes' })
     },
   ] satisfies GeocoderOptions[];
  
