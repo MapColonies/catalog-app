@@ -709,9 +709,9 @@
   "geocoder-panel.show-feature-on-map": "Show on map",
   "geocoder-panel.in-map-extent": "Search in extent",
   "geocoder-panel.title.location": "Location",
-  "geocoder-panel.title.tiles": "Tiles",
-  "geocoder-panel.title.control": "Control",
-  "geocoder-panel.title.routes": "Routes",
+  "geocoder-panel.title.tiles": "Control Tiles",
+  "geocoder-panel.title.control": "Control Data",
+  "geocoder-panel.title.routes": "Control Routes",
 
   "user-role.switch.user.text": "User",
   "user-role.switch.admin.text": "Admin",

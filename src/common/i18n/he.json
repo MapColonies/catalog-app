@@ -707,11 +707,11 @@
   "active-layers.remove": "הסר",
 
   "geocoder-panel.show-feature-on-map": "הראה על המפה",
-  "geocoder-panel.in-map-extent": "חיפוש בתצוגה",
+  "geocoder-panel.in-map-extent": "חיפוש בתיחום נוכחי",
   "geocoder-panel.title.location": "מיקום",
-  "geocoder-panel.title.tiles": "אריחים",
-  "geocoder-panel.title.control": "שליטה",
-  "geocoder-panel.title.routes": "דרכים",
+  "geocoder-panel.title.tiles": "אריחי שליטה (נצ\"א)",
+  "geocoder-panel.title.control": "נתוני שליטה",
+  "geocoder-panel.title.routes": "צירי שליטה",
 
   "user-role.switch.user.text": "משתמש",
   "user-role.switch.admin.text": "מנהל",
