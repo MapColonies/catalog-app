@@ -6,7 +6,7 @@ import lineStringToPolygon from '@turf/linestring-to-polygon';
 import intersect from '@turf/intersect';
 import bboxPolygon from '@turf/bbox-polygon';
 import bbox from '@turf/bbox';
-import { IBaseMaps } from '@map-colonies/react-components/dist/cesium-map/settings/settings';
+import { IBaseMaps } from '@map-colonies/react-components/dist/cesium-map/map';
 import { ApiHttpResponse } from '../../common/models/api-response';
 import { ResponseState } from '../../common/models/response-state.enum';
 import { MOCK_DATA_IMAGERY_LAYERS_ISRAEL } from '../../__mocks-data__/search-results.mock';
