@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.23.13](https://github.com/MapColonies/catalog-app/compare/v2.23.12...v2.23.13) (2025-08-31)
+
+
+### Bug Fixes
+
+* add crossOrigin: 'anonymous' ([#646](https://github.com/MapColonies/catalog-app/issues/646)) ([cb03503](https://github.com/MapColonies/catalog-app/commit/cb03503ba68dc0420fca01608304c78ae75d4ba6))
+* bugfix layer without pp ( MAPCO - 8435 ) ([#641](https://github.com/MapColonies/catalog-app/issues/641)) ([c993eb3](https://github.com/MapColonies/catalog-app/commit/c993eb3c5455ddc27a34a95c4f7b5e37493cd00a))
+* catch error and showing error in dialog ( MAPCO-8501 ) ([#649](https://github.com/MapColonies/catalog-app/issues/649)) ([9835399](https://github.com/MapColonies/catalog-app/commit/9835399c4ff4c71c898d8292a1f8d73c0a881fcd))
+* check button state after selecting shape file with less parts than previous  ([#655](https://github.com/MapColonies/catalog-app/issues/655)) ([4ac58d1](https://github.com/MapColonies/catalog-app/commit/4ac58d1566d18d87275c025dfee602f320359224))
+* remove caching tiles ([#653](https://github.com/MapColonies/catalog-app/issues/653)) ([1940e27](https://github.com/MapColonies/catalog-app/commit/1940e27112892cfd833f29443031f0d9787476a7))
+
 ## [2.23.12](https://github.com/MapColonies/catalog-app/compare/v2.23.11...v2.23.12) (2025-08-05)
 
 
