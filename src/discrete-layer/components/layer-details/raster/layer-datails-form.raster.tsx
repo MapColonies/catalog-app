@@ -1119,6 +1119,11 @@ export const InnerRasterForm = (
                 
                 importShapeFileFromClient((ev, fileType, fileName) => {
                   const shpFile = (ev.target?.result as unknown) as ArrayBuffer;
+
+                  setPPCheckPerformed(false);
+                  setPPFeatures([]);
+                  setShowCurtain(true);
+
                   void proccessShapeFile(shpFile, fileType, targetName, fileName)
                     .then((parsedPPData) => {
                       
@@ -1127,8 +1132,7 @@ export const InnerRasterForm = (
                       setLoadingPolygonParts(false);
 
                       setIsThresholdErrorsCleaned(false);
-
-                      setPPCheckPerformed(false);
+                      setShowCurtain(false);
 
                       const ppDataKeys = Object.keys(parsedPPData);
                       schemaUpdater(ppDataKeys.length, 0, true);
@@ -1262,6 +1266,7 @@ export const InnerRasterForm = (
                   <Button
                     outlined
                     type="button"
+                    disabled={ isValidatingSource }
                     onClick={(): void => {
                       setLoadingPolygonParts(false);
                       setPPCheckPerformed(false);
