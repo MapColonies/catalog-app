@@ -166,7 +166,7 @@ const DiscreteLayerView: React.FC = observer(() => {
     if (val) {
       setWhatsNewVisitedCnt(parseInt(val));
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
     const layers = get(data, 'search', []) as ILayerImage[];
@@ -223,7 +223,7 @@ const DiscreteLayerView: React.FC = observer(() => {
     } else {
       appContainer?.style.setProperty(SIDE_PANEL_WIDTH_VARIABLE, EXPANDED_PANEL_WIDTH);
     }
-  }, [tabsPanelExpanded])
+  }, [tabsPanelExpanded]);
 
   useEffect(() => {
     store.discreteLayersStore.resetTabView([TabViews.SEARCH_RESULTS]);
