@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.23.14](https://github.com/MapColonies/catalog-app/compare/v2.23.13...v2.23.14) (2025-09-01)
+
+
+### Bug Fixes
+
+* add hours to imagingTimeBeginUTC and imagingTimeEndUTC ([#658](https://github.com/MapColonies/catalog-app/issues/658)) ([7de5e7f](https://github.com/MapColonies/catalog-app/commit/7de5e7f33cc9e7ddad8adeb63f4af3024598c13b))
+
 ## [2.23.13](https://github.com/MapColonies/catalog-app/compare/v2.23.12...v2.23.13) (2025-08-31)
 
 
