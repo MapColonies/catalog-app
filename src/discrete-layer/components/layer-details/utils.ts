@@ -401,6 +401,8 @@ const getProviderResolutionValuePath = (desciptors: FieldConfigModelType[],provi
         .valuePath;
 };
 
+const HOURS_TO_ADD = 12;
+
 export const transformSynergyShapeFeatureToEntity = (desciptors: FieldConfigModelType[], feature: Feature, provider: ProviderType, fileName?: string): ParsedPolygonPart => {
   const poygonPartData: Record<string,unknown> = {"__typename": "PolygonPartRecord"};
   const errors: Record<string,ParsedPolygonPartError> = {};
@@ -423,7 +425,7 @@ export const transformSynergyShapeFeatureToEntity = (desciptors: FieldConfigMode
       switch(desc.fieldName){
         case 'imagingTimeBeginUTC':
         case 'imagingTimeEndUTC':
-          poygonPartData[desc.fieldName as string] = moment(shapeFieldValue,  "DD/MM/YYYY");
+          poygonPartData[desc.fieldName as string] = moment(shapeFieldValue,  "DD/MM/YYYY").add(HOURS_TO_ADD, 'hours');
           if (poygonPartData[desc.fieldName as string] as moment.Moment > moment()) {
             addError(errors, desc, 'validation-general.date.future');
           }
@@ -483,7 +485,7 @@ export const transformMaxarShapeFeatureToEntity = (desciptors: FieldConfigModelT
       switch(desc.fieldName) {
         case 'imagingTimeBeginUTC':
         case 'imagingTimeEndUTC':
-          poygonPartData[desc.fieldName as string] = moment(shapeFieldValue,  'YYYY-MM-DD');
+          poygonPartData[desc.fieldName as string] = moment(shapeFieldValue,  'YYYY-MM-DD').add(HOURS_TO_ADD, 'hours');
           if (poygonPartData[desc.fieldName as string] as moment.Moment > moment()) {
             addError(errors, desc, 'validation-general.date.future');
           }
@@ -539,7 +541,7 @@ export const transformTeraNovaShapeFeatureToEntity = (desciptors: FieldConfigMod
       switch(desc.fieldName){
         case 'imagingTimeBeginUTC':
         case 'imagingTimeEndUTC':
-          poygonPartData[desc.fieldName as string] = moment(shapeFieldValue,  "DD/MM/YYYY");
+          poygonPartData[desc.fieldName as string] = moment(shapeFieldValue,  "DD/MM/YYYY").add(HOURS_TO_ADD, 'hours');
           if (poygonPartData[desc.fieldName as string] as moment.Moment > moment()) {
             addError(errors, desc, 'validation-general.date.future');
           }
