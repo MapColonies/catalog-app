@@ -1133,6 +1133,8 @@ export const InnerRasterForm = (
 
                       setIsThresholdErrorsCleaned(false);
 
+                      setShowCurtain(false);
+
                       setPPCheckPerformed(false);
 
                       const ppDataKeys = Object.keys(parsedPPData);
