@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.23.15](https://github.com/MapColonies/catalog-app/compare/v2.23.14...v2.23.15) (2025-09-01)
+
+
+### Bug Fixes
+
+* control state when re-select shapefile ([#661](https://github.com/MapColonies/catalog-app/issues/661)) ([963b307](https://github.com/MapColonies/catalog-app/commit/963b3070dbcdb206a6cac1851cb7c50466a7fc02))
+
 ## [2.23.14](https://github.com/MapColonies/catalog-app/compare/v2.23.13...v2.23.14) (2025-09-01)
 
 

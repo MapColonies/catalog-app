@@ -1,8 +1,8 @@
 apiVersion: v2
 description: Helm chart to deploy Catalog App
 name: catalog-app
-version: 2.23.14
-appVersion: 2.23.14
+version: 2.23.15
+appVersion: 2.23.15
 dependencies:
   - name: helm-common
     version: 1.0.1
