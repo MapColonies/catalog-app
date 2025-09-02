@@ -1,8 +1,8 @@
 apiVersion: v2
 description: Helm chart to deploy Catalog App
-name: discrete-layer-client
-version: 2.23.10
-appVersion: 2.23.10
+name: catalog-app
+version: 2.23.15
+appVersion: 2.23.15
 dependencies:
   - name: helm-common
     version: 1.0.1

@@ -1,22 +1,17 @@
 {
-  "name": "discrete-layer-client",
-  "version": "2.23.10",
+  "name": "catalog-app",
+  "version": "2.23.15",
   "bugs": {
-    "url": "https://github.com/MapColonies/discrete-layer-client/issues"
+    "url": "https://github.com/MapColonies/catalog-app/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/MapColonies/discrete-layer-client.git"
+    "url": "https://github.com/MapColonies/catalog-app.git"
   },
   "license": "MIT",
   "husky": {
     "hooks": {
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
-    }
-  },
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
     }
   },
   "scripts": {
@@ -27,7 +22,6 @@
     "test": "react-scripts test --verbose",
     "test:coverage": "react-scripts test --verbose --coverage --watchAll",
     "eject": "react-scripts eject",
-    "release": "standard-version",
     "eslint:fix": "npx eslint --fix",
     "eslint:check": "npx eslint . --ext .ts,.tsx",
     "prettier:fix": "prettier --write .",
@@ -43,8 +37,8 @@
     "copyassets:components": "copyfiles -u 4 \"./node_modules/@map-colonies/react-components/dist/assets/**/*\" \"./public\"",
     "helm-update": "helm dependency update helm",
     "helm-assets": "npm run helm-update && tar -xzvf ./helm/charts/helm-common*.tgz --strip-components=1 helm-common/schemas",
-    "helm-install": "npm run helm-update && helm install -f 'helm/global.yaml' -f 'helm/values.yaml' discrete-layer-client helm",
-    "helm-uninstall": "helm uninstall discrete-layer-client"
+    "helm-install": "npm run helm-update && helm install -f 'helm/global.yaml' -f 'helm/values.yaml' catalog-app helm",
+    "helm-uninstall": "helm uninstall catalog-app"
   },
   "jest": {
     "transformIgnorePatterns": [
@@ -185,8 +179,6 @@
     "yup": "^0.32.11"
   },
   "devDependencies": {
-    "@map-colonies/standard-version-update-helm-version": "^2.0.1",
-    "@map-colonies/standard-version-update-openapi3-version": "^0.0.2",
     "@types/enzyme": "^3.10.5",
     "@types/enzyme-adapter-react-16": "^1.0.6",
     "@types/ol": "^6.3.1",
@@ -196,7 +188,6 @@
     "@typescript-eslint/parser": "^5.61.0",
     "@typescript-eslint/utils": "^5.61.0",
     "commitlint": "^9.1.0",
-    "cz-conventional-changelog": "^3.2.0",
     "enzyme": "^3.11.0",
     "enzyme-adapter-react-16": "^1.15.2",
     "eslint-config-react-app": "^7.0.1",
@@ -207,7 +198,6 @@
     "lint-staged": "^10.2.11",
     "prettier": "^2.0.5",
     "react-test-renderer": "^16.13.1",
-    "standard-version": "^8.0.2",
     "timezone-mock": "^1.1.3"
   },
   "browserslist": [

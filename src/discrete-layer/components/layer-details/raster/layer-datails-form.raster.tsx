@@ -1132,6 +1132,7 @@ export const InnerRasterForm = (
                       setLoadingPolygonParts(false);
 
                       setIsThresholdErrorsCleaned(false);
+                      setShowCurtain(false);
 
                       setShowCurtain(false);
 

@@ -206,7 +206,7 @@ export const PolygonParts: React.FC = observer(() => {
   };
 
   const NOT_VALID = 'NOT_VALID';
-
+ 
   const isOptionsObjValid = () => {
     return optionsPolygonParts.url !== NOT_VALID && optionsPolygonParts.featureType !== NOT_VALID;
   }

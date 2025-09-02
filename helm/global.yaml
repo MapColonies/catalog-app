@@ -20,7 +20,7 @@ global:
   releaseVersion: DUMMY_releaseVersion
   currentSubChart: DUMMY_currentSubChart
   shared:
-    servedEntityTypes: RECORD_ALL,RECORD_RASTER,RECORD_3D,RECORD_DEM
+    servedEntityTypes: RECORD_ALL,RECORD_RASTER,RECORD_3D,RECORD_DEM,RECORD_VECTOR
     accessToken:
       attributeName: token
       injectionType: queryParam
