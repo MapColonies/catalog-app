@@ -1,6 +1,6 @@
 import { CesiumGeographicTilingScheme, Proj } from '@map-colonies/react-components';
 import { IRasterLayer } from '@map-colonies/react-components/dist/cesium-map/layers-manager';
-import { IBaseMaps, IBaseMap } from '@map-colonies/react-components/dist/cesium-map/settings/settings';
+import { IBaseMaps, IBaseMap } from '@map-colonies/react-components/dist/cesium-map/map';
 import { LinkType } from '../models/link-type.enum';
 
 /*eslint-disable */
@@ -47,7 +47,7 @@ const enrichBaseMaps = (baseMaps: IBaseMaps): IBaseMaps => {
       return {
         ...baseMap,
         thumbnail: baseMap.thumbnail && ACCESS_TOKEN.injectionType?.toLowerCase() === 'queryparam' ? `${baseMap.thumbnail}?${ACCESS_TOKEN.attributeName}=${ACCESS_TOKEN.tokenValue}` : baseMap.thumbnail,
-        baseRasteLayers: (baseMap.baseRasteLayers as IRasterLayer[]).map((rasterLayer) => {
+        baseRasterLayers: (baseMap.baseRasterLayers as IRasterLayer[]).map((rasterLayer) => {
           return {
             ...rasterLayer,
             options: {
@@ -131,7 +131,9 @@ const APP_CONFIG = {
     ZOOM: MAP.zoom as number,
     MAPMODE2D: MAP.mapMode2D,
     USE_OPTIMIZED_TILE_REQUESTS: MAP.useOptimizedTileRequests as boolean,
-    DEBUG_PANEL: JSON.parse(MAP.debugPanel)
+    SHOW_DEBUGGER_TOOL: MAP.showDebuggerTool,
+    SHOW_ACTIVE_LAYERS_TOOL: MAP.showActiveLayersTool,
+    SHOW_GEOCODER_TOOL: MAP.showGeocoderTool
   },
   ACTIVE_LAYER: ACTIVE_LAYER, // | 'WMTS_LAYER' | 'WMS_LAYER' | 'XYZ_LAYER' | 'OSM_LAYER'
   ACTIVE_LAYER_PROPERTIES: ACTIVE_LAYER_PROPERTIES,
@@ -197,7 +199,7 @@ const APP_CONFIG = {
       MAX_ACTIVE_LAYERS_TO_PRESENT: 5,
       POLYGON_PARTS_FEATURE_CONFIG: {
         color: `${POLYGON_PARTS.highResolutionColor}50`, //'#00ff0030',//'#BF40BF',
-        outlineColor: POLYGON_PARTS.highResolutionColor,//'#00FF00',
+        outlineColor: POLYGON_PARTS.highResolutionColor, //'#00FF00',
         outlineWidth: 8
       }
     }

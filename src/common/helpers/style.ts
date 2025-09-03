@@ -55,8 +55,7 @@ export const getIconStyle = (
     resStyle = { [colorProperty]: UNPUBLISHED_COLOR };
   }
   if (existPolygonParts(data) && isPolygonPartsShown(data)) {
-    const hasWFSLink = (data.links as Array<Record<string, unknown>>)?.some(link => link.protocol === 'WFS')
-
+    const hasWFSLink = (data.links as Array<Record<string, unknown>>)?.some(link => link.protocol === 'WFS');
     if (hasWFSLink) {
       resStyle = { [colorProperty]: POLYGON_PARTS_SHOWN_COLOR };
     } else {
@@ -64,8 +63,7 @@ export const getIconStyle = (
     }
   }
   if (existPolygonParts(data) && !isPolygonPartsShown(data)) {
-    const hasWFSLink = (data.links as Array<Record<string, unknown>>)?.some(link => link.protocol === 'WFS')
-
+    const hasWFSLink = (data.links as Array<Record<string, unknown>>)?.some(link => link.protocol === 'WFS');
     if (!hasWFSLink) {
       resStyle = {
         ...resStyle,
@@ -73,6 +71,5 @@ export const getIconStyle = (
       };
     }
   }
-
   return resStyle;
 };
