@@ -379,7 +379,7 @@ export const EntityRasterDialog: React.FC<EntityRasterDialogProps> = observer(
       const { topLevelEntityVestErrors ,...rest} = vestValidationResults;
       removePrevNested && topLevelEntityVestErrors && Object.keys(topLevelEntityVestErrors).length && setVestValidationResults({topLevelEntityVestErrors});
 
-      const newSchema = removePrevNested ? removePropertiesWithPrefix(schema, NESTED_FORMS_PRFIX) : {...schema};
+      const newSchema = { ...(removePrevNested ? removePropertiesWithPrefix(schema, NESTED_FORMS_PRFIX) : schema) };
       
       for(let i=0; i < partsNumber; i++ ){
         newSchema[`${NESTED_FORMS_PRFIX}${i+startIndex}`] = Yup.object().shape({...nestedYupSchema});

@@ -72,7 +72,10 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
           });
           olBaseMap.push(
             <TileLayer key={layer.id} options={{ opacity: layer.opacity }}>
-              <TileWMTS options={wmtsOptions} />
+              <TileWMTS options={{
+                ...wmtsOptions,
+                crossOrigin: 'anonymous'
+              }} />
             </TileLayer>
           );
         }
@@ -82,7 +85,10 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
           });
           olBaseMap.push(
             <TileLayer key={layer.id} options={{ opacity: layer.opacity }}>
-              <TileXYZ options={xyzOptions} />
+              <TileXYZ options={{
+                ...xyzOptions,
+                crossOrigin: 'anonymous'
+              }} />
             </TileLayer>
           )
         }
@@ -131,7 +137,8 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
             return (feat && !isEmpty(feat.geometry)) ? <GeoJSONFeature 
               geometry={{...feat.geometry}} 
               fit={false}
-              featureStyle={featureStyle}/> : <></>
+              key={feat.id ?? idx}
+              featureStyle={featureStyle}/> : null
           })
         }
       </>

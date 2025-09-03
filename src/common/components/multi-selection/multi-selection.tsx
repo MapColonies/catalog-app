@@ -40,8 +40,11 @@ export const MultiSelection: React.FC<MultiSelectionWrapperProps> = (props) => {
 
     const getMultiSelectionValues = () => {
         const chosenValueStrings = (multiSelectionValues)?.map((value) =>
-            getMultiSelectionOptions().filter((option) =>
-                option.value.includes(value))).flat().map((filteredOption) => filteredOption.value);
+            getMultiSelectionOptions()
+            .filter((option) =>
+                option.value === value))
+            .flat()
+            .map((filteredOption) => filteredOption.value);
 
         const chosenValueOptions = chosenValueStrings?.map((value) => {
             return [
