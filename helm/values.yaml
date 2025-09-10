@@ -169,6 +169,7 @@ env:
       pageSize: 300
       zoomLevel: 14
       cacheSize: 6000
+  geocodingUrl: ''
 route:
   enabled: true
   annotations:

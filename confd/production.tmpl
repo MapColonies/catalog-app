@@ -86,5 +86,6 @@ window._env_ = {
       zoomLevel: {{ getv "/configuration/wfs/max/zoom/level" "14" }},
       cacheSize: {{ getv "/configuration/wfs/max/cache/size" "6000" }}
     }
-  }
+  },
+  GEOCODING_URL: '{{ getv "/configuration/geocoding/url" "http://geocoding-URL" }}',
 };

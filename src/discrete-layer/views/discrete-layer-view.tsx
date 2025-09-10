@@ -848,7 +848,7 @@ const DiscreteLayerView: React.FC = observer(() => {
   
   const GEOCODER_OPTIONS = [
     {
-      baseUrl: 'https://vector-geocoding-geocoding-route-vector-dev.apps.j1lk3njp.eastus.aroapp.io',
+      baseUrl: CONFIG.GEOCODING_URL,
       endPoint: '/search/location/query',
       method: 'GET',
       params: {
@@ -864,7 +864,7 @@ const DiscreteLayerView: React.FC = observer(() => {
       title: intl.formatMessage({ id: 'geocoder-panel.title.location' })
     },
     {
-      baseUrl: 'https://vector-geocoding-geocoding-route-vector-dev.apps.j1lk3njp.eastus.aroapp.io',
+      baseUrl: CONFIG.GEOCODING_URL,
       endPoint: '/search/control/tiles',
       method: 'GET',
       params: {
@@ -880,7 +880,7 @@ const DiscreteLayerView: React.FC = observer(() => {
       title: intl.formatMessage({ id: 'geocoder-panel.title.tiles' })
     },
     {
-      baseUrl: 'https://vector-geocoding-geocoding-route-vector-dev.apps.j1lk3njp.eastus.aroapp.io',
+      baseUrl: CONFIG.GEOCODING_URL,
       endPoint: '/search/control/items',
       method: 'GET',
       params: {
@@ -896,7 +896,7 @@ const DiscreteLayerView: React.FC = observer(() => {
       title: intl.formatMessage({ id: 'geocoder-panel.title.control' })
     },
     {
-      baseUrl: 'https://vector-geocoding-geocoding-route-vector-dev.apps.j1lk3njp.eastus.aroapp.io',
+      baseUrl: CONFIG.GEOCODING_URL,
       endPoint: '/search/control/routes',
       method: 'GET',
       params: {
@@ -967,10 +967,11 @@ const DiscreteLayerView: React.FC = observer(() => {
           <Tooltip content={intl.formatMessage({ id: 'general.login-user.tooltip' }, { user: store.userStore.user?.role })}>
             <Avatar className="avatar" name={store.userStore.user?.role} size="large" />
           </Tooltip>
-          {permissions.isSwitchUserRoleAllowed &&
-          <Box className="headerUserModeSwitchContainer">
-            <UserModeSwitch userRole={userRole} setUserRole={store.userStore.changeUserRole}/>
-          </Box>
+          {
+            permissions.isSwitchUserRoleAllowed &&
+            <Box className="headerUserModeSwitchContainer">
+              <UserModeSwitch userRole={userRole} setUserRole={store.userStore.changeUserRole}/>
+            </Box>
           }
           {
             permissions.isSystemJobsAllowed as boolean &&

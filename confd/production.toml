@@ -63,5 +63,6 @@ keys = [
   "/configuration/wfs/key/field",
   "/configuration/wfs/max/page/size",
   "/configuration/wfs/max/zoom/level",
-  "/configuration/wfs/max/cache/size"
+  "/configuration/wfs/max/cache/size",
+  "/configuration/geocoding/url"
 ]

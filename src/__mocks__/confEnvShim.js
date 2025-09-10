@@ -89,7 +89,8 @@ if (!window._env_) {
           zoomLevel: 14,
           cacheSize: 6000,
         }
-      }
+      },
+      GEOCODING_URL: 'http://geocoding-URL'
     };
   })(void 0);
 }
