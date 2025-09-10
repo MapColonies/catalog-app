@@ -5,7 +5,6 @@ import {
   GridReadyEvent as AgGridReadyEvent,
   GridApi as AgGridApi,
   GridOptions,
-  RowNode,
   ValueFormatterParams,
   RowSelectedEvent,
   CellMouseOverEvent,

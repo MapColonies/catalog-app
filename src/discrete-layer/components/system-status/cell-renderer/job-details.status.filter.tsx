@@ -1,13 +1,8 @@
-import React, {
-  useState,
-  useCallback,
-  useMemo,
-} from 'react';
+import React, { useCallback, useMemo } from 'react';
+import { useIntl } from 'react-intl';
 import { Box } from '@map-colonies/react-components';
 import { Select } from '@map-colonies/react-core';
-import { useIntl } from 'react-intl';
-import { JobModelType, Status } from '../../../models';
-import { IDoesFilterPassParams, IFilterParams, } from 'ag-grid-community';
+import { Status } from '../../../models';
 
 interface IFilterOnModelChange {
   onModelChange: (model: any | null, additionalEventAttributes?: any) => void;
@@ -16,8 +11,6 @@ interface IFilterOnModelChange {
 export const JobDetailsStatusFilter: React.FC<IFilterOnModelChange> = ({ onModelChange }) => {
   const intl = useIntl();
 
-  const [filterStatus, setFilterStatus] = useState<string | Status>('');
-
 
   const getStatusTranslation = useCallback((status: Status): string => {
     const statusText = intl.formatMessage({
@@ -25,7 +18,7 @@ export const JobDetailsStatusFilter: React.FC<IFilterOnModelChange> = ({ onModel
     });
 
     return statusText;
-  },[intl]);
+  }, [intl]);
 
   const getStatusOptions = useMemo((): JSX.Element => {
     const statuses: Record<string, string> = {};
@@ -33,7 +26,6 @@ export const JobDetailsStatusFilter: React.FC<IFilterOnModelChange> = ({ onModel
     const showAllStatusesText = intl.formatMessage({
       id: 'system-status.job.filter.status.all',
     });
-
 
     for (const [key, val] of Object.entries(Status)) {
       statuses[key] = getStatusTranslation(val);
@@ -50,7 +42,7 @@ export const JobDetailsStatusFilter: React.FC<IFilterOnModelChange> = ({ onModel
         }}
       />
     );
-  },[getStatusTranslation, intl]);
+  }, [getStatusTranslation, intl]);
 
   return (
     <Box style={{ height: '230px', width: '200px', overflow: 'hidden' }}>
