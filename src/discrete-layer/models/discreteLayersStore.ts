@@ -246,11 +246,11 @@ export const discreteLayersStore = ModelBase
     }
 
     function highlightLayer(layer: ILayerImage | undefined): void {
-      self.highlightedLayer = layer ? {...layer} : undefined;
+      self.highlightedLayer = layer ? cloneDeep(layer) : undefined;
     }
 
     function selectLayer(layer: ILayerImage | undefined, isUpdateMode: boolean | undefined = undefined): void {
-      self.selectedLayer = layer ? {...layer} : undefined;
+      self.selectedLayer = layer ? cloneDeep(layer) : undefined;
       self.selectedLayerIsUpdateMode = isUpdateMode;
     }
 
@@ -262,7 +262,7 @@ export const discreteLayersStore = ModelBase
 
     function selectLayerByID(layerID: string): void {
       const layer = self.layersImages?.find(layer => layer.id === layerID);
-      self.selectedLayer = layer ? {...layer} : undefined;
+      self.selectedLayer = layer ? cloneDeep(layer) : undefined;
     }
 
     function setTabviewData(tabView: TabViews, customLayersImages?: ILayerImage[]): void {
@@ -298,12 +298,12 @@ export const discreteLayersStore = ModelBase
       if (self.tabViews) {
         self.tabViews.forEach((tab) => {
           if (tab.selectedLayer && tab.selectedLayer.id === layer.id) {
-            tab.selectedLayer = {...layer};
+            tab.selectedLayer = cloneDeep(layer);
           }
           if (tab.layersImages) {
             tab.layersImages = tab.layersImages.map((item) => {
               if (item.id === layer.id) {
-                return {...layer};
+                return cloneDeep(layer);
               }
               return item;
             });
@@ -420,7 +420,7 @@ export const discreteLayersStore = ModelBase
     }
 
     function setPolygonPartsLayer(layer: ILayerImage | undefined): void {
-      self.polygonPartsLayer = layer ? {...layer} : undefined;
+      self.polygonPartsLayer = layer ? cloneDeep(layer) : undefined;
     }
 
     function setPolygonPartsInfo(polygonPartsInfo: Feature<Geometry, GeoJsonProperties>[]): void {
