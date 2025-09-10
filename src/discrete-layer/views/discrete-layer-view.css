@@ -290,7 +290,7 @@ body[dir='rtl'] .tabHeaderContainer .filterByCatalogEntitySelect {
   text-align: center;
   z-index: 1;
 }
-.badge_primary{
+.badge_primary {
   background: var(--mdc-theme-primary);
 }
 

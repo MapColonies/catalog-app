@@ -25,7 +25,7 @@ interface MultiSelectionWrapperProps {
 export const MultiSelection: React.FC<MultiSelectionWrapperProps> = (props) => {
   const { fieldInfo, lookupOptions, fieldName, customStyles, placeholder, value, formik } = props;
 
-  const [multiSelectionValues, setMultiSelectionValues] = useState(fieldInfo.isMultiSelection && !isEmpty(value) ? value?.split(", ") : [])
+  const [multiSelectionValues, setMultiSelectionValues] = useState(fieldInfo.isMultiSelection && !isEmpty(value) ? value?.split(", ") : []);
   const { lookupTablesData } = useContext(lookupTablesContext);
 
   const lang = CONFIG.I18N.DEFAULT_LANGUAGE;
@@ -34,23 +34,18 @@ export const MultiSelection: React.FC<MultiSelectionWrapperProps> = (props) => {
 
   const getMultiSelectionOptions = () => {
     return (lookupOptions as ILookupOption[]).map((option: ILookupOption) => {
-      const text = option.translation?.find((trns) => trns.locale === lang)?.text ?? ''
-      return { value: text, label: text }
+      const text = option.translation?.find((trns) => trns.locale === lang)?.text ?? '';
+      return { value: text, label: text };
     });
   };
 
   const getMultiSelectionValues = () => {
-    const chosenValueStrings = (multiSelectionValues)?.map((value) =>
-      getMultiSelectionOptions()
-        .filter((option) =>
-          option.value === value))
+    const chosenValueStrings = (multiSelectionValues)?.map((value) => getMultiSelectionOptions().filter((option) => option.value === value))
       .flat()
       .map((filteredOption) => filteredOption.value);
 
     const chosenValueOptions = chosenValueStrings?.map((value) => {
-      return [
-        { value: value, label: value }
-      ]
+      return [ { value: value, label: value } ];
     }).flat();
 
     return chosenValueOptions;
@@ -60,8 +55,8 @@ export const MultiSelection: React.FC<MultiSelectionWrapperProps> = (props) => {
     return values.map((val) => {
       const lookupOptionsTranslations = (lookupOptions as ILookupOption[]).map((option) => option.translation);
       const valueTranslation = lookupOptionsTranslations.find((trns) => (trns as unknown as { locale: string, text: string }[]).findIndex((trn) => trn.text === val.value) > -1);
-      return valueTranslation?.find((valueTranslations) => valueTranslations.locale === backLocale)?.text
-    }).join(', ')
+      return valueTranslation?.find((valueTranslations) => valueTranslations.locale === backLocale)?.text;
+    }).join(', ');
   };
 
   const onChangeMultiSelection = (data: any) => {
