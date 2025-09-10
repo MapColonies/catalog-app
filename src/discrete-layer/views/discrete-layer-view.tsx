@@ -846,7 +846,7 @@ const DiscreteLayerView: React.FC = observer(() => {
 
   const site = useMemo(() => currentSite(), []);
   
-  const GEOCODER_OPTIONS = [
+  const GEOCODER_OPTIONS = useMemo(() => ([
     {
       baseUrl: CONFIG.GEOCODING_URL,
       endPoint: '/search/location/query',
@@ -911,7 +911,7 @@ const DiscreteLayerView: React.FC = observer(() => {
       },
       title: intl.formatMessage({ id: 'geocoder-panel.title.routes' })
     },
-  ] satisfies GeocoderOptions[];
+  ]) satisfies GeocoderOptions[], [intl]);
  
   return (
     <>
