@@ -13,8 +13,10 @@ interface IProductTypeCellRendererParams {
 export const ProductTypeRenderer: React.FC<IProductTypeCellRendererParams> = ({ data, thumbnailUrl, onClick }) => {
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    if (onClick) {
-      onClick(data, !(data as LayerRasterRecordModelType).polygonPartsShown);
+    const rasterData = data as LayerRasterRecordModelType;
+
+    if (onClick && rasterData.links?.some(link => link.protocol === 'WFS')) {
+      onClick(data, !rasterData.polygonPartsShown);
     }
   };
 
@@ -32,5 +34,4 @@ export const ProductTypeRenderer: React.FC<IProductTypeCellRendererParams> = ({ 
       onClick={data.__typename === "LayerRasterRecord" ? handleClick : undefined}
     />
   );
-  
 };

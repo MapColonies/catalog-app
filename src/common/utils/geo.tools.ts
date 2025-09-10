@@ -219,3 +219,49 @@ export const getGapsByConvexHull = (polygonsData: {
     return convexHull? turf.difference(convexHull, mergedPolygons): null;
 };
 
+export const shrinkExtremeCoordinatesInOuterRing = (geometry: Geometry, factor = 0.99) => {
+  const LAT_THRESHOLD = 84.9;
+  const LON_THRESHOLD = 179;
+
+  function maybeShrink([lon, lat]: Position) {
+    const needsShrink =
+      Math.abs(lat) > LAT_THRESHOLD || Math.abs(lon) > LON_THRESHOLD;
+    if (needsShrink) {
+      return [lon * factor, lat * factor];
+    }
+    return [lon, lat];
+  }
+
+  function processRing(ring: Position[]) {
+    const processed = ring.map(maybeShrink);
+
+    // Ensure ring is closed
+    const first = processed[0];
+    const last = processed[processed.length - 1];
+    if (first[0] !== last[0] || first[1] !== last[1]) {
+      processed.push([...first]);
+    }
+
+    return processed;
+  }
+
+  if (geometry.type === "Polygon") {
+    const [outer, ...holes] = geometry.coordinates;
+    return {
+      type: "Polygon",
+      coordinates: [processRing(outer), ...holes]
+    } as Geometry;
+  }
+
+  if (geometry.type === "MultiPolygon") {
+    return {
+      type: "MultiPolygon",
+      coordinates: geometry.coordinates.map(polygon => {
+        const [outer, ...holes] = polygon;
+        return [processRing(outer), ...holes];
+      })
+    } as Geometry;
+  }
+
+  throw new Error("[shrinkExtremeCoordinatesInOuterRing] Unsupported geometry type: " + geometry.type);
+}

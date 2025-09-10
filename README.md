@@ -1,4 +1,4 @@
-# Discrete Layer Client
+# Catalog App
 
 React app created with typescript that defines manages and displays discrete layers image catalog
 

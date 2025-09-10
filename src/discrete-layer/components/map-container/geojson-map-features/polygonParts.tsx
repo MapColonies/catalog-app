@@ -36,6 +36,7 @@ import {
  } from '@map-colonies/react-components';
 import CONFIG from '../../../../common/config';
 import { useEnums } from '../../../../common/hooks/useEnum.hook';
+import { shrinkExtremeCoordinatesInOuterRing } from '../../../../common/utils/geo.tools';
 import { EntityDescriptorModelType, LayerRasterRecordModelType, useStore } from '../../../models';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
 import { getFlatEntityDescriptors } from '../../layer-details/utils';
@@ -51,31 +52,24 @@ export const PolygonParts: React.FC = observer(() => {
   const ZOOM_LEVELS_TABLE = useZoomLevelsTable();
   const [zoomLevel, setZoomLevel] = useState(mapViewState.currentZoomLevel);
   const [activeLayer, setActiveLayer] = useState(store.discreteLayersStore.polygonPartsLayer);
-  const [showFootprint, setShowFootprint] = useState(false);
+  const [showParts, setShowParts] = useState(false);
 
   useEffect(() => {
     if (JSON.stringify(activeLayer) !== JSON.stringify(store.discreteLayersStore.polygonPartsLayer)) {
       setActiveLayer(store.discreteLayersStore.polygonPartsLayer);
-      if (store.discreteLayersStore.polygonPartsLayer === undefined) {
-        setShowFootprint(false);
-      }
     }
-    if (store.discreteLayersStore.polygonPartsLayer) {
-      if (zoomLevel !== mapViewState.currentZoomLevel) {
-        setZoomLevel(mapViewState.currentZoomLevel);
-      }
+    if (zoomLevel !== mapViewState.currentZoomLevel) {
+      setZoomLevel(mapViewState.currentZoomLevel);
     }
   }, [store.discreteLayersStore.polygonPartsLayer, mapViewState.currentZoomLevel]);
 
   useEffect(() => {
-    if (activeLayer) {
-      if (zoomLevel && zoomLevel < optionsPolygonParts.zoomLevel) {
-        setShowFootprint(false);
-      } else {
-        setShowFootprint(true);
-      }
+    if (zoomLevel && zoomLevel < optionsPolygonParts.zoomLevel) {
+      setShowParts(false);
+    } else {
+      setShowParts(true);
     }
-  }, [zoomLevel, activeLayer]);
+  }, [zoomLevel]);
 
   const polygonPartsFieldLabels = useMemo(
     () => {
@@ -211,13 +205,23 @@ export const PolygonParts: React.FC = observer(() => {
     }
   };
 
+  const NOT_VALID = 'NOT_VALID';
+ 
+  const isOptionsObjValid = () => {
+    return optionsPolygonParts.url !== NOT_VALID && optionsPolygonParts.featureType !== NOT_VALID;
+  }
+
   const buildWFSUrl = (layer: ILayerImage) => {
     const token = CONFIG.ACCESS_TOKEN.TOKEN_VALUE;
     if(layer){
-      const url = layer.links?.find(link => link.protocol === 'WFS').url.split(/[?#]/)[0];
+      const url = layer.links?.find(link => link.protocol === 'WFS')?.url?.split(/[?#]/)[0];
+      if (!url) {
+        console.log(`[<PolygonParts>][buildWFSUrl] Layer ${layer.productName} does not have a WFS link`);
+        return NOT_VALID;
+      }
       return `${url}?token=${token}`
     } else {
-      return 'NO_CURRENT_LAYER';
+      return NOT_VALID;
     }
   };
 
@@ -231,7 +235,7 @@ export const PolygonParts: React.FC = observer(() => {
       featureType += ENUMS[(layer as LayerRasterRecordModelType).productType as string].realValue;
       return featureType;
     } else {
-      return 'NO_CURRENT_LAYER';
+      return NOT_VALID;
     }
   };
 
@@ -245,7 +249,6 @@ export const PolygonParts: React.FC = observer(() => {
     pageSize: CONFIG.WFS.MAX.PAGE_SIZE,//300,
     zoomLevel: SHOW_PP_ZOOM_LEVEL,//7
     maxCacheSize: CONFIG.WFS.MAX.CACHE_SIZE,//6000
-    keyField: 'id',
     labeling: {
       dataSourcePrefix: 'labels_',
       text: {
@@ -394,7 +397,11 @@ export const PolygonParts: React.FC = observer(() => {
         color: CONFIG.POLYGON_PARTS.STYLE.lowResolutionColor,//'#ff3401', // BRIGHT_RED
       },
     ];
-  
+
+    if (!mapViewer.dataSources.getByName(dataSource.name)[0]) {
+      return;
+    }
+
     const labelPos = [] as Feature<Point>[];
   
     dataSource?.entities.values.forEach((entity: CesiumCesiumEntity) => {
@@ -536,8 +543,8 @@ export const PolygonParts: React.FC = observer(() => {
   return (
     <>
       {
-        activeLayer && (
-          showFootprint ? <CesiumWFSLayer
+        activeLayer && isOptionsObjValid() && (
+          showParts ? <CesiumWFSLayer
               key={metaPolygonParts.id}
               options={optionsPolygonParts}
               meta={metaPolygonParts}
@@ -552,7 +559,7 @@ export const PolygonParts: React.FC = observer(() => {
                     type: 'Feature',
                     properties: {},
                     geometry: {
-                      ...activeLayer?.footprint,
+                      ...shrinkExtremeCoordinatesInOuterRing(activeLayer?.footprint,0.999),
                     },
                   }
                 ]

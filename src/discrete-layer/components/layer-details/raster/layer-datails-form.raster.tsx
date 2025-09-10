@@ -703,13 +703,6 @@ export const InnerRasterForm = (
     setGraphQLError(metadata.error);
   };
 
-  useEffect(() => {
-    const resVal = (values as unknown as Record<string, unknown>)["resolutionDegree"];
-    if (resVal) {
-      setIsValidatingSource(false);
-    }
-  }, [(values as unknown as Record<string, unknown>)["resolutionDegree"]]);
-
   const isShapeFileValid = (featuresArr: Feature<Geometry, GeoJsonProperties>[]): boolean | Error => {
     let verticesNum = 0;
     featuresArr?.forEach(f => {
@@ -1105,8 +1098,8 @@ export const InnerRasterForm = (
             isError={showCurtain}
             onErrorCallback={setShowCurtain}
             manageMetadata={false}
-            setValidatingSource={() => {
-              setIsValidatingSource(true);
+            setValidatingSource={(param: boolean) => {
+              setIsValidatingSource(param);
             }}
           >
             <Select
@@ -1126,6 +1119,11 @@ export const InnerRasterForm = (
                 
                 importShapeFileFromClient((ev, fileType, fileName) => {
                   const shpFile = (ev.target?.result as unknown) as ArrayBuffer;
+
+                  setPPCheckPerformed(false);
+                  setPPFeatures([]);
+                  setShowCurtain(true);
+
                   void proccessShapeFile(shpFile, fileType, targetName, fileName)
                     .then((parsedPPData) => {
                       
@@ -1134,6 +1132,7 @@ export const InnerRasterForm = (
                       setLoadingPolygonParts(false);
 
                       setIsThresholdErrorsCleaned(false);
+                      setShowCurtain(false);
 
                       const ppDataKeys = Object.keys(parsedPPData);
                       schemaUpdater(ppDataKeys.length, 0, true);
@@ -1267,6 +1266,7 @@ export const InnerRasterForm = (
                   <Button
                     outlined
                     type="button"
+                    disabled={ isValidatingSource }
                     onClick={(): void => {
                       setLoadingPolygonParts(false);
                       setPPCheckPerformed(false);

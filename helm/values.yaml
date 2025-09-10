@@ -40,7 +40,7 @@ configValues:
     enabled: false
   # ----------- containers ------------
   image:
-    repository: discrete-layer-client
+    repository: catalog-app
     tag: v1.1.1
     pullPolicy: Always
     debug: false
@@ -161,7 +161,8 @@ env:
       perShape: 300
       vertices: 300000
   wfs:
-    style: '{"color": "#45EB93", "fill": "#C4A346"}'
+    style: '{"color": "#01FF1F", "hover": "#24AEE9", "pointStroke": "#01FF1F"}'
+    keyField: 'id'
     max:
       pageSize: 300
       zoomLevel: 14

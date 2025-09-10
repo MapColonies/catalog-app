@@ -124,7 +124,7 @@ export const getTokenResource = (url: string, ver?: string): CesiumResource => {
 
   tokenProps.queryParameters = {
     ...(tokenProps.queryParameters as Record<string, unknown>),
-    ...(typeof ver !== 'undefined' ? { ver } : {})
+    // ...(typeof ver !== 'undefined' ? { ver } : {})
   };
 
   return new CesiumResource({...tokenProps as unknown as CesiumResource});

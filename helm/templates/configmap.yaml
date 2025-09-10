@@ -1,8 +1,8 @@
 {{- $MAIN_OBJECT_BLOCK := "configValues" -}}
 {{- $COMPONENT_NAME := "backend" -}}
-{{- $DATA := include "discreteLayerClientData" . -}}
+{{- $DATA := include "catalogAppData" . -}}
 
-{{- define "discreteLayerClientData" -}}
+{{- define "catalogAppData" -}}
 {{- $CONFIG_MANAGER_OBJECT := include "common.tplvalues.getGlobalObject" (dict "objName" "configManagment" "context" .) | fromYaml }}
 {{- if not $CONFIG_MANAGER_OBJECT.enabled -}}
   REQUEST_PAYLOAD_LIMIT: {{ .Values.env.requestPayloadLimit | quote }}
@@ -40,7 +40,7 @@
   CONFIGURATION_MAP_ZOOM: {{ quote .Values.env.map.zoom }}
   CONFIGURATION_MAP_MAPMODE2D: {{ quote .Values.env.map.mapMode2D }}
   CONFIGURATION_MAP_USE_OPTIMIZED_TILE_REQUESTS: {{ quote .Values.env.map.useOptimizedTileRequests }}
-  CONFIGURATION_DEBUG_PANEL: {{ quote .Values.env.map.debugPanel }}
+  CONFIGURATION_MAP_DEBUG_PANEL: {{ quote .Values.env.map.debugPanel }}
   CONFIGURATION_BASEMAPS: {{ quote .Values.env.baseMaps }}
   CONFIGURATION_DEFAULT_TERRAIN_PROVIDER_URL: {{ quote .Values.env.defaultTerrainProviderUrl }}
   CONFIGURATION_WEB_TOOLS_URL: {{ quote .Values.env.webToolsUrl }}
@@ -67,6 +67,7 @@
   CONFIGURATION_POLYGONPARTS_MAX_PERSHAPE: {{ quote .Values.env.polygonParts.max.perShape }}
   CONFIGURATION_POLYGONPARTS_MAX_VERTICES: {{ quote .Values.env.polygonParts.max.vertices }}
   CONFIGURATION_WFS_STYLE: {{ quote .Values.env.wfs.style }}
+  CONFIGURATION_WFS_KEY_FIELD: {{ quote .Values.env.wfs.keyField }}
   CONFIGURATION_WFS_MAX_PAGE_SIZE: {{ quote .Values.env.wfs.max.pageSize }}
   CONFIGURATION_WFS_MAX_ZOOM_LEVEL: {{ quote .Values.env.wfs.max.zoomLevel }}
   CONFIGURATION_WFS_MAX_CACHE_SIZE: {{ quote .Values.env.wfs.max.cacheSize }}

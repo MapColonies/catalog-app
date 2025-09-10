@@ -14,6 +14,7 @@ import CONFIG from '../../../../common/config';
 import { emphasizeByHTML } from '../../../../common/helpers/formatters';
 import { SetWithContentEquality } from '../../../../common/helpers/set';
 import { useEnums } from '../../../../common/hooks/useEnum.hook';
+import { area } from '../../../../common/utils/geo.tools';
 import { GetFeatureModelType, LayerRasterRecordModelType, useQuery, useStore } from '../../../models';
 import { IDispatchAction } from '../../../models/actionDispatcherStore';
 import { ILayerImage } from '../../../models/layerImage';
@@ -33,6 +34,7 @@ interface PolygonPartsVectorLayerProps {
 
 const START_PAGE = 0;
 const EXISTING_PART_BUFFER_METERS_TOLLERANCE = -1;
+const MINIMAL_POLYGON_AREA_METERS = 100;
 
 export const PolygonPartsByPolygonVectorLayer: React.FC<PolygonPartsVectorLayerProps> = observer(({layerRecord, maskFeature, partsToCheck, ingestionResolutionMeter}) => {
   const store = useStore();
@@ -65,6 +67,8 @@ export const PolygonPartsByPolygonVectorLayer: React.FC<PolygonPartsVectorLayerP
   };
 
   const getExistingPolygoParts = (feature: Feature | null | undefined, startIndex: number) => {
+    setDoneFetchingPP(false);
+
     setQuery(store.queryGetPolygonPartsFeature({ 
       data: {
         feature:  feature as GeojsonFeatureInput,
@@ -131,6 +135,8 @@ export const PolygonPartsByPolygonVectorLayer: React.FC<PolygonPartsVectorLayerP
   useEffect(() => {
     const interPartsSet = new SetWithContentEquality<Feature>(part => part.properties?.key);  
     if (doneFetchingPP && ingestionResolutionMeter && partsToCheck?.length) {
+      let smallPolygonError: boolean = false;
+
       const check = async () => {
         const totalParts = partsToCheck?.length;
   
@@ -145,36 +151,68 @@ export const PolygonPartsByPolygonVectorLayer: React.FC<PolygonPartsVectorLayerP
           if (!document.getElementsByClassName('olSpinner').length){
             return;
           }
-  
-          existingPolygonParts.forEach((existingPart: Feature) => {
-            const bufferedPart = buffer(part as Feature<Polygon>, EXISTING_PART_BUFFER_METERS_TOLLERANCE, { units: 'meters' });
-            const intersection = intersect(
-              bufferedPart.geometry as Polygon,
-              existingPart.geometry as Polygon
-            );
-            if (intersection && ingestionResolutionMeter > existingPart.properties?.resolutionMeter) {
-              interPartsSet.add(part);
-            }
-          })
-        }
-  
-        setProgress(null);
-  
-        setIllegalParts(interPartsSet.values());
-  
-        dispatchAction({
-          action: UserAction.SYSTEM_CALLBACK_SHOW_PPERROR_ON_UPDATE,
-          data: interPartsSet.values().length > 0
-            ? {
-                error: [
-                  intl.formatMessage(
-                    { id: 'validation-general.polygonParts.resolutionCollision' },
-                    { numErrorParts: emphasizeByHTML(`${interPartsSet.values().length}`) }
-                  )
-                ]
+          let bufferedPart = buffer(part as Feature<Polygon>, EXISTING_PART_BUFFER_METERS_TOLLERANCE, { units: 'meters' });
+          // bufferedPart can be UNDEFINED in two cases:
+          // 1. SMALL polygon which is collapsed --> might be neglected 
+          // 2. NEAR WORLD-WIDE(closed to poles) polyogn due to turf calculations --> must be checked 
+          if (!bufferedPart && area(part as Feature<Polygon>) > MINIMAL_POLYGON_AREA_METERS) {
+            bufferedPart = part as Feature<Polygon>;
+          }
+
+          for(let i = 0; i < existingPolygonParts.length; i++) {
+            const existingPart = existingPolygonParts[i];
+
+            try {
+              if (bufferedPart) {
+                const intersection = intersect(
+                  bufferedPart.geometry as Polygon,
+                  existingPart.geometry as Polygon
+                );
+                if (intersection && ingestionResolutionMeter > existingPart.properties?.resolutionMeter) {
+                  interPartsSet.add(part);
+                }
               }
+            } catch (err) {
+              console.log('Error WFS intersect accure:', err);
+              console.log('Problematic polygon:', existingPart);
+
+              dispatchAction(
+                {
+                  action: UserAction.SYSTEM_CALLBACK_SHOW_PPERROR_ON_UPDATE,
+                  data: 
+                  {
+                    error: [
+                      intl.formatMessage({ id: 'validation-general.polygonParts.wfsExtremelySmall' })]
+                  },
+                }
+              );
+
+              smallPolygonError = true;
+
+              break;
+            }
+          }
+        }
+        
+        setProgress(null);
+        
+        setIllegalParts(interPartsSet.values());
+
+        if (!smallPolygonError) { 
+          dispatchAction({
+            action: UserAction.SYSTEM_CALLBACK_SHOW_PPERROR_ON_UPDATE,
+            data: interPartsSet.values().length > 0
+            ? {
+              error: [
+                intl.formatMessage(
+                  { id: 'validation-general.polygonParts.resolutionCollision' },
+                  { numErrorParts: emphasizeByHTML(`${interPartsSet.values().length}`) }
+                )
+              ]
+            }
             : undefined
-        });
+          });
+        }
   
         store.discreteLayersStore.setPPCollisionCheckInProgress(false);
         showLoadingSpinner(false);
@@ -219,7 +257,7 @@ export const PolygonPartsByPolygonVectorLayer: React.FC<PolygonPartsVectorLayerP
               geometry={{...feat.geometry}} 
               fit={false}
               featureStyle={illegalStyle}
-            /> : <></>
+            /> : null
           }
         )}
       </VectorSource>

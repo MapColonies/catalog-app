@@ -3,26 +3,12 @@ import React, { useEffect, useState, useRef } from 'react';
 import { get, isEmpty } from 'lodash';
 import { observer } from 'mobx-react-lite';
 import {
-  CesiumCesiumEntity,
-  CesiumColor,
   Cesium3DTileset,
-  CesiumSceneMode,
-  CesiumViewer,
   CesiumWFSLayer,
   CesiumWMTSLayer,
   CesiumXYZLayer,
   ICesiumImageryLayer,
-  useCesiumMap,
-  CesiumCesiumPolygonGraphics,
-  CesiumCesiumPolylineGraphics,
-  CesiumGeoJsonDataSource,
-  CesiumCartographic,
-  CesiumCartesian3,
-  CesiumVerticalOrigin,
-  CesiumJulianDate,
-  CesiumCesiumBillboardGraphics,
-  CesiumHeightReference,
-  CesiumPositionProperty
+  useCesiumMap
 } from '@map-colonies/react-components';
 import CONFIG from '../../../common/config';
 import { usePrevious } from '../../../common/hooks/previous.hook';
@@ -139,76 +125,13 @@ export const SelectedLayersContainer: React.FC = observer(() => {
           pageSize: CONFIG.WFS.MAX.PAGE_SIZE,
           zoomLevel: CONFIG.WFS.MAX.ZOOM_LEVEL,
           maxCacheSize: CONFIG.WFS.MAX.CACHE_SIZE,
-          keyField: 'id'
-        };
-        const handleVisualization = (
-          mapViewer: CesiumViewer,
-          dataSource: CesiumGeoJsonDataSource,
-          processEntityIds: string[]
-        ): void => {
-          const is2D = mapViewer.scene.mode === CesiumSceneMode.SCENE2D;
-        
-          dataSource?.entities.values.forEach((entity: CesiumCesiumEntity) => {
-            if (processEntityIds.length > 0 && !processEntityIds.some((validId) => entity.id.startsWith(validId))) {
-              return;
-            }
-            if (entity.polygon) {
-              entity.polygon = new CesiumCesiumPolygonGraphics({
-                hierarchy: entity.polygon.hierarchy,
-                material: is2D
-                ? CesiumColor.fromCssColorString(CONFIG.WFS.STYLE.color).withAlpha(0.2)
-                : CesiumColor.fromCssColorString(CONFIG.WFS.STYLE.color).withAlpha(0.5),
-                outline: true,
-                outlineColor: CesiumColor.fromCssColorString(CONFIG.WFS.STYLE.color),
-                outlineWidth: 3,
-                height: is2D ? 10000 : undefined, // Mount Everest peak reaches an elevation of approximately 8848.86 meters above sea level
-                perPositionHeight: false,
-              });
-            }
-            if (entity.polyline) {
-              entity.polyline = new CesiumCesiumPolylineGraphics({
-                positions: entity.polyline.positions,
-                material: CesiumColor.fromCssColorString(CONFIG.WFS.STYLE.color).withAlpha(0.5),
-                clampToGround: true,
-                width: 4,
-              });
-            }
-            if (entity.billboard) {
-              const worldPos = entity.position?.getValue(CesiumJulianDate.now()) as CesiumCartesian3;
-              const worlPosCartographic = CesiumCartographic.fromCartesian(worldPos);
-              const correctedCarto = new CesiumCartographic(
-                worlPosCartographic.longitude,
-                worlPosCartographic.latitude,
-                is2D ? 500 : mapViewer.scene.sampleHeight(CesiumCartographic.fromCartesian(worldPos))
-              );
-        
-              // Convert back to Cartesian3
-              const correctedCartesian = CesiumCartesian3.fromRadians(correctedCarto.longitude, correctedCarto.latitude, correctedCarto.height);
-        
-              entity.position = correctedCartesian as unknown as CesiumPositionProperty;
-        
-              entity.billboard = new CesiumCesiumBillboardGraphics({
-                image:
-                  'data:image/svg+xml;base64,' +
-                  btoa(`
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16">
-                    <circle cx="8" cy="8" r="6" fill="${CONFIG.WFS.STYLE.color}33" stroke="${CONFIG.WFS.STYLE.pointStroke ?? CONFIG.WFS.STYLE.color}80" stroke-width="2"/>
-                  </svg>
-                `), //${BRIGHT_GREEN}33 - with opacity 0.2 ; #FFFF0080 - with opacity 0.5
-                verticalOrigin: CesiumVerticalOrigin.BOTTOM,
-                heightReference: CesiumHeightReference.NONE, // Ensures it's not clamped and floats above
-                scale: 1.0,
-                disableDepthTestDistance: Number.POSITIVE_INFINITY,
-              });
-            }
-          });
+          keyField: CONFIG.WFS.KEY_FIELD
         };
         return (
           <CesiumWFSLayer
             key={layer.id}
             options={options}
             meta={layer as unknown as Record<string, unknown>}
-            visualizationHandler={handleVisualization}
           />
         );
       default:
