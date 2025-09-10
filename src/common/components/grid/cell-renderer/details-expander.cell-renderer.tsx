@@ -15,8 +15,8 @@ export const DetailsExpanderRenderer: React.FC<DetailsExpanderRendererProps> = (
   const handleCollapseExpand = (): void => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     const rowNode = props.api.getRowNode(`${props.data?.id as string}${DETAILS_ROW_ID_SUFFIX}`);   
-    const isVisible = (rowNode.data as IGridRowDataDetailsExt).isVisible;
-    rowNode.setDataValue('isVisible', !isVisible);
+    const isVisible = (rowNode?.data as IGridRowDataDetailsExt).isVisible;
+    rowNode?.setDataValue('isVisible', !isVisible);
     props.api.onFilterChanged();
   };
   if (shouldRenderBtn) return  <CollapseButton onClick={handleCollapseExpand} />

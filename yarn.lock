@@ -6640,17 +6640,25 @@ adjust-sourcemap-loader@^4.0.0:
     loader-utils "^2.0.0"
     regex-parser "^2.2.11"
 
-ag-grid-community@24.1.0:
-  version "24.1.0"
-  resolved "https://registry.yarnpkg.com/ag-grid-community/-/ag-grid-community-24.1.0.tgz#1e3cab51211822e08d56f03a491b7c0deaa398e6"
-  integrity sha512-pWnWphuDcejZ8ahf6C734EpCx3XQ6dHEZWMWTlCdHNT0mZBLJ4YKCGACX+ttAEtSX2MGM3G13JncvuratUlYag==
+ag-charts-types@12.0.2:
+  version "12.0.2"
+  resolved "https://registry.yarnpkg.com/ag-charts-types/-/ag-charts-types-12.0.2.tgz#7796ac5d717f073145710e7318d22f7fafe6687a"
+  integrity sha512-AWM1Y+XW+9VMmV3AbzdVEnreh/I2C9Pmqpc2iLmtId3Xbvmv7O56DqnuDb9EXjK5uPxmyUerTP+utL13UGcztw==
 
-ag-grid-react@24.1.0:
-  version "24.1.0"
-  resolved "https://registry.yarnpkg.com/ag-grid-react/-/ag-grid-react-24.1.0.tgz#dd6cbf4bf6fe00df182af6d4cb08f1f85e2dc806"
-  integrity sha512-CwrToc+M+GPe8cZ2z5+2kg19c/SAw+/CjAv1VjbE1e++CED5HGAPZ4PapNmzyiM57DEDleSjW9qCCJ0/VURomg==
+ag-grid-community@34.0.2:
+  version "34.0.2"
+  resolved "https://registry.yarnpkg.com/ag-grid-community/-/ag-grid-community-34.0.2.tgz#7b1239cfda1bca2555611873eb845e0ba2c4ab3f"
+  integrity sha512-hVJp5vrmwHRB10YjfSOVni5YJkO/v+asLjT72S4YnIFSx8lAgyPmByNJgtojk1aJ5h6Up93jTEmGDJeuKiWWLA==
   dependencies:
-    prop-types "^15.6.2"
+    ag-charts-types "12.0.2"
+
+ag-grid-react@34.0.2:
+  version "34.0.2"
+  resolved "https://registry.yarnpkg.com/ag-grid-react/-/ag-grid-react-34.0.2.tgz#ae6f4da8175df50a0eeb4ef0aa82f5c77b089a41"
+  integrity sha512-1KBXkTvwtZiYVlSuDzBkiqfHjZgsATOmpLZdAtdmsCSOOOEWai0F9zHHgBuHfyciAE4nrbQWfojkx8IdnwsKFw==
+  dependencies:
+    ag-grid-community "34.0.2"
+    prop-types "^15.8.1"
 
 agent-base@6:
   version "6.0.2"
