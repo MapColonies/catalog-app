@@ -915,12 +915,6 @@ const DiscreteLayerView: React.FC = observer(() => {
  
   return (
     <>
-      <ActionResolver
-        handleOpenEntityDialog = {setEntityDialogOpen}
-        handleFlyTo = {onFlyTo}
-        handleTabViewChange = {handleTabViewChange}
-        activeTabView = {activeTabView}
-      />
       <Box className={`headerContainer ${disableOnDrawingClassName}`}>
         <Box className="headerViewsSwitcher">
           <Box>
@@ -1133,9 +1127,17 @@ const DiscreteLayerView: React.FC = observer(() => {
                   />
                 }
 
-                {memoizedLayers}
+                { memoizedLayers }
 
                 { activeTabView === TabViews.EXPORT_LAYER && <ExportDrawingHandler /> }
+
+                <ActionResolver
+                  handleOpenEntityDialog = {setEntityDialogOpen}
+                  handleFlyTo = {onFlyTo}
+                  handleTabViewChange = {handleTabViewChange}
+                  activeTabView = {activeTabView}
+                />
+
                 <Terrain/>
                 <ExtentUpdater/>
                 <WfsFeature />
