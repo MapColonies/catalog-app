@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`BBoxDialog component renders correctly 1`] = `
-<ue
+<Q
   id="bboxDialog"
 >
   <ForwardRef
@@ -24,14 +24,14 @@ exports[`BBoxDialog component renders correctly 1`] = `
         noValidate={true}
         onSubmit={[Function]}
       >
-        <ue
+        <Q
           className="bboxRow"
         >
           <BBoxCorner
             className="bboxField"
             corner="TOP_RIGHT"
           />
-          <ue
+          <Q
             className="bboxField"
           >
             <FieldLabelComponent
@@ -46,8 +46,8 @@ exports[`BBoxDialog component renders correctly 1`] = `
               type="number"
               value={0}
             />
-          </ue>
-          <ue
+          </Q>
+          <Q
             className="bboxField"
           >
             <FieldLabelComponent
@@ -62,16 +62,16 @@ exports[`BBoxDialog component renders correctly 1`] = `
               type="number"
               value={0}
             />
-          </ue>
-        </ue>
-        <ue
+          </Q>
+        </Q>
+        <Q
           className="bboxRow"
         >
           <BBoxCorner
             className="bboxField"
             corner="BOTTOM_LEFT"
           />
-          <ue
+          <Q
             className="bboxField"
           >
             <FieldLabelComponent
@@ -86,8 +86,8 @@ exports[`BBoxDialog component renders correctly 1`] = `
               type="number"
               value={0}
             />
-          </ue>
-          <ue
+          </Q>
+          <Q
             className="bboxField"
           >
             <FieldLabelComponent
@@ -102,15 +102,15 @@ exports[`BBoxDialog component renders correctly 1`] = `
               type="number"
               value={0}
             />
-          </ue>
-        </ue>
-        <ue
+          </Q>
+        </Q>
+        <Q
           className="footer"
         >
-          <ue
+          <Q
             className="messages"
           />
-          <ue
+          <Q
             className="buttons"
           >
             <ForwardRef
@@ -130,10 +130,10 @@ exports[`BBoxDialog component renders correctly 1`] = `
                 id="general.cancel-btn.text"
               />
             </ForwardRef>
-          </ue>
-        </ue>
+          </Q>
+        </Q>
       </form>
     </ForwardRef>
   </ForwardRef>
-</ue>
+</Q>
 `;
