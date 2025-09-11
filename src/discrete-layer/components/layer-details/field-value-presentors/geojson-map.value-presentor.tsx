@@ -1,5 +1,5 @@
 import { CSSProperties, useEffect, useMemo, useState } from 'react';
-import { Box, GeoJSONFeature, getWMTSOptions, getXYZOptions, Map, TileLayer, TileWMTS, TileXYZ, VectorLayer, VectorSource } from '@map-colonies/react-components';
+import { Box, GeoJSONFeature, getWMTSOptions, getXYZOptions, IBaseMap, Map, TileLayer, TileWMTS, TileXYZ, VectorLayer, VectorSource } from '@map-colonies/react-components';
 import { Geometry } from 'geojson';
 import { FitOptions } from 'ol/View';
 import { validateGeoJSONString } from '../../../../common/utils/geojson.validation';
@@ -39,12 +39,12 @@ export const GeoJsonMapValuePresentorComponent: React.FC<GeoJsonMapValuePresento
   const previewBaseMap = useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-array-constructor
     const olBaseMap = new Array();
-    let baseMap = store.discreteLayersStore.baseMaps?.maps.find((map) => map.isForPreview);
+    let baseMap = store.discreteLayersStore.baseMaps?.maps.find((map: IBaseMap) => map.isForPreview);
     if (!baseMap) {
-      baseMap = store.discreteLayersStore.baseMaps?.maps.find((map) => map.isCurrent);
+      baseMap = store.discreteLayersStore.baseMaps?.maps.find((map: IBaseMap) => map.isCurrent);
     }
     if (baseMap) {
-      baseMap.baseRasteLayers.forEach((layer) => {
+      baseMap.baseRasterLayers.forEach((layer) => {
         if (layer.type === 'WMTS_LAYER') {
           const wmtsOptions = getWMTSOptions({
             url: layer.options.url as string,

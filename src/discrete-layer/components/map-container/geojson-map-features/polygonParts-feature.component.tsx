@@ -74,8 +74,8 @@ export const PolygonPartsFeature: React.FC = observer(() => {
 
         enrichWFSData(geoJsonFeature);
 
-        return ( 
-         <GeojsonFeatureWithInfoBox
+        return (
+          <GeojsonFeatureWithInfoBox
             feature={geoJsonFeature as Feature<LineString | Polygon>}
             featureConfig={polygonPartsFeatureConfig}
             isPolylined={false} // Polygon parts will be displayed as 2D polygon, meaning that optimal is a Cesium 2D mode

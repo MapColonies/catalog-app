@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useIntl } from 'react-intl';
 import { ColDef, RowDataUpdatedEvent, ValueGetterParams } from 'ag-grid-community';
 import { observer } from 'mobx-react-lite';
-import { isObject, isEmpty } from 'lodash';
+import { isEmpty } from 'lodash';
 import { Box } from '@map-colonies/react-components';
 import { 
   GridComponent,
@@ -28,7 +28,7 @@ import CONFIG from '../../../common/config';
 import { getMax } from '../../../common/helpers/array';
 import { dateFormatter } from '../../../common/helpers/formatters';
 import { isPolygonPartsShown } from '../../../common/helpers/style';
-import { usePrevious } from '../../../common/hooks/previous.hook';
+// import { usePrevious } from '../../../common/hooks/previous.hook';
 import { LayerRasterRecordModelType } from '../../models';
 import { IDispatchAction } from '../../models/actionDispatcherStore';
 import { ILayerImage } from '../../models/layerImage';
@@ -40,7 +40,6 @@ import './layers-results.css';
 
 const PAGINATION = true;
 const PAGE_SIZE = 10;
-const IMMEDIATE_EXECUTION = 0;
 const INITIAL_ORDER = 0;
 
 interface LayersResultsProps {
@@ -53,10 +52,9 @@ export const LayersResults: React.FC<LayersResultsProps> = observer((props) => {
   const intl = useIntl();
   const store = useStore();
   const [layersImages, setlayersImages] = useState<ILayerImage[]>([]);
-  const [isChecked, setIsChecked] = useState<boolean>(false);
-  const [gridApi, setGridApi] = useState<GridApi>();
-  const prevLayersImages = usePrevious<ILayerImage[]>(layersImages);
-  const cacheRef = useRef({} as ILayerImage[]);
+  const [, setGridApi] = useState<GridApi>();
+  // const prevLayersImages = usePrevious<ILayerImage[]>(layersImages);
+  // const cacheRef = useRef({} as ILayerImage[]);
   const selectedLayersRef = useRef(INITIAL_ORDER);
 
   const updateRow = (id: string, newData: Partial<ILayerImage>, gridApi: GridApi): void => {
@@ -67,7 +65,7 @@ export const LayersResults: React.FC<LayersResultsProps> = observer((props) => {
     }
   };
 
-  const isSameRowData = (source: ILayerImage[] | undefined, target: ILayerImage[] | undefined): boolean => {
+  /*const isSameRowData = (source: ILayerImage[] | undefined, target: ILayerImage[] | undefined): boolean => {
     let res = false;
     if (source && target && source.length === target.length) {
       let matchesRes = true;
@@ -93,7 +91,7 @@ export const LayersResults: React.FC<LayersResultsProps> = observer((props) => {
       selectedLayersRef.current = INITIAL_ORDER;
       return cacheRef.current;
     }
-  };
+  };*/
 
   const entityPermittedActions = useMemo(() => {
     const entityActions: Record<string, unknown> = {};
@@ -155,7 +153,6 @@ export const LayersResults: React.FC<LayersResultsProps> = observer((props) => {
       cellRenderer: 'rowLayerImageRenderer',
       cellRendererParams: {
         onClick: (id: string, value: boolean, node: GridRowNode): void => {
-          // setTimeout(() => node.setDataValue('layerImageShown', value), immediateExecution);
           if (value) {
             selectedLayersRef.current++;
           } else {
@@ -169,7 +166,6 @@ export const LayersResults: React.FC<LayersResultsProps> = observer((props) => {
             selectedLayersRef.current = (orders.length) ? getMax(orders) : selectedLayersRef.current-1;
           }
           const order = value ? selectedLayersRef.current : null;
-          // setTimeout(() => node.setDataValue('order', order), immediateExecution) ;
           store.discreteLayersStore.showLayer(id, value, order);
         }
       }

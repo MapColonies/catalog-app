@@ -132,6 +132,7 @@ export const SelectedLayersContainer: React.FC = observer(() => {
             key={layer.id}
             options={options}
             meta={layer as unknown as Record<string, unknown>}
+            withGeometryValidation={true}
           />
         );
       default:
