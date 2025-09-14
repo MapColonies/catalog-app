@@ -1245,6 +1245,11 @@
   dependencies:
     regenerator-runtime "^0.14.0"
 
+"@babel/runtime@^7.14.5":
+  version "7.28.4"
+  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.28.4.tgz#a70226016fabe25c5783b2f22d3e1c9bc5ca3326"
+  integrity sha512-Q/N6JNWvIvPnLDvjlE1OUBLPQHH6l3CltCEsHIujp45zQUSSh8K+gHnaEX45yAT1nyngnINhvWtzN+Nb9D8RAQ==
+
 "@babel/template@^7.22.5", "@babel/template@^7.3.3", "@babel/template@^7.4.0":
   version "7.22.5"
   resolved "https://registry.yarnpkg.com/@babel/template/-/template-7.22.5.tgz#0c8c4d944509875849bd0344ff0050756eefc6ec"
@@ -2548,10 +2553,10 @@
     lodash "^4.17.21"
     ngeohash "^0.6.3"
 
-"@map-colonies/react-components@^4.10.4":
-  version "4.10.4"
-  resolved "https://registry.yarnpkg.com/@map-colonies/react-components/-/react-components-4.10.4.tgz#62bb22617d1a02888abe3de9876d92fb6efa2524"
-  integrity sha512-j5fvs5zVWyW0oiW0ZNEzRrOctSibjI1vRsdL16JCC4qtxAXGajao11C3QNiLlucmUdkL2HlDBRMVAgruldfBEw==
+"@map-colonies/react-components@^4.12.0":
+  version "4.12.0"
+  resolved "https://registry.yarnpkg.com/@map-colonies/react-components/-/react-components-4.12.0.tgz#8ca34d558f70ef64255ce4758be711ea8a79d2e0"
+  integrity sha512-sgPiULWc2OzB7g3pOr5qvKjXm+W6LoeKqVkw4CgkewGAdaXzjhpQX3ZBT3UJV6OvT+icKrZP4eW6+kU+v1lebg==
   dependencies:
     "@cmcleese/cesium-navigation" "^4.0.7"
     "@date-io/date-fns" "^1.3.13"
@@ -2564,6 +2569,7 @@
     "@turf/bbox-polygon" "^6.0.1"
     "@turf/boolean-contains" "^6.5.0"
     "@turf/boolean-point-in-polygon" "^6.5.0"
+    "@turf/boolean-valid" "^7.2.0"
     "@turf/centroid" "^7.2.0"
     "@turf/helpers" "^6.1.4"
     "@turf/intersect" "^6.1.3"
@@ -2582,10 +2588,14 @@
     ol "^6.4.3"
     ol-ext "^4.0.18"
     p-map "6.0.0"
+    react-circular-progressbar "^2.2.0"
     react-datepicker "^4.16.0"
+    react-move "^6.5.0"
+    react-rxjs "^2.0.8"
     react-select "5.7.3"
     resium "1.16.1"
     rimraf "3.0.2"
+    rxjs "^7.8.1"
     textarea-caret "^3.1.0"
     uuid "^11.1.0"
 
@@ -4342,6 +4352,16 @@
     "@turf/helpers" "5.0.0"
     "@turf/meta" "5.0.0"
 
+"@turf/bbox@^7.2.0":
+  version "7.2.0"
+  resolved "https://registry.yarnpkg.com/@turf/bbox/-/bbox-7.2.0.tgz#9db338d6407380f66a72050657f1998c5c5ccc4a"
+  integrity sha512-wzHEjCXlYZiDludDbXkpBSmv8Zu6tPGLmJ1sXQ6qDwpLE1Ew3mcWqt8AaxfTP5QwDNQa3sf2vvgTEzNbPQkCiA==
+  dependencies:
+    "@turf/helpers" "^7.2.0"
+    "@turf/meta" "^7.2.0"
+    "@types/geojson" "^7946.0.10"
+    tslib "^2.8.1"
+
 "@turf/bearing@^6.5.0":
   version "6.5.0"
   resolved "https://registry.yarnpkg.com/@turf/bearing/-/bearing-6.5.0.tgz#462a053c6c644434bdb636b39f8f43fb0cd857b0"
@@ -4406,6 +4426,19 @@
     "@turf/line-intersect" "^6.5.0"
     "@turf/polygon-to-line" "^6.5.0"
 
+"@turf/boolean-crosses@^7.2.0":
+  version "7.2.0"
+  resolved "https://registry.yarnpkg.com/@turf/boolean-crosses/-/boolean-crosses-7.2.0.tgz#48fbd37c51a0f1e1aa9cc75d5484e8441bb7f173"
+  integrity sha512-9GyM4UUWFKQOoNhHVSfJBf5XbPy8Fxfz9djjJNAnm/IOl8NmFUSwFPAjKlpiMcr6yuaAoc9R/1KokS9/eLqPvA==
+  dependencies:
+    "@turf/boolean-point-in-polygon" "^7.2.0"
+    "@turf/helpers" "^7.2.0"
+    "@turf/invariant" "^7.2.0"
+    "@turf/line-intersect" "^7.2.0"
+    "@turf/polygon-to-line" "^7.2.0"
+    "@types/geojson" "^7946.0.10"
+    tslib "^2.8.1"
+
 "@turf/boolean-disjoint@^6.5.0":
   version "6.5.0"
   resolved "https://registry.yarnpkg.com/@turf/boolean-disjoint/-/boolean-disjoint-6.5.0.tgz#e291d8f8f8cce7f7bb3c11e23059156a49afc5e4"
@@ -4416,6 +4449,19 @@
     "@turf/line-intersect" "^6.5.0"
     "@turf/meta" "^6.5.0"
     "@turf/polygon-to-line" "^6.5.0"
+
+"@turf/boolean-disjoint@^7.2.0":
+  version "7.2.0"
+  resolved "https://registry.yarnpkg.com/@turf/boolean-disjoint/-/boolean-disjoint-7.2.0.tgz#84b07b10b6b0fa1e3a8276dd81dd30d697059a47"
+  integrity sha512-xdz+pYKkLMuqkNeJ6EF/3OdAiJdiHhcHCV0ykX33NIuALKIEpKik0+NdxxNsZsivOW6keKwr61SI+gcVtHYcnQ==
+  dependencies:
+    "@turf/boolean-point-in-polygon" "^7.2.0"
+    "@turf/helpers" "^7.2.0"
+    "@turf/line-intersect" "^7.2.0"
+    "@turf/meta" "^7.2.0"
+    "@turf/polygon-to-line" "^7.2.0"
+    "@types/geojson" "^7946.0.10"
+    tslib "^2.8.1"
 
 "@turf/boolean-equal@^6.5.0":
   version "6.5.0"
@@ -4447,6 +4493,20 @@
     "@turf/line-overlap" "^6.5.0"
     "@turf/meta" "^6.5.0"
     geojson-equality "0.1.6"
+
+"@turf/boolean-overlap@^7.2.0":
+  version "7.2.0"
+  resolved "https://registry.yarnpkg.com/@turf/boolean-overlap/-/boolean-overlap-7.2.0.tgz#8319545b9bc50e7284b1c5d3ecad7b89500030cd"
+  integrity sha512-ieM5qIE4anO+gUHIOvEN7CjyowF+kQ6v20/oNYJCp63TVS6eGMkwgd+I4uMzBXfVW66nVHIXjODdUelU+Xyctw==
+  dependencies:
+    "@turf/helpers" "^7.2.0"
+    "@turf/invariant" "^7.2.0"
+    "@turf/line-intersect" "^7.2.0"
+    "@turf/line-overlap" "^7.2.0"
+    "@turf/meta" "^7.2.0"
+    "@types/geojson" "^7946.0.10"
+    geojson-equality-ts "^1.0.2"
+    tslib "^2.8.1"
 
 "@turf/boolean-parallel@^6.5.0":
   version "6.5.0"
@@ -4485,6 +4545,16 @@
     "@turf/helpers" "^6.5.0"
     "@turf/invariant" "^6.5.0"
 
+"@turf/boolean-point-on-line@^7.2.0":
+  version "7.2.0"
+  resolved "https://registry.yarnpkg.com/@turf/boolean-point-on-line/-/boolean-point-on-line-7.2.0.tgz#e0373a453cf504d1e7f3125705e7786ea8d48df6"
+  integrity sha512-H/bXX8+2VYeSyH8JWrOsu8OGmeA9KVZfM7M6U5/fSqGsRHXo9MyYJ94k39A9kcKSwI0aWiMXVD2UFmiWy8423Q==
+  dependencies:
+    "@turf/helpers" "^7.2.0"
+    "@turf/invariant" "^7.2.0"
+    "@types/geojson" "^7946.0.10"
+    tslib "^2.8.1"
+
 "@turf/boolean-valid@^6.5.0":
   version "6.5.0"
   resolved "https://registry.yarnpkg.com/@turf/boolean-valid/-/boolean-valid-6.5.0.tgz#20feee0a1187ba8944dd7b1e38fbf6594a20e59e"
@@ -4500,6 +4570,24 @@
     "@turf/invariant" "^6.5.0"
     "@turf/line-intersect" "^6.5.0"
     geojson-polygon-self-intersections "1.2.x"
+
+"@turf/boolean-valid@^7.2.0":
+  version "7.2.0"
+  resolved "https://registry.yarnpkg.com/@turf/boolean-valid/-/boolean-valid-7.2.0.tgz#608d1ac810b5009bc42d9b05408e4ce50489f58d"
+  integrity sha512-xb7gdHN8VV6ivPJh6rPpgxmAEGReiRxqY+QZoEZVGpW2dXcmU1BdY6FA6G/cwvggXAXxJBREoANtEDgp/0ySbA==
+  dependencies:
+    "@turf/bbox" "^7.2.0"
+    "@turf/boolean-crosses" "^7.2.0"
+    "@turf/boolean-disjoint" "^7.2.0"
+    "@turf/boolean-overlap" "^7.2.0"
+    "@turf/boolean-point-in-polygon" "^7.2.0"
+    "@turf/boolean-point-on-line" "^7.2.0"
+    "@turf/helpers" "^7.2.0"
+    "@turf/invariant" "^7.2.0"
+    "@turf/line-intersect" "^7.2.0"
+    "@types/geojson" "^7946.0.10"
+    geojson-polygon-self-intersections "^1.2.1"
+    tslib "^2.8.1"
 
 "@turf/boolean-within@^6.5.0":
   version "6.5.0"
@@ -4799,6 +4887,17 @@
     "@turf/helpers" "^6.5.0"
     "@turf/meta" "^6.5.0"
 
+"@turf/geojson-rbush@^7.2.0":
+  version "7.2.0"
+  resolved "https://registry.yarnpkg.com/@turf/geojson-rbush/-/geojson-rbush-7.2.0.tgz#b714af52b2302c0e9783d10e1a65236c8a92c269"
+  integrity sha512-ST8fLv+EwxVkDgsmhHggM0sPk2SfOHTZJkdgMXVFT7gB9o4lF8qk4y4lwvCCGIfFQAp2yv/PN5EaGMEKutk6xw==
+  dependencies:
+    "@turf/bbox" "^7.2.0"
+    "@turf/helpers" "^7.2.0"
+    "@turf/meta" "^7.2.0"
+    "@types/geojson" "^7946.0.10"
+    rbush "^3.0.1"
+
 "@turf/great-circle@^6.5.0":
   version "6.5.0"
   resolved "https://registry.yarnpkg.com/@turf/great-circle/-/great-circle-6.5.0.tgz#2daccbdd1c609a13b00d566ea0ad95457cfc87c2"
@@ -4965,6 +5064,16 @@
     "@turf/meta" "^6.5.0"
     geojson-rbush "3.x"
 
+"@turf/line-intersect@^7.2.0":
+  version "7.2.0"
+  resolved "https://registry.yarnpkg.com/@turf/line-intersect/-/line-intersect-7.2.0.tgz#74f6a149429718ff2219329a5e3239f784f44489"
+  integrity sha512-GhCJVEkc8EmggNi85EuVLoXF5T5jNVxmhIetwppiVyJzMrwkYAkZSYB3IBFYGUUB9qiNFnTwungVSsBV/S8ZiA==
+  dependencies:
+    "@turf/helpers" "^7.2.0"
+    "@types/geojson" "^7946.0.10"
+    sweepline-intersections "^1.5.0"
+    tslib "^2.8.1"
+
 "@turf/line-offset@^6.5.0":
   version "6.5.0"
   resolved "https://registry.yarnpkg.com/@turf/line-offset/-/line-offset-6.5.0.tgz#2bbd8fcf9ff82009b72890863da444b190e53689"
@@ -4988,6 +5097,22 @@
     deep-equal "1.x"
     geojson-rbush "3.x"
 
+"@turf/line-overlap@^7.2.0":
+  version "7.2.0"
+  resolved "https://registry.yarnpkg.com/@turf/line-overlap/-/line-overlap-7.2.0.tgz#02a49011fd15333db1f41fe3ba4b2eec3fa2c342"
+  integrity sha512-NNn7/jg53+N10q2Kyt66bEDqN3101iW/1zA5FW7J6UbKApDFkByh+18YZq1of71kS6oUYplP86WkDp16LFpqqw==
+  dependencies:
+    "@turf/boolean-point-on-line" "^7.2.0"
+    "@turf/geojson-rbush" "^7.2.0"
+    "@turf/helpers" "^7.2.0"
+    "@turf/invariant" "^7.2.0"
+    "@turf/line-segment" "^7.2.0"
+    "@turf/meta" "^7.2.0"
+    "@turf/nearest-point-on-line" "^7.2.0"
+    "@types/geojson" "^7946.0.10"
+    fast-deep-equal "^3.1.3"
+    tslib "^2.8.1"
+
 "@turf/line-segment@^6.5.0":
   version "6.5.0"
   resolved "https://registry.yarnpkg.com/@turf/line-segment/-/line-segment-6.5.0.tgz#ee73f3ffcb7c956203b64ed966d96af380a4dd65"
@@ -4996,6 +5121,17 @@
     "@turf/helpers" "^6.5.0"
     "@turf/invariant" "^6.5.0"
     "@turf/meta" "^6.5.0"
+
+"@turf/line-segment@^7.2.0":
+  version "7.2.0"
+  resolved "https://registry.yarnpkg.com/@turf/line-segment/-/line-segment-7.2.0.tgz#6ad3ec7ae80e49abe067ff1d95eb1a9002fd7a78"
+  integrity sha512-E162rmTF9XjVN4rINJCd15AdQGCBlNqeWN3V0YI1vOUpZFNT2ii4SqEMCcH2d+5EheHLL8BWVwZoOsvHZbvaWA==
+  dependencies:
+    "@turf/helpers" "^7.2.0"
+    "@turf/invariant" "^7.2.0"
+    "@turf/meta" "^7.2.0"
+    "@types/geojson" "^7946.0.10"
+    tslib "^2.8.1"
 
 "@turf/line-slice-along@^6.5.0":
   version "6.5.0"
@@ -5852,7 +5988,7 @@
   resolved "https://registry.yarnpkg.com/@types/geojson/-/geojson-7946.0.8.tgz#30744afdb385e2945e22f3b033f897f76b1f12ca"
   integrity sha512-1rkryxURpr6aWP7R786/UQOkJ3PcpQiWkAXBmdWc7ryFWqN6a4xfK7BtjXvFBKO9LjQ+MWQSWxYeZX1OApnArA==
 
-"@types/geojson@^7946.0.10", "@types/geojson@^7946.0.16":
+"@types/geojson@^7946.0.10", "@types/geojson@^7946.0.14", "@types/geojson@^7946.0.16":
   version "7946.0.16"
   resolved "https://registry.yarnpkg.com/@types/geojson/-/geojson-7946.0.16.tgz#8ebe53d69efada7044454e3305c19017d97ced2a"
   integrity sha512-6C8nqWur3j98U6+lXDfTUWIfgvZU+EumvpHKcYjujKH7woYyLj2sUmff0tRhrqM7BohUw7Pz3ZB1jj2gW9Fvmg==
@@ -6640,17 +6776,25 @@ adjust-sourcemap-loader@^4.0.0:
     loader-utils "^2.0.0"
     regex-parser "^2.2.11"
 
-ag-grid-community@24.1.0:
-  version "24.1.0"
-  resolved "https://registry.yarnpkg.com/ag-grid-community/-/ag-grid-community-24.1.0.tgz#1e3cab51211822e08d56f03a491b7c0deaa398e6"
-  integrity sha512-pWnWphuDcejZ8ahf6C734EpCx3XQ6dHEZWMWTlCdHNT0mZBLJ4YKCGACX+ttAEtSX2MGM3G13JncvuratUlYag==
+ag-charts-types@12.0.2:
+  version "12.0.2"
+  resolved "https://registry.yarnpkg.com/ag-charts-types/-/ag-charts-types-12.0.2.tgz#7796ac5d717f073145710e7318d22f7fafe6687a"
+  integrity sha512-AWM1Y+XW+9VMmV3AbzdVEnreh/I2C9Pmqpc2iLmtId3Xbvmv7O56DqnuDb9EXjK5uPxmyUerTP+utL13UGcztw==
 
-ag-grid-react@24.1.0:
-  version "24.1.0"
-  resolved "https://registry.yarnpkg.com/ag-grid-react/-/ag-grid-react-24.1.0.tgz#dd6cbf4bf6fe00df182af6d4cb08f1f85e2dc806"
-  integrity sha512-CwrToc+M+GPe8cZ2z5+2kg19c/SAw+/CjAv1VjbE1e++CED5HGAPZ4PapNmzyiM57DEDleSjW9qCCJ0/VURomg==
+ag-grid-community@34.0.2:
+  version "34.0.2"
+  resolved "https://registry.yarnpkg.com/ag-grid-community/-/ag-grid-community-34.0.2.tgz#7b1239cfda1bca2555611873eb845e0ba2c4ab3f"
+  integrity sha512-hVJp5vrmwHRB10YjfSOVni5YJkO/v+asLjT72S4YnIFSx8lAgyPmByNJgtojk1aJ5h6Up93jTEmGDJeuKiWWLA==
   dependencies:
-    prop-types "^15.6.2"
+    ag-charts-types "12.0.2"
+
+ag-grid-react@34.0.2:
+  version "34.0.2"
+  resolved "https://registry.yarnpkg.com/ag-grid-react/-/ag-grid-react-34.0.2.tgz#ae6f4da8175df50a0eeb4ef0aa82f5c77b089a41"
+  integrity sha512-1KBXkTvwtZiYVlSuDzBkiqfHjZgsATOmpLZdAtdmsCSOOOEWai0F9zHHgBuHfyciAE4nrbQWfojkx8IdnwsKFw==
+  dependencies:
+    ag-grid-community "34.0.2"
+    prop-types "^15.8.1"
 
 agent-base@6:
   version "6.0.2"
@@ -9058,6 +9202,11 @@ d3-geo@1.7.1:
   dependencies:
     d3-array "1"
 
+d3-timer@^1.0.9:
+  version "1.0.10"
+  resolved "https://registry.yarnpkg.com/d3-timer/-/d3-timer-1.0.10.tgz#dfe76b8a91748831b13b6d9c793ffbd508dd9de5"
+  integrity sha512-B1JDm0XDaQC+uvo4DT79H0XmBskgS3l6Ve+1SBCfxgmtIb1AVrPIoqd+nPSv+loMX8szQ0sVUhGngL7D5QPiXw==
+
 d3-voronoi@1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/d3-voronoi/-/d3-voronoi-1.1.2.tgz#1687667e8f13a2d158c80c1480c5a29cb0d8973c"
@@ -10861,6 +11010,13 @@ gensync@^1.0.0-beta.2:
   version "1.0.0-beta.2"
   resolved "https://registry.yarnpkg.com/gensync/-/gensync-1.0.0-beta.2.tgz#32a6ee76c3d7f52d46b2b1ae5d93fea8580a25e0"
   integrity sha512-3hN7NaskYvMDLQY55gnW3NQ+mesEAepTqlg+VEbj7zzqEMBVNhzcGYYeqFo/TlYz6eQiFcp1HcsCZO+nGgS8zg==
+
+geojson-equality-ts@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/geojson-equality-ts/-/geojson-equality-ts-1.0.2.tgz#2aed0b9aca1fedb17212fecbfc42f73020410480"
+  integrity sha512-h3Ryq+0mCSN/7yLs0eDgrZhvc9af23o/QuC4aTiuuzP/MRCtd6mf5rLsLRY44jX0RPUfM8c4GqERQmlUxPGPoQ==
+  dependencies:
+    "@types/geojson" "^7946.0.14"
 
 geojson-equality@0.1.6:
   version "0.1.6"
@@ -13400,6 +13556,13 @@ jszip@^3.5.0:
     pako "~1.0.2"
     readable-stream "~2.3.6"
     setimmediate "^1.0.5"
+
+kapellmeister@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/kapellmeister/-/kapellmeister-3.0.1.tgz#419b715cd221acda3db79892caedf63e1c9f7d25"
+  integrity sha512-S7+gYcziMREv8RxG46138mb1O4Xf9II/bCxEJPYkhlZ7PgGWTlicgsyNad/DGc5oEAlWGLXE5ExLbTDVvJmgDA==
+  dependencies:
+    d3-timer "^1.0.9"
 
 kdbush@^3.0.0:
   version "3.0.0"
@@ -16338,6 +16501,11 @@ react-app-rewired@^2.2.1:
   dependencies:
     semver "^5.6.0"
 
+react-circular-progressbar@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/react-circular-progressbar/-/react-circular-progressbar-2.2.0.tgz#282b7351dab2fd19c6d2c7f3cc698ed546c71c86"
+  integrity sha512-cgyqEHOzB0nWMZjKfWN3MfSa1LV3OatcDjPz68lchXQUEiBD5O1WsAtoVK4/DSL0B4USR//cTdok4zCBkq8X5g==
+
 react-contexify@^6.0.0:
   version "6.0.0"
   resolved "https://registry.yarnpkg.com/react-contexify/-/react-contexify-6.0.0.tgz#52959bb507d6a31224fe870ae147e211e359abe1"
@@ -16533,6 +16701,15 @@ react-lifecycles-compat@^3.0.4:
   resolved "https://registry.yarnpkg.com/react-lifecycles-compat/-/react-lifecycles-compat-3.0.4.tgz#4f1a273afdfc8f3488a8c516bfda78f872352362"
   integrity sha512-fBASbA6LnOU9dOU2eW7aQ8xmYBSXUIWr+UmF9b1efZBazGNO+rcXT/icdKnYm2pTwcRylVUYwW7H1PHfLekVzA==
 
+react-move@^6.5.0:
+  version "6.5.0"
+  resolved "https://registry.yarnpkg.com/react-move/-/react-move-6.5.0.tgz#4b337d75987f9266426193f80e982604d49e97ff"
+  integrity sha512-tl8zwCqtXXWfmrUJGnkyPMNhx8DUTy1NugEuPW/JTMp2TGSEC819aMXGYMG8FWFzV9I6jy4kbgoZJnBpmZRktA==
+  dependencies:
+    "@babel/runtime" "^7.14.5"
+    kapellmeister "^3.0.1"
+    prop-types "^15.7.2"
+
 react-onclickoutside@^6.13.0:
   version "6.13.0"
   resolved "https://registry.yarnpkg.com/react-onclickoutside/-/react-onclickoutside-6.13.0.tgz#e165ea4e5157f3da94f4376a3ab3e22a565f4ffc"
@@ -16562,6 +16739,11 @@ react-refresh@^0.11.0:
   version "0.11.0"
   resolved "https://registry.yarnpkg.com/react-refresh/-/react-refresh-0.11.0.tgz#77198b944733f0f1f1a90e791de4541f9f074046"
   integrity sha512-F27qZr8uUqwhWZboondsPx8tnC3Ct3SxZA3V5WyEvujRyyNv0VYPhoBg1gZ8/MV5tubQp76Trw8lTv9hzRBa+A==
+
+react-rxjs@^2.0.8:
+  version "2.0.8"
+  resolved "https://registry.yarnpkg.com/react-rxjs/-/react-rxjs-2.0.8.tgz#2b38cccde814482d93e0874a1f8a8520d4a1c922"
+  integrity sha512-/LbKpFwRqHMoOPucnr1fG1Sdv5kH7elq59e+H4kryNCvXQiZkynH5PzyxAZO000ZPpQQkqeJwnBXjoql56gV7w==
 
 react-scripts@5.0.1:
   version "5.0.1"
@@ -17238,6 +17420,13 @@ rxjs@^7.5.1:
   version "7.8.1"
   resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-7.8.1.tgz#6f6f3d99ea8044291efd92e7c7fcf562c4057543"
   integrity sha512-AA3TVj+0A2iuIoQkWEK/tqFjBq2j+6PO6Y0zJcvzLAFhEFIO3HL0vls9hWLncZbAAbK0mar7oZ4V079I/qPMxg==
+  dependencies:
+    tslib "^2.1.0"
+
+rxjs@^7.8.1:
+  version "7.8.2"
+  resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-7.8.2.tgz#955bc473ed8af11a002a2be52071bf475638607b"
+  integrity sha512-dhKf903U/PQZY6boNNtAGdWbG85WAbjT/1xYoZIC7FAY0yWapOBQVsVrDl58W86//e1VpMNBtRV4MaXfdMySFA==
   dependencies:
     tslib "^2.1.0"
 
@@ -18330,6 +18519,13 @@ svgo@^2.7.0:
     picocolors "^1.0.0"
     stable "^0.1.8"
 
+sweepline-intersections@^1.5.0:
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/sweepline-intersections/-/sweepline-intersections-1.5.0.tgz#85ab3629a291875926fae0acd508496430d8a647"
+  integrity sha512-AoVmx72QHpKtItPu72TzFL+kcYjd67BPLDoR0LarIk+xyaRg+pDTMFXndIEvZf9xEKnJv6JdhgRMnocoG0D3AQ==
+  dependencies:
+    tinyqueue "^2.0.0"
+
 symbol-observable@^1.1.0, symbol-observable@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/symbol-observable/-/symbol-observable-1.2.0.tgz#c22688aed4eab3cdc2dfeacbb561660560a00804"
@@ -18566,7 +18762,7 @@ tiny-warning@^1.0.2:
   resolved "https://registry.yarnpkg.com/tiny-warning/-/tiny-warning-1.0.3.tgz#94a30db453df4c643d0fd566060d60a875d84754"
   integrity sha512-lBN9zLN/oAf68o3zNXYrdCt1kP8WsiGW8Oo2ka41b2IM5JL/S1CTyX1rW0mb/zSuJun0ZUrDxx4sqvYS2FWzPA==
 
-tinyqueue@^2.0.3:
+tinyqueue@^2.0.0, tinyqueue@^2.0.3:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/tinyqueue/-/tinyqueue-2.0.3.tgz#64d8492ebf39e7801d7bd34062e29b45b2035f08"
   integrity sha512-ppJZNDuKGgxzkHihX8v9v9G5f+18gzaTfrukGrq6ueg0lmH4nqVnA2IPG0AEH3jKEk2GRJCUhDoqpoiw3PHLBA==
@@ -18885,10 +19081,10 @@ typedarray-to-buffer@^3.1.5:
   dependencies:
     is-typedarray "^1.0.0"
 
-typescript@^4.9.5:
-  version "4.9.5"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.9.5.tgz#095979f9bcc0d09da324d58d03ce8f8374cbe65a"
-  integrity sha512-1FXk9E2Hm+QzZQ7z+McJiHL4NW1F2EzMu9Nq9i3zAaGqibafqYwCVU6WyWAuyQRRzOlxou8xZSyXLEN8oKj24g==
+typescript@^5.9.2:
+  version "5.9.2"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.9.2.tgz#d93450cddec5154a2d5cabe3b8102b83316fb2a6"
+  integrity sha512-CWBzXQrc/qOkhidw1OzBTQuYRbfyxDXJMVJ1XNwUHGROVmuaeiEm3OslpZ1RV96d7SKKjZKrSJu3+t/xlw3R9A==
 
 ua-parser-js@^1.0.2:
   version "1.0.35"

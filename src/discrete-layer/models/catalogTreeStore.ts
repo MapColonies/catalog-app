@@ -415,6 +415,7 @@ export const catalogTreeStore = ModelBase.props({
         setIsDataLoading(true);
         resetCatalogTreeData();
         store.discreteLayersStore.resetSelectedLayer();
+        store.discreteLayersStore.setPolygonPartsLayer(undefined);
 
         const layersListResults = yield catalogSearch();
 

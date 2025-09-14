@@ -1,14 +1,14 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`AgGrid LayerDetailsRenderer component renders correctly 1`] = `
-<ue
+<Q
   className="layerDetailsContainer"
 >
-  <ue
+  <Q
     className="detailsColumn"
     key="0"
   >
-    <ue
+    <Q
       key="0_0"
     >
       <span
@@ -24,8 +24,8 @@ exports[`AgGrid LayerDetailsRenderer component renders correctly 1`] = `
         : 
       </span>
       <span />
-    </ue>
-    <ue
+    </Q>
+    <Q
       key="0_1"
     >
       <span
@@ -41,8 +41,8 @@ exports[`AgGrid LayerDetailsRenderer component renders correctly 1`] = `
         : 
       </span>
       <span />
-    </ue>
-    <ue
+    </Q>
+    <Q
       key="0_2"
     >
       <span
@@ -58,8 +58,8 @@ exports[`AgGrid LayerDetailsRenderer component renders correctly 1`] = `
         : 
       </span>
       <span />
-    </ue>
-    <ue
+    </Q>
+    <Q
       key="0_3"
     >
       <span
@@ -75,8 +75,8 @@ exports[`AgGrid LayerDetailsRenderer component renders correctly 1`] = `
         : 
       </span>
       <span />
-    </ue>
-    <ue
+    </Q>
+    <Q
       key="0_4"
     >
       <span
@@ -92,13 +92,13 @@ exports[`AgGrid LayerDetailsRenderer component renders correctly 1`] = `
         : 
       </span>
       <span />
-    </ue>
-  </ue>
-  <ue
+    </Q>
+  </Q>
+  <Q
     className="detailsColumn"
     key="1"
   >
-    <ue
+    <Q
       key="1_0"
     >
       <span
@@ -116,8 +116,8 @@ exports[`AgGrid LayerDetailsRenderer component renders correctly 1`] = `
       <span>
         06/12/2020
       </span>
-    </ue>
-    <ue
+    </Q>
+    <Q
       key="1_1"
     >
       <span
@@ -135,8 +135,8 @@ exports[`AgGrid LayerDetailsRenderer component renders correctly 1`] = `
       <span>
         06/12/2020
       </span>
-    </ue>
-    <ue
+    </Q>
+    <Q
       key="1_2"
     >
       <span
@@ -154,8 +154,8 @@ exports[`AgGrid LayerDetailsRenderer component renders correctly 1`] = `
       <span>
         06/12/2020
       </span>
-    </ue>
-    <ue
+    </Q>
+    <Q
       key="1_3"
     >
       <span
@@ -173,8 +173,8 @@ exports[`AgGrid LayerDetailsRenderer component renders correctly 1`] = `
       <span>
         06/12/2020
       </span>
-    </ue>
-    <ue
+    </Q>
+    <Q
       key="1_4"
     >
       <span
@@ -192,7 +192,7 @@ exports[`AgGrid LayerDetailsRenderer component renders correctly 1`] = `
       <span>
         06/12/2020
       </span>
-    </ue>
-  </ue>
-</ue>
+    </Q>
+  </Q>
+</Q>
 `;

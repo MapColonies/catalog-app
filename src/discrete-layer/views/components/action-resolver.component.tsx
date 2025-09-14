@@ -4,7 +4,7 @@ import { NodeData } from 'react-sortable-tree';
 import { observer } from 'mobx-react-lite';
 import { Feature } from 'geojson';
 import { isEmpty } from 'lodash';
-import { DrawType } from '@map-colonies/react-components';
+import { CesiumSceneMode, DrawType, useCesiumMap } from '@map-colonies/react-components';
 import { existStatus, isPolygonPartsShown, isUnpublished } from '../../../common/helpers/style';
 import {
   LayerRasterRecordModelKeys,
@@ -29,7 +29,7 @@ import { useEnums } from '../../../common/hooks/useEnum.hook';
 import { ExportActions } from '../../components/export-layer/hooks/useDomainExportActionsConfig';
 import useAddFeatureWithProps from '../../components/export-layer/hooks/useAddFeatureWithProps';
 import { getWFSFeatureTypeName } from '../../components/layer-details/raster/pp-map.utils';
-import { LayerMetadataMixedUnion } from '../../models';
+import { LayerMetadataMixedUnion, RecordType } from '../../models';
 import { TabViews } from '../tab-views';
 
 const initialOrder = 0;
@@ -46,6 +46,7 @@ export const ActionResolver: React.FC<ActionResolverProps> = observer((props) =>
 
   const store = useStore();
   const ENUMS = useEnums();
+  const mapViewer = useCesiumMap();
 
   const selectedLayersRef = useRef(initialOrder);
 
@@ -101,6 +102,9 @@ export const ActionResolver: React.FC<ActionResolverProps> = observer((props) =>
       if (!isEmpty(selectedLayer)) {
         if (isShown) {
           selectedLayersRef.current++;
+          if (selectedLayer.type === RecordType.RECORD_3D && mapViewer.scene.mode !== CesiumSceneMode.SCENE3D) {
+            mapViewer.scene.morphTo3D(1);
+          }
         } else {
           const orders: number[] = [];
           store.discreteLayersStore.layersImages?.forEach((item: ILayerImage) => {

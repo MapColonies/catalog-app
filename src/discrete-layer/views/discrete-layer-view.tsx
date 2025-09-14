@@ -33,9 +33,10 @@ import {
   IDrawing,
   IDrawingEvent
 } from '@map-colonies/react-components';
-import { IMapLegend } from '@map-colonies/react-components/dist/cesium-map/map-legend';
-import GPUInsufficiencyDetector from '../../common/components/gpu-insufficiency-detector/gpu-insufficiency-detector';
+import { GeocoderOptions } from '@map-colonies/react-components/dist/cesium-map/geocoder/geocoder-panel';
+import { IMapLegend } from '@map-colonies/react-components/dist/cesium-map/legend';
 // import { BrowserCompatibilityChecker } from '../../common/components/browser-compatibility-checker/browser-compatibility-checker';
+import GPUInsufficiencyDetector from '../../common/components/gpu-insufficiency-detector/gpu-insufficiency-detector';
 import CONFIG from '../../common/config';
 import { currentSite } from '../../common/helpers/siteUrl';
 import { localStore } from '../../common/helpers/storage';
@@ -165,7 +166,7 @@ const DiscreteLayerView: React.FC = observer(() => {
     if (val) {
       setWhatsNewVisitedCnt(parseInt(val));
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
     const layers = get(data, 'search', []) as ILayerImage[];
@@ -222,7 +223,7 @@ const DiscreteLayerView: React.FC = observer(() => {
     } else {
       appContainer?.style.setProperty(SIDE_PANEL_WIDTH_VARIABLE, EXPANDED_PANEL_WIDTH);
     }
-  }, [tabsPanelExpanded])
+  }, [tabsPanelExpanded]);
 
   useEffect(() => {
     store.discreteLayersStore.resetTabView([TabViews.SEARCH_RESULTS]);
@@ -250,15 +251,25 @@ const DiscreteLayerView: React.FC = observer(() => {
   /* eslint-disable */
   const mapSettingsLocale = useMemo(() => ({
     DIRECTION: intl.locale === 'he' ? 'rtl' : 'ltr',
-    MAP_SETTINGS_DIALOG_TITLE:  intl.formatMessage({ id: 'map-settings.dialog.title' }),
-    MAP_SETTINGS_SCENE_MODE_TITLE: intl.formatMessage({ id: 'map-settings.base-map.scene-mode.title' }),
-    MAP_SETTINGS_BASE_MAP_TITLE: intl.formatMessage({ id: 'map-settings.base-map.title' }),
+    METERS_UNIT: intl.formatMessage({ id: 'map.scale.units.meters' }),
+    KILOMETERS_UNIT: intl.formatMessage({ id: 'map.scale.units.kilometers' }),
     ZOOM_LABEL: intl.formatMessage({ id: 'map.zoom.label' }),
     DEBUG_PANEL_TITLE: intl.formatMessage({ id: 'debug-panel.title' }),
     WFS_TITLE: intl.formatMessage({ id: 'debug-panel.wfs.title' }),
     WFS_CACHE: intl.formatMessage({ id: 'debug-panel.wfs.cache' }),
     WFS_EXTENT: intl.formatMessage({ id: 'debug-panel.wfs.extent' }),
     NO_DATA_LAYERS: intl.formatMessage({ id: 'debug-panel.empty' }),
+    ACTIVE_LAYERS_TITLE: intl.formatMessage({ id: 'active-layers.title' }),
+    IMAGERY: intl.formatMessage({ id: 'active-layers.imagery' }),
+    DATA: intl.formatMessage({ id: 'active-layers.data' }),
+    FLY_TO: intl.formatMessage({ id: 'action.flyTo.tooltip' }),
+    REMOVE: intl.formatMessage({ id: 'active-layers.remove' }),
+    BASE_MAP_TITLE: intl.formatMessage({ id: 'map-settings.base-map.title' }),
+    TERRAIN_TITLE: intl.formatMessage({ id: 'record-type.record_quantized_mesh.label' }),
+    SHOW_FEATURE_ON_MAP: intl.formatMessage({ id: 'geocoder-panel.show-feature-on-map' }),
+    IN_MAP_EXTENT: intl.formatMessage({ id: 'geocoder-panel.in-map-extent' }),
+    SEARCH_PLACEHOLDER: intl.formatMessage({ id: 'general.search.placeholder' }),
+    NO_RESULTS: intl.formatMessage({ id: 'results.nodata' }),
   }), [intl]);
   /* eslint-enable */
 
@@ -266,10 +277,10 @@ const DiscreteLayerView: React.FC = observer(() => {
     return(
       <>
         <MapActionResolver />
-        <SelectedLayersContainer/>
-        <HighlightedLayer/>
-        <LayersFootprints/>
-        <PolygonParts/>
+        <SelectedLayersContainer />
+        <HighlightedLayer />
+        <LayersFootprints />
+        <PolygonParts />
       </>
     );
   }, []);
@@ -278,7 +289,6 @@ const DiscreteLayerView: React.FC = observer(() => {
     if (activeTabView !== targetViewIdx) {
       store.discreteLayersStore.setTabviewData(activeTabView);
       store.discreteLayersStore.restoreTabviewData(targetViewIdx);
-  
       if (activeTabView === TabViews.EXPORT_LAYER) {
         store.exportStore.setHasExportPreviewed(false);
       }
@@ -835,15 +845,76 @@ const DiscreteLayerView: React.FC = observer(() => {
   }, [activeTabView, actionsMenuDimensions]);
 
   const site = useMemo(() => currentSite(), []);
+  
+  const GEOCODER_OPTIONS = useMemo(() => ([
+    {
+      baseUrl: CONFIG.GEOCODING_URL,
+      endPoint: '/search/location/query',
+      method: 'GET',
+      params: {
+        dynamic: {
+          queryText: 'query',
+          geoContext: {
+            name: 'geo_context',
+            relatedParams: [["geo_context_mode", 'filter']]
+          }
+        },
+        static: [["limit", 6], ["disable_fuzziness", false]],
+      },
+      title: intl.formatMessage({ id: 'geocoder-panel.title.location' })
+    },
+    {
+      baseUrl: CONFIG.GEOCODING_URL,
+      endPoint: '/search/control/tiles',
+      method: 'GET',
+      params: {
+        dynamic: {
+          queryText: 'tile',
+          geoContext: {
+            name: 'geo_context',
+            relatedParams: [['geo_context_mode', 'filter']],
+          }
+        },
+        static: [["limit", 6], ["disable_fuzziness", false]],
+      },
+      title: intl.formatMessage({ id: 'geocoder-panel.title.tiles' })
+    },
+    {
+      baseUrl: CONFIG.GEOCODING_URL,
+      endPoint: '/search/control/items',
+      method: 'GET',
+      params: {
+        dynamic: {
+          queryText: 'command_name',
+          geoContext: {
+            name: 'geo_context',
+            relatedParams: [['geo_context_mode', 'filter']],
+          }
+        },
+        static: [["limit", 6], ["disable_fuzziness", false]],
+      },
+      title: intl.formatMessage({ id: 'geocoder-panel.title.control' })
+    },
+    {
+      baseUrl: CONFIG.GEOCODING_URL,
+      endPoint: '/search/control/routes',
+      method: 'GET',
+      params: {
+        dynamic: {
+          queryText: 'command_name',
+          geoContext: {
+            name: 'geo_context',
+            relatedParams: [['geo_context_mode', 'filter']],
+          }
+        },
+        // "geo_context": { "bbox": [-180, -90, 180, 90] },
+      },
+      title: intl.formatMessage({ id: 'geocoder-panel.title.routes' })
+    },
+  ]) satisfies GeocoderOptions[], [intl]);
  
   return (
     <>
-      <ActionResolver
-        handleOpenEntityDialog = {setEntityDialogOpen}
-        handleFlyTo = {onFlyTo}
-        handleTabViewChange = {handleTabViewChange}
-        activeTabView = {activeTabView}
-      />
       <Box className={`headerContainer ${disableOnDrawingClassName}`}>
         <Box className="headerViewsSwitcher">
           <Box>
@@ -890,10 +961,11 @@ const DiscreteLayerView: React.FC = observer(() => {
           <Tooltip content={intl.formatMessage({ id: 'general.login-user.tooltip' }, { user: store.userStore.user?.role })}>
             <Avatar className="avatar" name={store.userStore.user?.role} size="large" />
           </Tooltip>
-          {permissions.isSwitchUserRoleAllowed &&
-          <Box className="headerUserModeSwitchContainer">
-            <UserModeSwitch userRole={userRole} setUserRole={store.userStore.changeUserRole}/>
-          </Box>
+          {
+            permissions.isSwitchUserRoleAllowed &&
+            <Box className="headerUserModeSwitchContainer">
+              <UserModeSwitch userRole={userRole} setUserRole={store.userStore.changeUserRole}/>
+            </Box>
           }
           {
             permissions.isSystemJobsAllowed as boolean &&
@@ -1035,36 +1107,45 @@ const DiscreteLayerView: React.FC = observer(() => {
                   imgText: intl.formatMessage({ id: 'map-legends.actions.img' }),
                 }
               }}
-              debugPanel={CONFIG.MAP.DEBUG_PANEL}
+              showDebuggerTool={CONFIG.MAP.SHOW_DEBUGGER_TOOL}
+              showActiveLayersTool={CONFIG.MAP.SHOW_ACTIVE_LAYERS_TOOL}
+              {...(CONFIG.MAP.SHOW_GEOCODER_TOOL ? { geocoderPanel: GEOCODER_OPTIONS } : {})}
             >
-                {activeTabView !== TabViews.EXPORT_LAYER && <CesiumDrawingsDataSource
-                
-                  drawings={activeTabView === TabViews.SEARCH_RESULTS ? drawEntities : []}
-                  drawingMaterial={DRAWING_MATERIAL_COLOR}
-                  drawState={{
-                    drawing: isDrawing,
-                    type: drawPrimitive.type,
-                    handler: drawPrimitive.handler,
-                  }}
-                  hollow={true}
-                  outlineWidth={5}
-                  material={ (DRAWING_FINAL_MATERIAL as unknown) as CesiumColor }
-                />}
-                {memoizedLayers}
+                {
+                  activeTabView !== TabViews.EXPORT_LAYER &&
+                  <CesiumDrawingsDataSource
+                    drawings={activeTabView === TabViews.SEARCH_RESULTS ? drawEntities : []}
+                    drawingMaterial={DRAWING_MATERIAL_COLOR}
+                    drawState={{
+                      drawing: isDrawing,
+                      type: drawPrimitive.type,
+                      handler: drawPrimitive.handler,
+                    }}
+                    hollow={true}
+                    outlineWidth={5}
+                    material={ (DRAWING_FINAL_MATERIAL as unknown) as CesiumColor }
+                  />
+                }
 
-                {activeTabView === TabViews.EXPORT_LAYER && <ExportDrawingHandler /> }
+                { memoizedLayers }
+
+                { activeTabView === TabViews.EXPORT_LAYER && <ExportDrawingHandler /> }
+
+                <ActionResolver
+                  handleOpenEntityDialog = {setEntityDialogOpen}
+                  handleFlyTo = {onFlyTo}
+                  handleTabViewChange = {handleTabViewChange}
+                  activeTabView = {activeTabView}
+                />
+
                 <Terrain/>
                 <ExtentUpdater/>
                 <WfsFeature />
                 <DemHeightsFeatureComponent />
                 <PolygonPartsFeature />
-                {
-                  poi && activeTabView === TabViews.SEARCH_RESULTS && <PoiEntity longitude={poi.lon} latitude={poi.lat}/>
-                }
-                {
-                  rect && <FlyTo setRect={setRect} layer={store.discreteLayersStore.selectedLayer as LayerMetadataMixedUnion}/>
-                }
-                {activeTabView === TabViews.EXPORT_LAYER && <ExportPolygonsRenderer />}
+                { poi && activeTabView === TabViews.SEARCH_RESULTS && <PoiEntity longitude={poi.lon} latitude={poi.lat}/> }
+                { rect && <FlyTo setRect={setRect} layer={store.discreteLayersStore.selectedLayer as LayerMetadataMixedUnion}/> }
+                { activeTabView === TabViews.EXPORT_LAYER && <ExportPolygonsRenderer /> }
             </CesiumMap>
           </ActionsMenuDimensionsContext.Provider>
           {/* <BrowserCompatibilityChecker />  Should talk about if we need it or not anymore. */}

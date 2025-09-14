@@ -25,7 +25,9 @@ keys = [
   "/configuration/map/zoom",
   "/configuration/map/mapmode2d",
   "/configuration/map/use/optimized/tile/requests",
-  "/configuration/map/debug/panel",
+  "/configuration/map/show/debugger/tool",
+  "/configuration/map/show/active/layers/tool",
+  "/configuration/map/show/geocoder/tool",
   "/configuration/logger/http/host",
   "/configuration/logger/http/port",
   "/configuration/logger/http/path",
@@ -61,5 +63,6 @@ keys = [
   "/configuration/wfs/key/field",
   "/configuration/wfs/max/page/size",
   "/configuration/wfs/max/zoom/level",
-  "/configuration/wfs/max/cache/size"
+  "/configuration/wfs/max/cache/size",
+  "/configuration/geocoding/url"
 ]

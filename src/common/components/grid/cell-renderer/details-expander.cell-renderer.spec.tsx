@@ -1,6 +1,6 @@
 import React from 'react';
 import { shallow } from 'enzyme';
-import { ICellRendererParams, Column, RowNode, GridApi, ColumnApi } from 'ag-grid-community';
+import { ICellRendererParams, Column, RowNode, GridApi, ColumnApi, IRowNode } from 'ag-grid-community';
 // eslint-disable-next-line
 import '../../../../__mocks__/confEnvShim';
 import { DETAILS_ROW_ID_SUFFIX } from '../grid';
@@ -20,11 +20,12 @@ const mockDataBase:ICellRendererParams = {
   },
   node: new RowNode(),
   colDef: {},
-  column: new Column({},null,'isVisible',true),
   $scope: null,
   rowIndex: 1,
-  api: new GridApi(),
-  columnApi: new ColumnApi(),
+  api: {
+    onFilterChanged: () => {},
+    getRowNode: (id: string):IRowNode<any> | undefined => {return undefined},
+  },
   context: null,
   refreshCell: () => {},
   eGridCell: document.createElement('span'),

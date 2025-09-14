@@ -25,9 +25,11 @@ window._env_ = {
   MAP: {
     center: {{ getv "/configuration/map/center" "[34.811, 31.908]" }},
     zoom: {{ getv "/configuration/map/zoom" "14" }},
-    mapMode2D: '{{getv "/configuration/map/mapmode2d" "INFINITE_SCROLL"}}',
-    useOptimizedTileRequests: {{getv "/configuration/map/use/optimized/tile/requests" "false"}},
-    debugPanel: '{{getv "/configuration/map/debug/panel" "null"}}'
+    mapMode2D: '{{ getv "/configuration/map/mapmode2d" "INFINITE_SCROLL" }}',
+    useOptimizedTileRequests: {{ getv "/configuration/map/use/optimized/tile/requests" "false" }},
+    showDebuggerTool: {{ getv "/configuration/map/show/debugger/tool" "false" }},
+    showActiveLayersTool: {{ getv "/configuration/map/show/active/layers/tool" "true" }},
+    showGeocoderTool: {{ getv "/configuration/map/show/geocoder/tool" "true" }},
   },
   LOGGER: {
     level: '{{ getv "/configuration/logger/level" "warn" }}',
@@ -44,7 +46,7 @@ window._env_ = {
   DEFAULT_USER: {
     role: '{{ getv "/configuration/default/user/role" "USER" }}',
   },
-  BASE_MAPS: '{{ getv "/configuration/basemaps" "{\"maps\":[{\"id\":\"1st\",\"title\":\"1st Map Title\",\"isForPreview\":true,\"thumbnail\":\"https://nsw.digitaltwin.terria.io/build/3456d1802ab2ef330ae2732387726771.png\",\"baseRasteLayers\":[{\"id\":\"GOOGLE_TERRAIN\",\"type\":\"XYZ_LAYER\",\"opacity\":1,\"zIndex\":0,\"options\":{\"url\":\"https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}\",\"layers\":\"\",\"credit\":\"GOOGLE\"}},{\"id\":\"INFRARED_RASTER\",\"type\":\"WMS_LAYER\",\"opacity\":0.6,\"zIndex\":1,\"options\":{\"url\":\"https://mesonet.agron.iastate.edu/cgi-bin/wms/goes/conus_ir.cgi?\",\"layers\":\"goes_conus_ir\",\"credit\":\"Infrared data courtesy Iowa Environmental Mesonet\",\"parameters\":{\"transparent\":\"true\",\"format\":\"image/png\"}}}],\"baseVectorLayers\":[]},{\"id\":\"2nd\",\"title\":\"2nd Map Title\",\"thumbnail\":\"https://nsw.digitaltwin.terria.io/build/efa2f6c408eb790753a9b5fb2f3dc678.png\",\"baseRasteLayers\":[{\"id\":\"RADAR_RASTER\",\"type\":\"WMS_LAYER\",\"opacity\":0.6,\"zIndex\":1,\"options\":{\"url\":\"https://mesonet.agron.iastate.edu/cgi-bin/wms/nexrad/n0r.cgi?\",\"layers\":\"nexrad-n0r\",\"credit\":\"Radar data courtesy Iowa Environmental Mesonet\",\"parameters\":{\"transparent\":\"true\",\"format\":\"image/png\"}}},{\"id\":\"GOOGLE_TERRAIN\",\"type\":\"XYZ_LAYER\",\"opacity\":1,\"zIndex\":0,\"options\":{\"url\":\"https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}\",\"layers\":\"\",\"credit\":\"GOOGLE\"}},{\"id\":\"VECTOR_TILES_GPS\",\"type\":\"XYZ_LAYER\",\"opacity\":1,\"zIndex\":2,\"options\":{\"url\":\"https://gps.tile.openstreetmap.org/lines/{z}/{x}/{y}.png\",\"layers\":\"\",\"credit\":\"openstreetmap\"}}],\"baseVectorLayers\":[]},{\"id\":\"3rd\",\"title\":\"3rd Map Title\",\"isCurrent\":true,\"thumbnail\":\"https://nsw.digitaltwin.terria.io/build/d8b97d3e38a0d43e5a06dea9aae17a3e.png\",\"baseRasteLayers\":[{\"id\":\"VECTOR_TILES\",\"type\":\"XYZ_LAYER\",\"opacity\":1,\"zIndex\":0,\"options\":{\"url\":\"https://{s}.tile.thunderforest.com/cycle/{z}/{x}/{y}.png?apikey=6170aad10dfd42a38d4d8c709a536f38\",\"layers\":\"\",\"credit\":\"thunderforest\"}},{\"id\":\"VECTOR_TILES_GPS_1\",\"type\":\"XYZ_LAYER\",\"opacity\":1,\"zIndex\":1,\"options\":{\"url\":\"https://gps.tile.openstreetmap.org/lines/{z}/{x}/{y}.png\",\"layers\":\"\",\"credit\":\"openstreetmap\"}}],\"baseVectorLayers\":[]},{\"id\":\"4th\",\"title\":\"4th MapProxy\",\"isCurrent\":false,\"thumbnail\":\"\",\"baseRasteLayers\":[{\"id\":\"AZURE_RASTER_WMTS_FULL_IL\",\"type\":\"WMTS_LAYER\",\"opacity\":1,\"zIndex\":0,\"options\":{\"url\":\"http://map-raster.apps.v0h0bdx6.eastus.aroapp.io/wmts/full_il/{TileMatrixSet}/{TileMatrix}/{TileCol}/{TileRow}.png\",\"format\":\"image/png\",\"layer\":\"full_il\",\"style\":\"default\",\"tileMatrixSetID\":\"newGrids\"}},{\"id\":\"AZURE_RASTER_WMTS_BLUEMARBEL_IL\",\"type\":\"WMTS_LAYER\",\"opacity\":1,\"zIndex\":0,\"options\":{\"url\":\"http://map-raster.apps.v0h0bdx6.eastus.aroapp.io/wmts/bluemarble_il/{TileMatrixSet}/{TileMatrix}/{TileCol}/{TileRow}.png\",\"layer\":\"bluemarble_il\",\"style\":\"default\",\"format\":\"image/png\",\"tileMatrixSetID\":\"newGrids\"}}],\"baseVectorLayers\":[]}]}" }}',
+  BASE_MAPS: '{{ getv "/configuration/basemaps" "{\"maps\":[{\"id\":\"1st\",\"title\":\"1st Map\",\"isForPreview\":true,\"thumbnail\":\"https://mt1.google.com/vt/lyrs=s&x=6&y=4&z=3\",\"baseRasterLayers\":[{\"id\":\"GOOGLE_TERRAIN\",\"type\":\"XYZ_LAYER\",\"opacity\":1,\"zIndex\":0,\"options\":{\"url\":\"https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}\",\"layers\":\"\",\"credit\":\"GOOGLE\"}},{\"id\":\"INFRARED_RASTER\",\"type\":\"WMS_LAYER\",\"opacity\":0.6,\"zIndex\":1,\"options\":{\"url\":\"https://mesonet.agron.iastate.edu/cgi-bin/wms/goes/conus_ir.cgi?\",\"layers\":\"goes_conus_ir\",\"credit\":\"Infrared data courtesy Iowa Environmental Mesonet\",\"parameters\":{\"transparent\":\"true\",\"format\":\"image/png\"}}}]},{\"id\":\"2nd\",\"title\":\"2nd Map\",\"thumbnail\":\"https://mt1.google.com/vt/lyrs=s&x=6&y=4&z=3\",\"baseRasterLayers\":[{\"id\":\"RADAR_RASTER\",\"type\":\"WMS_LAYER\",\"opacity\":0.6,\"zIndex\":1,\"options\":{\"url\":\"https://mesonet.agron.iastate.edu/cgi-bin/wms/nexrad/n0r.cgi?\",\"layers\":\"nexrad-n0r\",\"credit\":\"Radar data courtesy Iowa Environmental Mesonet\",\"parameters\":{\"transparent\":\"true\",\"format\":\"image/png\"}}},{\"id\":\"GOOGLE_TERRAIN\",\"type\":\"XYZ_LAYER\",\"opacity\":1,\"zIndex\":0,\"options\":{\"url\":\"https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}\",\"layers\":\"\",\"credit\":\"GOOGLE\"}},{\"id\":\"VECTOR_TILES_GPS\",\"type\":\"XYZ_LAYER\",\"opacity\":1,\"zIndex\":2,\"options\":{\"url\":\"https://gps.tile.openstreetmap.org/lines/{z}/{x}/{y}.png\",\"layers\":\"\",\"credit\":\"openstreetmap\"}}]},{\"id\":\"3rd\",\"title\":\"3rd Map\",\"isCurrent\":true,\"thumbnail\":\"https://a.tile.thunderforest.com/cycle/17/78208/53265.png\",\"baseRasterLayers\":[{\"id\":\"VECTOR_TILES\",\"type\":\"XYZ_LAYER\",\"opacity\":1,\"zIndex\":0,\"options\":{\"url\":\"https://{s}.tile.thunderforest.com/cycle/{z}/{x}/{y}.png?apikey=6170aad10dfd42a38d4d8c709a536f38\",\"layers\":\"\",\"credit\":\"thunderforest\"}},{\"id\":\"VECTOR_TILES_GPS\",\"type\":\"XYZ_LAYER\",\"opacity\":1,\"zIndex\":1,\"options\":{\"url\":\"https://gps.tile.openstreetmap.org/lines/{z}/{x}/{y}.png\",\"layers\":\"\",\"credit\":\"openstreetmap\"}}]}]}" }}',
   DEFAULT_TERRAIN_PROVIDER_URL: '{{ getv "/configuration/default/terrain/provider/url" "" }}',
   WEB_TOOLS_URL: '{{ getv "/configuration/web/tools/url" "http://mc-web-tools-URL" }}',
   MODEL_VIEWER_ROUTE: '{{ getv "/configuration/model/viewer/route" "simple-catalog-viewer" }}',
@@ -55,34 +57,35 @@ window._env_ = {
   },
   NUMBER_OF_CHARACTERS_LIMIT: {{ getv "/configuration/number/of/characters/limit" "15" }},
   ACCESS_TOKEN: {
-    attributeName:'{{getv "/configuration/access/token/attribute/name" "token"}}',
-    injectionType:'{{getv "/configuration/access/token/injection/type" "queryParam"}}',
-    tokenValue:'{{getv "/configuration/access/token/token/value" "TOKEN"}}',
+    attributeName: '{{ getv "/configuration/access/token/attribute/name" "token" }}',
+    injectionType: '{{ getv "/configuration/access/token/injection/type" "queryParam" }}',
+    tokenValue: '{{ getv "/configuration/access/token/token/value" "TOKEN" }}',
   },
   SERVED_ENTITY_TYPES: '{{ getv "/configuration/served/entity/types" "RECORD_ALL,RECORD_RASTER,RECORD_3D,RECORD_DEM,RECORD_VECTOR" }}',
-  PROJECT_VERSION: '{{getv "/configuration/project/version" ""}}',
-  WHATSNEW_URL: '{{getv "/configuration/whatsnew/url" "http://whatsnew-URL"}}',
-  SITES_CONFIG: '{{ getv "/configuration/sites/config" "{\"masters\": [{ \"dns\": \"http://localhost:3000\", \"isAlias\": false }], \"slaves\": [{ \"dns\": \"http://localhost:8090\", \"isAlias\": false }], \"generics\": [{ \"dns\": \"https://catalog.mapcolonies.net\", \"isAlias\": false }]}"}}',
-  BFF_PATH: '{{getv "/configuration/bff/path" "/graphql"}}',
+  PROJECT_VERSION: '{{ getv "/configuration/project/version" "" }}',
+  WHATSNEW_URL: '{{ getv "/configuration/whatsnew/url" "http://whatsnew-URL" }}',
+  SITES_CONFIG: '{{ getv "/configuration/sites/config" "{\"masters\": [{ \"dns\": \"http://localhost:3000\", \"isAlias\": false }], \"slaves\": [{ \"dns\": \"http://localhost:8090\", \"isAlias\": false }], \"generics\": [{ \"dns\": \"https://catalog.mapcolonies.net\", \"isAlias\": false }]}" }}',
+  BFF_PATH: '{{ getv "/configuration/bff/path" "/graphql" }}',
   POLYGON_PARTS: {
-    featureTypePrefix: '{{getv "/configuration/polygonparts/featuretypeprefix" "polygonParts:"}}',
-    densityFactor: {{getv "/configuration/polygonparts/densityfactor" "0.3"}},
-    geometryErrorsThreshold: {{getv "/configuration/polygonparts/geometry/errors/threshold" "0.05"}},
-    areaThreshold: {{getv "/configuration/polygonparts/area/threshold" "10"}},
+    featureTypePrefix: '{{ getv "/configuration/polygonparts/featuretypeprefix" "polygonParts:" }}',
+    densityFactor: {{ getv "/configuration/polygonparts/densityfactor" "0.3" }},
+    geometryErrorsThreshold: {{ getv "/configuration/polygonparts/geometry/errors/threshold" "0.05" }},
+    areaThreshold: {{ getv "/configuration/polygonparts/area/threshold" "10" }},
     max: {
-      WFSFeatures: {{getv "/configuration/polygonparts/max/wfs/features" "500"}},
-      showFootprintZoomLevel: {{getv "/configuration/polygonParts/max/show/footprint/zoom/level" "10"}},
-      perShape: {{getv "/configuration/polygonparts/max/pershape" "300"}},
-      vertices: {{getv "/configuration/polygonparts/max/vertices" "300000"}}
+      WFSFeatures: {{ getv "/configuration/polygonparts/max/wfs/features" "500" }},
+      showFootprintZoomLevel: {{ getv "/configuration/polygonParts/max/show/footprint/zoom/level" "10" }},
+      perShape: {{ getv "/configuration/polygonparts/max/pershape" "300" }},
+      vertices: {{ getv "/configuration/polygonparts/max/vertices" "300000" }}
     }
   },
   WFS: {
-    style: '{{getv "/configuration/wfs/style" "{\"color\": \"#01FF1F\", \"hover\": \"#24AEE9\", \"pointStroke\": \"#01FF1F\"}"}}',
-    keyField: '{{getv "/configuration/wfs/key/field" "id"}}',
+    style: '{{ getv "/configuration/wfs/style" "{\"color\": \"#01FF1F\", \"hover\": \"#24AEE9\", \"pointStroke\": \"#01FF1F\"}" }}',
+    keyField: '{{ getv "/configuration/wfs/key/field" "id" }}',
     max: {
-      pageSize: {{getv "/configuration/wfs/max/page/size" "300"}},
-      zoomLevel: {{getv "/configuration/wfs/max/zoom/level" "14"}},
-      cacheSize: {{getv "/configuration/wfs/max/cache/size" "6000"}}
+      pageSize: {{ getv "/configuration/wfs/max/page/size" "300" }},
+      zoomLevel: {{ getv "/configuration/wfs/max/zoom/level" "14" }},
+      cacheSize: {{ getv "/configuration/wfs/max/cache/size" "6000" }}
     }
-  }
+  },
+  GEOCODING_URL: '{{ getv "/configuration/geocoding/url" "http://geocoding-URL" }}',
 };

@@ -1,6 +1,6 @@
 {
   "name": "catalog-app",
-  "version": "2.23.12",
+  "version": "2.24.0",
   "bugs": {
     "url": "https://github.com/MapColonies/catalog-app/issues"
   },
@@ -83,7 +83,7 @@
     "@formatjs/icu-messageformat-parser": "^2.6.0",
     "@map-colonies/error-types": "^1.1.5",
     "@map-colonies/mc-utils": "^1.6.1",
-    "@map-colonies/react-components": "^4.10.4",
+    "@map-colonies/react-components": "^4.12.0",
     "@map-colonies/react-core": "^4.2.0",
     "@map-colonies/static-assets": "^0.5.1",
     "@map-colonies/types": "1.6.0",
@@ -124,8 +124,8 @@
     "@types/topojson-server": "^3.0.4",
     "@types/ua-parser-js": "^0.7.36",
     "@types/uuid": "^9.0.1",
-    "ag-grid-community": "24.1.0",
-    "ag-grid-react": "24.1.0",
+    "ag-grid-community": "34.0.2",
+    "ag-grid-react": "34.0.2",
     "assert": "^2.0.0",
     "axios": "^0.21.1",
     "browserify-zlib": "^0.2.0",
@@ -169,7 +169,7 @@
     "topojson-client": "^3.1.0",
     "topojson-server": "^3.0.1",
     "ts-enum-util": "^4.0.2",
-    "typescript": "^4.9.5",
+    "typescript": "^5.9.2",
     "ua-parser-js": "^1.0.2",
     "url": "^0.11.1",
     "use-debounce": "^7.0.1",
