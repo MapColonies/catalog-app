@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.24.1](https://github.com/MapColonies/catalog-app/compare/v2.24.0...v2.24.1) (2025-09-14)
+
+
+### Bug Fixes
+
+* override query action ([#669](https://github.com/MapColonies/catalog-app/issues/669)) ([334a59e](https://github.com/MapColonies/catalog-app/commit/334a59e3308497e90e3c4149792222f197682e30))
+
 ## [2.24.0](https://github.com/MapColonies/catalog-app/compare/v2.23.16...v2.24.0) (2025-09-11)
 
 

@@ -6,7 +6,6 @@ import { StoreProvider, rootStore } from './discrete-layer/models/RootStore';
 import { SearchResponse } from './discrete-layer/models/discreteLayersStore';
 import CONFIG from './common/config';
 import { syncHttpClientGql } from './syncHttpClientGql';
-import { customizeStoreBehavior } from './customize-store-behavior';
 
 import './index.css';
 
@@ -31,8 +30,6 @@ const store = rootStore.create(
     // gqlHttpClient: createHttpClient("http://localhost:8080/graphql")
   }
 );
-
-customizeStoreBehavior(store);
 
 // REMARK IIFE to discard language presentation logic
 ((): void => {

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Method } from 'axios';
 import { types, Instance, getEnv } from 'mobx-state-tree';
+import { DocumentNode } from 'graphql';
 import { createStoreContext, createUseQueryHook } from 'mst-gql';
 import { useContext } from 'react';
 import { ResponseState } from '../../common/models/response-state.enum';
@@ -50,12 +51,37 @@ export const baseRootStore = RootStoreBase
       return env.fetch;
     },
   }))
-  .actions(self => ({
-    // This is an auto-generated example action.
-    log(): void {
-      console.log(JSON.stringify(self))
-    }
-  }))
+  .actions(self => {
+    const originalQuery = self.query;
+    return {
+      // This is an auto-generated example action.
+      log(): void {
+        console.log(JSON.stringify(self))
+      },
+      query: (
+        queryStr: string | DocumentNode,
+        variables?: any,
+        options: any = {}
+      ) => {
+        const mergedOptions = {
+          fetchPolicy: 'no-cache',
+          ...options,
+        };
+
+        // #region Unnecessary code, only for debug purpose
+        const regex = /query\W{1,2}[a-zA-Z]*/;
+        if (typeof queryStr === 'string') {
+          const matched = queryStr.match(regex)?.[0];
+          const queryNameSplited = matched?.split('(');
+          const queryName = queryNameSplited?.[0].replace('query ', '');
+          console.log(`[mst-gql] global no-cache applied to query: ${queryName}`);
+        }
+        // #endregion
+
+        return originalQuery.call(self, queryStr, variables, mergedOptions);
+      }
+    };
+  })
 
 export const rootStore = baseRootStore;
 
