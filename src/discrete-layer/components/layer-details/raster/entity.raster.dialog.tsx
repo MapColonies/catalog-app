@@ -54,6 +54,7 @@ import suite from '../validate';
 import { getUIIngestionFieldDescriptors } from './ingestion.utils';
 
 import './entity.raster.dialog.css';
+import { RasterWorkflowProvider, RasterWorkflowContext } from './state-machine-context.raster';
 
 const DEFAULT_ID = 'DEFAULT_UI_ID';
 const DEFAULT_TYPE_NAME = 'DEFAULT_TYPE_NAME';
@@ -126,8 +127,36 @@ const getLabel = (recordType: RecordType): string => {
   return 'field-names.ingestion.fileNames';
 };
 
-export const EntityRasterDialog: React.FC<EntityRasterDialogProps> = observer(
+
+export const EntityRasterDialog: React.FC<EntityRasterDialogProps> = (props: EntityRasterDialogProps) => {
+  return (
+    <RasterWorkflowProvider>
+      <EntityRasterDialogInner {...props} />
+    </RasterWorkflowProvider>
+  );
+}
+
+export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observer(
   (props: EntityRasterDialogProps) => {
+
+    const actorRef = RasterWorkflowContext.useActorRef();
+
+    // Subscribe to state using a selector
+    const state = RasterWorkflowContext.useSelector((s) => s);
+
+    useEffect(() => {
+      if (props.isSelectedLayerUpdateMode && props.layerRecord && actorRef) {
+        actorRef.send({ type: "START_UPDATE" });
+      } else {
+        actorRef.send({ type: "START_NEW"});
+        // actorRef.send({ type: "RESTORE", jobId: 'KUKU_JOB' });
+      }
+      console.log(
+        "****** PARENT CHANGE FLOWTYPE(props.isSelectedLayerUpdateMode) *******",
+        props.isSelectedLayerUpdateMode
+      );
+    }, [props.isSelectedLayerUpdateMode, props.layerRecord, actorRef]);
+  
 
     const store = useStore();
     const intl = useIntl();
@@ -526,6 +555,7 @@ export const EntityRasterDialog: React.FC<EntityRasterDialogProps> = observer(
             />
           </DialogTitle>
           <DialogContent className="dialogBody">
+          <h1>[DIALOG]file{state.context.gpkgFile?.name}</h1>
             {mode === Mode.UPDATE && <UpdateLayerHeader />}
               {isAllInfoReady && (
                 <EntityRasterForm

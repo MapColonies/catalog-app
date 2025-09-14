@@ -23,6 +23,8 @@ import { IRecordFieldInfo } from './layer-details.field-info';
 import { EntityFormikHandlers, FormValues } from './layer-datails-form';
 import { clearSyncWarnings, importJSONFileFromClient } from './utils';
 
+import { RasterWorkflowContext } from './raster/state-machine-context.raster';
+
 import './ingestion-fields.css';
 
 const DIRECTORY = 0;
@@ -172,6 +174,34 @@ export const IngestionFields: React.FC<PropsWithChildren<IngestionFieldsProps>> 
 }) => {
   const intl = useIntl();
   const store = useStore();
+  
+  // const actorRef = RasterWorkflowContext.useActorRef();
+  // const state = RasterWorkflowContext.useSelector((s) => s);
+
+  // useEffect(() => {
+  //   console.log("**** workflowMachine_STATE[<IngestionFields>] *****", state.value);
+  //   if((state.value as any).flow === 'selectGpkg'){
+  //     setFilePickerDialogOpen(true);
+  //     actorRef.send({ type: 'SELECT_GPKG', file: new File([], 'KUKU.GPKG') })
+  //   }
+  // }, [state.value]);
+
+  const actorRef = RasterWorkflowContext.useActorRef();
+  const state = RasterWorkflowContext.useSelector((s) => s);
+
+  const flowActor = state.children?.flow; // <-- the invoked child
+  const flowState = flowActor?.getSnapshot(); // grab its snapshot
+
+  useEffect(() => {
+    console.log("**** workflowMachine_STATE[<IngestionFields>] *****", state.value);
+    console.log("**** flowMachine_STATE *****", flowState?.value);
+
+    if (flowState?.matches("selectGpkg")) {
+      setFilePickerDialogOpen(true);
+      // flowActor?.send({ type: "SELECT_GPKG", file: new File([], "KUKU.GPKG") });
+    }
+  }, [state.value, flowState]);
+
   const [isFilePickerDialogOpen, setFilePickerDialogOpen] = useState<boolean>(false);
   const [isImportDisabled, setIsImportDisabled] = useState(true);
   const [selection, setSelection] = useState<Selection>({
@@ -344,6 +374,7 @@ export const IngestionFields: React.FC<PropsWithChildren<IngestionFieldsProps>> 
     const fileNames = selected.files.map((file: FileData) => file.name);
 
     if (validateSources) {
+      flowActor?.send({ type: "SELECT_GPKG", file: new File([], "KUKU.GPKG") });
       setValidatingSource?.(true);
       queryValidateSource.setQuery(
         store.queryValidateSource(
@@ -397,6 +428,7 @@ export const IngestionFields: React.FC<PropsWithChildren<IngestionFieldsProps>> 
 
   return (
     <>
+      <h1>[INGESTION-FIELDS]file{state.context.gpkgFile?.name}</h1>
       <Box className="header section">
         <Box className="ingestionFields">
           <IngestionInputs
