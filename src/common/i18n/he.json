@@ -58,7 +58,8 @@
   "general.empty.text": "ריק",
   "general.more.text": "עוד...",
   "general.missing.translation": "##MISSING_TRANSLATION##",
-  
+  "general.search.placeholder": "חיפוש...",
+
   "terrain-provider.access.error": "מידע פני השטח לא זמין",
 
   "action.tab-views.catalog.tooltip": "טאב קטלוג",
@@ -114,7 +115,6 @@
   "action.export.custom-selection.label": "ייצוא מבחירה",
   "action.export.import-shape.tooltip": "ייבא מקובץ",
   "action.export.select-hot-area.tooltip": "בחירה מאזורים חמים",
-  
 
   "record-type.record_raster.label": "ראסטר",
   "record-type.record_3d.label": "תלת-מימד",
@@ -126,7 +126,7 @@
   "enum-value.provider_type.synergy.label": "סינרגיה",
   "enum-value.provider_type.terra_nova.label": "טרה-נובה",
   "enum-value.provider_type.maxar.label": "Vivid",
-  
+
   "polygon-selection.draw-btn.tooltip": "ציור אזור לחיפוש",
   "polygon-selection.cancel-btn.tooltip": "בטל ציור",
   "polygon-selection.cancel-btn.text": "בטל ציור",
@@ -201,17 +201,14 @@
 
   "catalog-filter.productName.validation-error": "יש להזין ערך המורכב מאותיות, מספרים, פסיקים, גרשיים ומקף תחתון בלבד",
   "catalog-filter.productId.validation-error": "יש להזין ערך המורכב מאותיות, מספרים, פסיקים, גרשיים ומקף תחתון בלבד",
-  
   "catalog-filter.sevenDays.date-shortcuts": "7 ימים",
   "catalog-filter.thirtyDays.date-shortcuts": "30 ימים",
   "catalog-filter.thisYear.date-shortcuts": "השנה",
   "catalog-filter.lastYear.date-shortcuts": "שנה שעברה",
-
   "catalog-filter.dateRangeField.placeholder": "בחר טווח תאריכים",
   "catalog-filter.dateRangeField.validation-error": "יש לבחור בטווח תאריכים תקין",
   "catalog-filter.filterButton.text": "חפש",
   "catalog-filter.clearFilterButton.text": "נקה",
-
   "catalog-filter.freeText.placeholder": "חיפוש חופשי בקטלוג",
 
   "context-menu.title.tooltip": "פעולות על השכבה העליונה: ",
@@ -255,7 +252,7 @@
   "field-names.raster.productType": "סוג",
   "field-names.raster.productName": "שם",
   "field-names.raster.productVersion": "מס' גירסה",
-  
+
   "field-names.raster.minResolutionDeg": "רז' נמוכה במעלות",
   "field-names.raster.maxResolutionDeg": "רז' גבוהה במעלות",
   "field-names.raster.minResolutionMeter": "רז' נמוכה במטר",
@@ -636,11 +633,9 @@
   "system-status.job-priority-normal": "רגיל",
   "system-status.job-priority-high": "גבוה",
   "system-status.job-priority-highest": "גבוה מאוד",
-
   "system-status.job-details.header.internalId": "מזהה פנימי",
   "system-status.job-details.header.extetnalId": "מזהה חיצוני",
   "system-status.job-details.header.producerName": "שם יצרן",
-  
   "system-status.export-details.link.label": "לינק לקבצים",
   "system-status.export-details.description.label": "תיאור משימה: ",
   "system-status.export-details.no-description.text": "ללא",
@@ -658,10 +653,10 @@
   "system-core-info.externalServicesTitle": "שירותים חיצוניים",
   "system-core-info.versionText": "גרסה",
   "system-core-info.servicesText": "שירותי",
-  "pycsw.raster.url": "raster",
+  "pycsw.raster.url": "Raster",
   "pycsw.3d.url": "3D",
   "pycsw.dem.url": "DEM",
-  "map_server.raster.url": "raster",
+  "map_server.raster.url": "Raster",
   "map_server.dem.url": "DEM",
 
   "lookups.sensors.vis": "VIS",
@@ -686,7 +681,7 @@
   "compatibility-check.browser-version-not-supported": "גרסת הדפדפן שלך ישנה מדי, האפליקציה עלולה לא לעבוד כראוי.\nיש לעדכן את הדפדפן {browserName} לגרסה {minimumVersion} ומעלה לחוויה הטובה ביותר.",
 
   "gpu-insufficient.error": "המאיץ הגרפי שלך אינו מאופשר,\n לצפיה אופטימלית בצע את השלבים שמתוארים בפורטל המפתחים של ליבות המיפוי תחת הסעיף:\n'Enable Hardware Acceleration'",
-  
+
   "map-legends.sidebar-title": "מקראי מפות",
   "map-legends.empty-text": "אין מקראים לשכבות הפעילות",
   "map-legends.actions.doc": "פתח קובץ",
@@ -696,13 +691,28 @@
   "map-settings.base-map.scene-mode.title": "מצב תצוגה",
   "map-settings.dialog.title": "הגדרות מפה",
 
-  "map.zoom.label": "zoom",
+  "map.scale.units.meters": "מ'",
+  "map.scale.units.kilometers": "קמ'",
+
+  "map.zoom.label": "זום",
 
   "debug-panel.title": "דיבאגר",
   "debug-panel.wfs.title": "שכבות מידע",
   "debug-panel.wfs.cache": "בזכרון",
   "debug-panel.wfs.extent": "בתצוגה",
   "debug-panel.empty": "לא נמצאו שכבות",
+
+  "active-layers.title": "שכבות פעילות",
+  "active-layers.imagery": "ראסטר",
+  "active-layers.data": "מידע",
+  "active-layers.remove": "הסר",
+
+  "geocoder-panel.show-feature-on-map": "הראה על המפה",
+  "geocoder-panel.in-map-extent": "חיפוש בתיחום נוכחי",
+  "geocoder-panel.title.location": "מיקום",
+  "geocoder-panel.title.tiles": "אריחי שליטה (נצ\"א)",
+  "geocoder-panel.title.control": "נתוני שליטה",
+  "geocoder-panel.title.routes": "צירי שליטה",
 
   "user-role.switch.user.text": "משתמש",
   "user-role.switch.admin.text": "מנהל",
@@ -790,7 +800,6 @@
   "map-context-menu.layer-down.title": "הצג רמה אחת למטה",
   "map-context-menu.layer-to-top.title": "הצג מעל כולם",
   "map-context-menu.layer-to-bottom.title": "הצג מתחת לכולם",
-  
 
   "wfs-info.no-data.message": "לא נמצאו נתונים עבור שירות מידע {feature}",
   "dem-heights-info.no-data.message": "לא נמצאו נתוני גובה במיקום המבוקש",

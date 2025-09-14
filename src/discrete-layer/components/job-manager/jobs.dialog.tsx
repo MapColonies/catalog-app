@@ -45,13 +45,11 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
   const [gridApi, setGridApi] = useState<GridApi>();
   const [pollingCycle, setPollingCycle] = useState(START_CYCLE_ITERATION);
   const [fromDate, setFromDate] = useState<Date>(moment().subtract(CONFIG.JOB_MANAGER_END_OF_TIME, 'days').toDate());
-  const [tillDate, setTillDate] = useState<Date>(new Date());
-  // const [retryErr, setRetryErr] = useState(false);
 
   // @ts-ignore
   const [timeLeft, actions] = useCountDown(POLLING_CYCLE_INTERVAL, COUNTDOWN_REFRESH_RATE);
 
-  const dateNow = useDateNow();
+  const tillDate = useDateNow().current;
 
   // start the timer during the first render
   useEffect(() => {
@@ -71,18 +69,14 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
     }
   );
 
-  const { setQuery: setQueryForOneJob, data: jobData } = useQuery((store) =>
-    store.queryJob({
-      id: 'DEFAULT'
-    }),
+  //@ts-ignore
+  const { setQuery: setQueryForOneJob, data: jobData, loading:loadingJobData } = useQuery<Record<any,any>>((store) =>
+    undefined,
     {
       fetchPolicy: 'no-cache'
     }
   );
 
-  useEffect(() => {
-    setTillDate(dateNow)
-  }, [dateNow])
 
   const mutationQuery = useQuery();
 
@@ -189,9 +183,10 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
   }, [query, pollingCycle]);
   
   useEffect(() => {
-    if (!jobData) return;
-    downloadJSONToClient(jobData.job, `${encodeURI(jobData.job.resourceId as string)}_job_details.json`);
-  }, [jobData]);
+    if (!loadingJobData && jobData){
+      downloadJSONToClient(jobData.job, `${encodeURI(jobData.job.resourceId as string)}_job_details.json`);
+    }
+  }, [jobData, loadingJobData]);
 
   const closeDialog = useCallback(() => {
     onSetOpen(false);
@@ -257,9 +252,7 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
               setGridApi(params.api)
             }}
             updateJobCB={setUpdateTaskPayload}
-            rowDataChangeCB={(): void => {
-              gridApi?.applyTransaction({ update: gridRowData });
-            }}
+            rowDataChangeCB={(): void => {}}
             areJobsLoading={loading}
           />
       </Box>
@@ -277,7 +270,6 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
               typeof dateRange.to !== 'undefined'
             ) {
               setFromDate(dateRange.from);
-              setTillDate(dateRange.to);
             }
           }}
           from={fromDate}

@@ -1,18 +1,22 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { CSSProperties, useEffect, useState } from 'react';
+import React, { CSSProperties, useCallback, useEffect, useState } from 'react';
 import { AgGridReact } from 'ag-grid-react';
-import { ChangeDetectionStrategyType } from 'ag-grid-react/lib/changeDetectionService';
 import {
   GridReadyEvent as AgGridReadyEvent,
   GridApi as AgGridApi,
   GridOptions,
-  RowNode,
   ValueFormatterParams,
   RowSelectedEvent,
   CellMouseOverEvent,
   CellMouseOutEvent,
   RowDragEnterEvent,
-  RowDragEndEvent
+  RowDragEndEvent,
+  IRowNode,
+  RowHeightParams,
+  RowClickedEvent,
+  AllCommunityModule, 
+  ModuleRegistry, 
+  IsFullWidthRowParams
 } from 'ag-grid-community';
 import { useTheme } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
@@ -21,9 +25,10 @@ import CONFIG from '../../config';
 import { DetailsExpanderRenderer } from './cell-renderer/details-expander.cell-renderer';
 import { GridThemes } from './themes/themes';
 
-import 'ag-grid-community/dist/styles/ag-grid.css';
-import 'ag-grid-community/dist/styles/ag-theme-alpine-dark.css';
-import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
+import 'ag-grid-community/styles/ag-theme-alpine.css';
+
+// All Community Features
+ModuleRegistry.registerModules([AllCommunityModule]);
 
 const DEFAULT_DETAILS_ROW_HEIGHT = 150;
 const EXPANDER_COLUMN_WIDTH = 60;
@@ -43,13 +48,15 @@ export interface GridCellMouseOverEvent extends CellMouseOverEvent{};
 export interface GridRowDragEnterEvent extends RowDragEnterEvent{};
 export interface GridRowDragEndEvent extends RowDragEndEvent{};
 export interface GridRowSelectedEvent extends RowSelectedEvent{};
+export interface GridRowClickedEvent extends RowClickedEvent{};
 export interface GridValueFormatterParams extends ValueFormatterParams{};
 export interface GridComponentOptions extends GridOptions {
   detailsRowCellRenderer?: string;
   detailsRowHeight?: number;
   detailsRowExpanderPosition?: 'start' | 'end';
-  rowDataChangeDetectionStrategy?: ChangeDetectionStrategyType;
-  detailsRowCellRendererPresencePredicate?: (data: any) => boolean;
+  context?: {
+    detailsRowCellRendererPresencePredicate?: (data: any) => boolean;
+  }
 };
 
 export interface IGridRowDataDetailsExt {
@@ -57,17 +64,14 @@ export interface IGridRowDataDetailsExt {
   fullWidth: boolean;
   isVisible: boolean;
 };
-export interface GridRowNode extends RowNode {};
+export interface GridRowNode extends IRowNode {};
 
 export const GridComponent: React.FC<GridComponentProps> = (props) => {
   const [rowData, setRowData] = useState<any[]>()
   const theme = useTheme();
   const [gridApi, setGridApi] = useState<GridApi>();
   
-  const {rowDataChangeDetectionStrategy, detailsRowExpanderPosition, ...restGridOptions} = props.gridOptions as GridComponentOptions;
-  const reactGridConfig = {
-    rowDataChangeDetectionStrategy: rowDataChangeDetectionStrategy ?? undefined,
-  };
+  const {detailsRowExpanderPosition, ...restGridOptions} = props.gridOptions as GridComponentOptions;
 
   const gridOptionsFromProps: GridComponentOptions = {
     ...restGridOptions,
@@ -82,8 +86,9 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
           width: EXPANDER_COLUMN_WIDTH,
           cellRenderer: 'detailsExpanderRenderer',
           suppressMovable: true,
+          sortable: false,
           cellRendererParams: {
-            detailsRowCellRendererPresencePredicate: props.gridOptions.detailsRowCellRendererPresencePredicate
+            detailsRowCellRendererPresencePredicate: props.gridOptions.context?.detailsRowCellRendererPresencePredicate
           }
         } : 
         {
@@ -96,15 +101,16 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
           width: EXPANDER_COLUMN_WIDTH,
           cellRenderer: 'detailsExpanderRenderer',
           suppressMovable: true,
+          sortable: false,
           cellRendererParams: {
-            detailsRowCellRendererPresencePredicate: props.gridOptions.detailsRowCellRendererPresencePredicate
+            detailsRowCellRendererPresencePredicate: props.gridOptions.context?.detailsRowCellRendererPresencePredicate
           }
         } : 
         {
           hide: true,
         },
    ],
-   getRowHeight: props.gridOptions?.detailsRowCellRenderer !== undefined ? (params: RowNode): number => {
+   getRowHeight: props.gridOptions?.detailsRowCellRenderer !== undefined ? (params: RowHeightParams): number => {
     return (params.data as IGridRowDataDetailsExt).rowHeight;
    } : undefined,
    isExternalFilterPresent: props.gridOptions?.detailsRowCellRenderer !== undefined ? (): boolean => true : undefined,
@@ -112,15 +118,15 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
       return (node.data as IGridRowDataDetailsExt).isVisible;
       //return gridOptions.api.getValue("isVisible", node.rowNode);
     } : undefined,
-    isFullWidthCell: props.gridOptions?.detailsRowCellRenderer !== undefined ? (rowNode): boolean => {
+    isFullWidthRow: props.gridOptions?.detailsRowCellRenderer !== undefined ? (params: IsFullWidthRowParams): boolean => {
       // checked the fullWidth attribute that was set while creating the data
-      return (rowNode.data as IGridRowDataDetailsExt).fullWidth;
+      return (params.rowNode.data as IGridRowDataDetailsExt).fullWidth;
     } : undefined,
     fullWidthCellRenderer: props.gridOptions?.detailsRowCellRenderer ?? undefined,
 
-   frameworkComponents: {
-    ...props.gridOptions?.frameworkComponents as {[key: string]: any},
-    detailsExpanderRenderer: DetailsExpanderRenderer,
+   components: {
+    ...props.gridOptions?.components as {[key: string]: any},
+    detailsExpanderRenderer: useCallback(DetailsExpanderRenderer, []),
    },
    localeText: GRID_MESSAGES[CONFIG.I18N.DEFAULT_LANGUAGE],
    onGridReady(params: GridReadyEvent) {
@@ -170,16 +176,18 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
       result.push(...(props.rowData as []));
     }
     if (typeof props.isLoading === 'undefined' || props.isLoading === false) {
-      gridApi?.hideOverlay();
       setRowData(result);
+      if(result){
+        gridApi?.setGridOption("loading", false);  
+      }
     } else {
-      gridApi?.showLoadingOverlay();
+      gridApi?.setGridOption("loading", true);
     }
   
   }, [props.rowData, props.gridOptions, props.isLoading]);
 
   const agGridThemeOverrides = GridThemes.getTheme(theme);
-
+  
   return (
     <Box
       className={theme.type === 'dark' ? 'ag-theme-alpine-dark' : 'ag-theme-alpine' }
@@ -190,8 +198,8 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
     >
       <AgGridReact
         gridOptions={gridOptions}
-        rowData={rowData}
-        {...reactGridConfig} />
+        rowData={rowData} 
+      />
     </Box>
   );
 };

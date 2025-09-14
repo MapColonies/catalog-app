@@ -242,14 +242,9 @@ body[dir='rtl'] .tabHeaderContainer .filterByCatalogEntitySelect {
   margin-right: 0;
 }
 
-.cesium-viewer .sideToolsContainer {
-  z-index: 0;
+.cesium-viewer .bottomToolsContainer > div {
+  height: 28px;;
 }
-
-.cesium-viewer-fullscreenContainer , .cesium-viewer .toolsContainer {
-  z-index: 0;
-}
-
 
 .interactionsDisabled {
   position: relative;
@@ -295,6 +290,14 @@ body[dir='rtl'] .tabHeaderContainer .filterByCatalogEntitySelect {
   text-align: center;
   z-index: 1;
 }
-.badge_primary{
+.badge_primary {
   background: var(--mdc-theme-primary);
+}
+
+.mdc-checkbox__native-control {
+  size: 4px;
+}
+
+body[dir='rtl'] .MuiBox-root .resultsContainer {
+  direction: ltr;
 }

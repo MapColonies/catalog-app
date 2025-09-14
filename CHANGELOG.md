@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.24.0](https://github.com/MapColonies/catalog-app/compare/v2.23.16...v2.24.0) (2025-09-11)
+
+
+### Features
+
+* cesium active layers (MAPCO-7160) and geocoding custom component (MAPCO-7826) ([#640](https://github.com/MapColonies/catalog-app/issues/640)) ([4f9ee69](https://github.com/MapColonies/catalog-app/commit/4f9ee6975f5804af432dbc78c7e86dcbf8591886))
+* customize store behavior ([#623](https://github.com/MapColonies/catalog-app/issues/623)) ([9f58d7c](https://github.com/MapColonies/catalog-app/commit/9f58d7cfc100d4b9cbcf11005a051edf51d78f9a))
+
+
+### Bug Fixes
+
+* ag-grid upgrade ( MAPCO-6884 ) ([#648](https://github.com/MapColonies/catalog-app/issues/648)) ([aaa0312](https://github.com/MapColonies/catalog-app/commit/aaa0312441f65e969d9497f23ef438b5e17b5199))
+
 ## [2.23.16](https://github.com/MapColonies/catalog-app/compare/v2.23.15...v2.23.16) (2025-09-02)
 
 

@@ -276,8 +276,7 @@ const ExportLayerFooter: React.FC<ExportLayerFooterProps> = observer(({ handleTa
   return (
     <Box className="exportFooter">
       <ExportFormValidationErrors
-        //@ts-ignore
-        errors={{ ...insufficientSpaceErrorObj, ...serviceError, ...formattedFileError, ...formState.errors }}
+        errors={ { ...insufficientSpaceErrorObj, ...serviceError, ...formattedFileError, ...formState.errors } as FieldErrors<Record<string, unknown>> }
       />
       {sizeEstimationsContainer}
       <Box className="buttonsContainer">

@@ -1,21 +1,19 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef } from 'react';
 
 const SECOND = 1000;
 
-const useDateNow = (): Date => {
-    const [dateNow, setDateNow] = useState<Date>(new Date());
-
+const useDateNow = () => {
+    const dateNowRef = useRef(new Date());
+  
     useEffect(() => {
-        const secondInterval = setInterval(() => {
-            setDateNow(new Date());
-        }, SECOND);
-
-        return (): void => {
-            clearInterval(secondInterval);
-        }
-    }, [])
-
-    return dateNow;
-}
+      const interval = setInterval(() => {
+        dateNowRef.current = new Date();
+      }, SECOND);
+  
+      return () => clearInterval(interval);
+    }, []);
+  
+    return dateNowRef;
+  };
 
 export default useDateNow;
