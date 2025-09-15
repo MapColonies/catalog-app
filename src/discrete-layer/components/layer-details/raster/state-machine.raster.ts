@@ -1,6 +1,6 @@
 //@ts-nocheck
 import { createMachine, assign, sendParent, fromPromise } from "xstate";
-import { IBaseRootStore, IRootStore } from "../../../models/RootStore";
+import { IBaseRootStore, IRootStore, SourceValidationModelType } from "../../../models";
 
 interface ErrorEntry {
   source: "formik" | "api" | "logic";
@@ -18,6 +18,7 @@ interface Context {
   jobId?: string;
   jobStatus?: string;
   autoMode?: boolean;
+  validationResult?: SourceValidationModelType;
   errors: ErrorEntry[];
   store: IRootStore | IBaseRootStore;
 }
@@ -28,6 +29,7 @@ type Events =
   | { type: "RESTORE"; jobId: string }
   | { type: "SELECT_GPKG"; file: File }
   | { type: "SET_GPKG"; file: File }
+  | { type: "SET_GPKG_VALIDATION"; res: SourceValidationModelType }
   | { type: "AUTO" }
   | { type: "MANUAL" }
   | { type: "SELECT_PRODUCT"; file: File }
@@ -86,7 +88,21 @@ const verifyGpkgStates = {
       //   // return ctx.store.queryValidateSource({ fileName: ctx.gpkgFile.name });
       // },
       input: (ctx: Context) => ctx, // pass the current machine context explicitly
-      onDone: { target: "success" },
+      onDone: { 
+        target: "success",
+        actions: [
+          assign({
+            validationResult: (_ctx, e) => {
+              console.log('****STORING VALIDATION RESULTS IN LOCAL MACHINE CONTEXT*****');
+              return {..._ctx.event.output.validateSource[0]};
+            } // <-- store GraphQL result in context
+          }),
+          sendParent((_, e) => ({
+            type: "SET_GPKG_VALIDATION",
+            res:  _.event.output.validateSource[0]
+          }))
+        ]
+      },
       onError: { target: "failure" }
     }
   },
@@ -148,7 +164,7 @@ const fileSelectionStates = {
 const flowMachine = createMachine<Context, Events>({
   id: "flow",
   initial: "selectGpkg",
-  context: (ctx: Context) => ctx.input.context,
+  context: (ctx: Context) => ctx.input,
 
   // context: (ctx: Context) => ({
   //   ...ctx.input
@@ -171,10 +187,16 @@ const flowMachine = createMachine<Context, Events>({
         //   }})
         // },
         SELECT_GPKG: {
-          actions: sendParent((_, e) => ({
-            type: "SET_GPKG",
-            file:  _.event.file
-          }))
+          target: "verifyGpkg",
+          actions: [
+            sendParent((_, e) => ({
+              type: "SET_GPKG",
+              file:  _.event.file
+            })),
+            assign({ gpkgFile: (_, e) => {
+              return _.event.file
+            }})
+          ]
         },
         "*": { actions: warnUnexpectedStateEvent }
       }
@@ -309,7 +331,7 @@ export const workflowMachine = createMachine<Context, Events>({
         src: flowMachine,        // reference to your submachine
         input: (ctx: Context) => {
           console.log('[flowMachine share context by data]', ctx)
-          return {context:ctx};
+          return ctx.context//{context:ctx};
         },
         sync: true
       },
@@ -321,6 +343,13 @@ export const workflowMachine = createMachine<Context, Events>({
             }
           })
         },
+        SET_GPKG_VALIDATION: {
+          actions: assign({
+            validationResult: (_) => {
+              return _.event.res;
+            }
+          })
+        },        
         FLOW_ERROR: { target: "error", actions: assign({ errors: (ctx, e: any) => [...ctx.errors, e.error] }) },
         FLOW_SUBMIT: "jobSubmission"
       }
