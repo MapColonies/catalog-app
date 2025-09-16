@@ -555,8 +555,8 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
             />
           </DialogTitle>
           <DialogContent className="dialogBody">
-          <h1>[DIALOG]file{state.context.gpkgFile?.name}</h1>
-          <h2>[DIALOG]file{JSON.stringify(state.context.validationResult)}</h2>
+          <h1><bdi>[DIALOG]file:{state.context.files?.gpkg?.path}</bdi></h1>
+          <h2><bdi>[DIALOG]validation:{JSON.stringify(state.context.validationResult)}</bdi></h2>
             {mode === Mode.UPDATE && <UpdateLayerHeader />}
               {isAllInfoReady && (
                 <EntityRasterForm

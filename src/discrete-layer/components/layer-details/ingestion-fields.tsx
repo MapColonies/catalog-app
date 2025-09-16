@@ -374,7 +374,17 @@ export const IngestionFields: React.FC<PropsWithChildren<IngestionFieldsProps>> 
     const fileNames = selected.files.map((file: FileData) => file.name);
 
     if (validateSources) {
-      flowActor?.send({ type: "SELECT_GPKG", file: new File([], "KUKU.GPKG") });
+      flowActor?.send({
+        type: "SELECT_GPKG", 
+        file: {
+          path: `${directory}/${selected.files[0].name}`,
+          details: {
+            updateDate: selected.files[0].modDate,
+            size: selected.files[0].size,
+          },
+          exists: true
+        }
+      });
       setValidatingSource?.(true);
       queryValidateSource.setQuery(
         store.queryValidateSource(
@@ -428,7 +438,7 @@ export const IngestionFields: React.FC<PropsWithChildren<IngestionFieldsProps>> 
 
   return (
     <>
-      <h1>[INGESTION-FIELDS]file{state.context.gpkgFile?.name}</h1>
+      <h1><bdi>[INGESTION-FIELDS]file:{state.context.files?.gpkg?.path}</bdi></h1>
       <Box className="header section">
         <Box className="ingestionFields">
           <IngestionInputs

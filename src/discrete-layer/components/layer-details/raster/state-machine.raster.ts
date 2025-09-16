@@ -2,7 +2,7 @@
 import { createMachine, assign, sendParent, fromPromise } from "xstate";
 import { IBaseRootStore, IRootStore, SourceValidationModelType } from "../../../models";
 
-interface ErrorEntry {
+interface IErrorEntry {
   source: "formik" | "api" | "logic";
   code: string;
   message: string;
@@ -10,25 +10,50 @@ interface ErrorEntry {
   field?: string;
 }
 
+interface IFileDetails {
+  updateDate: Date;
+  size: number;
+}
+
+interface IFileBase {
+  path: string;
+  details: IFileDetails;
+  exists: boolean;
+}
+
+interface IGPKGFile extends IFileBase {
+  validationResult?: SourceValidationModelType;
+}
+
+interface IProductFile extends IFileBase {
+  data: File;
+}
+
 interface Context {
   flowType?: "NEW" | "UPDATE";
-  gpkgFile?: File;
-  files?: { product?: File; metadata?: File };
+  // gpkgFile?: File;
+  // files?: { product?: File; metadata?: File };
   formData?: Record<string, any>;
   jobId?: string;
   jobStatus?: string;
   autoMode?: boolean;
-  validationResult?: SourceValidationModelType;
-  errors: ErrorEntry[];
+  // validationResult?: SourceValidationModelType;
+  errors: IErrorEntry[];
   store: IRootStore | IBaseRootStore;
+
+  files?: {
+    gpkg?: IGPKGFile;
+    product?: IProductFile;
+    metadata?: IFileBase;
+  }
 }
 
 type Events =
   | { type: "START_NEW" }
   | { type: "START_UPDATE" }
   | { type: "RESTORE"; jobId: string }
-  | { type: "SELECT_GPKG"; file: File }
-  | { type: "SET_GPKG"; file: File }
+  | { type: "SELECT_GPKG"; file: IGPKGFile }
+  | { type: "SET_GPKG"; file: IGPKGFile }
   | { type: "SET_GPKG_VALIDATION"; res: SourceValidationModelType }
   | { type: "AUTO" }
   | { type: "MANUAL" }
@@ -63,7 +88,7 @@ const verifyGpkgStates = {
       src: fromPromise(async (ctx: Context) => {
         console.log("[verifyGpkgApi] ctx", ctx);
 
-        if (!ctx.input.context.gpkgFile) {
+        if (!ctx.input.context.files.gpkg) {
           throw new Error("No file selected");
         }
 
@@ -132,7 +157,7 @@ const fileSelectionStates = {
   auto: {
     invoke: {
       src: "checkNamingConvention",
-      input: (ctx: Context) => ctx.gpkgFile,
+      input: (ctx: Context) => ctx.files?.gpkg,
       onDone: [
         {
           target: "idle",
@@ -193,9 +218,15 @@ const flowMachine = createMachine<Context, Events>({
               type: "SET_GPKG",
               file:  _.event.file
             })),
-            assign({ gpkgFile: (_, e) => {
-              return _.event.file
-            }})
+            assign((_ctx) => ({
+              files: {
+                ..._ctx.context.files,
+                gpkg: {..._ctx.event.file}
+              } 
+            }))
+            // assign({ gpkgFile: (_, e) => {
+            //   return _.event.file
+            // }})
           ]
         },
         "*": { actions: warnUnexpectedStateEvent }
@@ -337,11 +368,17 @@ export const workflowMachine = createMachine<Context, Events>({
       },
       on: {
         SET_GPKG: {
-          actions: assign({
-            gpkgFile: (_) => {
-              return _.event.file;
-            }
-          })
+          // actions: assign({
+          //   gpkgFile: (_) => {
+          //     return _.event.file;
+          //   }
+          // })
+          actions: assign((_ctx) => ({
+            files: {
+              ..._ctx.context.files,
+              gpkg: {..._ctx.event.file}
+            } 
+          }))
         },
         SET_GPKG_VALIDATION: {
           actions: assign({
