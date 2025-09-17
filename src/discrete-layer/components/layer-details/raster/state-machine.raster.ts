@@ -1,8 +1,9 @@
 //@ts-nocheck
 import path from 'path';
-import { createMachine, assign, sendParent, fromPromise } from 'xstate';
+import { createMachine, assign, sendParent, fromPromise, SnapshotFrom, ActionArgs, InvokeDoneEvent , PromiseActorRef, EventObject, StateNodeConfig } from 'xstate';
 import { Mode } from '../../../../common/models/mode.enum';
-import { IBaseRootStore, IRootStore, SourceValidationModelType } from '../../../models';
+import { IBaseRootStore, IRootStore, RecordType, SourceValidationModelType } from '../../../models';
+import { AnyActorSystem } from 'xstate/dist/declarations/src/system';
 
 interface IErrorEntry {
   source: "formik" | "api" | "logic";
@@ -67,20 +68,33 @@ type Events =
   | { type: "RETRY" }
   | { type: "FORMIK_ERROR"; errors: Record<string, string> };
 
+//type FlowActionArgs = ActionArgs<Context, Events, Events>;
+
+type FromPromiseArgs<TInput> = {
+  input: {
+    context: TInput;
+  };
+  system: AnyActorSystem;
+  self: PromiseActorRef<any>;
+  signal: AbortSignal;
+  emit: (emitted: EventObject) => void;
+};
+
 export enum STATE_TAGS {
   GENERAL_LOADING = 'GENERAL_LOADING'
 }
 
 // --- Helpers ---
-const addError = assign<Context, any>({
-  errors: (ctx, e) => [...ctx.errors, e]
+const addError = assign({
+  errors: (ctx: Context, e) => [...ctx.errors, e]
 });
 
-const warnUnexpectedStateEvent = (_) => {
+const warnUnexpectedStateEvent = (_: any) => {
+  //@ts-ignore
   console.warn(`[StateMachine] Unexpected event '${_.event.type}' in state '${_.self._snapshot.value}'`);
 };
 
-export const hasLoadingTagDeep = (state: State<any, any>, tag? = STATE_TAGS.GENERAL_LOADING): boolean => {
+export const hasLoadingTagDeep = (state: SnapshotFrom<typeof workflowMachine>, tag = STATE_TAGS.GENERAL_LOADING): boolean => {
   // check current state tags
   if (state.hasTag(tag)) return true;
 
@@ -102,43 +116,30 @@ const verifyGpkgStates = {
     tags: [STATE_TAGS.GENERAL_LOADING],
     invoke: {
       id: "verifyGpkgApi",
-      // src: fromPromise(async (ctx: Context) => {
-      //   console.log("[verifyGpkgApi] ctx", ctx);
-      //   await new Promise((r) => setTimeout(r, 1000));
-      //   return { ok: true };
-      // }),
-      src: fromPromise(async (ctx: Context) => {
-        console.log("[verifyGpkgApi] ctx", ctx);
+      src: fromPromise(async ({ input }: FromPromiseArgs<Context>) => {
+        console.log("[verifyGpkgApi] ctx.input", input);
 
-        if (!ctx.input.context.files.gpkg) {
+        if (!input.context.files?.gpkg) {
           throw new Error("No file selected");
         };
 
         // Call into MobX-State-Tree store
-        const result = await ctx.input.context.store.queryValidateSource({
+        const result = await input.context.store.queryValidateSource({
           data: {
-            fileNames: [path.basename(ctx.input.context.files.gpkg.path)],
-            originDirectory: path.dirname(ctx.input.context.files.gpkg.path),
-            type: "RECORD_RASTER",
+            fileNames: [path.basename(input.context.files.gpkg.path)],
+            originDirectory: path.dirname(input.context.files.gpkg.path),
+            type: RecordType.RECORD_RASTER,
           }
         });
 
         if (!result.validateSource[0].isValid) {
-          throw new Error(result.validateSource[0].message);
+          throw new Error(result.validateSource[0].message as string);
         };
 
         // return whatever you want to flow into `onDone`
         return result;
       }),
-      // src: (ctx: Context) => {
-      //   console.log('[verifyGpkgApi] ctx', ctx)
-      //   return new Promise((resolve) => setTimeout(() => resolve({ ok: true }), 1000));
-      //   // if (!ctx.gpkgFile) throw new Error("No file selected");
-      //   // if (!ctx.store) throw new Error("Store not provided");
-
-      //   // return ctx.store.queryValidateSource({ fileName: ctx.gpkgFile.name });
-      // },
-      input: (ctx: Context) => ctx, // pass the current machine context explicitly
+      input: (ctx: Context) => ctx, 
       onDone: { 
         target: "success",
         actions: [
@@ -151,7 +152,7 @@ const verifyGpkgStates = {
               }
             })
           }),
-          sendParent((_, e) => ({
+          sendParent((_: { context: Context; event: any }) => ({
             type: "SET_GPKG_VALIDATION",
             res:  _.event.output.validateSource[0]
           }))
@@ -167,7 +168,7 @@ const verifyGpkgStates = {
 
   failure: {
     entry: assign({
-      errors: (_: Context) => [
+      errors: (_) => [
         ..._.context.errors,
         {
           source: "api",
@@ -208,42 +209,30 @@ const fileSelectionStates = {
     on: {
       SELECT_PRODUCT: { actions: assign({ files: (ctx: Context, e) => ({ ...ctx.files, product: (e as any).file }) }) },
       SELECT_METADATA: { actions: assign({ files: (ctx: Context, e) => ({ ...ctx.files, metadata: (e as any).file }) }) },
-      DONE: { actions: sendParent("FLOW_SUBMIT") },
+      DONE: { 
+        actions: sendParent((ctx, e) => ({
+          type: "FLOW_SUBMIT",
+          error: e.data ?? e
+        })) 
+      },
       "*": { actions: warnUnexpectedStateEvent }
     }
   }
 };
 
 // --- flow submachine ---
-const flowMachine = createMachine<Context, Events>({
+const flowMachine = createMachine({
   id: "flow",
   initial: "selectGpkg",
-  context: (ctx: Context) => ctx.input,
-
-  // context: (ctx: Context) => ({
-  //   ...ctx.input
-  //   // gpkgFile: undefined,
-  //   // files: undefined,
-  //   // formData: undefined,
-  //   // autoMode: undefined,
-  //   // errors: [],
-  //   // store: undefined
-  // }),
+  context: (ctx: any) => ctx.input,
   states: {
     selectGpkg: {
       entry: () => console.log('>>> Enter selectGpkg'),
       on: {
-        // SELECT_GPKG: {
-        //   target: "verifyGpkg",
-        //   actions: assign({ gpkgFile: (_, e) => {
-        //     return _.event.file
-        //     // return (e as any).file;
-        //   }})
-        // },
         SELECT_GPKG: {
           target: "verifyGpkg",
           actions: [
-            sendParent((_, e) => ({
+            sendParent((_: { context: Context; event: any }) => ({
               type: "SET_GPKG",
               file:  _.event.file
             })),
@@ -253,9 +242,6 @@ const flowMachine = createMachine<Context, Events>({
                 gpkg: {..._ctx.event.file}
               } 
             }))
-            // assign({ gpkgFile: (_, e) => {
-            //   return _.event.file
-            // }})
           ]
         },
         "*": { actions: warnUnexpectedStateEvent }
@@ -266,7 +252,7 @@ const flowMachine = createMachine<Context, Events>({
       entry: () => console.log('>>> Enter verifyGpkg parent'),
       type: "compound",
       initial: "verifying",
-      states: verifyGpkgStates,
+      states: verifyGpkgStates as any,
       // onDone: "modeSelection"
     },
 
@@ -318,7 +304,9 @@ const flowMachine = createMachine<Context, Events>({
             ]
           }))
         },
-        SUBMIT: sendParent("FLOW_SUBMIT"),
+        SUBMIT: {
+          actions: sendParent({type: "FLOW_SUBMIT"}),
+        },
         "*": { actions: warnUnexpectedStateEvent }
       }
     },
@@ -334,12 +322,11 @@ const flowMachine = createMachine<Context, Events>({
 });
 
 // --- parent workflow machine ---
-export const workflowMachine = createMachine<Context, Events>({
+export const workflowMachine = createMachine({
   id: "workflow",
   initial: "idle",
   context: ({ input }) => ({
-    //store: input.store,
-    ...input,
+    ...input as Context,
     errors: []
   }),
   states: {
@@ -369,21 +356,6 @@ export const workflowMachine = createMachine<Context, Events>({
       }
     },
     restoredReplay: { always: "flow" },
-    // flow: {
-    //   // type: "compound",
-    //   // initial: "selectGpkg",
-    //   // states: {
-    //   //   ...flowMachine.config.states // spread the states here
-    //   // },
-    //   id: "flow",
-    //   type: "machine",
-    //   // initial: "selectGpkg",
-    //   machine: flowMachine,
-    //   on: {
-    //     FLOW_ERROR: { target: "error", actions: assign({ errors: (ctx, e: any) => [...ctx.errors, e.error] }) },
-    //     FLOW_SUBMIT: "jobSubmission"
-    //   }
-    // },
     flow: {
       entry: () => console.log('>>> Entering flow state'),
       invoke: {
@@ -391,17 +363,12 @@ export const workflowMachine = createMachine<Context, Events>({
         src: flowMachine,        // reference to your submachine
         input: (ctx: Context) => {
           console.log('[flowMachine share context by data]', ctx)
-          return ctx.context//{context:ctx};
+          return (ctx as any).context;
         },
-        sync: true
+        // sync: true
       },
       on: {
         SET_GPKG: {
-          // actions: assign({
-          //   gpkgFile: (_) => {
-          //     return _.event.file;
-          //   }
-          // })
           actions: assign((_ctx) => ({
             files: {
               ..._ctx.context.files,
