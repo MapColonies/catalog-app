@@ -66,6 +66,10 @@ type Events =
   | { type: "RETRY" }
   | { type: "FORMIK_ERROR"; errors: Record<string, string> };
 
+export enum STATE_TAGS {
+  GENERAL_LOADING = 'GENERAL_LOADING'
+}
+
 // --- Helpers ---
 const addError = assign<Context, any>({
   errors: (ctx, e) => [...ctx.errors, e]
@@ -75,10 +79,26 @@ const warnUnexpectedStateEvent = (_) => {
   console.warn(`[StateMachine] Unexpected event '${_.event.type}' in state '${_.self._snapshot.value}'`);
 };
 
+export const hasLoadingTagDeep = (state: State<any, any>, tag? = STATE_TAGS.GENERAL_LOADING): boolean => {
+  // check current state tags
+  if (state.hasTag(tag)) return true;
+
+  // check all children recursively
+  for (const child of Object.values(state.children)) {
+    const childSnap = child.getSnapshot?.();
+    if (childSnap && hasLoadingTagDeep(childSnap)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 // --- verifyGpkg states ---
 const verifyGpkgStates = {
   verifying: {
     entry: (ctx: Context) => console.log(">>> verifying entry", ctx),
+    tags: [STATE_TAGS.GENERAL_LOADING],
     invoke: {
       id: "verifyGpkgApi",
       // src: fromPromise(async (ctx: Context) => {

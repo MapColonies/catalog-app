@@ -52,9 +52,10 @@ import {
 } from '../utils';
 import suite from '../validate';
 import { getUIIngestionFieldDescriptors } from './ingestion.utils';
+import { RasterWorkflowProvider, RasterWorkflowContext } from './state-machine-context.raster';
+import { hasLoadingTagDeep } from './state-machine.raster';
 
 import './entity.raster.dialog.css';
-import { RasterWorkflowProvider, RasterWorkflowContext } from './state-machine-context.raster';
 
 const DEFAULT_ID = 'DEFAULT_UI_ID';
 const DEFAULT_TYPE_NAME = 'DEFAULT_TYPE_NAME';
@@ -143,6 +144,8 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
 
     // Subscribe to state using a selector
     const state = RasterWorkflowContext.useSelector((s) => s);
+
+    const isLoading = hasLoadingTagDeep(actorRef?.getSnapshot());
 
     useEffect(() => {
       if (props.isSelectedLayerUpdateMode && props.layerRecord && actorRef) {
@@ -555,6 +558,7 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
             />
           </DialogTitle>
           <DialogContent className="dialogBody">
+          <h1><bdi>[DIALOG][LOADING FROM SOME STATE]:{isLoading+''}</bdi></h1>
           <h1><bdi>[DIALOG]file:{state.context.files?.gpkg?.path}</bdi></h1>
           <h2><bdi>[DIALOG]validation:{JSON.stringify(state.context?.files?.gpkg?.validationResult)}</bdi></h2>
             {mode === Mode.UPDATE && <UpdateLayerHeader />}
