@@ -1,6 +1,7 @@
 //@ts-nocheck
-import { createMachine, assign, sendParent, fromPromise } from "xstate";
-import { IBaseRootStore, IRootStore, SourceValidationModelType } from "../../../models";
+import path from 'path';
+import { createMachine, assign, sendParent, fromPromise } from 'xstate';
+import { IBaseRootStore, IRootStore, SourceValidationModelType } from '../../../models';
 
 interface IErrorEntry {
   source: "formik" | "api" | "logic";
@@ -90,13 +91,13 @@ const verifyGpkgStates = {
 
         if (!ctx.input.context.files.gpkg) {
           throw new Error("No file selected");
-        }
+        };
 
         // Call into MobX-State-Tree store
         const result = await ctx.input.context.store.queryValidateSource({
           data: {
-            fileNames: ["blueMarble.gpkg"/*ctx.input.context.gpkgFile.name*/],
-            originDirectory: "\\layerSources/test_dir",
+            fileNames: [path.basename(ctx.input.context.files.gpkg.path)],
+            originDirectory: path.dirname(ctx.input.context.files.gpkg.path),
             type: "RECORD_RASTER",
           }
         });
@@ -117,10 +118,13 @@ const verifyGpkgStates = {
         target: "success",
         actions: [
           assign({
-            validationResult: (_ctx, e) => {
-              console.log('****STORING VALIDATION RESULTS IN LOCAL MACHINE CONTEXT*****');
-              return {..._ctx.event.output.validateSource[0]};
-            } // <-- store GraphQL result in context
+            files: (_) => ({
+              ..._.context.files,
+              gpkg: {
+                ..._.context.files.gpkg,
+                validationResult: {..._.event.output.validateSource[0]}
+              }
+            })
           }),
           sendParent((_, e) => ({
             type: "SET_GPKG_VALIDATION",
@@ -382,9 +386,13 @@ export const workflowMachine = createMachine<Context, Events>({
         },
         SET_GPKG_VALIDATION: {
           actions: assign({
-            validationResult: (_) => {
-              return _.event.res;
-            }
+            files: (_) => ({
+              ..._.context.files,
+              gpkg: {
+                ..._.context.files.gpkg,
+                validationResult: {..._.event.res}
+              }
+            })
           })
         },        
         FLOW_ERROR: { target: "error", actions: assign({ errors: (ctx, e: any) => [...ctx.errors, e.error] }) },
