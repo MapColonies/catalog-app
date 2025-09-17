@@ -1,6 +1,7 @@
 //@ts-nocheck
 import path from 'path';
 import { createMachine, assign, sendParent, fromPromise } from 'xstate';
+import { Mode } from '../../../../common/models/mode.enum';
 import { IBaseRootStore, IRootStore, SourceValidationModelType } from '../../../models';
 
 interface IErrorEntry {
@@ -31,7 +32,7 @@ interface IProductFile extends IFileBase {
 }
 
 interface Context {
-  flowType?: "NEW" | "UPDATE";
+  flowType?: Mode.NEW | Mode.UPDATE;
   // gpkgFile?: File;
   // files?: { product?: File; metadata?: File };
   formData?: Record<string, any>;
@@ -344,8 +345,8 @@ export const workflowMachine = createMachine<Context, Events>({
   states: {
     idle: {
       on: {
-        START_NEW: { target: "flow", actions: assign({ flowType: "NEW" }) },
-        START_UPDATE: { target: "flow", actions: assign({ flowType: "UPDATE" }) },
+        START_NEW: { target: "flow", actions: assign({ flowType: Mode.NEW }) },
+        START_UPDATE: { target: "flow", actions: assign({ flowType: Mode.UPDATE }) },
         RESTORE: "restoreJob",
         "*": { actions: warnUnexpectedStateEvent }
       }

@@ -1,0 +1,56 @@
+#entityRasterDialog {
+  --update-layer-header-height: 150px;
+  --ingestion-fields-height: 100px; 
+  --footer-height: 60px;
+  --footer-offset: 4px;
+  --modal-content-offset: 20px;
+  --modal-height: calc(100vh - 80px);
+  --modal-width: 1360px;
+  --dialog-title-height: 40px;
+  --base-content-height: calc(var(--modal-height) - var(--footer-height) - var(--footer-offset) - var(--dialog-title-height) - var(--modal-content-offset));
+  --chonky-modal-height: calc(var(--modal-height) / 2)
+}
+
+@media (min-width: 900px) {
+  #entityRasterDialog .mdc-dialog .mdc-dialog__surface {
+    max-width: var(--modal-width);
+    height: var(--modal-height);
+  }
+  
+  /* Dialog inside of a dialog */
+  #entityRasterDialog .mdc-dialog .mdc-dialog__surface .mdc-dialog .mdc-dialog__surface {
+    max-width: var(--modal-width);
+    height: var(--chonky-modal-height);
+  }
+}
+
+#entityRasterDialog .closeIcon {
+  margin-left: auto;
+}
+
+body[dir='rtl'] #entityRasterDialog .closeIcon {
+  margin-left: unset;
+  margin-right: auto;
+}
+
+#entityRasterDialog .dialogBody {
+  overflow-y: hidden !important;
+}
+
+#updateLayerHeader {
+  position: relative;
+  display: flex;
+  background-color: var(--mdc-theme-text-primary-on-light);
+  padding: 8px;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: var(--update-layer-header-height);
+}
+
+#updateLayerHeaderContent {
+  margin: 0 auto;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+}

@@ -1,0 +1,186 @@
+#layerDetailsFormRaster .form {
+  max-height: 880px !important;
+}
+
+#layerDetailsFormRaster .curtain {
+  position: absolute;
+  width: 100%;
+  background-color: #000;
+  opacity: 0.3;
+  border-radius: 10px;
+  z-index: 4;
+  margin-bottom: -40%;
+  top: 0;
+  left: 0;
+  bottom: 0;
+}
+
+#layerDetailsFormRaster .content {
+  max-height: var(--content-height);
+  overflow-y: auto;
+  padding:  0px 20px 0px 20px;
+  position: relative;
+}
+
+#layerDetailsFormRaster .content.curtainVisible {
+  overflow: hidden;
+}
+
+#layerDetailsFormRaster .section {
+  border: 1px solid var(--mdc-theme-gc-selection-background, #fff);
+  border-radius: 10px;
+  /* overflow-y: hidden; */
+}
+
+#layerDetailsFormRaster .header.section {
+  height: var(--ingestion-fields-height);
+}
+
+#layerDetailsFormRaster .footer {
+  display: flex;
+  margin-top: var(--footer-offset);
+  width: 100%;
+  height: var(--footer-height);
+}
+
+body[dir='rtl'] #layerDetailsFormRaster .footer {
+  left: 20px;
+}
+
+#layerDetailsFormRaster .buttons {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  margin-left: auto;
+}
+
+body[dir='rtl'] #layerDetailsFormRaster .buttons {
+  margin-left: unset;
+  margin-right: auto;
+}
+
+#layerDetailsFormRaster .messages {
+  display: flex;
+  flex-direction: column;
+  height: 60px;
+  overflow-y: auto;
+}
+
+#layerDetailsFormRaster .categoryFieldsParentContainer {
+  margin-top: inherit;
+}
+
+#layerDetailsFormRaster .rmwc-collapsible-list__handle .mdc-list-item{
+  border: 1px solid var(--mdc-theme-gc-selection-background);
+  margin-top: 2px;
+}
+
+
+#layerDetailsFormRaster .enumOptions .mdc-menu.mdc-select__menu.mdc-menu-surface.mdc-menu-surface--open {
+  bottom: auto !important;
+  top: 24px;
+}
+
+body[dir='rtl'] #layerDetailsFormRaster .enumOptions .mdc-select__dropdown-icon {
+  right: initial;
+  left: initial;
+}
+
+#layerDetailsFormRaster .polygonPartsContainer {
+  display: flex;
+  height: 410px;
+  margin-bottom: 4px;
+  border-bottom: 1px dashed var(--mdc-theme-gc-selection-background);
+}
+
+#layerDetailsFormRaster .polygonPartsData {
+  width: 740px;
+  /* overflow-y: scroll; */
+}
+
+#layerDetailsFormRaster .polygonPartDataError {
+  background-color: var(--mdc-theme-gc-error-high);
+  opacity: 0.2;
+}
+
+#layerDetailsFormRaster .polygonPartFormContainer {
+  height: 200px;
+  overflow-y: auto;
+  margin-left: 4px;
+  border-bottom: 1px dashed var(--mdc-theme-gc-selection-background);
+}
+
+#layerDetailsFormRaster .ReactVirtualized__Grid.ReactVirtualized__List{
+  direction: inherit !important;
+}
+
+#layerDetailsFormRaster .mdc-checkbox__ripple {
+  display: none;
+}
+
+#layerDetailsFormRaster .checkBoxContainer {
+  height: 20px;
+}
+
+#layerDetailsFormRaster .displayFlex {
+  display: flex;
+}
+
+#layerDetailsFormRaster .flexCheckItem {
+  flex: 1;
+  position: relative;
+}
+
+#layerDetailsFormRaster .mdc-checkbox__background {
+  width: 12px;
+  height: 12px;
+}
+
+#layerDetailsFormRaster .showOnMapContainer .mdc-checkbox {
+  padding-left: 0px;
+}
+
+#layerDetailsFormRaster .showOnMapContainer label {
+  padding-bottom: 6px;
+  color: var(--mdc-theme-text-icon-on-dark);
+}
+
+#layerDetailsFormRaster .addPolygonPart{
+  display: flex;
+  justify-content: center;
+}
+
+#layerDetailsFormRaster .polygonPartsContainer .mdc-button--outlined:not(:disabled) {
+  border-color: unset;
+}
+
+#layerDetailsFormRaster .ingestionWarning {
+  display: flex;
+  flex-direction: row;
+}
+
+#layerDetailsFormRaster .ingestionWarningMessage {
+  width: 652px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#layerDetailsFormRaster .loadingOnTop {
+  position: absolute;
+  top:6px;
+  left: 20px;
+}
+
+#layerDetailsFormRaster .deletePolygonPart {
+  position: relative;
+  top: -44px;
+  left: 550px;
+  display: flex;
+  width: 160px;
+  align-items: center;
+}
+
+body[dir='rtl'] #layerDetailsFormRaster .deletePolygonPart { 
+  left: -550px;
+}

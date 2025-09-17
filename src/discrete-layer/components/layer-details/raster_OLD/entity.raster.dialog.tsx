@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import React, { useEffect, useCallback, useState, useLayoutEffect, useRef/*, useMemo*/ } from 'react';
+import React, { useEffect, useCallback, useState, useLayoutEffect, useRef, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import { observer } from 'mobx-react';
 import { FormikValues } from 'formik';
@@ -13,6 +13,7 @@ import { Box } from '@map-colonies/react-components';
 import { emphasizeByHTML } from '../../../../common/helpers/formatters';
 import { getTextStyle } from '../../../../common/helpers/style';
 import { Mode } from '../../../../common/models/mode.enum';
+import { removePropertiesWithPrefix } from '../../../../common/helpers/object';
 import {
   EntityDescriptorModelType,
   LayerMetadataMixedUnion,
@@ -29,7 +30,7 @@ import {
 } from '../../../models';
 import { IDispatchAction } from '../../../models/actionDispatcherStore';
 import { ILayerImage } from '../../../models/layerImage';
-// import { LayerRasterRecordInput } from '../../../models/RootStore.base';
+import { LayerRasterRecordInput, PolygonPartRecordInput } from '../../../models/RootStore.base';
 import { UserAction } from '../../../models/userStore';
 import {
   FieldConfigModelKeys,
@@ -41,7 +42,7 @@ import { FieldInfoName, IRecordFieldInfo } from '../layer-details.field-info';
 import EntityRasterForm from './layer-datails-form.raster';
 import {
   clearSyncWarnings,
-  // cleanUpEntityPayload,
+  cleanUpEntityPayload,
   filterModeDescriptors,
   getFlatEntityDescriptors,
   getValidationType,
@@ -51,14 +52,12 @@ import {
 } from '../utils';
 import suite from '../validate';
 import { getUIIngestionFieldDescriptors } from './ingestion.utils';
-import { hasLoadingTagDeep } from './state-machine.raster';
-import { RasterWorkflowProvider, RasterWorkflowContext } from './state-machine-context.raster';
 
 import './entity.raster.dialog.css';
 
 const DEFAULT_ID = 'DEFAULT_UI_ID';
 const DEFAULT_TYPE_NAME = 'DEFAULT_TYPE_NAME';
-// const NONE = 0;
+const NONE = 0;
 const START = 0;
 
 interface EntityRasterDialogProps {
@@ -68,6 +67,7 @@ interface EntityRasterDialogProps {
   layerRecord?: ILayerImage | null;
   isSelectedLayerUpdateMode?: boolean;
 }
+
 
 const setDefaultValues = (record: Record<string, unknown>, descriptors: EntityDescriptorModelType[]): void => {
   getFlatEntityDescriptors(
@@ -126,38 +126,8 @@ const getLabel = (recordType: RecordType): string => {
   return 'field-names.ingestion.fileNames';
 };
 
-export const EntityRasterDialog: React.FC<EntityRasterDialogProps> = (props: EntityRasterDialogProps) => {
-  return (
-    <RasterWorkflowProvider>
-      <EntityRasterDialogInner {...props} />
-    </RasterWorkflowProvider>
-  );
-}
-
-export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observer(
+export const EntityRasterDialog: React.FC<EntityRasterDialogProps> = observer(
   (props: EntityRasterDialogProps) => {
-
-    // START STATE MACHINE HOOKS
-    const actorRef = RasterWorkflowContext.useActorRef();
-
-    // Subscribe to state using a selector
-    const state = RasterWorkflowContext.useSelector((s) => s);
-
-    const isLoading = hasLoadingTagDeep(actorRef?.getSnapshot());
-
-    useEffect(() => {
-      if (props.isSelectedLayerUpdateMode && props.layerRecord && actorRef) {
-        actorRef.send({ type: "START_UPDATE" });
-      } else {
-        actorRef.send({ type: "START_NEW"});
-        // actorRef.send({ type: "RESTORE", jobId: 'KUKU_JOB' });
-      }
-      console.log(
-        "****** PARENT CHANGE FLOWTYPE(props.isSelectedLayerUpdateMode) *******",
-        props.isSelectedLayerUpdateMode
-      );
-    }, [props.isSelectedLayerUpdateMode, props.layerRecord, actorRef]);
-    // END STATE MACHINE HOOKS
 
     const store = useStore();
     const intl = useIntl();
@@ -165,15 +135,13 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
 
     const dialogContainerRef = useRef<HTMLDivElement>(null);
 
-    // const decideMode = useCallback(() => {
-    //   return (props.isSelectedLayerUpdateMode === true && props.layerRecord) ? Mode.UPDATE : Mode.NEW;
-    // }, []);
+    const decideMode = useCallback(() => {
+      return (props.isSelectedLayerUpdateMode === true && props.layerRecord) ? Mode.UPDATE : Mode.NEW;
+    }, []);
 
     const { isOpen, onSetOpen } = props;   
     const [recordType] = useState<RecordType>(props.recordType ?? (props.layerRecord?.type as RecordType));
-    const mode = state.context.flowType ?? Mode.NEW;
-    // const mode = decideMode();
-    // const removePolygonPart = (partId: string): void => {
+    const [mode] = useState<Mode>(decideMode());
     const [layerRecord] = useState<LayerMetadataMixedUnion>(
       props.layerRecord && mode !== Mode.UPDATE
         ? cloneDeep(props.layerRecord)
@@ -189,16 +157,26 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
     const [inputValues, setInputValues] = useState<FormikValues>({});
     const [isAllInfoReady, setIsAllInfoReady] = useState<boolean>(false);
     const queryGetProduct = useQuery<{getProduct: LayerMetadataMixedUnion | null}>();
-    // const metadataPayloadKeys = useMemo(
-    //   () => {
-    //     return getFlatEntityDescriptors(
-    //       'LayerRasterRecord',
-    //       store.discreteLayersStore.entityDescriptors as EntityDescriptorModelType[]
-    //     )
-    //     .filter(descriptor => descriptor.isCreateEssential || descriptor.fieldName === 'id')
-    //     .map(descriptor => descriptor.fieldName);
-    //   },
-    //   [store.discreteLayersStore.entityDescriptors]);
+    const polygonPartsPayloadKeys = useMemo(
+      () => {
+        return getFlatEntityDescriptors(
+          'PolygonPartRecord',
+          store.discreteLayersStore.entityDescriptors as EntityDescriptorModelType[]
+        )
+        .filter(descriptor => !descriptor.isAutoGenerated)
+        .map(descriptor => descriptor.fieldName);
+      },
+      [store.discreteLayersStore.entityDescriptors]);
+    const metadataPayloadKeys = useMemo(
+      () => {
+        return getFlatEntityDescriptors(
+          'LayerRasterRecord',
+          store.discreteLayersStore.entityDescriptors as EntityDescriptorModelType[]
+        )
+        .filter(descriptor => descriptor.isCreateEssential || descriptor.fieldName === 'id')
+        .map(descriptor => descriptor.fieldName);
+      },
+      [store.discreteLayersStore.entityDescriptors]);
     
     const dialogTitleParam = recordType;
     const dialogTitleParamTranslation = intl.formatMessage({
@@ -263,7 +241,23 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
       );
     };
 
-    /*const handleIngestQueries = (): void => {
+    const preparePartsDataPayload = (metadata: Record<string,unknown>) : Record<string,unknown>[] => {
+      const partsData = [];
+      for (const [fieldName, partObj] of Object.entries(metadata)) {
+        if (fieldName.indexOf(NESTED_FORMS_PRFIX) > -1) {
+          //build partData array with injected resolutions
+          const cleanedPayloadEntity = cleanUpEntityPayload(partObj as Record<string,unknown>, polygonPartsPayloadKeys as string[]);
+          partsData.push({
+            ...cleanedPayloadEntity,
+            resolutionDegree: (metadata as any).resolutionDegree,
+            resolutionMeter: (metadata as any).resolutionMeter,
+          });
+        }
+      }
+      return partsData;
+    }
+    
+    const handleIngestQueries = (): void => {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       const { directory, fileNames, __typename, ...metadata } = inputValues;
       switch (recordType) {
@@ -273,7 +267,7 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
               data: {
                 directory: directory as string,
                 fileNames: (fileNames as string).split(','),
-                partsData: [], //TODO: to be removed
+                partsData: [...preparePartsDataPayload(metadata)] as PolygonPartRecordInput[],
                 metadata: cleanUpEntityPayload(metadata, metadataPayloadKeys as string[]) as unknown as LayerRasterRecordInput,
                 type: RecordType.RECORD_RASTER,
               },
@@ -294,14 +288,14 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
             data: {
               directory: directory as string,
               fileNames: (fileNames as string).split(','),
-              partsData: [], //TODO: to be removed
+              partsData: [...preparePartsDataPayload(metadata)] as PolygonPartRecordInput[],
               metadata: cleanUpEntityPayload(metadata, metadataPayloadKeys as string[]) as unknown as LayerRasterRecordInput,
               type: RecordType.RECORD_RASTER,
             },
           })
         );
       }
-    };*/
+    };
 
     const checkHasQueriesSucceeded = (): boolean => {
       const SUCCESS_RESPONSE_VAL = 'ok';
@@ -359,11 +353,62 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
         infoMsgCode: ['info-general-tooltip.required'],
       },
     ];
-            
+
+    const schemaUpdater = (partsNumber: number, startIndex = 0, removePrevNested = false)=>{
+      const nestedFormdescriptors = getFlatEntityDescriptors(
+        'PolygonPartRecord',
+        store.discreteLayersStore.entityDescriptors as EntityDescriptorModelType[]
+      );
+      const nestedYupSchema: Record<string, any> = {};
+      [
+        ...nestedFormdescriptors
+      ].forEach((field) => {
+        const fieldName: string = field.fieldName as string;
+        switch (mode) {
+          case Mode.NEW:
+          case Mode.UPDATE:
+            if ((field.isRequired as boolean) && field.isAutoGenerated !== true) {
+              nestedYupSchema[fieldName] = getYupFieldConfig(field, intl);
+            }
+            break;
+          default:
+            break;
+        }
+      });
+
+      const { topLevelEntityVestErrors ,...rest} = vestValidationResults;
+      removePrevNested && topLevelEntityVestErrors && Object.keys(topLevelEntityVestErrors).length && setVestValidationResults({topLevelEntityVestErrors});
+
+      const newSchema = { ...(removePrevNested ? removePropertiesWithPrefix(schema, NESTED_FORMS_PRFIX) : schema) };
+      
+      for(let i=0; i < partsNumber; i++ ){
+        newSchema[`${NESTED_FORMS_PRFIX}${i+startIndex}`] = Yup.object().shape({...nestedYupSchema});
+      }
+      setSchema(newSchema);
+    }
+
+    const removePolygonPart = (polygonPartKey: string): string[] => {
+      let touchedFields: string[] = [];
+
+      const ppFields = (schema[polygonPartKey] as unknown as Record<string, string>).fields;
+
+      Object.keys(ppFields).forEach((key) => {
+        touchedFields.push(key);
+      });
+
+      delete schema[polygonPartKey];
+      setSchema({...schema});
+
+      const { [polygonPartKey]: polygonPartValue, ...rest } = vestValidationResults;
+      setVestValidationResults(rest);
+      
+      return touchedFields;
+    };
+          
     useEffect(() => {
       const descriptors = getFlatEntityDescriptors(
         layerRecord.__typename,
-        filterModeDescriptors(mode as unknown as Mode, store.discreteLayersStore.entityDescriptors as EntityDescriptorModelType[])
+        filterModeDescriptors(mode, store.discreteLayersStore.entityDescriptors as EntityDescriptorModelType[])
       );
 
       const uiIngestionFieldDescriptors = getUIIngestionFieldDescriptors(store.discreteLayersStore.entityDescriptors as EntityDescriptorModelType[]);
@@ -394,7 +439,7 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
 
       setDescriptors(desc as any[]);
 
-      if ([Mode.UPDATE].includes(mode as unknown as Mode)) {
+      if ([Mode.UPDATE].includes(mode)) {
         queryGetProduct.setQuery(
           store.queryGetProduct(
             {
@@ -406,27 +451,27 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
       }
     }, []);
 
-    // useEffect(() => {
-    //   let hasVestErrors = false;
+    useEffect(() => {
+      let hasVestErrors = false;
       
-    //   const formDrafts = Object.values(vestValidationResults);
-    //   if (formDrafts.length === NONE) return;
+      const formDrafts = Object.values(vestValidationResults);
+      if (formDrafts.length === NONE) return;
       
-    //   formDrafts.forEach((formDraft: DraftResult)=>{
-    //     hasVestErrors ||= (formDraft.errorCount !== NONE);
-    //   });
+      formDrafts.forEach((formDraft: DraftResult)=>{
+        hasVestErrors ||= (formDraft.errorCount !== NONE);
+      });
 
-    //   if (!hasVestErrors) {
-    //     switch(mode) {
-    //       case Mode.NEW:
-    //         handleIngestQueries();
-    //       break;
-    //       case Mode.UPDATE:
-    //         handleUpdateQueries();
-    //       break;
-    //     }
-    //   }
-    // }, [isSubmittedForm]);
+      if (!hasVestErrors) {
+        switch(mode) {
+          case Mode.NEW:
+            handleIngestQueries();
+          break;
+          case Mode.UPDATE:
+            handleUpdateQueries();
+          break;
+        }
+      }
+    }, [isSubmittedForm]);
 
     const closeDialog = useCallback(() => {
       onSetOpen(false);
@@ -481,10 +526,6 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
             />
           </DialogTitle>
           <DialogContent className="dialogBody">
-          <h1><bdi>[DIALOG][LOADING FROM SOME STATE]:{isLoading+''}</bdi></h1>
-          <h1><bdi>[DIALOG][ERRORS]:{JSON.stringify(state.context.errors)}</bdi></h1>
-          <h1><bdi>[DIALOG]file:{state.context.files?.gpkg?.path}</bdi></h1>
-          <h2><bdi>[DIALOG]validation:{JSON.stringify(state.context?.files?.gpkg?.validationResult)}</bdi></h2>
             {mode === Mode.UPDATE && <UpdateLayerHeader />}
               {isAllInfoReady && (
                 <EntityRasterForm
@@ -499,7 +540,7 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
                     mode === Mode.UPDATE
                       ? {...props.layerRecord} as LayerMetadataMixedUnion : layerRecord
                   }
-                  schemaUpdater = {()=>{}}
+                  schemaUpdater = {schemaUpdater}
                   yupSchema={Yup.object({
                     ...schema,
                   })}
@@ -541,7 +582,7 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
                   mutationQueryError={mutationQuery.error}
                   mutationQueryLoading={mutationQuery.loading}
                   closeDialog={closeDialog}
-                  removePolygonPart={(idx)=>[]}
+                  removePolygonPart={removePolygonPart}
                   customErrorReset={store.discreteLayersStore.clearCustomValidationError}
                   customError={store.discreteLayersStore.customValidationError}
                   ppCollisionCheckInProgress={store.discreteLayersStore.ppCollisionCheckInProgress}

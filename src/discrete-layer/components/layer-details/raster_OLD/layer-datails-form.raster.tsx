@@ -7,9 +7,9 @@ import {
   Form,
   FormikHandlers,
   FormikBag,
-  // Field,
+  Field,
 } from 'formik';
-import { List/*, ListRowRenderer*/ } from 'react-virtualized';
+import { List, ListRowRenderer } from 'react-virtualized';
 import * as Yup from 'yup';
 import { OptionalObjectSchema, TypeOfShape } from 'yup/lib/object';
 import { AnyObject } from 'yup/lib/types';
@@ -44,6 +44,7 @@ import {
   SourceValidationModelType
 } from '../../../models';
 import { LayersDetailsComponent } from '../layer-details';
+import { IngestionFields } from '../ingestion-fields';
 import {
   extractDescriptorRelatedFieldNames,
   getFlatEntityDescriptors,
@@ -57,11 +58,10 @@ import {
   transformMaxarShapeFeatureToEntity,
   prepareEntityForSubmit,
 } from '../utils';
-import { NESTED_FORMS_PRFIX } from './entity.raster.dialog';
-import { IngestionFields } from './ingestion-fields.raster';
+import { GeoFeaturesPresentorComponent } from './pp-map';
 import { getUIIngestionFieldDescriptors } from './ingestion.utils';
-// import { GeoFeaturesPresentorComponent } from './pp-map';
-import { FeatureType/*, PPMapStyles*/ } from './pp-map.utils';
+import { FeatureType, PPMapStyles } from './pp-map.utils';
+import { NESTED_FORMS_PRFIX } from './entity.raster.dialog';
 
 import './layer-details-form.raster.css';
 import 'react-virtualized/styles.css';
@@ -165,11 +165,11 @@ export const InnerRasterForm = (
   const [ppFeatures, setPPFeatures] = useState<Feature[]>([]);
   const [parsingErrors, setParsingErrors] = useState<Record<string, unknown>[]>([]);
   const [loadingPolygonParts, setLoadingPolygonParts] = useState<boolean>(false);
-  const [/*outlinedPerimeter*/, setOutlinedPerimeter] = useState<Feature | undefined>();
-  const [/*outlinedPerimeterMarker*/, setOutlinedPerimeterMarker] = useState<Feature | undefined>();
-  const [/*sourceExtent*/, setSourceExtent] = useState<Feature | undefined>();
-  const [/*sourceExtentMarker*/, setSourceExtentMarker] = useState<Feature | undefined>();
-  const [/*selectedFeature*/, setSelectedFeature] = useState<string | undefined>();
+  const [outlinedPerimeter, setOutlinedPerimeter] = useState<Feature | undefined>();
+  const [outlinedPerimeterMarker, setOutlinedPerimeterMarker] = useState<Feature | undefined>();
+  const [sourceExtent, setSourceExtent] = useState<Feature | undefined>();
+  const [sourceExtentMarker, setSourceExtentMarker] = useState<Feature | undefined>();
+  const [selectedFeature, setSelectedFeature] = useState<string | undefined>();
   const [expandedParts, setExpandedParts] = useState<boolean[]>([]);
   const [showPolygonPartsOnMap, setShowPolygonPartsOnMap] = useState<boolean>(true);
   const [showFaultyPolygonParts, setShowFaultyPolygonParts] = useState<boolean>(false);
@@ -828,7 +828,7 @@ export const InnerRasterForm = (
     handleClearSelection?: ()=>void;
   }
 
-  /*const Handler: React.FC<HandleProps> = ({partIndex, text, onClick, isErrorInPolygonPart, handleClick, handleSelection, handleClearSelection}) => {
+  const Handler: React.FC<HandleProps> = ({partIndex, text, onClick, isErrorInPolygonPart, handleClick, handleSelection, handleClearSelection}) => {
     const [deletingPart, setDeletingPart] = useState<boolean>(false);
     
     return  <Box 
@@ -874,7 +874,7 @@ export const InnerRasterForm = (
       />}
     </Box>
   </Box>
-  }*/
+  }
 
   let ppList:List;
   const setRef = (ref:List) => {
@@ -885,19 +885,19 @@ export const InnerRasterForm = (
     ppList?.forceUpdate();
   }
   
-  // const NATIVE_RESOLUTION_NAME_FIELD = 'sourceResolutionMeter';
-  // const geoArgsParams: geoArgs = [{name: NATIVE_RESOLUTION_NAME_FIELD, value: undefined}];
-  // const getResolutionObject = (params: geoArgs) => params.find((param) => param.name === NATIVE_RESOLUTION_NAME_FIELD);
+  const NATIVE_RESOLUTION_NAME_FIELD = 'sourceResolutionMeter';
+  const geoArgsParams: geoArgs = [{name: NATIVE_RESOLUTION_NAME_FIELD, value: undefined}];
+  const getResolutionObject = (params: geoArgs) => params.find((param) => param.name === NATIVE_RESOLUTION_NAME_FIELD);
 
-  /*const resolutionNotExist = () : geoJSONValidation => {
+  const resolutionNotExist = () : geoJSONValidation => {
     return {
       valid: false,
       severity_level: 'ERROR',
       reason: 'resolutionNotExistForGeometry'
     } as geoJSONValidation;
-  }*/
+  }
 
-  /*const ppVertexDensityFactor = (geometry: any, params: geoArgs) => {
+  const ppVertexDensityFactor = (geometry: any, params: geoArgs) => {
     const resolutionObj = getResolutionObject(params);
 
     if (!resolutionObj || !resolutionObj.value) {
@@ -912,9 +912,9 @@ export const InnerRasterForm = (
         reason: 'geometryTooDensed'
       } as geoJSONValidation;
     }
-  };*/
+  }
 
-  /*const ppArea = (geometry: any, params: geoArgs) => {
+  const ppArea = (geometry: any, params: geoArgs) => {
     const resolutionObj = getResolutionObject(params);
 
     if (!resolutionObj || !resolutionObj.value) {
@@ -929,9 +929,9 @@ export const InnerRasterForm = (
         reason: 'geometryTooSmall'
       } as geoJSONValidation;
     }
-  };*/
+  }
 
-  /*const ppCountSmallHoles = (geometry: any, params: geoArgs) => {
+  const ppCountSmallHoles = (geometry: any, params: geoArgs) => {
     const resolutionObj = getResolutionObject(params);
     
     if (!resolutionObj || !resolutionObj.value) {
@@ -946,20 +946,20 @@ export const InnerRasterForm = (
         reason: 'geometryHasSmallHoles'
       } as geoJSONValidation;
     }
-  }*/
+  }
 
-  /*const customChecks = useMemo(() => {
+  const customChecks = useMemo(() => {
     return {
-      validationFunc: [
-        ppVertexDensityFactor,
-        ppArea,
-        ppCountSmallHoles
-      ],
-      validationFuncArgs: geoArgsParams
-    };
-  }, [ppVertexDensityFactor, ppArea, ppCountSmallHoles]);*/
+        validationFunc: [
+          ppVertexDensityFactor,
+          ppArea,
+          ppCountSmallHoles
+        ],
+        validationFuncArgs: geoArgsParams
+      };
+  }, [ppVertexDensityFactor, ppArea, ppCountSmallHoles]);
   
-  /*const renderRow: ListRowRenderer = ({ index, key, style }) => {
+  const renderRow: ListRowRenderer = ({ index, key, style }) => {
     let data = Object.values(layerPolygonParts);
     let dataKeys = Object.keys(layerPolygonParts);
 
@@ -1072,7 +1072,7 @@ export const InnerRasterForm = (
         </Box>
       </CollapsibleList>
     );
-  };*/
+  };
 
   return (
     <Box id="layerDetailsFormRaster">
@@ -1249,17 +1249,17 @@ export const InnerRasterForm = (
                 loadingPolygonParts && <Loading />
               }
               {
-                // !loadingPolygonParts && !isEmpty(layerPolygonParts) && 
-                //   <List
-                //     width={740}
-                //     ref={setRef}
-                //     height={(polygonPartsMode === 'MANUAL') ? 370 : 410}
-                //     rowRenderer={renderRow}
-                //     rowCount={(faultyPolygonParts.length && showFaultyPolygonParts) ? faultyPolygonParts.length : expandedParts.length}
-                //     overscanRowCount={3}
-                //     rowHeight={(idx)=> ( expandedParts[idx.index] ? 316 : 48 )}
-                //     scrollToIndex = { graphQLPayloadObjectErrors[0] ? graphQLPayloadObjectErrors[0] : (expandedParts.length ? expandedParts.length - 1 : 0) }
-                //   />
+                !loadingPolygonParts && !isEmpty(layerPolygonParts) && 
+                  <List
+                    width={740}
+                    ref={setRef}
+                    height={(polygonPartsMode === 'MANUAL') ? 370 : 410}
+                    rowRenderer={renderRow}
+                    rowCount={(faultyPolygonParts.length && showFaultyPolygonParts) ? faultyPolygonParts.length : expandedParts.length}
+                    overscanRowCount={3}
+                    rowHeight={(idx)=> ( expandedParts[idx.index] ? 316 : 48 )}
+                    scrollToIndex = { graphQLPayloadObjectErrors[0] ? graphQLPayloadObjectErrors[0] : (expandedParts.length ? expandedParts.length - 1 : 0) }
+                  />
               }
               {
                 !loadingPolygonParts && (polygonPartsMode === 'MANUAL') && <Box className="addPolygonPart">
@@ -1305,7 +1305,7 @@ export const InnerRasterForm = (
             </Box>
             {
             <>
-              {/* <GeoFeaturesPresentorComponent 
+              <GeoFeaturesPresentorComponent 
                 layerRecord={layerRecord}
                 mode={mode} 
                 geoFeatures={
@@ -1327,7 +1327,7 @@ export const InnerRasterForm = (
                 showExisitngPolygonParts={showExisitngLayerPartsOnMap}
                 ingestionResolutionMeter={getFieldMeta('resolutionMeter').value as number}
                 ppCheck={ppCheckPerformed}
-              /> */}
+              />
             </>
             }
           </Box>

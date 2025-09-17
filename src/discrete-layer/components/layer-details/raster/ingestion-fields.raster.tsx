@@ -10,20 +10,21 @@ import { FormikValues } from 'formik';
 import { cloneDeep, isEmpty } from 'lodash';
 import { Button, CircularProgress, Icon, Tooltip, Typography } from '@map-colonies/react-core';
 import { Box, defaultFormatters, FileData } from '@map-colonies/react-components';
-import { Selection } from '../../../common/components/file-picker';
-import { FieldLabelComponent } from '../../../common/components/form/field-label';
+import { Selection } from '../../../../common/components/file-picker';
+import { FieldLabelComponent } from '../../../../common/components/form/field-label';
 // import useSessionStoreWatcherDirectory from '../../../common/hooks/useSessionStoreWatcherDirectory';
-import { Mode } from '../../../common/models/mode.enum';
-import { MetadataFile } from '../../../common/components/file-picker';
-import { RecordType, LayerMetadataMixedUnion, useQuery, useStore, SourceValidationModelType } from '../../models';
-import { FilePickerDialog } from '../dialogs/file-picker.dialog';
-import { Layer3DRecordModelKeys, LayerDemRecordModelKeys, LayerRasterRecordModelKeys} from './entity-types-keys';
-import { StringValuePresentorComponent } from './field-value-presentors/string.value-presentor';
-import { IRecordFieldInfo } from './layer-details.field-info';
-import { EntityFormikHandlers, FormValues } from './layer-datails-form';
-import { clearSyncWarnings, importJSONFileFromClient } from './utils';
+import { Mode } from '../../../../common/models/mode.enum';
+import { MetadataFile } from '../../../../common/components/file-picker';
+import { RecordType, LayerMetadataMixedUnion, useQuery, useStore, SourceValidationModelType } from '../../../models';
+import { FilePickerDialog } from '../../dialogs/file-picker.dialog';
+import { Layer3DRecordModelKeys, LayerDemRecordModelKeys, LayerRasterRecordModelKeys} from '../entity-types-keys';
+import { StringValuePresentorComponent } from '../field-value-presentors/string.value-presentor';
+import { IRecordFieldInfo } from '../layer-details.field-info';
+import { EntityFormikHandlers, FormValues } from '../layer-datails-form';
+import { clearSyncWarnings, importJSONFileFromClient } from '../utils';
+import { RasterWorkflowContext } from './state-machine-context.raster';
 
-import './ingestion-fields.css';
+import '../ingestion-fields.css';
 
 const DIRECTORY = 0;
 const FILES = 1;
@@ -172,6 +173,34 @@ export const IngestionFields: React.FC<PropsWithChildren<IngestionFieldsProps>> 
 }) => {
   const intl = useIntl();
   const store = useStore();
+  
+  // const actorRef = RasterWorkflowContext.useActorRef();
+  // const state = RasterWorkflowContext.useSelector((s) => s);
+
+  // useEffect(() => {
+  //   console.log("**** workflowMachine_STATE[<IngestionFields>] *****", state.value);
+  //   if((state.value as any).flow === 'selectGpkg'){
+  //     setFilePickerDialogOpen(true);
+  //     actorRef.send({ type: 'SELECT_GPKG', file: new File([], 'KUKU.GPKG') })
+  //   }
+  // }, [state.value]);
+
+  const actorRef = RasterWorkflowContext.useActorRef();
+  const state = RasterWorkflowContext.useSelector((s) => s);
+
+  const flowActor = state.children?.flow; // <-- the invoked child
+  const flowState = flowActor?.getSnapshot(); // grab its snapshot
+
+  useEffect(() => {
+    console.log("**** workflowMachine_STATE[<IngestionFields>] *****", state.value);
+    console.log("**** flowMachine_STATE *****", flowState?.value);
+
+    if (flowState?.matches("selectGpkg")) {
+      setFilePickerDialogOpen(true);
+      // flowActor?.send({ type: "SELECT_GPKG", file: new File([], "KUKU.GPKG") });
+    }
+  }, [state.value, flowState]);
+
   const [isFilePickerDialogOpen, setFilePickerDialogOpen] = useState<boolean>(false);
   const [isImportDisabled, setIsImportDisabled] = useState(true);
   const [selection, setSelection] = useState<Selection>({
@@ -344,6 +373,17 @@ export const IngestionFields: React.FC<PropsWithChildren<IngestionFieldsProps>> 
     const fileNames = selected.files.map((file: FileData) => file.name);
 
     if (validateSources) {
+      flowActor?.send({
+        type: "SELECT_GPKG", 
+        file: {
+          path: `${directory}/${selected.files[0].name}`,
+          details: {
+            updateDate: selected.files[0].modDate,
+            size: selected.files[0].size,
+          },
+          exists: true
+        }
+      });
       setValidatingSource?.(true);
       queryValidateSource.setQuery(
         store.queryValidateSource(
@@ -397,6 +437,8 @@ export const IngestionFields: React.FC<PropsWithChildren<IngestionFieldsProps>> 
 
   return (
     <>
+      <h1><bdi>[INGESTION-FIELDS]file:{state.context.files?.gpkg?.path}</bdi></h1>
+      <h1><bdi>[INGESTION-FIELDS][ERRORS]:{JSON.stringify(flowState.context.errors)}</bdi></h1>
       <Box className="header section">
         <Box className="ingestionFields">
           <IngestionInputs
