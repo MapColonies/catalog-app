@@ -559,6 +559,7 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
           </DialogTitle>
           <DialogContent className="dialogBody">
           <h1><bdi>[DIALOG][LOADING FROM SOME STATE]:{isLoading+''}</bdi></h1>
+          <h1><bdi>[DIALOG][ERRORS]:{JSON.stringify(state.context.errors)}</bdi></h1>
           <h1><bdi>[DIALOG]file:{state.context.files?.gpkg?.path}</bdi></h1>
           <h2><bdi>[DIALOG]validation:{JSON.stringify(state.context?.files?.gpkg?.validationResult)}</bdi></h2>
             {mode === Mode.UPDATE && <UpdateLayerHeader />}

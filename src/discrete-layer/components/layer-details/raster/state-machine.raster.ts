@@ -122,6 +122,10 @@ const verifyGpkgStates = {
           }
         });
 
+        if (!result.validateSource[0].isValid) {
+          throw new Error(result.validateSource[0].message);
+        };
+
         // return whatever you want to flow into `onDone`
         return result;
       }),
@@ -162,12 +166,12 @@ const verifyGpkgStates = {
 
   failure: {
     entry: assign({
-      errors: (ctx: Context, e: any) => [
-        ...ctx.context.errors,
+      errors: (_: Context) => [
+        ..._.context.errors,
         {
           source: "api",
           code: "VERIFY_FAILED",
-          message: /*e.data?.message ?? e.message ??*/ "Verification failed",
+          message: _.event.error.message ?? "Verification failed",
           level: "error"
         }
       ]
