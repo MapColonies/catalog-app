@@ -216,10 +216,10 @@
 
   "details-panel.no-selection": "No selection",
   "polygon-parts.button.load-from-shapeFile": "Load SHP",
-  "polygon-parts.empty-list": "Add polygon parts",
+  "FOR_DELETE_polygon-parts.empty-list": "Add polygon parts",
   "polygon-parts.deleting.label": "Deleting",
-  "polygon-parts.show-parts-on-map.label": "Show polygon parts on map",
-  "polygon-parts.show-parts-with-errors-on-map.label": "Show only polygon parts with errors",
+  "FOR_DELETE_polygon-parts.show-parts-on-map.label": "Show polygon parts on map",
+  "FOR_DELETE_polygon-parts.show-parts-with-errors-on-map.label": "Show only polygon parts with errors",
   "polygon-parts.show-exisitng-parts-on-map.label": "Show existing polygon parts",
   "polygon-parts.map-preview-legend.title": "Legend",
   "polygon-parts.map-preview-legend.DEFAULT": "Polygon parts",

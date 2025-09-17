@@ -216,10 +216,10 @@
 
   "details-panel.no-selection": "לא נבחר פריט",
   "polygon-parts.button.load-from-shapeFile": "טען Shape",
-  "polygon-parts.empty-list": "הוסיפו חלקי תיחום",
+  "FOR_DELETE_polygon-parts.empty-list": "הוסיפו חלקי תיחום",
   "polygon-parts.deleting.label": "מוחק",
-  "polygon-parts.show-parts-on-map.label": "הצג חלקי תיחום על המפה",
-  "polygon-parts.show-parts-with-errors-on-map.label": "הצג רק חלקי תיחום פגומים",
+  "FOR_DELETE_polygon-parts.show-parts-on-map.label": "הצג חלקי תיחום על המפה",
+  "FOR_DELETE_polygon-parts.show-parts-with-errors-on-map.label": "הצג רק חלקי תיחום פגומים",
   "polygon-parts.show-exisitng-parts-on-map.label": "הצג חלקי תיחום הקיימים",
   "polygon-parts.map-preview-legend.title": "מקרא",
   "polygon-parts.map-preview-legend.DEFAULT": "חלקי תיחום",
