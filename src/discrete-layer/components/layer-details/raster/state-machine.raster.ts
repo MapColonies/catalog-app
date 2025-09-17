@@ -1,6 +1,15 @@
 //@ts-nocheck
 import path from 'path';
-import { createMachine, assign, sendParent, fromPromise, SnapshotFrom, ActionArgs, InvokeDoneEvent , PromiseActorRef, EventObject, StateNodeConfig } from 'xstate';
+import {
+  // ActionArgs,
+  assign,
+  createMachine,
+  EventObject,
+  fromPromise,
+  PromiseActorRef,
+  sendParent,
+  SnapshotFrom
+} from 'xstate';
 import { Mode } from '../../../../common/models/mode.enum';
 import { IBaseRootStore, IRootStore, RecordType, SourceValidationModelType } from '../../../models';
 import { AnyActorSystem } from 'xstate/dist/declarations/src/system';
@@ -34,16 +43,12 @@ interface IProductFile extends IFileBase {
 
 interface Context {
   flowType?: Mode.NEW | Mode.UPDATE;
-  // gpkgFile?: File;
-  // files?: { product?: File; metadata?: File };
   formData?: Record<string, any>;
   jobId?: string;
   jobStatus?: string;
   autoMode?: boolean;
-  // validationResult?: SourceValidationModelType;
   errors: IErrorEntry[];
   store: IRootStore | IBaseRootStore;
-
   files?: {
     gpkg?: IGPKGFile;
     product?: IProductFile;
@@ -51,7 +56,7 @@ interface Context {
   }
 }
 
-type Events =
+export type Events =
   | { type: "START_NEW" }
   | { type: "START_UPDATE" }
   | { type: "RESTORE"; jobId: string }
@@ -68,7 +73,7 @@ type Events =
   | { type: "RETRY" }
   | { type: "FORMIK_ERROR"; errors: Record<string, string> };
 
-//type FlowActionArgs = ActionArgs<Context, Events, Events>;
+// type FlowActionArgs = ActionArgs<Context, Events, Events>;
 
 type FromPromiseArgs<TInput> = {
   input: {

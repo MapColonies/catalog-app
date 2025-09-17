@@ -22,6 +22,7 @@ import { StringValuePresentorComponent } from '../field-value-presentors/string.
 import { IRecordFieldInfo } from '../layer-details.field-info';
 import { EntityFormikHandlers, FormValues } from '../layer-datails-form';
 import { clearSyncWarnings, importJSONFileFromClient } from '../utils';
+import { Events } from './state-machine.raster';
 import { RasterWorkflowContext } from './state-machine-context.raster';
 
 import '../ingestion-fields.css';
@@ -186,7 +187,6 @@ export const IngestionFields: React.FC<PropsWithChildren<IngestionFieldsProps>> 
 
     if (flowState?.matches("selectGpkg")) {
       setFilePickerDialogOpen(true);
-      // flowActor?.send({ type: "SELECT_GPKG", file: new File([], "KUKU.GPKG") });
     }
   }, [state.value, flowState]);
 
@@ -367,12 +367,12 @@ export const IngestionFields: React.FC<PropsWithChildren<IngestionFieldsProps>> 
         file: {
           path: `${directory}/${selected.files[0].name}`,
           details: {
-            updateDate: selected.files[0].modDate,
-            size: selected.files[0].size,
+            updateDate: selected.files[0].modDate ? new Date(selected.files[0].modDate) : new Date(),
+            size: selected.files[0].size ?? 0,
           },
           exists: true
         }
-      });
+      } satisfies Events);
       setValidatingSource?.(true);
       queryValidateSource.setQuery(
         store.queryValidateSource(

@@ -401,6 +401,7 @@ const getProviderResolutionValuePath = (desciptors: FieldConfigModelType[],provi
         .valuePath;
 };
 
+// FOR_DELETE - start
 const HOURS_TO_ADD = 12;
 
 export const transformSynergyShapeFeatureToEntity = (desciptors: FieldConfigModelType[], feature: Feature, provider: ProviderType, fileName?: string): ParsedPolygonPart => {
@@ -576,6 +577,7 @@ export const transformTeraNovaShapeFeatureToEntity = (desciptors: FieldConfigMod
     errors: {...errors}
   };
 };
+// FOR_DELETE - end
 
 export const transformEntityToFormFields = (
   layerRecord: LayerMetadataMixedUnion | LinkModelType
