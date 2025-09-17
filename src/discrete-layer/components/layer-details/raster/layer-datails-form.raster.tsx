@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect, useCallback, MouseEventHandler } from 'react';
+import React, { useMemo, useState, useEffect, useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
   withFormik,
@@ -7,9 +7,7 @@ import {
   Form,
   FormikHandlers,
   FormikBag,
-  // Field,
 } from 'formik';
-import { List/*, ListRowRenderer*/ } from 'react-virtualized';
 import * as Yup from 'yup';
 import { OptionalObjectSchema, TypeOfShape } from 'yup/lib/object';
 import { AnyObject } from 'yup/lib/types';
@@ -18,7 +16,7 @@ import { get, set, isEmpty, isObject, omit, unset } from 'lodash';
 import { Feature, GeoJsonProperties, Geometry, MultiPolygon, Polygon } from 'geojson';
 import { AllGeoJSON, Properties } from '@turf/helpers';
 import shp, { FeatureCollectionWithFilename } from 'shpjs';
-import { Button, Checkbox, CircularProgress, CollapsibleList, Icon, IconButton, SimpleListItem, Typography, Select } from '@map-colonies/react-core';
+import { Button, Checkbox, CircularProgress, Select } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
 import CONFIG from '../../../../common/config';
 import { Mode } from '../../../../common/models/mode.enum';
@@ -26,12 +24,9 @@ import { ValidationsError } from '../../../../common/components/error/validation
 import { getGraphQLPayloadNestedObjectErrors, GraphQLError } from '../../../../common/components/error/graphql.error-presentor';
 import { MetadataFile } from '../../../../common/components/file-picker';
 import { emphasizeByHTML } from '../../../../common/helpers/formatters';
-import { Loading } from '../../../../common/components/tree/statuses/loading';
-import { area, countSmallHoles, DEGREES_PER_METER, explode, geoArgs, getFirstPoint, getOutlinedFeature, isGeometryPolygon, isSmallArea, polygonVertexDensityFactor } from '../../../../common/utils/geo.tools';
+import { explode, getFirstPoint, getOutlinedFeature, isGeometryPolygon } from '../../../../common/utils/geo.tools';
 import { mergeRecursive, removePropertiesWithPrefix } from '../../../../common/helpers/object';
-import { useZoomLevels } from '../../../../common/hooks/useZoomLevels';
 import { useEnums } from '../../../../common/hooks/useEnum.hook';
-import { geoJSONValidation } from '../../../../common/utils/geojson.validation';
 import {
   EntityDescriptorModelType,
   FieldConfigModelType,
@@ -60,8 +55,7 @@ import {
 import { NESTED_FORMS_PRFIX } from './entity.raster.dialog';
 import { IngestionFields } from './ingestion-fields.raster';
 import { getUIIngestionFieldDescriptors } from './ingestion.utils';
-// import { GeoFeaturesPresentorComponent } from './pp-map';
-import { FeatureType/*, PPMapStyles*/ } from './pp-map.utils';
+import { FeatureType } from './pp-map.utils';
 
 import './layer-details-form.raster.css';
 import 'react-virtualized/styles.css';
@@ -91,7 +85,6 @@ interface LayerDetailsFormCustomProps {
   mutationQueryLoading: boolean;
   closeDialog: () => void;
   schemaUpdater: (parts:number, startIndex?: number, removePrevNested?: boolean) => void;
-  removePolygonPart: (polygonPartKey: string) => string[];
   customErrorReset: () => void;
   customError?: Record<string,string[]> | undefined;
   ppCollisionCheckInProgress?: boolean | undefined;
@@ -143,7 +136,6 @@ export const InnerRasterForm = (
     mutationQueryLoading,
     closeDialog,
     schemaUpdater,
-    removePolygonPart,
     customErrorReset,
     customError,
     ppCollisionCheckInProgress,
@@ -157,31 +149,26 @@ export const InnerRasterForm = (
   
   const intl = useIntl();
   const enumsMap = useEnums();
-  const ZOOM_LEVELS = useZoomLevels();
   const [graphQLError, setGraphQLError] = useState<unknown>(mutationQueryError);
   const [isSelectedFiles, setIsSelectedFiles] = useState<boolean>(false);
   const [firstPhaseErrors, setFirstPhaseErrors] = useState<Record<string, string[]>>({});
   const [showCurtain, setShowCurtain] = useState<boolean>(true);
   const [ppFeatures, setPPFeatures] = useState<Feature[]>([]);
   const [parsingErrors, setParsingErrors] = useState<Record<string, unknown>[]>([]);
-  const [loadingPolygonParts, setLoadingPolygonParts] = useState<boolean>(false);
-  const [/*outlinedPerimeter*/, setOutlinedPerimeter] = useState<Feature | undefined>();
-  const [/*outlinedPerimeterMarker*/, setOutlinedPerimeterMarker] = useState<Feature | undefined>();
-  const [/*sourceExtent*/, setSourceExtent] = useState<Feature | undefined>();
-  const [/*sourceExtentMarker*/, setSourceExtentMarker] = useState<Feature | undefined>();
-  const [/*selectedFeature*/, setSelectedFeature] = useState<string | undefined>();
-  const [expandedParts, setExpandedParts] = useState<boolean[]>([]);
-  const [showPolygonPartsOnMap, setShowPolygonPartsOnMap] = useState<boolean>(true);
-  const [showFaultyPolygonParts, setShowFaultyPolygonParts] = useState<boolean>(false);
-  const [faultyPolygonParts, setFaultyPolygonParts] = useState<string[]>([]);
+  const [, setLoadingPolygonParts] = useState<boolean>(false);
+  const [, setOutlinedPerimeter] = useState<Feature | undefined>();
+  const [, setOutlinedPerimeterMarker] = useState<Feature | undefined>();
+  const [, setSourceExtent] = useState<Feature | undefined>();
+  const [, setSourceExtentMarker] = useState<Feature | undefined>();
+  const [, setExpandedParts] = useState<boolean[]>([]);
   const [showExisitngLayerPartsOnMap, setShowExisitngLayerPartsOnMap] = useState<boolean>(false);
   const [polygonPartsMode, setPolygonPartsMode] = useState<POLYGON_PARTS_MODE>('MANUAL');
-  const [layerPolygonParts, setLayerPolygonParts] = useState<Record<string, PolygonPartRecordModelType>>({});
+  const [, setLayerPolygonParts] = useState<Record<string, PolygonPartRecordModelType>>({});
   const [ppCheckPerformed, setPPCheckPerformed] = useState<boolean>(false);
   const [gpkgValidationError, setGpkgValidationError] = useState<string|undefined>(undefined);
   const [clientCustomValidationErrors, setClientCustomValidationErrors] = useState<Record<string,string>>({});
-  const [gpkgValidationResults, setGpkgValidationResults] = useState<SourceValidationModelType|undefined>(undefined);
-  const [graphQLPayloadObjectErrors, setGraphQLPayloadObjectErrors] = useState<number[]>([]);
+  const [, setGpkgValidationResults] = useState<SourceValidationModelType|undefined>(undefined);
+  const [, setGraphQLPayloadObjectErrors] = useState<number[]>([]);
   const [isSubmittedForm, setIsSubmittedForm] = useState(false);
   const [isThresholdErrorsCleaned, setIsThresholdErrorsCleaned] = useState(false);
   const [isValidatingSource, setIsValidatingSource] = useState(false);
@@ -270,8 +257,6 @@ export const InnerRasterForm = (
   useEffect(() => {
     // @ts-ignore
     setFirstPhaseErrors(mergeRecursive(getYupErrors(), getStatusErrors()));
-
-    setTimeout(()=>(ppList && updateListRowHeights()), 100);
   }, [errors, getYupErrors, getStatusErrors]);
 
   useEffect(() => {
@@ -491,16 +476,6 @@ export const InnerRasterForm = (
       setShowCurtain(ppCollisionCheckInProgress);
     }
   }, [ppCollisionCheckInProgress]);
-
-
-  useEffect(() => {
-    const vestValidationPPKeys = Object.fromEntries(Object.entries(vestValidationResults).filter(([key, value]) => vestValidationResults[key].errorCount));
-    const graphQLPPKeys = Object.fromEntries(graphQLPayloadObjectErrors.map((k) => [NESTED_FORMS_PRFIX + k, k]));
-    const ppWithProblems = Object.keys({...firstPhaseErrors, ...vestValidationPPKeys, ...graphQLPPKeys}).filter(key => key.includes(NESTED_FORMS_PRFIX))
-
-    setFaultyPolygonParts(ppWithProblems);
-  
-  }, [firstPhaseErrors, vestValidationResults, graphQLPayloadObjectErrors]);
   
   const shapeFileProviders = useMemo(() => {
     return getEnumKeys(enumsMap, 'ProviderType').map((key) => {
@@ -511,19 +486,6 @@ export const InnerRasterForm = (
       };
     });
   }, []);
-
-  // ****** Verification of GPKG extent vs. PP perimeter is disabled
-  // useEffect(() => {
-  //   if (sourceExtent?.geometry && outlinedPerimeter && !isPolygonContainsPolygon(sourceExtent as  Feature<any>, outlinedPerimeter as Feature<any>)){
-  //     setClientCustomValidationErrors({
-  //       ...clientCustomValidationErrors,
-  //       [CUSTOM_VALIDATION_ERROR_CODES.SHAPE_VS_GPKG]: intl.formatMessage({ id: shapeFilePerimeterVSGpkgExtentError.message })
-  //     });
-  //   }
-  //   else {
-  //     setClientCustomValidationErrors(omit(clientCustomValidationErrors,CUSTOM_VALIDATION_ERROR_CODES.SHAPE_VS_GPKG));
-  //   }
-  // }, [sourceExtent, outlinedPerimeter]);
   
   const exceededFeaturesNumberError = useMemo(() => new Error(
     intl.formatMessage(
@@ -531,10 +493,6 @@ export const InnerRasterForm = (
       { maxPPNumber: emphasizeByHTML(`${ppConfig.MAX.PER_SHAPE}`)}
      )
   ), []);
-
-  const isFaultyPPVisible: boolean = useMemo(() => {
-    return faultyPolygonParts.length ? showFaultyPolygonParts : false
-  }, [faultyPolygonParts, showFaultyPolygonParts])
 
   const exceededVertexNumberError = useCallback((numberOfPP: number, numberOfVertexes: number) => {
     return new Error(
@@ -550,21 +508,6 @@ export const InnerRasterForm = (
   }, []);
   
   const shapeFileGenericError = useMemo(() => new Error(`validation-general.shapeFile.generic`), []);
-  // const shapeFilePerimeterVSGpkgExtentError = useMemo(() => new Error(`validation-general.shapeFile.polygonParts.not-in-gpkg-extent`), []);
-
-  const editFieldDescriptors = useMemo(() => {
-    // **** Remove from descriptors autogenerated fields
-    return entityDescriptors.map((desc)=>{
-      return {
-        ...desc, 
-        categories: desc.categories?.map(cat=>{
-          return {
-            ...cat,
-            fields: cat.fields.filter((field: FieldConfigModelType) => (!field.isAutoGenerated && !field.isLifecycleEnvolved))
-          }})
-        }
-    });
-  }, [entityDescriptors]);
 
   const ingestionFieldDescriptors = useMemo(() => {
     return filterModeDescriptors(mode, entityDescriptors);
@@ -818,262 +761,6 @@ export const InnerRasterForm = (
     }
   });
 
-  interface HandleProps {
-    partIndex: number;
-    text?: string;
-    onClick?:  MouseEventHandler | undefined
-    isErrorInPolygonPart?: boolean
-    handleClick?: ()=>void;
-    handleSelection?: ()=>void;
-    handleClearSelection?: ()=>void;
-  }
-
-  /*const Handler: React.FC<HandleProps> = ({partIndex, text, onClick, isErrorInPolygonPart, handleClick, handleSelection, handleClearSelection}) => {
-    const [deletingPart, setDeletingPart] = useState<boolean>(false);
-    
-    return  <Box 
-      onClick={(e) => {
-        onClick ? onClick(e) : (()=>{})();
-        expandedParts[partIndex] = !expandedParts[partIndex];
-        updateListRowHeights(partIndex);
-      }} 
-      style={{ height: '48px'}}
-    >
-    <SimpleListItem
-      text={text}
-      // graphic="help"
-      metaIcon="chevron_right"
-      className={isErrorInPolygonPart ? 'polygonPartDataError' : ''}
-      onMouseOver={(e: any): void => { handleSelection && handleSelection();}}
-      onMouseOut={(e: any): void => { handleClearSelection && handleClearSelection();}}
-    />
-    <Box className="deletePolygonPart"
-     onMouseOver={(e: any): void => { handleSelection && handleSelection();}}
-     onMouseOut={(e: any): void => { handleClearSelection && handleClearSelection();}}
-    >
-      <Box style={{width: "100px"}}>
-        {
-          deletingPart && <Box style={{display: "flex", gap: "4px"}}>
-            <FormattedMessage id="polygon-parts.deleting.label" />
-            <CircularProgress/>
-          </Box>}
-      </Box>
-      {(polygonPartsMode === 'MANUAL') && <IconButton
-        className="operationIcon mc-icon-Delete"
-        label="DELETE PART"
-        onClick={ (e): void => {
-          if (handleClick) {
-            setDeletingPart(true);
-            
-            handleClick();
-
-            e.preventDefault();
-            e.stopPropagation();
-          }
-        } }
-      />}
-    </Box>
-  </Box>
-  }*/
-
-  let ppList:List;
-  const setRef = (ref:List) => {
-    ppList = ref;
-  }
-  const updateListRowHeights = (idx=0) => {
-    ppList?.recomputeRowHeights(idx);
-    ppList?.forceUpdate();
-  }
-  
-  // const NATIVE_RESOLUTION_NAME_FIELD = 'sourceResolutionMeter';
-  // const geoArgsParams: geoArgs = [{name: NATIVE_RESOLUTION_NAME_FIELD, value: undefined}];
-  // const getResolutionObject = (params: geoArgs) => params.find((param) => param.name === NATIVE_RESOLUTION_NAME_FIELD);
-
-  /*const resolutionNotExist = () : geoJSONValidation => {
-    return {
-      valid: false,
-      severity_level: 'ERROR',
-      reason: 'resolutionNotExistForGeometry'
-    } as geoJSONValidation;
-  }*/
-
-  /*const ppVertexDensityFactor = (geometry: any, params: geoArgs) => {
-    const resolutionObj = getResolutionObject(params);
-
-    if (!resolutionObj || !resolutionObj.value) {
-      return resolutionNotExist();
-    };
- 
-    const densityFactor = polygonVertexDensityFactor(geometry, resolutionObj.value * DEGREES_PER_METER);
-    if (densityFactor < CONFIG.POLYGON_PARTS.DENSITY_FACTOR) {
-      return {
-        valid: false,
-        severity_level: 'ERROR',
-        reason: 'geometryTooDensed'
-      } as geoJSONValidation;
-    }
-  };*/
-
-  /*const ppArea = (geometry: any, params: geoArgs) => {
-    const resolutionObj = getResolutionObject(params);
-
-    if (!resolutionObj || !resolutionObj.value) {
-      return resolutionNotExist();
-    };
-
-    const isSmallPolygon = isSmallArea(area(geometry), CONFIG.POLYGON_PARTS.AREA_THRESHOLD, resolutionObj.value);
-    if (isSmallPolygon) {
-      return {
-        valid: false,
-        severity_level: 'ERROR',
-        reason: 'geometryTooSmall'
-      } as geoJSONValidation;
-    }
-  };*/
-
-  /*const ppCountSmallHoles = (geometry: any, params: geoArgs) => {
-    const resolutionObj = getResolutionObject(params);
-    
-    if (!resolutionObj || !resolutionObj.value) {
-      return resolutionNotExist();
-    };
-
-    const polygonSmallHoles = countSmallHoles(geometry, CONFIG.POLYGON_PARTS.AREA_THRESHOLD, resolutionObj.value);
-    if (polygonSmallHoles > 0) {
-      return {
-        valid: false,
-        severity_level: 'ERROR',
-        reason: 'geometryHasSmallHoles'
-      } as geoJSONValidation;
-    }
-  }*/
-
-  /*const customChecks = useMemo(() => {
-    return {
-      validationFunc: [
-        ppVertexDensityFactor,
-        ppArea,
-        ppCountSmallHoles
-      ],
-      validationFuncArgs: geoArgsParams
-    };
-  }, [ppVertexDensityFactor, ppArea, ppCountSmallHoles]);*/
-  
-  /*const renderRow: ListRowRenderer = ({ index, key, style }) => {
-    let data = Object.values(layerPolygonParts);
-    let dataKeys = Object.keys(layerPolygonParts);
-
-    if (isFaultyPPVisible) {
-      data = [];
-      
-      for(let i = 0; i < Object.keys(dataKeys).length; i++){
-        for(let j = 0; j < Object.keys(faultyPolygonParts).length; j++){
-          if (dataKeys[i] === faultyPolygonParts[j]) {
-            data.push(Object.values(layerPolygonParts)[i] as unknown as PolygonPartRecordModelType);
-          }
-        }
-      }
-    }
-
-
-    let polygon_part = data[index];
-    if (!polygon_part) {
-      return <></>;
-    }
-
-    const currentFormKey = polygon_part.uniquePartId;
-    const isFirstPhaseErrorInPolygonPart = (firstPhaseErrors[currentFormKey] && Object.keys(firstPhaseErrors[currentFormKey])?.length > NONE);
-    const isVestPhaseErrorInPolygonPart = (vestValidationResults[currentFormKey] && vestValidationResults[currentFormKey]?.errorCount > NONE);
-    const isGraphQLErrorInPolygonPart = graphQLPayloadObjectErrors.includes(index);
-    const isGeometryValid = isGeometryPolygon(polygon_part.footprint);
-
-    if (layerPolygonParts && Object.keys(layerPolygonParts).length > NONE) {
-      polygon_part = layerPolygonParts[currentFormKey];
-    }
-    return (
-      <CollapsibleList
-                  key={currentFormKey}
-                  style={style}
-                  open={expandedParts[index]}
-                  handle={
-                    <Handler partIndex={index} text={currentFormKey} 
-                      isErrorInPolygonPart={isFirstPhaseErrorInPolygonPart || isVestPhaseErrorInPolygonPart || isGraphQLErrorInPolygonPart || !isGeometryValid}
-                      handleClick={()=>{
-                        const ppFields: string[] = removePolygonPart(currentFormKey);
-
-                        ppFields.forEach((key) => {
-                          setFieldTouched(currentFormKey + '.' + key, false);
-                        });
-
-                        setGraphQLPayloadObjectErrors((prev: number[]) => {
-                          const newGraphQLErrors = [ ...prev ];
-                          newGraphQLErrors?.splice(index, 1);
-                          return newGraphQLErrors;
-                        });
-
-                        if (status) {
-                          const { errors } = status;
-                          if (errors) {
-                            const { [currentFormKey]: removedKey, ...rest } = errors as Record<string, unknown>;
-                            setStatus({ errors: {...rest} });
-                          }
-                        }
-
-                        expandedParts?.splice(index, 1);
-                        setExpandedParts([...expandedParts]);
-                        updateListRowHeights(index);
-                        
-                        //@ts-ignore
-                        delete values[currentFormKey];
-                        setValues({
-                          ...values
-                        });
-
-                        setTimeout(async () => {
-                          await validateForm();
-                        }, 0); 
-                      }}
-                      handleSelection={()=>{
-                        setSelectedFeature(currentFormKey);
-                      }}
-                      handleClearSelection={()=>{
-                        setSelectedFeature(undefined);
-                      }}
-                    />
-                  }>
-        <Box className="polygonPartFormContainer"> 
-          <Field key={currentFormKey} name={currentFormKey}>
-            {(props: any) => <LayersDetailsComponent
-                                geoCustomChecks={
-                                  customChecks
-                                }
-                                entityDescriptors={editFieldDescriptors}
-                                layerRecord={polygon_part}
-                                // mode={mode}
-                                mode={polygonPartsMode === 'FROM_SHAPE' ? Mode.VIEW : mode}
-                                formik={entityFormikHandlers}
-                                enableMapPreview={false}
-                                fieldNamePrefix={`${currentFormKey}.`}
-                                showFiedlsCategory={false}
-            />}
-          </Field>
-        </Box>
-        <Box className="footer">
-          <Box className="messages">
-          {
-            isFirstPhaseErrorInPolygonPart &&
-            <ValidationsError errors={firstPhaseErrors[currentFormKey] as unknown as Record<string,string[]>} />
-          }
-          {
-            !isFirstPhaseErrorInPolygonPart && isVestPhaseErrorInPolygonPart &&
-            <ValidationsError errors={vestValidationResults[currentFormKey].getErrors()} />
-          }
-          </Box>
-        </Box>
-      </CollapsibleList>
-    );
-  };*/
-
   return (
     <Box id="layerDetailsFormRaster">
       <Form
@@ -1107,7 +794,7 @@ export const InnerRasterForm = (
               enhanced
               placeholder={intl.formatMessage({ id: `polygon-parts.button.load-from-shapeFile` })}
               options={shapeFileProviders}
-              disabled={/*!isIngestedSourceSelected() &&*/ showCurtain || isValidatingSource}
+              disabled={ showCurtain || isValidatingSource}
 
               onClick={(e): void => {
 
@@ -1197,26 +884,6 @@ export const InnerRasterForm = (
         >
           {showCurtain && <Box className="curtain"></Box>}
           <Box className='checkBoxContainer displayFlex'>
-            <Box className='polygonPartsData showOnMapContainer displayFlex'>
-              <Checkbox
-                className='flexCheckItem'
-                label={intl.formatMessage({id: 'polygon-parts.show-parts-on-map.label'})}
-                checked={showPolygonPartsOnMap}
-                onClick={
-                  (evt: React.MouseEvent<HTMLInputElement>): void => {
-                    setShowPolygonPartsOnMap(evt.currentTarget.checked);
-                  }}
-                  />
-              <Checkbox
-                className='flexCheckItem'
-                disabled={faultyPolygonParts.length === 0}
-                label={intl.formatMessage({ id: 'polygon-parts.show-parts-with-errors-on-map.label' })}
-                checked={isFaultyPPVisible}
-                onClick={(evt: React.MouseEvent<HTMLInputElement>): void => {
-                  setShowFaultyPolygonParts(evt.currentTarget.checked);
-                }}
-              />
-            </Box>
             <Box className='displayFlex'>
             {
               mode === Mode.UPDATE &&
@@ -1231,104 +898,35 @@ export const InnerRasterForm = (
             }
             </Box>
           </Box>
-          <Box className="polygonPartsContainer">
-            <Box className="polygonPartsData">
-              
-              {
-                !loadingPolygonParts && isEmpty(layerPolygonParts) && <Typography
-                    use="headline2"
-                    tag="div"
-                    className="noSelection"
-                    style={{paddingTop: '120px', height: (polygonPartsMode === 'MANUAL') ? '370px' : '410px'}}
-                  >
-                    <FormattedMessage id="polygon-parts.empty-list" />
-                  </Typography>
-              }
-              
-              {
-                loadingPolygonParts && <Loading />
-              }
-              {
-                // !loadingPolygonParts && !isEmpty(layerPolygonParts) && 
-                //   <List
-                //     width={740}
-                //     ref={setRef}
-                //     height={(polygonPartsMode === 'MANUAL') ? 370 : 410}
-                //     rowRenderer={renderRow}
-                //     rowCount={(faultyPolygonParts.length && showFaultyPolygonParts) ? faultyPolygonParts.length : expandedParts.length}
-                //     overscanRowCount={3}
-                //     rowHeight={(idx)=> ( expandedParts[idx.index] ? 316 : 48 )}
-                //     scrollToIndex = { graphQLPayloadObjectErrors[0] ? graphQLPayloadObjectErrors[0] : (expandedParts.length ? expandedParts.length - 1 : 0) }
-                //   />
-              }
-              {
-                !loadingPolygonParts && (polygonPartsMode === 'MANUAL') && <Box className="addPolygonPart">
-                  <Button
-                    outlined
-                    type="button"
-                    disabled={ isValidatingSource }
-                    onClick={(): void => {
-                      setLoadingPolygonParts(false);
-                      setPPCheckPerformed(false);
-
-                      //Sort exisitng pp keys in descending order
-                      const exisitngParts = layerPolygonParts ? Object.keys(layerPolygonParts)
-                                            .map(key => parseInt(key.replace(NESTED_FORMS_PRFIX,'')))
-                                            .sort((a, b) => b - a) : [];
-                      const lastPartIdx = exisitngParts.length ? exisitngParts[0] + 1 : 0;
-
-                      schemaUpdater(1, lastPartIdx);
-                      setIsSubmittedForm(false);
-                   
-                      setExpandedParts([...expandedParts.fill(false), true]);
-
-                      const polygonData = {
-                        uniquePartId: NESTED_FORMS_PRFIX + lastPartIdx,
-                        sourceResolutionMeter: Object.values(ZOOM_LEVELS)
-                                              .find((zoom) => zoom.resolutionDeg === gpkgValidationResults?.resolutionDegree)?.resolutionMeter,
-                        __typename: "PolygonPartRecord",
-                      }
-                      
-                      setValues({
-                        ...values,
-                        ...{[polygonData.uniquePartId]: polygonData}
-                      });
-
-                      setTimeout(async () => {
-                        await validateForm();
-                      }, 0);
-                    }}>
-                      <Icon className="mc-icon-Plus" />
-                    </Button>
-                </Box>
-              }
+          <Box className="validationsContainer">
+            <Box className="validationsData">
             </Box>
             {
-            <>
-              {/* <GeoFeaturesPresentorComponent 
-                layerRecord={layerRecord}
-                mode={mode} 
-                geoFeatures={
-                  showPolygonPartsOnMap ? 
-                  [
-                    sourceExtent as Feature<Geometry, GeoJsonProperties>,
-                    sourceExtentMarker as Feature<Geometry, GeoJsonProperties>,
-                    outlinedPerimeter as Feature<Geometry, GeoJsonProperties>,
-                    outlinedPerimeterMarker as Feature<Geometry, GeoJsonProperties>,
-                    ...ppFeatures
-                  ] 
-                  : []
-                } 
-                selectedFeatureKey={selectedFeature}
-                //@ts-ignore
-                selectionStyle={[PPMapStyles.get(FeatureType.SELECTED_FILL), PPMapStyles.get(FeatureType.SELECTED_MARKER)]} 
-                style={{width: '520px', position: 'relative', direction: 'ltr'}} 
-                fitOptions={{padding:[10,20,10,20]}}
-                showExisitngPolygonParts={showExisitngLayerPartsOnMap}
-                ingestionResolutionMeter={getFieldMeta('resolutionMeter').value as number}
-                ppCheck={ppCheckPerformed}
-              /> */}
-            </>
+              <>
+                {/* <GeoFeaturesPresentorComponent 
+                  layerRecord={layerRecord}
+                  mode={mode} 
+                  geoFeatures={
+                    showPolygonPartsOnMap ? 
+                    [
+                      sourceExtent as Feature<Geometry, GeoJsonProperties>,
+                      sourceExtentMarker as Feature<Geometry, GeoJsonProperties>,
+                      outlinedPerimeter as Feature<Geometry, GeoJsonProperties>,
+                      outlinedPerimeterMarker as Feature<Geometry, GeoJsonProperties>,
+                      ...ppFeatures
+                    ] 
+                    : []
+                  } 
+                  selectedFeatureKey={selectedFeature}
+                  //@ts-ignore
+                  selectionStyle={[PPMapStyles.get(FeatureType.SELECTED_FILL), PPMapStyles.get(FeatureType.SELECTED_MARKER)]} 
+                  style={{width: '520px', position: 'relative', direction: 'ltr'}} 
+                  fitOptions={{padding:[10,20,10,20]}}
+                  showExisitngPolygonParts={showExisitngLayerPartsOnMap}
+                  ingestionResolutionMeter={getFieldMeta('resolutionMeter').value as number}
+                  ppCheck={ppCheckPerformed}
+                /> */}
+              </>
             }
           </Box>
           <LayersDetailsComponent
@@ -1427,7 +1025,6 @@ interface LayerDetailsFormProps {
   entityDescriptors: EntityDescriptorModelType[];
   layerRecord: LayerMetadataMixedUnion;
   schemaUpdater: (parts:number) => void;
-  removePolygonPart: (polygonPartKey: string) => string[];
   yupSchema: OptionalObjectSchema<
     { [x: string]: Yup.AnySchema<unknown, unknown, unknown> },
     AnyObject,

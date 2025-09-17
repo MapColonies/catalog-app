@@ -86,16 +86,15 @@ body[dir='rtl'] #layerDetailsFormRaster .enumOptions .mdc-select__dropdown-icon 
   left: initial;
 }
 
-#layerDetailsFormRaster .polygonPartsContainer {
+#layerDetailsFormRaster .validationsContainer {
   display: flex;
   height: 410px;
   margin-bottom: 4px;
   border-bottom: 1px dashed var(--mdc-theme-gc-selection-background);
 }
 
-#layerDetailsFormRaster .polygonPartsData {
+#layerDetailsFormRaster .validationsData {
   width: 740px;
-  /* overflow-y: scroll; */
 }
 
 #layerDetailsFormRaster .polygonPartDataError {

@@ -173,19 +173,8 @@ export const IngestionFields: React.FC<PropsWithChildren<IngestionFieldsProps>> 
 }) => {
   const intl = useIntl();
   const store = useStore();
-  
+
   // const actorRef = RasterWorkflowContext.useActorRef();
-  // const state = RasterWorkflowContext.useSelector((s) => s);
-
-  // useEffect(() => {
-  //   console.log("**** workflowMachine_STATE[<IngestionFields>] *****", state.value);
-  //   if((state.value as any).flow === 'selectGpkg'){
-  //     setFilePickerDialogOpen(true);
-  //     actorRef.send({ type: 'SELECT_GPKG', file: new File([], 'KUKU.GPKG') })
-  //   }
-  // }, [state.value]);
-
-  const actorRef = RasterWorkflowContext.useActorRef();
   const state = RasterWorkflowContext.useSelector((s) => s);
 
   const flowActor = state.children?.flow; // <-- the invoked child

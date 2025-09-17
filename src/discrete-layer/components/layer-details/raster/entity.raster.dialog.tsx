@@ -541,7 +541,6 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
                   mutationQueryError={mutationQuery.error}
                   mutationQueryLoading={mutationQuery.loading}
                   closeDialog={closeDialog}
-                  removePolygonPart={(idx)=>[]}
                   customErrorReset={store.discreteLayersStore.clearCustomValidationError}
                   customError={store.discreteLayersStore.customValidationError}
                   ppCollisionCheckInProgress={store.discreteLayersStore.ppCollisionCheckInProgress}
