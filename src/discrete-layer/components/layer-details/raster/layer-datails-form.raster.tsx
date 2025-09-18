@@ -22,6 +22,7 @@ import { getGraphQLPayloadNestedObjectErrors, GraphQLError } from '../../../../c
 import { MetadataFile } from '../../../../common/components/file-picker';
 import { getFirstPoint } from '../../../../common/utils/geo.tools';
 import { mergeRecursive } from '../../../../common/helpers/object';
+import { StateMachineError } from '../../../../common/components/error/state-machine.error-presentor';
 import {
   EntityDescriptorModelType,
   FieldConfigModelType,
@@ -435,6 +436,7 @@ export const InnerRasterForm = (
         <Box className="footer">
           <Box className="messages">
             <GraphQLError error={state.context.errors[0]} />
+            <StateMachineError errors={state.context.errors} />
             {/* {
               topLevelFieldsErrors && Object.keys(topLevelFieldsErrors).length > NONE &&
               JSON.stringify(topLevelFieldsErrors) !== '{}' &&

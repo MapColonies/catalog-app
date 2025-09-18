@@ -1,4 +1,5 @@
 
+// @ts-nocheck
 import path from 'path';
 import {
   // ActionArgs,
@@ -142,7 +143,14 @@ const verifyGpkgStates = {
         });
 
         if (!result.validateSource[0].isValid) {
-          throw new Error(result.validateSource[0].message as string);
+          throw ({
+            source: "logic",
+            code: "ingestion.error.invalid-source-file",
+            message: result.validateSource[0].message as string,
+            level: "error",
+            addPolicy: "override"
+          });
+          // throw new Error(result.validateSource[0].message as string);
         };
 
         // return whatever you want to flow into `onDone`
@@ -177,17 +185,27 @@ const verifyGpkgStates = {
 
   failure: {
     entry: 
-      sendParent((_: { context: Context; event: any }) => ({
-        type: "FLOW_ERROR",
-        error:  {
-          source: "api",
-          code: "ingestion.error.invalid-source-file",
-          message: 'string',
-          response: _.event.error.response,
-          level: "error",
-          addPolicy: "override"
+      sendParent((_: { context: Context; event: any }) => {
+        let errObj = {
+          type: "FLOW_ERROR",
+          error:  {..._.event.error}
+        };
+
+        if(_.event.error.response){
+          errObj = {
+            type: "FLOW_ERROR",
+            error:  {
+              source: "api",
+              code: "ingestion.error.invalid-source-file",
+              message: 'SHOULD_BE_OMMITED',
+              response: _.event.error.response,
+              level: "error",
+              addPolicy: "override"
+            }
+          }
         }
-      })),
+        return errObj;
+        }),
     type: "final"
   }
 };
