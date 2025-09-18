@@ -1,4 +1,4 @@
-//@ts-nocheck
+
 import path from 'path';
 import {
   // ActionArgs,
@@ -20,6 +20,8 @@ interface IErrorEntry {
   message: string;
   level: "error" | "warning";
   field?: string;
+  addPolicy?: "merge" | "override";
+  response?: Record<string,unknown>;
 }
 
 interface IFileDetails {
@@ -71,7 +73,9 @@ export type Events =
   | { type: "UPDATE_FORM"; data: Record<string, any> }
   | { type: "SUBMIT" }
   | { type: "RETRY" }
-  | { type: "FORMIK_ERROR"; errors: Record<string, string> };
+  | { type: "FORMIK_ERROR"; errors: Record<string, string> }
+  | { type: "FLOW_ERROR"; error: IErrorEntry };
+
 
 // type FlowActionArgs = ActionArgs<Context, Events, Events>;
 
@@ -172,17 +176,18 @@ const verifyGpkgStates = {
   },
 
   failure: {
-    entry: assign({
-      errors: (_) => [
-        ..._.context.errors,
-        {
+    entry: 
+      sendParent((_: { context: Context; event: any }) => ({
+        type: "FLOW_ERROR",
+        error:  {
           source: "api",
-          code: "VERIFY_FAILED",
-          message: _.event.error.message ?? "Verification failed",
-          level: "error"
+          code: "ingestion.error.invalid-source-file",
+          message: 'string',
+          response: _.event.error.response,
+          level: "error",
+          addPolicy: "override"
         }
-      ]
-    }),
+      })),
     type: "final"
   }
 };
@@ -392,7 +397,16 @@ export const workflowMachine = createMachine({
             })
           })
         },        
-        FLOW_ERROR: { target: "error", actions: assign({ errors: (ctx, e: any) => [...ctx.errors, e.error] }) },
+        FLOW_ERROR: { 
+          // target: "error",
+          actions: assign({ 
+            errors: (_) => {
+              return _.event.error.addPolicy === "merge" ? 
+                [ ..._.context.errors, _.event.error] : 
+                [_.event.error]
+            }
+          }) 
+        },
         FLOW_SUBMIT: "jobSubmission"
       }
     },

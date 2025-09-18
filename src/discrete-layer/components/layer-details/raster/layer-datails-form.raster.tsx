@@ -40,6 +40,7 @@ import {
 import { IngestionFields } from './ingestion-fields.raster';
 import { getUIIngestionFieldDescriptors } from './ingestion.utils';
 import { FeatureType } from './pp-map.utils';
+import { RasterWorkflowContext } from './state-machine-context.raster';
 
 import './layer-details-form.raster.css';
 import 'react-virtualized/styles.css';
@@ -116,6 +117,13 @@ export const InnerRasterForm = (
     ppCollisionCheckInProgress,
   } = props;
 
+  //#region STATE MACHINE
+  // const actorRef = RasterWorkflowContext.useActorRef();
+  const state = RasterWorkflowContext.useSelector((s) => s);
+  //#endregion
+  
+  
+  
   const status = props.status as StatusError | Record<string, unknown>;
   
   const intl = useIntl();
@@ -426,7 +434,8 @@ export const InnerRasterForm = (
         </Box>
         <Box className="footer">
           <Box className="messages">
-            {
+            <GraphQLError error={state.context.errors[0]} />
+            {/* {
               topLevelFieldsErrors && Object.keys(topLevelFieldsErrors).length > NONE &&
               JSON.stringify(topLevelFieldsErrors) !== '{}' &&
               <ValidationsError errors={topLevelFieldsErrors} />
@@ -443,7 +452,7 @@ export const InnerRasterForm = (
               JSON.stringify(graphQLError) !== '{}' &&
               Object.keys(graphQLError).length > NONE &&
               <GraphQLError error={graphQLError} />
-            }
+            } */}
           </Box>
           <Box className="buttons">
             {
