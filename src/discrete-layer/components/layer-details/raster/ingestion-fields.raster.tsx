@@ -426,8 +426,8 @@ export const IngestionFields: React.FC<PropsWithChildren<IngestionFieldsProps>> 
 
   return (
     <>
-      <h1><bdi>[INGESTION-FIELDS]file:{state.context.files?.gpkg?.path}</bdi></h1>
-      <h1><bdi>[INGESTION-FIELDS][ERRORS]:{JSON.stringify(flowState.context.errors)}</bdi></h1>
+      {/* <h1><bdi>[INGESTION-FIELDS]file:{state.context.files?.gpkg?.path}</bdi></h1>
+      <h1><bdi>[INGESTION-FIELDS][ERRORS]:{JSON.stringify(state.context.errors)}</bdi></h1> */}
       <Box className="header section">
         <Box className="ingestionFields">
           <IngestionInputs

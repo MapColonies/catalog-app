@@ -47,6 +47,7 @@ import './layer-details-form.raster.css';
 import 'react-virtualized/styles.css';
 
 const NONE = 0;
+const FIRST = 0;
 
 // Shape of form values - a bit problematic because we cannot extend union type
 export interface FormValues {
@@ -122,9 +123,7 @@ export const InnerRasterForm = (
   // const actorRef = RasterWorkflowContext.useActorRef();
   const state = RasterWorkflowContext.useSelector((s) => s);
   //#endregion
-  
-  
-  
+
   const status = props.status as StatusError | Record<string, unknown>;
   
   const intl = useIntl();
@@ -435,7 +434,7 @@ export const InnerRasterForm = (
         </Box>
         <Box className="footer">
           <Box className="messages">
-            <GraphQLError error={state.context.errors[0]} />
+            <GraphQLError error={state.context.errors[FIRST]} />
             <StateMachineError errors={state.context.errors} />
             {/* {
               topLevelFieldsErrors && Object.keys(topLevelFieldsErrors).length > NONE &&
