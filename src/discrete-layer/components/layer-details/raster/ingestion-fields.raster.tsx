@@ -22,7 +22,7 @@ import { StringValuePresentorComponent } from '../field-value-presentors/string.
 import { IRecordFieldInfo } from '../layer-details.field-info';
 import { EntityFormikHandlers, FormValues } from '../layer-datails-form';
 import { clearSyncWarnings, importJSONFileFromClient } from '../utils';
-import { Events } from './state-machine.raster';
+import { Events, hasLoadingTagDeep } from './state-machine.raster';
 import { RasterWorkflowContext } from './state-machine-context.raster';
 
 import '../ingestion-fields.css';
@@ -175,7 +175,8 @@ export const IngestionFields: React.FC<PropsWithChildren<IngestionFieldsProps>> 
   const intl = useIntl();
   const store = useStore();
 
-  // const actorRef = RasterWorkflowContext.useActorRef();
+  const actorRef = RasterWorkflowContext.useActorRef();
+  const isLoading = hasLoadingTagDeep(actorRef?.getSnapshot());
   const state = RasterWorkflowContext.useSelector((s) => s);
 
   const flowActor = state.children?.flow; // <-- the invoked child
@@ -444,6 +445,7 @@ export const IngestionFields: React.FC<PropsWithChildren<IngestionFieldsProps>> 
             <Button
               raised
               type="button"
+              disabled={isLoading}
               onClick={(): void => {
                 setFilePickerDialogOpen(true);
               }}

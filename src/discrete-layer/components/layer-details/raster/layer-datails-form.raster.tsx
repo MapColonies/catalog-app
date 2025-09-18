@@ -435,7 +435,9 @@ export const InnerRasterForm = (
         <Box className="footer">
           <Box className="messages">
             <GraphQLError error={state.context.errors[FIRST]} />
-            <StateMachineError errors={state.context.errors} />
+            <StateMachineError 
+              errors={state.context.errors.filter((err:any)=>err.source === "logic")}
+            />
             {/* {
               topLevelFieldsErrors && Object.keys(topLevelFieldsErrors).length > NONE &&
               JSON.stringify(topLevelFieldsErrors) !== '{}' &&
