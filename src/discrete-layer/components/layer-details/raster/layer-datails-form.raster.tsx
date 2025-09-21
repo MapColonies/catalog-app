@@ -41,6 +41,7 @@ import {
 import { IngestionFields } from './ingestion-fields.raster';
 import { getUIIngestionFieldDescriptors } from './ingestion.utils';
 import { FeatureType } from './pp-map.utils';
+import { IErrorEntry } from './state-machine.raster';
 import { RasterWorkflowContext } from './state-machine-context.raster';
 
 import './layer-details-form.raster.css';
@@ -436,9 +437,9 @@ export const InnerRasterForm = (
           <Box className="messages">
             <GraphQLError error={state.context.errors[FIRST]} />
             <StateMachineError 
-              errors={state.context.errors.filter((err:any)=>err.source === "logic")}
+              errors={state.context.errors.filter((err: IErrorEntry) => err.source === "logic")}
             />
-            {/* {
+            {
               topLevelFieldsErrors && Object.keys(topLevelFieldsErrors).length > NONE &&
               JSON.stringify(topLevelFieldsErrors) !== '{}' &&
               <ValidationsError errors={topLevelFieldsErrors} />
@@ -448,14 +449,6 @@ export const InnerRasterForm = (
               vestValidationResults.topLevelEntityVestErrors?.errorCount > NONE &&
               <ValidationsError errors={vestValidationResults.topLevelEntityVestErrors.getErrors()} />
             }
-            { 
-              graphQLError !== undefined &&
-              graphQLError !== null &&
-              graphQLError &&
-              JSON.stringify(graphQLError) !== '{}' &&
-              Object.keys(graphQLError).length > NONE &&
-              <GraphQLError error={graphQLError} />
-            } */}
           </Box>
           <Box className="buttons">
             {

@@ -14,7 +14,7 @@ import { Mode } from '../../../../common/models/mode.enum';
 import { IBaseRootStore, IRootStore, RecordType, SourceValidationModelType } from '../../../models';
 import { AnyActorSystem } from 'xstate/dist/declarations/src/system';
 
-interface IErrorEntry {
+export interface IErrorEntry {
   source: "formik" | "api" | "logic";
   code: string;
   message: string;
@@ -130,7 +130,7 @@ const verifyGpkgStates = {
 
         if (!input.context.files?.gpkg) {
           throw new Error("No file selected");
-        };
+        }
 
         // Call into MobX-State-Tree store
         const result = await input.context.store.queryValidateSource({
@@ -149,8 +149,7 @@ const verifyGpkgStates = {
             level: "error",
             addPolicy: "override"
           });
-          // throw new Error(result.validateSource[0].message as string);
-        };
+        }
 
         // return whatever you want to flow into `onDone`
         return result;
@@ -190,7 +189,7 @@ const verifyGpkgStates = {
           error:  {..._.event.error}
         };
 
-        if(_.event.error.response){
+        if (_.event.error.response) {
           errObj = {
             type: "FLOW_ERROR",
             error:  {
