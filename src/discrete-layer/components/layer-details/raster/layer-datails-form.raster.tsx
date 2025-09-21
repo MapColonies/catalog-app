@@ -8,12 +8,12 @@ import {
   FormikHandlers,
   FormikBag,
 } from 'formik';
+import { Feature, GeoJsonProperties, Geometry } from 'geojson';
 import * as Yup from 'yup';
 import { OptionalObjectSchema, TypeOfShape } from 'yup/lib/object';
 import { AnyObject } from 'yup/lib/types';
 import { DraftResult } from 'vest/vestResult';
 import { get, isEmpty, isObject } from 'lodash';
-import { Feature } from 'geojson';
 import { Button, Checkbox, CircularProgress } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
 import { Mode } from '../../../../common/models/mode.enum';
@@ -40,7 +40,8 @@ import {
 } from '../utils';
 import { IngestionFields } from './ingestion-fields.raster';
 import { getUIIngestionFieldDescriptors } from './ingestion.utils';
-import { FeatureType } from './pp-map.utils';
+import { GeoFeaturesPresentorComponent } from './pp-map';
+import { FeatureType, PPMapStyles } from './pp-map.utils';
 import { IErrorEntry } from './state-machine.raster';
 import { RasterWorkflowContext } from './state-machine-context.raster';
 
@@ -393,27 +394,25 @@ export const InnerRasterForm = (
             </Box>
             {
               <>
-                {/* <GeoFeaturesPresentorComponent 
+                <GeoFeaturesPresentorComponent 
                   layerRecord={layerRecord}
                   mode={mode} 
                   geoFeatures={
-                    showPolygonPartsOnMap ? 
                     [
-                      sourceExtent as Feature<Geometry, GeoJsonProperties>,
-                      sourceExtentMarker as Feature<Geometry, GeoJsonProperties>,
-                      outlinedPerimeter as Feature<Geometry, GeoJsonProperties>,
-                      outlinedPerimeterMarker as Feature<Geometry, GeoJsonProperties>
+                      state.context.files?.gpkg?.geoDetails?.feature as Feature<Geometry, GeoJsonProperties>,
+                      state.context.files?.gpkg?.geoDetails?.marker as Feature<Geometry, GeoJsonProperties>,
+                      state.context.files?.product?.geoDetails?.feature as Feature<Geometry, GeoJsonProperties>,
+                      state.context.files?.product?.geoDetails?.marker as Feature<Geometry, GeoJsonProperties>
                     ] 
-                    : []
                   } 
-                  selectedFeatureKey={selectedFeature}
+                  // selectedFeatureKey={selectedFeature}
                   //@ts-ignore
                   selectionStyle={[PPMapStyles.get(FeatureType.SELECTED_FILL), PPMapStyles.get(FeatureType.SELECTED_MARKER)]} 
                   style={{width: '520px', position: 'relative', direction: 'ltr'}} 
                   fitOptions={{padding:[10,20,10,20]}}
                   showExisitngPolygonParts={showExisitngLayerPartsOnMap}
                   ingestionResolutionMeter={getFieldMeta('resolutionMeter').value as number}
-                /> */}
+                />
               </>
             }
           </Box>

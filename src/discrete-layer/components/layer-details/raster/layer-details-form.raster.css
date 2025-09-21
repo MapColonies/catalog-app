@@ -90,7 +90,6 @@ body[dir='rtl'] #layerDetailsFormRaster .enumOptions .mdc-select__dropdown-icon 
   display: flex;
   height: 410px;
   margin-bottom: 4px;
-  border-bottom: 1px dashed var(--mdc-theme-gc-selection-background);
 }
 
 #layerDetailsFormRaster .validationsData {
