@@ -47,9 +47,9 @@ import {
   isEnumType
 } from '../utils';
 import suite from '../validate';
-import { getUIIngestionFieldDescriptors } from './ingestion.utils';
 import { Events/*, hasLoadingTagDeep*/ } from './state-machine.raster';
 import { RasterWorkflowProvider, RasterWorkflowContext } from './state-machine-context.raster';
+import { getUIIngestionFieldDescriptors } from './utils';
 
 import './entity.raster.dialog.css';
 

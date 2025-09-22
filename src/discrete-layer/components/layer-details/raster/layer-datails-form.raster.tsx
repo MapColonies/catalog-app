@@ -38,12 +38,12 @@ import {
   filterModeDescriptors,
   prepareEntityForSubmit,
 } from '../utils';
-import { getUIIngestionFieldDescriptors } from './ingestion.utils';
 import { IngestionFields } from './ingestion-fields.raster';
 import { GeoFeaturesPresentorComponent } from './pp-map';
 import { FeatureType, PPMapStyles } from './pp-map.utils';
 import { Events, IErrorEntry } from './state-machine.raster';
 import { RasterWorkflowContext } from './state-machine-context.raster';
+import { getUIIngestionFieldDescriptors } from './utils';
 
 import './layer-details-form.raster.css';
 import 'react-virtualized/styles.css';
