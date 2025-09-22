@@ -51,7 +51,7 @@ import {
   isEnumType
 } from '../utils';
 import suite from '../validate';
-import { getUIIngestionFieldDescriptors } from './ingestion.utils';
+import { getUIIngestionFieldDescriptors } from './utils';
 
 import './entity.raster.dialog.css';
 

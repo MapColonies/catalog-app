@@ -16,13 +16,13 @@ import { DraftResult } from 'vest/vestResult';
 import { get, isEmpty, isObject } from 'lodash';
 import { Button, Checkbox, CircularProgress } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
-import { Mode } from '../../../../common/models/mode.enum';
-import { ValidationsError } from '../../../../common/components/error/validations.error-presentor';
-import { getGraphQLPayloadNestedObjectErrors, GraphQLError } from '../../../../common/components/error/graphql.error-presentor';
-import { MetadataFile } from '../../../../common/components/file-picker';
-import { getFirstPoint } from '../../../../common/utils/geo.tools';
-import { mergeRecursive } from '../../../../common/helpers/object';
+import { GraphQLError } from '../../../../common/components/error/graphql.error-presentor';
 import { StateMachineError } from '../../../../common/components/error/state-machine.error-presentor';
+import { ValidationsError } from '../../../../common/components/error/validations.error-presentor';
+import { MetadataFile } from '../../../../common/components/file-picker';
+import { mergeRecursive } from '../../../../common/helpers/object';
+import { Mode } from '../../../../common/models/mode.enum';
+import { isPolygonContainsPolygon } from '../../../../common/utils/geo.tools';
 import {
   EntityDescriptorModelType,
   FieldConfigModelType,
@@ -38,11 +38,11 @@ import {
   filterModeDescriptors,
   prepareEntityForSubmit,
 } from '../utils';
-import { IngestionFields } from './ingestion-fields.raster';
 import { getUIIngestionFieldDescriptors } from './ingestion.utils';
+import { IngestionFields } from './ingestion-fields.raster';
 import { GeoFeaturesPresentorComponent } from './pp-map';
 import { FeatureType, PPMapStyles } from './pp-map.utils';
-import { IErrorEntry } from './state-machine.raster';
+import { Events, IErrorEntry } from './state-machine.raster';
 import { RasterWorkflowContext } from './state-machine-context.raster';
 
 import './layer-details-form.raster.css';
@@ -124,6 +124,7 @@ export const InnerRasterForm = (
   //#region STATE MACHINE
   // const actorRef = RasterWorkflowContext.useActorRef();
   const state = RasterWorkflowContext.useSelector((s) => s);
+  const flowActor = state.children?.flow;
   //#endregion
 
   const status = props.status as StatusError | Record<string, unknown>;
@@ -133,14 +134,9 @@ export const InnerRasterForm = (
   const [isSelectedFiles, setIsSelectedFiles] = useState<boolean>(false);
   const [firstPhaseErrors, setFirstPhaseErrors] = useState<Record<string, string[]>>({});
   const [showCurtain, setShowCurtain] = useState<boolean>(true);
-  const [, setSourceExtent] = useState<Feature | undefined>();
-  const [, setSourceExtentMarker] = useState<Feature | undefined>();
   const [showExisitngLayerPartsOnMap, setShowExisitngLayerPartsOnMap] = useState<boolean>(false);
   const [gpkgValidationError, setGpkgValidationError] = useState<string|undefined>(undefined);
-  const [, setGpkgValidationResults] = useState<SourceValidationModelType|undefined>(undefined);
-  const [, setGraphQLPayloadObjectErrors] = useState<number[]>([]);
   const [isSubmittedForm, setIsSubmittedForm] = useState(false);
-  const [, setIsValidatingSource] = useState(false);
 
   const getStatusErrors = useCallback((): StatusError | Record<string, unknown> => {
     return {
@@ -190,7 +186,6 @@ export const InnerRasterForm = (
   }, [isSelectedFiles, gpkgValidationError]);
 
   useEffect(() => {
-    setGraphQLPayloadObjectErrors(getGraphQLPayloadNestedObjectErrors(mutationQueryError));
     setGraphQLError(mutationQueryError);
   }, [mutationQueryError]);
 
@@ -198,6 +193,26 @@ export const InnerRasterForm = (
     // @ts-ignore
     setFirstPhaseErrors(mergeRecursive(getYupErrors(), getStatusErrors()));
   }, [errors, getYupErrors, getStatusErrors]);
+
+  const shapeFilePerimeterVSGpkgExtentError = useMemo(() => new Error(`validation-general.shapeFile.polygonParts.not-in-gpkg-extent`), []);
+
+  // ****** Validation of GPKG extent vs. PP perimeter ******
+  useEffect(() => {
+    if (state.context.files?.gpkg?.geoDetails?.feature?.geometry &&
+      state.context.files?.product?.geoDetails?.feature &&
+      !isPolygonContainsPolygon(state.context.files?.gpkg?.geoDetails?.feature, state.context.files?.product?.geoDetails?.feature)) {
+      flowActor?.send({
+        type: "FLOW_ERROR",
+        error:  {
+          source: "logic",
+          code: "ingestion.error.invalid-source-file",
+          message: intl.formatMessage({ id: shapeFilePerimeterVSGpkgExtentError.message }),
+          level: "error",
+          addPolicy: "override"
+        }
+      } satisfies Events);
+    }
+  }, [state.context.files?.gpkg?.geoDetails?.feature, state.context.files?.product?.geoDetails?.feature]);
 
   const ingestionFieldDescriptors = useMemo(() => {
     return filterModeDescriptors(mode, entityDescriptors);
@@ -283,29 +298,6 @@ export const InnerRasterForm = (
     }
 
     const validationResults = metadata.recordModel as unknown as SourceValidationModelType;
-
-    setSourceExtent({
-      type: 'Feature',
-      properties: {
-        featureType: FeatureType.SOURCE_EXTENT
-      },
-      geometry: validationResults.extentPolygon,
-    });
-
-    if (validationResults.extentPolygon) {
-      setSourceExtentMarker({
-        type: 'Feature',
-        properties: {
-          featureType: FeatureType.SOURCE_EXTENT_MARKER
-        },
-        geometry: {
-          coordinates: getFirstPoint(validationResults.extentPolygon),
-          type: 'Point'
-        },
-      });
-    }
-    
-    setGpkgValidationResults(validationResults);
     
     setGpkgValidationError(
       !validationResults.isValid ? validationResults.message as string : undefined
@@ -360,9 +352,6 @@ export const InnerRasterForm = (
             isError={showCurtain}
             onErrorCallback={setShowCurtain}
             manageMetadata={false}
-            setValidatingSource={(param: boolean) => {
-              setIsValidatingSource(param);
-            }}
           />
         }
         <Box

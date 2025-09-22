@@ -23,7 +23,7 @@ import { Box } from '@map-colonies/react-components';
 import CONFIG from '../../../../common/config';
 import { Mode } from '../../../../common/models/mode.enum';
 import { ValidationsError } from '../../../../common/components/error/validations.error-presentor';
-import { getGraphQLPayloadNestedObjectErrors, GraphQLError } from '../../../../common/components/error/graphql.error-presentor';
+import { GraphQLError } from '../../../../common/components/error/graphql.error-presentor';
 import { MetadataFile } from '../../../../common/components/file-picker';
 import { emphasizeByHTML } from '../../../../common/helpers/formatters';
 import { Loading } from '../../../../common/components/tree/statuses/loading';
@@ -58,10 +58,10 @@ import {
   transformMaxarShapeFeatureToEntity,
   prepareEntityForSubmit,
 } from '../utils';
-import { GeoFeaturesPresentorComponent } from './pp-map';
-import { getUIIngestionFieldDescriptors } from './ingestion.utils';
-import { FeatureType, PPMapStyles } from './pp-map.utils';
 import { NESTED_FORMS_PRFIX } from './entity.raster.dialog';
+import { GeoFeaturesPresentorComponent } from './pp-map';
+import { FeatureType, PPMapStyles } from './pp-map.utils';
+import { getGraphQLPayloadNestedObjectErrors, getUIIngestionFieldDescriptors } from './utils';
 
 import './layer-details-form.raster.css';
 import 'react-virtualized/styles.css';

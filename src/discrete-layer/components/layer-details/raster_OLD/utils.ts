@@ -1,3 +1,5 @@
+import { isArray, isEmpty } from 'lodash';
+import { IServerError } from '../../../../common/components/error/graphql.error-presentor';
 import { EntityDescriptorModelType } from '../../../models';
 import { getFlatEntityDescriptors } from '../utils';
 
@@ -14,4 +16,18 @@ export const getUIIngestionFieldDescriptors = (entityDescriptors: EntityDescript
         infoMsgCode: ['info-general-tooltip.required'],
       }
     });
+};
+
+export const getGraphQLPayloadNestedObjectErrors = ( errorGraphQL: any ): number[] => {
+  const ret: number[] = [];
+  if (!isEmpty(errorGraphQL?.response)) {
+    errorGraphQL?.response.errors?.forEach((error: IServerError) => {
+      const regex = /\d+(?:\/\d+)*/g;
+      const matches = error.serverResponse?.data.message.match(regex);
+      if (isArray(matches)) {
+        ret.push(parseInt(matches[0]));
+      }
+    })
+  }
+  return ret;
 };

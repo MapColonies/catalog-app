@@ -45,7 +45,6 @@ interface IngestionFieldsProps {
   ) => void;
   formik?: EntityFormikHandlers;
   manageMetadata?: boolean;
-  setValidatingSource?: (param: boolean) => void;
 }
 
 const FileItem: React.FC<{ file: FileData }> = ({ file }) => {
@@ -170,7 +169,6 @@ export const IngestionFields: React.FC<PropsWithChildren<IngestionFieldsProps>> 
   formik,
   children,
   manageMetadata=true,
-  setValidatingSource,
 }) => {
   const intl = useIntl();
   const store = useStore();
@@ -344,12 +342,6 @@ export const IngestionFields: React.FC<PropsWithChildren<IngestionFieldsProps>> 
     }
   }, [queryValidateSource.error]);
 
-  useEffect(() => {
-    if (!queryValidateSource.loading && queryValidateSource.data) {
-      setValidatingSource?.(false);
-    }
-  }, [queryValidateSource.loading, queryValidateSource.data]);
-
   const onFilesSelection = (selected: Selection): void => {
     clearSyncWarnings(true);
     if (selected.files.length) {
@@ -374,7 +366,6 @@ export const IngestionFields: React.FC<PropsWithChildren<IngestionFieldsProps>> 
           exists: true
         }
       } satisfies Events);
-      setValidatingSource?.(true);
       queryValidateSource.setQuery(
         store.queryValidateSource(
           {
