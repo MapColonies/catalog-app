@@ -6,6 +6,9 @@ permissions:
   contents: read
   pull-requests: read
 
+env:
+  CODE_DIR: src
+
 jobs:
   helm-lint:
     name: Run Helm lint Check
@@ -46,9 +49,12 @@ jobs:
         uses: wearerequired/lint-action@v2
         with:
           tsc: true
+          tsc_dir: ${{ env.CODE_DIR }}
           eslint: true
+          eslint_dir: ${{ env.CODE_DIR }}
+          eslint_extensions: js,jsx,ts,tsx
           prettier: true
-          eslint_extensions: ts
+          prettier_dir: ${{ env.CODE_DIR }}
       - name: Test
         run: yarn test
 
