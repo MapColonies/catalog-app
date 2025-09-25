@@ -16,6 +16,9 @@ jobs:
 
   build_and_test:
     runs-on: ubuntu-latest
+    permissions:
+      checks: write
+      contents: write
     strategy:
       matrix:
         os: [ubuntu-latest]
