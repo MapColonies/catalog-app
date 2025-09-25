@@ -7,32 +7,6 @@ permissions:
   pull-requests: read
 
 jobs:
-  eslint:
-    name: Run TS Project eslint
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node: [22.x, 24.x]
-
-    steps:
-      - name: Check out TS Project Git repository
-        uses: actions/checkout@v5
-
-      - name: Init Nodejs
-        uses: MapColonies/shared-workflows/actions/init-npm@init-npm-v1
-        with:
-          node-version: ${{ matrix.node }}
-
-      - name: Run TS Project linters
-        uses: wearerequired/lint-action@v2
-        with:
-          tsc: true
-          eslint: true
-          prettier: true
-          stylelint: true
-          eslint_extensions: ts
-
   helm-lint:
     name: Run Helm lint Check
     runs-on: ubuntu-latest
@@ -48,13 +22,13 @@ jobs:
         node-version: [16.13.x]
     steps:
       - name: checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - uses: actions/cache@v4
         with:
           path: '**/node_modules'
           key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: ${{ matrix.node-version }}
       - name: Install yarn
@@ -63,11 +37,16 @@ jobs:
           echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
           sudo apt-get update
           sudo apt-get install --no-install-recommends yarn
-
       - name: Install dependecies
         run: yarn
       - name: Lint
-        run: yarn run eslint:check
+        uses: wearerequired/lint-action@v2
+        with:
+          tsc: true
+          eslint: true
+          prettier: true
+          stylelint: true
+          eslint_extensions: ts
       - name: Test
         run: yarn test
 
