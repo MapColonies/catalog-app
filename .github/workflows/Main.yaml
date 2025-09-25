@@ -45,7 +45,6 @@ jobs:
           tsc: true
           eslint: true
           prettier: true
-          stylelint: true
           eslint_extensions: ts
       - name: Test
         run: yarn test
