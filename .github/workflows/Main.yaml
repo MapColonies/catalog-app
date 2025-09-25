@@ -49,9 +49,7 @@ jobs:
         uses: wearerequired/lint-action@v2
         with:
           tsc: true
-          tsc_dir: ${{ env.CODE_DIR }}
           eslint: true
-          eslint_dir: ${{ env.CODE_DIR }}
           eslint_extensions: js,jsx,ts,tsx
           prettier: true
           prettier_dir: ${{ env.CODE_DIR }}
