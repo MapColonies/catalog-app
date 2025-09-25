@@ -2,7 +2,19 @@ name: CI
 
 on: [pull_request]
 
+permissions:
+  contents: read
+  pull-requests: read
+
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: helm-lint
+        uses: MapColonies/shared-workflows/actions/helm-lint@helm-lint-v1
+      - name: eslint
+        uses: MapColonies/shared-workflows/actions/eslint@eslint-v1
+
   build_and_test:
     runs-on: ubuntu-latest
     strategy:
