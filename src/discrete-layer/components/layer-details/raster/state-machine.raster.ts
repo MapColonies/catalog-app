@@ -79,9 +79,9 @@ export type Events =
   | { type: "AUTO" }
   | { type: "MANUAL" }
   | { type: "SELECT_PRODUCT"; file: File }
-  | { type: "SET_PRODUCT"; res: IProductFile }
+  | { type: "SET_PRODUCT"; file: IProductFile }
   | { type: "SELECT_METADATA"; file: File }
-  | { type: "SET_METADATA"; res: IFileBase }
+  | { type: "SET_METADATA"; file: IFileBase }
   | { type: "DONE" }
   | { type: "UPDATE_FORM"; data: Record<string, any> }
   | { type: "SUBMIT" }
@@ -109,9 +109,11 @@ export enum STATE_TAGS {
 const FIRST = 0;
 
 // --- Helpers ---
-const addError = assign({
-  errors: (ctx: Context, e) => [...ctx.errors, e]
-});
+const addError = assign((_: { context: Context; event: any }) => ({ 
+  errors: _.event.error.addPolicy === "merge" ?
+    [ ..._.context.errors, _.event.error] :
+    [_.event.error]
+}));
 
 const warnUnexpectedStateEvent = (_: any) => {
   //@ts-ignore
@@ -205,18 +207,18 @@ const verifyGpkgStates = {
       onDone: { 
         target: "success",
         actions: [
-          assign({
-            files: (_) => ({
+          assign((_: { context: Context; event: any }) => ({
+            files: {
               ..._.context.files,
               gpkg: {
                 ..._.context.files.gpkg,
                 ..._.event.output
               }
-            })
-          }),
+            }
+          })),
           sendParent((_: { context: Context; event: any }) => ({
             type: "SET_GPKG_VALIDATION",
-            file: _.context.files.gpkg
+            file: { ..._.event.output }
           }))
         ]
       },
@@ -300,21 +302,18 @@ const fileSelectionStates = {
           // target: "idle",
           // guard: (_, e) => e.data.gpkg && e.data.metadata,
           actions: [
-            assign({
-              files: (_) => ({
+            assign((_: { context: Context; event: any }) => ({
+              files: {
                 ..._.context.files,
                 product: {
                   ..._.context.files.product,
                   ..._.event.output
                 }
-              })
-            }),
+              }
+            })),
             sendParent((_: { context: Context; event: any }) => ({
               type: "SET_PRODUCT",
-              res:  {
-                ..._.context.files.product,
-                ..._.event.output
-              }
+              file:  { ..._.event.output }
             }))
           ]
         }
@@ -379,8 +378,8 @@ const fileSelectionStates = {
           target: "fetchProduct",
           // guard: (_, e) => e.data.gpkg && e.data.metadata,
           actions: [
-            assign({
-              files: (_: { context: Context; event: any }) => ({
+            assign((_: { context: Context; event: any }) => ({
+              files: {
                 ..._.context.files,
                 product: {
                   ..._.context.files.product,
@@ -390,14 +389,11 @@ const fileSelectionStates = {
                   ..._.context.files.metadata,
                   ..._.event.output.metadata
                 }
-              })
-            }),
+              }
+            })),
             sendParent((_: { context: Context; event: any }) => ({
               type: "SET_METADATA",
-              res: {
-                ..._.context.files.metadata,
-                ..._.event.output.metadata
-              }
+              file: { ..._.event.output.metadata }
             }))
           ]
         }
@@ -414,13 +410,33 @@ const fileSelectionStates = {
     entry: assign((_: { context: Context; event: any }) => (_.context.files ? { files: _.context.files } : {})),
     always: { target: "idle" }, // you can add guard if needed
     on: {
-      SELECT_PRODUCT: { actions: assign({ files: (ctx: Context, e) => ({ ...ctx.files, product: (e as any).file }) }) },
-      SELECT_METADATA: { actions: assign({ files: (ctx: Context, e) => ({ ...ctx.files, metadata: (e as any).file }) }) },
-      DONE: { 
+      SELECT_PRODUCT: {
+        actions: assign((_: { context: Context; event: any }) => ({
+          files: {
+            ..._.context.files,
+            product: {
+              ..._.context.files.product,
+              ..._.event.output
+            }
+          }
+        }))
+      },
+      SELECT_METADATA: {
+        actions: assign((_: { context: Context; event: any }) => ({
+          files: {
+            ...ctx.files,
+            metadata: {
+              ..._.context.files.metadata,
+              ..._.event.output
+            }
+          }
+        }))
+      },
+      DONE: {
         actions: sendParent((_: { context: Context; event: any }) => ({
           type: "FLOW_SUBMIT",
           error: _.event.error
-        })) 
+        }))
       },
       "*": { actions: warnUnexpectedStateEvent }
     }
@@ -442,12 +458,15 @@ const flowMachine = createMachine({
             assign((_: { context: Context; event: any }) => ({
               files: {
                 ..._.context.files,
-                gpkg: {..._.event.file}
+                gpkg: {
+                  ..._.context.files.gpkg,
+                  ..._.event.file
+                }
               } 
             })),
             sendParent((_: { context: Context; event: any }) => ({
               type: "SET_GPKG",
-              file: _.event.file
+              file: { ..._.event.file }
             }))
           ]
         },
@@ -493,9 +512,9 @@ const flowMachine = createMachine({
       })),
       on: {
         UPDATE_FORM: {
-          actions: assign({
-            formData: (_, e) => (e as any).data
-          })
+          actions: assign((_: { context: Context; event: any }) => ({
+            formData: _.event.data
+          }))
         },
         FORMIK_ERROR: {
           actions: assign((_: { context: Context; event: any }) => ({
@@ -579,51 +598,50 @@ export const workflowMachine = createMachine({
           actions: assign((_: { context: Context; event: any }) => ({
             files: {
               ..._.context.files,
-              gpkg: {..._.event.file}
+              gpkg: {
+                ..._.context.files?.gpkg,
+                ..._.event.file
+              }
             } 
           }))
         },
         SET_GPKG_VALIDATION: {
-          actions: assign({
-            files: (_) => ({
+          actions: assign((_: { context: Context; event: any }) => ({
+            files: {
               ..._.context.files,
               gpkg: {
                 ..._.context.files.gpkg,
                 ..._.event.file
               }
-            })
-          })
+            }
+          }))
         },
         SET_PRODUCT: {
-          actions: assign({
-            files: (_) => ({
+          actions: assign((_: { context: Context; event: any }) => ({
+            files: {
               ..._.context.files,
               product: {
-                ..._.event.res
+                ..._.context.files.product,
+                ..._.event.file
               }
-            })
-          })
+            }
+          }))
         },
         SET_METADATA: {
-          actions: assign({
-            files: (_) => ({
+          actions: assign((_: { context: Context; event: any }) => ({
+            files: {
               ..._.context.files,
               metadata: {
-                ..._.event.res
+                ..._.context.files.metadata,
+                ..._.event.file
               }
-            })
-          })
+            }
+          }))
         },
         // catch-all errors from any child state     
         FLOW_ERROR: { 
           // target: "error",
-          actions: assign({ 
-            errors: (_) => {
-              return _.event.error.addPolicy === "merge" ? 
-                [ ..._.context.errors, _.event.error] : 
-                [_.event.error]
-            }
-          }) 
+          actions: addError
         },
         FLOW_SUBMIT: "jobSubmission"
       }
@@ -631,8 +649,13 @@ export const workflowMachine = createMachine({
     jobSubmission: {
       invoke: {
         src: "createJobApi",
-        input: (ctx: Context) => ({ files: ctx.files, formData: ctx.formData, flowType: ctx.flowType }),
-        onDone: { target: "jobPolling", actions: assign({ jobId: (_, e) => e.data.jobId }) },
+        input: (ctx: Context) => ctx,
+        onDone: {
+          target: "jobPolling",
+          actions: assign((_: { context: Context; event: any }) => ({
+            jobId: _.event.data.jobId
+          }))
+        },
         onError: { target: "#workflow.error", actions: addError }
       }
     },
@@ -640,7 +663,12 @@ export const workflowMachine = createMachine({
       invoke: {
         src: "pollJobStatus",
         input: (ctx: Context) => ctx.jobId,
-        onDone: { target: "done", actions: assign({ jobStatus: (_, e) => e.data }) },
+        onDone: {
+          target: "done",
+          actions: assign((_: { context: Context; event: any }) => ({
+            jobStatus: _.event.data.jobStatus
+          }))
+        },
         onError: { target: "#workflow.error", actions: addError }
       }
     },
