@@ -51,7 +51,7 @@ interface IGPKGFile extends IFileBase, IGeoDetails {
 }
 
 interface IProductFile extends IFileBase, IGeoDetails {
-  data: File;
+  data?: File;
 }
 
 interface Context {
@@ -75,7 +75,7 @@ export type Events =
   | { type: "RESTORE"; jobId: string }
   | { type: "SELECT_GPKG"; file: IGPKGFile }
   | { type: "SET_GPKG"; file: IGPKGFile }
-  | { type: "SET_GPKG_VALIDATION"; res: SourceValidationModelType }
+  | { type: "SET_GPKG_VALIDATION"; file: IGPKGFile }
   | { type: "AUTO" }
   | { type: "MANUAL" }
   | { type: "SELECT_PRODUCT"; file: File }
@@ -216,7 +216,7 @@ const verifyGpkgStates = {
           }),
           sendParent((_: { context: Context; event: any }) => ({
             type: "SET_GPKG_VALIDATION",
-            res: _.event.output.validationResult
+            file: _.context.files.gpkg
           }))
         ]
       },
@@ -411,15 +411,15 @@ const fileSelectionStates = {
     }
   },
   manual: {
-    entry: assign((ctx: Context) => (ctx.files ? { files: ctx.files } : {})),
+    entry: assign((_: { context: Context; event: any }) => (_.context.files ? { files: _.context.files } : {})),
     always: { target: "idle" }, // you can add guard if needed
     on: {
       SELECT_PRODUCT: { actions: assign({ files: (ctx: Context, e) => ({ ...ctx.files, product: (e as any).file }) }) },
       SELECT_METADATA: { actions: assign({ files: (ctx: Context, e) => ({ ...ctx.files, metadata: (e as any).file }) }) },
       DONE: { 
-        actions: sendParent((ctx, e) => ({
+        actions: sendParent((_: { context: Context; event: any }) => ({
           type: "FLOW_SUBMIT",
-          error: e.data ?? e
+          error: _.event.error
         })) 
       },
       "*": { actions: warnUnexpectedStateEvent }
@@ -439,15 +439,15 @@ const flowMachine = createMachine({
         SELECT_GPKG: {
           target: "verifyGpkg",
           actions: [
+            assign((_: { context: Context; event: any }) => ({
+              files: {
+                ..._.context.files,
+                gpkg: {..._.event.file}
+              } 
+            })),
             sendParent((_: { context: Context; event: any }) => ({
               type: "SET_GPKG",
-              file:  _.event.file
-            })),
-            assign((_ctx) => ({
-              files: {
-                ..._ctx.context.files,
-                gpkg: {..._ctx.event.file}
-              } 
+              file: _.event.file
             }))
           ]
         },
@@ -488,8 +488,8 @@ const flowMachine = createMachine({
     },
 
     formFill: {
-      entry: assign((ctx: Context) => ({
-        formData: ctx.formData ?? {}
+      entry: assign((_: { context: Context; event: any }) => ({
+        formData: _.context.formData ?? {}
       })),
       on: {
         UPDATE_FORM: {
@@ -498,10 +498,10 @@ const flowMachine = createMachine({
           })
         },
         FORMIK_ERROR: {
-          actions: assign((ctx: Context, e: any) => ({
+          actions: assign((_: { context: Context; event: any }) => ({
             errors: [
-              ...ctx.errors,
-              ...Object.entries(e.errors).map(([field, msg]) => ({
+              ..._.context.errors,
+              ...Object.entries(_.event.errors).map(([field, msg]) => ({
                 source: "formik",
                 code: `FIELD_${field}`,
                 message: msg as string,
@@ -551,12 +551,12 @@ export const workflowMachine = createMachine({
         input: (_ctx: Context, e) => (e as any).jobId,
         onDone: {
           target: "restoredReplay",
-          actions: assign((_, e) => ({
-            flowType: e.data.flowType,
-            gpkgFile: e.data.gpkg,
-            files: e.data.files,
-            formData: e.data.formData,
-            autoMode: e.data.autoMode
+          actions: assign((_: { context: Context; event: any }) => ({
+            flowType: _.event.data.flowType,
+            gpkgFile: _.event.data.gpkg,
+            files: _.event.data.files,
+            formData: _.event.data.formData,
+            autoMode: _.event.data.autoMode
           }))
         },
         onError: { target: "#workflow.error", actions: addError }
@@ -576,7 +576,7 @@ export const workflowMachine = createMachine({
       },
       on: {
         SET_GPKG: {
-          actions: assign((_) => ({
+          actions: assign((_: { context: Context; event: any }) => ({
             files: {
               ..._.context.files,
               gpkg: {..._.event.file}
@@ -589,7 +589,7 @@ export const workflowMachine = createMachine({
               ..._.context.files,
               gpkg: {
                 ..._.context.files.gpkg,
-                validationResult: {..._.event.res}
+                ..._.event.file
               }
             })
           })

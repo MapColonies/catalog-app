@@ -22,7 +22,6 @@ import { ValidationsError } from '../../../../common/components/error/validation
 import { MetadataFile } from '../../../../common/components/file-picker';
 import { mergeRecursive } from '../../../../common/helpers/object';
 import { Mode } from '../../../../common/models/mode.enum';
-import { isPolygonContainsPolygon } from '../../../../common/utils/geo.tools';
 import {
   EntityDescriptorModelType,
   FieldConfigModelType,
@@ -41,7 +40,7 @@ import {
 import { IngestionFields } from './ingestion-fields.raster';
 import { GeoFeaturesPresentorComponent } from './pp-map';
 import { FeatureType, PPMapStyles } from './pp-map.utils';
-import { Events, IErrorEntry } from './state-machine.raster';
+import { IErrorEntry } from './state-machine.raster';
 import { RasterWorkflowContext } from './state-machine-context.raster';
 import { getUIIngestionFieldDescriptors } from './utils';
 
@@ -124,7 +123,7 @@ export const InnerRasterForm = (
   //#region STATE MACHINE
   // const actorRef = RasterWorkflowContext.useActorRef();
   const state = RasterWorkflowContext.useSelector((s) => s);
-  const flowActor = state.children?.flow;
+  // const flowActor = state.children?.flow;
   //#endregion
 
   const status = props.status as StatusError | Record<string, unknown>;
@@ -194,25 +193,27 @@ export const InnerRasterForm = (
     setFirstPhaseErrors(mergeRecursive(getYupErrors(), getStatusErrors()));
   }, [errors, getYupErrors, getStatusErrors]);
 
-  const shapeFilePerimeterVSGpkgExtentError = useMemo(() => new Error(`validation-general.shapeFile.polygonParts.not-in-gpkg-extent`), []);
+  // const shapeFilePerimeterVSGpkgExtentError = useMemo(() => new Error(`validation-general.shapeFile.polygonParts.not-in-gpkg-extent`), []);
 
   // ****** Validation of GPKG extent vs. PP perimeter ******
-  useEffect(() => {
-    if (state.context.files?.gpkg?.geoDetails?.feature?.geometry &&
-      state.context.files?.product?.geoDetails?.feature &&
-      !isPolygonContainsPolygon(state.context.files?.gpkg?.geoDetails?.feature, state.context.files?.product?.geoDetails?.feature)) {
-      flowActor?.send({
-        type: "FLOW_ERROR",
-        error:  {
-          source: "logic",
-          code: "ingestion.error.invalid-source-file",
-          message: intl.formatMessage({ id: shapeFilePerimeterVSGpkgExtentError.message }),
-          level: "error",
-          addPolicy: "override"
-        }
-      } satisfies Events);
-    }
-  }, [state.context.files?.gpkg?.geoDetails?.feature, state.context.files?.product?.geoDetails?.feature]);
+  // ****** Should not be on client side because of allowed tolerance ******
+  // ****** (Raster's internal logic) ******
+  // useEffect(() => {
+  //   if (state.context.files?.gpkg?.geoDetails?.feature?.geometry &&
+  //     state.context.files?.product?.geoDetails?.feature &&
+  //     !isPolygonContainsPolygon(state.context.files?.gpkg?.geoDetails?.feature, state.context.files?.product?.geoDetails?.feature)) {
+  //     flowActor?.send({
+  //       type: "FLOW_ERROR",
+  //       error:  {
+  //         source: "logic",
+  //         code: "ingestion.error.invalid-source-file",
+  //         message: intl.formatMessage({ id: shapeFilePerimeterVSGpkgExtentError.message }),
+  //         level: "error",
+  //         addPolicy: "override"
+  //       }
+  //     } satisfies Events);
+  //   }
+  // }, [state.context.files?.gpkg?.geoDetails?.feature, state.context.files?.product?.geoDetails?.feature]);
 
   const ingestionFieldDescriptors = useMemo(() => {
     return filterModeDescriptors(mode, entityDescriptors);
