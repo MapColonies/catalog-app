@@ -7,13 +7,38 @@ permissions:
   pull-requests: read
 
 jobs:
-  lint:
+  eslint:
+    name: Run TS Project eslint
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node: [22.x, 24.x]
+
+    steps:
+      - name: Check out TS Project Git repository
+        uses: actions/checkout@v5
+
+      - name: Init Nodejs
+        uses: MapColonies/shared-workflows/actions/init-npm@init-npm-v1
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Run TS Project linters
+        uses: wearerequired/lint-action@v2
+        with:
+          tsc: true
+          eslint: true
+          prettier: true
+          stylelint: true
+          eslint_extensions: ts
+
+  helm-lint:
+    name: Run Helm lint Check
     runs-on: ubuntu-latest
     steps:
       - name: helm-lint
         uses: MapColonies/shared-workflows/actions/helm-lint@helm-lint-v1
-      - name: eslint
-        uses: MapColonies/shared-workflows/actions/eslint@eslint-v1
 
   build_and_test:
     runs-on: ubuntu-latest
