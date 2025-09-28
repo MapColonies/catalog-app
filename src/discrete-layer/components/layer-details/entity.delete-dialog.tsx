@@ -64,7 +64,7 @@ export const EntityDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
     };
 
     useEffect(() => {
-      if (!mutationQuery.loading && ((mutationQuery.data as { updateStatus: string } | undefined)?.updateStatus === 'ok')) {
+      if (!mutationQuery.loading && ((mutationQuery.data as { deleteLayer: string } | undefined)?.deleteLayer === 'ok')) {
         onSetOpen(false);
         dispatchAction({
           action: UserAction.ENTITY_ACTION_LAYER3DRECORD_DELETE,

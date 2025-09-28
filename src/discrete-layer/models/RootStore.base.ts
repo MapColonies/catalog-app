@@ -665,7 +665,7 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
       return self.mutate<{ startDemIngestion: string }>(`mutation startDemIngestion($data: IngestionDemData!) { startDemIngestion(data: $data) }`, variables, optimisticUpdate)
     },
     mutateDelete3DLayer(variables: { data: RecordDeletePartial }, optimisticUpdate?: () => void) {
-      return self.mutate<{ delete3DLayer: string }>(`mutation delete3DLayer($data: RecordDeletePartial!) { delete3DLayer(data: $data) }`, variables, optimisticUpdate)
+      return self.mutate<{ deleteLayer: string }>(`mutation deleteLayer($data: RecordDeletePartial!) { deleteLayer(data: $data) }`, variables, optimisticUpdate)
     },
     mutateUpdateJob(variables: { data: JobUpdateData, id: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ updateJob: string }>(`mutation updateJob($data: JobUpdateData!, $id: String!) { updateJob(data: $data, id: $id) }`, variables, optimisticUpdate)
