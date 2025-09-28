@@ -124,14 +124,14 @@ const ACTIONS_CONFIG: IEntityActions[] = [
             titleTranslationId: 'action.edit.tooltip',
             views: [TabViews.CATALOG, TabViews.SEARCH_RESULTS]
           },
-          // {
-          //   action: 'delete',
-          //   frequent: false,
-          //   icon: '',
-          //   class: 'mc-icon-Delete',
-          //   titleTranslationId: 'action.delete.tooltip',
-          //   views: [TabViews.CATALOG, TabViews.SEARCH_RESULTS]
-          // },
+          {
+            action: 'delete',
+            frequent: false,
+            icon: '',
+            class: 'mc-icon-Delete',
+            titleTranslationId: 'action.delete.tooltip',
+            views: [TabViews.CATALOG, TabViews.SEARCH_RESULTS]
+          },
         ],
       },
     ]
