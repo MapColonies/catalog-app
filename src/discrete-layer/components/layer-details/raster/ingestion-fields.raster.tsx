@@ -8,7 +8,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { observer } from 'mobx-react';
 import { FormikValues } from 'formik';
 import { cloneDeep, isEmpty } from 'lodash';
-import { Button, CircularProgress, Icon, Tooltip, Typography } from '@map-colonies/react-core';
+import { Button, CircularProgress, Icon, Typography } from '@map-colonies/react-core';
 import { Box, defaultFormatters, FileData } from '@map-colonies/react-components';
 import { Selection } from '../../../../common/components/file-picker';
 import { FieldLabelComponent } from '../../../../common/components/form/field-label';
@@ -17,19 +17,15 @@ import { Mode } from '../../../../common/models/mode.enum';
 import { MetadataFile } from '../../../../common/components/file-picker';
 import { RecordType, LayerMetadataMixedUnion, useQuery, useStore, SourceValidationModelType } from '../../../models';
 import { FilePickerDialog } from '../../dialogs/file-picker.dialog';
-import { Layer3DRecordModelKeys, LayerDemRecordModelKeys, LayerRasterRecordModelKeys} from '../entity-types-keys';
+import { LayerRasterRecordModelKeys} from '../entity-types-keys';
 import { StringValuePresentorComponent } from '../field-value-presentors/string.value-presentor';
 import { IRecordFieldInfo } from '../layer-details.field-info';
 import { EntityFormikHandlers, FormValues } from '../layer-datails-form';
 import { clearSyncWarnings, importJSONFileFromClient } from '../utils';
-import { Events, hasLoadingTagDeep } from './state-machine.raster';
+import { Events, hasLoadingTagDeep, IFileBase } from './state-machine.raster';
 import { RasterWorkflowContext } from './state-machine-context.raster';
 
 import '../ingestion-fields.css';
-
-const DIRECTORY = 0;
-const FILES = 1;
-const NUM_OF_ROWS = 3;
 
 interface IngestionFieldsProps {
   recordType: RecordType;
@@ -47,50 +43,25 @@ interface IngestionFieldsProps {
   manageMetadata?: boolean;
 }
 
-const FileItem: React.FC<{ file: FileData }> = ({ file }) => {
+const FileItem: React.FC<{ file: IFileBase }> = ({ file }) => {
   return (
     <>
       <Box><Icon className="fileIcon mc-icon-Map-Vector" /></Box>
-      <Box className='fileItemName'>{file.name}</Box>
+      <Box className='fileItemName'>{file.path}</Box>
       <Box style={{ direction: 'ltr' }}>
-        {defaultFormatters.formatFileSize(null, file)}
+        {defaultFormatters.formatFileSize(null, file.details as FileData)}
       </Box>
     </>
   );
 };
 
-const MoreItem: React.FC<{ files: FileData[] }> = ({ files }) => {
-  return (
-    <>
-      <Box className="fileIconSpacer"></Box>
-      <Tooltip
-        content={
-          <Box className="filesList moreTooltip">
-            {
-              files.map((f: FileData, i: number) => {
-                if (i >= NUM_OF_ROWS - 1) {
-                  return <FileItem key={f.id} file={f} />;
-                }
-              })
-            }
-          </Box>
-        }
-      >
-        <Box className="moreButton">
-          <FormattedMessage id="general.more.text" />
-        </Box>
-      </Tooltip>
-    </>
-  );
-};
-
 const IngestionInputs: React.FC<{
-  recordType: RecordType;
   fields: IRecordFieldInfo[];
   values: string[];
   selection: Selection;
   formik: EntityFormikHandlers;
-}> = ({ recordType, fields, values, selection, formik }) => {
+  state: any;
+}> = ({ fields, values, selection, formik, state }) => {
   return (
     <>
       {
@@ -112,30 +83,10 @@ const IngestionInputs: React.FC<{
                   </Typography>
                 }
                 {
-                  index === DIRECTORY && values[index] !== '' &&
-                  <Tooltip content={values[index]}>
-                    <Box className="filesPathContainer">
-                      <Typography dir='ltr' tag='span'>{values[index]}</Typography>
-                    </Box>
-                  </Tooltip>
-                }
-                {
-                  index === FILES && values[index] !== '' &&
                   <Box className="filesList">
                     {
-                      selection.files.map((file: FileData, idx: number): JSX.Element | undefined => {
-                        if (
-                          idx < NUM_OF_ROWS - 1 ||
-                          (selection.files.length === NUM_OF_ROWS && idx === NUM_OF_ROWS - 1)
-                        ) {
-                          return <FileItem key={file.id} file={file} />;
-                        }
-                        if (
-                          selection.files.length > NUM_OF_ROWS &&
-                          idx === NUM_OF_ROWS - 1
-                        ) {
-                          return <MoreItem key={file.id} files={selection.files} />;
-                        }
+                      state.context?.files?.values?.map((file: IFileBase, idx: number): JSX.Element | undefined => {
+                        return <FileItem key={idx} file={file} />;
                       })
                     }
                   </Box>
@@ -264,7 +215,7 @@ export const IngestionFields: React.FC<PropsWithChildren<IngestionFieldsProps>> 
 
   useEffect(() => {
     if (queryValidateSource.data) {
-      const  directory= selection.files.length ? 
+      const directory = selection.files.length ? 
       selection.folderChain
           .map((folder: FileData) => folder.name)
           .join('/')
@@ -321,7 +272,7 @@ export const IngestionFields: React.FC<PropsWithChildren<IngestionFieldsProps>> 
   useEffect(() => {
     if (queryValidateSource.error) {
       if (reloadFormMetadata) {
-        const  directory= selection.files.length ? 
+        const directory = selection.files.length ? 
         selection.folderChain
             .map((folder: FileData) => folder.name)
             .join('/')
@@ -359,10 +310,7 @@ export const IngestionFields: React.FC<PropsWithChildren<IngestionFieldsProps>> 
         type: "SELECT_GPKG", 
         file: {
           path: `${directory}/${selected.files[0].name}`,
-          details: {
-            updateDate: selected.files[0].modDate ? new Date(selected.files[0].modDate) : new Date(),
-            size: selected.files[0].size ?? 0,
-          },
+          details: { ...selected.files[0] },
           exists: true
         }
       } satisfies Events);
@@ -395,39 +343,22 @@ export const IngestionFields: React.FC<PropsWithChildren<IngestionFieldsProps>> 
   };
 
   const checkIsValidMetadata = useCallback((record: Record<string, unknown>): boolean => {
-    let recordKeys: string[] = [];
-    switch(recordType) {
-      case RecordType.RECORD_RASTER:
-        recordKeys = LayerRasterRecordModelKeys as string[];
-        break;
-      case RecordType.RECORD_3D:
-        recordKeys = Layer3DRecordModelKeys as string[];
-        break;
-      case RecordType.RECORD_DEM:
-        recordKeys = LayerDemRecordModelKeys as string[];
-        break;
-      default:
-        break;
-    }
-
+    let recordKeys = LayerRasterRecordModelKeys as string[];
     return Object.keys(record).every(key => {
       return recordKeys.includes(key)
     });
-
-  }, [recordType]);
+  }, []);
 
   return (
     <>
-      {/* <h1><bdi>[INGESTION-FIELDS]file:{state.context.files?.gpkg?.path}</bdi></h1>
-      <h1><bdi>[INGESTION-FIELDS][ERRORS]:{JSON.stringify(state.context.errors)}</bdi></h1> */}
       <Box className="header section">
         <Box className="ingestionFields">
           <IngestionInputs
-            recordType={recordType}
             fields={fields}
             values={[values.directory, values.fileNames]}
             selection={selection}
             formik={formik as EntityFormikHandlers}
+            state={state}
             // notSynchedDirWarning={directoryComparisonWarn}
           />
         </Box>
@@ -446,42 +377,42 @@ export const IngestionFields: React.FC<PropsWithChildren<IngestionFieldsProps>> 
           </Box>
           {
             manageMetadata && 
-          <Box className="uploadMetadataButton">
-            <Button
-              outlined
-              type="button"
-              disabled={isImportDisabled}
-              onClick={(): void => {
-                importJSONFileFromClient((e) => {
-                  const resultFromFile = JSON.parse(
-                    e.target?.result as string
-                  ) as Record<string, unknown>;
-                  setChosenMetadataFile(null);
-                  setChosenMetadataError(null);
+            <Box className="uploadMetadataButton">
+              <Button
+                outlined
+                type="button"
+                disabled={isImportDisabled}
+                onClick={(): void => {
+                  importJSONFileFromClient((e) => {
+                    const resultFromFile = JSON.parse(
+                      e.target?.result as string
+                    ) as Record<string, unknown>;
+                    setChosenMetadataFile(null);
+                    setChosenMetadataError(null);
 
-                  if (checkIsValidMetadata(resultFromFile)) {
-                    setChosenMetadataFile(e.target?.result as string);
-                  } else {
-                    setChosenMetadataError({
-                      response: {
-                        errors: [
-                          {
-                            message: `Please choose metadata for product ${recordType}`,
-                          },
-                        ],
-                      },
-                    });
-                  }
-                });
-              }}
-            >
-              {queryResolveMetadataAsModel.loading ? (
-                <CircularProgress />
-              ) : (
-                <FormattedMessage id="ingestion.button.import-metadata" />
-              )}
-            </Button>
-          </Box>
+                    if (checkIsValidMetadata(resultFromFile)) {
+                      setChosenMetadataFile(e.target?.result as string);
+                    } else {
+                      setChosenMetadataError({
+                        response: {
+                          errors: [
+                            {
+                              message: `Please choose metadata for product ${recordType}`,
+                            },
+                          ],
+                        },
+                      });
+                    }
+                  });
+                }}
+              >
+                {queryResolveMetadataAsModel.loading ? (
+                  <CircularProgress />
+                ) : (
+                  <FormattedMessage id="ingestion.button.import-metadata" />
+                )}
+              </Button>
+            </Box>
           }
           <Box>
             {children}

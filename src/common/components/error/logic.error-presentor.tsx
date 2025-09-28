@@ -14,7 +14,7 @@ interface IStateMachineError {
 }
 
 
-export const StateMachineError: React.FC<IStateMachineError> = ({ errors }) => {
+export const LogicError: React.FC<IStateMachineError> = ({ errors }) => {
 
   const intl = useIntl();
 

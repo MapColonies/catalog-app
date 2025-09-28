@@ -16,8 +16,6 @@ import { DraftResult } from 'vest/vestResult';
 import { get, isEmpty, isObject } from 'lodash';
 import { Button, Checkbox, CircularProgress } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
-import { GraphQLError } from '../../../../common/components/error/graphql.error-presentor';
-import { StateMachineError } from '../../../../common/components/error/state-machine.error-presentor';
 import { ValidationsError } from '../../../../common/components/error/validations.error-presentor';
 import { MetadataFile } from '../../../../common/components/file-picker';
 import { mergeRecursive } from '../../../../common/helpers/object';
@@ -40,7 +38,7 @@ import {
 import { IngestionFields } from './ingestion-fields.raster';
 import { GeoFeaturesPresentorComponent } from './pp-map';
 import { FeatureType, PPMapStyles } from './pp-map.utils';
-import { IErrorEntry } from './state-machine.raster';
+import { StateMachineError } from './state.error-presentor';
 import { RasterWorkflowContext } from './state-machine-context.raster';
 import { getUIIngestionFieldDescriptors } from './utils';
 
@@ -48,7 +46,6 @@ import './layer-details-form.raster.css';
 import 'react-virtualized/styles.css';
 
 const NONE = 0;
-const FIRST = 0;
 
 // Shape of form values - a bit problematic because we cannot extend union type
 export interface FormValues {
@@ -424,10 +421,7 @@ export const InnerRasterForm = (
         </Box>
         <Box className="footer">
           <Box className="messages">
-            <GraphQLError error={state.context.errors[FIRST]} />
-            <StateMachineError 
-              errors={state.context.errors.filter((err: IErrorEntry) => err.source === "logic")}
-            />
+            <StateMachineError errors={state.context.errors} />
             {
               topLevelFieldsErrors && Object.keys(topLevelFieldsErrors).length > NONE &&
               JSON.stringify(topLevelFieldsErrors) !== '{}' &&

@@ -12,10 +12,10 @@ import {
   SnapshotFrom
 } from 'xstate';
 import { AnyActorSystem } from 'xstate/dist/declarations/src/system';
+import { FileData } from '@map-colonies/react-components';
 import { Mode } from '../../../../common/models/mode.enum';
 import { getFirstPoint } from '../../../../common/utils/geo.tools';
 import {
-  FileModelType,
   IBaseRootStore,
   IRootStore,
   RecordType,
@@ -23,25 +23,26 @@ import {
 } from '../../../models';
 import { FeatureType } from './pp-map.utils';
 
+const FIRST = 0;
+const SHAPES_DIR = '../../Shapes';
+const PRODUCT_SHP = 'Product.shp';
+const METADATA_SHP ='ShapeMetadata.shp';
+
 export interface IErrorEntry {
   source: "formik" | "api" | "logic";
+  level: "error" | "warning";
   code: string;
   message: string;
-  level: "error" | "warning";
+  params?: Record<string,string>;
   field?: string;
   addPolicy?: "merge" | "override";
   response?: Record<string,unknown>;
 }
 
-interface IFileDetails {
-  updateDate: Date;
-  size: number;
-}
-
-interface IFileBase {
+export interface IFileBase {
   path: string;
-  details: IFileDetails;
   exists: boolean;
+  details?: FileData;
 }
 
 interface IGeoDetails {
@@ -60,13 +61,13 @@ interface IProductFile extends IFileBase, IGeoDetails {
 }
 
 interface Context {
+  store: IRootStore | IBaseRootStore;
+  errors: IErrorEntry[];
   flowType?: Mode.NEW | Mode.UPDATE;
   formData?: Record<string, any>;
   jobId?: string;
   jobStatus?: string;
   autoMode?: boolean;
-  errors: IErrorEntry[];
-  store: IRootStore | IBaseRootStore;
   files?: {
     gpkg?: IGPKGFile;
     product?: IProductFile;
@@ -110,8 +111,6 @@ type FromPromiseArgs<TInput> = {
 export enum STATE_TAGS {
   GENERAL_LOADING = 'GENERAL_LOADING'
 }
-
-const FIRST = 0;
 
 // --- Helpers ---
 const addError = assign((_: { context: Context; event: any }) => ({ 
@@ -165,16 +164,28 @@ const getFeatureAndMarker = (
   return { feature, marker };
 };
 
-const getFileDetails = (fileName: string, gpkgPath: string, file: FileModelType): IFileBase => {
+const getFile = (files: FileData[], fileName: string, gpkgPath: string) => {
+  return files
+    .filter((file: FileData) => {
+      return file.name === fileName;
+    })
+    .map((file: FileData) => ({
+      path: path.resolve(gpkgPath, SHAPES_DIR, `${fileName}.json`),
+      details: { ...file },
+      exists: true
+    }))[FIRST];
+};
+
+const buildLogicError = (code: string, level: "error" | "warning", message?: string, errParams?: Record<string,string>) => {
   return {
-    path: path.resolve(gpkgPath, '../../Shapes', `${fileName}.json`),
-    details: {
-      updateDate: file.modDate,
-      size: file.size ?? 0
-    },
-    exists: true
-  };
-}
+    source: "logic",
+    code,
+    params: { ...errParams },
+    message,
+    level,
+    addPolicy: "override"
+  }
+};
 
 // --- verifyGpkg states ---
 const verifyGpkgStates = {
@@ -187,7 +198,8 @@ const verifyGpkgStates = {
         console.log("[verifyGpkgApi] ctx.input", input);
 
         if (!input.context.files?.gpkg) {
-          throw new Error("No file selected");
+          throw (buildLogicError('ingestion.error.gpkg-not-selected', 'error'));
+          // throw new Error("No file selected");
         }
 
         // Call into MobX-State-Tree store
@@ -200,13 +212,14 @@ const verifyGpkgStates = {
         });
 
         if (!res.validateSource[FIRST].isValid) {
-          throw ({
-            source: "logic",
-            code: "ingestion.error.invalid-source-file",
-            message: res.validateSource[FIRST].message as string,
-            level: "error",
-            addPolicy: "override"
-          });
+          throw (buildLogicError('ingestion.error.invalid-source-file', 'error', res.validateSource[FIRST].message as string));
+          // throw ({
+          //   source: "logic",
+          //   code: "ingestion.error.invalid-source-file",
+          //   message: res.validateSource[FIRST].message as string,
+          //   level: "error",
+          //   addPolicy: "override"
+          // });
         }
 
         const validationResult = { ...res.validateSource[FIRST] };
@@ -292,7 +305,7 @@ const fileSelectionStates = {
 
         // const res = await input.context.store.queryGetFile({
         //   data: {
-        //     pathSuffix: input.context.files?.product.path, //input.context.files.gpkg.path + '/Product.shp',
+        //     pathSuffix: input.context.files?.product.path,
         //     type: RecordType.RECORD_RASTER,
         //   },
         // });
@@ -347,34 +360,56 @@ const fileSelectionStates = {
     }
   },
   auto: {
-    entry: (_: { context: Context; event: any }) => console.log(">>> auto entry", _),
+    entry: (_: { context: Context; event: any }) => {
+      console.log(">>> auto entry", _);
+      
+      _.context.files = {
+        ..._.context.files,
+        product: {
+          path: path.resolve(_.context.files?.gpkg?.path as string, SHAPES_DIR, PRODUCT_SHP),
+          exists: false
+        },
+        metadata: {
+          path: path.resolve(_.context.files?.gpkg?.path as string, SHAPES_DIR, METADATA_SHP),
+          exists: false
+        }
+      };
+    },
     tags: [STATE_TAGS.GENERAL_LOADING],
     invoke: {
       src: fromPromise(async ({ input }: FromPromiseArgs<Context>) => {
         console.log("[fileSelectionStates.auto] ctx.input", input);
 
         if (!input.context.files?.gpkg) {
-          throw new Error("No file selected");
+          throw (buildLogicError('ingestion.error.gpkg-not-selected', 'error'));
+          // throw new Error("No file selected");
         }
 
         // Call into MobX-State-Tree store
         const result = await input.context.store.queryGetDirectory({
           data: {
-            pathSuffix: path.resolve(input.context.files.gpkg.path, '../../Shapes'),
+            pathSuffix: path.resolve(input.context.files.gpkg.path, SHAPES_DIR),
             type: RecordType.RECORD_RASTER,
           },
         });
 
         const gpkgPath = input.context.files?.gpkg?.path;
-        if (!gpkgPath) throw new Error("GPKG file path is undefined");
+        if (!gpkgPath) { 
+          throw (buildLogicError('ingestion.error.gpkg-not-selected', 'error'));
+          // throw new Error("GPKG file path is undefined"); 
+        }
 
-        const product = result.getDirectory
-          .filter((file: FileModelType) => file.name === 'Product.shp')
-          .map((file: FileModelType) => getFileDetails('Product.shp', gpkgPath, file))[FIRST];
+        const product = getFile(result.getDirectory as FileData[], PRODUCT_SHP, gpkgPath);
+        if (!product) { 
+          throw (buildLogicError('ingestion.error.invalid-source-file', 'error', undefined, { fileName: PRODUCT_SHP }));
+          // throw new Error("Product.shp not found in Shapes directory"); 
+        }
 
-        const metadata = result.getDirectory
-          .filter((file: FileModelType) => file.name === 'ShapeMetadata.shp')
-          .map((file: FileModelType) => getFileDetails('ShapeMetadata.shp', gpkgPath, file))[FIRST];
+        const metadata = getFile(result.getDirectory as FileData[], METADATA_SHP, gpkgPath);
+        if (!metadata) { 
+          throw (buildLogicError('ingestion.error.invalid-source-file', 'error', undefined, { fileName: METADATA_SHP }));
+          // throw new Error("ShapeMetadata.shp not found in Shapes directory"); 
+        }
 
         return {
           product,
@@ -408,10 +443,20 @@ const fileSelectionStates = {
         }
       ],
       onError: {
-        actions: sendParent((_: { context: Context; event: any }) => ({
-          type: "FLOW_ERROR",
-          error: {..._.event.error}
-        }))
+        actions: [
+          sendParent((_: { context: Context; event: any }) => ({
+            type: "SET_PRODUCT",
+            file: { ..._.context.files?.product }
+          })),
+          sendParent((_: { context: Context; event: any }) => ({
+            type: "SET_METADATA",
+            file: { ..._.context.files?.metadata }
+          })),
+          sendParent((_: { context: Context; event: any }) => ({
+            type: "FLOW_ERROR",
+            error: {..._.event.error}
+          }))
+        ]
       }
     }
   },
