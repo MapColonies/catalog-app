@@ -1,4 +1,3 @@
-//@ts-nocheck
 import { Feature, GeoJsonProperties, Geometry } from 'geojson';
 import path from 'path';
 // import shp from 'shpjs';
@@ -557,7 +556,8 @@ const flowMachine = createMachine({
 });
 
 // --- parent workflow machine ---
-export const workflowMachine = createMachine({
+// @ts-ignore
+export const workflowMachine = createMachine<Context,Events>({
   id: "workflow",
   initial: "idle",
   context: ({ input }) => ({
@@ -577,17 +577,19 @@ export const workflowMachine = createMachine({
       invoke: {
         src: "fetchJobData",
         input: (_: { context: Context; event: any }) => _.context,
-        onDone: {
+        /*onDone: {
           target: "restoredReplay",
           actions: assign((_: { context: Context; event: any }) => ({
-            flowType: _.event.data.flowType,
-            gpkgFile: _.event.data.gpkg,
-            files: _.event.data.files,
-            formData: _.event.data.formData,
-            autoMode: _.event.data.autoMode
+            flowType: _.event.output.flowType,
+            files: _.event.output.files,
+            formData: _.event.output.formData,
+            autoMode: _.event.output.autoMode
           }))
         },
-        onError: { target: "#workflow.error", actions: addError }
+        onError: {
+          target: "#workflow.error",
+          actions: addError
+        }*/
       }
     },
     restoredReplay: { always: "flow" },
@@ -616,7 +618,7 @@ export const workflowMachine = createMachine({
             files: {
               ..._.context.files,
               gpkg: {
-                ..._.context.files.gpkg,
+                ..._.context.files?.gpkg,
                 ..._.event.file
               }
             }
@@ -627,7 +629,7 @@ export const workflowMachine = createMachine({
             files: {
               ..._.context.files,
               product: {
-                ..._.context.files.product,
+                ..._.context.files?.product,
                 ..._.event.file
               }
             }
@@ -638,7 +640,7 @@ export const workflowMachine = createMachine({
             files: {
               ..._.context.files,
               metadata: {
-                ..._.context.files.metadata,
+                ..._.context.files?.metadata,
                 ..._.event.file
               }
             }
@@ -656,26 +658,32 @@ export const workflowMachine = createMachine({
       invoke: {
         src: "createJobApi",
         input: (_: { context: Context; event: any }) => _,
-        onDone: {
+        /*onDone: {
           target: "jobPolling",
           actions: assign((_: { context: Context; event: any }) => ({
             jobId: _.event.data.jobId
           }))
         },
-        onError: { target: "#workflow.error", actions: addError }
+        onError: {
+          target: "#workflow.error",
+          actions: addError
+        }*/
       }
     },
     jobPolling: {
       invoke: {
         src: "pollJobStatus",
         input: (_: { context: Context; event: any }) => _,
-        onDone: {
+        /*onDone: {
           target: "done",
           actions: assign((_: { context: Context; event: any }) => ({
             jobStatus: _.event.data.jobStatus
           }))
         },
-        onError: { target: "#workflow.error", actions: addError }
+        onError: {
+          target: "#workflow.error",
+          actions: addError
+        }*/
       }
     },
     done: { type: "final" },
