@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.24.2](https://github.com/MapColonies/catalog-app/compare/v2.24.1...v2.24.2) (2025-09-28)
+
+
+### Bug Fixes
+
+* cesium info panel overlap ([#674](https://github.com/MapColonies/catalog-app/issues/674)) ([bf5d091](https://github.com/MapColonies/catalog-app/commit/bf5d091d4992d295049bcf04c670bdf8a2c0f05a))
+* replace pp marker ([#672](https://github.com/MapColonies/catalog-app/issues/672)) ([204e4a4](https://github.com/MapColonies/catalog-app/commit/204e4a47c12205f6d2e49f5af9bcae7fa924c893))
+
 ## [2.24.1](https://github.com/MapColonies/catalog-app/compare/v2.24.0...v2.24.1) (2025-09-14)
 
 
