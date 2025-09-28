@@ -273,7 +273,7 @@ const verifyGpkgStates = {
           }
         }
         return errObj;
-        }),
+      }),
     type: "final"
   }
 };
@@ -508,7 +508,7 @@ const flowMachine = createMachine({
       entry: () => console.log('>>> Enter mapPreview parent'),
       invoke: {
         src: "downloadAndRenderProduct",
-        input: (_: { context: Context; event: any }) => _,
+        input: (_: { context: Context; event: any }) => _.context,
         onDone: "formFill",
         onError: {
           target: "error",
@@ -530,10 +530,10 @@ const flowMachine = createMachine({
             errors: [
               ..._.context.errors,
               ...Object.entries(_.event.errors).map(([field, msg]) => ({
-                source: "formik",
+                source: "formik" as const,
                 code: `FIELD_${field}`,
                 message: msg as string,
-                level: "error",
+                level: "error" as const,
                 field
               }))
             ]
@@ -576,7 +576,7 @@ export const workflowMachine = createMachine({
     restoreJob: {
       invoke: {
         src: "fetchJobData",
-        input: (_: { context: Context; event: any }) => _,
+        input: (_: { context: Context; event: any }) => _.context,
         onDone: {
           target: "restoredReplay",
           actions: assign((_: { context: Context; event: any }) => ({
