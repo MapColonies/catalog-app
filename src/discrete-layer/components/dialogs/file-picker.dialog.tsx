@@ -64,7 +64,7 @@ export const FilePickerDialog: React.FC<FilePickerDialogProps> = observer(
     const filePickerRef = useRef<FilePickerComponentHandle>(null);
     const [files, setFiles] = useState<FileData[]>([]);
     const [isFileSelected, setIsFileSelected] = useState<boolean>(false);
-    const [pathSuffix, setPathSuffix] = useState<string>(
+    const [path, setPath] = useState<string>(
       getSuffixFromFolderChain(currentSelection.folderChain)
     );
     const [graphQLError, setGraphQLError] = useState<Record<string, unknown> | null>(null);
@@ -83,7 +83,7 @@ export const FilePickerDialog: React.FC<FilePickerDialogProps> = observer(
       queryDirectory.setQuery(
         store.queryGetDirectory({
           data: {
-            pathSuffix,
+            path,
             type: recordType,
           },
         })
@@ -97,7 +97,7 @@ export const FilePickerDialog: React.FC<FilePickerDialogProps> = observer(
           error: null,
         },
       } as Selection);
-    }, [pathSuffix]);
+    }, [path]);
 
     useEffect(() => {
       if (queryDirectory.data) {
@@ -105,7 +105,7 @@ export const FilePickerDialog: React.FC<FilePickerDialogProps> = observer(
         
         const shouldAutoSelectMountDir =
           AUTO_SELECT_SINGLE_MOUNT as boolean &&
-          pathSuffix === BASE_PATH_SUFFIX &&
+          path === BASE_PATH_SUFFIX &&
           dirContent.length === 1 &&
           (dirContent[0].isDir as boolean);
 
@@ -124,7 +124,7 @@ export const FilePickerDialog: React.FC<FilePickerDialogProps> = observer(
               queryMetadata.setQuery(
                 store.queryGetFile({
                   data: {
-                    pathSuffix: pathSuffix + '/metadata.json',
+                    path: path + '/metadata.json',
                     type: recordType,
                   },
                 })
@@ -191,7 +191,7 @@ export const FilePickerDialog: React.FC<FilePickerDialogProps> = observer(
       const selected = filePickerRef.current?.getFileSelection() as Selection;
       if (data.id === FilePickerActions.OpenFiles.id) {
         const pathFromChain = getSuffixFromFolderChain(selected.folderChain);
-        setPathSuffix(pathFromChain);
+        setPath(pathFromChain);
       } else if (data.id === FilePickerActions.ChangeSelection.id) {
         setIsFileSelected(selected.files.length > EMPTY);
       }
