@@ -77,13 +77,13 @@ button.cesium-infoBox-close:hover {
 .cesium-infoBox {
   transform: unset;
   top: 60px;
-  right: 8px;
+  right: 88px;
   left: unset;
 }
 
 [dir=rtl] .cesium-infoBox {
   right: unset;
-  left: 8px;
+  left: 88px;
 }
 
 .cesium-infoBox-title {
