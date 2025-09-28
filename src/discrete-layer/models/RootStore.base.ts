@@ -199,8 +199,8 @@ export type LookupTableFieldInput = {
   lookupTable?: string
   lookupExcludeFields?: string
 }
-export type ExplorerGetByPathSuffix = {
-  pathSuffix: string
+export type ExplorerGetByPath = {
+  path: string
   type: RecordType
 }
 export type ExplorerGetById = {
@@ -578,8 +578,8 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
         ${typeof resultSelector === "function" ? resultSelector(new DeploymentWithServicesModelSelector()).toString() : resultSelector}
       } }`, variables, options)
     },
-    queryGetDirectory(variables: { data: ExplorerGetByPathSuffix }, resultSelector: string | ((qb: FileModelSelector) => FileModelSelector) = fileModelPrimitives.toString(), options: QueryOptions = {}) {
-      return self.query<{ getDirectory: FileModelType[]}>(`query getDirectory($data: ExplorerGetByPathSuffix!) { getDirectory(data: $data) {
+    queryGetDirectory(variables: { data: ExplorerGetByPath }, resultSelector: string | ((qb: FileModelSelector) => FileModelSelector) = fileModelPrimitives.toString(), options: QueryOptions = {}) {
+      return self.query<{ getDirectory: FileModelType[]}>(`query getDirectory($data: ExplorerGetByPath!) { getDirectory(data: $data) {
         ${typeof resultSelector === "function" ? resultSelector(new FileModelSelector()).toString() : resultSelector}
       } }`, variables, options)
     },
@@ -588,8 +588,8 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
         ${typeof resultSelector === "function" ? resultSelector(new FileModelSelector()).toString() : resultSelector}
       } }`, variables, options)
     },
-    queryGetFile(variables: { data: ExplorerGetByPathSuffix }, resultSelector: string | ((qb: LayerMetadataMixedModelSelector) => LayerMetadataMixedModelSelector) = layerMetadataMixedModelPrimitives.toString(), options: QueryOptions = {}) {
-      return self.query<{ getFile: LayerMetadataMixedUnion}>(`query getFile($data: ExplorerGetByPathSuffix!) { getFile(data: $data) {
+    queryGetFile(variables: { data: ExplorerGetByPath }, resultSelector: string | ((qb: LayerMetadataMixedModelSelector) => LayerMetadataMixedModelSelector) = layerMetadataMixedModelPrimitives.toString(), options: QueryOptions = {}) {
+      return self.query<{ getFile: LayerMetadataMixedUnion}>(`query getFile($data: ExplorerGetByPath!) { getFile(data: $data) {
         ${typeof resultSelector === "function" ? resultSelector(new LayerMetadataMixedModelSelector()).toString() : resultSelector}
       } }`, variables, options)
     },
