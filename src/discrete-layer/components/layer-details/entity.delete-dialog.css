@@ -2,10 +2,8 @@
   --update-layer-header-height: 150px;
   --footer-height: 60px;
   --footer-offset: 4px;
-  --modal-content-offset: 20px;
   --modal-height: calc(100vh - 80px);
   --modal-width: 888px;
-  --dialog-title-height: 40px;
 }
 
 #entityDeleteDialog .icon {

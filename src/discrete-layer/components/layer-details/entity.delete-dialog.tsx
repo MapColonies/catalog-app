@@ -1,7 +1,7 @@
-import React, { useCallback, useState, useMemo } from 'react';
+import React, { useCallback, useState, useMemo, useEffect } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { observer } from 'mobx-react';
-import { Button, Checkbox, DialogContent, Tooltip } from '@map-colonies/react-core';
+import { Button, Checkbox, CircularProgress, DialogActions, DialogContent, Tooltip } from '@map-colonies/react-core';
 import { Dialog, DialogTitle, Icon, IconButton, Typography } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
 import { emphasizeByHTML } from '../../../common/helpers/formatters';
@@ -9,12 +9,16 @@ import { Mode } from '../../../common/models/mode.enum';
 import {
   EntityDescriptorModelType,
   RecordType,
+  useQuery,
   useStore
 } from '../../models';
 import { ILayerImage } from '../../models/layerImage';
 import { GeoJsonMapValuePresentorComponent } from './field-value-presentors/geojson-map.value-presentor';
 import { LayersDetailsComponent } from './layer-details';
 import './entity.delete-dialog.css';
+import { IDispatchAction } from '../../models/actionDispatcherStore';
+import { UserAction } from '../../models/userStore';
+import { GraphQLError } from '../../../common/components/error/graphql.error-presentor';
 
 export const DEFAULT_ID = 'DEFAULT_UI_ID';
 
@@ -22,7 +26,7 @@ interface EntityDeleteDialogProps {
   isOpen: boolean;
   onSetOpen: (open: boolean) => void;
   recordType?: RecordType;
-  layerRecord?: ILayerImage | null;
+  layerRecord: ILayerImage;
 }
 
 export const EntityDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
@@ -30,6 +34,7 @@ export const EntityDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
 
     const { isOpen, onSetOpen, layerRecord } = props;
     const store = useStore();
+    const mutationQuery = useQuery();
     const intl = useIntl();
     const [allowDeleting, setAllowDeleting] = useState(false);
 
@@ -48,6 +53,36 @@ export const EntityDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
     const closeDialog = useCallback(() => {
       onSetOpen(false);
     }, [onSetOpen, store.discreteLayersStore]);
+
+    const dispatchAction = (action: Record<string, unknown>): void => {
+      store.actionDispatcherStore.dispatchAction(
+        {
+          action: action.action,
+          data: action.data,
+        } as IDispatchAction
+      );
+    };
+
+    useEffect(() => {
+      if (!mutationQuery.loading && ((mutationQuery.data as { updateStatus: string } | undefined)?.updateStatus === 'ok')) {
+        onSetOpen(false);
+        dispatchAction({
+          action: UserAction.ENTITY_ACTION_LAYER3DRECORD_DELETE,
+          data: { ...layerRecord, }
+        });
+      }
+    }, [mutationQuery.data]);
+
+    const deleteLayer = (): void => {
+      mutationQuery.setQuery(
+        store.mutateDelete3DLayer({
+          data: {
+            id: layerRecord.id,
+            type: layerRecord.type as RecordType
+          },
+        })
+      );
+    };
 
     const deleteMessage = useMemo((): string => {
       return intl.formatMessage(
@@ -106,9 +141,7 @@ export const EntityDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
 
             <Box className="footer">
               <Box className="messages">
-
               </Box>
-
               <Checkbox
                 checked={allowDeleting}
                 label={intl.formatMessage({ id: 'delete.dialog.checkbox' })}
@@ -117,13 +150,21 @@ export const EntityDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
                     setAllowDeleting(evt.currentTarget.checked);
                   }}
               />
-              <Box className="buttons">
+              <DialogActions className="buttons">
+                <Box className="errors">
+                  <GraphQLError error={mutationQuery.error ?? {}} />
+                </Box>
                 <Button
                   raised
                   type="submit"
                   disabled={!allowDeleting}
+                  onClick={deleteLayer}
                 >
-                  <FormattedMessage id="general.ok-btn.text" />
+                  {
+                    mutationQuery.loading ?
+                      <CircularProgress className="loading" /> :
+                      <FormattedMessage id="general.ok-btn.text" />
+                  }
                 </Button>
                 <Button
                   type="button"
@@ -133,7 +174,7 @@ export const EntityDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
                 >
                   <FormattedMessage id="general.cancel-btn.text" />
                 </Button>
-              </Box>
+              </DialogActions>
             </Box>
           </DialogContent>
         </Dialog>
