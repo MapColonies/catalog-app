@@ -88,11 +88,9 @@ export type Events =
   | { type: "AUTO" }
   | { type: "MANUAL" }
   | { type: "SELECT_GPKG"; file: IGPKGFile }
-  | { type: "SET_GPKG"; file: IGPKGFile }
   | { type: "SELECT_PRODUCT"; file: IProductFile }
-  | { type: "SET_PRODUCT"; file: IProductFile }
   | { type: "SELECT_METADATA"; file: IFileBase }
-  | { type: "SET_METADATA"; file: IFileBase }
+  | { type: "SET_FILES"; files: IFiles }
   | { type: "DONE" }
   | { type: "UPDATE_FORM"; data: Record<string, any> }
   | { type: "SUBMIT" }
@@ -255,8 +253,12 @@ const verifyGpkgStates = {
             }
           })),
           sendParent((_: { context: IContext; event: any }) => ({
-            type: "SET_GPKG",
-            file: { ..._.event.output }
+            type: "SET_FILES",
+            files: {
+              gpkg: {
+                ..._.event.output
+              }
+            }
           }))
         ]
       },
@@ -350,8 +352,12 @@ const fileSelectionStates = {
               }
             })),
             sendParent((_: { context: IContext; event: any }) => ({
-              type: "SET_PRODUCT",
-              file:  { ..._.event.output }
+              type: "SET_FILES",
+              files:  {
+                product: {
+                  ..._.event.output
+                }
+              }
             }))
           ]
         }
@@ -441,12 +447,15 @@ const fileSelectionStates = {
               }
             })),
             sendParent((_: { context: IContext; event: any }) => ({
-              type: "SET_PRODUCT",
-              file:  { ..._.event.output.product }
-            })),
-            sendParent((_: { context: IContext; event: any }) => ({
-              type: "SET_METADATA",
-              file: { ..._.event.output.metadata }
+              type: "SET_FILES",
+              files: {
+                product: {
+                  ..._.event.output.product
+                },
+                metadata: {
+                  ..._.event.output.metadata
+                }
+              }
             }))
           ]
         }
@@ -454,12 +463,15 @@ const fileSelectionStates = {
       onError: {
         actions: [
           sendParent((_: { context: IContext; event: any }) => ({
-            type: "SET_PRODUCT",
-            file: { ..._.context.files?.product }
-          })),
-          sendParent((_: { context: IContext; event: any }) => ({
-            type: "SET_METADATA",
-            file: { ..._.context.files?.metadata }
+            type: "SET_FILES",
+            files: {
+              product: {
+                ..._.context.files?.product
+              },
+              metadata: {
+                ..._.context.files?.metadata
+              }
+            }
           })),
           sendParent((_: { context: IContext; event: any }) => ({
             type: "FLOW_ERROR",
@@ -528,8 +540,12 @@ const flowMachine = createMachine({
               } 
             })),
             sendParent((_: { context: IContext; event: any }) => ({
-              type: "SET_GPKG",
-              file: { ..._.event.file }
+              type: "SET_FILES",
+              files: {
+                gpkg: {
+                  ..._.event.file
+                }
+              }
             }))
           ]
         },
@@ -656,35 +672,21 @@ export const workflowMachine = createMachine<IContext,Events>({
         // sync: true
       },
       on: {
-        SET_GPKG: {
+        SET_FILES: {
           actions: assign((_: { context: IContext; event: any }) => ({
             files: {
               ..._.context.files,
               gpkg: {
                 ..._.context.files?.gpkg,
-                ..._.event.file
-              }
-            }
-          }))
-        },
-        SET_PRODUCT: {
-          actions: assign((_: { context: IContext; event: any }) => ({
-            files: {
-              ..._.context.files,
+                ..._.event.files.gpkg
+              },
               product: {
                 ..._.context.files?.product,
-                ..._.event.file
-              }
-            }
-          }))
-        },
-        SET_METADATA: {
-          actions: assign((_: { context: IContext; event: any }) => ({
-            files: {
-              ..._.context.files,
+                ..._.event.files.product
+              },
               metadata: {
                 ..._.context.files?.metadata,
-                ..._.event.file
+                ..._.event.files.metadata
               }
             }
           }))
