@@ -1,10 +1,10 @@
 import React, { useMemo } from 'react';
 import moment from 'moment'; 
 import { Box, DateTimePicker, SupportedLocales } from '@map-colonies/react-components';
-import { Mode } from '../../../../common/models/mode.enum';
 import CONFIG from '../../../../common/config';
-import useDebounceField, { GCHTMLInputElement } from '../../../../common/hooks/debounce-field.hook';
 import { dateFormatter, dateSerializer, getDateformatType } from '../../../../common/helpers/formatters';
+import useDebounceField, { GCHTMLInputElement } from '../../../../common/hooks/debounce-field.hook';
+import { Mode } from '../../../../common/models/mode.enum';
 import TooltippedValue from '../../../../common/components/form/tooltipped.value';
 import { DateGranularityType } from '../../../models';
 import { IRecordFieldInfo } from '../layer-details.field-info';

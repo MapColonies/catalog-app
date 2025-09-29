@@ -1,0 +1,116 @@
+.header {
+  display: flex;
+  height: 96px;
+  padding: 4px 8px 4px 16px;
+  margin-bottom: 4px;
+}
+
+body[dir='rtl'] .header {
+  padding: 4px 16px 4px 8px;
+}
+
+.ingestionFields {
+  display: flex;
+  flex-direction: column;
+  width: 90%;
+}
+
+.ingestionField {
+  display: flex;
+  padding: 2px 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.ingestionButton {
+  display: flex;
+  align-items: center;
+}
+
+.ingestionButton .mdc-button {
+  padding: 20px;
+}
+
+.uploadMetadataButton .mdc-button--outlined:not(:disabled) {
+  border-color: currentColor;
+  /* color: var(--mdc-theme-text-icon-on-dark); */
+  padding: 20px;
+}
+
+.ingestionButtonsContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  width: min-content;
+  gap: 10px;
+}
+
+.directorySpacer {
+  display: flex;
+  margin: 0 12px 0 0;
+}
+
+body[dir='rtl'] .directorySpacer {
+  margin: 0 0 0 12px;
+}
+
+.fileNamesSpacer {
+  display: flex;
+  margin: 0 12px 0 24px;
+}
+
+body[dir='rtl'] .fileNamesSpacer {
+  margin: 0 24px 0 12px;
+}
+
+.hiddenField {
+  display: none;
+}
+
+.disabledText {
+  color: var(--mdc-theme-text-hint-on-dark, #fff);
+  opacity: 0.5;
+}
+
+.filesList {
+  display: grid;
+  grid-template-columns: 0.1fr 2fr 0.25fr 0.25fr;
+  column-gap: 8px;
+}
+
+.fileItemName {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  direction: rtl;
+}
+
+.fileIcon {
+  font-size: 16px;
+  cursor: default;
+}
+
+.fileIconSpacer {
+  width: 28px;
+}
+
+.moreButton {
+  color: var(--mdc-theme-primary);
+  cursor: pointer;
+}
+
+.moreTooltip {
+  text-align: left;
+}
+
+body[dir='rtl'] .moreTooltip {
+  text-align: right;
+}
+
+.filesPathContainer {
+  width: 60ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  direction: rtl;
+}

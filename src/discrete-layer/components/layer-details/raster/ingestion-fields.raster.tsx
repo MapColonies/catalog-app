@@ -11,21 +11,22 @@ import { cloneDeep, isEmpty } from 'lodash';
 import { Button, CircularProgress, Icon, Typography } from '@map-colonies/react-core';
 import { Box, defaultFormatters, FileData } from '@map-colonies/react-components';
 import { Selection } from '../../../../common/components/file-picker';
-import { FieldLabelComponent } from '../../../../common/components/form/field-label';
-// import useSessionStoreWatcherDirectory from '../../../common/hooks/useSessionStoreWatcherDirectory';
-import { Mode } from '../../../../common/models/mode.enum';
 import { MetadataFile } from '../../../../common/components/file-picker';
+import { FieldLabelComponent } from '../../../../common/components/form/field-label';
+import { dateSerializer } from '../../../../common/helpers/formatters';
+import { Mode } from '../../../../common/models/mode.enum';
+// import useSessionStoreWatcherDirectory from '../../../common/hooks/useSessionStoreWatcherDirectory';
 import { RecordType, LayerMetadataMixedUnion, useQuery, useStore, SourceValidationModelType } from '../../../models';
 import { FilePickerDialog } from '../../dialogs/file-picker.dialog';
 import { LayerRasterRecordModelKeys} from '../entity-types-keys';
 import { StringValuePresentorComponent } from '../field-value-presentors/string.value-presentor';
 import { IRecordFieldInfo } from '../layer-details.field-info';
 import { EntityFormikHandlers, FormValues } from '../layer-datails-form';
-import { clearSyncWarnings, importJSONFileFromClient } from '../utils';
-import { Events, hasLoadingTagDeep, IFileBase } from './state-machine.raster';
+import { Events, hasLoadingTagDeep, IFileBase, IFiles } from './state-machine.raster';
 import { RasterWorkflowContext } from './state-machine-context.raster';
+import { clearSyncWarnings, importJSONFileFromClient } from '../utils';
 
-import '../ingestion-fields.css';
+import './ingestion-fields.raster.css';
 
 interface IngestionFieldsProps {
   recordType: RecordType;
@@ -51,6 +52,7 @@ const FileItem: React.FC<{ file: IFileBase }> = ({ file }) => {
       <Box style={{ direction: 'ltr' }}>
         {defaultFormatters.formatFileSize(null, file.details as FileData)}
       </Box>
+      <Box>{file.details?.modDate ? dateSerializer(file.details.modDate) : ''}</Box>
     </>
   );
 };
@@ -58,14 +60,13 @@ const FileItem: React.FC<{ file: IFileBase }> = ({ file }) => {
 const IngestionInputs: React.FC<{
   fields: IRecordFieldInfo[];
   values: string[];
-  selection: Selection;
   formik: EntityFormikHandlers;
   state: any;
-}> = ({ fields, values, selection, formik, state }) => {
+}> = ({ fields, values, formik, state }) => {
   return (
     <>
       {
-        fields.map((field: IRecordFieldInfo, index: number) => {
+        fields.slice(1).map((field: IRecordFieldInfo, index: number) => {
           return (
             <Box className="ingestionField" key={field.fieldName}>
               <FieldLabelComponent
@@ -85,7 +86,8 @@ const IngestionInputs: React.FC<{
                 {
                   <Box className="filesList">
                     {
-                      state.context?.files?.values?.map((file: IFileBase, idx: number): JSX.Element | undefined => {
+                      state.context?.files &&
+                      Object.values(state.context?.files as IFiles).map((file: IFileBase, idx: number): JSX.Element => {
                         return <FileItem key={idx} file={file} />;
                       })
                     }
@@ -217,8 +219,8 @@ export const IngestionFields: React.FC<PropsWithChildren<IngestionFieldsProps>> 
     if (queryValidateSource.data) {
       const directory = selection.files.length ? 
       selection.folderChain
-          .map((folder: FileData) => folder.name)
-          .join('/')
+        .map((folder: FileData) => folder.name)
+        .join('/')
       : '';          
       const fileNames = selection.files.map((file: FileData) => file.name).join(',');
       if (queryValidateSource.data?.validateSource[ONLY_ONE_SOURCE].isValid === false) {
@@ -246,8 +248,7 @@ export const IngestionFields: React.FC<PropsWithChildren<IngestionFieldsProps>> 
           );
         }
         handleError(true);
-      }
-      else {
+      } else {
         if (reloadFormMetadata) {
           reloadFormMetadata(
             {
@@ -356,7 +357,6 @@ export const IngestionFields: React.FC<PropsWithChildren<IngestionFieldsProps>> 
           <IngestionInputs
             fields={fields}
             values={[values.directory, values.fileNames]}
-            selection={selection}
             formik={formik as EntityFormikHandlers}
             state={state}
             // notSynchedDirWarning={directoryComparisonWarn}
