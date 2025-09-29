@@ -13,7 +13,7 @@ import { Box, defaultFormatters, FileData } from '@map-colonies/react-components
 import { Selection } from '../../../../common/components/file-picker';
 import { MetadataFile } from '../../../../common/components/file-picker';
 import { FieldLabelComponent } from '../../../../common/components/form/field-label';
-import { dateSerializer } from '../../../../common/helpers/formatters';
+import { dateFormatter } from '../../../../common/helpers/formatters';
 import { Mode } from '../../../../common/models/mode.enum';
 // import useSessionStoreWatcherDirectory from '../../../common/hooks/useSessionStoreWatcherDirectory';
 import { RecordType, LayerMetadataMixedUnion, useQuery, useStore, SourceValidationModelType } from '../../../models';
@@ -52,7 +52,7 @@ const FileItem: React.FC<{ file: IFileBase }> = ({ file }) => {
       <Box style={{ direction: 'ltr' }}>
         {defaultFormatters.formatFileSize(null, file.details as FileData)}
       </Box>
-      <Box>{file.details?.modDate ? dateSerializer(file.details.modDate) : ''}</Box>
+      <Box>{file.details?.modDate ? dateFormatter(file.details.modDate) : ''}</Box>
     </>
   );
 };
