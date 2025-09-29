@@ -1,4 +1,5 @@
 import { Feature, GeoJsonProperties, Geometry } from 'geojson';
+import { merge } from 'lodash';
 import path from 'path';
 // import shp from 'shpjs';
 import {
@@ -674,21 +675,7 @@ export const workflowMachine = createMachine<IContext,Events>({
       on: {
         SET_FILES: {
           actions: assign((_: { context: IContext; event: any }) => ({
-            files: {
-              ..._.context.files,
-              gpkg: {
-                ..._.context.files?.gpkg,
-                ..._.event.files.gpkg
-              },
-              product: {
-                ..._.context.files?.product,
-                ..._.event.files.product
-              },
-              metadata: {
-                ..._.context.files?.metadata,
-                ..._.event.files.metadata
-              }
-            }
+            files: merge({}, _.context.files, _.event.files)
           }))
         },
         // catch-all errors from any child state     
