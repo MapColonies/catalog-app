@@ -442,7 +442,19 @@ const fileSelectionStates = {
                   ..._.event.output.metadata
                 }
               }
-            }))
+            })),
+            sendParent((_: { context: IContext; event: any }) => {
+              return {
+                type: "FLOW_ERROR",
+                error:  {
+                  source: "api",
+                  code: "ingestion.error.file-not-found",
+                  message: 'xxx',
+                  level: "error",
+                  addPolicy: "override"
+                }
+              };
+            })
           ]
         }
       ],
