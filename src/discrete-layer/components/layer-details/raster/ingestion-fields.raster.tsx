@@ -48,7 +48,7 @@ const FileItem: React.FC<{ file: IFileBase }> = ({ file }) => {
   return (
     <>
       <Box><Icon className="fileIcon mc-icon-Map-Vector" /></Box>
-      <Box className='fileItemName'>{file.path}</Box>
+      <Box className={file.exists ? 'fileItemName' : 'fileItemName warning'}>{file.path}</Box>
       <Box style={{ direction: 'ltr' }}>
         {defaultFormatters.formatFileSize(null, file.details as FileData)}
       </Box>

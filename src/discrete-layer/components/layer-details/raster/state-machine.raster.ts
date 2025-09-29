@@ -407,13 +407,13 @@ const fileSelectionStates = {
 
         const product = getFile(result.getDirectory as FileData[], PRODUCT_SHP, gpkgPath);
         if (!product) { 
-          throw (buildLogicError('ingestion.error.invalid-source-file', 'error', undefined, { fileName: PRODUCT_SHP }));
+          throw (buildLogicError('ingestion.error.invalid-source-file', 'error', undefined, { value: PRODUCT_SHP }));
           // throw new Error("Product.shp not found in Shapes directory"); 
         }
 
         const metadata = getFile(result.getDirectory as FileData[], METADATA_SHP, gpkgPath);
         if (!metadata) { 
-          throw (buildLogicError('ingestion.error.invalid-source-file', 'error', undefined, { fileName: METADATA_SHP }));
+          throw (buildLogicError('ingestion.error.invalid-source-file', 'error', undefined, { value: METADATA_SHP }));
           // throw new Error("ShapeMetadata.shp not found in Shapes directory"); 
         }
 
