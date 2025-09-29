@@ -510,7 +510,6 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
                 closeDialog={closeDialog}
                 customErrorReset={store.discreteLayersStore.clearCustomValidationError}
                 customError={store.discreteLayersStore.customValidationError}
-                ppCollisionCheckInProgress={store.discreteLayersStore.ppCollisionCheckInProgress}
               />
             )}
           </DialogContent>

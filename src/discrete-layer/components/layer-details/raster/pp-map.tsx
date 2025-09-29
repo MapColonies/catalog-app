@@ -10,8 +10,7 @@ import { MapLoadingIndicator } from '../../../../common/components/map/ol-map.lo
 import { ILayerImage } from '../../../models/layerImage';
 import { useStore } from '../../../models/RootStore';
 import { PolygonPartsVectorLayer as PolygonPartsExtentVectorLayer } from './pp-extent-vector-layer';
-import { FeatureType, PPMapStyles } from './pp-map.utils';
-import { PolygonPartsByPolygonVectorLayer } from './pp-polygon-vector-layer';
+import { PPMapStyles } from './pp-map.utils';
 
 interface GeoFeaturesPresentorProps {
   mode: Mode;
@@ -23,7 +22,6 @@ interface GeoFeaturesPresentorProps {
   showExisitngPolygonParts?: boolean;
   layerRecord?: ILayerImage | null;
   ingestionResolutionMeter?: number | null;
-  ppCheck?: boolean | null;
 }
 
 const DEFAULT_PROJECTION = 'EPSG:4326';
@@ -39,8 +37,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   selectionStyle,
   showExisitngPolygonParts,
   layerRecord,
-  ingestionResolutionMeter,
-  ppCheck
+  ingestionResolutionMeter
 }) => {
   const store = useStore();
   const intl = useIntl();
@@ -157,17 +154,6 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
         </VectorLayer>
         {
           showExisitngPolygonParts && <PolygonPartsExtentVectorLayer layerRecord={layerRecord}/>
-        }
-        {
-          ppCheck &&
-          <PolygonPartsByPolygonVectorLayer 
-            layerRecord={layerRecord} 
-            maskFeature={geoFeatures?.find((feat)=>{
-              return get(feat,'properties.featureType') === FeatureType.PP_PERIMETER;
-            })}
-            partsToCheck={geoFeatures?.filter((part) => [FeatureType.DEFAULT, undefined].includes(part?.properties?.featureType))}
-            ingestionResolutionMeter={ingestionResolutionMeter}
-          />
         }
         <Legend legendItems={LegendsArray} title={intl.formatMessage({id: 'polygon-parts.map-preview-legend.title'})}/>
       </Map>

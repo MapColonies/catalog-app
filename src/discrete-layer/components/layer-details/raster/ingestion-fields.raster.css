@@ -83,7 +83,7 @@ body[dir='rtl'] .fileNamesSpacer {
 .fileItemName {
   text-overflow: ellipsis;
   overflow: hidden;
-  direction: rtl;
+  direction: ltr;
 }
 
 .fileIcon {

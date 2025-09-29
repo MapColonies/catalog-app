@@ -60,7 +60,6 @@ const INITIAL_STATE = {
   baseMaps: CONFIG.BASE_MAPS,
   mapViewerExtentPolygon: undefined,
   customValidationError: undefined,
-  ppCollisionCheckInProgress: undefined,
   polygonPartsLayer: undefined,
   polygonPartsInfo: [],
   isActiveLayersImages: false,
@@ -87,7 +86,6 @@ export const discreteLayersStore = ModelBase
     baseMaps: types.maybe(types.frozen<IBaseMaps>(INITIAL_STATE.baseMaps)),
     mapViewerExtentPolygon: types.maybe(types.frozen<Feature|undefined>(INITIAL_STATE.mapViewerExtentPolygon)),
     customValidationError: types.maybe(types.frozen<Record<string,string[]>|undefined>(INITIAL_STATE.customValidationError)),
-    ppCollisionCheckInProgress: types.maybe(types.frozen<boolean|undefined>(INITIAL_STATE.ppCollisionCheckInProgress)),
     polygonPartsLayer: types.maybe(types.frozen<ILayerImage>(INITIAL_STATE.polygonPartsLayer as unknown as ILayerImage)),
     polygonPartsInfo: types.maybe(types.frozen<Feature<Geometry, GeoJsonProperties>[]>(INITIAL_STATE.polygonPartsInfo)),
     isActiveLayersImages: types.maybe(types.frozen<boolean>(INITIAL_STATE.isActiveLayersImages)),
@@ -256,7 +254,6 @@ export const discreteLayersStore = ModelBase
 
     function resetUpdateMode(): void {
       self.selectedLayerIsUpdateMode = false;
-      self.ppCollisionCheckInProgress = undefined;
       self.customValidationError = undefined;
     }
 
@@ -415,10 +412,6 @@ export const discreteLayersStore = ModelBase
       self.customValidationError = undefined;
     }
 
-    function setPPCollisionCheckInProgress(val: boolean | undefined): void {
-      self.ppCollisionCheckInProgress = val;
-    }
-
     function setPolygonPartsLayer(layer: ILayerImage | undefined): void {
       self.polygonPartsLayer = layer ? cloneDeep(layer) : undefined;
     }
@@ -482,7 +475,6 @@ export const discreteLayersStore = ModelBase
       setMapViewerExtentPolygon,
       setCustomValidationError,
       clearCustomValidationError,
-      setPPCollisionCheckInProgress,
       setPolygonPartsLayer,
       setPolygonPartsInfo,
       addPolygonPartsInfo,

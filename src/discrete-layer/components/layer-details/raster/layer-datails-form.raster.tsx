@@ -65,7 +65,6 @@ interface LayerDetailsFormCustomProps {
   closeDialog: () => void;
   customErrorReset: () => void;
   customError?: Record<string,string[]> | undefined;
-  ppCollisionCheckInProgress?: boolean | undefined;
 }
 
 export interface StatusError {
@@ -114,7 +113,6 @@ export const InnerRasterForm = (
     closeDialog,
     customErrorReset,
     customError,
-    ppCollisionCheckInProgress,
   } = props;
 
   //#region STATE MACHINE
@@ -454,7 +452,6 @@ export const InnerRasterForm = (
                 type="button"
                 raised
                 disabled={
-                  ppCollisionCheckInProgress ||
                   Object.keys(errors).length > NONE ||
                   (Object.keys(getStatusErrors()).length > NONE)
                 }
@@ -499,7 +496,6 @@ interface LayerDetailsFormProps {
   closeDialog: () => void;
   customErrorReset: () => void;
   customError?: Record<string,string[]> | undefined;
-  ppCollisionCheckInProgress?: boolean | undefined;
 }
 
 export default withFormik<LayerDetailsFormProps, FormValues>({
