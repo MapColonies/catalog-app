@@ -85,14 +85,13 @@ export type Events =
   | { type: "START_NEW" }
   | { type: "START_UPDATE" }
   | { type: "RESTORE"; jobId: string }
-  | { type: "SELECT_GPKG"; file: IGPKGFile }
-  | { type: "SET_GPKG"; file: IGPKGFile }
-  | { type: "SET_GPKG_VALIDATION"; file: IGPKGFile }
   | { type: "AUTO" }
   | { type: "MANUAL" }
-  | { type: "SELECT_PRODUCT"; file: File }
+  | { type: "SELECT_GPKG"; file: IGPKGFile }
+  | { type: "SET_GPKG"; file: IGPKGFile }
+  | { type: "SELECT_PRODUCT"; file: IProductFile }
   | { type: "SET_PRODUCT"; file: IProductFile }
-  | { type: "SELECT_METADATA"; file: File }
+  | { type: "SELECT_METADATA"; file: IFileBase }
   | { type: "SET_METADATA"; file: IFileBase }
   | { type: "DONE" }
   | { type: "UPDATE_FORM"; data: Record<string, any> }
@@ -256,7 +255,7 @@ const verifyGpkgStates = {
             }
           })),
           sendParent((_: { context: IContext; event: any }) => ({
-            type: "SET_GPKG_VALIDATION",
+            type: "SET_GPKG",
             file: { ..._.event.output }
           }))
         ]
@@ -658,17 +657,6 @@ export const workflowMachine = createMachine<IContext,Events>({
       },
       on: {
         SET_GPKG: {
-          actions: assign((_: { context: IContext; event: any }) => ({
-            files: {
-              ..._.context.files,
-              gpkg: {
-                ..._.context.files?.gpkg,
-                ..._.event.file
-              }
-            } 
-          }))
-        },
-        SET_GPKG_VALIDATION: {
           actions: assign((_: { context: IContext; event: any }) => ({
             files: {
               ..._.context.files,
