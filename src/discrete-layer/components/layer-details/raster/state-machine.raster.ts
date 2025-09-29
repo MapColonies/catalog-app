@@ -168,16 +168,19 @@ const getFeatureAndMarker = (
   return { feature, marker };
 };
 
-const getFile = (files: FileData[], fileName: string, gpkgPath: string) => {
-  return files
-    .filter((file: FileData) => {
-      return file.name === fileName;
-    })
-    .map((file: FileData) => ({
-      path: path.resolve(gpkgPath, SHAPES_DIR, `${fileName}.json`),
-      details: { ...file },
-      exists: true
-    }))[FIRST];
+const getFile = (files: FileData[], gpkgPath: string, fileName: string) => {
+  const matchingFiles = files.filter((file: FileData) => file.name === fileName);
+  if (matchingFiles.length === 0) {
+    return {
+      path: path.resolve(gpkgPath, SHAPES_DIR, fileName),
+      exists: false
+    };
+  }
+  return matchingFiles.map((file: FileData) => ({
+    path: path.resolve(gpkgPath, SHAPES_DIR, fileName),
+    details: { ...file },
+    exists: true
+  }))[FIRST];
 };
 
 const buildLogicError = (code: string, level: "error" | "warning", message?: string, errParams?: Record<string,string>) => {
@@ -201,29 +204,23 @@ const verifyGpkgStates = {
       src: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
         console.log("[verifyGpkgApi] ctx.input", input);
 
-        if (!input.context.files?.gpkg) {
-          throw (buildLogicError('ingestion.error.gpkg-not-selected', 'error'));
-          // throw new Error("No file selected");
+        if (!input.context.files?.gpkg?.path) {
+          throw (buildLogicError('ingestion.error.file-not-found', 'error', 'GPKG'));
         }
+
+        const gpkgPath = input.context.files?.gpkg?.path;
 
         // Call into MobX-State-Tree store
         const res = await input.context.store.queryValidateSource({
           data: {
-            fileNames: [path.basename(input.context.files.gpkg.path)],
-            originDirectory: path.dirname(input.context.files.gpkg.path),
+            fileNames: [path.basename(gpkgPath)],
+            originDirectory: path.dirname(gpkgPath),
             type: RecordType.RECORD_RASTER,
           }
         });
 
         if (!res.validateSource[FIRST].isValid) {
           throw (buildLogicError('ingestion.error.invalid-source-file', 'error', res.validateSource[FIRST].message as string));
-          // throw ({
-          //   source: "logic",
-          //   code: "ingestion.error.invalid-source-file",
-          //   message: res.validateSource[FIRST].message as string,
-          //   level: "error",
-          //   addPolicy: "override"
-          // });
         }
 
         const validationResult = { ...res.validateSource[FIRST] };
@@ -307,13 +304,15 @@ const fileSelectionStates = {
       src: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
         console.log("[fileSelectionStates.fetchProduct] ctx.input", input);
 
-        if (!input.context.files?.product) {
-          throw new Error("No product file selected");
+        if (!input.context.files?.product?.path) {
+          throw (buildLogicError('ingestion.error.file-not-found', 'error', PRODUCT_SHP));
         }
+
+        // const productPath = input.context.files.product.path;
 
         // const res = await input.context.store.queryGetFile({
         //   data: {
-        //     pathSuffix: input.context.files?.product.path,
+        //     pathSuffix: productPath,
         //     type: RecordType.RECORD_RASTER,
         //   },
         // });
@@ -374,54 +373,40 @@ const fileSelectionStates = {
   auto: {
     entry: (_: { context: IContext; event: any }) => {
       console.log(">>> auto entry", _);
-      
-      _.context.files = {
-        ..._.context.files,
-        product: {
-          path: path.resolve(_.context.files?.gpkg?.path as string, SHAPES_DIR, PRODUCT_SHP),
-          exists: false
-        },
-        metadata: {
-          path: path.resolve(_.context.files?.gpkg?.path as string, SHAPES_DIR, METADATA_SHP),
-          exists: false
-        }
-      };
+      // _.context.files = {
+      //   ..._.context.files,
+      //   product: {
+      //     path: path.resolve(_.context.files?.gpkg?.path as string, SHAPES_DIR, PRODUCT_SHP),
+      //     exists: false
+      //   },
+      //   metadata: {
+      //     path: path.resolve(_.context.files?.gpkg?.path as string, SHAPES_DIR, METADATA_SHP),
+      //     exists: false
+      //   }
+      // };
     },
     tags: [STATE_TAGS.GENERAL_LOADING],
     invoke: {
       src: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
         console.log("[fileSelectionStates.auto] ctx.input", input);
 
-        if (!input.context.files?.gpkg) {
-          throw (buildLogicError('ingestion.error.gpkg-not-selected', 'error'));
-          // throw new Error("No file selected");
+        if (!input.context.files?.gpkg?.path) {
+          throw (buildLogicError('ingestion.error.file-not-found', 'error', 'GPKG'));
         }
+
+        const gpkgPath = input.context.files.gpkg.path;
 
         // Call into MobX-State-Tree store
         const result = await input.context.store.queryGetDirectory({
           data: {
-            pathSuffix: path.resolve(input.context.files.gpkg.path, SHAPES_DIR),
+            pathSuffix: path.resolve(gpkgPath, SHAPES_DIR),
             type: RecordType.RECORD_RASTER,
           },
         });
 
-        const gpkgPath = input.context.files?.gpkg?.path;
-        if (!gpkgPath) { 
-          throw (buildLogicError('ingestion.error.gpkg-not-selected', 'error'));
-          // throw new Error("GPKG file path is undefined"); 
-        }
+        const product = getFile(result.getDirectory as FileData[], gpkgPath, PRODUCT_SHP+'1');
 
-        const product = getFile(result.getDirectory as FileData[], PRODUCT_SHP, gpkgPath);
-        if (!product) { 
-          throw (buildLogicError('ingestion.error.invalid-source-file', 'error', undefined, { value: PRODUCT_SHP }));
-          // throw new Error("Product.shp not found in Shapes directory"); 
-        }
-
-        const metadata = getFile(result.getDirectory as FileData[], METADATA_SHP, gpkgPath);
-        if (!metadata) { 
-          throw (buildLogicError('ingestion.error.invalid-source-file', 'error', undefined, { value: METADATA_SHP }));
-          // throw new Error("ShapeMetadata.shp not found in Shapes directory"); 
-        }
+        const metadata = getFile(result.getDirectory as FileData[], gpkgPath, METADATA_SHP);
 
         return {
           product,
@@ -463,17 +448,17 @@ const fileSelectionStates = {
       ],
       onError: {
         actions: [
-          sendParent((_: { context: IContext; event: any }) => ({
-            type: "SET_FILES",
-            files: {
-              product: {
-                ..._.context.files?.product
-              },
-              metadata: {
-                ..._.context.files?.metadata
-              }
-            }
-          })),
+          // sendParent((_: { context: IContext; event: any }) => ({
+          //   type: "SET_FILES",
+          //   files: {
+          //     product: {
+          //       ..._.context.files?.product
+          //     },
+          //     metadata: {
+          //       ..._.context.files?.metadata
+          //     }
+          //   }
+          // })),
           sendParent((_: { context: IContext; event: any }) => ({
             type: "FLOW_ERROR",
             error: {..._.event.error}

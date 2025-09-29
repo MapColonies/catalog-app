@@ -1,6 +1,6 @@
-import { createActorContext } from "@xstate/react";
-import { workflowMachine } from "./state-machine.raster";
-import { useStore } from "../../../models";
+import { createActorContext } from '@xstate/react';
+import { useStore } from '../../../models';
+import { workflowMachine } from './state-machine.raster';
 
 export const RasterWorkflowContext = createActorContext(workflowMachine);
 
