@@ -27,7 +27,7 @@ import { FeatureType } from './pp-map.utils';
 const FIRST = 0;
 const SHAPES_DIR = '../../Shapes';
 const PRODUCT_SHP = 'Product.shp';
-const METADATA_SHP ='ShapeMetadata.shp';
+const METADATA_SHP = 'ShapeMetadata.shp';
 
 export type ErrorSource = "formik" | "api" | "logic";
 export type ErrorLevel = "error" | "warning";

@@ -275,8 +275,8 @@ export const IngestionFields: React.FC<PropsWithChildren<IngestionFieldsProps>> 
       if (reloadFormMetadata) {
         const directory = selection.files.length ? 
         selection.folderChain
-            .map((folder: FileData) => folder.name)
-            .join('/')
+          .map((folder: FileData) => folder.name)
+          .join('/')
         : '';          
         const fileNames = selection.files.map((file: FileData) => file.name).join(',');
         reloadFormMetadata(
@@ -300,10 +300,10 @@ export const IngestionFields: React.FC<PropsWithChildren<IngestionFieldsProps>> 
       setSelection({ ...selected });
     }
     const directory = selected.files.length ? 
-                        selected.folderChain
-                            .map((folder: FileData) => folder.name)
-                            .join('/')
-                        : '';
+      selected.folderChain
+          .map((folder: FileData) => folder.name)
+          .join('/')
+      : '';
     const fileNames = selected.files.map((file: FileData) => file.name);
 
     if (validateSources) {
