@@ -79,3 +79,7 @@ body[dir='rtl'] #entityDeleteDialog .closeIcon {
   height: 100%;
   overflow-y: auto;
 }
+
+#entityDeleteDialog .errors {
+  width: 520px;
+}

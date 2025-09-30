@@ -52,7 +52,6 @@ const GENERAL_ACTIONS_GROUP: IActionGroup = {
       icon: '',
       class: 'mc-icon-Fly-to',
       titleTranslationId: 'action.flyTo.tooltip',
-      dependentField: {field: 'layerURLMissing', expectedValue: false},
       views: [TabViews.CATALOG, TabViews.SEARCH_RESULTS]
     },
     {
@@ -61,6 +60,7 @@ const GENERAL_ACTIONS_GROUP: IActionGroup = {
       icon: '',
       class: 'mc-icon-Earth',
       titleTranslationId: 'action.viewer.tooltip',
+      dependentField: {field: 'isBeingDeleted', expectedValue: false},
       views: [TabViews.CATALOG, TabViews.SEARCH_RESULTS]
     },
     {
@@ -122,6 +122,7 @@ const ACTIONS_CONFIG: IEntityActions[] = [
             icon: '',
             class: 'mc-icon-Edit1',
             titleTranslationId: 'action.edit.tooltip',
+            dependentField: {field: 'isBeingDeleted', expectedValue: false},
             views: [TabViews.CATALOG, TabViews.SEARCH_RESULTS]
           },
           {
@@ -130,6 +131,7 @@ const ACTIONS_CONFIG: IEntityActions[] = [
             icon: '',
             class: 'mc-icon-Delete',
             titleTranslationId: 'action.delete.tooltip',
+            dependentField: {field: 'isBeingDeleted', expectedValue: false},
             views: [TabViews.CATALOG, TabViews.SEARCH_RESULTS]
           },
         ],

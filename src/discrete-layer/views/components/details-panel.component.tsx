@@ -5,6 +5,7 @@ import { IconButton, Tooltip, Typography } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
 import { existStatus, getTextStyle } from '../../../common/helpers/style';
 import { Mode } from '../../../common/models/mode.enum';
+import { isBeingDeleted } from '../../../common/helpers/layer-url';
 import { EntityDialog } from '../../components/layer-details/entity.dialog';
 import { EntityRasterDialog } from '../../components/layer-details/raster/entity.raster.dialog';
 import { EntityDeleteDialog } from '../../components/layer-details/entity.delete-dialog';
@@ -68,13 +69,13 @@ export const DetailsPanel: React.FC<DetailsPanelComponentProps> = observer((prop
           {layerToPresent?.productName}
         </Typography>
         {
-          permissions.isPublishAllowed === true &&
+          permissions.isPublishAllowed === true && !isBeingDeleted(layerToPresent) &&
           layerToPresent &&
           existStatus(layerToPresent as any) &&
           <PublishButton layer={layerToPresent} className="operationIcon"/>
         }
         {
-          permissions.isEditAllowed === true && 
+          permissions.isEditAllowed === true && !isBeingDeleted(layerToPresent) &&
           <Tooltip content={intl.formatMessage({ id: 'action.edit.tooltip' })}>
             <IconButton
               className="operationIcon mc-icon-Edit1"

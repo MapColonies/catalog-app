@@ -408,6 +408,11 @@ export const ActionResolver: React.FC<ActionResolverProps> = observer((props) =>
           }
           break;
         }
+        case UserAction.SYSTEM_CALLBACK_DELETE: {
+          const layerRecord = data as unknown as ILayerImage;
+          baseUpdateEntity(layerRecord);
+          break;
+        }
         case UserAction.SYSTEM_CALLBACK_FLYTO: {
           const selectedLayer = data.selectedLayer as ILayerImage;
           baseFootprintShow(true, selectedLayer);

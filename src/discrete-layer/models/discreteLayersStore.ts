@@ -27,6 +27,8 @@ import { FieldConfigModelType } from './FieldConfigModel';
 import { GetFeatureModelType } from './GetFeatureModel';
 import { RecordType } from './RecordTypeEnum';
 import { WfsPolygonPartsGetFeatureParams } from './RootStore.base';
+import { RecordStatus } from './RecordStatusEnum';
+import { Layer3DRecordModelType } from './Layer3DRecordModel';
 
 export type LayersImagesResponse = ILayerImage[];
 
@@ -157,6 +159,11 @@ export const discreteLayersStore = ModelBase
           const hasCapabilities = self.capabilities?.find(item => layerLink.name === item.id);
           const hasWMTSUrl = layerLink.protocol === LinkType.WMTS;
           additional = { layerURLMissing: !hasCapabilities && hasWMTSUrl };
+        }
+        if (item.type === RecordType.RECORD_3D) {
+          additional = {
+            isBeingDeleted: (item as Layer3DRecordModelType).productStatus === RecordStatus.BEING_DELETED
+          }
         }
         return {
           ...item,

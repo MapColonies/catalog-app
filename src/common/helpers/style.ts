@@ -31,10 +31,10 @@ export const isUnpublishedValue = (value: string): boolean => {
 };
 
 export const getTextStyle = (
-  data: Record<string, unknown>, 
+  data: Record<string, unknown>,
   colorProperty: 'color' | 'backgroundColor'
 ): Record<string, unknown> | undefined => {
-  if (data.layerURLMissing) {
+  if (data.layerURLMissing || data.isBeingDeleted) {
     return { [colorProperty]: ERROR_COLOR };
   }
   if (existStatus(data) && isUnpublished(data)) {
@@ -44,11 +44,11 @@ export const getTextStyle = (
 };
 
 export const getIconStyle = (
-  data: Record<string, unknown>, 
+  data: Record<string, unknown>,
   colorProperty: 'color' | 'backgroundColor'
 ): Record<string, unknown> | undefined => {
   let resStyle = undefined;
-  if (data.layerURLMissing) {
+  if (data.layerURLMissing || data.isBeingDeleted) {
     return { [colorProperty]: ERROR_COLOR };
   }
   if (existStatus(data) && isUnpublished(data)) {

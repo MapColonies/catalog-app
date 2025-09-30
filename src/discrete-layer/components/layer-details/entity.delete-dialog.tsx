@@ -8,6 +8,7 @@ import { emphasizeByHTML } from '../../../common/helpers/formatters';
 import { Mode } from '../../../common/models/mode.enum';
 import {
   EntityDescriptorModelType,
+  RecordStatus,
   RecordType,
   useQuery,
   useStore
@@ -66,10 +67,16 @@ export const EntityDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
     useEffect(() => {
       if (!mutationQuery.loading && ((mutationQuery.data as { deleteLayer: string } | undefined)?.deleteLayer === 'ok')) {
         onSetOpen(false);
-        dispatchAction({
-          action: UserAction.ENTITY_ACTION_LAYER3DRECORD_DELETE,
-          data: { ...layerRecord, }
-        });
+        const payload = {
+          action: UserAction.SYSTEM_CALLBACK_DELETE,
+          data: {
+            ...layerRecord,
+            productStatus: RecordStatus.BEING_DELETED,
+            isBeingDeleted: true
+          }
+        };
+
+        dispatchAction(payload);
       }
     }, [mutationQuery.data]);
 
