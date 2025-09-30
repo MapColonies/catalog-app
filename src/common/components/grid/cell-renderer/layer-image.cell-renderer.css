@@ -6,6 +6,6 @@
   color: var(--mdc-theme-primary) !important;
 }
 
-.urlMissing {
+.iconNotAllowed {
   color: var(--mdc-theme-gc-error-high) !important;
 }

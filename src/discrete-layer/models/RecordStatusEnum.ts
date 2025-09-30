@@ -9,7 +9,8 @@ import { types } from "mobx-state-tree"
 
 export enum RecordStatus {
   PUBLISHED="PUBLISHED",
-UNPUBLISHED="UNPUBLISHED"
+UNPUBLISHED="UNPUBLISHED",
+BEING_DELETED="BEING_DELETED"
 }
 
 /**
@@ -18,4 +19,5 @@ UNPUBLISHED="UNPUBLISHED"
 export const RecordStatusEnumType = types.enumeration("RecordStatus", [
         "PUBLISHED",
   "UNPUBLISHED",
+  "BEING_DELETED",
       ])

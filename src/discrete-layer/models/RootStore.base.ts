@@ -199,8 +199,8 @@ export type LookupTableFieldInput = {
   lookupTable?: string
   lookupExcludeFields?: string
 }
-export type ExplorerGetByPathSuffix = {
-  pathSuffix: string
+export type ExplorerGetByPath = {
+  path: string
   type: RecordType
 }
 export type ExplorerGetById = {
@@ -410,6 +410,10 @@ export type LayerDemRecordInput = {
   keywords?: string
   links?: LinkInput[]
 }
+export type RecordDeletePartial = {
+  id: string
+  type: RecordType
+}
 export type JobUpdateData = {
   parameters?: any
   status?: string
@@ -472,6 +476,7 @@ mutateStartRasterIngestion="mutateStartRasterIngestion",
 mutateStartRasterUpdateGeopkg="mutateStartRasterUpdateGeopkg",
 mutateStart3DIngestion="mutateStart3DIngestion",
 mutateStartDemIngestion="mutateStartDemIngestion",
+mutateDelete3DLayer="mutateDelete3DLayer",
 mutateUpdateJob="mutateUpdateJob",
 mutateJobRetry="mutateJobRetry",
 mutateJobAbort="mutateJobAbort"
@@ -573,8 +578,8 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
         ${typeof resultSelector === "function" ? resultSelector(new DeploymentWithServicesModelSelector()).toString() : resultSelector}
       } }`, variables, options)
     },
-    queryGetDirectory(variables: { data: ExplorerGetByPathSuffix }, resultSelector: string | ((qb: FileModelSelector) => FileModelSelector) = fileModelPrimitives.toString(), options: QueryOptions = {}) {
-      return self.query<{ getDirectory: FileModelType[]}>(`query getDirectory($data: ExplorerGetByPathSuffix!) { getDirectory(data: $data) {
+    queryGetDirectory(variables: { data: ExplorerGetByPath }, resultSelector: string | ((qb: FileModelSelector) => FileModelSelector) = fileModelPrimitives.toString(), options: QueryOptions = {}) {
+      return self.query<{ getDirectory: FileModelType[]}>(`query getDirectory($data: ExplorerGetByPath!) { getDirectory(data: $data) {
         ${typeof resultSelector === "function" ? resultSelector(new FileModelSelector()).toString() : resultSelector}
       } }`, variables, options)
     },
@@ -583,8 +588,8 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
         ${typeof resultSelector === "function" ? resultSelector(new FileModelSelector()).toString() : resultSelector}
       } }`, variables, options)
     },
-    queryGetFile(variables: { data: ExplorerGetByPathSuffix }, resultSelector: string | ((qb: LayerMetadataMixedModelSelector) => LayerMetadataMixedModelSelector) = layerMetadataMixedModelPrimitives.toString(), options: QueryOptions = {}) {
-      return self.query<{ getFile: LayerMetadataMixedUnion}>(`query getFile($data: ExplorerGetByPathSuffix!) { getFile(data: $data) {
+    queryGetFile(variables: { data: ExplorerGetByPath }, resultSelector: string | ((qb: LayerMetadataMixedModelSelector) => LayerMetadataMixedModelSelector) = layerMetadataMixedModelPrimitives.toString(), options: QueryOptions = {}) {
+      return self.query<{ getFile: LayerMetadataMixedUnion}>(`query getFile($data: ExplorerGetByPath!) { getFile(data: $data) {
         ${typeof resultSelector === "function" ? resultSelector(new LayerMetadataMixedModelSelector()).toString() : resultSelector}
       } }`, variables, options)
     },
@@ -658,6 +663,9 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     },
     mutateStartDemIngestion(variables: { data: IngestionDemData }, optimisticUpdate?: () => void) {
       return self.mutate<{ startDemIngestion: string }>(`mutation startDemIngestion($data: IngestionDemData!) { startDemIngestion(data: $data) }`, variables, optimisticUpdate)
+    },
+    mutateDelete3DLayer(variables: { data: RecordDeletePartial }, optimisticUpdate?: () => void) {
+      return self.mutate<{ deleteLayer: string }>(`mutation deleteLayer($data: RecordDeletePartial!) { deleteLayer(data: $data) }`, variables, optimisticUpdate)
     },
     mutateUpdateJob(variables: { data: JobUpdateData, id: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ updateJob: string }>(`mutation updateJob($data: JobUpdateData!, $id: String!) { updateJob(data: $data, id: $id) }`, variables, optimisticUpdate)

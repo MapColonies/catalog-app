@@ -38,11 +38,12 @@ interface ActionResolverProps {
   handleOpenEntityDialog: (open: boolean) => void;
   handleFlyTo: () => void;
   handleTabViewChange: (tabView: TabViews) => void;
+  handleOpenEntityDeleteDialog: (open: boolean) => void;
   activeTabView: TabViews;
 }
 
 export const ActionResolver: React.FC<ActionResolverProps> = observer((props) => {
-  const { handleOpenEntityDialog, handleFlyTo, handleTabViewChange, activeTabView } = props;
+  const { handleOpenEntityDialog, handleFlyTo, handleTabViewChange, handleOpenEntityDeleteDialog, activeTabView } = props;
 
   const store = useStore();
   const ENUMS = useEnums();
@@ -226,6 +227,11 @@ export const ActionResolver: React.FC<ActionResolverProps> = observer((props) =>
         case 'Layer3DRecord.viewer':
           window.open(`${CONFIG.WEB_TOOLS_URL}/${CONFIG.MODEL_VIEWER_ROUTE}?model_ids=${data.productId}&token=${CONFIG.MODEL_VIEWER_TOKEN_VALUE}`);
           break;
+        case 'Layer3DRecord.delete':
+          // @ts-ignore
+          store.discreteLayersStore.selectLayer(cleanUpEntity(data, Layer3DRecordModelKeys) as LayerMetadataMixedUnion, false, true);
+          handleOpenEntityDeleteDialog(true);
+          break;
         case 'LayerRasterRecord.viewer':
         case 'LayerDemRecord.viewer':
         case 'VectorBestRecord.viewer':
@@ -400,6 +406,11 @@ export const ActionResolver: React.FC<ActionResolverProps> = observer((props) =>
               store.catalogTreeStore.removeChildFromParent(inputValues.id, unpublishedNode);
             }
           }
+          break;
+        }
+        case UserAction.SYSTEM_CALLBACK_DELETE: {
+          const layerRecord = data as unknown as ILayerImage;
+          baseUpdateEntity(layerRecord);
           break;
         }
         case UserAction.SYSTEM_CALLBACK_FLYTO: {

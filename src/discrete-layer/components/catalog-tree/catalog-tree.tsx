@@ -92,6 +92,10 @@ export const CatalogTreeComponent: React.FC<CatalogTreeComponentProps> = observe
     useEffect(() => {
       void store.catalogTreeStore.initTree();
     }, []);
+    
+    const areActionsAllowed = (rowInfo: ExtendedNodeData) => {
+      return !rowInfo.node.layerURLMissing && !rowInfo.node.isBeingDeleted;
+    }
 
     const entityPermittedActions = useMemo(() => {
       const entityActions: Record<string, unknown> = {};
@@ -303,7 +307,7 @@ export const CatalogTreeComponent: React.FC<CatalogTreeComponentProps> = observe
                 buttons: [
                   <>
                     {
-                      !rowInfo.node.layerURLMissing &&
+                      areActionsAllowed(rowInfo) &&
                       hoveredNode !== undefined &&
                       hoveredNode.id === rowInfo.node.id && 
                       hoveredNode.parentPath === rowInfo.path.slice(0, -1).toString() && (

@@ -28,3 +28,7 @@ export const getLayerUrl = () : string => {
 export const isExistLayerURL = (data: LayerMetadataMixedUnion): boolean => {
   return !get(data, 'layerURLMissing');
 };
+
+export const isBeingDeleted = (data: any): boolean => {
+  return get(data, 'isBeingDeleted');
+};
