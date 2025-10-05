@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ICellRendererParams } from 'ag-grid-community';
 import { IconButton } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
@@ -14,6 +14,13 @@ interface ILayerImageCellRendererParams extends ICellRendererParams {
 export const LayerImageRenderer: React.FC<ILayerImageCellRendererParams> = (props) => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
   const [layerImageShown, setLayerImageShown] = useState<boolean>(props.data.layerImageShown as boolean);
+
+  useEffect(() => {
+    if ('productStatus' in props.data && layerImageShown && isBeingDeleted(props.data)) {
+      props.onClick(props.data.id, false, props.node);
+    }
+  }, [props.data?.productStatus]);
+
   return (
     <Box style={{ display: 'flex', justifyContent: 'center', paddingTop: '8px' }}>
       <IconButton

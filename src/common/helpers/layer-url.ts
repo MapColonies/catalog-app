@@ -1,6 +1,6 @@
 /* eslint-disable */
 import { get } from 'lodash';
-import { LayerMetadataMixedUnion } from '../../discrete-layer/models';
+import { LayerMetadataMixedUnion, RecordStatus } from '../../discrete-layer/models';
 import CONFIG from '../config';
 
 const getParamsString = (params: {[key: string]: string | boolean | number}) : string  => {
@@ -29,6 +29,6 @@ export const isExistLayerURL = (data: LayerMetadataMixedUnion): boolean => {
   return !get(data, 'layerURLMissing');
 };
 
-export const isBeingDeleted = (data: any): boolean => {
-  return get(data, 'isBeingDeleted');
+export const isBeingDeleted = (data: LayerMetadataMixedUnion): boolean => {
+  return get(data, 'productStatus') === RecordStatus.BEING_DELETED;
 };

@@ -1,8 +1,10 @@
 import { TabViews } from '../../discrete-layer/views/tab-views';
+import { RecordStatus } from '../../discrete-layer/models';
 
 interface DependentFieldWithValue {
   field: string;
   expectedValue: unknown;
+  operator?: 'equals' | 'notEquals';
 }
 export type DependentField = string | DependentFieldWithValue;
 
@@ -60,7 +62,7 @@ const GENERAL_ACTIONS_GROUP: IActionGroup = {
       icon: '',
       class: 'mc-icon-Earth',
       titleTranslationId: 'action.viewer.tooltip',
-      dependentField: {field: 'isBeingDeleted', expectedValue: false},
+      dependentField: {field: 'productStatus', expectedValue: RecordStatus.BEING_DELETED, operator: 'notEquals'},
       views: [TabViews.CATALOG, TabViews.SEARCH_RESULTS]
     },
     {
@@ -122,7 +124,7 @@ const ACTIONS_CONFIG: IEntityActions[] = [
             icon: '',
             class: 'mc-icon-Edit1',
             titleTranslationId: 'action.edit.tooltip',
-            dependentField: {field: 'isBeingDeleted', expectedValue: false},
+            dependentField: {field: 'productStatus', expectedValue: RecordStatus.BEING_DELETED, operator: 'notEquals'},
             views: [TabViews.CATALOG, TabViews.SEARCH_RESULTS]
           },
           {
@@ -131,7 +133,7 @@ const ACTIONS_CONFIG: IEntityActions[] = [
             icon: '',
             class: 'mc-icon-Delete',
             titleTranslationId: 'action.delete.tooltip',
-            dependentField: {field: 'isBeingDeleted', expectedValue: false},
+            dependentField: {field: 'productStatus', expectedValue: RecordStatus.BEING_DELETED, operator: 'notEquals'},
             views: [TabViews.CATALOG, TabViews.SEARCH_RESULTS]
           },
         ],

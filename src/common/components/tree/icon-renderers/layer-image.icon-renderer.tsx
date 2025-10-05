@@ -18,6 +18,12 @@ export const LayerImageRenderer: React.FC<ILayerImageCellRendererParams> = (prop
     setLayerImageShown(props.data.layerImageShown as boolean);
   }, [props.data.layerImageShown]);
 
+  useEffect(() => {
+    if ('productStatus' in props.data && layerImageShown && isBeingDeleted(props.data)) {
+      props.onClick(props.data, false);
+    }
+  }, [(props.data as unknown as Record<string, unknown>)?.productStatus]);
+
   return (
     <Box>
       <IconButton 

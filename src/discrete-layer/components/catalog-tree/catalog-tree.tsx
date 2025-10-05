@@ -26,12 +26,14 @@ import { ProductTypeRenderer } from '../../../common/components/tree/icon-render
 import { Error } from '../../../common/components/tree/statuses/error';
 import { Loading } from '../../../common/components/tree/statuses/loading';
 import { getTextStyle } from '../../../common/helpers/style';
+import { isBeingDeleted } from '../../../common/helpers/layer-url';
 import { LinkType } from '../../../common/models/link-type.enum';
 import { IDispatchAction } from '../../models/actionDispatcherStore';
 import { ILayerImage } from '../../models/layerImage';
 import { useStore } from '../../models/RootStore';
 import { UserAction } from '../../models/userStore';
 import { TabViews } from '../../views/tab-views';
+import { LayerMetadataMixedUnion } from '../../models';
 import { BestInEditDialog } from '../dialogs/best-in-edit.dialog';
 import { getLinkUrlWithToken } from '../helpers/layersUtils';
 import { queue } from '../snackbar/notification-queue';
@@ -94,7 +96,7 @@ export const CatalogTreeComponent: React.FC<CatalogTreeComponentProps> = observe
     }, []);
     
     const areActionsAllowed = (rowInfo: ExtendedNodeData) => {
-      return !rowInfo.node.layerURLMissing && !rowInfo.node.isBeingDeleted;
+      return !rowInfo.node.layerURLMissing && !isBeingDeleted(rowInfo.node as LayerMetadataMixedUnion);
     }
 
     const entityPermittedActions = useMemo(() => {

@@ -72,7 +72,6 @@ export const EntityDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
           data: {
             ...layerRecord,
             productStatus: RecordStatus.BEING_DELETED,
-            isBeingDeleted: true
           }
         };
 

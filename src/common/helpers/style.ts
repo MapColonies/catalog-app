@@ -1,7 +1,8 @@
 import { get } from 'lodash';
-import { RecordStatus } from '../../discrete-layer/models';
+import { LayerMetadataMixedUnion, RecordStatus } from '../../discrete-layer/models';
 import { DEFAULT_ID } from '../../discrete-layer/components/layer-details/entity.dialog';
 import CONFIG from '../config';
+import { isBeingDeleted } from './layer-url';
 
 const STATUS = 'productStatus';
 const ID = 'id';
@@ -34,7 +35,7 @@ export const getTextStyle = (
   data: Record<string, unknown>,
   colorProperty: 'color' | 'backgroundColor'
 ): Record<string, unknown> | undefined => {
-  if (data.layerURLMissing || data.isBeingDeleted) {
+  if (data.layerURLMissing || isBeingDeleted(data as unknown as LayerMetadataMixedUnion)) {
     return { [colorProperty]: ERROR_COLOR };
   }
   if (existStatus(data) && isUnpublished(data)) {
@@ -48,7 +49,7 @@ export const getIconStyle = (
   colorProperty: 'color' | 'backgroundColor'
 ): Record<string, unknown> | undefined => {
   let resStyle = undefined;
-  if (data.layerURLMissing || data.isBeingDeleted) {
+  if (data.layerURLMissing || isBeingDeleted(data as unknown as LayerMetadataMixedUnion)) {
     return { [colorProperty]: ERROR_COLOR };
   }
   if (existStatus(data) && isUnpublished(data)) {
