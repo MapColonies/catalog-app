@@ -29,11 +29,11 @@ const SHAPES_DIR = '../../Shapes';
 const PRODUCT_SHP = 'Product.shp';
 const METADATA_SHP = 'ShapeMetadata.shp';
 
-export type ErrorSource = "formik" | "api" | "logic";
+export type ErrorSource = "api" | "logic" | "formik";
 export type ErrorLevel = "error" | "warning";
 export type AddPolicy = "merge" | "override";
 
-export interface IErrorEntry {
+export interface IStateError {
   source: ErrorSource;
   level: ErrorLevel;
   code: string;
@@ -73,7 +73,7 @@ export interface IFiles {
 
 export interface IContext {
   store: IRootStore | IBaseRootStore;
-  errors: IErrorEntry[];
+  errors: IStateError[];
   flowType?: Mode.NEW | Mode.UPDATE;
   formData?: Record<string, unknown>;
   jobId?: string;
@@ -97,7 +97,7 @@ export type Events =
   | { type: "SUBMIT" }
   | { type: "RETRY" }
   | { type: "FORMIK_ERROR"; errors: Record<string, string> }
-  | { type: "FLOW_ERROR"; error: IErrorEntry };
+  | { type: "FLOW_ERROR"; error: IStateError };
 
 
 // type FlowActionArgs = ActionArgs<Context, Events, Events>;
@@ -185,15 +185,24 @@ const getFile = (files: FileData[], gpkgPath: string, fileName: string) => {
   }))[FIRST];
 };
 
-const buildLogicError = (code: string, level: "error" | "warning", message?: string, errParams?: Record<string,string>) => {
+const buildError = (
+  code: string,
+  message: string,
+  errParams?: Record<string, string>,
+  source: ErrorSource = 'logic',
+  level: ErrorLevel = 'error',
+  addPolicy: AddPolicy = 'merge',
+  response?: Record<string, unknown>
+): IStateError => {
   return {
-    source: "logic",
-    code,
-    params: { ...errParams },
-    message,
+    source,
     level,
-    addPolicy: "merge"
-  }
+    code,
+    message,
+    params: { ...errParams },
+    addPolicy,
+    response
+  };
 };
 
 // --- verifyGpkg states ---
@@ -207,12 +216,12 @@ const verifyGpkgStates = {
         console.log("[verifyGpkgApi] ctx.input", input);
 
         if (!input.context.files?.gpkg?.path) {
-          throw (buildLogicError('ingestion.error.file-not-found', 'error', 'GPKG'));
+          throw (buildError('ingestion.error.file-not-found', 'GPKG'));
         }
 
         const gpkgPath = input.context.files?.gpkg?.path;
 
-        // Call into MobX-State-Tree store
+        // Call MobX-State-Tree store
         const res = await input.context.store.queryValidateSource({
           data: {
             fileNames: [path.basename(gpkgPath)],
@@ -222,7 +231,7 @@ const verifyGpkgStates = {
         });
 
         if (!res.validateSource[FIRST].isValid) {
-          throw (buildLogicError('ingestion.error.invalid-source-file', 'error', res.validateSource[FIRST].message as string));
+          throw (buildError('ingestion.error.invalid-source-file', res.validateSource[FIRST].message as string));
         }
 
         const validationResult = { ...res.validateSource[FIRST] };
@@ -236,7 +245,7 @@ const verifyGpkgStates = {
           }
         };
 
-        // return whatever you want to flow into `onDone`
+        // return whatever you want in 'onDone'
         return result;
       }),
       input: (_: { context: IContext; event: any }) => _, 
@@ -273,25 +282,12 @@ const verifyGpkgStates = {
   failure: {
     entry: 
       sendParent((_: { context: IContext; event: any }) => {
-        let errObj = {
+        return {
           type: "FLOW_ERROR",
-          error:  {..._.event.error}
+          error: _.event.error.response
+            ? buildError('ingestion.error.invalid-source-file', 'SHOULD_BE_OMMITED', undefined, 'api', 'error', 'override', _.event.error.response)
+            : { ..._.event.error }
         };
-
-        if (_.event.error.response) {
-          errObj = {
-            type: "FLOW_ERROR",
-            error:  {
-              source: "api",
-              code: "ingestion.error.invalid-source-file",
-              message: 'SHOULD_BE_OMMITED',
-              response: _.event.error.response,
-              level: "error",
-              addPolicy: "override"
-            }
-          }
-        }
-        return errObj;
       }),
     type: "final"
   }
@@ -307,7 +303,7 @@ const fileSelectionStates = {
         console.log("[fileSelectionStates.fetchProduct] ctx.input", input);
 
         if (!input.context.files?.product?.path) {
-          throw (buildLogicError('ingestion.error.file-not-found', 'error', PRODUCT_SHP));
+          throw (buildError('ingestion.error.file-not-found', PRODUCT_SHP));
         }
 
         // const productPath = input.context.files.product.path;
@@ -367,7 +363,7 @@ const fileSelectionStates = {
       onError: {
         actions: sendParent((_: { context: IContext; event: any }) => ({
           type: "FLOW_ERROR",
-          error: {..._.event.error}
+          error: { ..._.event.error }
         }))
       }
     }
@@ -393,7 +389,7 @@ const fileSelectionStates = {
         console.log("[fileSelectionStates.auto] ctx.input", input);
 
         if (!input.context.files?.gpkg?.path) {
-          throw (buildLogicError('ingestion.error.file-not-found', 'error', 'GPKG'));
+          throw (buildError('ingestion.error.file-not-found', 'GPKG'));
         }
 
         const gpkgPath = input.context.files.gpkg.path;
@@ -401,14 +397,14 @@ const fileSelectionStates = {
         // Call into MobX-State-Tree store
         const result = await input.context.store.queryGetDirectory({
           data: {
-            pathSuffix: path.resolve(gpkgPath, SHAPES_DIR),
+            pathSuffix: path.resolve(gpkgPath, SHAPES_DIR+'1'),
             type: RecordType.RECORD_RASTER,
           },
         });
 
         const product = getFile(result.getDirectory as FileData[], gpkgPath, PRODUCT_SHP+'1');
 
-        const metadata = getFile(result.getDirectory as FileData[], gpkgPath, METADATA_SHP);
+        const metadata = getFile(result.getDirectory as FileData[], gpkgPath, METADATA_SHP+'1');
 
         return {
           product,
@@ -446,16 +442,19 @@ const fileSelectionStates = {
               }
             })),
             sendParent((_: { context: IContext; event: any }) => {
-              if (!_.event.output.product.exists || !_.event.output.metadata.exists) {
+              if (!_.event.output.product.exists) {
                 return {
                   type: "FLOW_ERROR",
-                  error:  {
-                    source: "logic",
-                    code: "ingestion.error.file-not-found",
-                    message: 'xxx',
-                    level: "error",
-                    addPolicy: "merge"
-                  }
+                  error: buildError('ingestion.error.file-not-found', PRODUCT_SHP)
+                };
+              }
+              return { type: "NOOP" };
+            }),
+            sendParent((_: { context: IContext; event: any }) => {
+              if (!_.event.output.metadata.exists) {
+                return {
+                  type: "FLOW_ERROR",
+                  error: buildError('ingestion.error.file-not-found', METADATA_SHP)
                 };
               }
               return { type: "NOOP" };
@@ -478,7 +477,7 @@ const fileSelectionStates = {
           // })),
           sendParent((_: { context: IContext; event: any }) => ({
             type: "FLOW_ERROR",
-            error: {..._.event.error}
+            error: { ..._.event.error }
           }))
         ]
       }

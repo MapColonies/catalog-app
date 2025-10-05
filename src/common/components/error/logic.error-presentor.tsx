@@ -6,15 +6,16 @@ import { AutoDirectionBox } from '../auto-direction-box/auto-direction-box.compo
 
 import './error-presentor.css';
 
-interface IStateMachineError {
-  errors: {
-    message: string,
-    code: string
-  }[];
+interface IError {
+  code: string;
+  message: string;
 }
 
+interface ILogicErrorProps {
+  errors: IError[];
+}
 
-export const LogicError: React.FC<IStateMachineError> = ({ errors }) => {
+export const LogicError: React.FC<ILogicErrorProps> = ({ errors }) => {
 
   const intl = useIntl();
 
@@ -35,7 +36,7 @@ export const LogicError: React.FC<IStateMachineError> = ({ errors }) => {
                 return (
                   <li dir="auto" 
                     key={index} 
-                    dangerouslySetInnerHTML={{__html:  intl.formatMessage({ id: error.code}, {value: error.message })}} 
+                    dangerouslySetInnerHTML={{__html:  intl.formatMessage({ id: error.code }, { value: error.message })}} 
                   />
                 );
               })

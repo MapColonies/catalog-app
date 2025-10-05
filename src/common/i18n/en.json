@@ -240,7 +240,7 @@
   "ingestion.warning.unsynched": "Invalid product version",
   "ingestion.error.unsynched": "Layer does not exist on secondary site",
   "ingestion.error.invalid-source-file": "Selected file error: {value}",
-  "ingestion.error.file-not-found": "File does not exist",
+  "ingestion.error.file-not-found": "File does not exist: {value}",
   "ingestion.error.source-file-exception": "Cannot run validation api: {value}",
   "ingestion.error.directory-comparison": "Warning: directory content is not the same between current and secondary sites",
   "ingestion.error.invalid-metadata": "Metadata file format is not valid",
