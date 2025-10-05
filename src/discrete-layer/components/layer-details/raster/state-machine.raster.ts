@@ -38,7 +38,6 @@ export interface IStateError {
   level: ErrorLevel;
   code: string;
   message: string;
-  params?: Record<string, string>;
   field?: string;
   addPolicy?: AddPolicy;
   response?: Record<string, unknown>;
@@ -188,7 +187,6 @@ const getFile = (files: FileData[], gpkgPath: string, fileName: string) => {
 const buildError = (
   code: string,
   message: string,
-  errParams?: Record<string, string>,
   source: ErrorSource = 'logic',
   level: ErrorLevel = 'error',
   addPolicy: AddPolicy = 'merge',
@@ -199,7 +197,6 @@ const buildError = (
     level,
     code,
     message,
-    params: { ...errParams },
     addPolicy,
     response
   };
@@ -285,7 +282,7 @@ const verifyGpkgStates = {
         return {
           type: "FLOW_ERROR",
           error: _.event.error.response
-            ? buildError('ingestion.error.invalid-source-file', 'SHOULD_BE_OMMITED', undefined, 'api', 'error', 'override', _.event.error.response)
+            ? buildError('ingestion.error.invalid-source-file', 'SHOULD_BE_OMMITED', 'api', 'error', 'override', _.event.error.response)
             : { ..._.event.error }
         };
       }),
@@ -397,7 +394,7 @@ const fileSelectionStates = {
         // Call into MobX-State-Tree store
         const result = await input.context.store.queryGetDirectory({
           data: {
-            pathSuffix: path.resolve(gpkgPath, SHAPES_DIR+'1'),
+            pathSuffix: path.resolve(gpkgPath, SHAPES_DIR),
             type: RecordType.RECORD_RASTER,
           },
         });
