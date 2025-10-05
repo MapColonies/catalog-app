@@ -4,8 +4,12 @@ import { observer } from 'mobx-react';
 import { Button, Checkbox, CircularProgress, DialogActions, DialogContent, Tooltip } from '@map-colonies/react-core';
 import { Dialog, DialogTitle, Icon, IconButton, Typography } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
+import { GraphQLError } from '../../../common/components/error/graphql.error-presentor';
 import { emphasizeByHTML } from '../../../common/helpers/formatters';
 import { Mode } from '../../../common/models/mode.enum';
+import { ILayerImage } from '../../models/layerImage';
+import { IDispatchAction } from '../../models/actionDispatcherStore';
+import { UserAction } from '../../models/userStore';
 import {
   EntityDescriptorModelType,
   RecordStatus,
@@ -13,13 +17,10 @@ import {
   useQuery,
   useStore
 } from '../../models';
-import { ILayerImage } from '../../models/layerImage';
 import { GeoJsonMapValuePresentorComponent } from './field-value-presentors/geojson-map.value-presentor';
 import { LayersDetailsComponent } from './layer-details';
+
 import './entity.delete-dialog.css';
-import { IDispatchAction } from '../../models/actionDispatcherStore';
-import { UserAction } from '../../models/userStore';
-import { GraphQLError } from '../../../common/components/error/graphql.error-presentor';
 
 export const DEFAULT_ID = 'DEFAULT_UI_ID';
 
