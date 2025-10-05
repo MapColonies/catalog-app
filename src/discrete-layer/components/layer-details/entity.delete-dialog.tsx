@@ -106,8 +106,8 @@ export const EntityDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
             </Tooltip>
             <Typography tag='div' dangerouslySetInnerHTML={{ __html: deleteMessage }}></Typography>
           </DialogContent>
-          <Box id="deleteLayerHeader">
-            <Box id="deleteLayerHeaderContent">
+          <Box id="deleteLayerDetailsContainer">
+            <Box id="deleteLayerDetails">
               <LayersDetailsComponent
                 className="detailsPanelProductView"
                 entityDescriptors={

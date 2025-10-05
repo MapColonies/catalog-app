@@ -62,7 +62,7 @@ body[dir='rtl'] #entityDeleteDialog .closeIcon {
   }
 }
 
-#deleteLayerHeader {
+#deleteLayerDetailsContainer {
   position: relative;
   display: flex;
   background-color: var(--mdc-theme-text-primary-on-light);
@@ -73,7 +73,7 @@ body[dir='rtl'] #entityDeleteDialog .closeIcon {
   height: var(--update-layer-header-height);
 }
 
-#deleteLayerHeaderContent {
+#deleteLayerDetails {
   margin: 0 0;
   width: 100%;
   height: 100%;
