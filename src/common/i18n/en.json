@@ -174,8 +174,8 @@
   "publish-unpublish.dialog.unpublish.action": "canceling the publication",
 
   "delete.dialog.message": "This action will lead to {action} the product and all of its materials and may affect the systems that consume the product.",
-  "delete.dialog.action": "delete",
-  "delete.dialog.checkbox": "confirm deleting",
+  "delete.dialog.action": "Delete",
+  "delete.dialog.checkbox": "Confirm deleting",
 
   "snack.message.success": "SUCCESS",
   "snack.message.failed": "FAILURE",
