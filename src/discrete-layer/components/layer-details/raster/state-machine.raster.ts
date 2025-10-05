@@ -186,7 +186,7 @@ const getFile = (files: FileData[], gpkgPath: string, fileName: string) => {
 
 const buildError = (
   code: string,
-  message: string,
+  message: string = '',
   source: ErrorSource = 'logic',
   level: ErrorLevel = 'error',
   addPolicy: AddPolicy = 'merge',
@@ -282,7 +282,7 @@ const verifyGpkgStates = {
         return {
           type: "FLOW_ERROR",
           error: _.event.error.response
-            ? buildError('ingestion.error.invalid-source-file', 'SHOULD_BE_OMMITED', 'api', 'error', 'override', _.event.error.response)
+            ? buildError('ingestion.error.invalid-source-file', undefined, 'api', 'error', 'override', _.event.error.response)
             : { ..._.event.error }
         };
       }),
@@ -399,9 +399,9 @@ const fileSelectionStates = {
           },
         });
 
-        const product = getFile(result.getDirectory as FileData[], gpkgPath, PRODUCT_SHP+'1');
+        const product = getFile(result.getDirectory as FileData[], gpkgPath, PRODUCT_SHP);
 
-        const metadata = getFile(result.getDirectory as FileData[], gpkgPath, METADATA_SHP+'1');
+        const metadata = getFile(result.getDirectory as FileData[], gpkgPath, METADATA_SHP);
 
         return {
           product,
