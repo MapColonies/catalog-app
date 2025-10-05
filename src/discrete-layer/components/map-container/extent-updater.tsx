@@ -1,3 +1,4 @@
+import { get } from 'lodash';
 import React, { useEffect } from 'react';
 import { CesiumMath, CesiumRectangle, useCesiumMap } from '@map-colonies/react-components';
 import bboxPolygon from '@turf/bbox-polygon';
@@ -10,20 +11,19 @@ export const ExtentUpdater: React.FC = (): JSX.Element => {
   useEffect(() => {
     const updateViewerExtent = () => {
       const scratchRectangle = new CesiumRectangle();
-      try{
+      try {
         const rect = mapViewer.camera.computeViewRectangle(mapViewer.scene.globe.ellipsoid, scratchRectangle);
         if (rect) {
           const west = CesiumMath.toDegrees(rect.west),
-                south = CesiumMath.toDegrees(rect.south),
-                east = CesiumMath.toDegrees(rect.east),
-                north = CesiumMath.toDegrees(rect.north);
+            south = CesiumMath.toDegrees(rect.south),
+            east = CesiumMath.toDegrees(rect.east),
+            north = CesiumMath.toDegrees(rect.north);
     
           const poly = bboxPolygon([west, north, east, south]);
   
           store.discreteLayersStore.setMapViewerExtentPolygon(poly);
         }
-      }
-      catch(e){
+      } catch (e) {
         console.log('***** A Cesium Error Occurred *****', e);
       }
     };
@@ -31,7 +31,13 @@ export const ExtentUpdater: React.FC = (): JSX.Element => {
     mapViewer.camera.moveEnd.addEventListener(updateViewerExtent);
     
     return (): void => {
-      mapViewer.camera.moveEnd.removeEventListener(updateViewerExtent);  
+      try {
+        if (get(mapViewer, '_cesiumWidget') !== undefined) {
+          mapViewer.camera.moveEnd.removeEventListener(updateViewerExtent);
+        }
+      } catch(e) {
+        console.log('***** A Cesium Error Occurred *****', e);
+      }
     }
   }, []);
 

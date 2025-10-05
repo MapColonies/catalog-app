@@ -117,11 +117,13 @@ export enum STATE_TAGS {
 }
 
 // --- Helpers ---
-const addError = assign((_: { context: IContext; event: any }) => ({ 
-  errors: _.event.error.addPolicy === "merge" ?
-    [ ..._.context.errors, _.event.error] :
-    [_.event.error]
-}));
+const addError = assign((_: { context: IContext; event: any }) => { 
+  return {
+    errors: _.event.error.addPolicy === "merge" ?
+      [ ..._.context.errors, _.event.error] :
+      [_.event.error]
+  };
+});
 
 const warnUnexpectedStateEvent = (_: any) => {
   //@ts-ignore
@@ -190,7 +192,7 @@ const buildLogicError = (code: string, level: "error" | "warning", message?: str
     params: { ...errParams },
     message,
     level,
-    addPolicy: "override"
+    addPolicy: "merge"
   }
 };
 
@@ -444,16 +446,19 @@ const fileSelectionStates = {
               }
             })),
             sendParent((_: { context: IContext; event: any }) => {
-              return {
-                type: "FLOW_ERROR",
-                error:  {
-                  source: "api",
-                  code: "ingestion.error.file-not-found",
-                  message: 'xxx',
-                  level: "error",
-                  addPolicy: "override"
-                }
-              };
+              if (!_.event.output.product.exists || !_.event.output.metadata.exists) {
+                return {
+                  type: "FLOW_ERROR",
+                  error:  {
+                    source: "logic",
+                    code: "ingestion.error.file-not-found",
+                    message: 'xxx',
+                    level: "error",
+                    addPolicy: "merge"
+                  }
+                };
+              }
+              return { type: "NOOP" };
             })
           ]
         }
