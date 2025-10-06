@@ -51,10 +51,10 @@ const FileItem: React.FC<{ file: IFileBase }> = ({ file }) => {
       <Box className={file?.exists ? 'fileItemName' : 'fileItemName warning'}>
         {file?.path?.startsWith('/\\') ? file?.path?.substring(1) : file?.path}
       </Box>
-      <Box style={{ direction: 'ltr' }}>
+      <Box className="ltr">
         {defaultFormatters.formatFileSize(null, file.details as FileData)}
       </Box>
-      <Box style={{ direction: 'ltr' }}>
+      <Box className="ltr">
         {file.details?.modDate ? dateFormatter(file.details.modDate, true) : ''}
       </Box>
     </>
@@ -140,10 +140,9 @@ export const IngestionFields: React.FC<PropsWithChildren<IngestionFieldsProps>> 
   useEffect(() => {
     console.log("**** workflowMachine_STATE[<IngestionFields>] *****", state.value);
     console.log("**** flowMachine_STATE *****", flowState?.value);
-
-    if (flowState?.matches("selectGpkg")) {
-      setFilePickerDialogOpen(true);
-    }
+    // if (flowState?.matches("selectGpkg")) {
+    //   setFilePickerDialogOpen(true);
+    // }
   }, [state.value, flowState]);
 
   const [isFilePickerDialogOpen, setFilePickerDialogOpen] = useState<boolean>(false);

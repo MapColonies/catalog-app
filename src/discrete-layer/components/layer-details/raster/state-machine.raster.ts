@@ -334,7 +334,6 @@ const fileSelectionStates = {
       input: (_: { context: IContext; event: any }) => _,
       onDone: [
         {
-          // target: "idle",
           // guard: (_, e) => e.data.gpkg && e.data.metadata,
           actions: [
             assign((_: { context: IContext; event: any }) => ({
@@ -354,14 +353,16 @@ const fileSelectionStates = {
                 }
               }
             }))
-          ]
+          ],
+          target: "#flow"
         }
       ],
       onError: {
         actions: sendParent((_: { context: IContext; event: any }) => ({
           type: "FLOW_ERROR",
           error: { ..._.event.error }
-        }))
+        })),
+        target: "#flow"
       }
     }
   },

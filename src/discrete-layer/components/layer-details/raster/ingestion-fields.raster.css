@@ -47,24 +47,6 @@ body[dir='rtl'] .header {
   gap: 10px;
 }
 
-.directorySpacer {
-  display: flex;
-  margin: 0 12px 0 0;
-}
-
-body[dir='rtl'] .directorySpacer {
-  margin: 0 0 0 12px;
-}
-
-.fileNamesSpacer {
-  display: flex;
-  margin: 0 12px 0 24px;
-}
-
-body[dir='rtl'] .fileNamesSpacer {
-  margin: 0 24px 0 12px;
-}
-
 .hiddenField {
   display: none;
 }
@@ -76,7 +58,7 @@ body[dir='rtl'] .fileNamesSpacer {
 
 .filesList {
   display: grid;
-  grid-template-columns: 0.1fr 2fr 0.25fr 0.25fr;
+  grid-template-columns: 0.1fr 2fr 0.25fr 0.5fr;
   column-gap: 8px;
 }
 
@@ -91,26 +73,6 @@ body[dir='rtl'] .fileNamesSpacer {
   cursor: default;
 }
 
-.fileIconSpacer {
-  width: 28px;
-}
-
-.moreButton {
-  color: var(--mdc-theme-primary);
-  cursor: pointer;
-}
-
-.moreTooltip {
-  text-align: left;
-}
-
-body[dir='rtl'] .moreTooltip {
-  text-align: right;
-}
-
-.filesPathContainer {
-  width: 60ch;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  direction: rtl;
+.ltr {
+  direction: ltr;
 }
