@@ -169,8 +169,7 @@ export const PolygonPartsVectorLayer: React.FC<PolygonPartsVectorLayerProps> = o
                 const geometry = new GeoJSON().readGeometry(featureClippedPolygon.geometry);
                 greenStyle.setGeometry(geometry);
               }
-            }
-            catch (e) {
+            } catch (e) {
               console.log('*** PP: turf.intersect() failed ***', 'feat -->', feat, 'extentPolygon -->', extentPolygon);
             }
            
