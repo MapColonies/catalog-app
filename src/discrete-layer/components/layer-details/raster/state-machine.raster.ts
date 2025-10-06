@@ -115,7 +115,22 @@ export enum STATE_TAGS {
   GENERAL_LOADING = 'GENERAL_LOADING'
 }
 
-// --- Helpers ---
+export const WORKFLOW = {
+  IDLE: "idle",
+  RESTORE_JOB: "restoreJob",
+  RESTORE_REPLAY: "restoreReplay",
+  FLOW: {
+    ROOT: "flow",
+    FETCH_A: "fetching.fetchingA",
+    FETCH_B: "fetching.fetchingB",
+  },
+  JOB_SUBMISSION: "jobSubmission",
+  JOB_POLLING: "jobPolling",
+  DONE: "done",
+  ERROR: "error",
+} as const;
+
+//#region --- Helpers ---
 const addError = assign((_: { context: IContext; event: any }) => { 
   return {
     errors: _.event.error.addPolicy === "merge" ?
@@ -132,7 +147,6 @@ const warnUnexpectedStateEvent = (_: any) => {
 export const hasLoadingTagDeep = (state: SnapshotFrom<typeof workflowMachine>, tag = STATE_TAGS.GENERAL_LOADING): boolean => {
   // check current state tags
   if (state.hasTag(tag)) return true;
-
   // check all children recursively
   for (const child of Object.values(state.children)) {
     const childSnap = child.getSnapshot?.();
@@ -140,7 +154,6 @@ export const hasLoadingTagDeep = (state: SnapshotFrom<typeof workflowMachine>, t
       return true;
     }
   }
-
   return false;
 };
 
@@ -201,8 +214,9 @@ const buildError = (
     response
   };
 };
+//#endregion
 
-// --- verifyGpkg states ---
+//#region --- verifyGpkg states ---
 const verifyGpkgStates = {
   verifying: {
     entry: (_: { context: IContext; event: any }) => console.log(">>> verifying entry", _),
@@ -289,7 +303,9 @@ const verifyGpkgStates = {
     type: "final"
   }
 };
-// --- reusable file selection states ---
+//#endregion
+
+//#region --- reusable file selection states ---
 const fileSelectionStates = {
   idle: {},
   fetchProduct: {
@@ -507,18 +523,13 @@ const fileSelectionStates = {
           }
         }))
       },
-      DONE: {
-        actions: sendParent((_: { context: IContext; event: any }) => ({
-          type: "FLOW_SUBMIT",
-          error: _.event.error
-        }))
-      },
       "*": { actions: warnUnexpectedStateEvent }
     }
   }
 };
+//#endregion
 
-// --- flow submachine ---
+//#region --- flow submachine ---
 const flowMachine = createMachine({
   id: "flow",
   initial: "selectGpkg",
@@ -624,31 +635,32 @@ const flowMachine = createMachine({
     }
   }
 });
+//#endregion
 
-// --- parent workflow machine ---
+//#region --- parent workflow machine ---
 // @ts-ignore
-export const workflowMachine = createMachine<IContext,Events>({
+export const workflowMachine = createMachine<IContext, Events>({
   id: "workflow",
-  initial: "idle",
+  initial: WORKFLOW.IDLE,
   context: ({ input }) => ({
     ...input as IContext,
     errors: []
   }),
   states: {
-    idle: {
+    [WORKFLOW.IDLE]: {
       on: {
         START_NEW: { target: "flow", actions: assign({ flowType: Mode.NEW }) },
         START_UPDATE: { target: "flow", actions: assign({ flowType: Mode.UPDATE }) },
-        RESTORE: "restoreJob",
+        RESTORE: WORKFLOW.RESTORE_JOB,
         "*": { actions: warnUnexpectedStateEvent }
       }
     },
-    restoreJob: {
+    [WORKFLOW.RESTORE_JOB]: {
       invoke: {
         src: "fetchJobData",
         input: (_: { context: IContext; event: any }) => _.context,
         /*onDone: {
-          target: "restoredReplay",
+          target: "restoreReplay",
           actions: assign((_: { context: Context; event: any }) => ({
             flowType: _.event.output.flowType,
             files: _.event.output.files,
@@ -662,8 +674,8 @@ export const workflowMachine = createMachine<IContext,Events>({
         }*/
       }
     },
-    restoredReplay: { always: "flow" },
-    flow: {
+    [WORKFLOW.RESTORE_REPLAY]: { always: "flow" },
+    [WORKFLOW.FLOW.ROOT]: {
       entry: () => console.log('>>> Entering flow state'),
       invoke: {
         id: "flow",              // child actor name
@@ -679,13 +691,12 @@ export const workflowMachine = createMachine<IContext,Events>({
         },
         // catch-all errors from any child state     
         FLOW_ERROR: { 
-          // target: "error",
           actions: addError
-        },
-        FLOW_SUBMIT: "jobSubmission"
+          // target: "error",
+        }
       }
     },
-    jobSubmission: {
+    [WORKFLOW.JOB_SUBMISSION]: {
       invoke: {
         src: "createJobApi",
         input: (_: { context: IContext; event: any }) => _,
@@ -701,7 +712,7 @@ export const workflowMachine = createMachine<IContext,Events>({
         }*/
       }
     },
-    jobPolling: {
+    [WORKFLOW.JOB_POLLING]: {
       invoke: {
         src: "pollJobStatus",
         input: (_: { context: IContext; event: any }) => _,
@@ -717,10 +728,10 @@ export const workflowMachine = createMachine<IContext,Events>({
         }*/
       }
     },
-    done: { type: "final" },
-    error: {
+    [WORKFLOW.DONE]: { type: "final" },
+    [WORKFLOW.ERROR]: {
       on: {
-        RETRY: "idle",
+        RETRY: WORKFLOW.IDLE,
         "*": { actions: warnUnexpectedStateEvent }
       }
     }
@@ -730,3 +741,4 @@ export const workflowMachine = createMachine<IContext,Events>({
   //   FLOW_SUBMIT: { target: "#workflow.jobSubmission" }
   // }
 });
+//#endregion

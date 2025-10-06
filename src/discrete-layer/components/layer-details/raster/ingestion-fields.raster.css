@@ -58,7 +58,7 @@ body[dir='rtl'] .header {
 
 .filesList {
   display: grid;
-  grid-template-columns: 0.1fr 2fr 0.25fr 0.5fr;
+  grid-template-columns: 0.1fr 2fr 0.5fr 0.5fr;
   column-gap: 8px;
 }
 
