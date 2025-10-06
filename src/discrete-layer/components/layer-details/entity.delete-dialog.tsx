@@ -31,6 +31,8 @@ interface EntityDeleteDialogProps {
   layerRecord: ILayerImage;
 }
 
+const VALID = 'ok';
+
 export const EntityDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
   (props: EntityDeleteDialogProps) => {
 
@@ -66,7 +68,7 @@ export const EntityDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
     };
 
     useEffect(() => {
-      if (!mutationQuery.loading && ((mutationQuery.data as { deleteLayer: string } | undefined)?.deleteLayer === 'ok')) {
+      if (!mutationQuery.loading && ((mutationQuery.data as { deleteLayer: string } | undefined)?.deleteLayer === VALID)) {
         onSetOpen(false);
         const payload = {
           action: UserAction.SYSTEM_CALLBACK_DELETE,
@@ -97,33 +99,6 @@ export const EntityDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
         { action: emphasizeByHTML(`${intl.formatMessage({ id: 'delete.dialog.action' })}`) });
     }, []);
 
-    const UpdateLayerHeader = (): JSX.Element => {
-      return (
-        <>
-          <DialogContent className="headerWarning">
-            <Tooltip content={intl.formatMessage({ id: 'general.warning.text' })}>
-              <Icon className="icon" icon={{ icon: 'info', size: 'xsmall' }} />
-            </Tooltip>
-            <Typography tag='div' dangerouslySetInnerHTML={{ __html: deleteMessage }}></Typography>
-          </DialogContent>
-          <Box id="deleteLayerDetailsContainer">
-            <Box id="deleteLayerDetails">
-              <LayersDetailsComponent
-                className="detailsPanelProductView"
-                entityDescriptors={
-                  store.discreteLayersStore
-                    .entityDescriptors as EntityDescriptorModelType[]
-                }
-                layerRecord={props.layerRecord}
-                isBrief={true}
-                mode={Mode.VIEW}
-              />
-            </Box>
-          </Box>
-        </>
-      );
-    };
-
     return (
       <div id="entityDeleteDialog">
         <Dialog open={isOpen} preventOutsideDismiss={true}>
@@ -138,7 +113,26 @@ export const EntityDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
             />
           </DialogTitle>
           <DialogContent>
-            {<UpdateLayerHeader />}
+            <Box className="headerWarning">
+              <Tooltip content={intl.formatMessage({ id: 'general.warning.text' })}>
+                <Icon className="icon" icon={{ icon: 'info', size: 'xsmall' }} />
+              </Tooltip>
+              <Typography tag='div' dangerouslySetInnerHTML={{ __html: deleteMessage }}></Typography>
+            </Box>
+            <Box id="deleteLayerDetailsContainer">
+              <Box id="deleteLayerDetails">
+                <LayersDetailsComponent
+                  className="detailsPanelProductView"
+                  entityDescriptors={
+                    store.discreteLayersStore
+                      .entityDescriptors as EntityDescriptorModelType[]
+                  }
+                  layerRecord={props.layerRecord}
+                  isBrief={true}
+                  mode={Mode.VIEW}
+                />
+              </Box>
+            </Box>
             <GeoJsonMapValuePresentorComponent
               mode={Mode.VIEW}
               jsonValue={JSON.stringify(props.layerRecord?.footprint)}

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { IconButton } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
 import { ILayerImage } from '../../../../discrete-layer/models/layerImage';
-import { isExistLayerURL, isBeingDeleted } from '../../../helpers/layer-url';
+import { isBeingDeleted, isValidLayerMetadata } from '../../../helpers/layer-url';
 
 import './layer-image.icon-renderer.css';
 
@@ -27,11 +27,11 @@ export const LayerImageRenderer: React.FC<ILayerImageCellRendererParams> = (prop
   return (
     <Box>
       <IconButton 
-        className={layerImageShown ? 'mc-icon-Show imageChecked' : !isExistLayerURL(props.data) || isBeingDeleted(props.data) ? 'mc-icon-Hide iconNotAllowed' : 'mc-icon-Hide'}
+        className={layerImageShown ? 'mc-icon-Show imageChecked' : !isValidLayerMetadata(props.data) ? 'mc-icon-Hide iconNotAllowed' : 'mc-icon-Hide'}
         label="LAYER IMAGE SHOWN ICON"
         onClick={
           (evt: React.MouseEvent<HTMLButtonElement>): void => {
-            if (isExistLayerURL(props.data) && !isBeingDeleted(props.data)) {
+            if (isValidLayerMetadata(props.data)) {
               const val = !layerImageShown;
               evt.stopPropagation();
               setLayerImageShown(val);

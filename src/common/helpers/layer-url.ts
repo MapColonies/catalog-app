@@ -32,3 +32,7 @@ export const isExistLayerURL = (data: LayerMetadataMixedUnion): boolean => {
 export const isBeingDeleted = (data: LayerMetadataMixedUnion): boolean => {
   return get(data, 'productStatus') === RecordStatus.BEING_DELETED;
 };
+
+export const isValidLayerMetadata = (data: LayerMetadataMixedUnion) => {
+  return isExistLayerURL(data) && !isBeingDeleted(data);
+}

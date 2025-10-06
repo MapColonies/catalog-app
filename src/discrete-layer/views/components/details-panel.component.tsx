@@ -12,7 +12,7 @@ import { EntityDeleteDialog } from '../../components/layer-details/entity.delete
 import { LayersDetailsComponent } from '../../components/layer-details/layer-details';
 import { PublishButton } from '../../components/layer-details/publish-button';
 import { SaveMetadataButton } from '../../components/layer-details/save-metadata-button';
-import { EntityDescriptorModelType, LayerMetadataMixedUnion } from '../../models';
+import { EntityDescriptorModelType, LayerMetadataMixedUnion, RecordStatus } from '../../models';
 import { useStore } from '../../models/RootStore';
 import { TabViews } from '../tab-views';
 
@@ -49,6 +49,7 @@ export const DetailsPanel: React.FC<DetailsPanelComponentProps> = observer((prop
     return {
      isEditAllowed: layerToPresent && store.userStore.isActionAllowed(`entity_action.${layerToPresent.__typename}.edit`),
      isPublishAllowed: layerToPresent && store.userStore.isActionAllowed(`entity_action.${layerToPresent.__typename}.publish`),
+     isDeleteAllowed: layerToPresent && store.userStore.isActionAllowed(`entity_action.${layerToPresent.__typename}.delete`),
      isSaveMetadataAllowed: layerToPresent && store.userStore.isActionAllowed(`entity_action.${layerToPresent.__typename}.saveMetadata`),
     }
   }, [store.userStore.user, layerToPresent]);
@@ -103,7 +104,7 @@ export const DetailsPanel: React.FC<DetailsPanelComponentProps> = observer((prop
           />
         }
         {
-          isEntityDeleteDialogOpen && layerToPresent?.__typename === 'Layer3DRecord' && isSelectedLayerDeleteMode &&
+          permissions.isDeleteAllowed && layerToPresent && isEntityDeleteDialogOpen && isSelectedLayerDeleteMode &&
           <EntityDeleteDialog
             isOpen={isEntityDeleteDialogOpen}
             onSetOpen={setEntityDeleteDialogOpen}
