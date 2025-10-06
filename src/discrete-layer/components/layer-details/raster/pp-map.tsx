@@ -95,13 +95,13 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   }, []);
   
   const LegendsArray = useMemo(() => {
-    const res:LegendItem[] = [];
+    const res: LegendItem[] = [];
     PPMapStyles.forEach((value, key)=>{
       if (!key.includes('MARKER')) {
         res.push({
           title: intl.formatMessage({id: `polygon-parts.map-preview-legend.${key}`}) as string,
           style: value as Style
-        })
+        });
       }
     });
     return res;

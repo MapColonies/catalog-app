@@ -222,13 +222,8 @@
   "FOR_DELETE_polygon-parts.show-parts-with-errors-on-map.label": "Show only polygon parts with errors",
   "polygon-parts.show-exisitng-parts-on-map.label": "Show existing polygon parts",
   "polygon-parts.map-preview-legend.title": "Legend",
-  "polygon-parts.map-preview-legend.DEFAULT": "Polygon parts",
   "polygon-parts.map-preview-legend.PP_PERIMETER": "Polygon parts Perimeter",
   "polygon-parts.map-preview-legend.SOURCE_EXTENT": "Source Extent",
-  "polygon-parts.map-preview-legend.EXISTING_PP": "Existing polygon part",
-  "polygon-parts.map-preview-legend.SELECTED_FILL": "Selected polygon part",
-  "polygon-parts.map-preview-legend.ILLEGAL_PP": "Polygon part with illegal resolution",
-  "polygon-parts.map-preview.zoom-before-fetch": "Zoom in to see the parts",
 
   "field.actions.edit-draft": "Edit draft",
   "field.actions.more": "More options",

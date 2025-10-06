@@ -222,13 +222,8 @@
   "FOR_DELETE_polygon-parts.show-parts-with-errors-on-map.label": "הצג רק חלקי תיחום פגומים",
   "polygon-parts.show-exisitng-parts-on-map.label": "הצג חלקי תיחום הקיימים",
   "polygon-parts.map-preview-legend.title": "מקרא",
-  "polygon-parts.map-preview-legend.DEFAULT": "חלקי תיחום",
   "polygon-parts.map-preview-legend.PP_PERIMETER": "הקף של חלקי תיחום",
   "polygon-parts.map-preview-legend.SOURCE_EXTENT": "שטח המקור",
-  "polygon-parts.map-preview-legend.EXISTING_PP": "חלקי תיחום הקיימים",
-  "polygon-parts.map-preview-legend.SELECTED_FILL": "חלק הנבחר",
-  "polygon-parts.map-preview-legend.ILLEGAL_PP": "חלק תיחום עם רזולוציה קטנה מהקיים",
-  "polygon-parts.map-preview.zoom-before-fetch": "התקרב כדי לראות את חלקי התיחום",
 
   "field.actions.edit-draft": "ערוך טיוטה",
   "field.actions.more": "פעולות נוספות",
