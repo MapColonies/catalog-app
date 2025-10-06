@@ -54,7 +54,9 @@ const FileItem: React.FC<{ file: IFileBase }> = ({ file }) => {
       <Box style={{ direction: 'ltr' }}>
         {defaultFormatters.formatFileSize(null, file.details as FileData)}
       </Box>
-      <Box>{file.details?.modDate ? dateFormatter(file.details.modDate) : ''}</Box>
+      <Box style={{ direction: 'ltr' }}>
+        {file.details?.modDate ? dateFormatter(file.details.modDate, true) : ''}
+      </Box>
     </>
   );
 };
@@ -303,8 +305,8 @@ export const IngestionFields: React.FC<PropsWithChildren<IngestionFieldsProps>> 
     }
     const directory = selected.files.length ? 
       selected.folderChain
-          .map((folder: FileData) => folder.name)
-          .join('/')
+        .map((folder: FileData) => folder.name)
+        .join('/')
       : '';
     const fileNames = selected.files.map((file: FileData) => file.name);
 
