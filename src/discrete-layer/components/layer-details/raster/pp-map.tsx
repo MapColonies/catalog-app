@@ -148,6 +148,8 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
     <Box style={{...style}}>
       <Map>
         <MapLoadingIndicator/>
+        <Box style={{position: "relative", width: "54px", height: "40px", backgroundColor: "red", top: "-40px", left: "90%", opacity: "30%"}}>
+        </Box>
         {previewBaseMap}
         <VectorLayer>
           <VectorSource>
