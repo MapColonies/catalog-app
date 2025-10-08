@@ -601,7 +601,7 @@ export const catalogTreeStore = ModelBase.props({
             treeData: newTreeData,
             newNode: {
               ...item.node,
-              ...updatedNodeData[field],
+              [field]: updatedNodeData[field],
               title: getLayerTitle(updatedNodeData),
             },
             path: item.path,
