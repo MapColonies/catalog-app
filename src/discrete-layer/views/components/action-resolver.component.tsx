@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useRef } from 'react';
 import { NodeData } from 'react-sortable-tree';
 import { observer } from 'mobx-react-lite';
 import { Feature } from 'geojson';
-import { isEmpty } from 'lodash';
+import { get, isEmpty } from 'lodash';
 import { CesiumSceneMode, DrawType, useCesiumMap } from '@map-colonies/react-components';
 import { existStatus, isPolygonPartsShown, isUnpublished } from '../../../common/helpers/style';
 import {
@@ -38,11 +38,12 @@ interface ActionResolverProps {
   handleOpenEntityDialog: (open: boolean) => void;
   handleFlyTo: () => void;
   handleTabViewChange: (tabView: TabViews) => void;
+  handleOpenEntityDeleteDialog: (open: boolean) => void;
   activeTabView: TabViews;
 }
 
 export const ActionResolver: React.FC<ActionResolverProps> = observer((props) => {
-  const { handleOpenEntityDialog, handleFlyTo, handleTabViewChange, activeTabView } = props;
+  const { handleOpenEntityDialog, handleFlyTo, handleTabViewChange, handleOpenEntityDeleteDialog, activeTabView } = props;
 
   const store = useStore();
   const ENUMS = useEnums();
@@ -72,6 +73,25 @@ export const ActionResolver: React.FC<ActionResolverProps> = observer((props) =>
       store.discreteLayersStore.selectLayerByID,
       store.catalogTreeStore.updateNodeById,
       store.discreteLayersStore.updateTabviewsData,
+    ]
+  );
+
+  const baseUpdateEntityField = useCallback(
+    (updatedValue: ILayerImage, field: keyof ILayerImage, value: unknown) => {
+      store.discreteLayersStore.updateLayerField(updatedValue.id, field, value);
+      store.discreteLayersStore.selectLayerByID(updatedValue.id);
+
+      store.catalogTreeStore.updateFieldNodeById(updatedValue.id, updatedValue, field);
+
+      // After updating specific item REFRESH layerImages in order to present performed changes where it is relevant
+      store.discreteLayersStore.updateTabviewsFieldData(updatedValue, field);
+      store.discreteLayersStore.refreshLayersImages();
+    },
+    [
+      store.discreteLayersStore.updateLayerField,
+      store.discreteLayersStore.selectLayerByID,
+      store.catalogTreeStore.updateFieldNodeById,
+      store.discreteLayersStore.updateTabviewsFieldData,
     ]
   );
 
@@ -225,6 +245,11 @@ export const ActionResolver: React.FC<ActionResolverProps> = observer((props) =>
           break;
         case 'Layer3DRecord.viewer':
           window.open(`${CONFIG.WEB_TOOLS_URL}/${CONFIG.MODEL_VIEWER_ROUTE}?model_ids=${data.productId}&token=${CONFIG.MODEL_VIEWER_TOKEN_VALUE}`);
+          break;
+        case 'Layer3DRecord.delete':
+          // @ts-ignore
+          store.discreteLayersStore.selectLayer(cleanUpEntity(data, Layer3DRecordModelKeys) as LayerMetadataMixedUnion, false, true);
+          handleOpenEntityDeleteDialog(true);
           break;
         case 'LayerRasterRecord.viewer':
         case 'LayerDemRecord.viewer':
@@ -388,7 +413,7 @@ export const ActionResolver: React.FC<ActionResolverProps> = observer((props) =>
         case UserAction.SYSTEM_CALLBACK_PUBLISH: {
           const inputValues = data as unknown as ILayerImage;
           
-          baseUpdateEntity(inputValues);
+          baseUpdateEntityField(inputValues, 'productStatus' as keyof ILayerImage, get(inputValues, 'productStatus'));
           
           const node = store.catalogTreeStore.findNodeById(inputValues.id);
 
@@ -400,6 +425,11 @@ export const ActionResolver: React.FC<ActionResolverProps> = observer((props) =>
               store.catalogTreeStore.removeChildFromParent(inputValues.id, unpublishedNode);
             }
           }
+          break;
+        }
+        case UserAction.SYSTEM_CALLBACK_DELETE: {
+          const selectedLayer = data as unknown as ILayerImage;
+          baseUpdateEntityField(selectedLayer, 'productStatus' as keyof ILayerImage, get(selectedLayer, 'productStatus'));
           break;
         }
         case UserAction.SYSTEM_CALLBACK_FLYTO: {

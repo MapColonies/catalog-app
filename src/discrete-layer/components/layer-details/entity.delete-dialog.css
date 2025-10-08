@@ -1,0 +1,85 @@
+#entityDeleteDialog {
+  --update-layer-header-height: 150px;
+  --footer-height: 60px;
+  --footer-offset: 4px;
+  --modal-height: calc(100vh - 80px);
+  --modal-width: 888px;
+}
+
+#entityDeleteDialog .icon {
+  color: var(--mdc-theme-gc-warning-high);
+  font-size: 28px;
+  margin: 12px;
+}
+
+#entityDeleteDialog .footer {
+  display: flex;
+  margin-top: var(--footer-offset);
+  width: 100%;
+  height: var(--footer-height);
+}
+
+body[dir='rtl'] #entityDeleteDialog .footer {
+  left: 20px;
+}
+
+#entityDeleteDialog .buttons {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  margin-left: auto;
+}
+
+body[dir='rtl'] #entityDeleteDialog .buttons {
+  margin-left: unset;
+  margin-right: auto;
+}
+
+#entityDeleteDialog .closeIcon {
+  margin-left: auto;
+}
+
+body[dir='rtl'] #entityDeleteDialog .closeIcon {
+  margin-left: unset;
+  margin-right: auto;
+}
+
+#entityDeleteDialog .headerWarning {
+  height: 100px;
+  display: flex;
+  align-items: center;
+}
+
+@media (min-width: 900px) {
+  #entityDeleteDialog .mdc-dialog .mdc-dialog__surface {
+    max-width: var(--modal-width);
+    height: var(--modal-height);
+  }
+
+  #entityDeleteDialog .mdc-dialog .mdc-dialog__surface .mdc-dialog .mdc-dialog__surface {
+    max-width: var(--modal-width);
+    height: var(--chonky-modal-height);
+  }
+}
+
+#deleteLayerDetailsContainer {
+  position: relative;
+  display: flex;
+  background-color: var(--mdc-theme-text-primary-on-light);
+  padding: 8px;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: var(--update-layer-header-height);
+}
+
+#deleteLayerDetails {
+  margin: 0 0;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+}
+
+#entityDeleteDialog .errors {
+  width: 520px;
+}

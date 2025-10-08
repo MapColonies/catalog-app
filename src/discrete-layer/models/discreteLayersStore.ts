@@ -52,6 +52,7 @@ const INITIAL_STATE = {
   highlightedLayer: null,
   selectedLayer: null,
   selectedLayerIsUpdateMode: false,
+  selectedLayerIsDeleteMode: false,
   tabViews: [{idx: TabViews.CATALOG}, {idx: TabViews.SEARCH_RESULTS}, {idx: TabViews.EXPORT_LAYER}],
   entityDescriptors: [],
   entityTooltipFields: new Map(),
@@ -79,6 +80,7 @@ export const discreteLayersStore = ModelBase
     highlightedLayer: types.maybe(types.frozen<ILayerImage>(INITIAL_STATE.highlightedLayer as unknown as ILayerImage)),
     selectedLayer: types.maybe(types.frozen<ILayerImage>(INITIAL_STATE.selectedLayer as unknown as ILayerImage)),
     selectedLayerIsUpdateMode: types.maybe(types.frozen<boolean>(INITIAL_STATE.selectedLayerIsUpdateMode)),
+    selectedLayerIsDeleteMode: types.maybe(types.frozen<boolean>(INITIAL_STATE.selectedLayerIsDeleteMode)),
     tabViews: types.maybe(types.frozen<ITabViewData[]>(INITIAL_STATE.tabViews)),
     entityDescriptors: types.maybe(types.frozen<EntityDescriptorModelType[]>(INITIAL_STATE.entityDescriptors)),
     entityTooltipFields: types.maybe(types.frozen<Map<LayerRecordTypes, FieldConfigModelType[]>>(INITIAL_STATE.entityTooltipFields)),
@@ -198,6 +200,13 @@ export const discreteLayersStore = ModelBase
       }
     }
 
+    function updateLayerField(id: string, field: keyof ILayerImage, val: unknown): void {
+      const layerForUpdate = self.layersImages?.find(layer => layer.id === id);
+      if (layerForUpdate) {
+        set(layerForUpdate, field, val);
+      }
+    }
+
     // TODO: Remove when actual API is integrated
     function filterBySearchParams(layers: ILayerImage[]): ILayerImage[] {
       return layers.filter((layer) => {
@@ -249,9 +258,10 @@ export const discreteLayersStore = ModelBase
       self.highlightedLayer = layer ? cloneDeep(layer) : undefined;
     }
 
-    function selectLayer(layer: ILayerImage | undefined, isUpdateMode: boolean | undefined = undefined): void {
+    function selectLayer(layer: ILayerImage | undefined, isUpdateMode: boolean | undefined = undefined, isDeleteMode: boolean | undefined = undefined): void {
       self.selectedLayer = layer ? cloneDeep(layer) : undefined;
       self.selectedLayerIsUpdateMode = isUpdateMode;
+      self.selectedLayerIsDeleteMode = isDeleteMode;
     }
 
     function resetUpdateMode(): void {
@@ -304,6 +314,30 @@ export const discreteLayersStore = ModelBase
             tab.layersImages = tab.layersImages.map((item) => {
               if (item.id === layer.id) {
                 return cloneDeep(layer);
+              }
+              return item;
+            });
+          }
+        });
+      } 
+    }
+
+    function updateTabviewsFieldData(layer: ILayerImage, field: keyof ILayerImage): void {
+      if (self.tabViews) {
+        self.tabViews.forEach((tab) => {
+          if (tab.selectedLayer && tab.selectedLayer.id === layer.id) {
+            tab.selectedLayer = {
+              ...tab.selectedLayer,
+              [field]: layer[field]
+            }
+          }
+          if (tab.layersImages) {
+            tab.layersImages = tab.layersImages.map((item) => {
+              if (item.id === layer.id) {
+                return {
+                  ...item,
+                  [field]: layer[field]
+                }
               }
               return item;
             });
@@ -466,8 +500,10 @@ export const discreteLayersStore = ModelBase
       resetSelectedLayer,
       restoreTabviewData,
       updateTabviewsData,
+      updateTabviewsFieldData,
       setEntityDescriptors,
       updateLayer,
+      updateLayerField,
       addPreviewedLayer,
       cleanPreviewedLayer,
       removePreviewedLayer,

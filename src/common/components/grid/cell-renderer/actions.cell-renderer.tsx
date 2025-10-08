@@ -29,6 +29,10 @@ export const ActionsRenderer: React.FC<IActionsRendererParams> = (props) => {
           
           if (isDependentFieldWithValue(dependentField)) {
             if (!(dependentField.field in data)) return true;
+
+            if (dependentField.operator === 'notEquals') { 
+              return get(data, dependentField.field) !== dependentField.expectedValue;
+            }
             return get(data, dependentField.field) === dependentField.expectedValue;
           }
                     

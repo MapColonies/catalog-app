@@ -4,13 +4,15 @@ import { observer } from 'mobx-react-lite';
 import { IconButton, Tooltip, Typography } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
 import { existStatus, getTextStyle } from '../../../common/helpers/style';
+import { isBeingDeleted } from '../../../common/helpers/layer-url';
 import { Mode } from '../../../common/models/mode.enum';
 import { EntityDialog } from '../../components/layer-details/entity.dialog';
 import { EntityRasterDialog } from '../../components/layer-details/raster/entity.raster.dialog';
+import { EntityDeleteDialog } from '../../components/layer-details/entity.delete-dialog';
 import { LayersDetailsComponent } from '../../components/layer-details/layer-details';
 import { PublishButton } from '../../components/layer-details/publish-button';
 import { SaveMetadataButton } from '../../components/layer-details/save-metadata-button';
-import { EntityDescriptorModelType } from '../../models';
+import { EntityDescriptorModelType, LayerMetadataMixedUnion, RecordStatus } from '../../models';
 import { useStore } from '../../models/RootStore';
 import { TabViews } from '../tab-views';
 
@@ -19,6 +21,8 @@ import './details-panel.component.css';
 interface DetailsPanelComponentProps {
   isEntityDialogOpen: boolean;
   setEntityDialogOpen: (open: boolean) => void;
+  isEntityDeleteDialogOpen: boolean;
+  setEntityDeleteDialogOpen: (open: boolean) => void;
   detailsPanelExpanded: boolean;
   setDetailsPanelExpanded: (isExpanded: boolean) => void;
   activeTabView: TabViews;
@@ -28,6 +32,8 @@ export const DetailsPanel: React.FC<DetailsPanelComponentProps> = observer((prop
   const {
     isEntityDialogOpen,
     setEntityDialogOpen,
+    isEntityDeleteDialogOpen,
+    setEntityDeleteDialogOpen,
     detailsPanelExpanded,
     setDetailsPanelExpanded,
     activeTabView
@@ -37,11 +43,13 @@ export const DetailsPanel: React.FC<DetailsPanelComponentProps> = observer((prop
   const intl = useIntl();
   const layerToPresent = store.discreteLayersStore.selectedLayer;
   const isSelectedLayerUpdateMode = store.discreteLayersStore.selectedLayerIsUpdateMode ?? false;
+  const isSelectedLayerDeleteMode = store.discreteLayersStore.selectedLayerIsDeleteMode ?? false;
   
   const permissions = useMemo(() => {
     return {
      isEditAllowed: layerToPresent && store.userStore.isActionAllowed(`entity_action.${layerToPresent.__typename}.edit`),
      isPublishAllowed: layerToPresent && store.userStore.isActionAllowed(`entity_action.${layerToPresent.__typename}.publish`),
+     isDeleteAllowed: layerToPresent && store.userStore.isActionAllowed(`entity_action.${layerToPresent.__typename}.delete`),
      isSaveMetadataAllowed: layerToPresent && store.userStore.isActionAllowed(`entity_action.${layerToPresent.__typename}.saveMetadata`),
     }
   }, [store.userStore.user, layerToPresent]);
@@ -57,13 +65,13 @@ export const DetailsPanel: React.FC<DetailsPanelComponentProps> = observer((prop
           {layerToPresent?.productName}
         </Typography>
         {
-          permissions.isPublishAllowed === true &&
+          permissions.isPublishAllowed === true && !isBeingDeleted(layerToPresent as LayerMetadataMixedUnion) &&
           layerToPresent &&
           existStatus(layerToPresent as any) &&
           <PublishButton layer={layerToPresent} className="operationIcon"/>
         }
         {
-          permissions.isEditAllowed === true && 
+          permissions.isEditAllowed === true && !isBeingDeleted(layerToPresent as LayerMetadataMixedUnion) &&
           <Tooltip content={intl.formatMessage({ id: 'action.edit.tooltip' })}>
             <IconButton
               className="operationIcon mc-icon-Edit1"
@@ -93,6 +101,14 @@ export const DetailsPanel: React.FC<DetailsPanelComponentProps> = observer((prop
             onSetOpen={setEntityDialogOpen}
             layerRecord={layerToPresent}
             isSelectedLayerUpdateMode={isSelectedLayerUpdateMode}
+          />
+        }
+        {
+          permissions.isDeleteAllowed && layerToPresent && isEntityDeleteDialogOpen && isSelectedLayerDeleteMode &&
+          <EntityDeleteDialog
+            isOpen={isEntityDeleteDialogOpen}
+            onSetOpen={setEntityDeleteDialogOpen}
+            layerRecord={layerToPresent}
           />
         }
         {
