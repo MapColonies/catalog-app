@@ -322,6 +322,30 @@ export const discreteLayersStore = ModelBase
       } 
     }
 
+    function updateTabviewsFieldData(layer: ILayerImage, field: keyof ILayerImage): void {
+      if (self.tabViews) {
+        self.tabViews.forEach((tab) => {
+          if (tab.selectedLayer && tab.selectedLayer.id === layer.id) {
+            tab.selectedLayer = {
+              ...tab.selectedLayer,
+              [field]: layer[field]
+            }
+          }
+          if (tab.layersImages) {
+            tab.layersImages = tab.layersImages.map((item) => {
+              if (item.id === layer.id) {
+                return {
+                  ...item,
+                  [field]: layer[field]
+                }
+              }
+              return item;
+            });
+          }
+        });
+      } 
+    }
+
     function addPreviewedLayer(id: string): void {
       self.previewedLayers = [
         ...self.previewedLayers ?? [],
@@ -476,6 +500,7 @@ export const discreteLayersStore = ModelBase
       resetSelectedLayer,
       restoreTabviewData,
       updateTabviewsData,
+      updateTabviewsFieldData,
       setEntityDescriptors,
       updateLayer,
       updateLayerField,

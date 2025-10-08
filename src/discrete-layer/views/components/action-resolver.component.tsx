@@ -84,14 +84,14 @@ export const ActionResolver: React.FC<ActionResolverProps> = observer((props) =>
       store.catalogTreeStore.updateFieldNodeById(updatedValue.id, updatedValue, field);
 
       // After updating specific item REFRESH layerImages in order to present performed changes where it is relevant
-      store.discreteLayersStore.updateTabviewsData(updatedValue);
+      store.discreteLayersStore.updateTabviewsFieldData(updatedValue, field);
       store.discreteLayersStore.refreshLayersImages();
     },
     [
       store.discreteLayersStore.updateLayerField,
       store.discreteLayersStore.selectLayerByID,
       store.catalogTreeStore.updateFieldNodeById,
-      store.discreteLayersStore.updateTabviewsData,
+      store.discreteLayersStore.updateTabviewsFieldData,
     ]
   );
 
