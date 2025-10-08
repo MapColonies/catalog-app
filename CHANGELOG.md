@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.25.0](https://github.com/MapColonies/catalog-app/compare/v2.24.1...v2.25.0) (2025-10-08)
+
+
+### Features
+
+* add delete dialog to 3D layer ([#675](https://github.com/MapColonies/catalog-app/issues/675)) ([78914a4](https://github.com/MapColonies/catalog-app/commit/78914a46ea6824d146cc6912da87f6a1bda6829f))
+
+
+### Bug Fixes
+
+* cesium info panel overlap ([#674](https://github.com/MapColonies/catalog-app/issues/674)) ([bf5d091](https://github.com/MapColonies/catalog-app/commit/bf5d091d4992d295049bcf04c670bdf8a2c0f05a))
+* rename API to ExplorerGetByPath ([#639](https://github.com/MapColonies/catalog-app/issues/639)) ([f631e76](https://github.com/MapColonies/catalog-app/commit/f631e76151a8b52b1b871cb6c1aa649a0dedc3ec))
+* replace pp marker ([#672](https://github.com/MapColonies/catalog-app/issues/672)) ([204e4a4](https://github.com/MapColonies/catalog-app/commit/204e4a47c12205f6d2e49f5af9bcae7fa924c893))
+
 ## [2.24.1](https://github.com/MapColonies/catalog-app/compare/v2.24.0...v2.24.1) (2025-09-14)
 
 
