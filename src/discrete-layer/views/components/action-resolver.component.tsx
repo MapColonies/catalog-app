@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useRef } from 'react';
 import { NodeData } from 'react-sortable-tree';
 import { observer } from 'mobx-react-lite';
 import { Feature } from 'geojson';
-import { isEmpty } from 'lodash';
+import { get, isEmpty } from 'lodash';
 import { CesiumSceneMode, DrawType, useCesiumMap } from '@map-colonies/react-components';
 import { existStatus, isPolygonPartsShown, isUnpublished } from '../../../common/helpers/style';
 import {
@@ -72,6 +72,25 @@ export const ActionResolver: React.FC<ActionResolverProps> = observer((props) =>
       store.discreteLayersStore.updateLayer,
       store.discreteLayersStore.selectLayerByID,
       store.catalogTreeStore.updateNodeById,
+      store.discreteLayersStore.updateTabviewsData,
+    ]
+  );
+
+  const baseUpdateEntityField = useCallback(
+    (updatedValue: ILayerImage, field: keyof ILayerImage, value: unknown) => {
+      store.discreteLayersStore.updateLayerField(updatedValue.id, field, value);
+      store.discreteLayersStore.selectLayerByID(updatedValue.id);
+
+      store.catalogTreeStore.updateFieldNodeById(updatedValue.id, updatedValue, field);
+
+      // After updating specific item REFRESH layerImages in order to present performed changes where it is relevant
+      store.discreteLayersStore.updateTabviewsData(updatedValue);
+      store.discreteLayersStore.refreshLayersImages();
+    },
+    [
+      store.discreteLayersStore.updateLayerField,
+      store.discreteLayersStore.selectLayerByID,
+      store.catalogTreeStore.updateFieldNodeById,
       store.discreteLayersStore.updateTabviewsData,
     ]
   );
@@ -394,7 +413,7 @@ export const ActionResolver: React.FC<ActionResolverProps> = observer((props) =>
         case UserAction.SYSTEM_CALLBACK_PUBLISH: {
           const inputValues = data as unknown as ILayerImage;
           
-          baseUpdateEntity(inputValues);
+          baseUpdateEntityField(inputValues, 'productStatus' as keyof ILayerImage, get(inputValues, 'productStatus'));
           
           const node = store.catalogTreeStore.findNodeById(inputValues.id);
 
@@ -409,8 +428,8 @@ export const ActionResolver: React.FC<ActionResolverProps> = observer((props) =>
           break;
         }
         case UserAction.SYSTEM_CALLBACK_DELETE: {
-          const layerRecord = data as unknown as ILayerImage;
-          baseUpdateEntity(layerRecord);
+          const selectedLayer = data as unknown as ILayerImage;
+          baseUpdateEntityField(selectedLayer, 'productStatus' as keyof ILayerImage, get(selectedLayer, 'productStatus'));
           break;
         }
         case UserAction.SYSTEM_CALLBACK_FLYTO: {

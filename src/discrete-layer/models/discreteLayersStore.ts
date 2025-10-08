@@ -200,6 +200,13 @@ export const discreteLayersStore = ModelBase
       }
     }
 
+    function updateLayerField(id: string, field: keyof ILayerImage, val: unknown): void {
+      const layerForUpdate = self.layersImages?.find(layer => layer.id === id);
+      if (layerForUpdate) {
+        set(layerForUpdate, field, val);
+      }
+    }
+
     // TODO: Remove when actual API is integrated
     function filterBySearchParams(layers: ILayerImage[]): ILayerImage[] {
       return layers.filter((layer) => {
@@ -471,6 +478,7 @@ export const discreteLayersStore = ModelBase
       updateTabviewsData,
       setEntityDescriptors,
       updateLayer,
+      updateLayerField,
       addPreviewedLayer,
       cleanPreviewedLayer,
       removePreviewedLayer,

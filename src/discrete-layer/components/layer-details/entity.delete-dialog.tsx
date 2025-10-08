@@ -158,7 +158,10 @@ export const EntityDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
                 <Button
                   raised
                   type="submit"
-                  disabled={!allowDeleting}
+                  disabled={
+                    !allowDeleting ||
+                    mutationQuery.loading
+                  }
                   onClick={deleteLayer}
                 >
                   {

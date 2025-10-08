@@ -588,6 +588,41 @@ export const catalogTreeStore = ModelBase.props({
       }
     }
 
+    function updateFieldNodeById(id: string, updatedNodeData: ILayerImage, field: keyof ILayerImage): void {
+      if ((self.catalogTreeData as TreeItem[]).length > NONE) {
+        let newTreeData: TreeItem[] = [...self.catalogTreeData as TreeItem[]] ;
+
+        find({
+          treeData: self.catalogTreeData as TreeItem[],
+          getNodeKey: keyFromTreeIndex,
+          searchMethod: (data) => data.node.id === id,
+        }).matches.forEach((item) => {
+          newTreeData = changeNodeByPath({
+            treeData: newTreeData,
+            newNode: {
+              ...item.node,
+              ...updatedNodeData[field],
+              title: getLayerTitle(updatedNodeData),
+            },
+            path: item.path,
+          });
+
+          const { parentNode, path: parentPath } = getParentNode(item, newTreeData);
+          
+          // Re-sort parent group children after the changes (like if title has changed)
+          const sortedParentNode = sortGroupChildrenByFieldValue(parentNode?.node as TreeItem);
+
+          newTreeData = changeNodeByPath({
+            newNode: sortedParentNode,
+            path: parentPath,
+            treeData: newTreeData,
+          });
+        });
+
+        setCatalogTreeData(newTreeData);
+      }
+    }
+
     /**
      * 
      * @param path Node path to remove
@@ -634,6 +669,7 @@ export const catalogTreeStore = ModelBase.props({
       addNodeToParent,
       findNodeById,
       updateNodeById,
+      updateFieldNodeById,
       removeNodeFromTree,
       removeChildFromParent,
     };
