@@ -12,25 +12,20 @@ import { Feature, GeoJsonProperties, Geometry } from 'geojson';
 import * as Yup from 'yup';
 import { OptionalObjectSchema, TypeOfShape } from 'yup/lib/object';
 import { AnyObject } from 'yup/lib/types';
-import { DraftResult } from 'vest/vestResult';
-import { get, isEmpty, isObject } from 'lodash';
+import { get, isEmpty } from 'lodash';
 import { Button, Checkbox, CircularProgress } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
 import { ValidationsError } from '../../../../common/components/error/validations.error-presentor';
-import { MetadataFile } from '../../../../common/components/file-picker';
 import { mergeRecursive } from '../../../../common/helpers/object';
 import { Mode } from '../../../../common/models/mode.enum';
 import {
   EntityDescriptorModelType,
   FieldConfigModelType,
   LayerMetadataMixedUnion,
-  RecordType,
-  SourceValidationModelType
+  RecordType
 } from '../../../models';
 import { LayersDetailsComponent } from '../layer-details';
 import {
-  extractDescriptorRelatedFieldNames,
-  getFlatEntityDescriptors,
   transformEntityToFormFields,
   filterModeDescriptors,
   prepareEntityForSubmit,
@@ -59,7 +54,6 @@ interface LayerDetailsFormCustomProps {
   mode: Mode;
   entityDescriptors: EntityDescriptorModelType[];
   layerRecord: LayerMetadataMixedUnion;
-  vestValidationResults: Record<string, DraftResult>;
   mutationQueryError: unknown;
   mutationQueryLoading: boolean;
   closeDialog: () => void;
@@ -106,7 +100,6 @@ export const InnerRasterForm = (
     entityDescriptors,
     mode,
     layerRecord,
-    vestValidationResults,
     // eslint-disable-next-line
     mutationQueryError,
     mutationQueryLoading,
@@ -115,58 +108,79 @@ export const InnerRasterForm = (
     customError,
   } = props;
 
-  //#region STATE MACHINE
-  // const actorRef = RasterWorkflowContext.useActorRef();
-  const state = RasterWorkflowContext.useSelector((s) => s);
-  // const flowActor = state.children?.flow;
-  //#endregion
-
   const status = props.status as StatusError | Record<string, unknown>;
-  
   const intl = useIntl();
   const [graphQLError, setGraphQLError] = useState<unknown>(mutationQueryError);
   const [isSelectedFiles, setIsSelectedFiles] = useState<boolean>(false);
   const [firstPhaseErrors, setFirstPhaseErrors] = useState<Record<string, string[]>>({});
   const [showCurtain, setShowCurtain] = useState<boolean>(true);
   const [showExisitngLayerPartsOnMap, setShowExisitngLayerPartsOnMap] = useState<boolean>(false);
-  const [gpkgValidationError, setGpkgValidationError] = useState<string|undefined>(undefined);
   const [isSubmittedForm, setIsSubmittedForm] = useState(false);
+
+  //#region STATE MACHINE
+  // const actorRef = RasterWorkflowContext.useActorRef();
+  const state = RasterWorkflowContext.useSelector((s) => s);
+  // const flowActor = state.children?.flow;
+
+  useEffect(() => {
+    // console.log("**** workflowMachine_STATE[<IngestionFields>] *****", state.value);
+    // console.log("**** flowMachine_STATE *****", flowState?.value);
+
+    const { files } = state.context || {};
+    const gpkgExists = files?.gpkg?.exists;
+    const productExists = files?.product?.exists;
+    const metadataExists = files?.metadata?.exists;
+
+    const newResolution = files?.gpkg?.validationResult?.resolutionDegree;
+
+    const allFilesExistAndHavePaths = gpkgExists && productExists && metadataExists && 
+      files.gpkg?.path && files.product?.path && files.metadata?.path;
+
+    const newInputFiles = allFilesExistAndHavePaths ? {
+      gpkgFilesPath: [files.gpkg?.path],
+      productShapefilePath: files.product?.path,
+      metadataShapefilePath: files.metadata?.path,
+    } : undefined;
+
+    // if (newResolution !== values.ingestionResolution || newInputFiles !== values.inputFiles) {
+    //   setValues(prevValues => ({
+    //     ...prevValues,
+    //     ingestionResolution: newResolution,
+    //     inputFiles: newInputFiles
+    //   }));
+    // }
+    /*if (newResolution !== values.resolutionDegrees) {
+      setValues(
+        ...values,
+        resolutionDegrees: newResolution
+      );
+    }*/
+
+    if (!isSelectedFiles && allFilesExistAndHavePaths) {
+      setIsSelectedFiles(true);
+    }
+    if (isSelectedFiles && !allFilesExistAndHavePaths) {
+      setIsSelectedFiles(false);
+    }
+  }, [state.context?.files]);
+  //#endregion
 
   const getStatusErrors = useCallback((): StatusError | Record<string, unknown> => {
     return {
       ...get(status, 'errors') as Record<string, string[]>,
-      ...customError,
-      ...(gpkgValidationError ? {
-        error: [gpkgValidationError]
-      } : {})
+      ...customError
     }
-  }, [status, customError, gpkgValidationError]);
+  }, [status, customError]);
 
-  const getYupErrors = useCallback(
-    (): Record<string, string[]> => {
-      const validationResults: Record<string, string[]> = {};
-      Object.entries(errors).forEach(([key, value]) => {
-        if (isObject(value)) {
-          Object.entries(value).forEach(([keyNested, valueNested]) => {
-            if (getFieldMeta(key+'.'+keyNested).touched || isSubmittedForm) {
-              if (!validationResults[key]) {
-                // @ts-ignore
-                validationResults[key] = {};
-              }
-              // @ts-ignore
-              validationResults[key][keyNested] = [valueNested as string];
-            }
-          });
-        } else {
-          if (getFieldMeta(key).touched) {
-            validationResults[key] = [value];
-          }
-        }
-      });
-      return validationResults;
-    },
-    [errors, getFieldMeta, isSubmittedForm],
-  );
+  const getYupErrors = useCallback((): Record<string, string[]> => {
+    const validationResults: Record<string, string[]> = {};
+    Object.entries(errors).forEach(([key, value]) => {
+      if (getFieldMeta(key).touched) {
+        validationResults[key] = [value];
+      }
+    });
+    return validationResults;
+  }, [errors, getFieldMeta, isSubmittedForm]);
 
   useEffect(() => {
     setShowCurtain(!isSelectedFiles);
@@ -174,10 +188,10 @@ export const InnerRasterForm = (
 
   useEffect(() => {
     setShowCurtain(
-      !isSelectedFiles || (isSelectedFiles && 
-      gpkgValidationError !== undefined)
+      !isSelectedFiles ||
+      (isSelectedFiles && state.context?.files?.gpkg?.validationResult?.isValid !== true)
     );
-  }, [isSelectedFiles, gpkgValidationError]);
+  }, [isSelectedFiles, state.context?.files?.gpkg?.validationResult?.isValid]);
 
   useEffect(() => {
     setGraphQLError(mutationQueryError);
@@ -266,58 +280,6 @@ export const InnerRasterForm = (
       status,
     ]
   );
-  
-  const reloadFormMetadata = (
-    ingestionFields: FormValues,
-    metadata: MetadataFile,
-    removePrevData = false
-  ): void => {
-    setIsSelectedFiles(!!ingestionFields.fileNames);
-    
-    // Check update related fields in metadata obj
-    const updateFields = extractDescriptorRelatedFieldNames('updateRules', getFlatEntityDescriptors(layerRecord.__typename, entityDescriptors));
-
-    // Delete __typename prop to avoid collision
-    delete ((metadata.recordModel as unknown) as Record<string, unknown>)['__typename'];
-
-    for (const [key, val] of Object.entries(metadata.recordModel)) {
-      if (val === null || (updateFields.includes(key) && mode === Mode.UPDATE)) {
-        delete ((metadata.recordModel as unknown) as Record<string, unknown>)[key];
-      }
-    }
-
-    // Synch entity with loaded values
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    for (const [key, val] of Object.entries(metadata.recordModel)) {
-      // @ts-ignore
-      layerRecord[key] = metadata.recordModel[key];
-    }
-
-    const validationResults = metadata.recordModel as unknown as SourceValidationModelType;
-    
-    setGpkgValidationError(
-      !validationResults.isValid ? validationResults.message as string : undefined
-    );
-
-    resetForm();
-    
-    setValues({
-      ...values,
-      ...transformEntityToFormFields((isEmpty(metadata.recordModel) ? layerRecord : metadata.recordModel)),
-      ...ingestionFields,
-    });
-
-    setGraphQLError(metadata.error);
-  };
-
-  /*const isIngestedSourceSelected = () => {
-    let res = true;
-    ingestionFields.forEach((curr) => {
-      // @ts-ignore
-      res = res && !isEmpty(values[curr?.fieldName]);
-    }, true);
-    return res;
-  }*/
 
   const topLevelFieldsErrors = {} as Record<string,string[]>;
   firstPhaseErrors && Object.keys(firstPhaseErrors).forEach((err) => {
@@ -340,8 +302,6 @@ export const InnerRasterForm = (
           (mode === Mode.NEW || mode === Mode.UPDATE) &&
           <IngestionFields
             formik={entityFormikHandlers}
-            reloadFormMetadata={reloadFormMetadata}
-            validateSources={true}
             recordType={recordType}
             fields={ingestionFields}
             values={values}
@@ -402,20 +362,20 @@ export const InnerRasterForm = (
             }
           </Box>
           <LayersDetailsComponent
-                entityDescriptors={uiIngestionFieldDescriptors as EntityDescriptorModelType[]}
-                // @ts-ignore
-                layerRecord={{__typename: 'PolygonPartRecord'}}
-                mode={mode}
-                formik={entityFormikHandlers}
-                enableMapPreview={false}
-                showFiedlsCategory={false}/>
+            entityDescriptors={uiIngestionFieldDescriptors as EntityDescriptorModelType[]}
+            // @ts-ignore
+            layerRecord={{__typename: 'PolygonPartRecord'}}
+            mode={mode}
+            formik={entityFormikHandlers}
+            enableMapPreview={false}
+            showFiedlsCategory={false}/>
           <LayersDetailsComponent
-                entityDescriptors={ingestionFieldDescriptors}
-                layerRecord={layerRecord}
-                mode={mode}
-                formik={entityFormikHandlers}
-                enableMapPreview={false}
-                showFiedlsCategory={false}/>
+            entityDescriptors={ingestionFieldDescriptors}
+            layerRecord={layerRecord}
+            mode={mode}
+            formik={entityFormikHandlers}
+            enableMapPreview={false}
+            showFiedlsCategory={false}/>
         </Box>
         <Box className="footer">
           <Box className="messages">
@@ -424,11 +384,6 @@ export const InnerRasterForm = (
               topLevelFieldsErrors && Object.keys(topLevelFieldsErrors).length > NONE &&
               JSON.stringify(topLevelFieldsErrors) !== '{}' &&
               <ValidationsError errors={topLevelFieldsErrors} />
-            }
-            {
-              (Object.keys(topLevelFieldsErrors).length === NONE || JSON.stringify(errors) === '{}') &&
-              vestValidationResults.topLevelEntityVestErrors?.errorCount > NONE &&
-              <ValidationsError errors={vestValidationResults.topLevelEntityVestErrors.getErrors()} />
             }
           </Box>
           <Box className="buttons">
@@ -490,7 +445,6 @@ interface LayerDetailsFormProps {
     TypeOfShape<{ [x: string]: Yup.AnySchema<unknown, unknown, unknown> }>
   >;
   onSubmit: (values: Record<string, unknown>) => void;
-  vestValidationResults: Record<string, DraftResult>;
   mutationQueryError: unknown;
   mutationQueryLoading: boolean;
   closeDialog: () => void;

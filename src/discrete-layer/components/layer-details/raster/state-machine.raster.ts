@@ -116,18 +116,23 @@ export enum STATE_TAGS {
 }
 
 export const WORKFLOW = {
+  ROOT: "workflow",
   IDLE: "idle",
   RESTORE_JOB: "restoreJob",
   RESTORE_REPLAY: "restoreReplay",
   FLOW: {
     ROOT: "flow",
-    // FETCH_A: "fetching.fetchingA",
-    // FETCH_B: "fetching.fetchingB",
+    SELECT_GPKG: "selectGpkg",
+    VERIFY_GPKG: "verifyGpkg",
+    MODE_SELECTION: "modeSelection",
+    MAP_PREVIEW: "mapPreview",
+    FORM_FILL: "formFill",
+    ERROR: "error"
   },
   JOB_SUBMISSION: "jobSubmission",
   JOB_POLLING: "jobPolling",
   DONE: "done",
-  ERROR: "error",
+  ERROR: "error"
 } as const;
 
 //#region --- Helpers ---
@@ -223,6 +228,7 @@ const verifyGpkgStates = {
     tags: [STATE_TAGS.GENERAL_LOADING],
     invoke: {
       id: "verifyGpkgApi",
+      input: (_: { context: IContext; event: any }) => _,
       src: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
         console.log("[verifyGpkgApi] ctx.input", input);
 
@@ -259,7 +265,6 @@ const verifyGpkgStates = {
         // return whatever you want in 'onDone'
         return result;
       }),
-      input: (_: { context: IContext; event: any }) => _, 
       onDone: { 
         target: "success",
         actions: [
@@ -312,6 +317,7 @@ const fileSelectionStates = {
     entry: (_: { context: IContext; event: any }) => console.log(">>> fetchProduct entry", _),
     tags: [STATE_TAGS.GENERAL_LOADING],
     invoke: {
+      input: (_: { context: IContext; event: any }) => _,
       src: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
         console.log("[fileSelectionStates.fetchProduct] ctx.input", input);
 
@@ -347,7 +353,6 @@ const fileSelectionStates = {
 
         return result;
       }),
-      input: (_: { context: IContext; event: any }) => _,
       onDone: [
         {
           // guard: (_, e) => e.data.gpkg && e.data.metadata,
@@ -370,7 +375,7 @@ const fileSelectionStates = {
               }
             }))
           ],
-          target: "#flow"
+          target: `#${WORKFLOW.FLOW.ROOT}`
         }
       ],
       onError: {
@@ -378,27 +383,15 @@ const fileSelectionStates = {
           type: "FLOW_ERROR",
           error: { ..._.event.error }
         })),
-        target: "#flow"
+        target: `#${WORKFLOW.FLOW.ROOT}`
       }
     }
   },
   auto: {
-    entry: (_: { context: IContext; event: any }) => {
-      console.log(">>> auto entry", _);
-      // _.context.files = {
-      //   ..._.context.files,
-      //   product: {
-      //     path: path.resolve(_.context.files?.gpkg?.path as string, SHAPES_DIR, PRODUCT_SHP),
-      //     exists: false
-      //   },
-      //   metadata: {
-      //     path: path.resolve(_.context.files?.gpkg?.path as string, SHAPES_DIR, METADATA_SHP),
-      //     exists: false
-      //   }
-      // };
-    },
+    entry: (_: { context: IContext; event: any }) => console.log(">>> auto entry", _),
     tags: [STATE_TAGS.GENERAL_LOADING],
     invoke: {
+      input: (_: { context: IContext; event: any }) => _,
       src: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
         console.log("[fileSelectionStates.auto] ctx.input", input);
 
@@ -425,7 +418,6 @@ const fileSelectionStates = {
           metadata
         };
       }),
-      input: (_: { context: IContext; event: any }) => _,
       onDone: [
         {
           target: "fetchProduct",
@@ -478,17 +470,6 @@ const fileSelectionStates = {
       ],
       onError: {
         actions: [
-          // sendParent((_: { context: IContext; event: any }) => ({
-          //   type: "SET_FILES",
-          //   files: {
-          //     product: {
-          //       ..._.context.files?.product
-          //     },
-          //     metadata: {
-          //       ..._.context.files?.metadata
-          //     }
-          //   }
-          // })),
           sendParent((_: { context: IContext; event: any }) => ({
             type: "FLOW_ERROR",
             error: { ..._.event.error }
@@ -499,7 +480,7 @@ const fileSelectionStates = {
   },
   manual: {
     entry: (_: { context: IContext; event: any }) => console.log(">>> manual entry", _),
-    always: { target: "idle" }, // you can add guard if needed
+    always: { target: WORKFLOW.IDLE },
     on: {
       SELECT_PRODUCT: {
         actions: assign((_: { context: IContext; event: any }) => ({
@@ -532,14 +513,13 @@ const fileSelectionStates = {
 //#region --- flow submachine ---
 const flowMachine = createMachine({
   id: WORKFLOW.FLOW.ROOT,
-  initial: "selectGpkg",
+  initial: WORKFLOW.FLOW.SELECT_GPKG,
   context: (ctx: any) => ctx.input,
   states: {
-    selectGpkg: {
+    [WORKFLOW.FLOW.SELECT_GPKG]: {
       entry: () => console.log('>>> Enter selectGpkg parent'),
       on: {
         SELECT_GPKG: {
-          target: "verifyGpkg",
           actions: [
             assign((_: { context: IContext; event: any }) => ({
               files: {
@@ -558,21 +538,22 @@ const flowMachine = createMachine({
                 }
               }
             }))
-          ]
+          ],
+          target: WORKFLOW.FLOW.VERIFY_GPKG
         },
         "*": { actions: warnUnexpectedStateEvent }
       }
     },
 
-    verifyGpkg: {
+    [WORKFLOW.FLOW.VERIFY_GPKG]: {
       entry: () => console.log('>>> Enter verifyGpkg parent'),
       type: "compound",
       initial: "verifying",
       states: verifyGpkgStates as any,
-      onDone: "modeSelection"
+      onDone: WORKFLOW.FLOW.MODE_SELECTION
     },
 
-    modeSelection: {
+    [WORKFLOW.FLOW.MODE_SELECTION]: {
       entry: () => console.log('>>> Enter modeSelection parent'),
       type: "compound",
       initial: "auto",
@@ -584,20 +565,20 @@ const flowMachine = createMachine({
       }
     },
 
-    mapPreview: {
+    [WORKFLOW.FLOW.MAP_PREVIEW]: {
       entry: () => console.log('>>> Enter mapPreview parent'),
       invoke: {
+        input: (_: { context: IContext; event: any }) => _,
         src: "downloadAndRenderProduct",
-        input: (_: { context: IContext; event: any }) => _.context,
-        onDone: "formFill",
+        onDone: WORKFLOW.FLOW.FORM_FILL,
         onError: {
-          target: "error",
+          target: WORKFLOW.ERROR,
           actions: addError
         }
       }
     },
 
-    formFill: {
+    [WORKFLOW.FLOW.FORM_FILL]: {
       entry: () => console.log('>>> Enter formFill parent'),
       on: {
         UPDATE_FORM: {
@@ -627,10 +608,10 @@ const flowMachine = createMachine({
     },
 
     // parent-level error (instead of child jumping out)
-    error: {
+    [WORKFLOW.FLOW.ERROR]: {
       type: "atomic",
       on: {
-        RETRY: "selectGpkg" // example recovery path
+        RETRY: WORKFLOW.FLOW.SELECT_GPKG // example recovery path
       }
     }
   }
@@ -640,7 +621,7 @@ const flowMachine = createMachine({
 //#region --- parent workflow machine ---
 // @ts-ignore
 export const workflowMachine = createMachine<IContext, Events>({
-  id: "workflow",
+  id: WORKFLOW.ROOT,
   initial: WORKFLOW.IDLE,
   context: ({ input }) => ({
     ...input as IContext,
@@ -657,11 +638,11 @@ export const workflowMachine = createMachine<IContext, Events>({
     },
     [WORKFLOW.RESTORE_JOB]: {
       invoke: {
+        input: (_: { context: IContext; event: any }) => _,
         src: "fetchJobData",
-        input: (_: { context: IContext; event: any }) => _.context,
-        /*onDone: {
+        onDone: {
           target: "restoreReplay",
-          actions: assign((_: { context: Context; event: any }) => ({
+          actions: assign((_: { context: IContext; event: any }) => ({
             flowType: _.event.output.flowType,
             files: _.event.output.files,
             formData: _.event.output.formData,
@@ -669,18 +650,18 @@ export const workflowMachine = createMachine<IContext, Events>({
           }))
         },
         onError: {
-          target: "#workflow.error",
+          target: `#${WORKFLOW.ROOT}.${WORKFLOW.ERROR}`,
           actions: addError
-        }*/
+        }
       }
     },
     [WORKFLOW.RESTORE_REPLAY]: { always: WORKFLOW.FLOW.ROOT },
     [WORKFLOW.FLOW.ROOT]: {
       entry: () => console.log('>>> Entering flow state'),
       invoke: {
-        id: WORKFLOW.FLOW.ROOT,              // child actor name
-        src: flowMachine,        // reference to your submachine
+        id: WORKFLOW.FLOW.ROOT, // child actor name
         input: (_: { context: IContext; event: any }) => _.context,
+        src: flowMachine,       // reference to your submachine
         // sync: true
       },
       on: {
@@ -698,34 +679,34 @@ export const workflowMachine = createMachine<IContext, Events>({
     },
     [WORKFLOW.JOB_SUBMISSION]: {
       invoke: {
-        src: "createJobApi",
         input: (_: { context: IContext; event: any }) => _,
-        /*onDone: {
+        src: "createJobApi",
+        onDone: {
           target: "jobPolling",
-          actions: assign((_: { context: Context; event: any }) => ({
+          actions: assign((_: { context: IContext; event: any }) => ({
             jobId: _.event.data.jobId
           }))
         },
         onError: {
-          target: "#workflow.error",
+          target: `#${WORKFLOW.ROOT}.${WORKFLOW.ERROR}`,
           actions: addError
-        }*/
+        }
       }
     },
     [WORKFLOW.JOB_POLLING]: {
       invoke: {
-        src: "pollJobStatus",
         input: (_: { context: IContext; event: any }) => _,
-        /*onDone: {
-          target: "done",
-          actions: assign((_: { context: Context; event: any }) => ({
+        src: "pollJobStatus",
+        onDone: {
+          target: WORKFLOW.DONE,
+          actions: assign((_: { context: IContext; event: any }) => ({
             jobStatus: _.event.data.jobStatus
           }))
         },
         onError: {
-          target: "#workflow.error",
+          target: `#${WORKFLOW.ROOT}.${WORKFLOW.ERROR}`,
           actions: addError
-        }*/
+        }
       }
     },
     [WORKFLOW.DONE]: { type: "final" },
@@ -737,8 +718,8 @@ export const workflowMachine = createMachine<IContext, Events>({
     }
   },
   // on: {
-  //   FLOW_ERROR: { target: "#workflow.error", actions: addError },
-  //   FLOW_SUBMIT: { target: "#workflow.jobSubmission" }
+  //   FLOW_ERROR: { target: `#${WORKFLOW.ROOT}.${WORKFLOW.ERROR}`, actions: addError },
+  //   FLOW_SUBMIT: { target: `#${WORKFLOW.ROOT}.${WORKFLOW.JOB_SUBMISSION}` }
   // }
 });
 //#endregion

@@ -3,9 +3,8 @@ import React, { useEffect, useCallback, useState, useLayoutEffect, useRef } from
 import { useIntl } from 'react-intl';
 import { observer } from 'mobx-react';
 import { FormikValues } from 'formik';
-import { cloneDeep, get, isEmpty } from 'lodash';
+import { cloneDeep, isEmpty } from 'lodash';
 import * as Yup from 'yup';
-import { DraftResult } from 'vest/vestResult';
 import { DialogContent } from '@material-ui/core';
 import { Dialog, DialogTitle, IconButton } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
@@ -46,7 +45,6 @@ import {
   getBasicType,
   isEnumType
 } from '../utils';
-import suite from '../validate';
 import { Events/*, hasLoadingTagDeep*/ } from './state-machine.raster';
 import { RasterWorkflowProvider, RasterWorkflowContext } from './state-machine-context.raster';
 import { getUIIngestionFieldDescriptors } from './utils';
@@ -165,9 +163,6 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
         ? cloneDeep(props.layerRecord)
         : buildRecord(recordType, store.discreteLayersStore.entityDescriptors as EntityDescriptorModelType[])
     );
-    const [vestValidationResults, setVestValidationResults] = useState<
-      Record<string,DraftResult>
-    >({} as Record<string,DraftResult>);
     const [isSubmittedForm, setIsSubmittedForm] = useState(false);
     
     const [descriptors, setDescriptors] = useState<unknown[]>([]);
@@ -392,28 +387,6 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
       }
     }, []);
 
-    // useEffect(() => {
-    //   let hasVestErrors = false;
-      
-    //   const formDrafts = Object.values(vestValidationResults);
-    //   if (formDrafts.length === NONE) return;
-      
-    //   formDrafts.forEach((formDraft: DraftResult)=>{
-    //     hasVestErrors ||= (formDraft.errorCount !== NONE);
-    //   });
-
-    //   if (!hasVestErrors) {
-    //     switch(mode) {
-    //       case Mode.NEW:
-    //         handleIngestQueries();
-    //       break;
-    //       case Mode.UPDATE:
-    //         handleUpdateQueries();
-    //       break;
-    //     }
-    //   }
-    // }, [isSubmittedForm]);
-
     const closeDialog = useCallback(() => {
       onSetOpen(false);
       store.discreteLayersStore.resetUpdateMode();
@@ -492,18 +465,8 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
                 })}
                 onSubmit={(values): void => {
                   setInputValues(values);
-                  // eslint-disable-next-line
-                  const vestSuiteTopLevel = suite(
-                    descriptors as FieldConfigModelType[],
-                    values
-                  );
-                  const vestSuite: Record<string,DraftResult> = {
-                    topLevelEntityVestErrors: get(vestSuiteTopLevel, "get")(),
-                  }
-                  setVestValidationResults(vestSuite);
                   setIsSubmittedForm(!isSubmittedForm);
                 }}
-                vestValidationResults={vestValidationResults}
                 // eslint-disable-next-line
                 mutationQueryError={mutationQuery.error}
                 mutationQueryLoading={mutationQuery.loading}
