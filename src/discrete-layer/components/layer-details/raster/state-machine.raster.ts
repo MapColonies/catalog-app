@@ -121,8 +121,8 @@ export const WORKFLOW = {
   RESTORE_REPLAY: "restoreReplay",
   FLOW: {
     ROOT: "flow",
-    FETCH_A: "fetching.fetchingA",
-    FETCH_B: "fetching.fetchingB",
+    // FETCH_A: "fetching.fetchingA",
+    // FETCH_B: "fetching.fetchingB",
   },
   JOB_SUBMISSION: "jobSubmission",
   JOB_POLLING: "jobPolling",
@@ -531,7 +531,7 @@ const fileSelectionStates = {
 
 //#region --- flow submachine ---
 const flowMachine = createMachine({
-  id: "flow",
+  id: WORKFLOW.FLOW.ROOT,
   initial: "selectGpkg",
   context: (ctx: any) => ctx.input,
   states: {
@@ -649,8 +649,8 @@ export const workflowMachine = createMachine<IContext, Events>({
   states: {
     [WORKFLOW.IDLE]: {
       on: {
-        START_NEW: { target: "flow", actions: assign({ flowType: Mode.NEW }) },
-        START_UPDATE: { target: "flow", actions: assign({ flowType: Mode.UPDATE }) },
+        START_NEW: { target: WORKFLOW.FLOW.ROOT, actions: assign({ flowType: Mode.NEW }) },
+        START_UPDATE: { target: WORKFLOW.FLOW.ROOT, actions: assign({ flowType: Mode.UPDATE }) },
         RESTORE: WORKFLOW.RESTORE_JOB,
         "*": { actions: warnUnexpectedStateEvent }
       }
@@ -674,11 +674,11 @@ export const workflowMachine = createMachine<IContext, Events>({
         }*/
       }
     },
-    [WORKFLOW.RESTORE_REPLAY]: { always: "flow" },
+    [WORKFLOW.RESTORE_REPLAY]: { always: WORKFLOW.FLOW.ROOT },
     [WORKFLOW.FLOW.ROOT]: {
       entry: () => console.log('>>> Entering flow state'),
       invoke: {
-        id: "flow",              // child actor name
+        id: WORKFLOW.FLOW.ROOT,              // child actor name
         src: flowMachine,        // reference to your submachine
         input: (_: { context: IContext; event: any }) => _.context,
         // sync: true
