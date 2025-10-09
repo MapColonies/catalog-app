@@ -92,10 +92,10 @@ export type Events =
   | { type: "SELECT_METADATA"; file: IFileBase }
   | { type: "SET_FILES"; files: IFiles }
   | { type: "DONE" }
-  | { type: "UPDATE_FORM"; data: Record<string, any> }
-  | { type: "SUBMIT" }
+  // | { type: "UPDATE_FORM"; data: Record<string, any> }
+  | { type: "SUBMIT", data: Record<string, unknown> }
   | { type: "RETRY" }
-  | { type: "FORMIK_ERROR"; errors: Record<string, string> }
+  // | { type: "FORMIK_ERROR"; errors: Record<string, string> }
   | { type: "FLOW_ERROR"; error: IStateError };
 
 
@@ -125,8 +125,8 @@ export const WORKFLOW = {
     SELECT_GPKG: "selectGpkg",
     VERIFY_GPKG: "verifyGpkg",
     MODE_SELECTION: "modeSelection",
-    MAP_PREVIEW: "mapPreview",
-    FORM_FILL: "formFill",
+    // MAP_PREVIEW: "mapPreview",
+    // FORM_FILL: "formFill",
     ERROR: "error"
   },
   JOB_SUBMISSION: "jobSubmission",
@@ -565,47 +565,47 @@ const flowMachine = createMachine({
       }
     },
 
-    [WORKFLOW.FLOW.MAP_PREVIEW]: {
-      entry: () => console.log('>>> Enter mapPreview parent'),
-      invoke: {
-        input: (_: { context: IContext; event: any }) => _,
-        src: "downloadAndRenderProduct",
-        onDone: WORKFLOW.FLOW.FORM_FILL,
-        onError: {
-          target: WORKFLOW.ERROR,
-          actions: addError
-        }
-      }
-    },
+    // [WORKFLOW.FLOW.MAP_PREVIEW]: {
+    //   entry: () => console.log('>>> Enter mapPreview parent'),
+    //   invoke: {
+    //     input: (_: { context: IContext; event: any }) => _,
+    //     src: "downloadAndRenderProduct",
+    //     onDone: WORKFLOW.FLOW.FORM_FILL,
+    //     onError: {
+    //       target: WORKFLOW.ERROR,
+    //       actions: addError
+    //     }
+    //   }
+    // },
 
-    [WORKFLOW.FLOW.FORM_FILL]: {
-      entry: () => console.log('>>> Enter formFill parent'),
-      on: {
-        UPDATE_FORM: {
-          actions: assign((_: { context: IContext; event: any }) => ({
-            formData: _.event.data
-          }))
-        },
-        FORMIK_ERROR: {
-          actions: assign((_: { context: IContext; event: any }) => ({
-            errors: [
-              ..._.context.errors,
-              ...Object.entries(_.event.errors).map(([field, msg]) => ({
-                source: "formik" as const,
-                code: `FIELD_${field}`,
-                message: msg as string,
-                level: "error" as const,
-                field
-              }))
-            ]
-          }))
-        },
-        SUBMIT: {
-          actions: sendParent({type: "FLOW_SUBMIT"}),
-        },
-        "*": { actions: warnUnexpectedStateEvent }
-      }
-    },
+    // [WORKFLOW.FLOW.FORM_FILL]: {
+    //   entry: () => console.log('>>> Enter formFill parent'),
+    //   on: {
+    //     UPDATE_FORM: {
+    //       actions: assign((_: { context: IContext; event: any }) => ({
+    //         formData: _.event.data
+    //       }))
+    //     },
+    //     FORMIK_ERROR: {
+    //       actions: assign((_: { context: IContext; event: any }) => ({
+    //         errors: [
+    //           ..._.context.errors,
+    //           ...Object.entries(_.event.errors).map(([field, msg]) => ({
+    //             source: "formik" as const,
+    //             code: `FIELD_${field}`,
+    //             message: msg as string,
+    //             level: "error" as const,
+    //             field
+    //           }))
+    //         ]
+    //       }))
+    //     },
+    //     SUBMIT: {
+    //       actions: sendParent({type: "FLOW_SUBMIT"}),
+    //     },
+    //     "*": { actions: warnUnexpectedStateEvent }
+    //   }
+    // },
 
     // parent-level error (instead of child jumping out)
     [WORKFLOW.FLOW.ERROR]: {
@@ -680,12 +680,47 @@ export const workflowMachine = createMachine<IContext, Events>({
     [WORKFLOW.JOB_SUBMISSION]: {
       invoke: {
         input: (_: { context: IContext; event: any }) => _,
-        src: "createJobApi",
+        src: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
+          // console.log("[verifyGpkgApi] ctx.input", input);
+
+          // if (!input.context.files?.gpkg?.path) {
+          //   throw (buildError('ingestion.error.file-not-found', 'GPKG'));
+          // }
+
+          // const gpkgPath = input.context.files?.gpkg?.path;
+
+          // // Call MobX-State-Tree store
+          // const res = await input.context.store.queryValidateSource({
+          //   data: {
+          //     fileNames: [path.basename(gpkgPath)],
+          //     originDirectory: path.dirname(gpkgPath),
+          //     type: RecordType.RECORD_RASTER,
+          //   }
+          // });
+
+          // if (!res.validateSource[FIRST].isValid) {
+          //   throw (buildError('ingestion.error.invalid-source-file', res.validateSource[FIRST].message as string));
+          // }
+
+          // const validationResult = { ...res.validateSource[FIRST] };
+          // const { feature, marker } = getFeatureAndMarker(validationResult.extentPolygon, FeatureType.SOURCE_EXTENT, FeatureType.SOURCE_EXTENT_MARKER);
+
+          // const result = {
+          //   validationResult,
+          //   geoDetails: {
+          //     feature,
+          //     marker
+          //   }
+          // };
+
+          // // return whatever you want in 'onDone'
+          // return result;
+        }),
         onDone: {
-          target: "jobPolling",
           actions: assign((_: { context: IContext; event: any }) => ({
             jobId: _.event.data.jobId
-          }))
+          })),
+          target: WORKFLOW.JOB_POLLING
         },
         onError: {
           target: `#${WORKFLOW.ROOT}.${WORKFLOW.ERROR}`,
@@ -698,10 +733,10 @@ export const workflowMachine = createMachine<IContext, Events>({
         input: (_: { context: IContext; event: any }) => _,
         src: "pollJobStatus",
         onDone: {
-          target: WORKFLOW.DONE,
           actions: assign((_: { context: IContext; event: any }) => ({
             jobStatus: _.event.data.jobStatus
-          }))
+          })),
+          target: WORKFLOW.DONE
         },
         onError: {
           target: `#${WORKFLOW.ROOT}.${WORKFLOW.ERROR}`,
@@ -717,9 +752,9 @@ export const workflowMachine = createMachine<IContext, Events>({
       }
     }
   },
-  // on: {
-  //   FLOW_ERROR: { target: `#${WORKFLOW.ROOT}.${WORKFLOW.ERROR}`, actions: addError },
-  //   FLOW_SUBMIT: { target: `#${WORKFLOW.ROOT}.${WORKFLOW.JOB_SUBMISSION}` }
-  // }
+  on: {
+    FLOW_ERROR: { target: `#${WORKFLOW.ROOT}.${WORKFLOW.ERROR}`, actions: addError },
+    SUBMIT: { target: `#${WORKFLOW.ROOT}.${WORKFLOW.JOB_SUBMISSION}` }
+  }
 });
 //#endregion
