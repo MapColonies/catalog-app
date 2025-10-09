@@ -12,10 +12,8 @@ import { Box, defaultFormatters, FileData } from '@map-colonies/react-components
 import { Selection } from '../../../../common/components/file-picker';
 import { FieldLabelComponent } from '../../../../common/components/form/field-label';
 import { dateFormatter } from '../../../../common/helpers/formatters';
-import { Mode } from '../../../../common/models/mode.enum';
 import { RecordType, LayerMetadataMixedUnion } from '../../../models';
 import { FilePickerDialog } from '../../dialogs/file-picker.dialog';
-import { StringValuePresentorComponent } from '../field-value-presentors/string.value-presentor';
 import { IRecordFieldInfo } from '../layer-details.field-info';
 import { EntityFormikHandlers } from '../layer-datails-form';
 import { Events, hasLoadingTagDeep, IFileBase, IFiles } from './state-machine.raster';
@@ -87,15 +85,6 @@ const IngestionInputs: React.FC<{
                     }
                   </Box>
                 }
-              </Box>
-              <Box className="hiddenField">
-                <StringValuePresentorComponent
-                  mode={Mode.NEW}
-                  fieldInfo={field}
-                  // @ts-ignore
-                  value={formik.getFieldProps(field.fieldName).value as string}
-                  formik={formik}
-                />
               </Box>
             </Box>
           );
