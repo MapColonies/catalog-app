@@ -44,8 +44,12 @@ const NONE = 0;
 
 // Shape of form values - a bit problematic because we cannot extend union type
 export interface FormValues {
-  directory: string;
-  fileNames: string;
+  inputFiles: {
+    gpkgFilesPath: string[];
+    productShapefilePath: string;
+    metadataShapefilePath: string;
+  } | undefined;
+  resolutionDegree: number | undefined;
 }
 
 interface LayerDetailsFormCustomProps {
@@ -134,27 +138,23 @@ export const InnerRasterForm = (
     const newResolution = files?.gpkg?.validationResult?.resolutionDegree;
 
     const allFilesExistAndHavePaths = gpkgExists && productExists && metadataExists && 
-      files.gpkg?.path && files.product?.path && files.metadata?.path;
+      typeof files.gpkg?.path === 'string' &&
+      typeof files.product?.path === 'string' &&
+      typeof files.metadata?.path === 'string';
 
     const newInputFiles = allFilesExistAndHavePaths ? {
-      gpkgFilesPath: [files.gpkg?.path],
-      productShapefilePath: files.product?.path,
-      metadataShapefilePath: files.metadata?.path,
+      gpkgFilesPath: [files.gpkg?.path as string],
+      productShapefilePath: files.product?.path as string,
+      metadataShapefilePath: files.metadata?.path as string
     } : undefined;
 
-    // if (newResolution !== values.ingestionResolution || newInputFiles !== values.inputFiles) {
-    //   setValues(prevValues => ({
-    //     ...prevValues,
-    //     ingestionResolution: newResolution,
-    //     inputFiles: newInputFiles
-    //   }));
-    // }
-    /*if (newResolution !== values.resolutionDegrees) {
-      setValues(
+    if (newResolution !== values.resolutionDegree || newInputFiles !== values.inputFiles) {
+      setValues({
         ...values,
-        resolutionDegrees: newResolution
-      );
-    }*/
+        resolutionDegree: newResolution ?? values.resolutionDegree,
+        inputFiles: newInputFiles ?? values.inputFiles,
+      });
+    }
 
     if (!isSelectedFiles && allFilesExistAndHavePaths) {
       setIsSelectedFiles(true);
@@ -176,7 +176,9 @@ export const InnerRasterForm = (
     const validationResults: Record<string, string[]> = {};
     Object.entries(errors).forEach(([key, value]) => {
       if (getFieldMeta(key).touched) {
-        validationResults[key] = [value];
+        if (typeof value === 'string') {
+          validationResults[key] = [value];
+        }
       }
     });
     return validationResults;
@@ -455,8 +457,8 @@ interface LayerDetailsFormProps {
 export default withFormik<LayerDetailsFormProps, FormValues>({
   mapPropsToValues: (props) => {
     return {
-      directory: '',
-      fileNames: '',
+      inputFiles: undefined,
+      resolutionDegree: undefined,
       ...transformEntityToFormFields(props.layerRecord)
     };
   },

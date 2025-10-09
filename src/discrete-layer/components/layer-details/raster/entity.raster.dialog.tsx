@@ -78,7 +78,7 @@ const setDefaultValues = (record: Record<string, unknown>, descriptors: EntityDe
           record[fieldName] = '';
         }
       }
-      if (field.default){
+      if (field.default) {
         record[fieldName] = field.default;
       }
     }
