@@ -352,7 +352,7 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const yupSchema: Record<string, any> = {};
       [
-        ...ingestionFields,
+        // ...ingestionFields,
         ...uiIngestionFieldDescriptors,
         ...descriptors
       ].forEach((field) => {
@@ -371,7 +371,7 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
 
       setSchema(yupSchema);
 
-      const desc = addDescriptorValidations([...ingestionFields, ...descriptors]);
+      const desc = addDescriptorValidations([/*...ingestionFields,*/ ...descriptors]);
 
       setDescriptors(desc as any[]);
 
@@ -464,6 +464,7 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
                   ...schema,
                 })}
                 onSubmit={(values): void => {
+                  actorRef.send({ type: "SUBMIT", data: values } satisfies Events);
                   setInputValues(values);
                   setIsSubmittedForm(!isSubmittedForm);
                 }}

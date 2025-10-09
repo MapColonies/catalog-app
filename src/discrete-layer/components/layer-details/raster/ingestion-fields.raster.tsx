@@ -6,8 +6,7 @@
 import React, { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { observer } from 'mobx-react';
-import { FormikValues } from 'formik';
-import { Button, Icon, Typography } from '@map-colonies/react-core';
+import { Button, Icon } from '@map-colonies/react-core';
 import { Box, defaultFormatters, FileData } from '@map-colonies/react-components';
 import { Selection } from '../../../../common/components/file-picker';
 import { FieldLabelComponent } from '../../../../common/components/form/field-label';
@@ -15,7 +14,6 @@ import { dateFormatter } from '../../../../common/helpers/formatters';
 import { RecordType, LayerMetadataMixedUnion } from '../../../models';
 import { FilePickerDialog } from '../../dialogs/file-picker.dialog';
 import { IRecordFieldInfo } from '../layer-details.field-info';
-import { EntityFormikHandlers } from '../layer-datails-form';
 import { Events, hasLoadingTagDeep, IFileBase, IFiles } from './state-machine.raster';
 import { RasterWorkflowContext } from './state-machine-context.raster';
 import { clearSyncWarnings } from '../utils';
@@ -25,19 +23,15 @@ import './ingestion-fields.raster.css';
 interface IngestionFieldsProps {
   recordType: RecordType;
   fields: IRecordFieldInfo[];
-  values: FormikValues;
-  isError: boolean;
-  onErrorCallback: (open: boolean) => void;
-  formik?: EntityFormikHandlers;
-  manageMetadata?: boolean;
 }
 
 const FileItem: React.FC<{ file: IFileBase }> = ({ file }) => {
   return (
     <>
       <Box><Icon className="fileIcon mc-icon-Map-Vector" /></Box>
-      <Box className={file?.exists ? 'fileItemName' : 'fileItemName warning'}>
-        {file?.path?.startsWith('/\\') ? file?.path?.substring(1) : file?.path}
+      <FormattedMessage id={file.label} />
+      <Box className={`fileItemName ${file.exists ? '' : 'warning'}`}>
+        {file.path?.startsWith('/\\') ? file.path?.substring(1) : file.path}
       </Box>
       <Box className="ltr">
         {defaultFormatters.formatFileSize(null, file.details as FileData)}
@@ -51,10 +45,8 @@ const FileItem: React.FC<{ file: IFileBase }> = ({ file }) => {
 
 const IngestionInputs: React.FC<{
   fields: IRecordFieldInfo[];
-  values: string[];
-  formik: EntityFormikHandlers;
   state: any;
-}> = ({ fields, values, formik, state }) => {
+}> = ({ fields, state }) => {
   return (
     <>
       {
@@ -67,14 +59,14 @@ const IngestionInputs: React.FC<{
                 customClassName={`${field.fieldName as string}Spacer`}
               />
               <Box className="detailsFieldValue">
-                {
+                {/* {
                   values[index] === '' &&
                   <Typography tag="span" className="disabledText">
                     {'<'}
                     <FormattedMessage id="general.empty.text" />
                     {'>'}
                   </Typography>
-                }
+                } */}
                 {
                   <Box className="filesList">
                     {
@@ -96,26 +88,13 @@ const IngestionInputs: React.FC<{
 
 export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({
   recordType,
-  fields,
-  values,
-  isError,
-  onErrorCallback,
-  formik,
-  manageMetadata=true,
+  fields
 }) => {
   const actorRef = RasterWorkflowContext.useActorRef();
   const isLoading = hasLoadingTagDeep(actorRef?.getSnapshot());
   const state = RasterWorkflowContext.useSelector((s) => s);
   const flowActor = state.children?.flow; // <-- the invoked child
   const flowState = flowActor?.getSnapshot(); // grab its snapshot
-
-  useEffect(() => {
-    console.log("**** workflowMachine_STATE[<IngestionFields>] *****", state.value);
-    console.log("**** flowMachine_STATE *****", flowState?.value);
-    // if (flowState?.matches("selectGpkg")) {
-    //   setFilePickerDialogOpen(true);
-    // }
-  }, [state.value, flowState]);
 
   const [isFilePickerDialogOpen, setFilePickerDialogOpen] = useState<boolean>(false);
   const [selection, setSelection] = useState<Selection>({
@@ -137,6 +116,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({
     flowActor?.send({
       type: "SELECT_GPKG", 
       file: {
+        label: 'file-name.gpkg',
         path: `${directory}/${selected.files[0].name}`,
         details: { ...selected.files[0] },
         exists: true
@@ -150,8 +130,6 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({
         <Box className="ingestionFields">
           <IngestionInputs
             fields={fields}
-            values={[values.directory, values.fileNames]}
-            formik={formik as EntityFormikHandlers}
             state={state}
           />
         </Box>
@@ -178,7 +156,6 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({
           onSetOpen={setFilePickerDialogOpen}
           onFilesSelection={onFilesSelection}
           selection={selection}
-          fetchMetaData={manageMetadata}
         />
       }
     </>

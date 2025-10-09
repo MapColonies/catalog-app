@@ -123,10 +123,6 @@
   "record-type.record_quantized_mesh.label": "Quantized Mesh BEST",
   "record-type.record_all.label": "All",
 
-  "FOR_DELETE_enum-value.provider_type.synergy.label": "Synergy",
-  "FOR_DELETE_enum-value.provider_type.terra_nova.label": "Tera-Nova",
-  "FOR_DELETE_enum-value.provider_type.maxar.label": "Vivid",
-
   "polygon-selection.draw-btn.tooltip": "Draw an area to search",
   "polygon-selection.cancel-btn.tooltip": "Cancel the ongoing draw",
   "polygon-selection.cancel-btn.text": "Cancel Draw",
@@ -215,11 +211,9 @@
   "context-menu.sub-title.tooltip": "overlapping layers",
 
   "details-panel.no-selection": "No selection",
+
   "polygon-parts.button.load-from-shapeFile": "Load SHP",
-  "FOR_DELETE_polygon-parts.empty-list": "Add polygon parts",
   "polygon-parts.deleting.label": "Deleting",
-  "FOR_DELETE_polygon-parts.show-parts-on-map.label": "Show polygon parts on map",
-  "FOR_DELETE_polygon-parts.show-parts-with-errors-on-map.label": "Show only polygon parts with errors",
   "polygon-parts.show-exisitng-parts-on-map.label": "Show existing polygon parts",
   "polygon-parts.map-preview-legend.title": "Legend",
   "polygon-parts.map-preview-legend.PP_PERIMETER": "Polygon parts Perimeter",
@@ -230,6 +224,11 @@
 
   "field-names.ingestion.directory": "Directory",
   "field-names.ingestion.fileNames": "File names",
+
+  "file-name.gpkg": "GPKG",
+  "file-name.product": "Source extent",
+  "file-name.metadata": "Polygon parts",
+
   "ingestion.warning.title": "Warning:",
   "ingestion.warning.invalid-secondary-file": "{title} validation error on secondary site",
   "ingestion.warning.unsynched": "Invalid product version",
@@ -521,15 +520,10 @@
   "validation-general.number": "{fieldName} is required and numeric",
   "validation-general.date.future": "{fieldName} cannot be future date",
   "validation-general.shapeFile.too-many-features": "Number of features exceeds {maxPPNumber}",
-  "FOR_DELETE_validation-general.shapeFile.too-many-vertices": "Vertices number exceeds the limit of {maxVerticesPP}. Number defined polygons: {ppNumber}, total vertices {verticesNumber}",
-  "FOR_DELETE_validation-general.shapeFile.generic": "Please select zip file with only shape or related files, or a single shape file",
-  "validation-general.shapeFile.polygonParts.not-in-gpkg-extent": "Polygon Parts from shape file are not in GPKG extent", 
-  "FOR_DELETE_validation-general.polygonParts.hasErrors": "Marked {numErrorParts} Polygon Parts has errors. Complete missing data or fix the SHAPE file.",
-  "FOR_DELETE_validation-general.polygonParts.footPrint.hasErrors": "{numErrorParts} Polygon Parts has errors in geometry",
+  "validation-general.shapeFile.polygonParts.not-in-gpkg-extent": "Polygon Parts from shape file are not in GPKG extent",
   "validation-general.shapeFile.polygonParts.geometryTooDensed": "Footprint contain patterns with high density, must be simplified.",
   "validation-general.shapeFile.polygonParts.geometryTooSmall": "Geometry too small.",
   "validation-general.shapeFile.polygonParts.geometryHasSmallHoles": "Geometry contains too small holes",
-  "FOR_DELETE_validation-general.polygonParts.noValidGeometry": "Marked {numErrorParts} Plygon Parts contains not supported MULTIPOLYGON geometry.",
   "validation-general.polygonParts.resolutionCollision": "Marked {numErrorParts} Plygon Parts has resolution collision with parts already existing in that area",
   "validation-general.polygonParts.wfsServerError": "Service WFS of Polygon Parts returned error.",
   "validation-general.polygonParts.wfsExtremelySmall": "Resolution cross-checking failed (likely due to extremely small polygons).",

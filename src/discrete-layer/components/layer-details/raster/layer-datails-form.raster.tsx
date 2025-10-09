@@ -34,6 +34,7 @@ import { IngestionFields } from './ingestion-fields.raster';
 import { GeoFeaturesPresentorComponent } from './pp-map';
 import { FeatureType, PPMapStyles } from './pp-map.utils';
 import { StateMachineError } from './state.error-presentor';
+import { hasLoadingTagDeep } from './state-machine.raster';
 import { RasterWorkflowContext } from './state-machine-context.raster';
 import { getUIIngestionFieldDescriptors } from './utils';
 
@@ -110,47 +111,32 @@ export const InnerRasterForm = (
   const status = props.status as StatusError | Record<string, unknown>;
   const intl = useIntl();
   const [graphQLError, setGraphQLError] = useState<unknown>(mutationQueryError);
-  const [isSelectedFiles, setIsSelectedFiles] = useState<boolean>(false);
   const [firstPhaseErrors, setFirstPhaseErrors] = useState<Record<string, string[]>>({});
   const [showCurtain, setShowCurtain] = useState<boolean>(false);
-  const [showExisitngLayerPartsOnMap, setShowExisitngLayerPartsOnMap] = useState<boolean>(false);
+  const [showExistingLayerPartsOnMap, setShowExistingLayerPartsOnMap] = useState<boolean>(false);
   const [isSubmittedForm, setIsSubmittedForm] = useState(false);
 
   //#region STATE MACHINE
-  // const actorRef = RasterWorkflowContext.useActorRef();
+  const actorRef = RasterWorkflowContext.useActorRef();
+  const isLoading = hasLoadingTagDeep(actorRef?.getSnapshot());
+  
   const state = RasterWorkflowContext.useSelector((s) => s);
   // const flowActor = state.children?.flow;
 
   useEffect(() => {
-    // console.log("**** workflowMachine_STATE[<IngestionFields>] *****", state.value);
-    // console.log("**** flowMachine_STATE *****", flowState?.value);
-
     const { files } = state.context || {};
-    const gpkgExists = files?.gpkg?.exists;
-    const productExists = files?.product?.exists;
-    const metadataExists = files?.metadata?.exists;
-
     const newResolution = files?.gpkg?.validationResult?.resolutionDegree;
-
-    const allFilesExistAndHavePaths = gpkgExists && productExists && metadataExists && 
-      typeof files.gpkg?.path === 'string' &&
-      typeof files.product?.path === 'string' &&
-      typeof files.metadata?.path === 'string';
-
     if (newResolution !== values.resolutionDegree) {
       setValues({
         ...values,
         resolutionDegree: newResolution ?? values.resolutionDegree,
       });
     }
-
-    if (!isSelectedFiles && allFilesExistAndHavePaths) {
-      setIsSelectedFiles(true);
-    }
-    if (isSelectedFiles && !allFilesExistAndHavePaths) {
-      setIsSelectedFiles(false);
-    }
   }, [state.context?.files]);
+
+  useEffect(() => {
+    setShowCurtain(isLoading);
+  }, [isLoading]);
   //#endregion
 
   const getStatusErrors = useCallback((): StatusError | Record<string, unknown> => {
@@ -171,17 +157,6 @@ export const InnerRasterForm = (
     });
     return validationResults;
   }, [errors, getFieldMeta, isSubmittedForm]);
-
-  // useEffect(() => {
-  //   setShowCurtain(!isSelectedFiles);
-  // }, [isSelectedFiles]);
-
-  // useEffect(() => {
-  //   setShowCurtain(
-  //     !isSelectedFiles ||
-  //     (isSelectedFiles && state.context?.files?.gpkg?.validationResult?.isValid !== true)
-  //   );
-  // }, [isSelectedFiles, state.context?.files?.gpkg?.validationResult?.isValid]);
 
   useEffect(() => {
     setGraphQLError(mutationQueryError);
@@ -291,13 +266,8 @@ export const InnerRasterForm = (
         {
           (mode === Mode.NEW || mode === Mode.UPDATE) &&
           <IngestionFields
-            formik={entityFormikHandlers}
             recordType={recordType}
             fields={ingestionFields}
-            values={values}
-            isError={showCurtain}
-            onErrorCallback={setShowCurtain}
-            manageMetadata={false}
           />
         }
         <Box
@@ -309,16 +279,16 @@ export const InnerRasterForm = (
           {
             showCurtain && <Box className="curtain"></Box>
           }
-          <Box className='checkBoxContainer displayFlex'>
-            <Box className='displayFlex'>
+          <Box className="checkBoxContainer displayFlex">
+            <Box className="displayFlex">
             {
               mode === Mode.UPDATE &&
               <Checkbox
-                className='flexCheckItem showOnMapContainer'
-                label={intl.formatMessage({id: 'polygon-parts.show-exisitng-parts-on-map.label'})}
-                checked={showExisitngLayerPartsOnMap}
+                className="flexCheckItem showOnMapContainer"
+                label={intl.formatMessage({ id: 'polygon-parts.show-exisitng-parts-on-map.label' })}
+                checked={showExistingLayerPartsOnMap}
                 onClick={(evt: React.MouseEvent<HTMLInputElement>): void => {
-                  setShowExisitngLayerPartsOnMap(evt.currentTarget.checked);
+                  setShowExistingLayerPartsOnMap(evt.currentTarget.checked);
                 }}
               />
             }
@@ -345,7 +315,7 @@ export const InnerRasterForm = (
                   selectionStyle={[PPMapStyles.get(FeatureType.SELECTED_FILL), PPMapStyles.get(FeatureType.SELECTED_MARKER)]} 
                   style={{width: '520px', position: 'relative', direction: 'ltr'}} 
                   fitOptions={{padding:[10,20,10,20]}}
-                  showExisitngPolygonParts={showExisitngLayerPartsOnMap}
+                  showExistingPolygonParts={showExistingLayerPartsOnMap}
                   ingestionResolutionMeter={getFieldMeta('resolutionMeter').value as number}
                 />
               </>

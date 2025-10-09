@@ -17,17 +17,21 @@ import { FileData } from '@map-colonies/react-components';
 import { Mode } from '../../../../common/models/mode.enum';
 import { getFirstPoint } from '../../../../common/utils/geo.tools';
 import {
+  EntityDescriptorModelType,
   IBaseRootStore,
   IRootStore,
   RecordType,
   SourceValidationModelType
 } from '../../../models';
+import { cleanUpEntityPayload, getFlatEntityDescriptors } from '../utils';
 import { FeatureType } from './pp-map.utils';
 
 const FIRST = 0;
 const SHAPES_DIR = '../../Shapes';
 const PRODUCT_SHP = 'Product.shp';
 const METADATA_SHP = 'ShapeMetadata.shp';
+const PRODUCT_LABEL = 'file-name.product';
+const METADATA_LABEL = 'file-name.metadata';
 
 export type ErrorSource = "api" | "logic" | "formik";
 export type ErrorLevel = "error" | "warning";
@@ -44,6 +48,7 @@ export interface IStateError {
 }
 
 export interface IFileBase {
+  label: string;
   path: string;
   exists: boolean;
   details?: FileData;
@@ -125,7 +130,6 @@ export const WORKFLOW = {
     SELECT_GPKG: "selectGpkg",
     VERIFY_GPKG: "verifyGpkg",
     MODE_SELECTION: "modeSelection",
-    // MAP_PREVIEW: "mapPreview",
     // FORM_FILL: "formFill",
     ERROR: "error"
   },
@@ -162,6 +166,10 @@ export const hasLoadingTagDeep = (state: SnapshotFrom<typeof workflowMachine>, t
   return false;
 };
 
+export const disableUI = () => {
+  // return isLoading || error
+};
+
 const getFeatureAndMarker = (
   geometry: Geometry,
   featureFeatureType: FeatureType,
@@ -187,15 +195,17 @@ const getFeatureAndMarker = (
   return { feature, marker };
 };
 
-const getFile = (files: FileData[], gpkgPath: string, fileName: string) => {
+const getFile = (files: FileData[], gpkgPath: string, fileName: string, label: string) => {
   const matchingFiles = files.filter((file: FileData) => file.name === fileName);
   if (matchingFiles.length === 0) {
     return {
+      label,
       path: path.resolve(gpkgPath, SHAPES_DIR, fileName),
       exists: false
     };
   }
   return matchingFiles.map((file: FileData) => ({
+    label,
     path: path.resolve(gpkgPath, SHAPES_DIR, fileName),
     details: { ...file },
     exists: true
@@ -409,9 +419,9 @@ const fileSelectionStates = {
           },
         });
 
-        const product = getFile(result.getDirectory as FileData[], gpkgPath, PRODUCT_SHP);
+        const product = getFile(result.getDirectory as FileData[], gpkgPath, PRODUCT_SHP, PRODUCT_LABEL);
 
-        const metadata = getFile(result.getDirectory as FileData[], gpkgPath, METADATA_SHP);
+        const metadata = getFile(result.getDirectory as FileData[], gpkgPath, METADATA_SHP, METADATA_LABEL);
 
         return {
           product,
@@ -565,19 +575,6 @@ const flowMachine = createMachine({
       }
     },
 
-    // [WORKFLOW.FLOW.MAP_PREVIEW]: {
-    //   entry: () => console.log('>>> Enter mapPreview parent'),
-    //   invoke: {
-    //     input: (_: { context: IContext; event: any }) => _,
-    //     src: "downloadAndRenderProduct",
-    //     onDone: WORKFLOW.FLOW.FORM_FILL,
-    //     onError: {
-    //       target: WORKFLOW.ERROR,
-    //       actions: addError
-    //     }
-    //   }
-    // },
-
     // [WORKFLOW.FLOW.FORM_FILL]: {
     //   entry: () => console.log('>>> Enter formFill parent'),
     //   on: {
@@ -680,41 +677,34 @@ export const workflowMachine = createMachine<IContext, Events>({
     [WORKFLOW.JOB_SUBMISSION]: {
       invoke: {
         input: (_: { context: IContext; event: any }) => _,
+        tags: [STATE_TAGS.GENERAL_LOADING],
         src: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
-          // console.log("[verifyGpkgApi] ctx.input", input);
+          console.log(`[${WORKFLOW.JOB_SUBMISSION}] events data`, input.event?.data);
+          const store = input.context.store;
+          const metadataPayloadKeys = getFlatEntityDescriptors(
+              'LayerRasterRecord',
+              store.discreteLayersStore.entityDescriptors as EntityDescriptorModelType[]
+            )
+            .filter(descriptor => descriptor.isCreateEssential || descriptor.fieldName === 'id')
+            .map(descriptor => descriptor.fieldName);
+          const res = await store.mutateStartRasterIngestion({
+              data: {
+                ingestionResolution: input.event?.data?.resolutiondegrees as number,
+                inputFiles: {
+                  gpkgFilesPath: [ input.context.files?.gpkg?.path ],
+                  productShapefilePath: input.context.files?.product?.path,
+                  metadataShapefilePath: input.context.files?.metadata?.path
+                },
+                metadata: cleanUpEntityPayload(input.event?.data, metadataPayloadKeys as string[]) as unknown as LayerRasterRecordInput,
+                callbackUrls: ['https://my-dns-for-callback'],
+                type: RecordType.RECORD_RASTER,
+              },
+            });
+          if (!res.startRasterIngestion/*.jobId || res.startRasterIngestion.taskIds[0] */) {
+            throw (buildError('ingestion.error.invalid-source-file', res.startRasterIngestion));
+          }
 
-          // if (!input.context.files?.gpkg?.path) {
-          //   throw (buildError('ingestion.error.file-not-found', 'GPKG'));
-          // }
-
-          // const gpkgPath = input.context.files?.gpkg?.path;
-
-          // // Call MobX-State-Tree store
-          // const res = await input.context.store.queryValidateSource({
-          //   data: {
-          //     fileNames: [path.basename(gpkgPath)],
-          //     originDirectory: path.dirname(gpkgPath),
-          //     type: RecordType.RECORD_RASTER,
-          //   }
-          // });
-
-          // if (!res.validateSource[FIRST].isValid) {
-          //   throw (buildError('ingestion.error.invalid-source-file', res.validateSource[FIRST].message as string));
-          // }
-
-          // const validationResult = { ...res.validateSource[FIRST] };
-          // const { feature, marker } = getFeatureAndMarker(validationResult.extentPolygon, FeatureType.SOURCE_EXTENT, FeatureType.SOURCE_EXTENT_MARKER);
-
-          // const result = {
-          //   validationResult,
-          //   geoDetails: {
-          //     feature,
-          //     marker
-          //   }
-          // };
-
-          // // return whatever you want in 'onDone'
-          // return result;
+          
         }),
         onDone: {
           actions: assign((_: { context: IContext; event: any }) => ({

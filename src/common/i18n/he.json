@@ -123,10 +123,6 @@
   "record-type.record_quantized_mesh.label": "פני השטח",
   "record-type.record_all.label": "הכל",
 
-  "FOR_DELETE_enum-value.provider_type.synergy.label": "סינרגיה",
-  "FOR_DELETE_enum-value.provider_type.terra_nova.label": "טרה-נובה",
-  "FOR_DELETE_enum-value.provider_type.maxar.label": "Vivid",
-
   "polygon-selection.draw-btn.tooltip": "ציור אזור לחיפוש",
   "polygon-selection.cancel-btn.tooltip": "בטל ציור",
   "polygon-selection.cancel-btn.text": "בטל ציור",
@@ -215,14 +211,12 @@
   "context-menu.sub-title.tooltip": "שכבות חופפות בנקודה שנבחרה",
 
   "details-panel.no-selection": "לא נבחר פריט",
+
   "polygon-parts.button.load-from-shapeFile": "טען Shape",
-  "FOR_DELETE_polygon-parts.empty-list": "הוסיפו חלקי תיחום",
   "polygon-parts.deleting.label": "מוחק",
-  "FOR_DELETE_polygon-parts.show-parts-on-map.label": "הצג חלקי תיחום על המפה",
-  "FOR_DELETE_polygon-parts.show-parts-with-errors-on-map.label": "הצג רק חלקי תיחום פגומים",
   "polygon-parts.show-exisitng-parts-on-map.label": "הצג חלקי תיחום הקיימים",
   "polygon-parts.map-preview-legend.title": "מקרא",
-  "polygon-parts.map-preview-legend.PP_PERIMETER": "הקף של חלקי תיחום",
+  "polygon-parts.map-preview-legend.PP_PERIMETER": "היקף של חלקי התיחום",
   "polygon-parts.map-preview-legend.SOURCE_EXTENT": "שטח המקור",
 
   "field.actions.edit-draft": "ערוך טיוטה",
@@ -230,6 +224,11 @@
 
   "field-names.ingestion.directory": "נתיב מלא",
   "field-names.ingestion.fileNames": "שמות הקבצים",
+
+  "file-name.gpkg": "GPKG",
+  "file-name.product": "תיחום היקפי",
+  "file-name.metadata": "חלקי התיחום",
+
   "ingestion.warning.title": "אזהרה:",
   "ingestion.warning.invalid-secondary-file": "{title} אירעה שגיאת וולידציה באתר המשני",
   "ingestion.warning.unsynched": "מספר גרסה שונה",
@@ -521,15 +520,10 @@
   "validation-general.number": "{fieldName} הוא שדה חובה ומספרי",
   "validation-general.date.future": "{fieldName} לא יכול להיות תאריך עתידי",
   "validation-general.shapeFile.too-many-features": "מס' חלקי תיחום חורג מ {maxPPNumber}",
-  "FOR_DELETE_validation-general.shapeFile.too-many-vertices": "מספר נקודות חורג מ {maxVerticesPP}.  {ppNumber} פוליגונים מורכבים מ {verticesNumber} נקודות",
-  "FOR_DELETE_validation-general.shapeFile.generic": "יש לוודא שבחרת בקובץ zip המכיל קבצי shape ונלווים בלבד, או קובץ shape בודד",
-  "validation-general.shapeFile.polygonParts.not-in-gpkg-extent": "חלקי תיחום מחוץ לGPKG", 
-  "FOR_DELETE_validation-general.polygonParts.hasErrors": "{numErrorParts} חלקי תיחום שגויים, נדרש להשלים מידע על חלקי תיחום או לתקן קובץ shape",
-  "FOR_DELETE_validation-general.polygonParts.footPrint.hasErrors": "{numErrorParts} תיחומ(ים) גאוגרפי(ם) שגוי(ים)",
+  "validation-general.shapeFile.polygonParts.not-in-gpkg-extent": "חלקי תיחום מחוץ לGPKG",
   "validation-general.shapeFile.polygonParts.geometryTooDensed": "תיחום גאוגרפי מכיל צפיפות נקודות יתרה, נדרש לבצע תהליך של פישוט.",
   "validation-general.shapeFile.polygonParts.geometryTooSmall": "תיחום גאוגרפי קטן מידי.",
   "validation-general.shapeFile.polygonParts.geometryHasSmallHoles": "גיאומטריה מכילה חורים קטנים מידי.",
-  "FOR_DELETE_validation-general.polygonParts.noValidGeometry": "{numErrorParts} חלק(י) תיחום מכיל(ים) גאומטריה מסוג MULTIPOLYGON",
   "validation-general.polygonParts.resolutionCollision": "רזולוציה של {numErrorParts} חלקי תיחום מסומנים מתנגשת עם חלקים קיימים באותו אזור!",
   "validation-general.polygonParts.wfsServerError": "שירות WFS של חלקי תיחום החזיר שגיאה.",
   "validation-general.polygonParts.wfsExtremelySmall": "הצלבת הרזולוציות נכשלה. ייתכן שקיימים פוליגונים זעירים במיוחד.",

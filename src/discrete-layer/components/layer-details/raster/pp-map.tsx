@@ -1,6 +1,22 @@
 import { CSSProperties, useEffect, useMemo, useRef } from 'react';
 import { useIntl } from 'react-intl';
-import { Box, GeoJSONFeature, getWMTSOptions, getXYZOptions, IBaseMap, Legend, LegendItem, Map, TileLayer, TileWMTS, TileXYZ, useMap, useVectorSource, VectorLayer, VectorSource } from '@map-colonies/react-components';
+import {
+  Box,
+  GeoJSONFeature,
+  getWMTSOptions,
+  getXYZOptions,
+  IBaseMap,
+  Legend,
+  LegendItem,
+  Map,
+  TileLayer,
+  TileWMTS,
+  TileXYZ,
+  useMap,
+  useVectorSource,
+  VectorLayer,
+  VectorSource
+} from '@map-colonies/react-components';
 import { Feature } from 'geojson';
 import { get, isEmpty } from 'lodash';
 import { FitOptions } from 'ol/View';
@@ -19,9 +35,8 @@ interface GeoFeaturesPresentorProps {
   fitOptions?: FitOptions | undefined,
   selectedFeatureKey?: string;
   selectionStyle?: Style;
-  showExisitngPolygonParts?: boolean;
+  showExistingPolygonParts?: boolean;
   layerRecord?: ILayerImage | null;
-  ingestionResolutionMeter?: number | null;
 }
 
 const DEFAULT_PROJECTION = 'EPSG:4326';
@@ -35,9 +50,8 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   fitOptions,
   selectedFeatureKey,
   selectionStyle,
-  showExisitngPolygonParts,
-  layerRecord,
-  ingestionResolutionMeter
+  showExistingPolygonParts,
+  layerRecord
 }) => {
   const store = useStore();
   const intl = useIntl();
@@ -157,7 +171,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
           </VectorSource>
         </VectorLayer>
         {
-          showExisitngPolygonParts && <PolygonPartsExtentVectorLayer layerRecord={layerRecord}/>
+          showExistingPolygonParts && <PolygonPartsExtentVectorLayer layerRecord={layerRecord}/>
         }
         <Legend legendItems={LegendsArray} title={intl.formatMessage({id: 'polygon-parts.map-preview-legend.title'})}/>
       </Map>
