@@ -44,11 +44,6 @@ const NONE = 0;
 
 // Shape of form values - a bit problematic because we cannot extend union type
 export interface FormValues {
-  inputFiles: {
-    gpkgFilesPath: string[];
-    productShapefilePath: string;
-    metadataShapefilePath: string;
-  } | undefined;
   resolutionDegree: number | undefined;
 }
 
@@ -117,7 +112,7 @@ export const InnerRasterForm = (
   const [graphQLError, setGraphQLError] = useState<unknown>(mutationQueryError);
   const [isSelectedFiles, setIsSelectedFiles] = useState<boolean>(false);
   const [firstPhaseErrors, setFirstPhaseErrors] = useState<Record<string, string[]>>({});
-  const [showCurtain, setShowCurtain] = useState<boolean>(true);
+  const [showCurtain, setShowCurtain] = useState<boolean>(false);
   const [showExisitngLayerPartsOnMap, setShowExisitngLayerPartsOnMap] = useState<boolean>(false);
   const [isSubmittedForm, setIsSubmittedForm] = useState(false);
 
@@ -142,17 +137,10 @@ export const InnerRasterForm = (
       typeof files.product?.path === 'string' &&
       typeof files.metadata?.path === 'string';
 
-    const newInputFiles = allFilesExistAndHavePaths ? {
-      gpkgFilesPath: [files.gpkg?.path as string],
-      productShapefilePath: files.product?.path as string,
-      metadataShapefilePath: files.metadata?.path as string
-    } : undefined;
-
-    if (newResolution !== values.resolutionDegree || newInputFiles !== values.inputFiles) {
+    if (newResolution !== values.resolutionDegree) {
       setValues({
         ...values,
         resolutionDegree: newResolution ?? values.resolutionDegree,
-        inputFiles: newInputFiles ?? values.inputFiles,
       });
     }
 
@@ -184,16 +172,16 @@ export const InnerRasterForm = (
     return validationResults;
   }, [errors, getFieldMeta, isSubmittedForm]);
 
-  useEffect(() => {
-    setShowCurtain(!isSelectedFiles);
-  }, [isSelectedFiles]);
+  // useEffect(() => {
+  //   setShowCurtain(!isSelectedFiles);
+  // }, [isSelectedFiles]);
 
-  useEffect(() => {
-    setShowCurtain(
-      !isSelectedFiles ||
-      (isSelectedFiles && state.context?.files?.gpkg?.validationResult?.isValid !== true)
-    );
-  }, [isSelectedFiles, state.context?.files?.gpkg?.validationResult?.isValid]);
+  // useEffect(() => {
+  //   setShowCurtain(
+  //     !isSelectedFiles ||
+  //     (isSelectedFiles && state.context?.files?.gpkg?.validationResult?.isValid !== true)
+  //   );
+  // }, [isSelectedFiles, state.context?.files?.gpkg?.validationResult?.isValid]);
 
   useEffect(() => {
     setGraphQLError(mutationQueryError);
@@ -457,7 +445,6 @@ interface LayerDetailsFormProps {
 export default withFormik<LayerDetailsFormProps, FormValues>({
   mapPropsToValues: (props) => {
     return {
-      inputFiles: undefined,
       resolutionDegree: undefined,
       ...transformEntityToFormFields(props.layerRecord)
     };
