@@ -846,10 +846,30 @@ const DiscreteLayerView: React.FC = observer(() => {
   }, [activeTabView, actionsMenuDimensions]);
 
   const site = useMemo(() => currentSite(), []);
-  
+
+  const triggerCallbackFunc = (data: {
+    [key: string]: unknown;
+    headers: Headers;
+  }, options: GeocoderOptions, i: number) => {
+
+    if (!CONFIG.GEOCODER.CALLBACK_URL) return;
+
+    const body = {
+      request_id: data.headers.get('request_id'),
+      chosen_result_id: i
+    }
+
+    const url = `${CONFIG.GEOCODER.CALLBACK_URL}?token=${CONFIG.ACCESS_TOKEN.TOKEN_VALUE}`;
+
+    fetch(url, {
+      method: 'POST',
+      body: JSON.stringify(body)
+    });
+  };
+
   const GEOCODER_OPTIONS = useMemo(() => ([
     {
-      baseUrl: CONFIG.GEOCODING_URL,
+      baseUrl: CONFIG.GEOCODER.URL,
       endPoint: '/search/location/query',
       method: 'GET',
       params: {
@@ -860,12 +880,17 @@ const DiscreteLayerView: React.FC = observer(() => {
             relatedParams: [["geo_context_mode", 'filter']]
           }
         },
-        static: [["limit", 6], ["disable_fuzziness", false]],
+        static: [
+          ["limit", CONFIG.GEOCODER.RES_LIMIT],
+          ["disable_fuzziness", false],
+          ["token", CONFIG.ACCESS_TOKEN.TOKEN_VALUE]
+        ],
       },
-      title: intl.formatMessage({ id: 'geocoder-panel.title.location' })
+      title: intl.formatMessage({ id: 'geocoder-panel.title.location' }),
+      callbackFunc: (data, options, i) => { triggerCallbackFunc(data, options, i) }
     },
     {
-      baseUrl: CONFIG.GEOCODING_URL,
+      baseUrl: CONFIG.GEOCODER.URL,
       endPoint: '/search/control/tiles',
       method: 'GET',
       params: {
@@ -876,12 +901,17 @@ const DiscreteLayerView: React.FC = observer(() => {
             relatedParams: [['geo_context_mode', 'filter']],
           }
         },
-        static: [["limit", 6], ["disable_fuzziness", false]],
+        static: [
+          ["limit",CONFIG.GEOCODER.RES_LIMIT],
+          ["disable_fuzziness", false],
+          ["token", CONFIG.ACCESS_TOKEN.TOKEN_VALUE]
+        ],
       },
-      title: intl.formatMessage({ id: 'geocoder-panel.title.tiles' })
+      title: intl.formatMessage({ id: 'geocoder-panel.title.tiles' }),
+      callbackFunc: (data, options, i) => { triggerCallbackFunc(data, options, i) }
     },
     {
-      baseUrl: CONFIG.GEOCODING_URL,
+      baseUrl: CONFIG.GEOCODER.URL,
       endPoint: '/search/control/items',
       method: 'GET',
       params: {
@@ -892,12 +922,17 @@ const DiscreteLayerView: React.FC = observer(() => {
             relatedParams: [['geo_context_mode', 'filter']],
           }
         },
-        static: [["limit", 6], ["disable_fuzziness", false]],
+        static: [
+          ["limit", CONFIG.GEOCODER.RES_LIMIT],
+          ["disable_fuzziness", false],
+          ["token", CONFIG.ACCESS_TOKEN.TOKEN_VALUE]
+        ],
       },
-      title: intl.formatMessage({ id: 'geocoder-panel.title.control' })
+      title: intl.formatMessage({ id: 'geocoder-panel.title.control' }),
+      callbackFunc: (data, options, i) => { triggerCallbackFunc(data, options, i) }
     },
     {
-      baseUrl: CONFIG.GEOCODING_URL,
+      baseUrl: CONFIG.GEOCODER.URL,
       endPoint: '/search/control/routes',
       method: 'GET',
       params: {
@@ -908,9 +943,13 @@ const DiscreteLayerView: React.FC = observer(() => {
             relatedParams: [['geo_context_mode', 'filter']],
           }
         },
+        static: [
+          ["token", CONFIG.ACCESS_TOKEN.TOKEN_VALUE]
+        ],
         // "geo_context": { "bbox": [-180, -90, 180, 90] },
       },
-      title: intl.formatMessage({ id: 'geocoder-panel.title.routes' })
+      title: intl.formatMessage({ id: 'geocoder-panel.title.routes' }),
+      callbackFunc: (data, options, i) => { triggerCallbackFunc(data, options, i) }
     },
   ]) satisfies GeocoderOptions[], [intl]);
  

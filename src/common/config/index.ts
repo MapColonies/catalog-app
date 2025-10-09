@@ -40,7 +40,7 @@ const POLYGON_PARTS = {
   billBoardStrokeColor: '#FFFF00'
 };
 const WFS = (window as any)._env_.WFS;
-const GEOCODING_URL = (window as any)._env_.GEOCODING_URL;
+const GEOCODER = (window as any)._env_.GEOCODER;
 
 const enrichBaseMaps = (baseMaps: IBaseMaps): IBaseMaps => {
   return {
@@ -236,7 +236,11 @@ const APP_CONFIG = {
       CACHE_SIZE: WFS.max.cacheSize,
     }
   },
-  GEOCODING_URL: GEOCODING_URL
+  GEOCODER: {
+    URL: GEOCODER.geocoderUrl,
+    CALLBACK_URL: GEOCODER.geocoderCallback,
+    RES_LIMIT: 6
+  }
 };
 
 export default APP_CONFIG;
