@@ -83,7 +83,7 @@
     "@formatjs/icu-messageformat-parser": "^2.6.0",
     "@map-colonies/error-types": "^1.1.5",
     "@map-colonies/mc-utils": "^1.6.1",
-    "@map-colonies/react-components": "^4.12.0",
+    "@map-colonies/react-components": "file:../shared-components/packages/react-components",
     "@map-colonies/react-core": "^4.2.0",
     "@map-colonies/static-assets": "^0.5.1",
     "@map-colonies/types": "1.6.0",
