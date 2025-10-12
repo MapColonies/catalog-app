@@ -96,7 +96,7 @@ export type Events =
   | { type: "SELECT_GPKG"; file: IGPKGFile }
   | { type: "SELECT_PRODUCT"; file: IProductFile }
   | { type: "SELECT_METADATA"; file: IFileBase }
-  | { type: "SET_FILES"; files: IFiles }
+  | { type: "SET_FILES"; files: IFiles; addPolicy: AddPolicy }
   | { type: "DONE" }
   // | { type: "UPDATE_FORM"; data: Record<string, any> }
   | { type: "SUBMIT", data: Record<string, unknown> }
@@ -290,7 +290,8 @@ const verifyGpkgStates = {
               gpkg: {
                 ..._.event.output
               }
-            }
+            },
+            addPolicy: "merge"
           }))
         ],
         target: "success"
@@ -377,7 +378,8 @@ const fileSelectionStates = {
                 product: {
                   ..._.event.output
                 }
-              }
+              },
+              addPolicy: "merge"
             }))
           ],
           target: `#${WORKFLOW.FILES.ROOT}`
@@ -448,7 +450,8 @@ const fileSelectionStates = {
                 metadata: {
                   ..._.event.output.metadata
                 }
-              }
+              },
+              addPolicy: "merge"
             })),
             sendParent((_: { context: IContext; event: any }) => {
               if (!_.event.output.product.exists) {
@@ -527,9 +530,7 @@ const filesMachine = createMachine({
           actions: [
             assign((_: { context: IContext; event: any }) => ({
               files: {
-                ..._.context.files,
                 gpkg: {
-                  ..._.context.files?.gpkg,
                   ..._.event.file
                 }
               } 
@@ -540,7 +541,8 @@ const filesMachine = createMachine({
                 gpkg: {
                   ..._.event.file
                 }
-              }
+              },
+              addPolicy: "override"
             }))
           ],
           target: WORKFLOW.FILES.VERIFY_GPKG
@@ -635,7 +637,9 @@ export const workflowMachine = createMachine<IContext, Events>({
       on: {
         SET_FILES: {
           actions: assign((_: { context: IContext; event: any }) => ({
-            files: merge({}, _.context.files, _.event.files)
+            files: _.event.addPolicy === 'merge' ?
+              merge({}, _.context.files, _.event.files) :
+              { ..._.event.files }
           }))
         },
         // catch-all errors from any child state     
