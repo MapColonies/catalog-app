@@ -196,8 +196,8 @@ const getFeatureAndMarker = (
 };
 
 const getFile = (files: FileData[], gpkgPath: string, fileName: string, label: string) => {
-  const matchingFiles = files.filter((file: FileData) => file.name === fileName);
-  if (matchingFiles.length === 0) {
+  const matchingFiles = files?.filter((file: FileData) => file.name === fileName);
+  if (!matchingFiles || matchingFiles.length === 0) {
     return {
       label,
       path: path.resolve(gpkgPath, SHAPES_DIR, fileName),
@@ -335,6 +335,10 @@ const fileSelectionStates = {
           throw (buildError('ingestion.error.file-not-found', PRODUCT_SHP));
         }
 
+        if (!input.context.files?.metadata?.path) {
+          throw (buildError('ingestion.error.file-not-found', METADATA_SHP));
+        }
+
         // const productPath = input.context.files.product.path;
 
         // const res = await input.context.store.queryGetFile({
@@ -409,18 +413,18 @@ const fileSelectionStates = {
         }
 
         const gpkgPath = input.context.files.gpkg.path;
-
-        // Call into MobX-State-Tree store
-        const result = await input.context.store.queryGetDirectory({
-          data: {
-            pathSuffix: path.resolve(gpkgPath, SHAPES_DIR),
-            type: RecordType.RECORD_RASTER,
-          },
-        });
-
-        const product = getFile(result.getDirectory as FileData[], gpkgPath, PRODUCT_SHP, PRODUCT_LABEL);
-
-        const metadata = getFile(result.getDirectory as FileData[], gpkgPath, METADATA_SHP, METADATA_LABEL);
+        let result;
+        try {
+          result = await input.context.store.queryGetDirectory({
+            data: {
+              pathSuffix: path.resolve(gpkgPath, SHAPES_DIR),
+              type: RecordType.RECORD_RASTER,
+            },
+          });
+        } catch (e) {
+        }
+        const product = getFile(result?.getDirectory as FileData[], gpkgPath, PRODUCT_SHP, PRODUCT_LABEL);
+        const metadata = getFile(result?.getDirectory as FileData[], gpkgPath, METADATA_SHP, METADATA_LABEL);
 
         return {
           product,
