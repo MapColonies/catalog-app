@@ -178,13 +178,7 @@ export const InnerRasterForm = (
   //     !isPolygonContainsPolygon(state.context.files?.gpkg?.geoDetails?.feature, state.context.files?.product?.geoDetails?.feature)) {
   //     filesActor?.send({
   //       type: "FILES_ERROR",
-  //       error:  {
-  //         source: "logic",
-  //         code: "ingestion.error.invalid-source-file",
-  //         message: intl.formatMessage({ id: shapeFilePerimeterVSGpkgExtentError.message }),
-  //         level: "error",
-  //         addPolicy: "override"
-  //       }
+  //       error: buildError('ingestion.error.invalid-source-file', intl.formatMessage({ id: shapeFilePerimeterVSGpkgExtentError.message }), 'logic', 'error', 'override')
   //     } satisfies Events);
   //   }
   // }, [state.context.files?.gpkg?.geoDetails?.feature, state.context.files?.product?.geoDetails?.feature]);

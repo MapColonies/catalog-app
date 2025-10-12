@@ -248,7 +248,6 @@ const verifyGpkgStates = {
 
         const gpkgPath = input.context.files?.gpkg?.path;
 
-        // Call MobX-State-Tree store
         const res = await input.context.store.queryValidateSource({
           data: {
             fileNames: [path.basename(gpkgPath)],
@@ -272,11 +271,9 @@ const verifyGpkgStates = {
           }
         };
 
-        // return whatever you want in 'onDone'
         return result;
       }),
-      onDone: { 
-        target: "success",
+      onDone: {
         actions: [
           assign((_: { context: IContext; event: any }) => ({
             files: {
@@ -295,26 +292,21 @@ const verifyGpkgStates = {
               }
             }
           }))
-        ]
+        ],
+        target: "success"
       },
       onError: { target: "failure" }
     }
   },
-
   success: {
     type: "final"
   },
-
   failure: {
     entry:
-      sendParent((_: { context: IContext; event: any }) => {
-        return {
-          type: "FILES_ERROR",
-          error: _.event.error.response
-            ? buildError('ingestion.error.invalid-source-file', undefined, 'api', 'error', 'override', _.event.error.response)
-            : { ..._.event.error }
-        };
-      }),
+      sendParent((_: { context: IContext; event: any }) => ({
+        type: "FILES_ERROR",
+        error: { ..._.event.error }
+      })),
     type: "final"
   }
 };
