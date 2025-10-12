@@ -278,6 +278,15 @@ const verifyGpkgStates = {
       onDone: { 
         target: "success",
         actions: [
+          assign((_: { context: IContext; event: any }) => ({
+            files: {
+              ..._.context.files,
+              gpkg: {
+                ..._.context.files?.gpkg,
+                ..._.event.output
+              }
+            }
+          })),
           sendParent((_: { context: IContext; event: any }) => ({
             type: "SET_FILES",
             files: {
@@ -297,7 +306,7 @@ const verifyGpkgStates = {
   },
 
   failure: {
-    entry: 
+    entry:
       sendParent((_: { context: IContext; event: any }) => {
         return {
           type: "FLOW_ERROR",
@@ -358,6 +367,15 @@ const fileSelectionStates = {
         {
           // guard: (_, e) => e.data.gpkg && e.data.metadata,
           actions: [
+            assign((_: { context: IContext; event: any }) => ({
+              files: {
+                ..._.context.files,
+                product: {
+                  ..._.context.files?.product,
+                  ..._.event.output
+                }
+              }
+            })),
             sendParent((_: { context: IContext; event: any }) => ({
               type: "SET_FILES",
               files:  {
@@ -414,6 +432,19 @@ const fileSelectionStates = {
         {
           // guard: (_, e) => e.data.gpkg && e.data.metadata,
           actions: [
+            assign((_: { context: IContext; event: any }) => ({
+              files: {
+                ..._.context.files,
+                product: {
+                  ..._.context.files?.product,
+                  ..._.event.output.product
+                },
+                metadata: {
+                  ..._.context.files?.metadata,
+                  ..._.event.output.metadata
+                }
+              }
+            })),
             sendParent((_: { context: IContext; event: any }) => ({
               type: "SET_FILES",
               files: {
@@ -461,13 +492,24 @@ const fileSelectionStates = {
     entry: (_: { context: IContext; event: any }) => console.log(">>> manual entry", _),
     always: { target: WORKFLOW.IDLE },
     on: {
+      SELECT_GPKG: {
+        actions: assign((_: { context: IContext; event: any }) => ({
+          files: {
+            ..._.context.files,
+            gpkg: {
+              ..._.context.files?.gpkg,
+              ..._.event.file
+            }
+          }
+        }))
+      },
       SELECT_PRODUCT: {
         actions: assign((_: { context: IContext; event: any }) => ({
           files: {
             ..._.context.files,
             product: {
               ..._.context.files?.product,
-              ..._.event.output
+              ..._.event.file
             }
           }
         }))
@@ -478,7 +520,7 @@ const fileSelectionStates = {
             ..._.context.files,
             metadata: {
               ..._.context.files?.metadata,
-              ..._.event.output
+              ..._.event.file
             }
           }
         }))

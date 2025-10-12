@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { observer } from 'mobx-react';
 import { Button, Icon } from '@map-colonies/react-core';
@@ -94,7 +94,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({
   const isLoading = hasLoadingTagDeep(actorRef?.getSnapshot());
   const state = RasterWorkflowContext.useSelector((s) => s);
   const flowActor = state.children?.flow; // <-- the invoked child
-  const flowState = flowActor?.getSnapshot(); // grab its snapshot
+  // const flowState = flowActor?.getSnapshot(); // grab its snapshot
 
   const [isFilePickerDialogOpen, setFilePickerDialogOpen] = useState<boolean>(false);
   const [selection, setSelection] = useState<Selection>({
