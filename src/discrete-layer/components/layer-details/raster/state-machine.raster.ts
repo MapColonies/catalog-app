@@ -126,7 +126,7 @@ export const WORKFLOW = {
   IDLE: "idle",
   RESTORE_JOB: "restoreJob",
   RESTORE_REPLAY: "restoreReplay",
-  FLOW: {
+  FILES: {
     ROOT: "flow",
     SELECT_GPKG: "selectGpkg",
     VERIFY_GPKG: "verifyGpkg",
@@ -384,7 +384,7 @@ const fileSelectionStates = {
               }
             }))
           ],
-          target: `#${WORKFLOW.FLOW.ROOT}`
+          target: `#${WORKFLOW.FILES.ROOT}`
         }
       ],
       onError: {
@@ -392,7 +392,7 @@ const fileSelectionStates = {
           type: "FILES_ERROR",
           error: { ..._.event.error }
         })),
-        target: `#${WORKFLOW.FLOW.ROOT}`
+        target: `#${WORKFLOW.FILES.ROOT}`
       }
     }
   },
@@ -529,13 +529,13 @@ const fileSelectionStates = {
 };
 //#endregion
 
-//#region --- flow submachine ---
-const flowMachine = createMachine({
-  id: WORKFLOW.FLOW.ROOT,
-  initial: WORKFLOW.FLOW.SELECT_GPKG,
+//#region --- files submachine ---
+const filesMachine = createMachine({
+  id: WORKFLOW.FILES.ROOT,
+  initial: WORKFLOW.FILES.SELECT_GPKG,
   context: (ctx: any) => ctx.input,
   states: {
-    [WORKFLOW.FLOW.SELECT_GPKG]: {
+    [WORKFLOW.FILES.SELECT_GPKG]: {
       entry: () => console.log('>>> Enter selectGpkg parent'),
       on: {
         SELECT_GPKG: {
@@ -558,21 +558,21 @@ const flowMachine = createMachine({
               }
             }))
           ],
-          target: WORKFLOW.FLOW.VERIFY_GPKG
+          target: WORKFLOW.FILES.VERIFY_GPKG
         },
         "*": { actions: warnUnexpectedStateEvent }
       }
     },
 
-    [WORKFLOW.FLOW.VERIFY_GPKG]: {
+    [WORKFLOW.FILES.VERIFY_GPKG]: {
       entry: () => console.log('>>> Enter verifyGpkg parent'),
       type: "compound",
       initial: "verifying",
       states: verifyGpkgStates as any,
-      onDone: WORKFLOW.FLOW.MODE_SELECTION
+      onDone: WORKFLOW.FILES.MODE_SELECTION
     },
 
-    [WORKFLOW.FLOW.MODE_SELECTION]: {
+    [WORKFLOW.FILES.MODE_SELECTION]: {
       entry: () => console.log('>>> Enter modeSelection parent'),
       type: "compound",
       initial: "auto",
@@ -585,10 +585,10 @@ const flowMachine = createMachine({
     },
 
     // parent-level error (instead of child jumping out)
-    [WORKFLOW.FLOW.ERROR]: {
+    [WORKFLOW.FILES.ERROR]: {
       type: "atomic",
       on: {
-        RETRY: WORKFLOW.FLOW.SELECT_GPKG // example recovery path
+        RETRY: WORKFLOW.FILES.SELECT_GPKG // example recovery path
       }
     }
   }
@@ -609,11 +609,11 @@ export const workflowMachine = createMachine<IContext, Events>({
       on: {
         START_NEW: {
           actions: assign({ flowType: Mode.NEW }),
-          target: WORKFLOW.FLOW.ROOT
+          target: WORKFLOW.FILES.ROOT
         },
         START_UPDATE: {
           actions: assign({ flowType: Mode.UPDATE }),
-          target: WORKFLOW.FLOW.ROOT
+          target: WORKFLOW.FILES.ROOT
         },
         RESTORE: WORKFLOW.RESTORE_JOB,
         "*": { actions: warnUnexpectedStateEvent }
@@ -638,13 +638,13 @@ export const workflowMachine = createMachine<IContext, Events>({
         }
       }
     },
-    [WORKFLOW.RESTORE_REPLAY]: { always: WORKFLOW.FLOW.ROOT },
-    [WORKFLOW.FLOW.ROOT]: {
-      entry: () => console.log('>>> Entering flow state'),
+    [WORKFLOW.RESTORE_REPLAY]: { always: WORKFLOW.FILES.ROOT },
+    [WORKFLOW.FILES.ROOT]: {
+      entry: () => console.log('>>> Entering files state'),
       invoke: {
-        id: WORKFLOW.FLOW.ROOT, // child actor name
+        id: WORKFLOW.FILES.ROOT, // child actor name
         input: (_: { context: IContext; event: any }) => _.context,
-        src: flowMachine, // reference to submachine
+        src: filesMachine, // reference to submachine
         // sync: true
       },
       on: {
