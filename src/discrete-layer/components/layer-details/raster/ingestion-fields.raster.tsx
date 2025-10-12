@@ -93,7 +93,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({
   const actorRef = RasterWorkflowContext.useActorRef();
   const isLoading = hasLoadingTagDeep(actorRef?.getSnapshot());
   const state = RasterWorkflowContext.useSelector((s) => s);
-  const flowActor = state.children?.flow; // <-- the invoked child
+  const filesActor = state.children?.files; // <-- the invoked child
   // const flowState = flowActor?.getSnapshot(); // grab its snapshot
 
   const [isFilePickerDialogOpen, setFilePickerDialogOpen] = useState<boolean>(false);
@@ -113,7 +113,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({
         .map((folder: FileData) => folder.name)
         .join('/')
       : '';
-    flowActor?.send({
+    filesActor?.send({
       type: "SELECT_GPKG", 
       file: {
         label: 'file-name.gpkg',

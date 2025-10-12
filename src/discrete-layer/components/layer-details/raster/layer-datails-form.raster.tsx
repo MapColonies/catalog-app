@@ -121,7 +121,7 @@ export const InnerRasterForm = (
   const isLoading = hasLoadingTagDeep(actorRef?.getSnapshot());
   
   const state = RasterWorkflowContext.useSelector((s) => s);
-  // const flowActor = state.children?.flow;
+  // const filesActor = state.children?.files;
 
   useEffect(() => {
     const { files } = state.context || {};
@@ -176,7 +176,7 @@ export const InnerRasterForm = (
   //   if (state.context.files?.gpkg?.geoDetails?.feature?.geometry &&
   //     state.context.files?.product?.geoDetails?.feature &&
   //     !isPolygonContainsPolygon(state.context.files?.gpkg?.geoDetails?.feature, state.context.files?.product?.geoDetails?.feature)) {
-  //     flowActor?.send({
+  //     filesActor?.send({
   //       type: "FILES_ERROR",
   //       error:  {
   //         source: "logic",

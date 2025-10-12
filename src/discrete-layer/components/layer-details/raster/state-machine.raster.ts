@@ -34,7 +34,7 @@ const METADATA_SHP = 'ShapeMetadata.shp';
 const PRODUCT_LABEL = 'file-name.product';
 const METADATA_LABEL = 'file-name.metadata';
 
-export type ErrorSource = "api" | "logic" | "formik";
+export type ErrorSource = "api" | "logic";
 export type ErrorLevel = "error" | "warning";
 export type AddPolicy = "merge" | "override";
 
@@ -127,7 +127,7 @@ export const WORKFLOW = {
   RESTORE_JOB: "restoreJob",
   RESTORE_REPLAY: "restoreReplay",
   FILES: {
-    ROOT: "flow",
+    ROOT: "files",
     SELECT_GPKG: "selectGpkg",
     VERIFY_GPKG: "verifyGpkg",
     MODE_SELECTION: "modeSelection",
@@ -490,17 +490,6 @@ const fileSelectionStates = {
     entry: (_: { context: IContext; event: any }) => console.log(">>> manual entry", _),
     always: { target: WORKFLOW.IDLE },
     on: {
-      SELECT_GPKG: {
-        actions: assign((_: { context: IContext; event: any }) => ({
-          files: {
-            ..._.context.files,
-            gpkg: {
-              ..._.context.files?.gpkg,
-              ..._.event.file
-            }
-          }
-        }))
-      },
       SELECT_PRODUCT: {
         actions: assign((_: { context: IContext; event: any }) => ({
           files: {
