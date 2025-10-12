@@ -389,8 +389,7 @@ const fileSelectionStates = {
         actions: sendParent((_: { context: IContext; event: any }) => ({
           type: "FILES_ERROR",
           error: { ..._.event.error }
-        })),
-        target: `#${WORKFLOW.FILES.ROOT}`
+        }))
       }
     }
   },
