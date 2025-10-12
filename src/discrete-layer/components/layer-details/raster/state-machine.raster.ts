@@ -500,6 +500,15 @@ const flowMachine = createMachine({
       on: {
         SELECT_GPKG: {
           actions: [
+            assign((_: { context: IContext; event: any }) => ({
+              files: {
+                ..._.context.files,
+                gpkg: {
+                  ..._.context.files?.gpkg,
+                  ..._.event.file
+                }
+              } 
+            })),
             sendParent((_: { context: IContext; event: any }) => ({
               type: "SET_FILES",
               files: {
