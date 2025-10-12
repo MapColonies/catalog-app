@@ -571,7 +571,6 @@ const filesMachine = createMachine({
       }
     },
 
-    // parent-level error (instead of child jumping out)
     [WORKFLOW.FILES.ERROR]: {
       type: "atomic",
       on: {
