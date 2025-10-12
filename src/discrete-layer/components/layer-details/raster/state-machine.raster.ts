@@ -23,6 +23,7 @@ import {
   RecordType,
   SourceValidationModelType
 } from '../../../models';
+import { LayerRasterRecordInput } from '../../../models/RootStore.base';
 import { cleanUpEntityPayload, getFlatEntityDescriptors } from '../utils';
 import { FeatureType } from './pp-map.utils';
 
@@ -658,7 +659,7 @@ export const workflowMachine = createMachine<IContext, Events>({
       invoke: {
         id: WORKFLOW.FLOW.ROOT, // child actor name
         input: (_: { context: IContext; event: any }) => _.context,
-        src: flowMachine,       // reference to your submachine
+        src: flowMachine, // reference to submachine
         // sync: true
       },
       on: {
@@ -679,32 +680,39 @@ export const workflowMachine = createMachine<IContext, Events>({
         input: (_: { context: IContext; event: any }) => _,
         tags: [STATE_TAGS.GENERAL_LOADING],
         src: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
-          console.log(`[${WORKFLOW.JOB_SUBMISSION}] events data`, input.event?.data);
+          console.log(`[${WORKFLOW.JOB_SUBMISSION}] input`, input);
           const store = input.context.store;
           const metadataPayloadKeys = getFlatEntityDescriptors(
-              'LayerRasterRecord',
-              store.discreteLayersStore.entityDescriptors as EntityDescriptorModelType[]
-            )
-            .filter(descriptor => descriptor.isCreateEssential || descriptor.fieldName === 'id')
-            .map(descriptor => descriptor.fieldName);
-          const res = await store.mutateStartRasterIngestion({
-              data: {
-                ingestionResolution: input.event?.data?.resolutiondegrees as number,
-                inputFiles: {
-                  gpkgFilesPath: [ input.context.files?.gpkg?.path ],
-                  productShapefilePath: input.context.files?.product?.path,
-                  metadataShapefilePath: input.context.files?.metadata?.path
-                },
-                metadata: cleanUpEntityPayload(input.event?.data, metadataPayloadKeys as string[]) as unknown as LayerRasterRecordInput,
-                callbackUrls: ['https://my-dns-for-callback'],
-                type: RecordType.RECORD_RASTER,
-              },
-            });
-          if (!res.startRasterIngestion/*.jobId || res.startRasterIngestion.taskIds[0] */) {
-            throw (buildError('ingestion.error.invalid-source-file', res.startRasterIngestion));
-          }
+            'LayerRasterRecord',
+            store.discreteLayersStore.entityDescriptors as EntityDescriptorModelType[]
+          )
+          .filter(descriptor => descriptor.isCreateEssential || descriptor.fieldName === 'id')
+          .map(descriptor => descriptor.fieldName);
 
-          
+          const data = {
+            ingestionResolution: input.context?.formData?.resolutiondegrees as number,
+            inputFiles: {
+              gpkgFilesPath: [input.context.files?.gpkg?.path],
+              productShapefilePath: input.context.files?.product?.path,
+              metadataShapefilePath: input.context.files?.metadata?.path
+            },
+            metadata: cleanUpEntityPayload(input.context?.formData ?? {}, metadataPayloadKeys as string[]) as unknown as LayerRasterRecordInput,
+            callbackUrls: ['https://my-dns-for-callback'],
+            type: RecordType.RECORD_RASTER,
+          };
+
+          let result;
+          if (input.context.flowType === Mode.NEW) {
+            result = await store.mutateStartRasterIngestion({ data });
+            if (!result || !result.startRasterIngestion) {
+              throw buildError('ingestion.error.invalid-source-file', result?.startRasterIngestion);
+            }
+          } else if (input.context.flowType === Mode.UPDATE) {
+            result = await store.mutateStartRasterUpdateGeopkg({ data });
+            if (!result || !result.startRasterUpdateGeopkg) {
+              throw buildError('ingestion.error.invalid-source-file', result?.startRasterUpdateGeopkg);
+            }
+          }
         }),
         onDone: {
           actions: assign((_: { context: IContext; event: any }) => ({
@@ -743,8 +751,17 @@ export const workflowMachine = createMachine<IContext, Events>({
     }
   },
   on: {
-    FLOW_ERROR: { target: `#${WORKFLOW.ROOT}.${WORKFLOW.ERROR}`, actions: addError },
-    SUBMIT: { target: `#${WORKFLOW.ROOT}.${WORKFLOW.JOB_SUBMISSION}` }
+    SUBMIT: {
+      actions:
+        assign((_: { context: IContext; event: any }) => ({
+          formData: {
+            ..._.event.data
+          }
+        }))
+      ,
+      target: `#${WORKFLOW.ROOT}.${WORKFLOW.JOB_SUBMISSION}`
+    },
+    FLOW_ERROR: { target: `#${WORKFLOW.ROOT}.${WORKFLOW.ERROR}`, actions: addError }
   }
 });
 //#endregion
