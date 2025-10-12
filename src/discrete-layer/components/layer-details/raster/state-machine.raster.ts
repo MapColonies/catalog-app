@@ -575,7 +575,7 @@ const filesMachine = createMachine({
     [WORKFLOW.FILES.ERROR]: {
       type: "atomic",
       on: {
-        RETRY: WORKFLOW.FILES.SELECT_GPKG // example recovery path
+        RETRY: WORKFLOW.FILES.SELECT_GPKG
       }
     }
   }
@@ -642,7 +642,7 @@ export const workflowMachine = createMachine<IContext, Events>({
               { ..._.event.files }
           }))
         },
-        // catch-all errors from any child state     
+        // catch all errors from any child state     
         FILES_ERROR: {
           actions: addError,
           target: `#${WORKFLOW.ROOT}.${WORKFLOW.ERROR}`
@@ -726,13 +726,11 @@ export const workflowMachine = createMachine<IContext, Events>({
   },
   on: {
     SUBMIT: {
-      actions:
-        assign((_: { context: IContext; event: any }) => ({
-          formData: {
-            ..._.event.data
-          }
-        }))
-      ,
+      actions: assign((_: { context: IContext; event: any }) => ({
+        formData: {
+          ..._.event.data
+        }
+      })),
       target: `#${WORKFLOW.ROOT}.${WORKFLOW.JOB_SUBMISSION}`
     }
   }
