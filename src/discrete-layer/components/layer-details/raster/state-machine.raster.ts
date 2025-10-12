@@ -389,7 +389,8 @@ const fileSelectionStates = {
         actions: sendParent((_: { context: IContext; event: any }) => ({
           type: "FILES_ERROR",
           error: { ..._.event.error }
-        }))
+        })),
+        target: `#${WORKFLOW.FILES.ROOT}`
       }
     }
   },
@@ -642,8 +643,7 @@ export const workflowMachine = createMachine<IContext, Events>({
         },
         // catch all errors from any child state     
         FILES_ERROR: {
-          actions: addError,
-          target: `#${WORKFLOW.ROOT}.${WORKFLOW.ERROR}`
+          actions: addError
         }
       }
     },
