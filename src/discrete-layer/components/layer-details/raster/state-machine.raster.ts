@@ -102,7 +102,7 @@ export type Events =
   | { type: "SUBMIT", data: Record<string, unknown> }
   | { type: "RETRY" }
   // | { type: "FORMIK_ERROR"; errors: Record<string, string> }
-  | { type: "FLOW_ERROR"; error: IStateError };
+  | { type: "FILES_ERROR"; error: IStateError };
 
 
 // type FlowActionArgs = ActionArgs<Context, Events, Events>;
@@ -309,7 +309,7 @@ const verifyGpkgStates = {
     entry:
       sendParent((_: { context: IContext; event: any }) => {
         return {
-          type: "FLOW_ERROR",
+          type: "FILES_ERROR",
           error: _.event.error.response
             ? buildError('ingestion.error.invalid-source-file', undefined, 'api', 'error', 'override', _.event.error.response)
             : { ..._.event.error }
@@ -365,7 +365,6 @@ const fileSelectionStates = {
       }),
       onDone: [
         {
-          // guard: (_, e) => e.data.gpkg && e.data.metadata,
           actions: [
             assign((_: { context: IContext; event: any }) => ({
               files: {
@@ -390,7 +389,7 @@ const fileSelectionStates = {
       ],
       onError: {
         actions: sendParent((_: { context: IContext; event: any }) => ({
-          type: "FLOW_ERROR",
+          type: "FILES_ERROR",
           error: { ..._.event.error }
         })),
         target: `#${WORKFLOW.FLOW.ROOT}`
@@ -430,7 +429,6 @@ const fileSelectionStates = {
       }),
       onDone: [
         {
-          // guard: (_, e) => e.data.gpkg && e.data.metadata,
           actions: [
             assign((_: { context: IContext; event: any }) => ({
               files: {
@@ -459,7 +457,7 @@ const fileSelectionStates = {
             sendParent((_: { context: IContext; event: any }) => {
               if (!_.event.output.product.exists) {
                 return {
-                  type: "FLOW_ERROR",
+                  type: "FILES_ERROR",
                   error: buildError('ingestion.error.file-not-found', PRODUCT_SHP)
                 };
               }
@@ -468,7 +466,7 @@ const fileSelectionStates = {
             sendParent((_: { context: IContext; event: any }) => {
               if (!_.event.output.metadata.exists) {
                 return {
-                  type: "FLOW_ERROR",
+                  type: "FILES_ERROR",
                   error: buildError('ingestion.error.file-not-found', METADATA_SHP)
                 };
               }
@@ -481,7 +479,7 @@ const fileSelectionStates = {
       onError: {
         actions: [
           sendParent((_: { context: IContext; event: any }) => ({
-            type: "FLOW_ERROR",
+            type: "FILES_ERROR",
             error: { ..._.event.error }
           }))
         ]
@@ -609,8 +607,14 @@ export const workflowMachine = createMachine<IContext, Events>({
   states: {
     [WORKFLOW.IDLE]: {
       on: {
-        START_NEW: { target: WORKFLOW.FLOW.ROOT, actions: assign({ flowType: Mode.NEW }) },
-        START_UPDATE: { target: WORKFLOW.FLOW.ROOT, actions: assign({ flowType: Mode.UPDATE }) },
+        START_NEW: {
+          actions: assign({ flowType: Mode.NEW }),
+          target: WORKFLOW.FLOW.ROOT
+        },
+        START_UPDATE: {
+          actions: assign({ flowType: Mode.UPDATE }),
+          target: WORKFLOW.FLOW.ROOT
+        },
         RESTORE: WORKFLOW.RESTORE_JOB,
         "*": { actions: warnUnexpectedStateEvent }
       }
@@ -620,17 +624,17 @@ export const workflowMachine = createMachine<IContext, Events>({
         input: (_: { context: IContext; event: any }) => _,
         src: "fetchJobData",
         onDone: {
-          target: "restoreReplay",
           actions: assign((_: { context: IContext; event: any }) => ({
             flowType: _.event.output.flowType,
             files: _.event.output.files,
             formData: _.event.output.formData,
             autoMode: _.event.output.autoMode
-          }))
+          })),
+          target: "restoreReplay"
         },
         onError: {
-          target: `#${WORKFLOW.ROOT}.${WORKFLOW.ERROR}`,
-          actions: addError
+          actions: addError,
+          target: `#${WORKFLOW.ROOT}.${WORKFLOW.ERROR}`
         }
       }
     },
@@ -650,9 +654,9 @@ export const workflowMachine = createMachine<IContext, Events>({
           }))
         },
         // catch-all errors from any child state     
-        FLOW_ERROR: { 
-          actions: addError
-          // target: "error",
+        FILES_ERROR: {
+          actions: addError,
+          target: `#${WORKFLOW.ROOT}.${WORKFLOW.ERROR}`
         }
       }
     },
@@ -702,8 +706,8 @@ export const workflowMachine = createMachine<IContext, Events>({
           target: WORKFLOW.JOB_POLLING
         },
         onError: {
-          target: `#${WORKFLOW.ROOT}.${WORKFLOW.ERROR}`,
-          actions: addError
+          actions: addError,
+          target: `#${WORKFLOW.ROOT}.${WORKFLOW.ERROR}`
         }
       }
     },
@@ -718,8 +722,8 @@ export const workflowMachine = createMachine<IContext, Events>({
           target: WORKFLOW.DONE
         },
         onError: {
-          target: `#${WORKFLOW.ROOT}.${WORKFLOW.ERROR}`,
-          actions: addError
+          actions: addError,
+          target: `#${WORKFLOW.ROOT}.${WORKFLOW.ERROR}`
         }
       }
     },
@@ -741,8 +745,7 @@ export const workflowMachine = createMachine<IContext, Events>({
         }))
       ,
       target: `#${WORKFLOW.ROOT}.${WORKFLOW.JOB_SUBMISSION}`
-    },
-    FLOW_ERROR: { target: `#${WORKFLOW.ROOT}.${WORKFLOW.ERROR}`, actions: addError }
+    }
   }
 });
 //#endregion

@@ -177,7 +177,7 @@ export const InnerRasterForm = (
   //     state.context.files?.product?.geoDetails?.feature &&
   //     !isPolygonContainsPolygon(state.context.files?.gpkg?.geoDetails?.feature, state.context.files?.product?.geoDetails?.feature)) {
   //     flowActor?.send({
-  //       type: "FLOW_ERROR",
+  //       type: "FILES_ERROR",
   //       error:  {
   //         source: "logic",
   //         code: "ingestion.error.invalid-source-file",
