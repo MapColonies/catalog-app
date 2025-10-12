@@ -131,7 +131,6 @@ export const WORKFLOW = {
     SELECT_GPKG: "selectGpkg",
     VERIFY_GPKG: "verifyGpkg",
     MODE_SELECTION: "modeSelection",
-    // FORM_FILL: "formFill",
     ERROR: "error"
   },
   JOB_SUBMISSION: "jobSubmission",
@@ -279,15 +278,6 @@ const verifyGpkgStates = {
       onDone: { 
         target: "success",
         actions: [
-          assign((_: { context: IContext; event: any }) => ({
-            files: {
-              ..._.context.files,
-              gpkg: {
-                ..._.context.files?.gpkg,
-                ..._.event.output
-              }
-            }
-          })),
           sendParent((_: { context: IContext; event: any }) => ({
             type: "SET_FILES",
             files: {
@@ -368,15 +358,6 @@ const fileSelectionStates = {
         {
           // guard: (_, e) => e.data.gpkg && e.data.metadata,
           actions: [
-            assign((_: { context: IContext; event: any }) => ({
-              files: {
-                ..._.context.files,
-                product: {
-                  ..._.context.files?.product,
-                  ..._.event.output
-                }
-              }
-            })),
             sendParent((_: { context: IContext; event: any }) => ({
               type: "SET_FILES",
               files:  {
@@ -431,22 +412,8 @@ const fileSelectionStates = {
       }),
       onDone: [
         {
-          target: "fetchProduct",
           // guard: (_, e) => e.data.gpkg && e.data.metadata,
           actions: [
-            assign((_: { context: IContext; event: any }) => ({
-              files: {
-                ..._.context.files,
-                product: {
-                  ..._.context.files?.product,
-                  ..._.event.output.product
-                },
-                metadata: {
-                  ..._.context.files?.metadata,
-                  ..._.event.output.metadata
-                }
-              }
-            })),
             sendParent((_: { context: IContext; event: any }) => ({
               type: "SET_FILES",
               files: {
@@ -476,7 +443,8 @@ const fileSelectionStates = {
               }
               return { type: "NOOP" };
             })
-          ]
+          ],
+          target: "fetchProduct"
         }
       ],
       onError: {
@@ -532,15 +500,6 @@ const flowMachine = createMachine({
       on: {
         SELECT_GPKG: {
           actions: [
-            assign((_: { context: IContext; event: any }) => ({
-              files: {
-                ..._.context.files,
-                gpkg: {
-                  ..._.context.files?.gpkg,
-                  ..._.event.file
-                }
-              } 
-            })),
             sendParent((_: { context: IContext; event: any }) => ({
               type: "SET_FILES",
               files: {
@@ -575,35 +534,6 @@ const flowMachine = createMachine({
         "*": { actions: warnUnexpectedStateEvent }
       }
     },
-
-    // [WORKFLOW.FLOW.FORM_FILL]: {
-    //   entry: () => console.log('>>> Enter formFill parent'),
-    //   on: {
-    //     UPDATE_FORM: {
-    //       actions: assign((_: { context: IContext; event: any }) => ({
-    //         formData: _.event.data
-    //       }))
-    //     },
-    //     FORMIK_ERROR: {
-    //       actions: assign((_: { context: IContext; event: any }) => ({
-    //         errors: [
-    //           ..._.context.errors,
-    //           ...Object.entries(_.event.errors).map(([field, msg]) => ({
-    //             source: "formik" as const,
-    //             code: `FIELD_${field}`,
-    //             message: msg as string,
-    //             level: "error" as const,
-    //             field
-    //           }))
-    //         ]
-    //       }))
-    //     },
-    //     SUBMIT: {
-    //       actions: sendParent({type: "FLOW_SUBMIT"}),
-    //     },
-    //     "*": { actions: warnUnexpectedStateEvent }
-    //   }
-    // },
 
     // parent-level error (instead of child jumping out)
     [WORKFLOW.FLOW.ERROR]: {
@@ -704,12 +634,12 @@ export const workflowMachine = createMachine<IContext, Events>({
           let result;
           if (input.context.flowType === Mode.NEW) {
             result = await store.mutateStartRasterIngestion({ data });
-            if (!result || !result.startRasterIngestion) {
+            if (!result || !result.startRasterIngestion/*.jobId || res.startRasterIngestion.taskIds[0] */) {
               throw buildError('ingestion.error.invalid-source-file', result?.startRasterIngestion);
             }
           } else if (input.context.flowType === Mode.UPDATE) {
             result = await store.mutateStartRasterUpdateGeopkg({ data });
-            if (!result || !result.startRasterUpdateGeopkg) {
+            if (!result || !result.startRasterUpdateGeopkg/*.jobId || res.startRasterIngestion.taskIds[0] */) {
               throw buildError('ingestion.error.invalid-source-file', result?.startRasterUpdateGeopkg);
             }
           }
