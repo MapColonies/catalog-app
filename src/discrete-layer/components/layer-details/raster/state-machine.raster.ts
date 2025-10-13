@@ -138,7 +138,6 @@ export const WORKFLOW = {
     },
     SELECTION_MODE: {
       ROOT: "selectionMode",
-      IDLE: "idle",
       AUTO: "auto",
       MANUAL: "manual",
       FETCH_PRODUCT: "fetchProduct"
@@ -323,9 +322,6 @@ const validateGpkgStates = {
 
 //#region --- selection mode states ---
 const selectionModeStates = {
-  [WORKFLOW.FILES.SELECTION_MODE.IDLE]: {
-    entry: (_: { context: IContext; event: any }) => console.log(`>>> ${WORKFLOW.FILES.SELECTION_MODE.IDLE}`, _),
-  },
   [WORKFLOW.FILES.SELECTION_MODE.AUTO]: {
     entry: (_: { context: IContext; event: any }) => console.log(`>>> ${WORKFLOW.FILES.SELECTION_MODE.AUTO}`, _),
     tags: [STATE_TAGS.GENERAL_LOADING],
