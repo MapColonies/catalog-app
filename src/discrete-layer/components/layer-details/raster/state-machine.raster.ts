@@ -382,25 +382,7 @@ const selectionModeStates = {
                 }
               },
               addPolicy: "merge"
-            })),
-            sendParent((_: { context: IContext; event: any }) => {
-              if (!_.event.output.product.exists) {
-                return {
-                  type: "FILES_ERROR",
-                  error: buildError('ingestion.error.file-not-found', PRODUCT_SHP)
-                };
-              }
-              return { type: "NOOP" };
-            }),
-            sendParent((_: { context: IContext; event: any }) => {
-              if (!_.event.output.metadata.exists) {
-                return {
-                  type: "FILES_ERROR",
-                  error: buildError('ingestion.error.file-not-found', METADATA_SHP)
-                };
-              }
-              return { type: "NOOP" };
-            })
+            }))
           ],
           target: WORKFLOW.FILES.SELECTION_MODE.FETCH_PRODUCT
         }
@@ -418,9 +400,6 @@ const selectionModeStates = {
   [WORKFLOW.FILES.SELECTION_MODE.MANUAL]: {
     entry: (_: { context: IContext; event: any }) => console.log(`>>> ${WORKFLOW.FILES.SELECTION_MODE.MANUAL}`, _),
     tags: [STATE_TAGS.GENERAL_LOADING],
-    always: {
-      target: WORKFLOW.FILES.SELECTION_MODE.IDLE
-    },
     on: {
       SELECT_PRODUCT: {
         actions: [
@@ -466,6 +445,10 @@ const selectionModeStates = {
           }))
         ]
       },
+      CHECK_SELECTIONS: {
+        guard: (_: { context: IContext; event: any }) => !!_.context.files?.product && !!_.context.files?.metadata,
+        target: WORKFLOW.FILES.SELECTION_MODE.FETCH_PRODUCT
+      },
       "*": { actions: warnUnexpectedStateEvent }
     }
   },
@@ -475,15 +458,21 @@ const selectionModeStates = {
     invoke: {
       input: (_: { context: IContext; event: any }) => _,
       src: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
-        // if (!input.context.files?.product?.path) {
-        //   throw (buildError('ingestion.error.file-not-found', PRODUCT_SHP));
-        // }
-
-        // const productPath = input.context.files.product.path;
+        const { product, metadata } = input.context.files ?? {};
+        const missingFiles = [];
+        if (!product || !product.exists || !product.path) {
+          missingFiles.push(PRODUCT_SHP);
+        }
+        if (!metadata || !metadata.exists || !metadata.path) {
+          missingFiles.push(METADATA_SHP);
+        }
+        if (missingFiles.length > 0) {
+          throw buildError('ingestion.error.file-not-found', `${missingFiles.join(', ')}`);
+        }
 
         // const res = await input.context.store.queryGetFile({
         //   data: {
-        //     pathSuffix: productPath,
+        //     pathSuffix: product.path,
         //     type: RecordType.RECORD_RASTER,
         //   },
         // });
@@ -498,7 +487,7 @@ const selectionModeStates = {
         const { feature, marker } = getFeatureAndMarker(outlinedPolygon, FeatureType.PP_PERIMETER, FeatureType.PP_PERIMETER_MARKER);
 
         const result = {
-          // data: new File(res.getFile[FIRST], path.basename(_.context.files.product.path)),
+          // data: new File(res.getFile[FIRST], path.basename(product.path)),
           geoDetails: {
             feature,
             marker
