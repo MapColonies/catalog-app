@@ -137,10 +137,6 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
       } else {
         actorRef.send({ type: "START_NEW" } satisfies Events);
       }
-      console.log(
-        "****** PARENT CHANGE FLOWTYPE(props.isSelectedLayerUpdateMode) ******",
-        props.isSelectedLayerUpdateMode
-      );
     }, [props.isSelectedLayerUpdateMode, props.layerRecord, actorRef]);
     //#endregion
 
