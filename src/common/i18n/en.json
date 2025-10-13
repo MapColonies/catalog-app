@@ -47,6 +47,7 @@
   "general.title.new": "New {value} product",
   "general.title.edit": "Edit {value} product's metadata",
   "general.title.update": "Update {value} product",
+  "general.title.delete": "Delete {value} product",
   "general.title.view": "View {value} product",
   "general.title.choose": "Choose files",
   "general.dialog.exit.title": "Are you sure?",
@@ -167,6 +168,10 @@
   "publish-unpublish.dialog.publish.action": "publication",
   "publish-unpublish.dialog.unpublish.message": "This action will lead to {action} of the product and hiding it and may affect systems that consume this product",
   "publish-unpublish.dialog.unpublish.action": "canceling the publication",
+
+  "delete.dialog.message": "This action will lead to {action} the product and all of its materials and may affect the systems that consume the product.",
+  "delete.dialog.action": "Delete",
+  "delete.dialog.checkbox": "Confirm deleting",
 
   "snack.message.success": "SUCCESS",
   "snack.message.failed": "FAILURE",
