@@ -129,8 +129,8 @@ export const WORKFLOW = {
   FILES: {
     ROOT: "files",
     SELECT_GPKG: "selectGpkg",
-    VERIFY_GPKG: "verifyGpkg",
-    MODE_SELECTION: "modeSelection",
+    VALIDATE_GPKG: "validateGpkg",
+    SELECTION_MODE: "selectionMode",
     ERROR: "error"
   },
   JOB_SUBMISSION: "jobSubmission",
@@ -231,16 +231,15 @@ const buildError = (
 };
 //#endregion
 
-//#region --- verifyGpkg states ---
-const verifyGpkgStates = {
-  verifying: {
-    entry: (_: { context: IContext; event: any }) => console.log(">>> verifying entry", _),
+//#region --- validate gpkg states ---
+const validateGpkgStates = {
+  validation: {
+    entry: (_: { context: IContext; event: any }) => console.log(">>> validation", _),
     tags: [STATE_TAGS.GENERAL_LOADING],
     invoke: {
-      id: "verifyGpkgApi",
       input: (_: { context: IContext; event: any }) => _,
       src: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
-        console.log("[verifyGpkgApi] ctx.input", input);
+        console.log("[validateGpkgStates.validation] input", input);
 
         if (!input.context.files?.gpkg?.path) {
           throw (buildError('ingestion.error.file-not-found', 'GPKG'));
@@ -313,24 +312,24 @@ const verifyGpkgStates = {
 };
 //#endregion
 
-//#region --- reusable file selection states ---
-const fileSelectionStates = {
+//#region --- selection mode states ---
+const selectionModeStates = {
   idle: {},
   fetchProduct: {
-    entry: (_: { context: IContext; event: any }) => console.log(">>> fetchProduct entry", _),
+    entry: (_: { context: IContext; event: any }) => console.log(">>> fetchProduct", _),
     tags: [STATE_TAGS.GENERAL_LOADING],
     invoke: {
       input: (_: { context: IContext; event: any }) => _,
       src: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
-        console.log("[fileSelectionStates.fetchProduct] ctx.input", input);
+        console.log("[selectionModeStates.fetchProduct] input", input);
 
-        if (!input.context.files?.product?.path) {
-          throw (buildError('ingestion.error.file-not-found', PRODUCT_SHP));
-        }
+        // if (!input.context.files?.product?.path) {
+        //   throw (buildError('ingestion.error.file-not-found', PRODUCT_SHP));
+        // }
 
-        if (!input.context.files?.metadata?.path) {
-          throw (buildError('ingestion.error.file-not-found', METADATA_SHP));
-        }
+        // if (!input.context.files?.metadata?.path) {
+        //   throw (buildError('ingestion.error.file-not-found', METADATA_SHP));
+        // }
 
         // const productPath = input.context.files.product.path;
 
@@ -395,12 +394,12 @@ const fileSelectionStates = {
     }
   },
   auto: {
-    entry: (_: { context: IContext; event: any }) => console.log(">>> auto entry", _),
+    entry: (_: { context: IContext; event: any }) => console.log(">>> auto", _),
     tags: [STATE_TAGS.GENERAL_LOADING],
     invoke: {
       input: (_: { context: IContext; event: any }) => _,
       src: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
-        console.log("[fileSelectionStates.auto] ctx.input", input);
+        console.log("[selectionModeStates.auto] input", input);
 
         if (!input.context.files?.gpkg?.path) {
           throw (buildError('ingestion.error.file-not-found', 'GPKG'));
@@ -486,7 +485,8 @@ const fileSelectionStates = {
     }
   },
   manual: {
-    entry: (_: { context: IContext; event: any }) => console.log(">>> manual entry", _),
+    entry: (_: { context: IContext; event: any }) => console.log(">>> manual", _),
+    tags: [STATE_TAGS.GENERAL_LOADING],
     always: { target: WORKFLOW.IDLE },
     on: {
       SELECT_PRODUCT: {
@@ -517,14 +517,14 @@ const fileSelectionStates = {
 };
 //#endregion
 
-//#region --- files submachine ---
+//#region --- FILES sub state machine ---
 const filesMachine = createMachine({
   id: WORKFLOW.FILES.ROOT,
   initial: WORKFLOW.FILES.SELECT_GPKG,
   context: (ctx: any) => ctx.input,
   states: {
     [WORKFLOW.FILES.SELECT_GPKG]: {
-      entry: () => console.log('>>> Enter selectGpkg parent'),
+      entry: () => console.log(`>>> Enter ${WORKFLOW.FILES.SELECT_GPKG}`),
       on: {
         SELECT_GPKG: {
           actions: [
@@ -545,25 +545,25 @@ const filesMachine = createMachine({
               addPolicy: "override"
             }))
           ],
-          target: WORKFLOW.FILES.VERIFY_GPKG
+          target: WORKFLOW.FILES.VALIDATE_GPKG
         },
         "*": { actions: warnUnexpectedStateEvent }
       }
     },
 
-    [WORKFLOW.FILES.VERIFY_GPKG]: {
-      entry: () => console.log('>>> Enter verifyGpkg parent'),
+    [WORKFLOW.FILES.VALIDATE_GPKG]: {
+      entry: () => console.log(`>>> Enter ${WORKFLOW.FILES.VALIDATE_GPKG}`),
       type: "compound",
-      initial: "verifying",
-      states: verifyGpkgStates as any,
-      onDone: WORKFLOW.FILES.MODE_SELECTION
+      initial: "validation",
+      states: validateGpkgStates as any,
+      onDone: WORKFLOW.FILES.SELECTION_MODE
     },
 
-    [WORKFLOW.FILES.MODE_SELECTION]: {
-      entry: () => console.log('>>> Enter modeSelection parent'),
+    [WORKFLOW.FILES.SELECTION_MODE]: {
+      entry: () => console.log(`>>> Enter ${WORKFLOW.FILES.SELECTION_MODE}`),
       type: "compound",
       initial: "auto",
-      states: fileSelectionStates,
+      states: selectionModeStates,
       on: {
         AUTO: ".auto",
         MANUAL: ".manual",
@@ -581,7 +581,7 @@ const filesMachine = createMachine({
 });
 //#endregion
 
-//#region --- parent workflow machine ---
+//#region --- WORKFLOW state machine ---
 // @ts-ignore
 export const workflowMachine = createMachine<IContext, Events>({
   id: WORKFLOW.ROOT,
@@ -626,11 +626,11 @@ export const workflowMachine = createMachine<IContext, Events>({
     },
     [WORKFLOW.RESTORE_REPLAY]: { always: WORKFLOW.FILES.ROOT },
     [WORKFLOW.FILES.ROOT]: {
-      entry: () => console.log('>>> Entering files state'),
+      entry: () => console.log(`>>> Enter ${WORKFLOW.FILES.ROOT} sub state machine`),
       invoke: {
-        id: WORKFLOW.FILES.ROOT, // child actor name
+        id: WORKFLOW.FILES.ROOT,
         input: (_: { context: IContext; event: any }) => _.context,
-        src: filesMachine, // reference to submachine
+        src: filesMachine,
         // sync: true
       },
       on: {
