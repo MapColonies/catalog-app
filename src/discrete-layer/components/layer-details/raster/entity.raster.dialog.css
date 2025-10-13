@@ -46,6 +46,8 @@ body[dir='rtl'] #entityRasterDialog .closeIcon {
   justify-content: center;
   width: 100%;
   height: var(--update-layer-header-height);
+  border-radius: 10px;
+  margin-bottom: 4px;
 }
 
 #updateLayerHeaderContent {

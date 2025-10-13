@@ -89,11 +89,16 @@ body[dir='rtl'] #layerDetailsFormRaster .enumOptions .mdc-select__dropdown-icon 
 #layerDetailsFormRaster .validationsContainer {
   display: flex;
   height: 410px;
-  margin-bottom: 4px;
+  margin: 4px 0;
 }
 
 #layerDetailsFormRaster .validationsData {
-  width: 740px;
+  width: 728px;
+  margin: 0 4px;
+}
+
+#layerDetailsFormRaster .map {
+  border: 1px solid var(--mdc-theme-gc-selection-background, #fff);
 }
 
 #layerDetailsFormRaster .polygonPartDataError {
@@ -114,14 +119,6 @@ body[dir='rtl'] #layerDetailsFormRaster .enumOptions .mdc-select__dropdown-icon 
 
 #layerDetailsFormRaster .mdc-checkbox__ripple {
   display: none;
-}
-
-#layerDetailsFormRaster .checkBoxContainer {
-  height: 20px;
-}
-
-#layerDetailsFormRaster .displayFlex {
-  display: flex;
 }
 
 #layerDetailsFormRaster .flexCheckItem {

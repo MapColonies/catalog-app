@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect, useCallback } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import {
   withFormik,
   FormikProps,
@@ -13,7 +13,7 @@ import * as Yup from 'yup';
 import { OptionalObjectSchema, TypeOfShape } from 'yup/lib/object';
 import { AnyObject } from 'yup/lib/types';
 import { get, isEmpty } from 'lodash';
-import { Button, Checkbox, CircularProgress } from '@map-colonies/react-core';
+import { Button, CircularProgress } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
 import { ValidationsError } from '../../../../common/components/error/validations.error-presentor';
 import { mergeRecursive } from '../../../../common/helpers/object';
@@ -109,19 +109,15 @@ export const InnerRasterForm = (
   } = props;
 
   const status = props.status as StatusError | Record<string, unknown>;
-  const intl = useIntl();
   const [graphQLError, setGraphQLError] = useState<unknown>(mutationQueryError);
   const [firstPhaseErrors, setFirstPhaseErrors] = useState<Record<string, string[]>>({});
   const [showCurtain, setShowCurtain] = useState<boolean>(false);
-  const [showExistingLayerPartsOnMap, setShowExistingLayerPartsOnMap] = useState<boolean>(false);
   const [isSubmittedForm, setIsSubmittedForm] = useState(false);
 
   //#region STATE MACHINE
   const actorRef = RasterWorkflowContext.useActorRef();
   const isLoading = hasLoadingTagDeep(actorRef?.getSnapshot());
-  
   const state = RasterWorkflowContext.useSelector((s) => s);
-  // const filesActor = state.children?.files;
 
   useEffect(() => {
     const { files } = state.context || {};
@@ -273,47 +269,27 @@ export const InnerRasterForm = (
           {
             showCurtain && <Box className="curtain"></Box>
           }
-          <Box className="checkBoxContainer displayFlex">
-            <Box className="displayFlex">
-            {
-              mode === Mode.UPDATE &&
-              <Checkbox
-                className="flexCheckItem showOnMapContainer"
-                label={intl.formatMessage({ id: 'polygon-parts.show-exisitng-parts-on-map.label' })}
-                checked={showExistingLayerPartsOnMap}
-                onClick={(evt: React.MouseEvent<HTMLInputElement>): void => {
-                  setShowExistingLayerPartsOnMap(evt.currentTarget.checked);
-                }}
-              />
-            }
-            </Box>
-          </Box>
           <Box className="validationsContainer">
-            <Box className="validationsData">
+            <Box className="validationsData section">
             </Box>
-            {
-              <>
-                <GeoFeaturesPresentorComponent 
-                  layerRecord={layerRecord}
-                  mode={mode} 
-                  geoFeatures={
-                    [
-                      state.context.files?.gpkg?.geoDetails?.feature as Feature<Geometry, GeoJsonProperties>,
-                      state.context.files?.gpkg?.geoDetails?.marker as Feature<Geometry, GeoJsonProperties>,
-                      state.context.files?.product?.geoDetails?.feature as Feature<Geometry, GeoJsonProperties>,
-                      state.context.files?.product?.geoDetails?.marker as Feature<Geometry, GeoJsonProperties>
-                    ] 
-                  } 
-                  // selectedFeatureKey={selectedFeature}
-                  //@ts-ignore
-                  selectionStyle={[PPMapStyles.get(FeatureType.SELECTED_FILL), PPMapStyles.get(FeatureType.SELECTED_MARKER)]} 
-                  style={{width: '520px', position: 'relative', direction: 'ltr'}} 
-                  fitOptions={{padding:[10,20,10,20]}}
-                  showExistingPolygonParts={showExistingLayerPartsOnMap}
-                  ingestionResolutionMeter={getFieldMeta('resolutionMeter').value as number}
-                />
-              </>
-            }
+            <GeoFeaturesPresentorComponent
+              layerRecord={layerRecord}
+              mode={mode}
+              geoFeatures={
+                [
+                  state.context.files?.gpkg?.geoDetails?.feature as Feature<Geometry, GeoJsonProperties>,
+                  state.context.files?.gpkg?.geoDetails?.marker as Feature<Geometry, GeoJsonProperties>,
+                  state.context.files?.product?.geoDetails?.feature as Feature<Geometry, GeoJsonProperties>,
+                  state.context.files?.product?.geoDetails?.marker as Feature<Geometry, GeoJsonProperties>
+                ]
+              } 
+              // selectedFeatureKey={selectedFeature}
+              // @ts-ignore
+              selectionStyle={[PPMapStyles.get(FeatureType.SELECTED_FILL), PPMapStyles.get(FeatureType.SELECTED_MARKER)]}
+              style={{width: '520px', position: 'relative', direction: 'ltr'}}
+              fitOptions={{padding:[10,20,10,20]}}
+              ingestionResolutionMeter={getFieldMeta('resolutionMeter').value as number}
+            />
           </Box>
           <LayersDetailsComponent
             entityDescriptors={uiIngestionFieldDescriptors as EntityDescriptorModelType[]}

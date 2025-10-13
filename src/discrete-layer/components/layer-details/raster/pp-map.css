@@ -1,0 +1,17 @@
+#entityRasterDialog .map + .checkbox {
+  display: inline-block;
+  position: relative;
+  top: -32px;
+  left: 293px;
+  height: 31px;
+  background-color: #262626bf;
+  direction: ltr;
+  padding-right: 12px;
+}
+
+body[dir='rtl'] #entityRasterDialog .map + .checkbox {
+  direction: rtl;
+  left: unset;
+  right: 1px;
+  padding-left: 12px;
+}

@@ -1,5 +1,9 @@
-import { CSSProperties, useEffect, useMemo, useRef } from 'react';
+import { CSSProperties, useEffect, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
+import { Feature } from 'geojson';
+import { get, isEmpty } from 'lodash';
+import { FitOptions } from 'ol/View';
+import { Style } from 'ol/style';
 import {
   Box,
   GeoJSONFeature,
@@ -17,16 +21,15 @@ import {
   VectorLayer,
   VectorSource
 } from '@map-colonies/react-components';
-import { Feature } from 'geojson';
-import { get, isEmpty } from 'lodash';
-import { FitOptions } from 'ol/View';
-import { Style } from 'ol/style';
+import { Checkbox } from '@map-colonies/react-core';
 import { Mode } from '../../../../common/models/mode.enum';
 import { MapLoadingIndicator } from '../../../../common/components/map/ol-map.loader';
 import { ILayerImage } from '../../../models/layerImage';
 import { useStore } from '../../../models/RootStore';
 import { PolygonPartsVectorLayer as PolygonPartsExtentVectorLayer } from './pp-extent-vector-layer';
 import { PPMapStyles } from './pp-map.utils';
+
+import './pp-map.css';
 
 interface GeoFeaturesPresentorProps {
   mode: Mode;
@@ -50,12 +53,12 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   fitOptions,
   selectedFeatureKey,
   selectionStyle,
-  showExistingPolygonParts,
   layerRecord
 }) => {
   const store = useStore();
   const intl = useIntl();
   const renderCount = useRef(0);
+  const [showExistingPolygonParts, setShowExistingPolygonParts] = useState<boolean>(false);
 
   useEffect(() => {
     if (geoFeatures && geoFeatures?.length >= MIN_FEATURES_NUMBER) {
@@ -162,8 +165,19 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
     <Box style={{...style}}>
       <Map>
         <MapLoadingIndicator/>
-        <Box style={{position: "relative", width: "54px", height: "40px", backgroundColor: "red", top: "-40px", left: "90%", opacity: "30%"}}>
-        </Box>
+        {
+          mode === Mode.UPDATE &&
+          <Box className="checkbox">
+            <Checkbox
+              className="flexCheckItem showOnMapContainer"
+              label={intl.formatMessage({ id: 'polygon-parts.show-exisitng-parts-on-map.label' })}
+              checked={showExistingPolygonParts}
+              onClick={(evt: React.MouseEvent<HTMLInputElement>): void => {
+                setShowExistingPolygonParts(evt.currentTarget.checked);
+              }}
+            />
+          </Box>
+        }
         {previewBaseMap}
         <VectorLayer>
           <VectorSource>
