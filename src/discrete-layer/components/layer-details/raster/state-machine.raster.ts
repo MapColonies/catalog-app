@@ -99,6 +99,7 @@ export type Events =
   | { type: "SET_FILES"; files: IFiles; addPolicy: AddPolicy }
   | { type: "FILES_ERROR"; error: IStateError }
   | { type: "CLEAN_ERRORS" }
+  | { type: "NOOP" }
   // | { type: "UPDATE_FORM"; data: Record<string, any> }
   | { type: "SUBMIT", data: Record<string, unknown> }
   | { type: "RETRY" }
@@ -129,8 +130,19 @@ export const WORKFLOW = {
   FILES: {
     ROOT: "files",
     SELECT_GPKG: "selectGpkg",
-    VALIDATE_GPKG: "validateGpkg",
-    SELECTION_MODE: "selectionMode",
+    VALIDATE_GPKG: {
+      ROOT: "validateGpkg",
+      VALIDATION: "validation",
+      SUCCESS: "success",
+      FAILURE: "failure"
+    },
+    SELECTION_MODE: {
+      ROOT: "selectionMode",
+      IDLE: "idle",
+      FETCH_PRODUCT: "fetchProduct",
+      AUTO: "auto",
+      MANUAL: "manual"
+    },
     ERROR: "error"
   },
   JOB_SUBMISSION: "jobSubmission",
@@ -149,7 +161,6 @@ const addError = assign((_: { context: IContext; event: any }) => {
 });
 
 const warnUnexpectedStateEvent = (_: any) => {
-  //@ts-ignore
   console.warn(`[StateMachine] Unexpected event '${_.event.type}' in state '${_.self._snapshot.value}'`);
 };
 
@@ -233,14 +244,12 @@ const buildError = (
 
 //#region --- validate gpkg states ---
 const validateGpkgStates = {
-  validation: {
-    entry: (_: { context: IContext; event: any }) => console.log(">>> validation", _),
+  [WORKFLOW.FILES.VALIDATE_GPKG.VALIDATION]: {
+    entry: (_: { context: IContext; event: any }) => console.log(`>>> ${WORKFLOW.FILES.VALIDATE_GPKG.VALIDATION}`, _),
     tags: [STATE_TAGS.GENERAL_LOADING],
     invoke: {
       input: (_: { context: IContext; event: any }) => _,
       src: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
-        console.log("[validateGpkgStates.validation] input", input);
-
         if (!input.context.files?.gpkg?.path) {
           throw (buildError('ingestion.error.file-not-found', 'GPKG'));
         }
@@ -293,15 +302,15 @@ const validateGpkgStates = {
             addPolicy: "merge"
           }))
         ],
-        target: "success"
+        target: WORKFLOW.FILES.VALIDATE_GPKG.SUCCESS
       },
-      onError: { target: "failure" }
+      onError: { target: WORKFLOW.FILES.VALIDATE_GPKG.FAILURE }
     }
   },
-  success: {
+  [WORKFLOW.FILES.VALIDATE_GPKG.SUCCESS]: {
     type: "final"
   },
-  failure: {
+  [WORKFLOW.FILES.VALIDATE_GPKG.FAILURE]: {
     entry:
       sendParent((_: { context: IContext; event: any }) => ({
         type: "FILES_ERROR",
@@ -314,15 +323,13 @@ const validateGpkgStates = {
 
 //#region --- selection mode states ---
 const selectionModeStates = {
-  idle: {},
-  fetchProduct: {
-    entry: (_: { context: IContext; event: any }) => console.log(">>> fetchProduct", _),
+  [WORKFLOW.FILES.SELECTION_MODE.IDLE]: {},
+  [WORKFLOW.FILES.SELECTION_MODE.FETCH_PRODUCT]: {
+    entry: (_: { context: IContext; event: any }) => console.log(`>>> ${WORKFLOW.FILES.SELECTION_MODE.FETCH_PRODUCT}`, _),
     tags: [STATE_TAGS.GENERAL_LOADING],
     invoke: {
       input: (_: { context: IContext; event: any }) => _,
       src: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
-        console.log("[selectionModeStates.fetchProduct] input", input);
-
         // if (!input.context.files?.product?.path) {
         //   throw (buildError('ingestion.error.file-not-found', PRODUCT_SHP));
         // }
@@ -393,14 +400,12 @@ const selectionModeStates = {
       }
     }
   },
-  auto: {
-    entry: (_: { context: IContext; event: any }) => console.log(">>> auto", _),
+  [WORKFLOW.FILES.SELECTION_MODE.AUTO]: {
+    entry: (_: { context: IContext; event: any }) => console.log(`>>> ${WORKFLOW.FILES.SELECTION_MODE.AUTO}`, _),
     tags: [STATE_TAGS.GENERAL_LOADING],
     invoke: {
       input: (_: { context: IContext; event: any }) => _,
       src: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
-        console.log("[selectionModeStates.auto] input", input);
-
         if (!input.context.files?.gpkg?.path) {
           throw (buildError('ingestion.error.file-not-found', 'GPKG'));
         }
@@ -471,7 +476,7 @@ const selectionModeStates = {
               return { type: "NOOP" };
             })
           ],
-          target: "fetchProduct"
+          target: WORKFLOW.FILES.SELECTION_MODE.FETCH_PRODUCT
         }
       ],
       onError: {
@@ -484,8 +489,8 @@ const selectionModeStates = {
       }
     }
   },
-  manual: {
-    entry: (_: { context: IContext; event: any }) => console.log(">>> manual", _),
+  [WORKFLOW.FILES.SELECTION_MODE.MANUAL]: {
+    entry: (_: { context: IContext; event: any }) => console.log(`>>> ${WORKFLOW.FILES.SELECTION_MODE.MANUAL}`, _),
     tags: [STATE_TAGS.GENERAL_LOADING],
     always: { target: WORKFLOW.IDLE },
     on: {
@@ -568,33 +573,34 @@ const filesMachine = createMachine({
             })),
             sendParent({ type: "CLEAN_ERRORS" })
           ],
-          target: WORKFLOW.FILES.VALIDATE_GPKG
+          target: WORKFLOW.FILES.VALIDATE_GPKG.ROOT
         },
         "*": { actions: warnUnexpectedStateEvent }
       }
     },
 
-    [WORKFLOW.FILES.VALIDATE_GPKG]: {
-      entry: () => console.log(`>>> Enter ${WORKFLOW.FILES.VALIDATE_GPKG}`),
+    [WORKFLOW.FILES.VALIDATE_GPKG.ROOT]: {
+      entry: () => console.log(`>>> Enter ${WORKFLOW.FILES.VALIDATE_GPKG.ROOT}`),
       type: "compound",
-      initial: "validation",
+      initial: WORKFLOW.FILES.VALIDATE_GPKG.VALIDATION,
       states: validateGpkgStates as any,
-      onDone: WORKFLOW.FILES.SELECTION_MODE
+      onDone: WORKFLOW.FILES.SELECTION_MODE.ROOT
     },
 
-    [WORKFLOW.FILES.SELECTION_MODE]: {
-      entry: () => console.log(`>>> Enter ${WORKFLOW.FILES.SELECTION_MODE}`),
+    [WORKFLOW.FILES.SELECTION_MODE.ROOT]: {
+      entry: () => console.log(`>>> Enter ${WORKFLOW.FILES.SELECTION_MODE.ROOT}`),
       type: "compound",
-      initial: "auto",
+      initial: WORKFLOW.FILES.SELECTION_MODE.AUTO,
       states: selectionModeStates,
       on: {
-        AUTO: ".auto",
-        MANUAL: ".manual",
+        AUTO: `.${WORKFLOW.FILES.SELECTION_MODE.AUTO}`,
+        MANUAL: `.${WORKFLOW.FILES.SELECTION_MODE.MANUAL}`,
         "*": { actions: warnUnexpectedStateEvent }
       }
     },
 
     [WORKFLOW.FILES.ERROR]: {
+      entry: () => console.log(`>>> Enter ${WORKFLOW.FILES.ERROR}`),
       type: "atomic",
       on: {
         RETRY: WORKFLOW.FILES.SELECT_GPKG
@@ -615,6 +621,7 @@ export const workflowMachine = createMachine<IContext, Events>({
   }),
   states: {
     [WORKFLOW.IDLE]: {
+      entry: () => console.log(`>>> Enter ${WORKFLOW.ROOT.toUpperCase()} state machine`),
       on: {
         START_NEW: {
           actions: assign({ flowType: Mode.NEW }),
@@ -629,6 +636,7 @@ export const workflowMachine = createMachine<IContext, Events>({
       }
     },
     [WORKFLOW.RESTORE_JOB]: {
+      entry: () => console.log(`>>> Enter ${WORKFLOW.RESTORE_JOB}`),
       invoke: {
         input: (_: { context: IContext; event: any }) => _,
         src: "fetchJobData",
@@ -639,7 +647,7 @@ export const workflowMachine = createMachine<IContext, Events>({
             formData: _.event.output.formData,
             autoMode: _.event.output.autoMode
           })),
-          target: "restoreReplay"
+          target: WORKFLOW.RESTORE_REPLAY
         },
         onError: {
           actions: addError,
@@ -647,9 +655,12 @@ export const workflowMachine = createMachine<IContext, Events>({
         }
       }
     },
-    [WORKFLOW.RESTORE_REPLAY]: { always: WORKFLOW.FILES.ROOT },
+    [WORKFLOW.RESTORE_REPLAY]: {
+      entry: () => console.log(`>>> Enter ${WORKFLOW.RESTORE_REPLAY}`),
+      always: WORKFLOW.FILES.ROOT
+    },
     [WORKFLOW.FILES.ROOT]: {
-      entry: () => console.log(`>>> Enter ${WORKFLOW.FILES.ROOT.toLocaleUpperCase()} sub state machine`),
+      entry: () => console.log(`>>> Enter ${WORKFLOW.FILES.ROOT.toUpperCase()} sub state machine`),
       invoke: {
         id: WORKFLOW.FILES.ROOT,
         input: (_: { context: IContext; event: any }) => _.context,
@@ -664,17 +675,18 @@ export const workflowMachine = createMachine<IContext, Events>({
               { ..._.event.files }
           }))
         },
-        // catch all errors from any child state     
         FILES_ERROR: {
           actions: addError
         },
         CLEAN_ERRORS: {
           actions: assign({ errors: [] })
         },
+        NOOP: { actions: () => {} },
         "*": { actions: warnUnexpectedStateEvent }
       }
     },
     [WORKFLOW.JOB_SUBMISSION]: {
+      entry: () => console.log(`>>> Enter ${WORKFLOW.JOB_SUBMISSION}`),
       invoke: {
         input: (_: { context: IContext; event: any }) => _,
         tags: [STATE_TAGS.GENERAL_LOADING],
@@ -726,6 +738,7 @@ export const workflowMachine = createMachine<IContext, Events>({
       }
     },
     [WORKFLOW.JOB_POLLING]: {
+      entry: () => console.log(`>>> Enter ${WORKFLOW.JOB_POLLING}`),
       invoke: {
         input: (_: { context: IContext; event: any }) => _,
         src: "pollJobStatus",
@@ -741,8 +754,12 @@ export const workflowMachine = createMachine<IContext, Events>({
         }
       }
     },
-    [WORKFLOW.DONE]: { type: "final" },
+    [WORKFLOW.DONE]: {
+      entry: () => console.log(`>>> Enter ${WORKFLOW.DONE}`),
+      type: "final"
+    },
     [WORKFLOW.ERROR]: {
+      entry: () => console.log(`>>> Enter ${WORKFLOW.ERROR}`),
       on: {
         RETRY: WORKFLOW.IDLE,
         "*": { actions: warnUnexpectedStateEvent }
