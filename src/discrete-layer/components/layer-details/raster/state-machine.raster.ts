@@ -97,12 +97,12 @@ export type Events =
   | { type: "SELECT_PRODUCT"; file: IProductFile }
   | { type: "SELECT_METADATA"; file: IFileBase }
   | { type: "SET_FILES"; files: IFiles; addPolicy: AddPolicy }
-  | { type: "DONE" }
+  | { type: "FILES_ERROR"; error: IStateError }
+  | { type: "CLEAN_ERRORS" }
   // | { type: "UPDATE_FORM"; data: Record<string, any> }
   | { type: "SUBMIT", data: Record<string, unknown> }
   | { type: "RETRY" }
-  // | { type: "FORMIK_ERROR"; errors: Record<string, string> }
-  | { type: "FILES_ERROR"; error: IStateError };
+  | { type: "DONE" };
 
 
 // type FlowActionArgs = ActionArgs<Context, Events, Events>;
@@ -490,26 +490,48 @@ const selectionModeStates = {
     always: { target: WORKFLOW.IDLE },
     on: {
       SELECT_PRODUCT: {
-        actions: assign((_: { context: IContext; event: any }) => ({
-          files: {
-            ..._.context.files,
-            product: {
-              ..._.context.files?.product,
-              ..._.event.file
+        actions: [
+          assign((_: { context: IContext; event: any }) => ({
+            files: {
+              ..._.context.files,
+              product: {
+                ..._.context.files?.product,
+                ..._.event.file
+              }
             }
-          }
-        }))
+          })),
+          sendParent((_: { context: IContext; event: any }) => ({
+            type: "SET_FILES",
+            files: {
+              product: {
+                ..._.event.file
+              }
+            },
+            addPolicy: "merge"
+          }))
+        ]
       },
       SELECT_METADATA: {
-        actions: assign((_: { context: IContext; event: any }) => ({
-          files: {
-            ..._.context.files,
-            metadata: {
-              ..._.context.files?.metadata,
-              ..._.event.file
+        actions: [
+          assign((_: { context: IContext; event: any }) => ({
+            files: {
+              ..._.context.files,
+              metadata: {
+                ..._.context.files?.metadata,
+                ..._.event.file
+              }
             }
-          }
-        }))
+          })),
+          sendParent((_: { context: IContext; event: any }) => ({
+            type: "SET_FILES",
+            files: {
+              metadata: {
+                ..._.event.file
+              }
+            },
+            addPolicy: "merge"
+          }))
+        ]
       },
       "*": { actions: warnUnexpectedStateEvent }
     }
@@ -543,7 +565,8 @@ const filesMachine = createMachine({
                 }
               },
               addPolicy: "override"
-            }))
+            })),
+            sendParent({ type: "CLEAN_ERRORS" })
           ],
           target: WORKFLOW.FILES.VALIDATE_GPKG
         },
@@ -626,7 +649,7 @@ export const workflowMachine = createMachine<IContext, Events>({
     },
     [WORKFLOW.RESTORE_REPLAY]: { always: WORKFLOW.FILES.ROOT },
     [WORKFLOW.FILES.ROOT]: {
-      entry: () => console.log(`>>> Enter ${WORKFLOW.FILES.ROOT} sub state machine`),
+      entry: () => console.log(`>>> Enter ${WORKFLOW.FILES.ROOT.toLocaleUpperCase()} sub state machine`),
       invoke: {
         id: WORKFLOW.FILES.ROOT,
         input: (_: { context: IContext; event: any }) => _.context,
@@ -644,7 +667,11 @@ export const workflowMachine = createMachine<IContext, Events>({
         // catch all errors from any child state     
         FILES_ERROR: {
           actions: addError
-        }
+        },
+        CLEAN_ERRORS: {
+          actions: assign({ errors: [] })
+        },
+        "*": { actions: warnUnexpectedStateEvent }
       }
     },
     [WORKFLOW.JOB_SUBMISSION]: {
