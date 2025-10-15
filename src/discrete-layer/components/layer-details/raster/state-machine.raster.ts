@@ -764,42 +764,5 @@ export const workflowMachine = createMachine<IContext, Events>({
       }
     }
   }
-}, {
-  services: {
-    jobSubmissionService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
-      const store = input.context.store;
-      const metadataPayloadKeys = getFlatEntityDescriptors(
-        'LayerRasterRecord',
-        store.discreteLayersStore.entityDescriptors as EntityDescriptorModelType[]
-      )
-      .filter(descriptor => descriptor.isCreateEssential || descriptor.fieldName === 'id')
-      .map(descriptor => descriptor.fieldName);
-
-      const data = {
-        ingestionResolution: input.context?.formData?.resolutiondegrees as number,
-        inputFiles: {
-          gpkgFilesPath: [input.context.files?.gpkg?.path],
-          productShapefilePath: input.context.files?.product?.path,
-          metadataShapefilePath: input.context.files?.metadata?.path
-        },
-        metadata: cleanUpEntityPayload(input.context?.formData ?? {}, metadataPayloadKeys as string[]) as unknown as LayerRasterRecordInput,
-        callbackUrls: ['https://my-dns-for-callback'],
-        type: RecordType.RECORD_RASTER,
-      };
-
-      let result;
-      if (input.context.flowType === Mode.NEW) {
-        result = await store.mutateStartRasterIngestion({ data });
-        if (!result || !result.startRasterIngestion/*.jobId || res.startRasterIngestion.taskIds[0] */) {
-          throw buildError('ingestion.error.invalid-source-file', result?.startRasterIngestion);
-        }
-      } else if (input.context.flowType === Mode.UPDATE) {
-        result = await store.mutateStartRasterUpdateGeopkg({ data });
-        if (!result || !result.startRasterUpdateGeopkg/*.jobId || res.startRasterIngestion.taskIds[0] */) {
-          throw buildError('ingestion.error.invalid-source-file', result?.startRasterUpdateGeopkg);
-        }
-      }
-    })
-  }
 });
 //#endregion
