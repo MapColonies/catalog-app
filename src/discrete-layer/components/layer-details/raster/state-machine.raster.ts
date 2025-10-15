@@ -99,6 +99,7 @@ export type Events =
   | { type: "SET_FILES"; files: IFiles; addPolicy: AddPolicy }
   | { type: "FILES_ERROR"; error: IStateError }
   | { type: "CLEAN_ERRORS" }
+  | { type: "FILES_SELECTED" }
   | { type: "NOOP" }
   | { type: "SUBMIT", data: Record<string, unknown> }
   | { type: "RETRY" }
@@ -511,9 +512,9 @@ const selectionModeStates = {
                 }
               },
               addPolicy: "merge"
-            }))
-          ],
-          target: `#${WORKFLOW.FILES.ROOT}`
+            })),
+            sendParent({ type: "FILES_SELECTED" })
+          ]
         }
       ],
       onError: {
@@ -616,6 +617,14 @@ export const workflowMachine = createMachine<IContext, Events>({
           target: WORKFLOW.FILES.ROOT
         },
         RESTORE: WORKFLOW.RESTORE_JOB,
+        SUBMIT: {
+          actions: assign((_: { context: IContext; event: any }) => ({
+            formData: {
+              ..._.event.data
+            }
+          })),
+          target: WORKFLOW.JOB_SUBMISSION
+        },
         "*": { actions: warnUnexpectedStateEvent }
       }
     },
@@ -657,6 +666,10 @@ export const workflowMachine = createMachine<IContext, Events>({
               merge({}, _.context.files, _.event.files) :
               { ..._.event.files }
           }))
+        },
+        FILES_SELECTED: {
+          actions: assign({ errors: [] }),
+          target: `#${WORKFLOW.ROOT}`
         },
         FILES_ERROR: {
           actions: addError
@@ -715,8 +728,7 @@ export const workflowMachine = createMachine<IContext, Events>({
           target: WORKFLOW.JOB_POLLING
         },
         onError: {
-          actions: addError,
-          target: `#${WORKFLOW.ROOT}.${WORKFLOW.ERROR}`
+          actions: addError
         }
       }
     },
@@ -732,8 +744,7 @@ export const workflowMachine = createMachine<IContext, Events>({
           target: WORKFLOW.DONE
         },
         onError: {
-          actions: addError,
-          target: `#${WORKFLOW.ROOT}.${WORKFLOW.ERROR}`
+          actions: addError
         }
       }
     },
@@ -747,16 +758,6 @@ export const workflowMachine = createMachine<IContext, Events>({
         RETRY: WORKFLOW.IDLE,
         "*": { actions: warnUnexpectedStateEvent }
       }
-    }
-  },
-  on: {
-    SUBMIT: {
-      actions: assign((_: { context: IContext; event: any }) => ({
-        formData: {
-          ..._.event.data
-        }
-      })),
-      target: `#${WORKFLOW.ROOT}.${WORKFLOW.JOB_SUBMISSION}`
     }
   }
 });
