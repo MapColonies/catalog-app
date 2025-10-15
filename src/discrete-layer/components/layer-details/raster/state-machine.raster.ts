@@ -164,13 +164,15 @@ const warnUnexpectedStateEvent = (_: any) => {
 };
 
 export const hasLoadingTagDeep = (state: SnapshotFrom<typeof workflowMachine>, tag = STATE_TAGS.GENERAL_LOADING): boolean => {
-  // check current state tags
-  if (state.hasTag(tag)) return true;
-  // check all children recursively
-  for (const child of Object.values(state.children)) {
-    const childSnap = child.getSnapshot?.();
-    if (childSnap && hasLoadingTagDeep(childSnap)) {
-      return true;
+  if (state && typeof state.hasTag === 'function' && state.hasTag(tag)) {
+    return true;
+  }
+  if (state && state.children) {
+    for (const child of Object.values(state.children)) {
+      const childSnap = child.getSnapshot?.();
+      if (childSnap && hasLoadingTagDeep(childSnap)) {
+        return true;
+      }
     }
   }
   return false;
@@ -723,7 +725,7 @@ export const workflowMachine = createMachine<IContext, Events>({
         }),
         onDone: {
           actions: assign((_: { context: IContext; event: any }) => ({
-            jobId: _.event.data.jobId
+            jobId: _.event.output.jobId
           })),
           target: WORKFLOW.JOB_POLLING
         },
@@ -739,7 +741,7 @@ export const workflowMachine = createMachine<IContext, Events>({
         src: "pollJobStatus",
         onDone: {
           actions: assign((_: { context: IContext; event: any }) => ({
-            jobStatus: _.event.data.jobStatus
+            jobStatus: _.event.output.jobStatus
           })),
           target: WORKFLOW.DONE
         },
