@@ -337,7 +337,7 @@ const selectionModeStates = {
         try {
           result = await input.context.store.queryGetDirectory({
             data: {
-              pathSuffix: path.resolve(gpkgPath, SHAPES_DIR),
+              path: path.resolve(gpkgPath, SHAPES_DIR),
               type: RecordType.RECORD_RASTER,
             },
           });
