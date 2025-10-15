@@ -100,7 +100,6 @@ export type Events =
   | { type: "FILES_ERROR"; error: IStateError }
   | { type: "CLEAN_ERRORS" }
   | { type: "NOOP" }
-  // | { type: "UPDATE_FORM"; data: Record<string, any> }
   | { type: "SUBMIT", data: Record<string, unknown> }
   | { type: "RETRY" }
   | { type: "DONE" };
