@@ -169,7 +169,7 @@ export const hasLoadingTagDeep = (state: SnapshotFrom<typeof workflowMachine>, t
   }
   if (state && state.children) {
     for (const child of Object.values(state.children)) {
-      const childSnap = child.getSnapshot?.();
+      const childSnap = child?.getSnapshot?.();
       if (childSnap && hasLoadingTagDeep(childSnap)) {
         return true;
       }
@@ -606,9 +606,10 @@ export const workflowMachine = createMachine<IContext, Events>({
     ...input as IContext,
     errors: []
   }),
+  entry: () => console.log(`>>> Enter ${WORKFLOW.ROOT.toUpperCase()} state machine`),
   states: {
     [WORKFLOW.IDLE]: {
-      entry: () => console.log(`>>> Enter ${WORKFLOW.ROOT.toUpperCase()} state machine`),
+      entry: () => console.log(`>>> Enter ${WORKFLOW.IDLE}`),
       on: {
         START_NEW: {
           actions: assign({ flowType: Mode.NEW }),
@@ -646,7 +647,7 @@ export const workflowMachine = createMachine<IContext, Events>({
         },
         onError: {
           actions: addError,
-          target: `#${WORKFLOW.ROOT}.${WORKFLOW.ERROR}`
+          target: WORKFLOW.ERROR
         }
       }
     },
@@ -689,7 +690,6 @@ export const workflowMachine = createMachine<IContext, Events>({
         input: (_: { context: IContext; event: any }) => _,
         tags: [STATE_TAGS.GENERAL_LOADING],
         src: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
-          console.log(`[${WORKFLOW.JOB_SUBMISSION}] input`, input);
           const store = input.context.store;
           const metadataPayloadKeys = getFlatEntityDescriptors(
             'LayerRasterRecord',
@@ -730,7 +730,8 @@ export const workflowMachine = createMachine<IContext, Events>({
           target: WORKFLOW.JOB_POLLING
         },
         onError: {
-          actions: addError
+          actions: addError,
+          target: WORKFLOW.ERROR
         }
       }
     },
@@ -746,7 +747,8 @@ export const workflowMachine = createMachine<IContext, Events>({
           target: WORKFLOW.DONE
         },
         onError: {
-          actions: addError
+          actions: addError,
+          target: WORKFLOW.ERROR
         }
       }
     },
@@ -761,6 +763,43 @@ export const workflowMachine = createMachine<IContext, Events>({
         "*": { actions: warnUnexpectedStateEvent }
       }
     }
+  }
+}, {
+  services: {
+    jobSubmissionService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
+      const store = input.context.store;
+      const metadataPayloadKeys = getFlatEntityDescriptors(
+        'LayerRasterRecord',
+        store.discreteLayersStore.entityDescriptors as EntityDescriptorModelType[]
+      )
+      .filter(descriptor => descriptor.isCreateEssential || descriptor.fieldName === 'id')
+      .map(descriptor => descriptor.fieldName);
+
+      const data = {
+        ingestionResolution: input.context?.formData?.resolutiondegrees as number,
+        inputFiles: {
+          gpkgFilesPath: [input.context.files?.gpkg?.path],
+          productShapefilePath: input.context.files?.product?.path,
+          metadataShapefilePath: input.context.files?.metadata?.path
+        },
+        metadata: cleanUpEntityPayload(input.context?.formData ?? {}, metadataPayloadKeys as string[]) as unknown as LayerRasterRecordInput,
+        callbackUrls: ['https://my-dns-for-callback'],
+        type: RecordType.RECORD_RASTER,
+      };
+
+      let result;
+      if (input.context.flowType === Mode.NEW) {
+        result = await store.mutateStartRasterIngestion({ data });
+        if (!result || !result.startRasterIngestion/*.jobId || res.startRasterIngestion.taskIds[0] */) {
+          throw buildError('ingestion.error.invalid-source-file', result?.startRasterIngestion);
+        }
+      } else if (input.context.flowType === Mode.UPDATE) {
+        result = await store.mutateStartRasterUpdateGeopkg({ data });
+        if (!result || !result.startRasterUpdateGeopkg/*.jobId || res.startRasterIngestion.taskIds[0] */) {
+          throw buildError('ingestion.error.invalid-source-file', result?.startRasterUpdateGeopkg);
+        }
+      }
+    })
   }
 });
 //#endregion
