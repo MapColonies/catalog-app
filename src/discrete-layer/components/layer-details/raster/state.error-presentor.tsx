@@ -5,6 +5,7 @@ import { ErrorSource, IStateError } from './state-machine.raster';
 
 const FIRST = 0;
 const LOGIC_ERROR: ErrorSource = "logic";
+const API_ERROR: ErrorSource = "api";
 
 interface StateMachineErrorProps {
   errors: IStateError[];
@@ -14,7 +15,7 @@ export const StateMachineError: React.FC<StateMachineErrorProps> = ({ errors }) 
   return (
     <>
       <GraphQLError error={errors[FIRST]} />
-      <LogicError errors={errors.filter((err: IStateError) => err.source === LOGIC_ERROR)} />
+      <LogicError errors={errors.filter((err: IStateError) => [LOGIC_ERROR,API_ERROR].includes(err.source))} />
     </>
   );
 };

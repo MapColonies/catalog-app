@@ -26,6 +26,7 @@ import {
 // import { LayerRasterRecordInput } from '../../../models/RootStore.base';
 // import { cleanUpEntityPayload, getFlatEntityDescriptors } from '../utils';
 import { FeatureType } from './pp-map.utils';
+import { queryExecutor } from './state-machine.query-executor';
 
 const FIRST = 0;
 const SHAPES_DIR = '../../Shapes';
@@ -224,7 +225,7 @@ const getFile = (files: FileData[], gpkgPath: string, fileName: string, label: s
   }))[FIRST];
 };
 
-const buildError = (
+export const buildError = (
   code: string,
   message: string = '',
   source: ErrorSource = 'logic',
@@ -269,12 +270,16 @@ const SERVICES = {
 
       let result;
       if (input.context.flowType === Mode.NEW) {
-        /* result = await store.mutateStartRasterIngestion({ data });
+        /* result = await queryExecutor(async () => {
+          return await store.mutateStartRasterIngestion({ data });
+        });
         if (!result || !result.startRasterIngestion.jobId || !res.startRasterIngestion.taskIds[0]) {
           throw buildError('general.server.error');
         } */
       } else if (input.context.flowType === Mode.UPDATE) {
-        /* result = await store.mutateStartRasterUpdateGeopkg({ data });
+        /* result = await queryExecutor(async () => {
+          return await store.mutateStartRasterUpdateGeopkg({ data });
+        });
         if (!result || !result.startRasterUpdateGeopkg.jobId || !res.startRasterIngestion.taskIds[0]) {
           throw buildError('general.server.error');
         } */
@@ -296,12 +301,14 @@ const SERVICES = {
 
       const gpkgPath = input.context.files?.gpkg?.path;
 
-      const res = await input.context.store.queryValidateSource({
-        data: {
-          fileNames: [path.basename(gpkgPath)],
-          originDirectory: path.dirname(gpkgPath),
-          type: RecordType.RECORD_RASTER,
-        }
+      const res = await queryExecutor(async () => {
+        return await input.context.store.queryValidateSource({
+          data: {
+            fileNames: [path.basename(gpkgPath)],
+            originDirectory: path.dirname(gpkgPath),
+            type: RecordType.RECORD_RASTER,
+          }
+        });
       });
 
       if (!res.validateSource[FIRST].isValid) {
@@ -329,11 +336,13 @@ const SERVICES = {
       const gpkgPath = input.context.files.gpkg.path;
       let result;
       try {
-        result = await input.context.store.queryGetDirectory({
-          data: {
-            path: path.resolve(gpkgPath, SHAPES_DIR),
-            type: RecordType.RECORD_RASTER,
-          },
+        result = await queryExecutor(async () => {
+          return await input.context.store.queryGetDirectory({
+            data: {
+              path: path.resolve(gpkgPath, SHAPES_DIR),
+              type: RecordType.RECORD_RASTER,
+            },
+          });
         });
       } catch (e) {
       }
@@ -358,11 +367,13 @@ const SERVICES = {
         throw buildError('ingestion.error.file-not-found', `${missingFiles.join(', ')}`);
       }
 
-      // const res = await input.context.store.queryGetFile({
-      //   data: {
-      //     path: product.path,
-      //     type: RecordType.RECORD_RASTER,
-      //   },
+      // const res = await queryExecutor(async () => {
+      //   return await input.context.store.queryGetFile({
+      //       data: {
+      //         path: product.path,
+      //         type: RecordType.RECORD_RASTER,
+      //       },
+      //     });
       // });
 
       // const outlinedPolygon = await shp(res.getFile[FIRST]);
