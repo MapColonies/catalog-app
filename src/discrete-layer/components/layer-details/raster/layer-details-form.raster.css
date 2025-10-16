@@ -89,7 +89,7 @@ body[dir='rtl'] #layerDetailsFormRaster .enumOptions .mdc-select__dropdown-icon 
 #layerDetailsFormRaster .validationsContainer {
   display: flex;
   height: 410px;
-  margin: 4px 0;
+  margin: 16px 0 4px 0;
 }
 
 #layerDetailsFormRaster .validationsData {

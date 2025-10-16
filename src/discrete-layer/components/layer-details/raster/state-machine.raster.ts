@@ -17,14 +17,14 @@ import { FileData } from '@map-colonies/react-components';
 import { Mode } from '../../../../common/models/mode.enum';
 import { getFirstPoint } from '../../../../common/utils/geo.tools';
 import {
-  EntityDescriptorModelType,
+  // EntityDescriptorModelType,
   IBaseRootStore,
   IRootStore,
   RecordType,
   SourceValidationModelType
 } from '../../../models';
-import { LayerRasterRecordInput } from '../../../models/RootStore.base';
-import { cleanUpEntityPayload, getFlatEntityDescriptors } from '../utils';
+// import { LayerRasterRecordInput } from '../../../models/RootStore.base';
+// import { cleanUpEntityPayload, getFlatEntityDescriptors } from '../utils';
 import { FeatureType } from './pp-map.utils';
 
 const FIRST = 0;
@@ -83,6 +83,7 @@ export interface IContext {
   formData?: Record<string, unknown>;
   jobId?: string;
   jobStatus?: string;
+  taskId?: string;
   autoMode?: boolean;
   files?: IFiles;
 }
@@ -90,7 +91,7 @@ export interface IContext {
 export type Events =
   | { type: "START_NEW" }
   | { type: "START_UPDATE" }
-  | { type: "RESTORE"; jobId: string }
+  | { type: "RESTORE"; jobId: string; taskId: string }
   | { type: "AUTO" }
   | { type: "MANUAL" }
   | { type: "SELECT_GPKG"; file: IGPKGFile }
@@ -470,7 +471,7 @@ const selectionModeStates = {
 
         // const res = await input.context.store.queryGetFile({
         //   data: {
-        //     pathSuffix: product.path,
+        //     path: product.path,
         //     type: RecordType.RECORD_RASTER,
         //   },
         // });
@@ -690,7 +691,7 @@ export const workflowMachine = createMachine<IContext, Events>({
         input: (_: { context: IContext; event: any }) => _,
         tags: [STATE_TAGS.GENERAL_LOADING],
         src: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
-          const store = input.context.store;
+          /*const store = input.context.store;
           const metadataPayloadKeys = getFlatEntityDescriptors(
             'LayerRasterRecord',
             store.discreteLayersStore.entityDescriptors as EntityDescriptorModelType[]
@@ -708,24 +709,32 @@ export const workflowMachine = createMachine<IContext, Events>({
             metadata: cleanUpEntityPayload(input.context?.formData ?? {}, metadataPayloadKeys as string[]) as unknown as LayerRasterRecordInput,
             callbackUrls: ['https://my-dns-for-callback'],
             type: RecordType.RECORD_RASTER,
-          };
+          };*/
 
           let result;
           if (input.context.flowType === Mode.NEW) {
-            result = await store.mutateStartRasterIngestion({ data });
-            if (!result || !result.startRasterIngestion/*.jobId || res.startRasterIngestion.taskIds[0] */) {
-              throw buildError('ingestion.error.invalid-source-file', result?.startRasterIngestion);
-            }
+            /* result = await store.mutateStartRasterIngestion({ data });
+            if (!result || !result.startRasterIngestion.jobId || !res.startRasterIngestion.taskIds[0]) {
+              throw buildError('general.server.error');
+            } */
           } else if (input.context.flowType === Mode.UPDATE) {
-            result = await store.mutateStartRasterUpdateGeopkg({ data });
-            if (!result || !result.startRasterUpdateGeopkg/*.jobId || res.startRasterIngestion.taskIds[0] */) {
-              throw buildError('ingestion.error.invalid-source-file', result?.startRasterUpdateGeopkg);
-            }
+            /* result = await store.mutateStartRasterUpdateGeopkg({ data });
+            if (!result || !result.startRasterUpdateGeopkg.jobId || !res.startRasterIngestion.taskIds[0]) {
+              throw buildError('general.server.error');
+            } */
           }
+          result = {
+            jobId: '3fa85f64-5717-4562-b3fc-2c963f66afa6', // '8b62987a-c1f7-4326-969e-ceca4c81b5aa',
+            taskIds: [
+              '3fa85f64-5717-4562-b3fc-2c963f66afa6'
+            ]
+          };
+          return { jobId: result.jobId, taskId: result.taskIds[0] };
         }),
         onDone: {
           actions: assign((_: { context: IContext; event: any }) => ({
-            jobId: _.event.output.jobId
+            jobId: _.event.output.jobId,
+            taskId: _.event.output.taskId
           })),
           target: WORKFLOW.JOB_POLLING
         },
