@@ -260,12 +260,7 @@ export const InnerRasterForm = (
             fields={ingestionFields}
           />
         }
-        <Box
-          className={[
-            mode === Mode.NEW ? 'content section' : 'content',
-            showCurtain && 'curtainVisible',
-          ].join(' ')}
-        >
+        <Box className={`content section ${showCurtain ? 'curtainVisible' : ''}`}>
           {
             showCurtain && <Box className="curtain"></Box>
           }
