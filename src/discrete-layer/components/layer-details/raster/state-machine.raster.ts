@@ -134,8 +134,7 @@ export const WORKFLOW = {
     VALIDATE_GPKG: {
       ROOT: "validateGpkg",
       VALIDATION: "validation",
-      SUCCESS: "success",
-      FAILURE: "failure"
+      SUCCESS: "success"
     },
     SELECTION_MODE: {
       ROOT: "selectionMode",
@@ -420,18 +419,18 @@ const validateGpkgStates = {
         ],
         target: WORKFLOW.FILES.VALIDATE_GPKG.SUCCESS
       },
-      onError: { target: WORKFLOW.FILES.VALIDATE_GPKG.FAILURE }
+      onError: { 
+        actions: [
+          sendParent((_: { context: IContext; event: any }) => ({
+            type: "FILES_ERROR",
+            error: { ..._.event.error }
+          })),
+        ],
+        target: `#${WORKFLOW.FILES.ROOT}`
+      }
     }
   },
   [WORKFLOW.FILES.VALIDATE_GPKG.SUCCESS]: {
-    type: "final" as const
-  },
-  [WORKFLOW.FILES.VALIDATE_GPKG.FAILURE]: {
-    entry:
-      sendParent((_: { context: IContext; event: any }) => ({
-        type: "FILES_ERROR",
-        error: { ..._.event.error }
-      })),
     type: "final" as const
   }
 };
@@ -725,7 +724,6 @@ export const workflowMachine = createMachine<IContext, Events>({
           }))
         },
         FILES_SELECTED: {
-          actions: assign({ errors: [] }),
           target: `#${WORKFLOW.ROOT}`
         },
         FILES_ERROR: {
