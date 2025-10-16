@@ -310,7 +310,7 @@ const validateGpkgStates = {
     }
   },
   [WORKFLOW.FILES.VALIDATE_GPKG.SUCCESS]: {
-    type: "final"
+    type: "final" as const
   },
   [WORKFLOW.FILES.VALIDATE_GPKG.FAILURE]: {
     entry:
@@ -318,7 +318,7 @@ const validateGpkgStates = {
         type: "FILES_ERROR",
         error: { ..._.event.error }
       })),
-    type: "final"
+    type: "final" as const
   }
 };
 //#endregion
@@ -571,7 +571,7 @@ const filesMachine = createMachine({
       entry: () => console.log(`>>> Enter ${WORKFLOW.FILES.VALIDATE_GPKG.ROOT}`),
       type: "compound",
       initial: WORKFLOW.FILES.VALIDATE_GPKG.VALIDATION,
-      states: validateGpkgStates as any,
+      states: validateGpkgStates,
       onDone: WORKFLOW.FILES.SELECTION_MODE.ROOT
     },
 
