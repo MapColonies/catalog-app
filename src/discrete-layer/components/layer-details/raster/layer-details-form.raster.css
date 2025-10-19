@@ -123,8 +123,8 @@ body[dir='rtl'] #layerDetailsFormRaster .enumOptions .mdc-select__dropdown-icon 
 }
 
 #layerDetailsFormRaster .progressBar {
-  width: 200px;
-  height: 200px;
+  width: 150px;
+  height: 150px;
 }
 
 #layerDetailsFormRaster .map {
@@ -138,7 +138,7 @@ body[dir='rtl'] #layerDetailsFormRaster .enumOptions .mdc-select__dropdown-icon 
 #layerDetailsFormRaster .reportList {
   display: flex;
   flex-direction: column;
-  height: 100px;
+  height: 120px;
   overflow-y: auto;
 }
 

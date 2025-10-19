@@ -798,15 +798,27 @@ export const workflowMachine = createMachine<IContext, Events>({
       invoke: {
         input: (_: { context: IContext; event: any }) => _,
         src: SERVICES[WORKFLOW.ROOT].jobPollingService,
-        onDone: {
-          actions: assign((_: { context: IContext; event: any }) => ({
-            job: {
-              ..._.context.job,
-              ..._.event.output
-            }
-          })),
-          target: WORKFLOW.JOB_POLLING_WAIT
-        },
+        onDone: [
+          {
+            guard: (_: { context: IContext; event: any }) => _.event.output.taskStatus === Status.Completed,
+            actions: assign((_: { context: IContext; event: any }) => ({
+              job: {
+                ..._.context.job,
+                ..._.event.output
+              }
+            })),
+            target: WORKFLOW.DONE
+          },
+          {
+            actions: assign((_: { context: IContext; event: any }) => ({
+              job: {
+                ..._.context.job,
+                ..._.event.output
+              }
+            })),
+            target: WORKFLOW.JOB_POLLING_WAIT
+          }
+        ],
         onError: {
           actions: addError,
           target: WORKFLOW.JOB_POLLING_WAIT
@@ -815,7 +827,7 @@ export const workflowMachine = createMachine<IContext, Events>({
     },
     [WORKFLOW.JOB_POLLING_WAIT]: {
       after: {
-        30000: WORKFLOW.JOB_POLLING
+        5000: WORKFLOW.JOB_POLLING
       }
     },
     [WORKFLOW.RESTORE_JOB]: {
