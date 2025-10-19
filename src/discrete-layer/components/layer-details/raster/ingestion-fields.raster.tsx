@@ -1,20 +1,15 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable array-callback-return */
-/* eslint-disable @typescript-eslint/naming-convention */
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import React, { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
+import { isEmpty } from 'lodash';
 import { observer } from 'mobx-react';
-import { Button, Icon } from '@map-colonies/react-core';
+import { Button, Icon, Typography } from '@map-colonies/react-core';
 import { Box, defaultFormatters, FileData } from '@map-colonies/react-components';
 import { Selection } from '../../../../common/components/file-picker';
 import { FieldLabelComponent } from '../../../../common/components/form/field-label';
 import { dateFormatter } from '../../../../common/helpers/formatters';
 import { RecordType, LayerMetadataMixedUnion } from '../../../models';
 import { FilePickerDialog } from '../../dialogs/file-picker.dialog';
-import { IRecordFieldInfo } from '../layer-details.field-info';
-import { Events, hasLoadingTagDeep, IFileBase, IFiles } from './state-machine.raster';
+import { Events, hasLoadingTagDeep, IFileBase, IFiles, WORKFLOW } from './state-machine.raster';
 import { RasterWorkflowContext } from './state-machine-context.raster';
 import { clearSyncWarnings } from '../utils';
 
@@ -22,7 +17,6 @@ import './ingestion-fields.raster.css';
 
 interface IngestionFieldsProps {
   recordType: RecordType;
-  fields: IRecordFieldInfo[];
 }
 
 const FileItem: React.FC<{ file: IFileBase }> = ({ file }) => {
@@ -43,53 +37,33 @@ const FileItem: React.FC<{ file: IFileBase }> = ({ file }) => {
   );
 };
 
-const IngestionInputs: React.FC<{
-  fields: IRecordFieldInfo[];
-  state: any;
-}> = ({ fields, state }) => {
+const IngestionInputs: React.FC<{ state: any; }> = ({ state }) => {
   return (
-    <>
-      {
-        fields.slice(1).map((field: IRecordFieldInfo, index: number) => {
-          return (
-            <Box className="ingestionField" key={field.fieldName}>
-              <FieldLabelComponent
-                value={field.label}
-                isRequired={true}
-                customClassName={`${field.fieldName as string}Spacer`}
-              />
-              <Box className="detailsFieldValue">
-                {/* {
-                  values[index] === '' &&
-                  <Typography tag="span" className="disabledText">
-                    {'<'}
-                    <FormattedMessage id="general.empty.text" />
-                    {'>'}
-                  </Typography>
-                } */}
-                {
-                  <Box className="filesList">
-                    {
-                      state.context?.files &&
-                      Object.values(state.context?.files as IFiles).map((file: IFileBase, idx: number): JSX.Element => {
-                        return <FileItem key={idx} file={file} />;
-                      })
-                    }
-                  </Box>
-                }
-              </Box>
-            </Box>
-          );
-        })
-      }
-    </>
+    <Box className="ingestionField">
+      <FieldLabelComponent value={'field-names.ingestion.fileNames'} />
+      <Box className="detailsFieldValue">
+        {
+          !state.context?.files &&
+          <Typography tag="span" className="empty disabledText">
+            {'<'}<FormattedMessage id="general.empty.text" />{'>'}
+          </Typography>
+        }
+        {
+          <Box className="filesList">
+            {
+              state.context?.files &&
+              Object.values(state.context?.files as IFiles).map((file: IFileBase, idx: number): JSX.Element => {
+                return <FileItem key={idx} file={file} />;
+              })
+            }
+          </Box>
+        }
+      </Box>
+    </Box>
   );
 };
 
-export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({
-  recordType,
-  fields
-}) => {
+export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recordType }) => {
   const actorRef = RasterWorkflowContext.useActorRef();
   const isLoading = hasLoadingTagDeep(actorRef?.getSnapshot());
   const state = RasterWorkflowContext.useSelector((s) => s);
@@ -128,17 +102,18 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({
     <>
       <Box className="header section">
         <Box className="ingestionFields">
-          <IngestionInputs
-            fields={fields}
-            state={state}
-          />
+          <IngestionInputs state={state} />
         </Box>
         <Box className="ingestionButtonsContainer">
           <Box className="ingestionButton">
             <Button
               raised
               type="button"
-              disabled={isLoading}
+              disabled={
+                isLoading ||
+                !isEmpty(state.context.files) ||
+                state.value === WORKFLOW.DONE
+              }
               onClick={(): void => {
                 setFilePickerDialogOpen(true);
               }}

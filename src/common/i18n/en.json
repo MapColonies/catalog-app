@@ -229,7 +229,7 @@
   "field.actions.more": "More options",
 
   "field-names.ingestion.directory": "Directory",
-  "field-names.ingestion.fileNames": "File names",
+  "field-names.ingestion.fileNames": "Files",
 
   "file-name.gpkg": "GPKG",
   "file-name.product": "Source extent",

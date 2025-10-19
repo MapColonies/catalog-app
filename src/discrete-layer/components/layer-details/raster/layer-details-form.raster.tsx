@@ -9,10 +9,10 @@ import {
   FormikBag,
 } from 'formik';
 import { Feature, GeoJsonProperties, Geometry } from 'geojson';
+import { get, isEmpty } from 'lodash';
 import * as Yup from 'yup';
 import { OptionalObjectSchema, TypeOfShape } from 'yup/lib/object';
 import { AnyObject } from 'yup/lib/types';
-import { get, isEmpty } from 'lodash';
 import { Button, CircularProgress } from '@map-colonies/react-core';
 import { Box, CircularProgressBar } from '@map-colonies/react-components';
 import { ValidationsError } from '../../../../common/components/error/validations.error-presentor';
@@ -20,7 +20,6 @@ import { mergeRecursive } from '../../../../common/helpers/object';
 import { Mode } from '../../../../common/models/mode.enum';
 import {
   EntityDescriptorModelType,
-  FieldConfigModelType,
   LayerMetadataMixedUnion,
   RecordType
 } from '../../../models';
@@ -34,7 +33,7 @@ import { IngestionFields } from './ingestion-fields.raster';
 import { GeoFeaturesPresentorComponent } from './pp-map';
 import { FeatureType, PPMapStyles } from './pp-map.utils';
 import { StateMachineError } from './state.error-presentor';
-import { hasLoadingTagDeep } from './state-machine.raster';
+import { hasLoadingTagDeep, WORKFLOW } from './state-machine.raster';
 import { RasterWorkflowContext } from './state-machine-context.raster';
 import { getUIIngestionFieldDescriptors } from './utils';
 
@@ -50,12 +49,9 @@ export interface FormValues {
 
 interface LayerDetailsFormCustomProps {
   recordType: RecordType;
-  ingestionFields: FieldConfigModelType[];
   mode: Mode;
   entityDescriptors: EntityDescriptorModelType[];
   layerRecord: LayerMetadataMixedUnion;
-  mutationQueryError: unknown;
-  mutationQueryLoading: boolean;
   closeDialog: () => void;
   customErrorReset: () => void;
   customError?: Record<string,string[]> | undefined;
@@ -96,22 +92,16 @@ export const InnerRasterForm = (
     setFieldTouched,
     setStatus,
     recordType,
-    ingestionFields,
     entityDescriptors,
     mode,
     layerRecord,
-    // eslint-disable-next-line
-    mutationQueryError,
-    mutationQueryLoading,
     closeDialog,
     customErrorReset,
     customError,
   } = props;
 
   const status = props.status as StatusError | Record<string, unknown>;
-  const [graphQLError, setGraphQLError] = useState<unknown>(mutationQueryError);
   const [firstPhaseErrors, setFirstPhaseErrors] = useState<Record<string, string[]>>({});
-  const [showCurtain, setShowCurtain] = useState<boolean>(false);
   const [isSubmittedForm, setIsSubmittedForm] = useState(false);
 
   //#region STATE MACHINE
@@ -129,10 +119,6 @@ export const InnerRasterForm = (
       });
     }
   }, [state.context?.files]);
-
-  useEffect(() => {
-    setShowCurtain(isLoading);
-  }, [isLoading]);
   //#endregion
 
   const getStatusErrors = useCallback((): StatusError | Record<string, unknown> => {
@@ -153,10 +139,6 @@ export const InnerRasterForm = (
     });
     return validationResults;
   }, [errors, getFieldMeta, isSubmittedForm]);
-
-  useEffect(() => {
-    setGraphQLError(mutationQueryError);
-  }, [mutationQueryError]);
 
   useEffect(() => {
     // @ts-ignore
@@ -201,7 +183,6 @@ export const InnerRasterForm = (
         handleChange(e);
       },
       handleBlur: (e: React.FocusEvent<unknown>): void => {
-        setGraphQLError(undefined);
         customErrorReset();
         handleBlur(e);
       },
@@ -241,6 +222,48 @@ export const InnerRasterForm = (
     topLevelFieldsErrors[err] = firstPhaseErrors[err];
   });
 
+  const JobInfo = (): JSX.Element => {
+    return (
+      <Box className="jobData section">
+        {
+          state.context.job &&
+          <>
+            <Box className="progress">
+              <Box className="title bold">
+                <FormattedMessage id="ingestion.job.progress" />
+              </Box>
+              <Box className="center">
+                <Box className="progressBar">
+                  <CircularProgressBar
+                    value={state.context.job?.percentage ?? 0}
+                    text={`${state.context.job?.percentage ?? 0}%`}
+                  />
+                </Box>
+              </Box>
+            </Box>
+            <Box className="section">
+              <Box className="reportContainer">
+                <Box className="title underline">
+                  <FormattedMessage id="ingestion.job.report" />
+                </Box>
+                <Box className="reportList error">
+                  {
+                    Object.entries(state.context.job?.report ?? {}).map(([key, value]) => (
+                      <Fragment key={key}>
+                        <Box key={`${key}-key`}><FormattedMessage id={`report.error.${key}`} /></Box>
+                        <Box key={`${key}-value`}>{value as number}</Box>
+                      </Fragment>
+                    ))
+                  }
+                </Box>
+              </Box>
+            </Box>
+          </>
+        }
+      </Box>
+    );
+  };
+
   return (
     <Box id="layerDetailsFormRaster">
       <Form
@@ -255,53 +278,15 @@ export const InnerRasterForm = (
       >
         {
           (mode === Mode.NEW || mode === Mode.UPDATE) &&
-          <IngestionFields
-            recordType={recordType}
-            fields={ingestionFields}
-          />
+          <IngestionFields recordType={recordType} />
         }
-        <Box className={`content section ${showCurtain ? 'curtainVisible' : ''}`}>
+        <Box className={`content section ${(isLoading || !state.context?.files) ? 'curtainVisible' : ''}`}>
           {
-            showCurtain && <Box className="curtain"></Box>
+            (isLoading || !state.context?.files) &&
+            <Box className="curtain"></Box>
           }
-          <Box className="jobContainer">
-            <Box className="jobData section">
-              {
-                state.context.job &&
-                <>
-                  <Box className="progress">
-                    <Box className="title bold">
-                      <FormattedMessage id="ingestion.job.progress" />
-                    </Box>
-                    <Box className="center">
-                      <Box className="progressBar">
-                        <CircularProgressBar
-                          value={state.context.job?.percentage ?? 0}
-                          text={`${state.context.job?.percentage ?? 0}%`}
-                        />
-                      </Box>
-                    </Box>
-                  </Box>
-                  <Box className="section">
-                    <Box className="reportContainer">
-                      <Box className="title underline">
-                        <FormattedMessage id="ingestion.job.report" />
-                      </Box>
-                      <Box className="reportList error">
-                        {
-                          Object.entries(state.context.job?.report ?? {}).map(([key, value]) => (
-                            <Fragment key={key}>
-                              <Box key={`${key}-key`}><FormattedMessage id={`report.error.${key}`} /></Box>
-                              <Box key={`${key}-value`}>{value as number}</Box>
-                            </Fragment>
-                          ))
-                        }
-                      </Box>
-                    </Box>
-                  </Box>
-                </>
-              }
-            </Box>
+          <Box className="previewAndJobContainer">
+            <JobInfo />
             <GeoFeaturesPresentorComponent
               layerRecord={layerRecord}
               mode={mode}
@@ -357,7 +342,8 @@ export const InnerRasterForm = (
                   !dirty ||
                   Object.keys(errors).length > NONE ||
                   (Object.keys(getStatusErrors()).length > NONE) ||
-                  !isEmpty(graphQLError)
+                  !isEmpty(state.context.errors) ||
+                  state.value === WORKFLOW.DONE
                 }
               >
                 <FormattedMessage id="general.ok-btn.text" />
@@ -395,7 +381,6 @@ export const InnerRasterForm = (
 
 interface LayerDetailsFormProps {
   recordType: RecordType;
-  ingestionFields: FieldConfigModelType[];
   mode: Mode;
   entityDescriptors: EntityDescriptorModelType[];
   layerRecord: LayerMetadataMixedUnion;
@@ -405,8 +390,6 @@ interface LayerDetailsFormProps {
     TypeOfShape<{ [x: string]: Yup.AnySchema<unknown, unknown, unknown> }>
   >;
   onSubmit: (values: Record<string, unknown>) => void;
-  mutationQueryError: unknown;
-  mutationQueryLoading: boolean;
   closeDialog: () => void;
   customErrorReset: () => void;
   customError?: Record<string,string[]> | undefined;

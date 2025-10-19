@@ -47,8 +47,8 @@ body[dir='rtl'] .header {
   gap: 10px;
 }
 
-.hiddenField {
-  display: none;
+.empty {
+  margin: 0 12px;
 }
 
 .disabledText {
@@ -60,6 +60,7 @@ body[dir='rtl'] .header {
   display: grid;
   grid-template-columns: 0.1fr 0.2fr 1.5fr 0.3fr 0.5fr;
   column-gap: 8px;
+  margin: 0 12px
 }
 
 .fileItemName {
