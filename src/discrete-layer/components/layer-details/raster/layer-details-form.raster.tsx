@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect, useCallback } from 'react';
+import React, { useMemo, useState, useEffect, useCallback, Fragment } from 'react';
 import { FormattedMessage } from 'react-intl';
 import {
   withFormik,
@@ -266,38 +266,41 @@ export const InnerRasterForm = (
           }
           <Box className="jobContainer">
             <Box className="jobData section">
-              <Box className="progress">
-                <Box className="title bold">
-                  <FormattedMessage id="ingestion.job.progress" />
-                </Box>
-                <Box className="center">
-                  <Box className="progressBar">
-                    <CircularProgressBar
-                      value={state.context.job?.percentage ?? 0}
-                      text={`${state.context.job?.percentage ?? 0}%`}
-                    />
-                  </Box>
-                </Box>
-              </Box>
-              <Box className="section">
-                <Box className="reportContainer">
-                  <Box className="title underline">
-                    <FormattedMessage id="ingestion.job.report" />
-                  </Box>
-                  <Box className="reportList error">
-                    <Box className="reportItem">
-                      {
-                        Object.entries(state.context.job?.report ?? {}).map(([key, value]) => (
-                          <>
-                            <Box key={key}><FormattedMessage id={key} /></Box>
-                            <Box key={`${key}-value`}>{value as number}</Box>
-                          </>
-                        ))
-                      }
+              {
+                state.context.job &&
+                <>
+                  <Box className="progress">
+                    <Box className="title bold">
+                      <FormattedMessage id="ingestion.job.progress" />
+                    </Box>
+                    <Box className="center">
+                      <Box className="progressBar">
+                        <CircularProgressBar
+                          value={state.context.job?.percentage ?? 0}
+                          text={`${state.context.job?.percentage ?? 0}%`}
+                        />
+                      </Box>
                     </Box>
                   </Box>
-                </Box>
-              </Box>
+                  <Box className="section">
+                    <Box className="reportContainer">
+                      <Box className="title underline">
+                        <FormattedMessage id="ingestion.job.report" />
+                      </Box>
+                      <Box className="reportList error">
+                        {
+                          Object.entries(state.context.job?.report ?? {}).map(([key, value]) => (
+                            <Fragment key={key}>
+                              <Box key={`${key}-key`}><FormattedMessage id={`report.error.${key}`} /></Box>
+                              <Box key={`${key}-value`}>{value as number}</Box>
+                            </Fragment>
+                          ))
+                        }
+                      </Box>
+                    </Box>
+                  </Box>
+                </>
+              }
             </Box>
             <GeoFeaturesPresentorComponent
               layerRecord={layerRecord}
@@ -350,7 +353,7 @@ export const InnerRasterForm = (
                 raised
                 type="submit"
                 disabled={
-                  mutationQueryLoading ||
+                  isLoading ||
                   !dirty ||
                   Object.keys(errors).length > NONE ||
                   (Object.keys(getStatusErrors()).length > NONE) ||
@@ -358,7 +361,7 @@ export const InnerRasterForm = (
                 }
               >
                 <FormattedMessage id="general.ok-btn.text" />
-                {mutationQueryLoading && <Box className="loadingOnTop"><CircularProgress/></Box>}
+                {isLoading && <Box className="loadingOnTop"><CircularProgress/></Box>}
               </Button> :
               <Button
                 type="button"

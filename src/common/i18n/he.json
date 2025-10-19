@@ -223,6 +223,7 @@
   "polygon-parts.map-preview-legend.title": "מקרא",
   "polygon-parts.map-preview-legend.PP_PERIMETER": "היקף של חלקי התיחום",
   "polygon-parts.map-preview-legend.SOURCE_EXTENT": "שטח המקור",
+  "polygon-parts.map-preview.zoom-before-fetch": "התקרב כדי לראות את חלקי התיחום",
 
   "field.actions.edit-draft": "ערוך טיוטה",
   "field.actions.more": "פעולות נוספות",
@@ -251,11 +252,11 @@
   "ingestion.job.progress": "התקדמות הולידציה",
   "ingestion.job.report": "שגיאות שהתקבלו:",
 
-  "report.error.invalid-data": "תקינות נתונים",
-  "report.error.invalid-geometry": "תקינות גיאומטרית",
-  "report.error.too-many-vertices": "פוליגונים עם עודף נקודות",
-  "report.error.small-holes": "פוליגונים עם חורים זעירים",
-  "report.error.resolution-mismatch": "תאימות רזולוציה",
+  "report.error.invalidData": "תקינות נתונים",
+  "report.error.invalidGeometry": "תקינות גיאומטרית",
+  "report.error.tooManyVertices": "פוליגונים עם עודף נקודות",
+  "report.error.smallHoles": "פוליגונים עם חורים זעירים",
+  "report.error.resolutionMismatch": "תאימות רזולוציה",
 
   "field-names.raster.id": "מזהה",
   "field-names.raster.productId": "מזהה חיצוני",

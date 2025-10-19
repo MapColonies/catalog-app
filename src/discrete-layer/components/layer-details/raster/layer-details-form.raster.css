@@ -136,17 +136,12 @@ body[dir='rtl'] #layerDetailsFormRaster .enumOptions .mdc-select__dropdown-icon 
 }
 
 #layerDetailsFormRaster .reportList {
-  display: flex;
-  flex-direction: column;
-  height: 120px;
-  overflow-y: auto;
-}
-
-#layerDetailsFormRaster .reportItem {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 4px;
   margin: 0 8px;
+  height: 120px;
+  overflow-y: auto;
 }
 
 #layerDetailsFormRaster .ReactVirtualized__Grid.ReactVirtualized__List{

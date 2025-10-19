@@ -342,7 +342,7 @@ const SERVICES = {
 
       return {
         percentage: task.percentage ?? 0,
-        report: task.parameters ?? {'report.error.invalid-data': 5, 'report.error.invalid-geometry': 10, 'report.error.too-many-vertices': 1, 'report.error.small-holes': 1, 'report.error.resolution-mismatch': 13},
+        report: task.parameters ?? {invalidData: 5, invalidGeometry: 10, tooManyVertices: 1, smallHoles: 1, resolutionMismatch: 13},
         taskStatus: task.status ?? ''
       };
     }),

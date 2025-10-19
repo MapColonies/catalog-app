@@ -52,6 +52,18 @@ export const PPMapStyles = new Map<FeatureType, Style | undefined>([
         src: 'assets/img/map-marker.gif'
       })
     })
+  ],
+  [
+    FeatureType.EXISTING_PP,
+    new Style({
+      stroke: new Stroke({
+        width: 2,
+        color: CONFIG.CONTEXT_MENUS.MAP.POLYGON_PARTS_FEATURE_CONFIG.outlineColor
+      }),
+      fill: new Fill({
+        color: CONFIG.CONTEXT_MENUS.MAP.POLYGON_PARTS_FEATURE_CONFIG.color
+      })
+    })
   ]
 ]);
 

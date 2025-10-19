@@ -223,6 +223,7 @@
   "polygon-parts.map-preview-legend.title": "Legend",
   "polygon-parts.map-preview-legend.PP_PERIMETER": "Polygon parts Perimeter",
   "polygon-parts.map-preview-legend.SOURCE_EXTENT": "Source Extent",
+  "polygon-parts.map-preview.zoom-before-fetch": "Zoom in to see the parts",
 
   "field.actions.edit-draft": "Edit draft",
   "field.actions.more": "More options",
@@ -251,11 +252,11 @@
   "ingestion.job.progress": "Validation progress",
   "ingestion.job.report": "Validation errors found:",
   
-  "report.error.invalid-data": "Invalid data",
-  "report.error.invalid-geometry": "Invalid geometry",
-  "report.error.too-many-vertices": "Polygons with too many vertices",
-  "report.error.small-holes": "Polygons with small holes",
-  "report.error.resolution-mismatch": "Resolution mismatch",
+  "report.error.invalidData": "Invalid data",
+  "report.error.invalidGeometry": "Invalid geometry",
+  "report.error.tooManyVertices": "Polygons with too many vertices",
+  "report.error.smallHoles": "Polygons with small holes",
+  "report.error.resolutionMismatch": "Resolution mismatch",
 
   "field-names.raster.id": "ID",
   "field-names.raster.productId": "Ext. ID",
@@ -540,7 +541,7 @@
   "validation-general.shapeFile.polygonParts.geometryTooSmall": "Geometry too small.",
   "validation-general.shapeFile.polygonParts.geometryHasSmallHoles": "Geometry contains too small holes",
   "validation-general.polygonParts.resolutionCollision": "Marked {numErrorParts} Plygon Parts has resolution collision with parts already existing in that area",
-  "validation-general.polygonParts.wfsServerError": "Service WFS of Polygon Parts returned error.",
+  "validation-general.polygonParts.wfsServerError": "Service WFS of Polygon Parts returned an error.",
   "validation-general.polygonParts.wfsExtremelySmall": "Resolution cross-checking failed (likely due to extremely small polygons).",
   "validation-field.sourceDateEnd.min": "{fieldName} should be later than {value}",
   "validation-field.sourceDateStart.max": "{fieldName} should be earlier than {value}",
