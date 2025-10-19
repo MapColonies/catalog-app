@@ -266,29 +266,35 @@ export const InnerRasterForm = (
           }
           <Box className="jobContainer">
             <Box className="jobData section">
-              <Box>
-                <Box className="title bold"><FormattedMessage id="ingestion.job.progress" /></Box>
+              <Box className="progress">
+                <Box className="title bold">
+                  <FormattedMessage id="ingestion.job.progress" />
+                </Box>
                 <Box className="center">
-                  <Box className="progress">
+                  <Box className="progressBar">
                     <CircularProgressBar
-                      value={state.context.percentage ?? 0}
-                      text={`${state.context.percentage ?? 0}%`}
+                      value={state.context.job?.percentage ?? 0}
+                      text={`${state.context.job?.percentage ?? 0}%`}
                     />
                   </Box>
                 </Box>
               </Box>
               <Box className="section">
-                <Box className="violations">
-                  <Box className="title underline"><FormattedMessage id="ingestion.job.violations" /></Box>
-                  <Box className="error">
-                    {
-                      state.context.violations?.map((item, index) => (
-                        <Box key={index}>
-                          <Box>{item.text as string}</Box>
-                          <Box>{item.value as number}</Box>
-                        </Box>
-                      ))
-                    }
+                <Box className="reportContainer">
+                  <Box className="title underline">
+                    <FormattedMessage id="ingestion.job.report" />
+                  </Box>
+                  <Box className="reportList error">
+                    <Box className="reportItem">
+                      {
+                        Object.entries(state.context.job?.report ?? {}).map(([key, value]) => (
+                          <>
+                            <Box key={key}><FormattedMessage id={key} /></Box>
+                            <Box key={`${key}-value`}>{value as number}</Box>
+                          </>
+                        ))
+                      }
+                    </Box>
                   </Box>
                 </Box>
               </Box>

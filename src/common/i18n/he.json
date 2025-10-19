@@ -249,7 +249,13 @@
   "ingestion.button.import-metadata": "בחר מטא-דאטה",
   "ingestion.checkbox.label": "לא ניתן לבצע את הפעולה באתר המשני, יש לסמן כדי להמשיך ולבצע את הפעולה באתר הראשי בלבד",
   "ingestion.job.progress": "התקדמות הולידציה",
-  "ingestion.job.violations": "שגיאות שהתקבלו:",
+  "ingestion.job.report": "שגיאות שהתקבלו:",
+
+  "report.error.invalid-data": "תקינות נתונים",
+  "report.error.invalid-geometry": "תקינות גיאומטרית",
+  "report.error.too-many-vertices": "פוליגונים עם עודף נקודות",
+  "report.error.small-holes": "פוליגונים עם חורים זעירים",
+  "report.error.resolution-mismatch": "תאימות רזולוציה",
 
   "field-names.raster.id": "מזהה",
   "field-names.raster.productId": "מזהה חיצוני",

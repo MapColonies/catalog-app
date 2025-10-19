@@ -93,8 +93,11 @@ body[dir='rtl'] #layerDetailsFormRaster .enumOptions .mdc-select__dropdown-icon 
 }
 
 #layerDetailsFormRaster .jobData {
+  display: flex;
+  flex-direction: column;
   width: 728px;
   margin: 0 4px;
+  padding: 8px;
 }
 
 #layerDetailsFormRaster .center {
@@ -116,6 +119,10 @@ body[dir='rtl'] #layerDetailsFormRaster .enumOptions .mdc-select__dropdown-icon 
 }
 
 #layerDetailsFormRaster .progress {
+  flex: 1;
+}
+
+#layerDetailsFormRaster .progressBar {
   width: 200px;
   height: 200px;
 }
@@ -124,10 +131,22 @@ body[dir='rtl'] #layerDetailsFormRaster .enumOptions .mdc-select__dropdown-icon 
   border: 1px solid var(--mdc-theme-gc-selection-background, #fff);
 }
 
-#layerDetailsFormRaster .violations {
-  height: 80px;
-  overflow-y: auto;
+#layerDetailsFormRaster .reportContainer {
   margin: 4px;
+}
+
+#layerDetailsFormRaster .reportList {
+  display: flex;
+  flex-direction: column;
+  height: 100px;
+  overflow-y: auto;
+}
+
+#layerDetailsFormRaster .reportItem {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4px;
+  margin: 0 8px;
 }
 
 #layerDetailsFormRaster .ReactVirtualized__Grid.ReactVirtualized__List{

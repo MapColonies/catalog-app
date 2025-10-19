@@ -79,6 +79,14 @@ export interface IFiles {
   metadata?: IFileBase;
 }
 
+export interface IJob {
+  jobId?: string;
+  taskId?: string;
+  percentage?: number;
+  report?: Record<string, unknown>;
+  taskStatus?: Status;
+}
+
 export interface IContext {
   store: IRootStore | IBaseRootStore;
   errors: IStateError[];
@@ -86,17 +94,13 @@ export interface IContext {
   autoMode?: boolean;
   files?: IFiles;
   formData?: Record<string, unknown>;
-  jobId?: string;
-  taskId?: string;
-  percentage?: number;
-  violations?: Record<string, unknown>[];
-  taskStatus?: Status;
+  job?: IJob;
 }
 
 export type Events =
   | { type: "START_NEW" }
   | { type: "START_UPDATE" }
-  | { type: "RESTORE"; jobId: string; taskId: string }
+  | { type: "RESTORE"; job: IJob }
   | { type: "AUTO" }
   | { type: "MANUAL" }
   | { type: "SELECT_GPKG"; file: IGPKGFile }
@@ -149,6 +153,7 @@ export const WORKFLOW = {
   },
   JOB_SUBMISSION: "jobSubmission",
   JOB_POLLING: "jobPolling",
+  JOB_POLLING_WAIT: "jobPollingWait",
   RESTORE_JOB: "restoreJob",
   DONE: "done",
   ERROR: "error"
@@ -288,7 +293,7 @@ const SERVICES = {
         } */
       }
       result = {
-        jobId: '3fa85f64-5717-4562-b3fc-2c963f66afa6', // '8b62987a-c1f7-4326-969e-ceca4c81b5aa',
+        jobId: '8b62987a-c1f7-4326-969e-ceca4c81b5aa',
         taskIds: [
           '3fa85f64-5717-4562-b3fc-2c963f66afa6'
         ]
@@ -300,7 +305,7 @@ const SERVICES = {
       };
     }),
     jobPollingService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
-      const { jobId, taskId } = input.context;
+      const { jobId, taskId } = input.context.job || {};
       const missing = [];
       if (!jobId) {
         missing.push('jobId');
@@ -328,7 +333,8 @@ const SERVICES = {
         });
       });
       // @ts-ignore
-      const task = (result.tasks as TasksGroupModelType[]).find(task => task.id === taskId);
+      const task = (result.tasks as TasksGroupModelType[]).find(task => task.type === 'init');
+      // const task = (result.tasks as TasksGroupModelType[]).find(task => task.id === taskId);
 
       if (!task) {
         throw buildError('ingestion.error.not-found', taskId);
@@ -336,7 +342,7 @@ const SERVICES = {
 
       return {
         percentage: task.percentage ?? 0,
-        violations: task.parameters ?? [{text: 'תקינות נתונים', value: 5}, {text: 'תקינות גיאומטרית', value: 10}, {text: 'פוליגונים עם עודף נקודות', value: 1}],
+        report: task.parameters ?? {'report.error.invalid-data': 5, 'report.error.invalid-geometry': 10, 'report.error.too-many-vertices': 1, 'report.error.small-holes': 1, 'report.error.resolution-mismatch': 13},
         taskStatus: task.status ?? ''
       };
     }),
@@ -775,8 +781,9 @@ export const workflowMachine = createMachine<IContext, Events>({
         src: SERVICES[WORKFLOW.ROOT].jobSubmissionService,
         onDone: {
           actions: assign((_: { context: IContext; event: any }) => ({
-            jobId: _.event.output.jobId,
-            taskId: _.event.output.taskId
+            job: {
+              ..._.event.output
+            }
           })),
           target: WORKFLOW.JOB_POLLING
         },
@@ -793,30 +800,22 @@ export const workflowMachine = createMachine<IContext, Events>({
         src: SERVICES[WORKFLOW.ROOT].jobPollingService,
         onDone: {
           actions: assign((_: { context: IContext; event: any }) => ({
-            percentage: _.event.output.percentage,
-            violations: _.event.output.violations,
-            taskStatus: _.event.output.taskStatus
-          })),
-          target: [
-            {
-              cond: (_: { context: IContext }) => _.context.taskStatus === Status.Completed,
-              target: WORKFLOW.DONE
-            },
-            {
-              target: WORKFLOW.JOB_POLLING
+            job: {
+              ..._.context.job,
+              ..._.event.output
             }
-          ]
+          })),
+          target: WORKFLOW.JOB_POLLING_WAIT
         },
         onError: {
           actions: addError,
-          target: WORKFLOW.ERROR
+          target: WORKFLOW.JOB_POLLING_WAIT
         }
-      },
+      }
+    },
+    [WORKFLOW.JOB_POLLING_WAIT]: {
       after: {
-        30000: {
-          actions: () => console.log(`>>> Re-invoking ${WORKFLOW.JOB_POLLING}...`),
-          target: WORKFLOW.JOB_POLLING
-        }
+        30000: WORKFLOW.JOB_POLLING
       }
     },
     [WORKFLOW.RESTORE_JOB]: {
@@ -829,8 +828,7 @@ export const workflowMachine = createMachine<IContext, Events>({
             flowType: _.event.output.flowType,
             files: _.event.output.files,
             formData: _.event.output.formData,
-            jobId: _.event.output.jobId,
-            taskId: _.event.output.taskId
+            job: _.event.output.job
           })),
           target: WORKFLOW.JOB_POLLING
         },
