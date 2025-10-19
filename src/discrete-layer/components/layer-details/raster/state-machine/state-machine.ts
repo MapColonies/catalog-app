@@ -14,8 +14,8 @@ import {
 } from 'xstate';
 import { AnyActorSystem } from 'xstate/dist/declarations/src/system';
 import { FileData } from '@map-colonies/react-components';
-import { Mode } from '../../../../common/models/mode.enum';
-import { getFirstPoint } from '../../../../common/utils/geo.tools';
+import { Mode } from '../../../../../common/models/mode.enum';
+import { getFirstPoint } from '../../../../../common/utils/geo.tools';
 import {
   // EntityDescriptorModelType,
   IBaseRootStore,
@@ -24,11 +24,11 @@ import {
   SourceValidationModelType,
   Status,
   TasksGroupModelType
-} from '../../../models';
+} from '../../../../models';
 // import { LayerRasterRecordInput } from '../../../models/RootStore.base';
 // import { cleanUpEntityPayload, getFlatEntityDescriptors } from '../utils';
-import { FeatureType } from './pp-map.utils';
-import { queryExecutor } from './state-machine.query-executor';
+import { FeatureType } from '../pp-map.utils';
+import { queryExecutor } from './query-executor';
 
 const FIRST = 0;
 const SHAPES_DIR = '../../Shapes';

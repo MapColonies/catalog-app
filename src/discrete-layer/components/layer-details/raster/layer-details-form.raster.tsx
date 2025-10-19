@@ -32,9 +32,9 @@ import {
 import { IngestionFields } from './ingestion-fields.raster';
 import { GeoFeaturesPresentorComponent } from './pp-map';
 import { FeatureType, PPMapStyles } from './pp-map.utils';
-import { StateMachineError } from './state.error-presentor';
-import { hasLoadingTagDeep, WORKFLOW } from './state-machine.raster';
-import { RasterWorkflowContext } from './state-machine-context.raster';
+import { StateError } from './state-error';
+import { RasterWorkflowContext } from './state-machine/context';
+import { hasLoadingTagDeep, WORKFLOW } from './state-machine/state-machine';
 import { getUIIngestionFieldDescriptors } from './utils';
 
 import './layer-details-form.raster.css';
@@ -324,7 +324,7 @@ export const InnerRasterForm = (
         </Box>
         <Box className="footer">
           <Box className="messages">
-            <StateMachineError errors={state.context.errors} />
+            <StateError errors={state.context.errors} />
             {
               topLevelFieldsErrors && Object.keys(topLevelFieldsErrors).length > NONE &&
               JSON.stringify(topLevelFieldsErrors) !== '{}' &&

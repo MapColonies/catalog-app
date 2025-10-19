@@ -9,8 +9,8 @@ import { FieldLabelComponent } from '../../../../common/components/form/field-la
 import { dateFormatter } from '../../../../common/helpers/formatters';
 import { RecordType, LayerMetadataMixedUnion } from '../../../models';
 import { FilePickerDialog } from '../../dialogs/file-picker.dialog';
-import { Events, hasLoadingTagDeep, IFileBase, IFiles, WORKFLOW } from './state-machine.raster';
-import { RasterWorkflowContext } from './state-machine-context.raster';
+import { RasterWorkflowContext } from './state-machine/context';
+import { Events, hasLoadingTagDeep, IFileBase, IFiles, WORKFLOW } from './state-machine/state-machine';
 import { clearSyncWarnings } from '../utils';
 
 import './ingestion-fields.raster.css';

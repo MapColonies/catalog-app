@@ -39,8 +39,8 @@ import {
   getBasicType,
   isEnumType
 } from '../utils';
-import { Events/*, hasLoadingTagDeep*/ } from './state-machine.raster';
-import { RasterWorkflowProvider, RasterWorkflowContext } from './state-machine-context.raster';
+import { Events/*, hasLoadingTagDeep*/ } from './state-machine/state-machine';
+import { RasterWorkflowProvider, RasterWorkflowContext } from './state-machine/context';
 import { getUIIngestionFieldDescriptors } from './utils';
 
 import './entity.raster.dialog.css';

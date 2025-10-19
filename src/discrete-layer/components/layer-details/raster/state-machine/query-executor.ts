@@ -1,4 +1,4 @@
-import { buildError } from './state-machine.raster';
+import { buildError } from './state-machine';
 
 export async function queryExecutor<T>(queryWrapper: () => Promise<T>): Promise<T> {
   try {
