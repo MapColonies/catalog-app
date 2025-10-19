@@ -1,4 +1,4 @@
-import { buildError } from './state-machine';
+import { buildError } from './helpers';
 
 export async function queryExecutor<T>(queryWrapper: () => Promise<T>): Promise<T> {
   try {

@@ -2,16 +2,17 @@ import React, { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { isEmpty } from 'lodash';
 import { observer } from 'mobx-react';
-import { Button, Icon, Typography } from '@map-colonies/react-core';
 import { Box, defaultFormatters, FileData } from '@map-colonies/react-components';
+import { Button, Icon, Typography } from '@map-colonies/react-core';
 import { Selection } from '../../../../common/components/file-picker';
 import { FieldLabelComponent } from '../../../../common/components/form/field-label';
 import { dateFormatter } from '../../../../common/helpers/formatters';
 import { RecordType, LayerMetadataMixedUnion } from '../../../models';
 import { FilePickerDialog } from '../../dialogs/file-picker.dialog';
-import { RasterWorkflowContext } from './state-machine/context';
-import { Events, hasLoadingTagDeep, IFileBase, IFiles, WORKFLOW } from './state-machine/state-machine';
 import { clearSyncWarnings } from '../utils';
+import { RasterWorkflowContext } from './state-machine/context';
+import { hasLoadingTagDeep } from './state-machine/helpers';
+import { Events, IFileBase, IFiles, WORKFLOW } from './state-machine/types';
 
 import './ingestion-fields.raster.css';
 

@@ -34,7 +34,8 @@ import { GeoFeaturesPresentorComponent } from './pp-map';
 import { FeatureType, PPMapStyles } from './pp-map.utils';
 import { StateError } from './state-error';
 import { RasterWorkflowContext } from './state-machine/context';
-import { hasLoadingTagDeep, WORKFLOW } from './state-machine/state-machine';
+import { hasLoadingTagDeep } from './state-machine/helpers';
+import { WORKFLOW } from './state-machine/types';
 import { getUIIngestionFieldDescriptors } from './utils';
 
 import './layer-details-form.raster.css';

@@ -29,7 +29,6 @@ import {
 } from '../entity-types-keys';
 import { LayersDetailsComponent } from '../layer-details';
 import { FieldInfoName } from '../layer-details.field-info';
-import EntityRasterForm from './layer-details-form.raster';
 import {
   clearSyncWarnings,
   filterModeDescriptors,
@@ -39,7 +38,8 @@ import {
   getBasicType,
   isEnumType
 } from '../utils';
-import { Events/*, hasLoadingTagDeep*/ } from './state-machine/state-machine';
+import EntityRasterForm from './layer-details-form.raster';
+import { Events } from './state-machine/types';
 import { RasterWorkflowProvider, RasterWorkflowContext } from './state-machine/context';
 import { getUIIngestionFieldDescriptors } from './utils';
 
@@ -111,8 +111,6 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
 
     // Subscribe to state using a selector
     const state = RasterWorkflowContext.useSelector((s) => s);
-
-    // const isLoading = hasLoadingTagDeep(actorRef?.getSnapshot());
 
     useEffect(() => {
       if (props.isSelectedLayerUpdateMode && props.layerRecord && actorRef) {
