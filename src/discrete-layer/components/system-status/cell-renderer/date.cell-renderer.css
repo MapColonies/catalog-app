@@ -4,12 +4,12 @@
 }
 
 .dateCellRendererContainer {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 .dateCellRendererContainer.changeable {
-    width: 100%;
+  width: 100%;
 }
 
 .updateableDateCellRendererPicker .MuiInput-underline:before, 
@@ -18,14 +18,14 @@
 }
 
 .updateableDateCellRendererPicker .MuiInputBase-input {
-    visibility: hidden !important;
+  visibility: hidden !important;
 }
 
 @keyframes soonIndicator {
-    from {
-      text-shadow: 0 0 10px #fff, 0 0 12px #fff, 0 0 14px var(--mdc-theme-gc-warning-high), 0 0 15px var(--mdc-theme-gc-warning-high);
-    }
-    to {
-      text-shadow: 0 0 12px #fff, 0 0 14px var(--mdc-theme-gc-warning-high), 0 0 16px var(--mdc-theme-gc-warning-high), 0 0 18px var(--mdc-theme-gc-warning-high);
-    }
+  from {
+    text-shadow: 0 0 10px #fff, 0 0 12px #fff, 0 0 14px var(--mdc-theme-gc-warning-high), 0 0 15px var(--mdc-theme-gc-warning-high);
   }
+  to {
+    text-shadow: 0 0 12px #fff, 0 0 14px var(--mdc-theme-gc-warning-high), 0 0 16px var(--mdc-theme-gc-warning-high), 0 0 18px var(--mdc-theme-gc-warning-high);
+  }
+}

@@ -14,7 +14,7 @@ import { OptionalObjectSchema, TypeOfShape } from 'yup/lib/object';
 import { AnyObject } from 'yup/lib/types';
 import { get, isEmpty } from 'lodash';
 import { Button, CircularProgress } from '@map-colonies/react-core';
-import { Box } from '@map-colonies/react-components';
+import { Box, CircularProgressBar } from '@map-colonies/react-components';
 import { ValidationsError } from '../../../../common/components/error/validations.error-presentor';
 import { mergeRecursive } from '../../../../common/helpers/object';
 import { Mode } from '../../../../common/models/mode.enum';
@@ -187,10 +187,10 @@ export const InnerRasterForm = (
     return [{ 
       type: 'PolygonPartRecord',
       categories :[
-      {
-        category: 'DUMMY',
-        fields: getUIIngestionFieldDescriptors(entityDescriptors)
-      }
+        {
+          category: 'DUMMY',
+          fields: getUIIngestionFieldDescriptors(entityDescriptors)
+        }
       ]
     }];
   }, [entityDescriptors, mode]);
@@ -264,8 +264,34 @@ export const InnerRasterForm = (
           {
             showCurtain && <Box className="curtain"></Box>
           }
-          <Box className="validationsContainer">
-            <Box className="validationsData section">
+          <Box className="jobContainer">
+            <Box className="jobData section">
+              <Box>
+                <Box className="title bold"><FormattedMessage id="ingestion.job.progress" /></Box>
+                <Box className="center">
+                  <Box className="progress">
+                    <CircularProgressBar
+                      value={state.context.percentage ?? 0}
+                      text={`${state.context.percentage ?? 0}%`}
+                    />
+                  </Box>
+                </Box>
+              </Box>
+              <Box className="section">
+                <Box className="violations">
+                  <Box className="title underline"><FormattedMessage id="ingestion.job.violations" /></Box>
+                  <Box className="error">
+                    {
+                      state.context.violations?.map((item, index) => (
+                        <Box key={index}>
+                          <Box>{item.text as string}</Box>
+                          <Box>{item.value as number}</Box>
+                        </Box>
+                      ))
+                    }
+                  </Box>
+                </Box>
+              </Box>
             </Box>
             <GeoFeaturesPresentorComponent
               layerRecord={layerRecord}

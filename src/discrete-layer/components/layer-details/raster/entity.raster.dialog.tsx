@@ -35,7 +35,7 @@ import {
 } from '../entity-types-keys';
 import { LayersDetailsComponent } from '../layer-details';
 import { FieldInfoName, IRecordFieldInfo } from '../layer-details.field-info';
-import EntityRasterForm from './layer-datails-form.raster';
+import EntityRasterForm from './layer-details-form.raster';
 import {
   clearSyncWarnings,
   filterModeDescriptors,

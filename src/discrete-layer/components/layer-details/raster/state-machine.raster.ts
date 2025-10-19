@@ -21,7 +21,9 @@ import {
   IBaseRootStore,
   IRootStore,
   RecordType,
-  SourceValidationModelType
+  SourceValidationModelType,
+  Status,
+  TasksGroupModelType
 } from '../../../models';
 // import { LayerRasterRecordInput } from '../../../models/RootStore.base';
 // import { cleanUpEntityPayload, getFlatEntityDescriptors } from '../utils';
@@ -81,12 +83,14 @@ export interface IContext {
   store: IRootStore | IBaseRootStore;
   errors: IStateError[];
   flowType?: Mode.NEW | Mode.UPDATE;
-  formData?: Record<string, unknown>;
-  jobId?: string;
-  jobStatus?: string;
-  taskId?: string;
   autoMode?: boolean;
   files?: IFiles;
+  formData?: Record<string, unknown>;
+  jobId?: string;
+  taskId?: string;
+  percentage?: number;
+  violations?: Record<string, unknown>[];
+  taskStatus?: Status;
 }
 
 export type Events =
@@ -127,8 +131,6 @@ export enum STATE_TAGS {
 export const WORKFLOW = {
   ROOT: "workflow",
   IDLE: "idle",
-  RESTORE_JOB: "restoreJob",
-  RESTORE_REPLAY: "restoreReplay",
   FILES: {
     ROOT: "files",
     SELECT_GPKG: "selectGpkg",
@@ -147,6 +149,7 @@ export const WORKFLOW = {
   },
   JOB_SUBMISSION: "jobSubmission",
   JOB_POLLING: "jobPolling",
+  RESTORE_JOB: "restoreJob",
   DONE: "done",
   ERROR: "error"
 } as const;
@@ -290,18 +293,63 @@ const SERVICES = {
           '3fa85f64-5717-4562-b3fc-2c963f66afa6'
         ]
       };
-      return { jobId: result.jobId, taskId: result.taskIds[0] };
-    })
+
+      return {
+        jobId: result.jobId,
+        taskId: result.taskIds[0]
+      };
+    }),
+    jobPollingService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
+      const { jobId, taskId } = input.context;
+      const missing = [];
+      if (!jobId) {
+        missing.push('jobId');
+      }
+      if (!taskId) {
+        missing.push('taskId');
+      }
+      if (missing.length > 0) {
+        throw buildError('ingestion.error.missing', `${missing.join(', ')}`);
+      }
+
+      // const result = await queryExecutor(async () => {
+      //   return await input.context.store.queryTaskById({
+      //     params: {
+      //       jobId: jobId as string,
+      //       taskId: taskId as string
+      //     }
+      //   });
+      // });
+      const result = await queryExecutor(async () => {
+        return await input.context.store.queryTasks({
+          params: {
+            jobId: jobId as string
+          }
+        });
+      });
+      // @ts-ignore
+      const task = (result.tasks as TasksGroupModelType[]).find(task => task.id === taskId);
+
+      if (!task) {
+        throw buildError('ingestion.error.not-found', taskId);
+      }
+
+      return {
+        percentage: task.percentage ?? 0,
+        violations: task.parameters ?? [{text: 'תקינות נתונים', value: 5}, {text: 'תקינות גיאומטרית', value: 10}, {text: 'פוליגונים עם עודף נקודות', value: 1}],
+        taskStatus: task.status ?? ''
+      };
+    }),
   },
   [WORKFLOW.FILES.ROOT]: {
     validationService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
       if (!input.context.files?.gpkg?.path) {
-        throw (buildError('ingestion.error.file-not-found', 'GPKG'));
+        throw (buildError('ingestion.error.missing', 'GPKG'));
       }
 
       const gpkgPath = input.context.files?.gpkg?.path;
 
-      const res = await queryExecutor(async () => {
+      const result = await queryExecutor(async () => {
         return await input.context.store.queryValidateSource({
           data: {
             fileNames: [path.basename(gpkgPath)],
@@ -311,26 +359,24 @@ const SERVICES = {
         });
       });
 
-      if (!res.validateSource[FIRST].isValid) {
-        throw (buildError('ingestion.error.invalid-source-file', res.validateSource[FIRST].message as string));
+      if (!result.validateSource[FIRST].isValid) {
+        throw (buildError('ingestion.error.invalid-source-file', result.validateSource[FIRST].message as string));
       }
 
-      const validationResult = { ...res.validateSource[FIRST] };
+      const validationResult = { ...result.validateSource[FIRST] };
       const { feature, marker } = getFeatureAndMarker(validationResult.extentPolygon, FeatureType.SOURCE_EXTENT, FeatureType.SOURCE_EXTENT_MARKER);
 
-      const result = {
+      return {
         validationResult,
         geoDetails: {
           feature,
           marker
         }
       };
-
-      return result;
     }),
     autoService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
       if (!input.context.files?.gpkg?.path) {
-        throw (buildError('ingestion.error.file-not-found', 'GPKG'));
+        throw (buildError('ingestion.error.missing', 'GPKG'));
       }
 
       const gpkgPath = input.context.files.gpkg.path;
@@ -364,19 +410,19 @@ const SERVICES = {
         missingFiles.push(METADATA_SHP);
       }
       if (missingFiles.length > 0) {
-        throw buildError('ingestion.error.file-not-found', `${missingFiles.join(', ')}`);
+        throw buildError('ingestion.error.missing', `${missingFiles.join(', ')}`);
       }
 
-      // const res = await queryExecutor(async () => {
+      // const result = await queryExecutor(async () => {
       //   return await input.context.store.queryGetFile({
       //       data: {
-      //         path: product.path,
+      //         path: product?.path ?? '',
       //         type: RecordType.RECORD_RASTER,
       //       },
       //     });
       // });
 
-      // const outlinedPolygon = await shp(res.getFile[FIRST]);
+      // const outlinedPolygon = await shp(result.getFile[FIRST]);
       const outlinedPolygon: Geometry = {
         bbox: [47.5116117000133,29.7960044289981,48.4333988970044,32.1668865940011],
         type: "MultiPolygon",
@@ -385,15 +431,13 @@ const SERVICES = {
 
       const { feature, marker } = getFeatureAndMarker(outlinedPolygon, FeatureType.PP_PERIMETER, FeatureType.PP_PERIMETER_MARKER);
 
-      const result = {
-        // data: new File(res.getFile[FIRST], path.basename(product.path)),
+      return {
+        // data: new File(result.getFile[FIRST], path.basename(product.path)),
         geoDetails: {
           feature,
           marker
         }
       };
-
-      return result;
     })
   }
 };
@@ -683,7 +727,6 @@ export const workflowMachine = createMachine<IContext, Events>({
           actions: assign({ flowType: Mode.UPDATE }),
           target: WORKFLOW.FILES.ROOT
         },
-        RESTORE: WORKFLOW.RESTORE_JOB,
         SUBMIT: {
           actions: assign((_: { context: IContext; event: any }) => ({
             formData: {
@@ -692,32 +735,9 @@ export const workflowMachine = createMachine<IContext, Events>({
           })),
           target: WORKFLOW.JOB_SUBMISSION
         },
+        RESTORE: WORKFLOW.RESTORE_JOB,
         "*": { actions: warnUnexpectedStateEvent }
       }
-    },
-    [WORKFLOW.RESTORE_JOB]: {
-      entry: () => console.log(`>>> Enter ${WORKFLOW.RESTORE_JOB}`),
-      invoke: {
-        input: (_: { context: IContext; event: any }) => _,
-        src: "fetchJobData",
-        onDone: {
-          actions: assign((_: { context: IContext; event: any }) => ({
-            flowType: _.event.output.flowType,
-            files: _.event.output.files,
-            formData: _.event.output.formData,
-            autoMode: _.event.output.autoMode
-          })),
-          target: WORKFLOW.RESTORE_REPLAY
-        },
-        onError: {
-          actions: addError,
-          target: WORKFLOW.ERROR
-        }
-      }
-    },
-    [WORKFLOW.RESTORE_REPLAY]: {
-      entry: () => console.log(`>>> Enter ${WORKFLOW.RESTORE_REPLAY}`),
-      always: WORKFLOW.FILES.ROOT
     },
     [WORKFLOW.FILES.ROOT]: {
       entry: () => console.log(`>>> Enter ${WORKFLOW.FILES.ROOT.toUpperCase()} sub state machine`),
@@ -770,12 +790,49 @@ export const workflowMachine = createMachine<IContext, Events>({
       entry: () => console.log(`>>> Enter ${WORKFLOW.JOB_POLLING}`),
       invoke: {
         input: (_: { context: IContext; event: any }) => _,
-        src: "pollJobStatus",
+        src: SERVICES[WORKFLOW.ROOT].jobPollingService,
         onDone: {
           actions: assign((_: { context: IContext; event: any }) => ({
-            jobStatus: _.event.output.jobStatus
+            percentage: _.event.output.percentage,
+            violations: _.event.output.violations,
+            taskStatus: _.event.output.taskStatus
           })),
-          target: WORKFLOW.DONE
+          target: [
+            {
+              cond: (_: { context: IContext }) => _.context.taskStatus === Status.Completed,
+              target: WORKFLOW.DONE
+            },
+            {
+              target: WORKFLOW.JOB_POLLING
+            }
+          ]
+        },
+        onError: {
+          actions: addError,
+          target: WORKFLOW.ERROR
+        }
+      },
+      after: {
+        30000: {
+          actions: () => console.log(`>>> Re-invoking ${WORKFLOW.JOB_POLLING}...`),
+          target: WORKFLOW.JOB_POLLING
+        }
+      }
+    },
+    [WORKFLOW.RESTORE_JOB]: {
+      entry: () => console.log(`>>> Enter ${WORKFLOW.RESTORE_JOB}`),
+      invoke: {
+        input: (_: { context: IContext; event: any }) => _,
+        src: "fetchJobData",
+        onDone: {
+          actions: assign((_: { context: IContext; event: any }) => ({
+            flowType: _.event.output.flowType,
+            files: _.event.output.files,
+            formData: _.event.output.formData,
+            jobId: _.event.output.jobId,
+            taskId: _.event.output.taskId
+          })),
+          target: WORKFLOW.JOB_POLLING
         },
         onError: {
           actions: addError,

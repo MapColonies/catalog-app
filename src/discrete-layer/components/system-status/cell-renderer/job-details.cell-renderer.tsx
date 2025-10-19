@@ -13,9 +13,9 @@ import { JobModelType, ProductType, Status, TasksGroupModelType } from '../../..
 import { useQuery } from '../../../models/RootStore';
 import { CopyButton } from '../../job-manager/job-details.copy-button';
 import { JobDetailsHeader } from './job-details.header';
+import JobDetailsExportJobData from './job.details.export-job-data';
 
 import './job-details.cell-renderer.css';
-import JobDetailsExportJobData from './job.details.export-job-data';
 
 type ValueType = 'string' | 'Status' | 'date';
 interface ITaskField {
@@ -158,15 +158,17 @@ const TasksRenderer: React.FC<TasksRendererParams> = observer(({ jobId, productT
 
   return (
     <>
-      {tasksData.map((task) => {
-        return taskFields.map((field, idx) => {
-          return getValuePresentor(
-            (task as unknown) as Record<string, unknown>,
-            field,
-            idx
-          );
-        });
-      })}
+      {
+        tasksData.map((task) => {
+          return taskFields.map((field, idx) => {
+            return getValuePresentor(
+              (task as unknown) as Record<string, unknown>,
+              field,
+              idx
+            );
+          });
+        })
+      }
     </>
   );
 });

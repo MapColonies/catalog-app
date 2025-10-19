@@ -86,31 +86,48 @@ body[dir='rtl'] #layerDetailsFormRaster .enumOptions .mdc-select__dropdown-icon 
   left: initial;
 }
 
-#layerDetailsFormRaster .validationsContainer {
+#layerDetailsFormRaster .jobContainer {
   display: flex;
   height: 410px;
   margin: 16px 0 4px 0;
 }
 
-#layerDetailsFormRaster .validationsData {
+#layerDetailsFormRaster .jobData {
   width: 728px;
   margin: 0 4px;
+}
+
+#layerDetailsFormRaster .center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#layerDetailsFormRaster .title {
+  margin: 4px 8px;
+}
+
+#layerDetailsFormRaster .bold {
+  font-weight: bold;
+}
+
+#layerDetailsFormRaster .underline {
+  border-bottom: 1px solid var(--mdc-theme-gc-selection-background);
+}
+
+#layerDetailsFormRaster .progress {
+  width: 200px;
+  height: 200px;
 }
 
 #layerDetailsFormRaster .map {
   border: 1px solid var(--mdc-theme-gc-selection-background, #fff);
 }
 
-#layerDetailsFormRaster .polygonPartDataError {
-  background-color: var(--mdc-theme-gc-error-high);
-  opacity: 0.2;
-}
-
-#layerDetailsFormRaster .polygonPartFormContainer {
-  height: 200px;
+#layerDetailsFormRaster .violations {
+  height: 80px;
   overflow-y: auto;
-  margin-left: 4px;
-  border-bottom: 1px dashed var(--mdc-theme-gc-selection-background);
+  margin: 4px;
 }
 
 #layerDetailsFormRaster .ReactVirtualized__Grid.ReactVirtualized__List{
