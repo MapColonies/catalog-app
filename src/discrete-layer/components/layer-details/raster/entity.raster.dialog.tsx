@@ -15,13 +15,11 @@ import {
   LayerMetadataMixedUnion,
   LayerRasterRecordModel,
   RecordType,
-  useQuery,
   useStore,
   ValidationConfigModelType,
   FieldConfigModelType,
   ProductType,
   ValidationValueType,
-  LayerRasterRecordModelType,
   RecordStatus
 } from '../../../models';
 import { ILayerImage } from '../../../models/layerImage';
@@ -49,7 +47,6 @@ import './entity.raster.dialog.css';
 
 const DEFAULT_ID = 'DEFAULT_UI_ID';
 const DEFAULT_TYPE_NAME = 'DEFAULT_TYPE_NAME';
-// const NONE = 0;
 const START = 0;
 
 interface EntityRasterDialogProps {
@@ -140,7 +137,6 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
     const [descriptors, setDescriptors] = useState<unknown[]>([]);
     const [schema, setSchema] = useState<Record<string, Yup.AnySchema>>({});
     const [isAllInfoReady, setIsAllInfoReady] = useState<boolean>(false);
-    const queryGetProduct = useQuery<{getProduct: LayerMetadataMixedUnion | null}>();
     const dialogTitleParam = recordType;
     const dialogTitleParamTranslation = intl.formatMessage({
       id: `record-type.${(dialogTitleParam as string).toLowerCase()}.label`,
@@ -255,17 +251,6 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
       const desc = addDescriptorValidations([ ...descriptors ]);
 
       setDescriptors(desc as any[]);
-
-      if ([Mode.UPDATE].includes(mode as unknown as Mode)) {
-        queryGetProduct.setQuery(
-          store.queryGetProduct(
-            {
-              productType: props.layerRecord?.productType as ProductType,
-              productId: (props.layerRecord as LayerRasterRecordModelType).productId as string
-            }
-          )
-        );
-      }
     }, []);
 
     const closeDialog = useCallback(() => {
