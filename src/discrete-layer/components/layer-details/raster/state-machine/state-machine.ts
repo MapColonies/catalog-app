@@ -1,5 +1,6 @@
 import { merge } from 'lodash';
 import { assign, createMachine, sendParent } from 'xstate';
+import CONFIG from '../../../../../common/config';
 import { Mode } from '../../../../../common/models/mode.enum';
 import { Status } from '../../../../models';
 import { addError, warnUnexpectedStateEvent } from './helpers';
@@ -383,8 +384,9 @@ export const workflowMachine = createMachine<IContext, Events>({
       }
     },
     [WORKFLOW.JOB_POLLING_WAIT]: {
+      entry: () => console.log(`>>> Enter ${WORKFLOW.JOB_POLLING_WAIT}`),
       after: {
-        5000: WORKFLOW.JOB_POLLING
+        [CONFIG.JOB_STATUS.POLLING_CYCLE_INTERVAL]: WORKFLOW.JOB_POLLING
       }
     },
     [WORKFLOW.RESTORE_JOB]: {
