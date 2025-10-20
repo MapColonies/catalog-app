@@ -114,6 +114,7 @@ export const InnerRasterForm = (
     const { files } = state.context || {};
     const newResolution = files?.gpkg?.validationResult?.resolutionDegree;
     if (newResolution !== values.resolutionDegree) {
+      // resetForm();
       setValues({
         ...values,
         resolutionDegree: newResolution ?? values.resolutionDegree,
