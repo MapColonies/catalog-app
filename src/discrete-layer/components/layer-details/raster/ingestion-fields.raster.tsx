@@ -16,6 +16,7 @@ import { AutoMode, Events, IFileBase, IFiles, WORKFLOW } from './state-machine/t
 
 import './ingestion-fields.raster.css';
 
+const AUTO: AutoMode = 'auto';
 const MANUAL: AutoMode = 'manual';
 
 interface IngestionFieldsProps {
@@ -40,7 +41,7 @@ const FileItem: React.FC<{ file: IFileBase }> = ({ file }) => {
   );
 };
 
-const IngestionInputs: React.FC<{ state: any; }> = ({ state }) => {
+const IngestionInputs: React.FC<{ state: any }> = ({ state }) => {
   return (
     <Box className="ingestionField">
       <FieldLabelComponent value={'field-names.ingestion.fileNames'} />
@@ -51,16 +52,14 @@ const IngestionInputs: React.FC<{ state: any; }> = ({ state }) => {
             {'<'}<FormattedMessage id="general.empty.text" />{'>'}
           </Typography>
         }
-        {
-          <Box className="filesList">
-            {
-              state.context?.files &&
-              Object.values(state.context?.files as IFiles).map((file: IFileBase, idx: number): JSX.Element => {
-                return <FileItem key={idx} file={file} />;
-              })
-            }
-          </Box>
-        }
+        <Box className="filesList">
+          {
+            state.context?.files &&
+            Object.values(state.context?.files as IFiles).map((file: IFileBase, idx: number): JSX.Element => {
+              return <FileItem key={idx} file={file} />;
+            })
+          }
+        </Box>
       </Box>
     </Box>
   );
@@ -73,25 +72,24 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
   const filesActor = state.children?.files; // <-- the invoked child
   // const flowState = flowActor?.getSnapshot(); // grab its snapshot
 
-  const [isFilePickerDialogOpen, setFilePickerDialogOpen] = useState<boolean>(false);
+  const [autoMode, setAutoMode] = useState<AutoMode>(AUTO);
+  const [isFilePickerDialogOpen, setFilePickerDialogOpen] = useState(false);
   const [selection, setSelection] = useState<Selection>({
     files: [],
     folderChain: [],
     metadata: { recordModel: {} as LayerMetadataMixedUnion, error: null },
   });
- 
+
   const onFilesSelection = (selected: Selection): void => {
     clearSyncWarnings(true);
     if (selected.files.length) {
       setSelection({ ...selected });
     }
-    const directory = selected.files.length ? 
-      selected.folderChain
-        .map((folder: FileData) => folder.name)
-        .join('/')
+    const directory = selected.files.length
+      ? selected.folderChain.map((folder: FileData) => folder.name).join('/')
       : '';
     filesActor?.send({
-      type: "SELECT_GPKG", 
+      type: 'SELECT_GPKG',
       file: {
         label: 'file-name.gpkg',
         path: `${directory}/${selected.files[0].name}`,
@@ -101,52 +99,76 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
     } satisfies Events);
   };
 
-  const isChecked = (): boolean => {
-    return false;
+  const handleSwitchClick = (): void => {
+    setAutoMode((prev) => (prev === MANUAL ? AUTO : MANUAL));
   };
 
-  const handleSwitchClick = (): void => {
-    if (state.context.autoMode === MANUAL) {
-      console.log('MANUAL -> AUTO');
-    } else {
-      console.log('AUTO -> MANUAL');
-    }
-  };
+  const isManualMode = autoMode === MANUAL;
 
   return (
     <>
-      <Box className="ingestionSwitchContainer">
-        <Box className="ingestionSwitch">
-          <Typography tag="p">
-            <FormattedMessage id="switch.auto.text" />
-          </Typography>
-          <Switch checked={isChecked()} onClick={handleSwitchClick} />
-          <Typography tag="p">
-            <FormattedMessage id="switch.manual.text" />
-          </Typography>
-        </Box>
-      </Box>
       <Box className="header section">
         <Box className="ingestionFields">
           <IngestionInputs state={state} />
         </Box>
-        <Box className="ingestionButtonsContainer">
-          <Box className="ingestionButton">
-            <Button
-              raised
-              type="button"
-              disabled={
-                isLoading ||
-                (state.context.files?.gpkg?.exists && state.context.files?.product?.exists && state.context.files?.metadata?.exists && state.context.files?.gpkg?.validationResult?.isValid) ||
-                state.value === WORKFLOW.DONE
-              }
-              onClick={(): void => {
-                setFilePickerDialogOpen(true);
-              }}
-            >
-              <FormattedMessage id="general.choose-btn.text" />
-            </Button>
-          </Box>
+        <Box className="ingestionButtons">
+          {
+            isManualMode ? (
+              <>
+                <Button
+                  raised
+                  type="button"
+                  disabled={isLoading}
+                  onClick={() => console.log('Manual Action 1')}
+                >
+                  <FormattedMessage id="general.choose-btn.text" />
+                </Button>
+                <Button
+                  raised
+                  type="button"
+                  disabled={isLoading}
+                  onClick={() => console.log('Manual Action 2')}
+                >
+                  <FormattedMessage id="general.choose-btn.text" />
+                </Button>
+                <Button
+                  raised
+                  type="button"
+                  disabled={isLoading}
+                  onClick={() => console.log('Manual Action 3')}
+                >
+                  <FormattedMessage id="general.choose-btn.text" />
+                </Button>
+              </>
+            ) : (
+              <Button
+                raised
+                type="button"
+                disabled={
+                  isLoading ||
+                  (state.context.files?.gpkg?.exists &&
+                    state.context.files?.product?.exists &&
+                    state.context.files?.metadata?.exists &&
+                    state.context.files?.gpkg?.validationResult?.isValid) ||
+                  state.value === WORKFLOW.DONE
+                }
+                onClick={(): void => {
+                  setFilePickerDialogOpen(true);
+                }}
+              >
+                <FormattedMessage id="general.choose-btn.text" />
+              </Button>
+            )
+          }
+        </Box>
+        <Box className="ingestionSwitch">
+          <Typography tag="p">
+            <FormattedMessage id="switch.auto.text" />
+          </Typography>
+          <Switch checked={isManualMode} onChange={handleSwitchClick} />
+          <Typography tag="p">
+            <FormattedMessage id="switch.manual.text" />
+          </Typography>
         </Box>
       </Box>
       {

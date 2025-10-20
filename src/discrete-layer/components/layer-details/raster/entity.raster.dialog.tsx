@@ -114,9 +114,9 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
 
     useEffect(() => {
       if (props.isSelectedLayerUpdateMode && props.layerRecord && actorRef) {
-        actorRef.send({ type: "START_UPDATE" } satisfies Events);
+        actorRef.send({ type: 'START_UPDATE' } satisfies Events);
       } else {
-        actorRef.send({ type: "START_NEW" } satisfies Events);
+        actorRef.send({ type: 'START_NEW' } satisfies Events);
       }
     }, [props.isSelectedLayerUpdateMode, props.layerRecord, actorRef]);
     //#endregion
@@ -311,7 +311,7 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
                   ...schema,
                 })}
                 onSubmit={(values): void => {
-                  actorRef.send({ type: "SUBMIT", data: values } satisfies Events);
+                  actorRef.send({ type: 'SUBMIT', data: values } satisfies Events);
                 }}
                 closeDialog={closeDialog}
                 customErrorReset={store.discreteLayersStore.clearCustomValidationError}
