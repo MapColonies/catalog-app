@@ -7,6 +7,13 @@ import { addError, warnUnexpectedStateEvent } from './helpers';
 import { SERVICES } from './services';
 import { IContext, STATE_TAGS, WORKFLOW } from './types';
 
+//#region --- Guards ---
+const hasSelectedFiles = (_: { context: IContext }) => {
+  const files = _.context.files ?? {};
+  return !!(files.gpkg && files.product && files.metadata);
+};
+//#endregion
+
 //#region --- validate gpkg states ---
 const validateGpkgStates = {
   [WORKFLOW.FILES.VALIDATE_GPKG.VALIDATION]: {
