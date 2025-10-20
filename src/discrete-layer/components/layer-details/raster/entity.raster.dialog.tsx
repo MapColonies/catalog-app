@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import React, { useEffect, useCallback, useState, useLayoutEffect, useRef } from 'react';
+import React, { useEffect, useCallback, useState, useLayoutEffect, useRef, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import { observer } from 'mobx-react';
 import { cloneDeep, isEmpty } from 'lodash';
@@ -23,6 +23,7 @@ import {
   RecordStatus
 } from '../../../models';
 import { ILayerImage } from '../../../models/layerImage';
+import { LayerRasterRecordInput } from '../../../models/RootStore.base';
 import {
   LayerRasterRecordModelKeys,
   LayerRecordTypes,
@@ -36,7 +37,8 @@ import {
   getValidationType,
   getYupFieldConfig,
   getBasicType,
-  isEnumType
+  isEnumType,
+  cleanUpEntityPayload
 } from '../utils';
 import EntityRasterForm from './layer-details-form.raster';
 import { Events } from './state-machine/types';
@@ -135,6 +137,16 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
     const [descriptors, setDescriptors] = useState<unknown[]>([]);
     const [schema, setSchema] = useState<Record<string, Yup.AnySchema>>({});
     const [isAllInfoReady, setIsAllInfoReady] = useState<boolean>(false);
+
+    const metadataPayloadKeys = useMemo(() => {
+      return getFlatEntityDescriptors(
+        'LayerRasterRecord',
+        store.discreteLayersStore.entityDescriptors as EntityDescriptorModelType[]
+      )
+      .filter(descriptor => descriptor.isCreateEssential || descriptor.fieldName === 'id')
+      .map(descriptor => descriptor.fieldName);
+    }, [store.discreteLayersStore.entityDescriptors]);
+
     const dialogTitleParam = recordType;
     const dialogTitleParamTranslation = intl.formatMessage({
       id: `record-type.${(dialogTitleParam as string).toLowerCase()}.label`,
@@ -311,7 +323,9 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
                   ...schema,
                 })}
                 onSubmit={(values): void => {
-                  actorRef.send({ type: 'SUBMIT', data: values } satisfies Events);
+                  const data = cleanUpEntityPayload(values, metadataPayloadKeys as string[]) as unknown as LayerRasterRecordInput;
+                  const resolutionDegree = values.resolutionDegree as number;
+                  actorRef.send({ type: 'SUBMIT', data, resolutionDegree } satisfies Events);
                 }}
                 closeDialog={closeDialog}
                 customErrorReset={store.discreteLayersStore.clearCustomValidationError}

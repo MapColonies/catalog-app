@@ -9,6 +9,7 @@ import {
   SourceValidationModelType,
   Status
 } from '../../../../models';
+import { LayerRasterRecordInput } from '../../../../models/RootStore.base';
 
 export type ErrorSource = "api" | "logic";
 export type ErrorLevel = "error" | "warning";
@@ -67,25 +68,26 @@ export interface IContext {
   flowType?: Mode.NEW | Mode.UPDATE;
   autoMode?: AutoMode;
   files?: IFiles;
-  formData?: Record<string, unknown>;
+  resolutionDegree?: number;
+  formData?: LayerRasterRecordInput;
   job?: IJob;
 }
 
 export type Events =
   | { type: "START_NEW" }
   | { type: "START_UPDATE" }
-  | { type: "RESTORE"; job: IJob }
+  | { type: "RESTORE"; data: Record<string, unknown> }
   | { type: "AUTO" }
   | { type: "MANUAL" }
   | { type: "SELECT_GPKG"; file: IGPKGFile }
   | { type: "SELECT_PRODUCT"; file: IProductFile }
   | { type: "SELECT_METADATA"; file: IFileBase }
   | { type: "SET_FILES"; files: IFiles; addPolicy: AddPolicy }
+  | { type: "FILES_SELECTED" }
   | { type: "FILES_ERROR"; error: IStateError }
   | { type: "CLEAN_ERRORS" }
-  | { type: "FILES_SELECTED" }
   | { type: "NOOP" }
-  | { type: "SUBMIT", data: Record<string, unknown> }
+  | { type: "SUBMIT", data: LayerRasterRecordInput, resolutionDegree: number }
   | { type: "RETRY" }
   | { type: "DONE" };
 

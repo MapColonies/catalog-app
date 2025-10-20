@@ -4,7 +4,11 @@ import path from 'path';
 import { fromPromise } from 'xstate';
 import { FileData } from '@map-colonies/react-components';
 import { Mode } from '../../../../../common/models/mode.enum';
-import { RecordType/*, EntityDescriptorModelType*/ } from '../../../../models';
+import {
+  RecordType,
+  // EntityDescriptorModelType,
+  Status
+} from '../../../../models';
 // import { LayerRasterRecordInput } from '../../../../models/RootStore.base';
 // import { cleanUpEntityPayload, getFlatEntityDescriptors } from '../../utils';
 import { FeatureType } from '../pp-map.utils';
@@ -25,22 +29,16 @@ import {
 export const SERVICES = {
   [WORKFLOW.ROOT]: {
     jobSubmissionService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
-      /*const store = input.context.store;
-      const metadataPayloadKeys = getFlatEntityDescriptors(
-        'LayerRasterRecord',
-        store.discreteLayersStore.entityDescriptors as EntityDescriptorModelType[]
-      )
-      .filter(descriptor => descriptor.isCreateEssential || descriptor.fieldName === 'id')
-      .map(descriptor => descriptor.fieldName);
+      /*const { store, files, resolutionDegree, formData } = input.context || {};
 
       const data = {
-        ingestionResolution: input.context?.formData?.resolutiondegrees as number,
+        ingestionResolution: resolutionDegree as number,
         inputFiles: {
-          gpkgFilesPath: [input.context.files?.gpkg?.path],
-          productShapefilePath: input.context.files?.product?.path,
-          metadataShapefilePath: input.context.files?.metadata?.path
+          gpkgFilesPath: [files?.gpkg?.path],
+          productShapefilePath: files?.product?.path,
+          metadataShapefilePath: files?.metadata?.path
         },
-        metadata: cleanUpEntityPayload(input.context?.formData ?? {}, metadataPayloadKeys as string[]) as unknown as LayerRasterRecordInput,
+        metadata: formData ?? {},
         callbackUrls: ['https://my-dns-for-callback'],
         type: RecordType.RECORD_RASTER,
       };*/
@@ -115,6 +113,20 @@ export const SERVICES = {
         taskStatus: task.status ?? ''
       };
     }),
+    restoreJobService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
+      let { flowType, autoMode, files, resolutionDegree, formData, job } = input.context || {};
+
+      // TODO: files
+
+      return {
+        flowType,
+        autoMode,
+        files,
+        resolutionDegree,
+        formData,
+        job
+      };
+    })
   },
   [WORKFLOW.FILES.ROOT]: {
     validationService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {

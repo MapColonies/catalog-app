@@ -295,11 +295,17 @@ export const workflowMachine = createMachine<IContext, Events>({
           actions: assign((_: { context: IContext; event: any }) => ({
             formData: {
               ..._.event.data
-            }
+            },
+            resolutionDegree: _.event.resolutionDegree
           })),
           target: WORKFLOW.JOB_SUBMISSION
         },
-        RESTORE: WORKFLOW.RESTORE_JOB,
+        RESTORE: {
+          actions: assign((_: { context: IContext; event: any }) => ({
+            ..._.event.data
+          })),
+          target: WORKFLOW.RESTORE_JOB
+        },
         "*": { actions: warnUnexpectedStateEvent }
       }
     },
@@ -393,13 +399,10 @@ export const workflowMachine = createMachine<IContext, Events>({
       entry: () => console.log(`>>> Enter ${WORKFLOW.RESTORE_JOB}`),
       invoke: {
         input: (_: { context: IContext; event: any }) => _,
-        src: "fetchJobData",
+        src: SERVICES[WORKFLOW.ROOT].restoreJobService,
         onDone: {
           actions: assign((_: { context: IContext; event: any }) => ({
-            flowType: _.event.output.flowType,
-            files: _.event.output.files,
-            formData: _.event.output.formData,
-            job: _.event.output.job
+            ..._.event.output
           })),
           target: WORKFLOW.JOB_POLLING
         },
