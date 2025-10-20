@@ -64,5 +64,6 @@ keys = [
   "/configuration/wfs/max/page/size",
   "/configuration/wfs/max/zoom/level",
   "/configuration/wfs/max/cache/size",
-  "/configuration/geocoding/url"
+  "/configuration/geocoder/url"
+  "/configuration/geocoder/callbackUrl"
 ]

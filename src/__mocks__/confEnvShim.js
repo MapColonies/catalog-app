@@ -90,7 +90,10 @@ if (!window._env_) {
           cacheSize: 6000,
         }
       },
-      GEOCODING_URL: 'http://geocoding-URL'
+      GEOCODER: {
+        url: 'http://geocoder-URL',
+        callbackUrl: 'http://geocoder-callback-URL'
+      }
     };
   })(void 0);
 }

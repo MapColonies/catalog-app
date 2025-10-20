@@ -237,8 +237,8 @@ const APP_CONFIG = {
     }
   },
   GEOCODER: {
-    URL: GEOCODER.geocoderUrl,
-    CALLBACK_URL: GEOCODER.geocoderCallback,
+    URL: GEOCODER.url,
+    CALLBACK_URL: GEOCODER.callbackUrl,
     RES_LIMIT: 6
   }
 };

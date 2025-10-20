@@ -847,16 +847,19 @@ const DiscreteLayerView: React.FC = observer(() => {
 
   const site = useMemo(() => currentSite(), []);
 
-  const triggerCallbackFunc = (data: {
-    [key: string]: unknown;
-    headers: Headers;
-  }, options: GeocoderOptions, i: number) => {
+  const triggerCallbackFunc = (data: Feature, options: GeocoderOptions, i: number) => {
+    const requestId = data.properties?.headers['request_id'];
+
+    if (!requestId) {
+      console.warn('GEOCODING[FEEDBACK]: request_id header not propagated (pay attention on "Access-Control-Expose-Headers" response header of geocoding API\'s call)');
+    }
 
     if (!CONFIG.GEOCODER.CALLBACK_URL) return;
 
     const body = {
-      request_id: data.headers.get('request_id'),
-      chosen_result_id: i
+      request_id: requestId,
+      chosen_result_id: i,
+      user_id: 'catalog-app@mapcolonies.net'
     }
 
     const url = `${CONFIG.GEOCODER.CALLBACK_URL}?token=${CONFIG.ACCESS_TOKEN.TOKEN_VALUE}`;

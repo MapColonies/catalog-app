@@ -87,5 +87,8 @@ window._env_ = {
       cacheSize: {{ getv "/configuration/wfs/max/cache/size" "6000" }}
     }
   },
-  GEOCODING_URL: '{{ getv "/configuration/geocoding/url" "http://geocoding-URL" }}',
+  GEOCODER: {
+    url: '{{ getv "/configuration/geocoder/url" "http://geocoder-URL" }}'
+    callbackUrl: '{{ getv "/configuration/geocoder/callbackUrl" "http://geocoder-callback-URL" }}'
+  }
 };
