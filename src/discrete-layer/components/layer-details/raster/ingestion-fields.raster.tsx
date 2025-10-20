@@ -114,7 +114,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
   };
 
   const handleSwitchClick = (): void => {
-    setAutoMode((prev) => (prev === MANUAL ? AUTO : MANUAL));
+    setAutoMode((prev) => (prev === AUTO ? MANUAL : AUTO));
     if (autoMode === AUTO) {
       actorRef.send({ type: 'MANUAL' } satisfies Events);
     } else {
