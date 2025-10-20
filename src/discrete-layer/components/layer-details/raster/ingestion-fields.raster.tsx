@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
-import { isEmpty } from 'lodash';
 import { observer } from 'mobx-react';
 import { Switch } from '@material-ui/core';
 import { Box, defaultFormatters, FileData } from '@map-colonies/react-components';
@@ -138,7 +137,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
               type="button"
               disabled={
                 isLoading ||
-                !isEmpty(state.context.files) ||
+                (state.context.files?.gpkg?.exists && state.context.files?.product?.exists && state.context.files?.metadata?.exists && state.context.files?.gpkg?.validationResult?.isValid) ||
                 state.value === WORKFLOW.DONE
               }
               onClick={(): void => {
