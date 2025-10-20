@@ -9,7 +9,6 @@ import { FieldLabelComponent } from '../../../../common/components/form/field-la
 import { dateFormatter } from '../../../../common/helpers/formatters';
 import { RecordType, LayerMetadataMixedUnion } from '../../../models';
 import { FilePickerDialog } from '../../dialogs/file-picker.dialog';
-import { clearSyncWarnings } from '../utils';
 import { RasterWorkflowContext } from './state-machine/context';
 import { hasLoadingTagDeep } from './state-machine/helpers';
 import { AutoMode, Events, IFileBase, IFiles, WORKFLOW } from './state-machine/types';
@@ -18,6 +17,9 @@ import './ingestion-fields.raster.css';
 
 const AUTO: AutoMode = 'auto';
 const MANUAL: AutoMode = 'manual';
+const GPKG = 'gpkg';
+const PRODUCT = 'product';
+const METADATA = 'metadata';
 
 interface IngestionFieldsProps {
   recordType: RecordType;
@@ -79,88 +81,52 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
     folderChain: [],
     metadata: { recordModel: {} as LayerMetadataMixedUnion, error: null },
   });
+  const [selectedAction, setSelectedAction] = useState<string | null>(null);
 
   const onFilesSelection = (selected: Selection): void => {
-    clearSyncWarnings(true);
     if (selected.files.length) {
       setSelection({ ...selected });
-    }
-    const directory = selected.files.length
-      ? selected.folderChain.map((folder: FileData) => folder.name).join('/')
-      : '';
-    filesActor?.send({
-      type: 'SELECT_GPKG',
-      file: {
-        label: 'file-name.gpkg',
-        path: `${directory}/${selected.files[0].name}`,
-        details: { ...selected.files[0] },
-        exists: true
+      
+      const directory = selected.files.length
+        ? selected.folderChain.map((folder: FileData) => folder.name).join('/')
+        : '';
+
+      if (selectedAction) {
+        const actionTypeMap: Record<string, 'SELECT_GPKG' | 'SELECT_PRODUCT' | 'SELECT_METADATA'> = {
+          gpkg: 'SELECT_GPKG',
+          product: 'SELECT_PRODUCT',
+          metadata: 'SELECT_METADATA',
+        };
+        const eventType = actionTypeMap[selectedAction];
+        if (eventType) {
+          filesActor?.send({
+            type: eventType,
+            file: {
+              label: `file-name.${selectedAction}`,
+              path: `${directory}/${selected.files[0].name}`,
+              details: { ...selected.files[0] },
+              exists: true
+            }
+          } satisfies Events);
+        }
       }
-    } satisfies Events);
+    }
   };
 
   const handleSwitchClick = (): void => {
     setAutoMode((prev) => (prev === MANUAL ? AUTO : MANUAL));
+    if (autoMode === AUTO) {
+      actorRef.send({ type: 'MANUAL' } satisfies Events);
+    } else {
+      actorRef.send({ type: 'AUTO' } satisfies Events);
+    }
   };
 
   const isManualMode = autoMode === MANUAL;
 
   return (
     <>
-      <Box className="header section">
-        <Box className="ingestionFields">
-          <IngestionInputs state={state} />
-        </Box>
-        <Box className="ingestionButtons">
-          {
-            isManualMode ? (
-              <>
-                <Button
-                  raised
-                  type="button"
-                  disabled={isLoading}
-                  onClick={() => console.log('Manual Action 1')}
-                >
-                  <FormattedMessage id="general.choose-btn.text" />
-                </Button>
-                <Button
-                  raised
-                  type="button"
-                  disabled={isLoading}
-                  onClick={() => console.log('Manual Action 2')}
-                >
-                  <FormattedMessage id="general.choose-btn.text" />
-                </Button>
-                <Button
-                  raised
-                  type="button"
-                  disabled={isLoading}
-                  onClick={() => console.log('Manual Action 3')}
-                >
-                  <FormattedMessage id="general.choose-btn.text" />
-                </Button>
-              </>
-            ) : (
-              <Button
-                raised
-                type="button"
-                disabled={
-                  isLoading ||
-                  (state.context.files?.gpkg?.exists &&
-                    state.context.files?.product?.exists &&
-                    state.context.files?.metadata?.exists &&
-                    state.context.files?.gpkg?.validationResult?.isValid) ||
-                  state.value === WORKFLOW.DONE
-                }
-                onClick={(): void => {
-                  setFilePickerDialogOpen(true);
-                }}
-              >
-                <FormattedMessage id="general.choose-btn.text" />
-              </Button>
-            )
-          }
-        </Box>
+      <Box className="ingestionSwitchContainer">
         <Box className="ingestionSwitch">
           <Typography tag="p">
             <FormattedMessage id="switch.auto.text" />
@@ -170,6 +136,71 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
             <FormattedMessage id="switch.manual.text" />
           </Typography>
         </Box>
+      </Box>
+      <Box className="header section">
+        <Box className="ingestionFields">
+          <IngestionInputs state={state} />
+        </Box>
+        {
+          isManualMode ? (
+            <Box className="ingestionManualButtons">
+              <Button
+                raised
+                type="button"
+                className="manualButton"
+                disabled={isLoading}
+                onClick={() => {
+                  setSelectedAction(GPKG);
+                  setFilePickerDialogOpen(true);
+                }}
+              >
+                <FormattedMessage id="general.choose-btn.text" />
+              </Button>
+              <Button
+                raised
+                type="button"
+                className="manualButton"
+                disabled={isLoading}
+                onClick={() => {
+                  setSelectedAction(PRODUCT);
+                  setFilePickerDialogOpen(true);
+                }}
+              >
+                <FormattedMessage id="general.choose-btn.text" />
+              </Button>
+              <Button
+                raised
+                type="button"
+                className="manualButton"
+                disabled={isLoading}
+                onClick={() => {
+                  setSelectedAction(METADATA);
+                  setFilePickerDialogOpen(true);
+                }}
+              >
+                <FormattedMessage id="general.choose-btn.text" />
+              </Button>
+            </Box>
+          ) : (
+            <Box className="ingestionAutoButtons">
+              <Button
+                raised
+                type="button"
+                className="autoButton"
+                disabled={
+                  isLoading ||
+                  state.value === WORKFLOW.DONE
+                }
+                onClick={(): void => {
+                  setSelectedAction(GPKG);
+                  setFilePickerDialogOpen(true);
+                }}
+              >
+                <FormattedMessage id="general.choose-btn.text" />
+              </Button>
+            </Box>
+          )
+        }
       </Box>
       {
         isFilePickerDialogOpen &&

@@ -1,3 +1,14 @@
+#layerDetailsFormRaster .ingestionSwitchContainer {
+  position: absolute;
+  right: 78px;
+  top: 40px;
+}
+
+body[dir='rtl'] #layerDetailsFormRaster .ingestionSwitchContainer {
+  right: unset;
+  left: 78px;
+}
+
 #layerDetailsFormRaster .ingestionSwitch {
   display: flex;
   flex-direction: row;
@@ -30,7 +41,7 @@ body[dir='rtl'] #layerDetailsFormRaster .ingestionSwitch {
   height: 96px;
   padding: 4px 8px 4px 16px;
   margin-bottom: 4px;
-  gap: 16px;
+  gap: 4px;
 }
 
 body[dir='rtl'] #layerDetailsFormRaster .header {
@@ -40,7 +51,8 @@ body[dir='rtl'] #layerDetailsFormRaster .header {
 #layerDetailsFormRaster .ingestionFields {
   display: flex;
   flex-direction: column;
-  width: 80%;
+  width: 90%;
+  margin-top: 22px;
 }
 
 #layerDetailsFormRaster .ingestionField {
@@ -51,12 +63,29 @@ body[dir='rtl'] #layerDetailsFormRaster .header {
   text-overflow: ellipsis;
 }
 
-#layerDetailsFormRaster .ingestionButtons {
+#layerDetailsFormRaster .ingestionManualButtons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.4rem;
+  margin-bottom: 2px;
+}
+
+#layerDetailsFormRaster .ingestionAutoButtons {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+}
+
+#layerDetailsFormRaster .manualButton {
+  width: 80px;
+  height: 16px;
+}
+
+#layerDetailsFormRaster .autoButton {
+  width: 80px;
 }
 
 #layerDetailsFormRaster .empty {
@@ -72,8 +101,8 @@ body[dir='rtl'] #layerDetailsFormRaster .header {
   display: grid;
   grid-template-columns: 0.1fr 0.2fr 1.5fr 0.3fr 0.5fr;
   column-gap: 8px;
-  row-gap: 14px;
-  margin: 0 12px
+  row-gap: 3px;
+  margin: 0 12px;
 }
 
 #layerDetailsFormRaster .fileItemName {
