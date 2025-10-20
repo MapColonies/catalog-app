@@ -228,6 +228,9 @@
   "field.actions.edit-draft": "ערוך טיוטה",
   "field.actions.more": "פעולות נוספות",
 
+  "switch.auto.text": "אוטומטי",
+  "switch.manual.text": "ידני",
+
   "field-names.ingestion.directory": "נתיב מלא",
   "field-names.ingestion.fileNames": "הקבצים",
 

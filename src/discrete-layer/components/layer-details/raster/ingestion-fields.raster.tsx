@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { isEmpty } from 'lodash';
 import { observer } from 'mobx-react';
+import { Switch } from '@material-ui/core';
 import { Box, defaultFormatters, FileData } from '@map-colonies/react-components';
 import { Button, Icon, Typography } from '@map-colonies/react-core';
 import { Selection } from '../../../../common/components/file-picker';
@@ -12,9 +13,11 @@ import { FilePickerDialog } from '../../dialogs/file-picker.dialog';
 import { clearSyncWarnings } from '../utils';
 import { RasterWorkflowContext } from './state-machine/context';
 import { hasLoadingTagDeep } from './state-machine/helpers';
-import { Events, IFileBase, IFiles, WORKFLOW } from './state-machine/types';
+import { AutoMode, Events, IFileBase, IFiles, WORKFLOW } from './state-machine/types';
 
 import './ingestion-fields.raster.css';
+
+const MANUAL: AutoMode = 'manual';
 
 interface IngestionFieldsProps {
   recordType: RecordType;
@@ -99,8 +102,31 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
     } satisfies Events);
   };
 
+  const isChecked = (): boolean => {
+    return false;
+  };
+
+  const handleSwitchClick = (): void => {
+    if (state.context.autoMode === MANUAL) {
+      console.log('MANUAL -> AUTO');
+    } else {
+      console.log('AUTO -> MANUAL');
+    }
+  };
+
   return (
     <>
+      <Box className="ingestionSwitchContainer">
+        <Box className="ingestionSwitch">
+          <Typography tag="p">
+            <FormattedMessage id="switch.auto.text" />
+          </Typography>
+          <Switch checked={isChecked()} onClick={handleSwitchClick} />
+          <Typography tag="p">
+            <FormattedMessage id="switch.manual.text" />
+          </Typography>
+        </Box>
+      </Box>
       <Box className="header section">
         <Box className="ingestionFields">
           <IngestionInputs state={state} />

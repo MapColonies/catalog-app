@@ -228,6 +228,9 @@
   "field.actions.edit-draft": "Edit draft",
   "field.actions.more": "More options",
 
+  "switch.auto.text": "Auto",
+  "switch.manual.text": "Manual",
+
   "field-names.ingestion.directory": "Directory",
   "field-names.ingestion.fileNames": "Files",
 

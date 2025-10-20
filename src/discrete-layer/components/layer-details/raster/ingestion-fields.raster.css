@@ -1,21 +1,60 @@
-.header {
+#layerDetailsFormRaster .ingestionSwitchContainer {
+  position: absolute;
+  right: 54px;
+  top: 40px;
+}
+
+body[dir='rtl'] #layerDetailsFormRaster .ingestionSwitchContainer {
+  right: unset;
+  left: 80px;
+}
+
+#layerDetailsFormRaster .ingestionSwitch {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+body[dir='rtl'] #layerDetailsFormRaster .ingestionSwitch {
+  flex-direction: row-reverse;
+}
+
+#layerDetailsFormRaster .ingestionSwitch .MuiSwitch-track {
+  background-color: var(--mdc-theme-gc-selection-background);
+}
+
+#layerDetailsFormRaster .ingestionSwitch .MuiSwitch-colorSecondary.Mui-checked + .MuiSwitch-track {
+  background-color: var(--mdc-theme-gc-selection-background);
+  filter: brightness(2);
+}
+
+#layerDetailsFormRaster .ingestionSwitch .MuiSwitch-colorSecondary.Mui-checked {
+  color: var(--mdc-theme-text-icon-on-dark);
+}
+
+#layerDetailsFormRaster .ingestionSwitch .MuiSwitch-switchBase {
+  color: var(--mdc-theme-text-icon-on-dark);
+}
+
+#layerDetailsFormRaster .header {
   display: flex;
   height: 96px;
   padding: 4px 8px 4px 16px;
   margin-bottom: 4px;
 }
 
-body[dir='rtl'] .header {
+body[dir='rtl'] #layerDetailsFormRaster .header {
   padding: 4px 16px 4px 8px;
 }
 
-.ingestionFields {
+#layerDetailsFormRaster .ingestionFields {
   display: flex;
   flex-direction: column;
   width: 90%;
+  margin-top: 22px;
 }
 
-.ingestionField {
+#layerDetailsFormRaster .ingestionField {
   display: flex;
   padding: 2px 0;
   overflow: hidden;
@@ -23,22 +62,16 @@ body[dir='rtl'] .header {
   text-overflow: ellipsis;
 }
 
-.ingestionButton {
+#layerDetailsFormRaster .ingestionButton {
   display: flex;
   align-items: center;
 }
 
-.ingestionButton .mdc-button {
+#layerDetailsFormRaster .ingestionButton .mdc-button {
   padding: 20px;
 }
 
-.uploadMetadataButton .mdc-button--outlined:not(:disabled) {
-  border-color: currentColor;
-  /* color: var(--mdc-theme-text-icon-on-dark); */
-  padding: 20px;
-}
-
-.ingestionButtonsContainer {
+#layerDetailsFormRaster .ingestionButtonsContainer {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -47,23 +80,23 @@ body[dir='rtl'] .header {
   gap: 10px;
 }
 
-.empty {
+#layerDetailsFormRaster .empty {
   margin: 0 12px;
 }
 
-.disabledText {
+#layerDetailsFormRaster .disabledText {
   color: var(--mdc-theme-text-hint-on-dark, #fff);
   opacity: 0.5;
 }
 
-.filesList {
+#layerDetailsFormRaster .filesList {
   display: grid;
   grid-template-columns: 0.1fr 0.2fr 1.5fr 0.3fr 0.5fr;
   column-gap: 8px;
   margin: 0 12px
 }
 
-.fileItemName {
+#layerDetailsFormRaster .fileItemName {
   text-overflow: ellipsis;
   overflow: hidden;
   direction: ltr;
@@ -71,11 +104,11 @@ body[dir='rtl'] .header {
   margin: 0 16px;
 }
 
-.fileIcon {
+#layerDetailsFormRaster .fileIcon {
   font-size: 16px;
   cursor: default;
 }
 
-.ltr {
+#layerDetailsFormRaster .ltr {
   direction: ltr;
 }

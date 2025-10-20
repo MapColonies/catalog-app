@@ -13,6 +13,7 @@ import {
 export type ErrorSource = "api" | "logic";
 export type ErrorLevel = "error" | "warning";
 export type AddPolicy = "merge" | "override";
+export type AutoMode = "auto" | "manual";
 
 export interface IStateError {
   source: ErrorSource;
@@ -64,7 +65,7 @@ export interface IContext {
   store: IRootStore | IBaseRootStore;
   errors: IStateError[];
   flowType?: Mode.NEW | Mode.UPDATE;
-  autoMode?: boolean;
+  autoMode?: AutoMode;
   files?: IFiles;
   formData?: Record<string, unknown>;
   job?: IJob;
