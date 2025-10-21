@@ -162,8 +162,6 @@ const DiscreteLayerView: React.FC = observer(() => {
   const isDrawingState = isDrawing || store.exportStore.drawingState?.drawing;
   const disableOnDrawingClassName = isDrawingState ? 'interactionsDisabled' : ''; 
 
-  const CATALOG_APP_USER_ID = CONFIG.CATALOG_APP_USER_ID.replace('${CURRENT_USER}', store.userStore?.user?.role as string);
-
   useEffect(() => {
     const val = localStore.get('whatsNewVisitedCnt');
     if (val) {
@@ -857,6 +855,8 @@ const DiscreteLayerView: React.FC = observer(() => {
     }
 
     if (!CONFIG.GEOCODER.CALLBACK_URL) return;
+
+    const CATALOG_APP_USER_ID = CONFIG.CATALOG_APP_USER_ID.replace('${CURRENT_USER}', store.userStore?.user?.role as string);
 
     const body = {
       request_id: requestId,
