@@ -50,7 +50,7 @@ exports[`MapContainer component renders correctly 1`] = `
       </div>
     </div>
   </div>
-  <mo
+  <po
     center={
       Array [
         34.811,
@@ -68,7 +68,7 @@ exports[`MapContainer component renders correctly 1`] = `
     <Memo(observerComponent) />
     <Memo(observerComponent) />
     <Memo(observerComponent) />
-    <Do
+    <Ao
       drawState={
         Object {
           "drawing": false,
@@ -95,6 +95,6 @@ exports[`MapContainer component renders correctly 1`] = `
         ]
       }
     />
-  </mo>
+  </po>
 </div>
 `;
