@@ -9,7 +9,7 @@ window._env_ = {
   REQUEST: '{{ getv "/configuration/mapServer/request" "ImageryMaps" }}',
   SERVICE_PROTOCOL: '{{ getv "/configuration/service/protocol" "http://" }}',
   SERVICE_NAME: '{{ getv "/configuration/service/url" "localhost:8080/graphql" }}',
-  CATALOG_APP_USER_ID: 'catalog-app-${CURRENT_USER}@mapcolonies.net',
+  CATALOG_APP_USER_ID: '{{ getv "/configuration/catalogAppUserId" "catalog-app-${CURRENT_USER}@mapcolonies.net" }}',
   ACTIVE_LAYER: '{{ getv "/configuration/activeLayer" "OSM_LAYER" }}',
   ACTIVE_LAYER_PROPERTIES: {
     urlPattern: MAP_SERVER + '{{ getv "/configuration/active/layer/properties/mapurlpath" "/service" }}',
