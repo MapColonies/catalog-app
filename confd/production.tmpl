@@ -9,6 +9,7 @@ window._env_ = {
   REQUEST: '{{ getv "/configuration/mapServer/request" "ImageryMaps" }}',
   SERVICE_PROTOCOL: '{{ getv "/configuration/service/protocol" "http://" }}',
   SERVICE_NAME: '{{ getv "/configuration/service/url" "localhost:8080/graphql" }}',
+  CATALOG_APP_USER_ID: '{{ getv "/configuration/catalogAppUserId" "catalog-app-${CURRENT_USER}@mapcolonies.net" }}',
   ACTIVE_LAYER: '{{ getv "/configuration/activeLayer" "OSM_LAYER" }}',
   ACTIVE_LAYER_PROPERTIES: {
     urlPattern: MAP_SERVER + '{{ getv "/configuration/active/layer/properties/mapurlpath" "/service" }}',
@@ -87,5 +88,8 @@ window._env_ = {
       cacheSize: {{ getv "/configuration/wfs/max/cache/size" "6000" }}
     }
   },
-  GEOCODING_URL: '{{ getv "/configuration/geocoding/url" "http://geocoding-URL" }}',
+  GEOCODER: {
+    url: '{{ getv "/configuration/geocoder/url" "http://geocoder-URL" }}'
+    callbackUrl: '{{ getv "/configuration/geocoder/callbackUrl" "http://geocoder-callback-URL" }}'
+  }
 };

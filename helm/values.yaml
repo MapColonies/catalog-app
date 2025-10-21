@@ -115,6 +115,7 @@ env:
   bboxAreaSquareKmLimit: 10000
   language: he
   backendLocale: he
+  catalogAppUserId: catalog-app-${CURRENT_USER}@mapcolonies.net
   jobStatus:
     pollingCycleInterval: 120000
   defaultUser:
@@ -169,7 +170,9 @@ env:
       pageSize: 300
       zoomLevel: 14
       cacheSize: 6000
-  geocodingUrl: ''
+  geocoder:
+    url: ''
+    callbackUrl: ''
 route:
   enabled: true
   annotations:
