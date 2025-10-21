@@ -298,6 +298,9 @@ export const workflowMachine = createMachine<IContext, Events>({
           actions: assign({ flowType: Mode.UPDATE }),
           target: WORKFLOW.FILES.ROOT
         },
+        RESELECT_FILES: {
+          target: WORKFLOW.FILES.ROOT
+        },
         SUBMIT: {
           actions: assign((_: { context: IContext; event: any }) => ({
             formData: {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { observer } from 'mobx-react';
 import { Switch } from '@material-ui/core';
@@ -82,7 +82,15 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
     metadata: { recordModel: {} as LayerMetadataMixedUnion, error: null },
   });
   const [selectedAction, setSelectedAction] = useState<string | null>(null);
+  const [pendingFileEvent, setPendingFileEvent] = useState<Events | null>(null);
 
+  useEffect(() => {
+    if (pendingFileEvent && filesActor) {
+      filesActor.send(pendingFileEvent);
+      setPendingFileEvent(null); // clear
+    }
+  }, [filesActor, pendingFileEvent]);
+  
   const onFilesSelection = (selected: Selection): void => {
     if (selected.files.length) {
       setSelection({ ...selected });
@@ -98,16 +106,21 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
           metadata: 'SELECT_METADATA',
         };
         const eventType = actionTypeMap[selectedAction];
-        if (eventType) {
-          filesActor?.send({
-            type: eventType,
-            file: {
-              label: `file-name.${selectedAction}`,
-              path: `${directory}/${selected.files[0].name}`,
-              details: { ...selected.files[0] },
-              exists: true
-            }
-          } satisfies Events);
+        const fileEvent = {
+          type: eventType,
+          file: {
+            label: `file-name.${selectedAction}`,
+            path: `${directory}/${selected.files[0].name}`,
+            details: { ...selected.files[0] },
+            exists: true
+          }
+        } satisfies Events ;
+
+        if (!filesActor) {
+          actorRef.send({ type: 'RESELECT_FILES' } satisfies Events);
+          setPendingFileEvent(fileEvent); // wait for child actor
+        } else {
+          filesActor.send(fileEvent);
         }
       }
     }
