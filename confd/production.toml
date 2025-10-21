@@ -66,4 +66,5 @@ keys = [
   "/configuration/wfs/max/cache/size",
   "/configuration/geocoder/url"
   "/configuration/geocoder/callbackUrl"
+  "/configuration/catalogAppUserId"
 ]

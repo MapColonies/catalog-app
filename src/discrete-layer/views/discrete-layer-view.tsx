@@ -162,6 +162,8 @@ const DiscreteLayerView: React.FC = observer(() => {
   const isDrawingState = isDrawing || store.exportStore.drawingState?.drawing;
   const disableOnDrawingClassName = isDrawingState ? 'interactionsDisabled' : ''; 
 
+  const CATALOG_APP_USER_ID = CONFIG.CATALOG_APP_USER_ID.replace('${CURRENT_USER}', store.userStore?.user?.role as string);
+
   useEffect(() => {
     const val = localStore.get('whatsNewVisitedCnt');
     if (val) {
@@ -851,7 +853,7 @@ const DiscreteLayerView: React.FC = observer(() => {
     const requestId = data.properties?.headers['request_id'];
 
     if (!requestId) {
-      console.warn('GEOCODING[FEEDBACK]: request_id header not propagated (pay attention on "Access-Control-Expose-Headers" response header of geocoding API\'s call)');
+      console.warn('GEOCODING[FEEDBACK]: Missing request_id in response header. Ensure the "Access-Control-Expose-Headers" header includes "request_id".');
     }
 
     if (!CONFIG.GEOCODER.CALLBACK_URL) return;
@@ -859,7 +861,7 @@ const DiscreteLayerView: React.FC = observer(() => {
     const body = {
       request_id: requestId,
       chosen_result_id: i,
-      user_id: 'catalog-app@mapcolonies.net'
+      user_id: CATALOG_APP_USER_ID
     }
 
     const url = `${CONFIG.GEOCODER.CALLBACK_URL}?token=${CONFIG.ACCESS_TOKEN.TOKEN_VALUE}`;

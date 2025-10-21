@@ -13,6 +13,7 @@ const VERSION = (window as any)._env_.VERSION;
 const REQUEST = (window as any)._env_.REQUEST;
 const SERVICE_PROTOCOL = (window as any)._env_.SERVICE_PROTOCOL;
 const SERVICE_NAME = (window as any)._env_.SERVICE_NAME;
+const CATALOG_APP_USER_ID = (window as any)._env_.CATALOG_APP_USER_ID;
 const ACTIVE_LAYER = (window as any)._env_.ACTIVE_LAYER;
 const ACTIVE_LAYER_PROPERTIES = (window as any)._env_.ACTIVE_LAYER_PROPERTIES;
 const MAP = (window as any)._env_.MAP;
@@ -105,6 +106,7 @@ const DATE_FNS_FORMAT = 'dd/MM/yyyy';
 const APP_CONFIG = {
   SERVICE_PROTOCOL: SERVICE_PROTOCOL,
   SERVICE_NAME: SERVICE_NAME,
+  CATALOG_APP_USER_ID: CATALOG_APP_USER_ID,
   LOCALE: {
     DATE_FORMAT: DATE_FORMAT,
     DATE_TIME_FORMAT: `${DATE_FORMAT} HH:mm`,
