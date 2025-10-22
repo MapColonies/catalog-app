@@ -117,37 +117,35 @@ const selectionModeStates = {
         invoke: {
           input: (_: { context: IContext; event: any }) => _,
           src: SERVICES[WORKFLOW.FILES.ROOT].fetchProductService,
-          onDone: [
-            {
-              actions: [
-                assign((_: { context: IContext; event: any }) => ({
-                  files: {
-                    ..._.context.files,
-                    product: {
-                      ..._.context.files?.product,
-                      ..._.event.output
-                    }
+          onDone: {
+            actions: [
+              assign((_: { context: IContext; event: any }) => ({
+                files: {
+                  ..._.context.files,
+                  product: {
+                    ..._.context.files?.product,
+                    ..._.event.output
                   }
-                })),
-                sendParent((_: { context: IContext; event: any }) => ({
-                  type: "SET_FILES",
-                  files: {
-                    product: {
-                      ..._.event.output
-                    }
-                  },
-                  addPolicy: "merge"
-                })),
-                sendParent({ type: "FILES_SELECTED" })
-              ]
-            }
-          ],
+                }
+              })),
+              sendParent((_: { context: IContext; event: any }) => ({
+                type: "SET_FILES",
+                files: {
+                  product: {
+                    ..._.event.output
+                  }
+                },
+                addPolicy: "merge"
+              })),
+              sendParent({ type: "FILES_SELECTED" })
+            ]
+          },
           onError: {
             actions: sendParent((_: { context: IContext; event: any }) => ({
               type: "FILES_ERROR",
               error: { ..._.event.error }
             })),
-            target: `#${WORKFLOW.FILES.ROOT}`
+            // target: `#${WORKFLOW.FILES.ROOT}`
           }
         }
       }
@@ -201,7 +199,8 @@ const selectionModeStates = {
                 },
                 addPolicy: "merge"
               }))
-            ]
+            ],
+            target: WORKFLOW.FILES.SELECTION_MODE.MANUAL.FETCH_PRODUCT
           },
           SELECT_METADATA: {
             actions: [
@@ -222,11 +221,8 @@ const selectionModeStates = {
                 },
                 addPolicy: "merge"
               }))
-            ]
-          },
-          CHECK_SELECTIONS: {
-            guard: (_: { context: IContext; event: any }) => !!_.context.files?.gpkg && !!_.context.files?.product && !!_.context.files?.metadata,
-            target: WORKFLOW.FILES.SELECTION_MODE.MANUAL.FETCH_PRODUCT
+            ],
+            target: WORKFLOW.FILES.SELECTION_MODE.MANUAL.IDLE
           },
           AUTO: {
             actions: [
@@ -276,7 +272,7 @@ const selectionModeStates = {
                 error: { ..._.event.error }
               })),
             ],
-            // target: `#${WORKFLOW.FILES.ROOT}`
+            target: WORKFLOW.FILES.SELECTION_MODE.MANUAL.IDLE
           }
         }
       },
@@ -286,37 +282,36 @@ const selectionModeStates = {
         invoke: {
           input: (_: { context: IContext; event: any }) => _,
           src: SERVICES[WORKFLOW.FILES.ROOT].fetchProductService,
-          onDone: [
-            {
-              actions: [
-                assign((_: { context: IContext; event: any }) => ({
-                  files: {
-                    ..._.context.files,
-                    product: {
-                      ..._.context.files?.product,
-                      ..._.event.output
-                    }
+          onDone: {
+            actions: [
+              assign((_: { context: IContext; event: any }) => ({
+                files: {
+                  ..._.context.files,
+                  product: {
+                    ..._.context.files?.product,
+                    ..._.event.output
                   }
-                })),
-                sendParent((_: { context: IContext; event: any }) => ({
-                  type: "SET_FILES",
-                  files: {
-                    product: {
-                      ..._.event.output
-                    }
-                  },
-                  addPolicy: "merge"
-                })),
-                sendParent({ type: "FILES_SELECTED" })
-              ]
-            }
-          ],
+                }
+              })),
+              sendParent((_: { context: IContext; event: any }) => ({
+                type: "SET_FILES",
+                files: {
+                  product: {
+                    ..._.event.output
+                  }
+                },
+                addPolicy: "merge"
+              })),
+              sendParent({ type: "FILES_SELECTED" })
+            ],
+            target: WORKFLOW.FILES.SELECTION_MODE.MANUAL.IDLE
+          },
           onError: {
             actions: sendParent((_: { context: IContext; event: any }) => ({
               type: "FILES_ERROR",
               error: { ..._.event.error }
             })),
-            target: `#${WORKFLOW.FILES.ROOT}`
+            target: WORKFLOW.FILES.SELECTION_MODE.MANUAL.IDLE
           }
         }
       }
