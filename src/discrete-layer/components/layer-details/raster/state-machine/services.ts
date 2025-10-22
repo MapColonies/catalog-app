@@ -6,8 +6,7 @@ import { FileData } from '@map-colonies/react-components';
 import { Mode } from '../../../../../common/models/mode.enum';
 import {
   RecordType,
-  // EntityDescriptorModelType,
-  Status
+  // EntityDescriptorModelType
 } from '../../../../models';
 // import { LayerRasterRecordInput } from '../../../../models/RootStore.base';
 // import { cleanUpEntityPayload, getFlatEntityDescriptors } from '../../utils';

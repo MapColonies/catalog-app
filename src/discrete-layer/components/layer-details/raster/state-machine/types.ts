@@ -135,6 +135,7 @@ export const WORKFLOW = {
 } as const;
 
 export const FIRST = 0;
+export const GPKG_PATH = '\\layerSources';
 export const SHAPES_DIR = '../../Shapes';
 export const PRODUCT_SHP = 'Product.shp';
 export const METADATA_SHP = 'ShapeMetadata.shp';

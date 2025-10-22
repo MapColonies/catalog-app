@@ -1,4 +1,4 @@
-import { merge } from 'lodash';
+/*import { merge } from 'lodash';
 import { assign, createMachine } from 'xstate';
 import CONFIG from '../../../../../common/config';
 import { Mode } from '../../../../../common/models/mode.enum';
@@ -257,3 +257,4 @@ export const workflowMachine = createMachine<IContext>({
   },
 });
 //#endregion
+*/
