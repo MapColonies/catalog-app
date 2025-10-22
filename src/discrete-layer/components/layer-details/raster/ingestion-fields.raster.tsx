@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { observer } from 'mobx-react';
+import path from 'path';
 import { Switch } from '@material-ui/core';
 import { Box, defaultFormatters, FileData } from '@map-colonies/react-components';
 import { Button, Icon, Typography } from '@map-colonies/react-core';
@@ -11,7 +12,14 @@ import { RecordType, LayerMetadataMixedUnion } from '../../../models';
 import { FilePickerDialog } from '../../dialogs/file-picker.dialog';
 import { RasterWorkflowContext } from './state-machine/context';
 import { hasLoadingTagDeep } from './state-machine/helpers';
-import { AutoMode, Events, IFileBase, IFiles, WORKFLOW } from './state-machine/types';
+import {
+  AutoMode,
+  Events,
+  GPKG_PATH,
+  IFileBase,
+  IFiles,
+  WORKFLOW
+} from './state-machine/types';
 
 import './ingestion-fields.raster.css';
 
@@ -90,7 +98,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
       setPendingFileEvent(null); // clear
     }
   }, [filesActor, pendingFileEvent]);
-  
+
   const onFilesSelection = (selected: Selection): void => {
     if (selected.files.length) {
       setSelection({ ...selected });
@@ -107,14 +115,14 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
         };
         const eventType = actionTypeMap[selectedAction];
         const fileEvent = {
-          type: eventType,
-          file: {
-            label: `file-name.${selectedAction}`,
-            path: `${directory}/${selected.files[0].name}`,
-            details: { ...selected.files[0] },
-            exists: true
-          }
-        } satisfies Events ;
+            type: eventType,
+            file: {
+              label: `file-name.${selectedAction}`,
+              path: `${directory}/${selected.files[0].name}`,
+              details: { ...selected.files[0] },
+              exists: true
+            }
+        } satisfies Events;
 
         if (!filesActor) {
           actorRef.send({ type: 'RESELECT_FILES' } satisfies Events);
@@ -128,6 +136,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
 
   const handleSwitchClick = (): void => {
     setAutoMode((prev) => (prev === AUTO ? MANUAL : AUTO));
+
     const job = {
       "__typename": "Job",
       "id": "8b62987a-c1f7-4326-969e-ceca4c81b5aa",
@@ -207,10 +216,9 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
             }
           ],
           "inputFiles": {
-              "fileNames": [
-                  "blueMarble.gpkg"
-              ],
-              "originDirectory": "test_dir"
+              "gpkgFilesPath": ["test_dir/blueMarble.gpkg"],
+              "productShapefilePath": "Shapes/Product.shpppp",
+              "metadataShapefilePath": "Shapes/ShapeMetadata.shp"
           },
           "additionalParams": {
               "jobTrackerServiceURL": "http://raster-core-int-job-tracker-service"
@@ -246,17 +254,17 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
         files: {
           gpkg: {
             label: 'file-name.gpkg',
-            path: `\\layerSources/${job.parameters.inputFiles.originDirectory}/${job.parameters.inputFiles.fileNames[0]}`,
+            path: path.resolve(GPKG_PATH, job.parameters.inputFiles.gpkgFilesPath[0]),
             exists: false
           },
           product: {
             label: 'file-name.product',
-            path: `\\layerSources/Shapes/Product.shp}`,
+            path: path.resolve(GPKG_PATH, job.parameters.inputFiles.productShapefilePath),
             exists: false
           },
           metadata: {
             label: 'file-name.metadata',
-            path: `\\layerSources/Shapes/ShapeMetadata.shp}`,
+            path: path.resolve(GPKG_PATH, job.parameters.inputFiles.metadataShapefilePath),
             exists: false
           }
         },
