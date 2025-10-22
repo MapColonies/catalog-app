@@ -12,14 +12,7 @@ import { RecordType, LayerMetadataMixedUnion } from '../../../models';
 import { FilePickerDialog } from '../../dialogs/file-picker.dialog';
 import { RasterWorkflowContext } from './state-machine/context';
 import { hasLoadingTagDeep } from './state-machine/helpers';
-import {
-  AutoMode,
-  Events,
-  GPKG_PATH,
-  IFileBase,
-  IFiles,
-  WORKFLOW
-} from './state-machine/types';
+import { AutoMode, Events, IFileBase, IFiles, WORKFLOW } from './state-machine/types';
 
 import './ingestion-fields.raster.css';
 
@@ -115,13 +108,13 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
         };
         const eventType = actionTypeMap[selectedAction];
         const fileEvent = {
-            type: eventType,
-            file: {
-              label: `file-name.${selectedAction}`,
-              path: `${directory}/${selected.files[0].name}`,
-              details: { ...selected.files[0] },
-              exists: true
-            }
+          type: eventType,
+          file: {
+            label: `file-name.${selectedAction}`,
+            path: `${directory}/${selected.files[0].name}`,
+            details: { ...selected.files[0] },
+            exists: true
+          }
         } satisfies Events;
 
         if (!filesActor) {
@@ -216,9 +209,10 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
             }
           ],
           "inputFiles": {
-              "gpkgFilesPath": ["test_dir/blueMarble.gpkg"],
-              "productShapefilePath": "Shapes/Product.shpppp",
-              "metadataShapefilePath": "Shapes/ShapeMetadata.shp"
+              "fileNames": [
+                  "blueMarble.gpkg"
+              ],
+              "originDirectory": "test_dir"
           },
           "additionalParams": {
               "jobTrackerServiceURL": "http://raster-core-int-job-tracker-service"
@@ -254,17 +248,17 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
         files: {
           gpkg: {
             label: 'file-name.gpkg',
-            path: path.resolve(GPKG_PATH, job.parameters.inputFiles.gpkgFilesPath[0]),
+            path: `\\layerSources/${job.parameters.inputFiles.originDirectory}/${job.parameters.inputFiles.fileNames[0]}`,
             exists: false
           },
           product: {
             label: 'file-name.product',
-            path: path.resolve(GPKG_PATH, job.parameters.inputFiles.productShapefilePath),
+            path: `\\layerSources/Shapes/Product.shp}`,
             exists: false
           },
           metadata: {
             label: 'file-name.metadata',
-            path: path.resolve(GPKG_PATH, job.parameters.inputFiles.metadataShapefilePath),
+            path: `\\layerSources/Shapes/ShapeMetadata.shp}`,
             exists: false
           }
         },
@@ -279,9 +273,9 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
       }
     } satisfies Events);
     if (autoMode === AUTO) {
-      actorRef.send({ type: 'MANUAL' } satisfies Events);
+      filesActor.send({ type: 'MANUAL' } satisfies Events);
     } else {
-      actorRef.send({ type: 'AUTO' } satisfies Events);
+      filesActor.send({ type: 'AUTO' } satisfies Events);
     }
   };
 
@@ -311,7 +305,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
                 raised
                 type="button"
                 className="manualButton"
-                disabled={isLoading}
+                // disabled={isLoading}
                 onClick={() => {
                   setSelectedAction(GPKG);
                   setFilePickerDialogOpen(true);
@@ -323,7 +317,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
                 raised
                 type="button"
                 className="manualButton"
-                disabled={isLoading}
+                // disabled={isLoading}
                 onClick={() => {
                   setSelectedAction(PRODUCT);
                   setFilePickerDialogOpen(true);
@@ -335,7 +329,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
                 raised
                 type="button"
                 className="manualButton"
-                disabled={isLoading}
+                // disabled={isLoading}
                 onClick={() => {
                   setSelectedAction(METADATA);
                   setFilePickerDialogOpen(true);
