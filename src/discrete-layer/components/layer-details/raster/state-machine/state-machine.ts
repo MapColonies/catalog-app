@@ -32,6 +32,7 @@ const selectionModeStates = {
     initial: WORKFLOW.FILES.SELECTION_MODE.AUTO.IDLE,
     states: {
       [WORKFLOW.FILES.SELECTION_MODE.AUTO.IDLE]: {
+        entry: () => console.log(`>>> Enter ${WORKFLOW.FILES.SELECTION_MODE.AUTO.IDLE}`),
         on: {
           SELECT_FILES: {
             actions: [
@@ -157,6 +158,7 @@ const selectionModeStates = {
     initial: WORKFLOW.FILES.SELECTION_MODE.MANUAL.IDLE,
     states: {
       [WORKFLOW.FILES.SELECTION_MODE.MANUAL.IDLE]: {
+        entry: () => console.log(`>>> Enter ${WORKFLOW.FILES.SELECTION_MODE.MANUAL.IDLE}`),
         on: {
           SELECT_GPKG: {
             actions: [
