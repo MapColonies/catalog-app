@@ -76,6 +76,7 @@ export interface IContext {
 export type Events =
   | { type: "START_NEW" }
   | { type: "START_UPDATE" }
+  | { type: "RESELECT_FILES" }
   | { type: "RESTORE"; data: Record<string, unknown> }
   | { type: "AUTO" }
   | { type: "MANUAL" }
