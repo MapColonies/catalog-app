@@ -78,8 +78,6 @@ export type Events =
   | { type: "START_UPDATE" }
   | { type: "RESELECT_FILES" }
   | { type: "RESTORE"; data: Record<string, unknown> }
-  | { type: "AUTO" }
-  | { type: "MANUAL" }
   | { type: "SELECT_GPKG"; file: IGPKGFile }
   | { type: "SELECT_PRODUCT"; file: IProductFile }
   | { type: "SELECT_METADATA"; file: IFileBase }

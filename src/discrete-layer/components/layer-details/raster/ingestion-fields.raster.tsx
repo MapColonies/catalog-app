@@ -272,11 +272,6 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
         }
       }
     } satisfies Events);
-    if (autoMode === AUTO) {
-      filesActor.send({ type: 'MANUAL' } satisfies Events);
-    } else {
-      filesActor.send({ type: 'AUTO' } satisfies Events);
-    }
   };
 
   const isManualMode = autoMode === MANUAL;
