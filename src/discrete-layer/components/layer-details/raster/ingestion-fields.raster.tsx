@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { observer } from 'mobx-react';
-import path from 'path';
+// import path from 'path';
 import { Switch } from '@material-ui/core';
 import { Box, defaultFormatters, FileData } from '@map-colonies/react-components';
 import { Button, Icon, Typography } from '@map-colonies/react-core';
@@ -12,7 +12,14 @@ import { RecordType, LayerMetadataMixedUnion } from '../../../models';
 import { FilePickerDialog } from '../../dialogs/file-picker.dialog';
 import { RasterWorkflowContext } from './state-machine/context';
 import { hasLoadingTagDeep } from './state-machine/helpers';
-import { AutoMode, Events, GPKG_PATH, IFileBase, IFiles, WORKFLOW } from './state-machine/types';
+import {
+  AutoMode,
+  Events,
+  // GPKG_PATH,
+  IFileBase,
+  IFiles,
+  WORKFLOW
+} from './state-machine/types';
 
 import './ingestion-fields.raster.css';
 
