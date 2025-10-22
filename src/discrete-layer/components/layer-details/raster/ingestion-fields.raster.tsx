@@ -130,7 +130,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
   const handleSwitchClick = (): void => {
     setAutoMode((prev) => (prev === AUTO ? MANUAL : AUTO));
 
-    const job = {
+    /*const job = {
       "__typename": "Job",
       "id": "8b62987a-c1f7-4326-969e-ceca4c81b5aa",
       "resourceId": "elicy_test",
@@ -271,7 +271,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
           taskId: '3fa85f64-5717-4562-b3fc-2c963f66afa6'
         }
       }
-    } satisfies Events);
+    } satisfies Events);*/
   };
 
   const isManualMode = autoMode === MANUAL;
