@@ -113,13 +113,13 @@ export const SERVICES = {
       };
     }),
     restoreJobService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
-      let { flowType, autoMode, files, resolutionDegree, formData, job } = input.context || {};
+      let { flowType, selectionMode, files, resolutionDegree, formData, job } = input.context || {};
 
       // TODO: files
 
       return {
         flowType,
-        autoMode,
+        selectionMode,
         files,
         resolutionDegree,
         formData,

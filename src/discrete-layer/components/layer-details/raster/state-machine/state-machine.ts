@@ -18,7 +18,7 @@ const selectionModeStates = {
   [WORKFLOW.FILES.SELECTION_MODE.DECIDE_MODE]: {
     always: [
       {
-        guard: (_: { context: IContext; event: any }) => _.context.autoMode === 'manual',
+        guard: (_: { context: IContext; event: any }) => _.context.selectionMode === 'manual',
         target: WORKFLOW.FILES.SELECTION_MODE.MANUAL.ROOT
       },
       {
@@ -58,7 +58,7 @@ const selectionModeStates = {
           },
           MANUAL: {
             actions: [
-              assign({ autoMode: 'manual', files: {} }),
+              assign({ selectionMode: 'manual', files: {} }),
               sendParent({ type: "SET_FILES", files: {}, addPolicy: "override" })
             ],
             target: `#${WORKFLOW.FILES.ROOT}`
@@ -228,7 +228,7 @@ const selectionModeStates = {
           },
           AUTO: {
             actions: [
-              assign({ autoMode: 'auto', files: {} }),
+              assign({ selectionMode: 'auto', files: {} }),
               sendParent({ type: "SET_FILES", files: {}, addPolicy: "override" })
             ],
             target: `#${WORKFLOW.FILES.ROOT}`

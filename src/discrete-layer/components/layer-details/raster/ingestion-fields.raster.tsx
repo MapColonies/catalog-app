@@ -13,7 +13,7 @@ import { FilePickerDialog } from '../../dialogs/file-picker.dialog';
 import { RasterWorkflowContext } from './state-machine/context';
 // import { hasLoadingTagDeep } from './state-machine/helpers';
 import {
-  AutoMode,
+  SelectionMode,
   Events,
   // GPKG_PATH,
   IFileBase,
@@ -23,8 +23,8 @@ import {
 
 import './ingestion-fields.raster.css';
 
-const AUTO: AutoMode = 'auto';
-const MANUAL: AutoMode = 'manual';
+const AUTO: SelectionMode = 'auto';
+const MANUAL: SelectionMode = 'manual';
 const FILES = 'files';
 const GPKG = 'gpkg';
 const PRODUCT = 'product';
@@ -83,7 +83,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
   const filesActor = state.children?.files; // <-- the invoked child
   // const flowState = flowActor?.getSnapshot(); // grab its snapshot
 
-  const [autoMode, setAutoMode] = useState<AutoMode>(AUTO);
+  const [selectionMode, setSelectionMode] = useState<SelectionMode>(AUTO);
   const [isFilePickerDialogOpen, setFilePickerDialogOpen] = useState(false);
   const [selection, setSelection] = useState<Selection>({
     files: [],
@@ -137,13 +137,13 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
   };
 
   const handleSwitchClick = (): void => {
-    setAutoMode((prev) => (prev === AUTO ? MANUAL : AUTO));
-
-    if (autoMode === AUTO) {
+    if (selectionMode === AUTO) {
       filesActor.send({ type: 'MANUAL' } satisfies Events);
     } else {
       filesActor.send({ type: 'AUTO' } satisfies Events);
     }
+
+    setSelectionMode((prev) => (prev === AUTO ? MANUAL : AUTO));
 
     /*const job = {
       "__typename": "Job",
@@ -259,7 +259,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
       type: 'RESTORE',
       data: {
         flowType: job.type.substring(job.type.lastIndexOf('_') + 1),
-        autoMode: 'auto',
+        selectionMode: 'auto',
         files: {
           gpkg: {
             label: 'file-name.gpkg',
@@ -289,7 +289,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
     } satisfies Events);*/
   };
 
-  const isManualMode = autoMode === MANUAL;
+  const isManualMode = selectionMode === MANUAL;
 
   return (
     <>

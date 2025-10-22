@@ -14,7 +14,7 @@ import { LayerRasterRecordInput } from '../../../../models/RootStore.base';
 export type ErrorSource = "api" | "logic";
 export type ErrorLevel = "error" | "warning";
 export type AddPolicy = "merge" | "override";
-export type AutoMode = "auto" | "manual";
+export type SelectionMode = "auto" | "manual";
 
 export interface IStateError {
   source: ErrorSource;
@@ -66,7 +66,7 @@ export interface IContext {
   store: IRootStore | IBaseRootStore;
   errors: IStateError[];
   flowType?: Mode.NEW | Mode.UPDATE;
-  autoMode?: AutoMode;
+  selectionMode?: SelectionMode;
   files?: IFiles;
   resolutionDegree?: number;
   formData?: LayerRasterRecordInput;
@@ -74,7 +74,7 @@ export interface IContext {
 }
 
 export type Events =
-  | { type: "START", flowType: Mode, autoMode: AutoMode }
+  | { type: "START", flowType: Mode, selectionMode: SelectionMode }
   | { type: "AUTO" }
   | { type: "MANUAL" }
   | { type: "SELECT_FILES", file: IGPKGFile }
@@ -82,7 +82,7 @@ export type Events =
   | { type: "SELECT_PRODUCT", file: IProductFile }
   | { type: "SELECT_METADATA", file: IFileBase }
   | { type: "RESELECT_FILES" }
-  | { type: "SET_FILES", files: IFiles; addPolicy: AddPolicy }
+  | { type: "SET_FILES", files: IFiles, addPolicy: AddPolicy }
   | { type: "FILES_SELECTED" }
   | { type: "FILES_ERROR", error: IStateError }
   | { type: "CLEAN_ERRORS" }
