@@ -11,20 +11,21 @@ import { dateFormatter } from '../../../../common/helpers/formatters';
 import { RecordType, LayerMetadataMixedUnion } from '../../../models';
 import { FilePickerDialog } from '../../dialogs/file-picker.dialog';
 import { RasterWorkflowContext } from './state-machine/context';
-import { hasLoadingTagDeep } from './state-machine/helpers';
+// import { hasLoadingTagDeep } from './state-machine/helpers';
 import {
   AutoMode,
   Events,
   // GPKG_PATH,
   IFileBase,
   IFiles,
-  WORKFLOW
+  // WORKFLOW
 } from './state-machine/types';
 
 import './ingestion-fields.raster.css';
 
 const AUTO: AutoMode = 'auto';
 const MANUAL: AutoMode = 'manual';
+const FILES = 'files';
 const GPKG = 'gpkg';
 const PRODUCT = 'product';
 const METADATA = 'metadata';
@@ -77,7 +78,7 @@ const IngestionInputs: React.FC<{ state: any }> = ({ state }) => {
 
 export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recordType }) => {
   const actorRef = RasterWorkflowContext.useActorRef();
-  const isLoading = hasLoadingTagDeep(actorRef?.getSnapshot());
+  // const isLoading = hasLoadingTagDeep(actorRef?.getSnapshot());
   const state = RasterWorkflowContext.useSelector((s) => s);
   const filesActor = state.children?.files; // <-- the invoked child
   // const flowState = flowActor?.getSnapshot(); // grab its snapshot
@@ -108,7 +109,8 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
         : '';
 
       if (selectedAction) {
-        const actionTypeMap: Record<string, 'SELECT_GPKG' | 'SELECT_PRODUCT' | 'SELECT_METADATA'> = {
+        const actionTypeMap: Record<string, 'SELECT_FILES' | 'SELECT_GPKG' | 'SELECT_PRODUCT' | 'SELECT_METADATA'> = {
+          files: 'SELECT_FILES',
           gpkg: 'SELECT_GPKG',
           product: 'SELECT_PRODUCT',
           metadata: 'SELECT_METADATA',
@@ -136,6 +138,12 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
 
   const handleSwitchClick = (): void => {
     setAutoMode((prev) => (prev === AUTO ? MANUAL : AUTO));
+
+    if (autoMode === AUTO) {
+      filesActor.send({ type: 'MANUAL' } satisfies Events);
+    } else {
+      filesActor.send({ type: 'AUTO' } satisfies Events);
+    }
 
     /*const job = {
       "__typename": "Job",
@@ -346,12 +354,12 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
                 raised
                 type="button"
                 className="autoButton"
-                disabled={
-                  isLoading ||
-                  state.value === WORKFLOW.DONE
-                }
+                // disabled={
+                //   isLoading ||
+                //   state.value === WORKFLOW.DONE
+                // }
                 onClick={(): void => {
-                  setSelectedAction(GPKG);
+                  setSelectedAction(FILES);
                   setFilePickerDialogOpen(true);
                 }}
               >

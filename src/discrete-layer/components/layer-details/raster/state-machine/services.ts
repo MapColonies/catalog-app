@@ -128,12 +128,63 @@ export const SERVICES = {
     })
   },
   [WORKFLOW.FILES.ROOT]: {
-    validationService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
+    selectFilesService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
       if (!input.context.files?.gpkg?.path) {
         throw (buildError('ingestion.error.missing', 'GPKG'));
       }
 
-      const gpkgPath = input.context.files?.gpkg?.path;
+      const gpkgPath = input.context.files.gpkg.path;
+
+      const result = await queryExecutor(async () => {
+        return await input.context.store.queryValidateSource({
+          data: {
+            fileNames: [path.basename(gpkgPath)],
+            originDirectory: path.dirname(gpkgPath),
+            type: RecordType.RECORD_RASTER,
+          }
+        });
+      });
+
+      if (!result.validateSource[FIRST].isValid) {
+        throw (buildError('ingestion.error.invalid-source-file', result.validateSource[FIRST].message as string));
+      }
+
+      const validationResult = { ...result.validateSource[FIRST] };
+      const { feature, marker } = getFeatureAndMarker(validationResult.extentPolygon, FeatureType.SOURCE_EXTENT, FeatureType.SOURCE_EXTENT_MARKER);
+
+      let res;
+      try {
+        res = await queryExecutor(async () => {
+          return await input.context.store.queryGetDirectory({
+            data: {
+              path: path.resolve(gpkgPath, SHAPES_DIR),
+              type: RecordType.RECORD_RASTER,
+            },
+          });
+        });
+      } catch (e) {
+      }
+      const product = getFile(res?.getDirectory as FileData[], gpkgPath, PRODUCT_SHP, PRODUCT_LABEL);
+      const metadata = getFile(res?.getDirectory as FileData[], gpkgPath, METADATA_SHP, METADATA_LABEL);
+
+      return {
+        gpkg: {
+          validationResult,
+          geoDetails: {
+            feature,
+            marker
+          }
+        },
+        product,
+        metadata
+      };
+    }),
+    selectGpkgService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
+      if (!input.context.files?.gpkg?.path) {
+        throw (buildError('ingestion.error.missing', 'GPKG'));
+      }
+
+      const gpkgPath = input.context.files.gpkg.path;
 
       const result = await queryExecutor(async () => {
         return await input.context.store.queryValidateSource({
@@ -158,32 +209,6 @@ export const SERVICES = {
           feature,
           marker
         }
-      };
-    }),
-    autoService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
-      if (!input.context.files?.gpkg?.path) {
-        throw (buildError('ingestion.error.missing', 'GPKG'));
-      }
-
-      const gpkgPath = input.context.files.gpkg.path;
-      let result;
-      try {
-        result = await queryExecutor(async () => {
-          return await input.context.store.queryGetDirectory({
-            data: {
-              path: path.resolve(gpkgPath, SHAPES_DIR),
-              type: RecordType.RECORD_RASTER,
-            },
-          });
-        });
-      } catch (e) {
-      }
-      const product = getFile(result?.getDirectory as FileData[], gpkgPath, PRODUCT_SHP, PRODUCT_LABEL);
-      const metadata = getFile(result?.getDirectory as FileData[], gpkgPath, METADATA_SHP, METADATA_LABEL);
-
-      return {
-        product,
-        metadata
       };
     }),
     fetchProductService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {

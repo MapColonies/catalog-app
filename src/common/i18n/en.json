@@ -234,6 +234,7 @@
   "field-names.ingestion.directory": "Directory",
   "field-names.ingestion.fileNames": "Files",
 
+  "file-name.files": "GPKG",
   "file-name.gpkg": "GPKG",
   "file-name.product": "Source extent",
   "file-name.metadata": "Polygon parts",

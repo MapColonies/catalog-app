@@ -113,18 +113,21 @@ export const WORKFLOW = {
   IDLE: "idle",
   FILES: {
     ROOT: "files",
-    SELECT_GPKG: "selectGpkg",
-    VALIDATE_GPKG: {
-      ROOT: "validateGpkg",
-      VALIDATION: "validation",
-      SUCCESS: "success"
-    },
     SELECTION_MODE: {
       ROOT: "selectionMode",
       DECIDE_MODE: "decideMode",
-      AUTO: "auto",
-      MANUAL: "manual",
-      FETCH_PRODUCT: "fetchProduct"
+      AUTO: {
+        ROOT: "auto",
+        IDLE: "idle",
+        SELECT_FILES: "selectFiles",
+        FETCH_PRODUCT: "fetchProduct"
+      },
+      MANUAL: {
+        ROOT: "manual",
+        IDLE: "idle",
+        SELECT_GPKG: "selectGpkg",
+        FETCH_PRODUCT: "fetchProduct"
+      }
     },
     ERROR: "error"
   },

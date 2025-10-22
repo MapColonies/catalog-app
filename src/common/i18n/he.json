@@ -234,6 +234,7 @@
   "field-names.ingestion.directory": "נתיב מלא",
   "field-names.ingestion.fileNames": "הקבצים",
 
+  "file-name.files": "GPKG",
   "file-name.gpkg": "GPKG",
   "file-name.product": "תיחום היקפי",
   "file-name.metadata": "חלקי התיחום",
