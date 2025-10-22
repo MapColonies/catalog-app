@@ -12,7 +12,7 @@ import { RecordType, LayerMetadataMixedUnion } from '../../../models';
 import { FilePickerDialog } from '../../dialogs/file-picker.dialog';
 import { RasterWorkflowContext } from './state-machine/context';
 import { hasLoadingTagDeep } from './state-machine/helpers';
-import { AutoMode, Events, IFileBase, IFiles, WORKFLOW } from './state-machine/types';
+import { AutoMode, Events, GPKG_PATH, IFileBase, IFiles, WORKFLOW } from './state-machine/types';
 
 import './ingestion-fields.raster.css';
 
@@ -248,17 +248,17 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
         files: {
           gpkg: {
             label: 'file-name.gpkg',
-            path: `\\layerSources/${job.parameters.inputFiles.originDirectory}/${job.parameters.inputFiles.fileNames[0]}`,
+            path: path.resolve(GPKG_PATH, job.parameters.inputFiles.gpkgFilesPath[0]),
             exists: false
           },
           product: {
             label: 'file-name.product',
-            path: `\\layerSources/Shapes/Product.shp}`,
+            path: path.resolve(GPKG_PATH, job.parameters.inputFiles.productShapefilePath),
             exists: false
           },
           metadata: {
             label: 'file-name.metadata',
-            path: `\\layerSources/Shapes/ShapeMetadata.shp}`,
+            path: path.resolve(GPKG_PATH, job.parameters.inputFiles.metadataShapefilePath),
             exists: false
           }
         },
