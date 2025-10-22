@@ -64,6 +64,17 @@ const validateGpkgStates = {
 
 //#region --- selection mode states ---
 const selectionModeStates = {
+  [WORKFLOW.FILES.SELECTION_MODE.DECIDE_MODE]: {
+    always: [
+      {
+        guard: (_: { context: IContext; event: any }) => _.context.autoMode === 'manual',
+        target: WORKFLOW.FILES.SELECTION_MODE.MANUAL
+      },
+      {
+        target: WORKFLOW.FILES.SELECTION_MODE.AUTO
+      }
+    ]
+  },
   [WORKFLOW.FILES.SELECTION_MODE.AUTO]: {
     entry: (_: { context: IContext; event: any }) => console.log(`>>> ${WORKFLOW.FILES.SELECTION_MODE.AUTO}`, _),
     tags: [STATE_TAGS.GENERAL_LOADING],
@@ -110,12 +121,59 @@ const selectionModeStates = {
           }))
         ]
       }
+    },
+    on: {
+      SELECT_FILES: {
+        actions: [
+          assign((_: { context: IContext; event: any }) => ({
+            files: {
+              ..._.context.files,
+              gpkg: {
+                ..._.context.files?.gpkg,
+                ..._.event.file
+              }
+            }
+          })),
+          sendParent((_: { context: IContext; event: any }) => ({
+            type: "SET_FILES",
+            files: {
+              gpkg: {
+                ..._.event.file
+              }
+            },
+            addPolicy: "merge"
+          }))
+        ],
+        target: WORKFLOW.FILES.SELECT_GPKG
+      }
     }
   },
   [WORKFLOW.FILES.SELECTION_MODE.MANUAL]: {
     entry: (_: { context: IContext; event: any }) => console.log(`>>> ${WORKFLOW.FILES.SELECTION_MODE.MANUAL}`, _),
     tags: [STATE_TAGS.GENERAL_LOADING],
     on: {
+      SELECT_GPKG: {
+        actions: [
+          assign((_: { context: IContext; event: any }) => ({
+            files: {
+              ..._.context.files,
+              gpkg: {
+                ..._.context.files?.gpkg,
+                ..._.event.file
+              }
+            }
+          })),
+          sendParent((_: { context: IContext; event: any }) => ({
+            type: "SET_FILES",
+            files: {
+              gpkg: {
+                ..._.event.file
+              }
+            },
+            addPolicy: "merge"
+          }))
+        ]
+      },
       SELECT_PRODUCT: {
         actions: [
           assign((_: { context: IContext; event: any }) => ({
@@ -161,11 +219,46 @@ const selectionModeStates = {
         ]
       },
       CHECK_SELECTIONS: {
-        guard: (_: { context: IContext; event: any }) => !!_.context.files?.product && !!_.context.files?.metadata,
+        guard: (_: { context: IContext; event: any }) => !!_.context.files?.gpkg && !!_.context.files?.product && !!_.context.files?.metadata,
         target: WORKFLOW.FILES.SELECTION_MODE.FETCH_PRODUCT
       },
       "*": { actions: warnUnexpectedStateEvent }
     }
+  },
+  [WORKFLOW.FILES.SELECT_GPKG]: {
+    entry: () => console.log(`>>> Enter ${WORKFLOW.FILES.SELECT_GPKG}`),
+    on: {
+      SELECT_GPKG: {
+        actions: [
+          assign((_: { context: IContext; event: any }) => ({
+            files: {
+              gpkg: {
+                ..._.event.file
+              }
+            }
+          })),
+          sendParent((_: { context: IContext; event: any }) => ({
+            type: "SET_FILES",
+            files: {
+              gpkg: {
+                ..._.event.file
+              }
+            },
+            addPolicy: "override"
+          })),
+          sendParent({ type: "CLEAN_ERRORS" })
+        ],
+        target: WORKFLOW.FILES.VALIDATE_GPKG.ROOT
+      },
+      "*": { actions: warnUnexpectedStateEvent }
+    }
+  },
+  [WORKFLOW.FILES.VALIDATE_GPKG.ROOT]: {
+    entry: () => console.log(`>>> Enter ${WORKFLOW.FILES.VALIDATE_GPKG.ROOT}`),
+    type: "compound" as "compound",
+    initial: WORKFLOW.FILES.VALIDATE_GPKG.VALIDATION,
+    states: validateGpkgStates,
+    onDone: WORKFLOW.FILES.SELECTION_MODE.ROOT
   },
   [WORKFLOW.FILES.SELECTION_MODE.FETCH_PRODUCT]: {
     entry: (_: { context: IContext; event: any }) => console.log(`>>> ${WORKFLOW.FILES.SELECTION_MODE.FETCH_PRODUCT}`, _),
@@ -187,7 +280,7 @@ const selectionModeStates = {
             })),
             sendParent((_: { context: IContext; event: any }) => ({
               type: "SET_FILES",
-              files:  {
+              files: {
                 product: {
                   ..._.event.output
                 }
@@ -213,50 +306,13 @@ const selectionModeStates = {
 //#region --- FILES sub state machine ---
 const filesMachine = createMachine({
   id: WORKFLOW.FILES.ROOT,
-  initial: WORKFLOW.FILES.SELECT_GPKG,
+  initial: WORKFLOW.FILES.SELECTION_MODE.ROOT,
   context: (ctx: any) => ctx.input,
   states: {
-    [WORKFLOW.FILES.SELECT_GPKG]: {
-      entry: () => console.log(`>>> Enter ${WORKFLOW.FILES.SELECT_GPKG}`),
-      on: {
-        SELECT_GPKG: {
-          actions: [
-            assign((_: { context: IContext; event: any }) => ({
-              files: {
-                gpkg: {
-                  ..._.event.file
-                }
-              } 
-            })),
-            sendParent((_: { context: IContext; event: any }) => ({
-              type: "SET_FILES",
-              files: {
-                gpkg: {
-                  ..._.event.file
-                }
-              },
-              addPolicy: "override"
-            })),
-            sendParent({ type: "CLEAN_ERRORS" })
-          ],
-          target: WORKFLOW.FILES.VALIDATE_GPKG.ROOT
-        },
-        "*": { actions: warnUnexpectedStateEvent }
-      }
-    },
-
-    [WORKFLOW.FILES.VALIDATE_GPKG.ROOT]: {
-      entry: () => console.log(`>>> Enter ${WORKFLOW.FILES.VALIDATE_GPKG.ROOT}`),
-      type: "compound",
-      initial: WORKFLOW.FILES.VALIDATE_GPKG.VALIDATION,
-      states: validateGpkgStates,
-      onDone: WORKFLOW.FILES.SELECTION_MODE.ROOT
-    },
-
     [WORKFLOW.FILES.SELECTION_MODE.ROOT]: {
       entry: () => console.log(`>>> Enter ${WORKFLOW.FILES.SELECTION_MODE.ROOT}`),
-      type: "compound",
-      initial: WORKFLOW.FILES.SELECTION_MODE.AUTO,
+      type: "compound" as "compound",
+      initial: WORKFLOW.FILES.SELECTION_MODE.DECIDE_MODE,
       states: selectionModeStates,
       on: {
         AUTO: `.${WORKFLOW.FILES.SELECTION_MODE.AUTO}`,
@@ -290,12 +346,10 @@ export const workflowMachine = createMachine<IContext, Events>({
     [WORKFLOW.IDLE]: {
       entry: () => console.log(`>>> Enter ${WORKFLOW.IDLE}`),
       on: {
-        START_NEW: {
-          actions: assign({ flowType: Mode.NEW }),
-          target: WORKFLOW.FILES.ROOT
-        },
-        START_UPDATE: {
-          actions: assign({ flowType: Mode.UPDATE }),
+        START: {
+          actions: assign((_: { context: IContext; event: any }) => ({
+            ..._.event
+          })),
           target: WORKFLOW.FILES.ROOT
         },
         RESELECT_FILES: {

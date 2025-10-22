@@ -77,6 +77,7 @@ export type Events =
   | { type: "START", flowType: Mode, autoMode: AutoMode }
   | { type: "AUTO" }
   | { type: "MANUAL" }
+  | { type: "SELECT_FILES", file: IGPKGFile }
   | { type: "SELECT_GPKG", file: IGPKGFile }
   | { type: "SELECT_PRODUCT", file: IProductFile }
   | { type: "SELECT_METADATA", file: IFileBase }
