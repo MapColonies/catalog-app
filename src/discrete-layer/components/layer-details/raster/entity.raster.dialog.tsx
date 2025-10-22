@@ -115,10 +115,12 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
     const state = RasterWorkflowContext.useSelector((s) => s);
 
     useEffect(() => {
-      if (props.isSelectedLayerUpdateMode && props.layerRecord && actorRef) {
-        actorRef.send({ type: 'START_UPDATE' } satisfies Events);
-      } else {
-        actorRef.send({ type: 'START_NEW' } satisfies Events);
+      if (actorRef) {
+        actorRef.send({
+          type: 'START',
+          flowType: (props.isSelectedLayerUpdateMode && props.layerRecord) ? Mode.UPDATE : Mode.NEW,
+          autoMode: 'auto'
+        } satisfies Events);
       }
     }, [props.isSelectedLayerUpdateMode, props.layerRecord, actorRef]);
     //#endregion

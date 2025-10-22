@@ -74,19 +74,20 @@ export interface IContext {
 }
 
 export type Events =
-  | { type: "START_NEW" }
-  | { type: "START_UPDATE" }
+  | { type: "START", flowType: Mode, autoMode: AutoMode }
+  | { type: "AUTO" }
+  | { type: "MANUAL" }
+  | { type: "SELECT_GPKG", file: IGPKGFile }
+  | { type: "SELECT_PRODUCT", file: IProductFile }
+  | { type: "SELECT_METADATA", file: IFileBase }
   | { type: "RESELECT_FILES" }
-  | { type: "RESTORE"; data: Record<string, unknown> }
-  | { type: "SELECT_GPKG"; file: IGPKGFile }
-  | { type: "SELECT_PRODUCT"; file: IProductFile }
-  | { type: "SELECT_METADATA"; file: IFileBase }
-  | { type: "SET_FILES"; files: IFiles; addPolicy: AddPolicy }
+  | { type: "SET_FILES", files: IFiles; addPolicy: AddPolicy }
   | { type: "FILES_SELECTED" }
-  | { type: "FILES_ERROR"; error: IStateError }
+  | { type: "FILES_ERROR", error: IStateError }
   | { type: "CLEAN_ERRORS" }
   | { type: "NOOP" }
   | { type: "SUBMIT", data: LayerRasterRecordInput, resolutionDegree: number }
+  | { type: "RESTORE", data: Record<string, unknown> }
   | { type: "RETRY" }
   | { type: "DONE" };
 
