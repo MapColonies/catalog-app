@@ -1,35 +1,17 @@
-import { CSSProperties, useEffect, useMemo, useRef, useState } from 'react';
+import { CSSProperties, useEffect, useMemo, useRef } from 'react';
 import { useIntl } from 'react-intl';
+import { Box, GeoJSONFeature, getWMTSOptions, getXYZOptions, IBaseMap, Legend, LegendItem, Map, TileLayer, TileWMTS, TileXYZ, useMap, useVectorSource, VectorLayer, VectorSource } from '@map-colonies/react-components';
 import { Feature } from 'geojson';
 import { get, isEmpty } from 'lodash';
 import { FitOptions } from 'ol/View';
 import { Style } from 'ol/style';
-import {
-  Box,
-  GeoJSONFeature,
-  getWMTSOptions,
-  getXYZOptions,
-  IBaseMap,
-  Legend,
-  LegendItem,
-  Map,
-  TileLayer,
-  TileWMTS,
-  TileXYZ,
-  useMap,
-  useVectorSource,
-  VectorLayer,
-  VectorSource
-} from '@map-colonies/react-components';
-import { Checkbox } from '@map-colonies/react-core';
 import { Mode } from '../../../../common/models/mode.enum';
 import { MapLoadingIndicator } from '../../../../common/components/map/ol-map.loader';
-import { ILayerImage } from '../../../models/layerImage';
 import { useStore } from '../../../models/RootStore';
 import { PolygonPartsVectorLayer as PolygonPartsExtentVectorLayer } from './pp-extent-vector-layer';
-import { PPMapStyles } from './pp-map.utils';
-
-import './pp-map.css';
+import { FeatureType, PPMapStyles } from './pp-map.utils';
+import { ILayerImage } from '../../../models/layerImage';
+import { PolygonPartsByPolygonVectorLayer } from './pp-polygon-vector-layer';
 
 interface GeoFeaturesPresentorProps {
   mode: Mode;
@@ -38,8 +20,10 @@ interface GeoFeaturesPresentorProps {
   fitOptions?: FitOptions | undefined,
   selectedFeatureKey?: string;
   selectionStyle?: Style;
-  showExistingPolygonParts?: boolean;
+  showExisitngPolygonParts?: boolean;
   layerRecord?: ILayerImage | null;
+  ingestionResolutionMeter?: number | null;
+  ppCheck?: boolean | null;
 }
 
 const DEFAULT_PROJECTION = 'EPSG:4326';
@@ -53,12 +37,14 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   fitOptions,
   selectedFeatureKey,
   selectionStyle,
-  layerRecord
+  showExisitngPolygonParts,
+  layerRecord,
+  ingestionResolutionMeter,
+  ppCheck
 }) => {
   const store = useStore();
   const intl = useIntl();
   const renderCount = useRef(0);
-  const [showExistingPolygonParts, setShowExistingPolygonParts] = useState<boolean>(false);
 
   useEffect(() => {
     if (geoFeatures && geoFeatures?.length >= MIN_FEATURES_NUMBER) {
@@ -112,13 +98,13 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   }, []);
   
   const LegendsArray = useMemo(() => {
-    const res: LegendItem[] = [];
+    const res:LegendItem[] = [];
     PPMapStyles.forEach((value, key)=>{
       if (!key.includes('MARKER')) {
         res.push({
           title: intl.formatMessage({id: `polygon-parts.map-preview-legend.${key}`}) as string,
           style: value as Style
-        });
+        })
       }
     });
     return res;
@@ -144,17 +130,15 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
           geoFeatures?.map((feat, idx) => {
             let featureStyle = PPMapStyles.get(feat?.properties?.featureType);
 
-            if ( selectedFeatureKey && feat?.properties?.key === selectedFeatureKey) {
-              featureStyle = selectionStyle;
-            }
+          if ( selectedFeatureKey && feat?.properties?.key === selectedFeatureKey) {
+            featureStyle = selectionStyle;
+          }
 
-            return (feat && !isEmpty(feat.geometry)) ?
-              <GeoJSONFeature 
-                geometry={{...feat.geometry}} 
-                fit={false}
-                key={feat.id ?? idx}
-                featureStyle={featureStyle}
-              /> : null
+            return (feat && !isEmpty(feat.geometry)) ? <GeoJSONFeature 
+              geometry={{...feat.geometry}} 
+              fit={false}
+              key={feat.id ?? idx}
+              featureStyle={featureStyle}/> : null
           })
         }
       </>
@@ -165,19 +149,6 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
     <Box style={{...style}}>
       <Map>
         <MapLoadingIndicator/>
-        {
-          mode === Mode.UPDATE &&
-          <Box className="checkbox">
-            <Checkbox
-              className="flexCheckItem showOnMapContainer"
-              label={intl.formatMessage({ id: 'polygon-parts.show-exisitng-parts-on-map.label' })}
-              checked={showExistingPolygonParts}
-              onClick={(evt: React.MouseEvent<HTMLInputElement>): void => {
-                setShowExistingPolygonParts(evt.currentTarget.checked);
-              }}
-            />
-          </Box>
-        }
         {previewBaseMap}
         <VectorLayer>
           <VectorSource>
@@ -185,7 +156,18 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
           </VectorSource>
         </VectorLayer>
         {
-          showExistingPolygonParts && <PolygonPartsExtentVectorLayer layerRecord={layerRecord}/>
+          showExisitngPolygonParts && <PolygonPartsExtentVectorLayer layerRecord={layerRecord}/>
+        }
+        {
+          ppCheck &&
+          <PolygonPartsByPolygonVectorLayer 
+            layerRecord={layerRecord} 
+            maskFeature={geoFeatures?.find((feat)=>{
+              return get(feat,'properties.featureType') === FeatureType.PP_PERIMETER;
+            })}
+            partsToCheck={geoFeatures?.filter((part) => [FeatureType.DEFAULT, undefined].includes(part?.properties?.featureType))}
+            ingestionResolutionMeter={ingestionResolutionMeter}
+          />
         }
         <Legend legendItems={LegendsArray} title={intl.formatMessage({id: 'polygon-parts.map-preview-legend.title'})}/>
       </Map>

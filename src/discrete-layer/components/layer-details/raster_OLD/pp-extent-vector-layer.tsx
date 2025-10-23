@@ -1,32 +1,26 @@
 
 import { useEffect, useState } from 'react';
-import { useIntl } from 'react-intl';
 import { BBox, Feature, GeoJsonProperties, Geometry } from 'geojson';
 import { debounce } from 'lodash';
-import { observer } from 'mobx-react';
 import { MapEvent } from 'ol';
-import GeoJSON from 'ol/format/GeoJSON';
 import { Size } from 'ol/size';
-import { Style } from 'ol/style';
+import GeoJSON from 'ol/format/GeoJSON';
 import intersect from '@turf/intersect';
 import { polygon } from '@turf/helpers';
 import bboxPolygon from '@turf/bbox-polygon';
+import { observer } from 'mobx-react';
 import { GeoJSONFeature, useMap, VectorLayer, VectorSource } from '@map-colonies/react-components';
+import { Style } from 'ol/style';
+import { createTextStyle, FeatureType, FEATURE_LABEL_CONFIG, getWFSFeatureTypeName, PPMapStyles } from './pp-map.utils';
 import CONFIG from '../../../../common/config';
-import { useEnums } from '../../../../common/hooks/useEnum.hook';
 import { GetFeatureModelType, LayerRasterRecordModelType, useQuery, useStore } from '../../../models';
-import { IDispatchAction } from '../../../models/actionDispatcherStore';
-import { ILayerImage } from '../../../models/layerImage';
 import { GeojsonFeatureInput } from '../../../models/RootStore.base';
-import { UserAction } from '../../../models/userStore';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
-import {
-  createTextStyle,
-  FeatureType,
-  FEATURE_LABEL_CONFIG,
-  getWFSFeatureTypeName,
-  PPMapStyles
-} from './pp-map.utils';
+import { ILayerImage } from '../../../models/layerImage';
+import { useEnums } from '../../../../common/hooks/useEnum.hook';
+import { UserAction } from '../../../models/userStore';
+import { IDispatchAction } from '../../../models/actionDispatcherStore';
+import { useIntl } from 'react-intl';
 
 interface PolygonPartsVectorLayerProps {
   layerRecord?: ILayerImage | null;
@@ -161,7 +155,7 @@ export const PolygonPartsVectorLayer: React.FC<PolygonPartsVectorLayerProps> = o
             const bbox = bboxPolygon(mapOl.getView().calculateExtent([size[0] + BUFFER,size[1] + BUFFER]) as BBox);
             const extentPolygon = polygon(bbox.geometry.coordinates);
             
-            try { // There is some cases when turf.intersect() throws exception, then no need to change geometry
+            try{ // There is some cases when turf.intersect() throws exception, then no need to change geometry
               // @ts-ignore
               const featureClippedPolygon = intersect(feat, extentPolygon);
 
@@ -169,8 +163,9 @@ export const PolygonPartsVectorLayer: React.FC<PolygonPartsVectorLayerProps> = o
                 const geometry = new GeoJSON().readGeometry(featureClippedPolygon.geometry);
                 greenStyle.setGeometry(geometry);
               }
-            } catch (e) {
-              console.log('*** PP: turf.intersect() failed ***', 'feat -->', feat, 'extentPolygon -->', extentPolygon);
+            }
+            catch(e){
+              console.log('*** PP: turf.intersect() failed ***', 'feat -->',feat, 'extentPolygon -->',extentPolygon);
             }
            
             return feat ? <GeoJSONFeature 

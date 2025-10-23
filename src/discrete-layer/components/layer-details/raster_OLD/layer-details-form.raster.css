@@ -86,62 +86,28 @@ body[dir='rtl'] #layerDetailsFormRaster .enumOptions .mdc-select__dropdown-icon 
   left: initial;
 }
 
-#layerDetailsFormRaster .previewAndJobContainer {
+#layerDetailsFormRaster .polygonPartsContainer {
   display: flex;
   height: 410px;
-  margin: 16px 0 4px 0;
+  margin-bottom: 4px;
+  border-bottom: 1px dashed var(--mdc-theme-gc-selection-background);
 }
 
-#layerDetailsFormRaster .jobData {
-  display: flex;
-  flex-direction: column;
-  width: 728px;
-  margin: 0 4px;
-  padding: 8px;
+#layerDetailsFormRaster .polygonPartsData {
+  width: 740px;
+  /* overflow-y: scroll; */
 }
 
-#layerDetailsFormRaster .center {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+#layerDetailsFormRaster .polygonPartDataError {
+  background-color: var(--mdc-theme-gc-error-high);
+  opacity: 0.2;
 }
 
-#layerDetailsFormRaster .title {
-  margin: 4px 8px;
-}
-
-#layerDetailsFormRaster .bold {
-  font-weight: bold;
-}
-
-#layerDetailsFormRaster .underline {
-  border-bottom: 1px solid var(--mdc-theme-gc-selection-background);
-}
-
-#layerDetailsFormRaster .progress {
-  flex: 1;
-}
-
-#layerDetailsFormRaster .progressBar {
-  width: 150px;
-  height: 150px;
-}
-
-#layerDetailsFormRaster .map {
-  border: 1px solid var(--mdc-theme-gc-selection-background, #fff);
-}
-
-#layerDetailsFormRaster .reportContainer {
-  margin: 4px;
-}
-
-#layerDetailsFormRaster .reportList {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 4px;
-  margin: 0 8px;
-  height: 120px;
+#layerDetailsFormRaster .polygonPartFormContainer {
+  height: 200px;
   overflow-y: auto;
+  margin-left: 4px;
+  border-bottom: 1px dashed var(--mdc-theme-gc-selection-background);
 }
 
 #layerDetailsFormRaster .ReactVirtualized__Grid.ReactVirtualized__List{
@@ -150,6 +116,14 @@ body[dir='rtl'] #layerDetailsFormRaster .enumOptions .mdc-select__dropdown-icon 
 
 #layerDetailsFormRaster .mdc-checkbox__ripple {
   display: none;
+}
+
+#layerDetailsFormRaster .checkBoxContainer {
+  height: 20px;
+}
+
+#layerDetailsFormRaster .displayFlex {
+  display: flex;
 }
 
 #layerDetailsFormRaster .flexCheckItem {

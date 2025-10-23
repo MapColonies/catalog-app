@@ -1,0 +1,123 @@
+#layerDetailsFormRaster .ingestionSwitchContainer {
+  position: absolute;
+  right: 78px;
+  top: 40px;
+}
+
+body[dir='rtl'] #layerDetailsFormRaster .ingestionSwitchContainer {
+  right: unset;
+  left: 78px;
+}
+
+#layerDetailsFormRaster .ingestionSwitch {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+body[dir='rtl'] #layerDetailsFormRaster .ingestionSwitch {
+  flex-direction: row-reverse;
+}
+
+#layerDetailsFormRaster .ingestionSwitch .MuiSwitch-track {
+  background-color: var(--mdc-theme-gc-selection-background);
+}
+
+#layerDetailsFormRaster .ingestionSwitch .MuiSwitch-colorSecondary.Mui-checked + .MuiSwitch-track {
+  background-color: var(--mdc-theme-gc-selection-background);
+  filter: brightness(2);
+}
+
+#layerDetailsFormRaster .ingestionSwitch .MuiSwitch-colorSecondary.Mui-checked {
+  color: var(--mdc-theme-text-icon-on-dark);
+}
+
+#layerDetailsFormRaster .ingestionSwitch .MuiSwitch-switchBase {
+  color: var(--mdc-theme-text-icon-on-dark);
+}
+
+#layerDetailsFormRaster .header {
+  display: flex;
+  height: 96px;
+  padding: 4px 8px 4px 16px;
+  margin-bottom: 4px;
+  gap: 4px;
+}
+
+body[dir='rtl'] #layerDetailsFormRaster .header {
+  padding: 4px 16px 4px 8px;
+}
+
+#layerDetailsFormRaster .ingestionFields {
+  display: flex;
+  flex-direction: column;
+  width: 90%;
+  margin-top: 22px;
+}
+
+#layerDetailsFormRaster .ingestionField {
+  display: flex;
+  padding: 2px 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+#layerDetailsFormRaster .ingestionManualButtons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.4rem;
+  margin-bottom: 2px;
+}
+
+#layerDetailsFormRaster .ingestionAutoButtons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+#layerDetailsFormRaster .manualButton {
+  width: 80px;
+  height: 16px;
+}
+
+#layerDetailsFormRaster .autoButton {
+  width: 80px;
+}
+
+#layerDetailsFormRaster .empty {
+  margin: 0 12px;
+}
+
+#layerDetailsFormRaster .disabledText {
+  color: var(--mdc-theme-text-hint-on-dark, #fff);
+  opacity: 0.5;
+}
+
+#layerDetailsFormRaster .filesList {
+  display: grid;
+  grid-template-columns: 0.1fr 0.2fr 1.5fr 0.3fr 0.5fr;
+  column-gap: 8px;
+  row-gap: 3px;
+  margin: 0 12px;
+}
+
+#layerDetailsFormRaster .fileItemName {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  direction: ltr;
+  text-align: left;
+  margin: 0 16px;
+}
+
+#layerDetailsFormRaster .fileIcon {
+  font-size: 16px;
+  cursor: default;
+}
+
+#layerDetailsFormRaster .ltr {
+  direction: ltr;
+}

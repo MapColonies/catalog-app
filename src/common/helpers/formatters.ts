@@ -46,11 +46,10 @@ export const dateSerializer: FormatterFunc = (date): string => {
       return '-';
     }
   }
-  
+
   if (typeof date !== 'undefined') {
     return (date).toISOString();
   }
-
 
   return '-';
 };

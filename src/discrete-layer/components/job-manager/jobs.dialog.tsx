@@ -1,29 +1,26 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import React, { useEffect, useCallback, useState, useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { observer } from 'mobx-react';
 import { cloneDeep, isEmpty } from 'lodash';
+import { observer } from 'mobx-react';
 import moment from 'moment';
 import { DialogContent } from '@material-ui/core';
 import { Button, Dialog, DialogTitle, IconButton } from '@map-colonies/react-core';
 import { Box, DateTimeRangePicker, SupportedLocales } from '@map-colonies/react-components';
-import CONFIG from '../../../common/config';
 import { IActionGroup } from '../../../common/actions/entity.actions';
-import { 
-  GridApi
-} from '../../../common/components/grid';
 import { GraphQLError } from '../../../common/components/error/graphql.error-presentor';
+import { GridApi } from '../../../common/components/grid';
+import CONFIG from '../../../common/config';
 import useCountDown, { IActions } from '../../../common/hooks/countdown.hook';
-import { useQuery, useStore } from '../../models/RootStore';
-import { IDispatchAction } from '../../models/actionDispatcherStore';
+import useDateNow from '../../../common/hooks/useDateNow.hook';
 import { JobModelType } from '../../models';
+import { IDispatchAction } from '../../models/actionDispatcherStore';
+import { useQuery, useStore } from '../../models/RootStore';
 import { downloadJSONToClient } from '../layer-details/utils';
+import JobManagerGrid from './grids/job-manager-grid.common';
 import { JOB_ENTITY } from './job.types';
 
-
 import './jobs.dialog.css';
-import JobManagerGrid from './grids/job-manager-grid.common';
-import useDateNow from '../../../common/hooks/useDateNow.hook';
 
 const START_CYCLE_ITERATION = 0;
 const POLLING_CYCLE_INTERVAL = CONFIG.JOB_STATUS.POLLING_CYCLE_INTERVAL;
