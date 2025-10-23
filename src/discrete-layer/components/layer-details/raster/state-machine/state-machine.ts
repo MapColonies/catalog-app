@@ -18,7 +18,9 @@ const selectionModeStates = {
   [WORKFLOW.FILES.SELECTION_MODE.DECIDE_MODE]: {
     always: [
       {
-        guard: (_: { context: IContext; event: any }) => _.context.selectionMode === 'manual',
+        guard: (_: { context: IContext }) => {
+          return _.context.selectionMode === 'manual';
+        },
         target: WORKFLOW.FILES.SELECTION_MODE.MANUAL.ROOT
       },
       {
@@ -458,7 +460,9 @@ export const workflowMachine = createMachine<IContext, Events>({
         src: SERVICES[WORKFLOW.ROOT].jobPollingService,
         onDone: [
           {
-            guard: (_: { context: IContext; event: any }) => _.event.output.taskStatus === Status.Completed,
+            guard: (_: { context: IContext; event: any }) => {
+              return _.event.output.taskStatus !== Status.InProgress;
+            },
             actions: assign((_: { context: IContext; event: any }) => ({
               job: {
                 ..._.context.job,

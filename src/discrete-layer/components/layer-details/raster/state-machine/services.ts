@@ -114,13 +114,65 @@ export const SERVICES = {
     }),
     restoreJobService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
       let { flowType, selectionMode, files, resolutionDegree, formData, job } = input.context || {};
+      // let gpkg, product, metadata;
 
-      // TODO: files
+      if (!files?.gpkg?.path) {
+        throw (buildError('ingestion.error.missing', 'GPKG'));
+      }
+
+      const gpkgPath = files.gpkg.path;
+
+      try {
+        await queryExecutor(async () => {
+          return await input.context.store.queryGetDirectory({
+            data: {
+              path: path.resolve(gpkgPath, SHAPES_DIR),
+              type: RecordType.RECORD_RASTER,
+            },
+          });
+        });
+      } catch (e) {
+      }
+
+      const result = await queryExecutor(async () => {
+        return await input.context.store.queryValidateSource({
+          data: {
+            fileNames: [path.basename(gpkgPath)],
+            originDirectory: path.dirname(gpkgPath),
+            type: RecordType.RECORD_RASTER,
+          }
+        });
+      });
+
+      if (!result.validateSource[FIRST].isValid) {
+        throw (buildError('ingestion.error.invalid-source-file', result.validateSource[FIRST].message as string));
+      }
+
+      const validationResult = { ...result.validateSource[FIRST] };
+      const { feature, marker } = getFeatureAndMarker(validationResult.extentPolygon, FeatureType.SOURCE_EXTENT, FeatureType.SOURCE_EXTENT_MARKER);
 
       return {
         flowType,
         selectionMode,
-        files,
+        files: {
+          ...files,
+          gpkg: {
+            ...files?.gpkg,
+            validationResult,
+            geoDetails: {
+              feature,
+              marker
+            }
+          },
+          product: {
+            ...files?.product,
+            // ...product
+          },
+          metadata: {
+            ...files?.metadata,
+            // ...metadata
+          }
+        },
         resolutionDegree,
         formData,
         job
@@ -129,11 +181,12 @@ export const SERVICES = {
   },
   [WORKFLOW.FILES.ROOT]: {
     selectFilesService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
-      if (!input.context.files?.gpkg?.path) {
+      const { files } = input.context || {};
+      if (!files?.gpkg?.path) {
         throw (buildError('ingestion.error.missing', 'GPKG'));
       }
 
-      const gpkgPath = input.context.files.gpkg.path;
+      const gpkgPath = files.gpkg.path;
 
       const result = await queryExecutor(async () => {
         return await input.context.store.queryValidateSource({
