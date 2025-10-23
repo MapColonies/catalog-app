@@ -25,6 +25,39 @@ import {
   WORKFLOW
 } from './types';
 
+const selectGpkgLogic = async (context: IContext) => {
+  if (!context.files?.gpkg?.path) {
+    throw (buildError('ingestion.error.missing', 'GPKG'));
+  }
+
+  const gpkgPath = context.files.gpkg.path;
+
+  const result = await queryExecutor(async () => {
+    return await context.store.queryValidateSource({
+      data: {
+        fileNames: [path.basename(gpkgPath)],
+        originDirectory: path.dirname(gpkgPath),
+        type: RecordType.RECORD_RASTER,
+      }
+    });
+  });
+
+  if (!result.validateSource[FIRST].isValid) {
+    throw (buildError('ingestion.error.invalid-source-file', result.validateSource[FIRST].message as string));
+  }
+
+  const validationResult = { ...result.validateSource[FIRST] };
+  const { feature, marker } = getFeatureAndMarker(validationResult.extentPolygon, FeatureType.SOURCE_EXTENT, FeatureType.SOURCE_EXTENT_MARKER);
+
+  return {
+    validationResult,
+    geoDetails: {
+      feature,
+      marker
+    }
+  };
+};
+
 export const SERVICES = {
   [WORKFLOW.ROOT]: {
     jobSubmissionService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
@@ -181,30 +214,8 @@ export const SERVICES = {
   },
   [WORKFLOW.FILES.ROOT]: {
     selectFilesService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
-      const { files } = input.context || {};
-      if (!files?.gpkg?.path) {
-        throw (buildError('ingestion.error.missing', 'GPKG'));
-      }
-
-      const gpkgPath = files.gpkg.path;
-
-      const result = await queryExecutor(async () => {
-        return await input.context.store.queryValidateSource({
-          data: {
-            fileNames: [path.basename(gpkgPath)],
-            originDirectory: path.dirname(gpkgPath),
-            type: RecordType.RECORD_RASTER,
-          }
-        });
-      });
-
-      if (!result.validateSource[FIRST].isValid) {
-        throw (buildError('ingestion.error.invalid-source-file', result.validateSource[FIRST].message as string));
-      }
-
-      const validationResult = { ...result.validateSource[FIRST] };
-      const { feature, marker } = getFeatureAndMarker(validationResult.extentPolygon, FeatureType.SOURCE_EXTENT, FeatureType.SOURCE_EXTENT_MARKER);
-
+      const gpkgRes = await selectGpkgLogic(input.context);
+      const gpkgPath = input.context.files?.gpkg?.path as string;
       let res;
       try {
         res = await queryExecutor(async () => {
@@ -222,47 +233,14 @@ export const SERVICES = {
 
       return {
         gpkg: {
-          validationResult,
-          geoDetails: {
-            feature,
-            marker
-          }
+          ...gpkgRes
         },
         product,
         metadata
       };
     }),
     selectGpkgService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
-      if (!input.context.files?.gpkg?.path) {
-        throw (buildError('ingestion.error.missing', 'GPKG'));
-      }
-
-      const gpkgPath = input.context.files.gpkg.path;
-
-      const result = await queryExecutor(async () => {
-        return await input.context.store.queryValidateSource({
-          data: {
-            fileNames: [path.basename(gpkgPath)],
-            originDirectory: path.dirname(gpkgPath),
-            type: RecordType.RECORD_RASTER,
-          }
-        });
-      });
-
-      if (!result.validateSource[FIRST].isValid) {
-        throw (buildError('ingestion.error.invalid-source-file', result.validateSource[FIRST].message as string));
-      }
-
-      const validationResult = { ...result.validateSource[FIRST] };
-      const { feature, marker } = getFeatureAndMarker(validationResult.extentPolygon, FeatureType.SOURCE_EXTENT, FeatureType.SOURCE_EXTENT_MARKER);
-
-      return {
-        validationResult,
-        geoDetails: {
-          feature,
-          marker
-        }
-      };
+      return selectGpkgLogic(input.context);
     }),
     fetchProductService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
       const { product } = input.context.files ?? {};
