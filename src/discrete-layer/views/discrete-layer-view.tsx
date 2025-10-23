@@ -856,7 +856,7 @@ const DiscreteLayerView: React.FC = observer(() => {
 
     if (!CONFIG.GEOCODER.CALLBACK_URL) return;
 
-    const CATALOG_APP_USER_ID = CONFIG.CATALOG_APP_USER_ID.replace('${CURRENT_USER}', store.userStore?.user?.role as string);
+    const CATALOG_APP_USER_ID = CONFIG.CATALOG_APP_USER_ID.replace('{CURRENT_USER}', store.userStore?.user?.role as string);
 
     const body = {
       request_id: requestId,

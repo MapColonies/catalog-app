@@ -10,7 +10,7 @@ if (!window._env_) {
       REQUEST: 'REQUEST',
       SERVICE_PROTOCOL: 'SERVICE_PROTOCOL',
       SERVICE_NAME: 'SERVICE_NAME',
-      CATALOG_APP_USER_ID: 'catalog-app-${CURRENT_USER}@mapcolonies.net',
+      CATALOG_APP_USER_ID: 'catalog-app-{CURRENT_USER}@mapcolonies.net',
       ACTIVE_LAYER: 'ACTIVE_LAYER',
       LOCALE: {
         DATE_FORMAT: 'DD/MM/YYYY HH:mm',
