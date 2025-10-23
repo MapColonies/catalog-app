@@ -103,7 +103,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
   const onFilesSelection = (selected: Selection): void => {
     if (selected.files.length) {
       setSelection({ ...selected });
-      
+
       const directory = selected.files.length
         ? selected.folderChain.map((folder: FileData) => folder.name).join('/')
         : '';
@@ -137,10 +137,13 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
   };
 
   const handleSwitchClick = (): void => {
-    if (selectionMode === AUTO) {
-      filesActor.send({ type: 'MANUAL' } satisfies Events);
+    const eventType = selectionMode === AUTO ? 'AUTO' : 'MANUAL';
+
+    if (!filesActor) {
+      actorRef.send({ type: 'RESELECT_FILES' } satisfies Events);
+      setPendingFileEvent({ type: eventType });
     } else {
-      filesActor.send({ type: 'AUTO' } satisfies Events);
+      filesActor.send({ type: eventType } satisfies Events);
     }
 
     setSelectionMode((prev) => (prev === AUTO ? MANUAL : AUTO));
