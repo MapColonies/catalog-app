@@ -212,16 +212,9 @@ export const SERVICES = {
       };
     }),
     fetchProductService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
-      const { product, metadata } = input.context.files ?? {};
-      const missingFiles = [];
+      const { product } = input.context.files ?? {};
       if (!product || !product.exists || !product.path) {
-        missingFiles.push(PRODUCT_SHP);
-      }
-      if (!metadata || !metadata.exists || !metadata.path) {
-        missingFiles.push(METADATA_SHP);
-      }
-      if (missingFiles.length > 0) {
-        throw buildError('ingestion.error.missing', `${missingFiles.join(', ')}`);
+        throw buildError('ingestion.error.missing', PRODUCT_SHP);
       }
 
       // const result = await queryExecutor(async () => {
