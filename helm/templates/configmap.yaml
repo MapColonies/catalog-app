@@ -73,7 +73,9 @@
   CONFIGURATION_WFS_MAX_PAGE_SIZE: {{ quote .Values.env.wfs.max.pageSize }}
   CONFIGURATION_WFS_MAX_ZOOM_LEVEL: {{ quote .Values.env.wfs.max.zoomLevel }}
   CONFIGURATION_WFS_MAX_CACHE_SIZE: {{ quote .Values.env.wfs.max.cacheSize }}
-  CONFIGURATION_GEOCODING_URL: {{ quote .Values.env.geocodingUrl }}
+  CONFIGURATION_GEOCODER_URL: {{ quote .Values.env.geocoder.url }}
+  CONFIGURATION_GEOCODER_CALLBACKURL: {{ quote .Values.env.geocoder.callbackUrl }}
+  CONFIGURATION_CATALOGAPPUSERID: {{ quote .Values.env.catalogAppUserId }}
 {{- end -}}
 
 {{ include "mc-chart.configmap" (dict "MAIN_OBJECT_BLOCK" $MAIN_OBJECT_BLOCK "COMPONENT_NAME" $COMPONENT_NAME "DATA" $DATA "WITH_TELEMETRY_TRACING" false "WITH_TELEMETRY_METRICS" false "context" .)}}

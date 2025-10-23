@@ -10,6 +10,7 @@ if (!window._env_) {
       REQUEST: 'REQUEST',
       SERVICE_PROTOCOL: 'SERVICE_PROTOCOL',
       SERVICE_NAME: 'SERVICE_NAME',
+      CATALOG_APP_USER_ID: 'catalog-app-${CURRENT_USER}@mapcolonies.net',
       ACTIVE_LAYER: 'ACTIVE_LAYER',
       LOCALE: {
         DATE_FORMAT: 'DD/MM/YYYY HH:mm',
@@ -90,7 +91,10 @@ if (!window._env_) {
           cacheSize: 6000,
         }
       },
-      GEOCODING_URL: 'http://geocoding-URL'
+      GEOCODER: {
+        url: 'http://geocoder-URL',
+        callbackUrl: 'http://geocoder-callback-URL'
+      }
     };
   })(void 0);
 }
