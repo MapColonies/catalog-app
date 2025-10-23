@@ -242,6 +242,13 @@ export const SERVICES = {
           marker
         }
       };
+    }),
+    checkMetadataService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
+      const { metadata } = input.context.files ?? {};
+      if (!metadata || !metadata.exists || !metadata.path) {
+        throw buildError('ingestion.error.missing', METADATA_SHP);
+      }
+      return Promise.resolve({ success: true });
     })
   }
 };

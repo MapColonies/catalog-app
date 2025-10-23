@@ -32,7 +32,7 @@ const selectionModeStates = {
     initial: WORKFLOW.FILES.SELECTION_MODE.AUTO.IDLE,
     states: {
       [WORKFLOW.FILES.SELECTION_MODE.AUTO.IDLE]: {
-        entry: () => console.log(`>>> Enter ${WORKFLOW.FILES.SELECTION_MODE.AUTO.IDLE}`),
+        entry: () => console.log(`>>> Enter ${WORKFLOW.FILES.SELECTION_MODE.AUTO.ROOT.toUpperCase()}.${WORKFLOW.FILES.SELECTION_MODE.AUTO.IDLE}`),
         on: {
           SELECT_FILES: {
             actions: [
@@ -108,7 +108,7 @@ const selectionModeStates = {
                 error: { ..._.event.error }
               })),
             ],
-            // target: `#${WORKFLOW.FILES.ROOT}`
+            target: WORKFLOW.FILES.SELECTION_MODE.AUTO.IDLE
           }
         }
       },
@@ -139,14 +139,33 @@ const selectionModeStates = {
                 addPolicy: "merge"
               })),
               sendParent({ type: "FILES_SELECTED" })
-            ]
+            ],
+            target: WORKFLOW.FILES.SELECTION_MODE.AUTO.CHECK_METADATA
           },
           onError: {
             actions: sendParent((_: { context: IContext; event: any }) => ({
               type: "FILES_ERROR",
               error: { ..._.event.error }
             })),
-            // target: `#${WORKFLOW.FILES.ROOT}`
+            target: WORKFLOW.FILES.SELECTION_MODE.AUTO.IDLE
+          }
+        }
+      },
+      [WORKFLOW.FILES.SELECTION_MODE.AUTO.CHECK_METADATA]: {
+        entry: (_: { context: IContext; event: any }) => console.log(`>>> ${WORKFLOW.FILES.SELECTION_MODE.MANUAL.CHECK_METADATA}`, _),
+        tags: [STATE_TAGS.GENERAL_LOADING],
+        invoke: {
+          input: (_: { context: IContext; event: any }) => _,
+          src: SERVICES[WORKFLOW.FILES.ROOT].checkMetadataService,
+          onDone: {
+            target: WORKFLOW.FILES.SELECTION_MODE.AUTO.IDLE
+          },
+          onError: {
+            actions: sendParent((_: { context: IContext; event: any }) => ({
+              type: "FILES_ERROR",
+              error: { ..._.event.error }
+            })),
+            target: WORKFLOW.FILES.SELECTION_MODE.AUTO.IDLE
           }
         }
       }
@@ -158,7 +177,7 @@ const selectionModeStates = {
     initial: WORKFLOW.FILES.SELECTION_MODE.MANUAL.IDLE,
     states: {
       [WORKFLOW.FILES.SELECTION_MODE.MANUAL.IDLE]: {
-        entry: () => console.log(`>>> Enter ${WORKFLOW.FILES.SELECTION_MODE.MANUAL.IDLE}`),
+        entry: () => console.log(`>>> Enter ${WORKFLOW.FILES.SELECTION_MODE.MANUAL.ROOT.toLocaleUpperCase()}.${WORKFLOW.FILES.SELECTION_MODE.MANUAL.IDLE}`),
         on: {
           SELECT_GPKG: {
             actions: [
@@ -224,7 +243,7 @@ const selectionModeStates = {
                 addPolicy: "merge"
               }))
             ],
-            target: WORKFLOW.FILES.SELECTION_MODE.MANUAL.IDLE
+            target: WORKFLOW.FILES.SELECTION_MODE.MANUAL.CHECK_METADATA
           },
           AUTO: {
             actions: [
@@ -316,6 +335,24 @@ const selectionModeStates = {
             target: WORKFLOW.FILES.SELECTION_MODE.MANUAL.IDLE
           }
         }
+      },
+      [WORKFLOW.FILES.SELECTION_MODE.MANUAL.CHECK_METADATA]: {
+        entry: (_: { context: IContext; event: any }) => console.log(`>>> ${WORKFLOW.FILES.SELECTION_MODE.MANUAL.CHECK_METADATA}`, _),
+        tags: [STATE_TAGS.GENERAL_LOADING],
+        invoke: {
+          input: (_: { context: IContext; event: any }) => _,
+          src: SERVICES[WORKFLOW.FILES.ROOT].checkMetadataService,
+          onDone: {
+            target: WORKFLOW.FILES.SELECTION_MODE.MANUAL.IDLE
+          },
+          onError: {
+            actions: sendParent((_: { context: IContext; event: any }) => ({
+              type: "FILES_ERROR",
+              error: { ..._.event.error }
+            })),
+            target: WORKFLOW.FILES.SELECTION_MODE.MANUAL.IDLE
+          }
+        }
       }
     }
   }
@@ -330,7 +367,7 @@ const filesMachine = createMachine({
   states: {
     [WORKFLOW.FILES.SELECTION_MODE.ROOT]: {
       entry: () => console.log(`>>> Enter ${WORKFLOW.FILES.SELECTION_MODE.ROOT}`),
-      type: "compound" as "compound",
+      type: "compound",
       initial: WORKFLOW.FILES.SELECTION_MODE.DECIDE_MODE,
       states: selectionModeStates,
       on: {
@@ -355,7 +392,7 @@ export const workflowMachine = createMachine<IContext, Events>({
   entry: () => console.log(`>>> Enter ${WORKFLOW.ROOT.toUpperCase()} state machine`),
   states: {
     [WORKFLOW.IDLE]: {
-      entry: () => console.log(`>>> Enter ${WORKFLOW.IDLE}`),
+      entry: () => console.log(`>>> Enter ${WORKFLOW.ROOT.toUpperCase()}.${WORKFLOW.IDLE}`),
       on: {
         START: {
           actions: assign((_: { context: IContext; event: any }) => ({
