@@ -305,8 +305,8 @@ export const InnerRasterForm = (
                 [
                   state.context.files?.gpkg?.geoDetails?.feature as Feature<Geometry, GeoJsonProperties>,
                   state.context.files?.gpkg?.geoDetails?.marker as Feature<Geometry, GeoJsonProperties>,
-                  // state.context.files?.product?.geoDetails?.feature as Feature<Geometry, GeoJsonProperties>,
-                  // state.context.files?.product?.geoDetails?.marker as Feature<Geometry, GeoJsonProperties>
+                  state.context.files?.product?.geoDetails?.feature as Feature<Geometry, GeoJsonProperties>,
+                  state.context.files?.product?.geoDetails?.marker as Feature<Geometry, GeoJsonProperties>
                 ]
               } 
               // selectedFeatureKey={selectedFeature}
@@ -328,7 +328,7 @@ export const InnerRasterForm = (
           <LayersDetailsComponent
             entityDescriptors={ingestionFieldDescriptors}
             layerRecord={layerRecord}
-            mode={state.context.formData ? Mode.VIEW : mode}
+            mode={mode}
             formik={entityFormikHandlers}
             enableMapPreview={false}
             showFiedlsCategory={false}/>
