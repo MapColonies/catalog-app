@@ -152,7 +152,7 @@ const selectionModeStates = {
         }
       },
       [WORKFLOW.FILES.SELECTION_MODE.AUTO.CHECK_METADATA]: {
-        entry: (_: { context: IContext; event: any }) => console.log(`>>> ${WORKFLOW.FILES.SELECTION_MODE.MANUAL.CHECK_METADATA}`, _),
+        entry: (_: { context: IContext; event: any }) => console.log(`>>> ${WORKFLOW.FILES.SELECTION_MODE.AUTO.CHECK_METADATA}`, _),
         tags: [STATE_TAGS.GENERAL_LOADING],
         invoke: {
           input: (_: { context: IContext; event: any }) => _,
@@ -243,7 +243,7 @@ const selectionModeStates = {
                 addPolicy: "merge"
               }))
             ],
-            target: WORKFLOW.FILES.SELECTION_MODE.MANUAL.CHECK_METADATA
+            target: WORKFLOW.FILES.SELECTION_MODE.MANUAL.IDLE
           },
           AUTO: {
             actions: [
@@ -325,24 +325,6 @@ const selectionModeStates = {
               })),
               sendParent({ type: "FILES_SELECTED" })
             ],
-            target: WORKFLOW.FILES.SELECTION_MODE.MANUAL.IDLE
-          },
-          onError: {
-            actions: sendParent((_: { context: IContext; event: any }) => ({
-              type: "FILES_ERROR",
-              error: { ..._.event.error }
-            })),
-            target: WORKFLOW.FILES.SELECTION_MODE.MANUAL.IDLE
-          }
-        }
-      },
-      [WORKFLOW.FILES.SELECTION_MODE.MANUAL.CHECK_METADATA]: {
-        entry: (_: { context: IContext; event: any }) => console.log(`>>> ${WORKFLOW.FILES.SELECTION_MODE.MANUAL.CHECK_METADATA}`, _),
-        tags: [STATE_TAGS.GENERAL_LOADING],
-        invoke: {
-          input: (_: { context: IContext; event: any }) => _,
-          src: SERVICES[WORKFLOW.FILES.ROOT].checkMetadataService,
-          onDone: {
             target: WORKFLOW.FILES.SELECTION_MODE.MANUAL.IDLE
           },
           onError: {

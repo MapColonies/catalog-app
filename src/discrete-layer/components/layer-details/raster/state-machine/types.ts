@@ -127,8 +127,7 @@ export const WORKFLOW = {
         ROOT: "manual",
         IDLE: "idle",
         SELECT_GPKG: "selectGpkg",
-        FETCH_PRODUCT: "fetchProduct",
-        CHECK_METADATA: "checkMetadata"
+        FETCH_PRODUCT: "fetchProduct"
       }
     },
     ERROR: "error"
