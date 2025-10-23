@@ -121,6 +121,15 @@ export const InnerRasterForm = (
       });
     }
   }, [state.context?.files]);
+
+  useEffect(() => {
+    if (state.context?.formData) {
+      setValues({
+        ...values,
+        ...state.context.formData,
+      });
+    }
+  }, [state.context?.formData]);
   //#endregion
 
   const getStatusErrors = useCallback((): StatusError | Record<string, unknown> => {
@@ -296,8 +305,8 @@ export const InnerRasterForm = (
                 [
                   state.context.files?.gpkg?.geoDetails?.feature as Feature<Geometry, GeoJsonProperties>,
                   state.context.files?.gpkg?.geoDetails?.marker as Feature<Geometry, GeoJsonProperties>,
-                  state.context.files?.product?.geoDetails?.feature as Feature<Geometry, GeoJsonProperties>,
-                  state.context.files?.product?.geoDetails?.marker as Feature<Geometry, GeoJsonProperties>
+                  // state.context.files?.product?.geoDetails?.feature as Feature<Geometry, GeoJsonProperties>,
+                  // state.context.files?.product?.geoDetails?.marker as Feature<Geometry, GeoJsonProperties>
                 ]
               } 
               // selectedFeatureKey={selectedFeature}
@@ -319,7 +328,7 @@ export const InnerRasterForm = (
           <LayersDetailsComponent
             entityDescriptors={ingestionFieldDescriptors}
             layerRecord={layerRecord}
-            mode={mode}
+            mode={state.context.formData ? Mode.VIEW : mode}
             formik={entityFormikHandlers}
             enableMapPreview={false}
             showFiedlsCategory={false}/>
