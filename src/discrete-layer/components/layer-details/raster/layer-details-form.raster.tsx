@@ -121,6 +121,15 @@ export const InnerRasterForm = (
       });
     }
   }, [state.context?.files]);
+
+  useEffect(() => {
+    if (state.context?.formData) {
+      setValues({
+        ...values,
+        ...state.context.formData,
+      });
+    }
+  }, [state.context?.formData]);
   //#endregion
 
   const getStatusErrors = useCallback((): StatusError | Record<string, unknown> => {
