@@ -14,7 +14,7 @@ import { LayerRasterRecordInput } from '../../../../models/RootStore.base';
 export type ErrorSource = "api" | "logic";
 export type ErrorLevel = "error" | "warning";
 export type AddPolicy = "merge" | "override";
-export type SelectionMode = "auto" | "manual";
+export type SelectionMode = "auto" | "manual" | "restore";
 
 export interface IStateError {
   source: ErrorSource;
@@ -129,8 +129,7 @@ export const WORKFLOW = {
         SELECT_GPKG: "selectGpkg",
         FETCH_PRODUCT: "fetchProduct"
       }
-    },
-    ERROR: "error"
+    }
   },
   JOB_SUBMISSION: "jobSubmission",
   JOB_POLLING: "jobPolling",

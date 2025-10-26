@@ -34,7 +34,7 @@ import { GeoFeaturesPresentorComponent } from './pp-map';
 import { FeatureType, PPMapStyles } from './pp-map.utils';
 import { StateError } from './state-error';
 import { RasterWorkflowContext } from './state-machine/context';
-import { hasLoadingTagDeep } from './state-machine/helpers';
+import { disableUI, hasLoadingTagDeep } from './state-machine/helpers';
 import { WORKFLOW } from './state-machine/types';
 import { getUIIngestionFieldDescriptors } from './utils';
 
@@ -123,7 +123,7 @@ export const InnerRasterForm = (
   }, [state.context?.files]);
 
   useEffect(() => {
-    if (state.context?.formData) {
+    if (state.context?.formData && state.context?.selectionMode === 'restore') {
       setValues({
         ...values,
         ...state.context.formData,
@@ -354,7 +354,7 @@ export const InnerRasterForm = (
                   Object.keys(errors).length > NONE ||
                   (Object.keys(getStatusErrors()).length > NONE) ||
                   !isEmpty(state.context.errors) ||
-                  state.value === WORKFLOW.DONE
+                  disableUI(state)
                 }
               >
                 <FormattedMessage id="general.ok-btn.text" />
@@ -365,7 +365,8 @@ export const InnerRasterForm = (
                 raised
                 disabled={
                   Object.keys(errors).length > NONE ||
-                  (Object.keys(getStatusErrors()).length > NONE)
+                  (Object.keys(getStatusErrors()).length > NONE) ||
+                  disableUI(state)
                 }
                 onClick={(e): void => {
                   e.preventDefault();

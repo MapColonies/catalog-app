@@ -23,7 +23,7 @@ export const fetchProductServiceOnDoneActions = [
   sendParent({ type: "FILES_SELECTED" })
 ];
 
-export const swtichModeActions = (selectionMode: SelectionMode) => {
+export const switchModeActions = (selectionMode: SelectionMode) => {
   return [
     assign({ selectionMode, files: {} }),
     sendParent({ type: "SET_FILES", files: {}, addPolicy: "override" })

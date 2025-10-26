@@ -13,7 +13,8 @@ import {
   IContext,
   IStateError,
   SHAPES_DIR,
-  STATE_TAGS
+  STATE_TAGS,
+  WORKFLOW
 } from './types';
 
 export const addError = assign((_: { context: IContext; event: any }) => { 
@@ -43,8 +44,8 @@ export const hasLoadingTagDeep = (state: SnapshotFrom<typeof workflowMachine>, t
   return false;
 };
 
-export const disableUI = () => {
-  // return isLoading || error
+export const disableUI = (state: SnapshotFrom<typeof workflowMachine>) => {
+  return state.value === WORKFLOW.DONE;
 };
 
 export const getFeatureAndMarker = (
