@@ -5,8 +5,6 @@ import { fromPromise } from 'xstate';
 import { FileData } from '@map-colonies/react-components';
 import { Mode } from '../../../../../common/models/mode.enum';
 import {
-  IBaseRootStore,
-  IRootStore,
   RecordType,
   // EntityDescriptorModelType
 } from '../../../../models';
@@ -27,23 +25,23 @@ import {
   WORKFLOW
 } from './types';
 
-const getDetails = async (filePath: string, store: IRootStore | IBaseRootStore): Promise<FileData | undefined> => {
+const getDetails = async (filePath: string, context: IContext): Promise<FileData | undefined> => {
   try {
-    const res = await queryExecutor(async () => {
-      return await store.queryGetDirectory({
+    const result = await queryExecutor(async () => {
+      return await context.store.queryGetDirectory({
         data: {
           path: path.dirname(filePath),
           type: RecordType.RECORD_RASTER,
         },
       });
     });
-    return (res?.getDirectory as FileData[]).filter((file: FileData) => file.name === path.basename(filePath))[0];
+    return (result?.getDirectory as FileData[]).filter((file: FileData) => file.name === path.basename(filePath))[0];
   } catch (e) {
     return undefined;
   }
 };
 
-const selectGpkgLogic = async (context: IContext) => {
+const selectGpkg = async (context: IContext) => {
   if (!context.files?.gpkg?.path) {
     throw (buildError('ingestion.error.missing', 'GPKG'));
   }
@@ -169,17 +167,17 @@ export const SERVICES = {
 
       if (files?.gpkg) {
         const gpkgRef = files.gpkg;
-        gpkgRef.details = await getDetails(gpkgRef.path, input.context.store);
+        gpkgRef.details = await getDetails(gpkgRef.path, input.context);
         gpkgRef.exists = !!gpkgRef.details;
       }
       if (files?.product) {
         const productRef = files.product;
-        productRef.details = await getDetails(productRef.path, input.context.store);
+        productRef.details = await getDetails(productRef.path, input.context);
         productRef.exists = !!productRef.details;
       }
       if (files?.metadata) {
         const metadataRef = files.metadata;
-        metadataRef.details = await getDetails(metadataRef.path, input.context.store);
+        metadataRef.details = await getDetails(metadataRef.path, input.context);
         metadataRef.exists = !!metadataRef.details;
       }
 
@@ -255,11 +253,11 @@ export const SERVICES = {
   },
   [WORKFLOW.FILES.ROOT]: {
     selectFilesService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
-      const gpkgRes = await selectGpkgLogic(input.context);
+      const gpkg = await selectGpkg(input.context);
       const gpkgPath = input.context.files?.gpkg?.path as string;
-      let res;
+      let result;
       try {
-        res = await queryExecutor(async () => {
+        result = await queryExecutor(async () => {
           return await input.context.store.queryGetDirectory({
             data: {
               path: path.resolve(gpkgPath, SHAPES_DIR),
@@ -269,19 +267,19 @@ export const SERVICES = {
         });
       } catch (e) {
       }
-      const product = getFile(res?.getDirectory as FileData[], gpkgPath, PRODUCT_SHP, PRODUCT_LABEL);
-      const metadata = getFile(res?.getDirectory as FileData[], gpkgPath, METADATA_SHP, METADATA_LABEL);
+      const product = getFile(result?.getDirectory as FileData[], gpkgPath, PRODUCT_SHP, PRODUCT_LABEL);
+      const metadata = getFile(result?.getDirectory as FileData[], gpkgPath, METADATA_SHP, METADATA_LABEL);
 
       return {
         gpkg: {
-          ...gpkgRes
+          ...gpkg
         },
         product,
         metadata
       };
     }),
     selectGpkgService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
-      return selectGpkgLogic(input.context);
+      return selectGpkg(input.context);
     }),
     fetchProductService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
       const { product } = input.context.files ?? {};

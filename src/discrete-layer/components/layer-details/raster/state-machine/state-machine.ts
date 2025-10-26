@@ -2,10 +2,15 @@ import { merge } from 'lodash';
 import { assign, createMachine, sendParent } from 'xstate';
 import CONFIG from '../../../../../common/config';
 import { Status } from '../../../../models';
+import {
+  fetchProductActions,
+  filesErrorActions,
+  selectFileActions,
+  selectionModeActions
+} from './action-handlers';
 import { addError, warnUnexpectedStateEvent } from './helpers';
 import { SERVICES } from './services';
 import { IContext, STATE_TAGS, WORKFLOW } from './types';
-import { fetchProductServiceOnDoneActions, filesOnError, selectFileActions, switchModeActions } from './action-handlers';
 
 //#region --- Guards ---
 /*const hasSelectedFiles = (_: { context: IContext }) => {
@@ -14,217 +19,201 @@ import { fetchProductServiceOnDoneActions, filesOnError, selectFileActions, swit
 };*/
 //#endregion
 
-//#region --- selection mode states ---
-const selectionModeStates = {
-  [WORKFLOW.FILES.SELECTION_MODE.DECIDE_MODE]: {
-    always: [
-      {
-        guard: (_: { context: IContext }) => {
-          return _.context.selectionMode === 'manual';
-        },
-        target: WORKFLOW.FILES.SELECTION_MODE.MANUAL.ROOT
-      },
-      {
-        target: WORKFLOW.FILES.SELECTION_MODE.AUTO.ROOT
-      }
-    ]
-  },
-  [WORKFLOW.FILES.SELECTION_MODE.AUTO.ROOT]: {
-    entry: (_: { context: IContext; event: any }) => console.log(`>>> ${WORKFLOW.FILES.SELECTION_MODE.AUTO.ROOT}`, _),
-    tags: [STATE_TAGS.GENERAL_LOADING],
-    initial: WORKFLOW.FILES.SELECTION_MODE.AUTO.IDLE,
-    states: {
-      [WORKFLOW.FILES.SELECTION_MODE.AUTO.IDLE]: {
-        entry: () => console.log(`>>> Enter ${WORKFLOW.FILES.SELECTION_MODE.AUTO.ROOT.toUpperCase()}.${WORKFLOW.FILES.SELECTION_MODE.AUTO.IDLE}`),
-        on: {
-          SELECT_FILES: {
-            actions: [
-              ...selectFileActions('gpkg','override',false),
-              sendParent({ type: "CLEAN_ERRORS" })
-            ],
-            target: WORKFLOW.FILES.SELECTION_MODE.AUTO.SELECT_FILES
-          },
-          MANUAL: {
-            actions: switchModeActions('manual' as SelectionMode),
-            target: `#${WORKFLOW.FILES.ROOT}`
-          },
-          "*": { actions: warnUnexpectedStateEvent }
-        }
-      },
-      [WORKFLOW.FILES.SELECTION_MODE.AUTO.SELECT_FILES]: {
-        entry: () => console.log(`>>> Enter ${WORKFLOW.FILES.SELECTION_MODE.AUTO.SELECT_FILES}`),
-        tags: [STATE_TAGS.GENERAL_LOADING],
-        invoke: {
-          input: (_: { context: IContext; event: any }) => _,
-          src: SERVICES[WORKFLOW.FILES.ROOT].selectFilesService,
-          onDone: {
-            actions: [
-              assign((_: { context: IContext; event: any }) => ({
-                files: {
-                  ..._.context.files,
-                  gpkg: {
-                    ..._.context.files?.gpkg,
-                    ..._.event.output.gpkg
-                  },
-                  product: {
-                    ..._.context.files?.product,
-                    ..._.event.output.product
-                  },
-                  metadata: {
-                    ..._.context.files?.metadata,
-                    ..._.event.output.metadata
-                  }
-                }
-              })),
-              sendParent((_: { context: IContext; event: any }) => ({
-                type: "SET_FILES",
-                files: {
-                  ..._.event.output
-                },
-                addPolicy: "merge"
-              }))
-            ],
-            target: WORKFLOW.FILES.SELECTION_MODE.AUTO.FETCH_PRODUCT
-          },
-          onError: {
-            actions: filesOnError,
-            target: WORKFLOW.FILES.SELECTION_MODE.AUTO.IDLE
-          }
-        }
-      },
-      [WORKFLOW.FILES.SELECTION_MODE.AUTO.FETCH_PRODUCT]: {
-        entry: (_: { context: IContext; event: any }) => console.log(`>>> ${WORKFLOW.FILES.SELECTION_MODE.AUTO.FETCH_PRODUCT}`, _),
-        tags: [STATE_TAGS.GENERAL_LOADING],
-        invoke: {
-          input: (_: { context: IContext; event: any }) => _,
-          src: SERVICES[WORKFLOW.FILES.ROOT].fetchProductService,
-          onDone: {
-            actions: fetchProductServiceOnDoneActions,
-            target: WORKFLOW.FILES.SELECTION_MODE.AUTO.CHECK_METADATA
-          },
-          onError: {
-            actions: filesOnError,
-            target: WORKFLOW.FILES.SELECTION_MODE.AUTO.IDLE
-          }
-        }
-      },
-      [WORKFLOW.FILES.SELECTION_MODE.AUTO.CHECK_METADATA]: {
-        entry: (_: { context: IContext; event: any }) => console.log(`>>> ${WORKFLOW.FILES.SELECTION_MODE.AUTO.CHECK_METADATA}`, _),
-        tags: [STATE_TAGS.GENERAL_LOADING],
-        invoke: {
-          input: (_: { context: IContext; event: any }) => _,
-          src: SERVICES[WORKFLOW.FILES.ROOT].checkMetadataService,
-          onDone: {
-            target: WORKFLOW.FILES.SELECTION_MODE.AUTO.IDLE
-          },
-          onError: {
-            actions: filesOnError,
-            target: WORKFLOW.FILES.SELECTION_MODE.AUTO.IDLE
-          }
-        }
-      }
-    }
-  },
-  [WORKFLOW.FILES.SELECTION_MODE.MANUAL.ROOT]: {
-    entry: (_: { context: IContext; event: any }) => console.log(`>>> ${WORKFLOW.FILES.SELECTION_MODE.MANUAL.ROOT}`, _),
-    tags: [STATE_TAGS.GENERAL_LOADING],
-    initial: WORKFLOW.FILES.SELECTION_MODE.MANUAL.IDLE,
-    states: {
-      [WORKFLOW.FILES.SELECTION_MODE.MANUAL.IDLE]: {
-        entry: () => console.log(`>>> Enter ${WORKFLOW.FILES.SELECTION_MODE.MANUAL.ROOT.toLocaleUpperCase()}.${WORKFLOW.FILES.SELECTION_MODE.MANUAL.IDLE}`),
-        on: {
-          SELECT_GPKG: {
-            actions: selectFileActions('gpkg'),
-            target: WORKFLOW.FILES.SELECTION_MODE.MANUAL.SELECT_GPKG
-          },
-          SELECT_PRODUCT: {
-            actions: selectFileActions('product'),
-            target: WORKFLOW.FILES.SELECTION_MODE.MANUAL.FETCH_PRODUCT
-          },
-          SELECT_METADATA: {
-            actions: selectFileActions('metadata'),
-            target: WORKFLOW.FILES.SELECTION_MODE.MANUAL.IDLE
-          },
-          AUTO: {
-            actions: switchModeActions('auto' as SelectionMode),
-            target: `#${WORKFLOW.FILES.ROOT}`
-          },
-          "*": { actions: warnUnexpectedStateEvent }
-        }
-      },
-      [WORKFLOW.FILES.SELECTION_MODE.MANUAL.SELECT_GPKG]: {
-        entry: () => console.log(`>>> Enter ${WORKFLOW.FILES.SELECTION_MODE.MANUAL.SELECT_GPKG}`),
-        tags: [STATE_TAGS.GENERAL_LOADING],
-        invoke: {
-          input: (_: { context: IContext; event: any }) => _,
-          src: SERVICES[WORKFLOW.FILES.ROOT].selectGpkgService,
-          onDone: {
-            actions: [
-              assign((_: { context: IContext; event: any }) => ({
-                files: {
-                  ..._.context.files,
-                  gpkg: {
-                    ..._.context.files?.gpkg,
-                    ..._.event.output.gpkg
-                  }
-                }
-              })),
-              sendParent((_: { context: IContext; event: any }) => ({
-                type: "SET_FILES",
-                files: {
-                  ..._.context.files,
-                  gpkg: {
-                    ..._.context.files?.gpkg,
-                    ..._.event.output
-                  }
-                },
-                addPolicy: "merge"
-              }))
-            ],
-            target: WORKFLOW.FILES.SELECTION_MODE.MANUAL.IDLE
-          },
-          onError: {
-            actions: filesOnError,
-            target: WORKFLOW.FILES.SELECTION_MODE.MANUAL.IDLE
-          }
-        }
-      },
-      [WORKFLOW.FILES.SELECTION_MODE.MANUAL.FETCH_PRODUCT]: {
-        entry: (_: { context: IContext; event: any }) => console.log(`>>> ${WORKFLOW.FILES.SELECTION_MODE.MANUAL.FETCH_PRODUCT}`, _),
-        tags: [STATE_TAGS.GENERAL_LOADING],
-        invoke: {
-          input: (_: { context: IContext; event: any }) => _,
-          src: SERVICES[WORKFLOW.FILES.ROOT].fetchProductService,
-          onDone: {
-            actions: fetchProductServiceOnDoneActions,
-            target: WORKFLOW.FILES.SELECTION_MODE.MANUAL.IDLE
-          },
-          onError: {
-            actions: filesOnError,
-            target: WORKFLOW.FILES.SELECTION_MODE.MANUAL.IDLE
-          }
-        }
-      }
-    }
-  }
-};
-//#endregion
-
 //#region --- FILES sub state machine ---
 const filesMachine = createMachine({
   id: WORKFLOW.FILES.ROOT,
-  initial: WORKFLOW.FILES.SELECTION_MODE.ROOT,
+  initial: WORKFLOW.FILES.SELECTION_MODE,
   context: (ctx: any) => ctx.input,
   states: {
-    [WORKFLOW.FILES.SELECTION_MODE.ROOT]: {
-      entry: () => console.log(`>>> Enter ${WORKFLOW.FILES.SELECTION_MODE.ROOT}`),
-      type: "compound",
-      initial: WORKFLOW.FILES.SELECTION_MODE.DECIDE_MODE,
-      states: selectionModeStates,
-      on: {
-        AUTO: `.${WORKFLOW.FILES.SELECTION_MODE.AUTO.ROOT}`,
-        MANUAL: `.${WORKFLOW.FILES.SELECTION_MODE.MANUAL.ROOT}`,
-        "*": { actions: warnUnexpectedStateEvent }
+    [WORKFLOW.FILES.SELECTION_MODE]: {
+      always: [
+        {
+          guard: (_: { context: IContext }) => {
+            return _.context.selectionMode === 'manual';
+          },
+          target: WORKFLOW.FILES.MANUAL.ROOT
+        },
+        {
+          target: WORKFLOW.FILES.AUTO.ROOT
+        }
+      ]
+    },
+    [WORKFLOW.FILES.AUTO.ROOT]: {
+      entry: (_: { context: IContext; event: any }) => console.log(`>>> ${WORKFLOW.FILES.AUTO.ROOT}`, _),
+      tags: [STATE_TAGS.GENERAL_LOADING],
+      initial: WORKFLOW.FILES.AUTO.IDLE,
+      states: {
+        [WORKFLOW.FILES.AUTO.IDLE]: {
+          entry: () => console.log(`>>> Enter ${WORKFLOW.FILES.AUTO.ROOT.toUpperCase()}.${WORKFLOW.FILES.AUTO.IDLE}`),
+          on: {
+            SELECT_FILES: {
+              actions: [
+                ...selectFileActions('gpkg', 'override', false),
+                sendParent({ type: "CLEAN_ERRORS" })
+              ],
+              target: WORKFLOW.FILES.AUTO.SELECT_FILES
+            },
+            MANUAL: {
+              actions: selectionModeActions('manual' as SelectionMode),
+              target: `#${WORKFLOW.FILES.ROOT}`
+            },
+            "*": { actions: warnUnexpectedStateEvent }
+          }
+        },
+        [WORKFLOW.FILES.AUTO.SELECT_FILES]: {
+          entry: () => console.log(`>>> Enter ${WORKFLOW.FILES.AUTO.SELECT_FILES}`),
+          tags: [STATE_TAGS.GENERAL_LOADING],
+          invoke: {
+            input: (_: { context: IContext; event: any }) => _,
+            src: SERVICES[WORKFLOW.FILES.ROOT].selectFilesService,
+            onDone: {
+              actions: [
+                assign((_: { context: IContext; event: any }) => ({
+                  files: {
+                    ..._.context.files,
+                    gpkg: {
+                      ..._.context.files?.gpkg,
+                      ..._.event.output.gpkg
+                    },
+                    product: {
+                      ..._.context.files?.product,
+                      ..._.event.output.product
+                    },
+                    metadata: {
+                      ..._.context.files?.metadata,
+                      ..._.event.output.metadata
+                    }
+                  }
+                })),
+                sendParent((_: { context: IContext; event: any }) => ({
+                  type: "SET_FILES",
+                  files: {
+                    ..._.event.output
+                  },
+                  addPolicy: "merge"
+                }))
+              ],
+              target: WORKFLOW.FILES.AUTO.FETCH_PRODUCT
+            },
+            onError: {
+              actions: filesErrorActions,
+              target: WORKFLOW.FILES.AUTO.IDLE
+            }
+          }
+        },
+        [WORKFLOW.FILES.AUTO.FETCH_PRODUCT]: {
+          entry: (_: { context: IContext; event: any }) => console.log(`>>> ${WORKFLOW.FILES.AUTO.FETCH_PRODUCT}`, _),
+          tags: [STATE_TAGS.GENERAL_LOADING],
+          invoke: {
+            input: (_: { context: IContext; event: any }) => _,
+            src: SERVICES[WORKFLOW.FILES.ROOT].fetchProductService,
+            onDone: {
+              actions: fetchProductActions,
+              target: WORKFLOW.FILES.AUTO.CHECK_METADATA
+            },
+            onError: {
+              actions: filesErrorActions,
+              target: WORKFLOW.FILES.AUTO.IDLE
+            }
+          }
+        },
+        [WORKFLOW.FILES.AUTO.CHECK_METADATA]: {
+          entry: (_: { context: IContext; event: any }) => console.log(`>>> ${WORKFLOW.FILES.AUTO.CHECK_METADATA}`, _),
+          tags: [STATE_TAGS.GENERAL_LOADING],
+          invoke: {
+            input: (_: { context: IContext; event: any }) => _,
+            src: SERVICES[WORKFLOW.FILES.ROOT].checkMetadataService,
+            onDone: {
+              target: WORKFLOW.FILES.AUTO.IDLE
+            },
+            onError: {
+              actions: filesErrorActions,
+              target: WORKFLOW.FILES.AUTO.IDLE
+            }
+          }
+        }
+      }
+    },
+    [WORKFLOW.FILES.MANUAL.ROOT]: {
+      entry: (_: { context: IContext; event: any }) => console.log(`>>> ${WORKFLOW.FILES.MANUAL.ROOT}`, _),
+      tags: [STATE_TAGS.GENERAL_LOADING],
+      initial: WORKFLOW.FILES.MANUAL.IDLE,
+      states: {
+        [WORKFLOW.FILES.MANUAL.IDLE]: {
+          entry: () => console.log(`>>> Enter ${WORKFLOW.FILES.MANUAL.ROOT.toLocaleUpperCase()}.${WORKFLOW.FILES.MANUAL.IDLE}`),
+          on: {
+            SELECT_GPKG: {
+              actions: selectFileActions('gpkg'),
+              target: WORKFLOW.FILES.MANUAL.SELECT_GPKG
+            },
+            SELECT_PRODUCT: {
+              actions: selectFileActions('product'),
+              target: WORKFLOW.FILES.MANUAL.FETCH_PRODUCT
+            },
+            SELECT_METADATA: {
+              actions: selectFileActions('metadata'),
+              target: WORKFLOW.FILES.MANUAL.IDLE
+            },
+            AUTO: {
+              actions: selectionModeActions('auto' as SelectionMode),
+              target: `#${WORKFLOW.FILES.ROOT}`
+            },
+            "*": { actions: warnUnexpectedStateEvent }
+          }
+        },
+        [WORKFLOW.FILES.MANUAL.SELECT_GPKG]: {
+          entry: () => console.log(`>>> Enter ${WORKFLOW.FILES.MANUAL.SELECT_GPKG}`),
+          tags: [STATE_TAGS.GENERAL_LOADING],
+          invoke: {
+            input: (_: { context: IContext; event: any }) => _,
+            src: SERVICES[WORKFLOW.FILES.ROOT].selectGpkgService,
+            onDone: {
+              actions: [
+                assign((_: { context: IContext; event: any }) => ({
+                  files: {
+                    ..._.context.files,
+                    gpkg: {
+                      ..._.context.files?.gpkg,
+                      ..._.event.output.gpkg
+                    }
+                  }
+                })),
+                sendParent((_: { context: IContext; event: any }) => ({
+                  type: "SET_FILES",
+                  files: {
+                    ..._.context.files,
+                    gpkg: {
+                      ..._.context.files?.gpkg,
+                      ..._.event.output
+                    }
+                  },
+                  addPolicy: "merge"
+                }))
+              ],
+              target: WORKFLOW.FILES.MANUAL.IDLE
+            },
+            onError: {
+              actions: filesErrorActions,
+              target: WORKFLOW.FILES.MANUAL.IDLE
+            }
+          }
+        },
+        [WORKFLOW.FILES.MANUAL.FETCH_PRODUCT]: {
+          entry: (_: { context: IContext; event: any }) => console.log(`>>> ${WORKFLOW.FILES.MANUAL.FETCH_PRODUCT}`, _),
+          tags: [STATE_TAGS.GENERAL_LOADING],
+          invoke: {
+            input: (_: { context: IContext; event: any }) => _,
+            src: SERVICES[WORKFLOW.FILES.ROOT].fetchProductService,
+            onDone: {
+              actions: fetchProductActions,
+              target: WORKFLOW.FILES.MANUAL.IDLE
+            },
+            onError: {
+              actions: filesErrorActions,
+              target: WORKFLOW.FILES.MANUAL.IDLE
+            }
+          }
+        }
       }
     }
   }

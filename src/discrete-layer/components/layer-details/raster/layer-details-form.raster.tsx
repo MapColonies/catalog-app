@@ -35,7 +35,6 @@ import { FeatureType, PPMapStyles } from './pp-map.utils';
 import { StateError } from './state-error';
 import { RasterWorkflowContext } from './state-machine/context';
 import { disableUI, hasLoadingTagDeep } from './state-machine/helpers';
-import { WORKFLOW } from './state-machine/types';
 import { getUIIngestionFieldDescriptors } from './utils';
 
 import './layer-details-form.raster.css';
