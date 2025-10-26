@@ -10,8 +10,12 @@ import { FieldLabelComponent } from '../../../../common/components/form/field-la
 import { dateFormatter } from '../../../../common/helpers/formatters';
 import { RecordType, LayerMetadataMixedUnion } from '../../../models';
 import { FilePickerDialog } from '../../dialogs/file-picker.dialog';
+// import { transformEntityToFormFields } from '../utils';
 import { RasterWorkflowContext } from './state-machine/context';
-// import { hasLoadingTagDeep } from './state-machine/helpers';
+import {
+  disableUI,
+  // hasLoadingTagDeep
+} from './state-machine/helpers';
 import {
   SelectionMode,
   Events,
@@ -137,7 +141,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
   };
 
   const handleSwitchClick = (): void => {
-    const eventType = selectionMode === AUTO ? 'AUTO' : 'MANUAL';
+    const eventType = selectionMode === AUTO ? 'MANUAL' : 'AUTO';
 
     if (!filesActor) {
       actorRef.send({ type: 'RESELECT_FILES' } satisfies Events);
@@ -227,10 +231,9 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
             }
           ],
           "inputFiles": {
-              "fileNames": [
-                  "blueMarble.gpkg"
-              ],
-              "originDirectory": "test_dir"
+              "gpkgFilesPath": ["test_dir/shaziri-orthophto-test.gpkg"],
+              "productShapefilePath": "Shapes/Product.shp",
+              "metadataShapefilePath": "Shapes/ShapeMetadata.shp"
           },
           "additionalParams": {
               "jobTrackerServiceURL": "http://raster-core-int-job-tracker-service"
@@ -262,7 +265,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
       type: 'RESTORE',
       data: {
         flowType: job.type.substring(job.type.lastIndexOf('_') + 1),
-        selectionMode: 'auto',
+        selectionMode: 'restore',
         files: {
           gpkg: {
             label: 'file-name.gpkg',
@@ -282,7 +285,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
         },
         resolutionDegree: job.parameters.partsData[0].resolutionDegree,
         formData: {
-          ...job.parameters.metadata
+          ...transformEntityToFormFields(job.parameters.metadata as unknown as LayerMetadataMixedUnion)
         },
         job: {
           jobId: job.id,
@@ -318,7 +321,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
                 raised
                 type="button"
                 className="manualButton"
-                // disabled={isLoading}
+                disabled={disableUI(state)}
                 onClick={() => {
                   setSelectedAction(GPKG);
                   setFilePickerDialogOpen(true);
@@ -330,7 +333,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
                 raised
                 type="button"
                 className="manualButton"
-                // disabled={isLoading}
+                disabled={disableUI(state)}
                 onClick={() => {
                   setSelectedAction(PRODUCT);
                   setFilePickerDialogOpen(true);
@@ -342,7 +345,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
                 raised
                 type="button"
                 className="manualButton"
-                // disabled={isLoading}
+                disabled={disableUI(state)}
                 onClick={() => {
                   setSelectedAction(METADATA);
                   setFilePickerDialogOpen(true);
@@ -357,10 +360,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
                 raised
                 type="button"
                 className="autoButton"
-                // disabled={
-                //   isLoading ||
-                //   state.value === WORKFLOW.DONE
-                // }
+                disabled={disableUI(state)}
                 onClick={(): void => {
                   setSelectedAction(FILES);
                   setFilePickerDialogOpen(true);

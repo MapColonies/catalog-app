@@ -5,7 +5,7 @@ import { Status } from '../../../../models';
 import { addError, warnUnexpectedStateEvent } from './helpers';
 import { SERVICES } from './services';
 import { IContext, STATE_TAGS, WORKFLOW } from './types';
-import { fetchProductServiceOnDoneActions, filesOnError, selectFileActions, swtichModeActions } from './action-handlers';
+import { fetchProductServiceOnDoneActions, filesOnError, selectFileActions, switchModeActions } from './action-handlers';
 
 //#region --- Guards ---
 /*const hasSelectedFiles = (_: { context: IContext }) => {
@@ -45,7 +45,7 @@ const selectionModeStates = {
             target: WORKFLOW.FILES.SELECTION_MODE.AUTO.SELECT_FILES
           },
           MANUAL: {
-            actions: swtichModeActions('manual' as SelectionMode),
+            actions: switchModeActions('manual' as SelectionMode),
             target: `#${WORKFLOW.FILES.ROOT}`
           },
           "*": { actions: warnUnexpectedStateEvent }
@@ -146,7 +146,7 @@ const selectionModeStates = {
             target: WORKFLOW.FILES.SELECTION_MODE.MANUAL.IDLE
           },
           AUTO: {
-            actions: swtichModeActions('auto' as SelectionMode),
+            actions: switchModeActions('auto' as SelectionMode),
             target: `#${WORKFLOW.FILES.ROOT}`
           },
           "*": { actions: warnUnexpectedStateEvent }
