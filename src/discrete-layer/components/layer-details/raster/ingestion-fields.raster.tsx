@@ -304,7 +304,10 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
           <Typography tag="p">
             <FormattedMessage id="switch.auto.text" />
           </Typography>
-          <Switch checked={isManualMode} onChange={handleSwitchClick} />
+          <Switch
+            checked={isManualMode}
+            disabled={disableUI(state)}
+            onChange={handleSwitchClick} />
           <Typography tag="p">
             <FormattedMessage id="switch.manual.text" />
           </Typography>
