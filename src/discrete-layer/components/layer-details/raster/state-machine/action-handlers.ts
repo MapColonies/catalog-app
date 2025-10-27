@@ -1,7 +1,7 @@
-import { assign, sendParent } from "xstate";
-import { AddPolicy, IContext } from "./types";
+import { assign, sendParent } from 'xstate';
+import { AddPolicy, IContext, IFiles } from './types';
 
-export const fetchProductServiceOnDoneActions = [
+export const fetchProductActions = [
   assign((_: { context: IContext; event: any }) => ({
     files: {
       ..._.context.files,
@@ -23,36 +23,32 @@ export const fetchProductServiceOnDoneActions = [
   sendParent({ type: "FILES_SELECTED" })
 ];
 
-export const swtichModeActions = (selectionMode: SelectionMode) => {
-  return [
-    assign({ selectionMode, files: {} }),
-    sendParent({ type: "SET_FILES", files: {}, addPolicy: "override" })
-  ]
-};
+export const selectionModeActions = (selectionMode: SelectionMode, files: IFiles = {}) => [
+  assign({ selectionMode, files }),
+  sendParent({ type: "SET_FILES", files, addPolicy: "override" })
+];
 
-export const selectFileActions = (fileType: 'gpkg'| 'product' | 'metadata', parentAddPolicy: AddPolicy = 'merge', preserveCurrent: boolean = true) => {
-  return [
-    assign((_: { context: IContext; event: any }) => ({
-      files: {
-        ...(preserveCurrent ? _.context.files : {}),
-        [fileType]: {
-          ..._.event.file
-        }
+export const selectFileActions = (fileType: 'gpkg' | 'product' | 'metadata', parentAddPolicy: AddPolicy = 'merge', preserveCurrent: boolean = true) => [
+  assign((_: { context: IContext; event: any }) => ({
+    files: {
+      ...(preserveCurrent ? _.context.files : {}),
+      [fileType]: {
+        ..._.event.file
       }
-    })),
-    sendParent((_: { context: IContext; event: any }) => ({
-      type: "SET_FILES",
-      files: {
-        [fileType]: {
-          ..._.event.file
-        }
-      },
-      addPolicy: parentAddPolicy
-    }))
-  ];
-}
+    }
+  })),
+  sendParent((_: { context: IContext; event: any }) => ({
+    type: "SET_FILES",
+    files: {
+      [fileType]: {
+        ..._.event.file
+      }
+    },
+    addPolicy: parentAddPolicy
+  }))
+];
 
-export const filesOnError = [
+export const filesErrorActions = [
   sendParent((_: { context: IContext; event: any }) => ({
     type: "FILES_ERROR",
     error: { ..._.event.error }

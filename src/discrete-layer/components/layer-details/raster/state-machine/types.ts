@@ -14,7 +14,7 @@ import { LayerRasterRecordInput } from '../../../../models/RootStore.base';
 export type ErrorSource = "api" | "logic";
 export type ErrorLevel = "error" | "warning";
 export type AddPolicy = "merge" | "override";
-export type SelectionMode = "auto" | "manual";
+export type SelectionMode = "auto" | "manual" | "restore";
 
 export interface IStateError {
   source: ErrorSource;
@@ -113,24 +113,20 @@ export const WORKFLOW = {
   IDLE: "idle",
   FILES: {
     ROOT: "files",
-    SELECTION_MODE: {
-      ROOT: "selectionMode",
-      DECIDE_MODE: "decideMode",
-      AUTO: {
-        ROOT: "auto",
-        IDLE: "idle",
-        SELECT_FILES: "selectFiles",
-        FETCH_PRODUCT: "fetchProduct",
-        CHECK_METADATA: "checkMetadata"
-      },
-      MANUAL: {
-        ROOT: "manual",
-        IDLE: "idle",
-        SELECT_GPKG: "selectGpkg",
-        FETCH_PRODUCT: "fetchProduct"
-      }
+    SELECTION_MODE: "selectionMode",
+    AUTO: {
+      ROOT: "auto",
+      IDLE: "idle",
+      SELECT_FILES: "selectFiles",
+      FETCH_PRODUCT: "fetchProduct",
+      CHECK_METADATA: "checkMetadata"
     },
-    ERROR: "error"
+    MANUAL: {
+      ROOT: "manual",
+      IDLE: "idle",
+      SELECT_GPKG: "selectGpkg",
+      FETCH_PRODUCT: "fetchProduct"
+    }
   },
   JOB_SUBMISSION: "jobSubmission",
   JOB_POLLING: "jobPolling",

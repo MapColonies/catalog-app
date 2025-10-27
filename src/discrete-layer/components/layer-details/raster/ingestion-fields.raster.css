@@ -4,6 +4,10 @@
   top: 40px;
 }
 
+#layerDetailsFormRaster .ingestionSwitchContainer.update {
+  top: 194px;
+}
+
 body[dir='rtl'] #layerDetailsFormRaster .ingestionSwitchContainer {
   right: unset;
   left: 78px;
@@ -34,6 +38,10 @@ body[dir='rtl'] #layerDetailsFormRaster .ingestionSwitch {
 
 #layerDetailsFormRaster .ingestionSwitch .MuiSwitch-switchBase {
   color: var(--mdc-theme-text-icon-on-dark);
+}
+
+#layerDetailsFormRaster .ingestionSwitch .MuiSwitch-input:disabled {
+  display: none;
 }
 
 #layerDetailsFormRaster .header {
