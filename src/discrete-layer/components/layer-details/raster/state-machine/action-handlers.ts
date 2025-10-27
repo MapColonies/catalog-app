@@ -1,5 +1,5 @@
 import { assign, sendParent } from 'xstate';
-import { AddPolicy, IContext } from './types';
+import { AddPolicy, IContext, IFiles } from './types';
 
 export const fetchProductActions = [
   assign((_: { context: IContext; event: any }) => ({
@@ -23,9 +23,9 @@ export const fetchProductActions = [
   sendParent({ type: "FILES_SELECTED" })
 ];
 
-export const selectionModeActions = (selectionMode: SelectionMode) => [
-  assign({ selectionMode, files: {} }),
-  sendParent({ type: "SET_FILES", files: {}, addPolicy: "override" })
+export const selectionModeActions = (selectionMode: SelectionMode, files: IFiles = {}) => [
+  assign({ selectionMode, files }),
+  sendParent({ type: "SET_FILES", files, addPolicy: "override" })
 ];
 
 export const selectFileActions = (fileType: 'gpkg' | 'product' | 'metadata', parentAddPolicy: AddPolicy = 'merge', preserveCurrent: boolean = true) => [

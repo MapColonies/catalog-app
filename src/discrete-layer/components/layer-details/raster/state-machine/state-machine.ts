@@ -54,7 +54,11 @@ const filesMachine = createMachine({
               target: WORKFLOW.FILES.AUTO.SELECT_FILES
             },
             MANUAL: {
-              actions: selectionModeActions('manual' as SelectionMode),
+              actions: selectionModeActions('manual' as SelectionMode, {
+                gpkg: { label: 'file-name.gpkg', path: '', exists: false },
+                product: { label: 'file-name.product', path: '', exists: false },
+                metadata: { label: 'file-name.metadata', path: '', exists: false }
+              }),
               target: `#${WORKFLOW.FILES.ROOT}`
             },
             "*": { actions: warnUnexpectedStateEvent }
