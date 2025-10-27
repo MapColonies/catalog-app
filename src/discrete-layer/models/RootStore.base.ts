@@ -249,6 +249,10 @@ export type SourceValidationParams = {
   fileNames: string[]
   type: RecordType
 }
+export type SourceGpkgValidationParams = {
+  gpkgFilesPath: string[]
+  type: RecordType
+}
 export type RecordUpdatePartial = {
   id: string
   type: RecordType
@@ -467,7 +471,8 @@ queryGetPointsHeights="queryGetPointsHeights",
 queryServicesAvailability="queryServicesAvailability",
 queryGetPolygonPartsFeature="queryGetPolygonPartsFeature",
 queryLogin="queryLogin",
-queryValidateSource="queryValidateSource"
+queryValidateSource="queryValidateSource",
+queryValidateGPKGSource="queryValidateGPKGSource"
 }
 export enum RootStoreBaseMutations {
 mutateUpdateStatus="mutateUpdateStatus",
@@ -476,7 +481,7 @@ mutateStartRasterIngestion="mutateStartRasterIngestion",
 mutateStartRasterUpdateGeopkg="mutateStartRasterUpdateGeopkg",
 mutateStart3DIngestion="mutateStart3DIngestion",
 mutateStartDemIngestion="mutateStartDemIngestion",
-mutateDelete3DLayer="mutateDelete3DLayer",
+mutateDeleteLayer="mutateDeleteLayer",
 mutateUpdateJob="mutateUpdateJob",
 mutateJobRetry="mutateJobRetry",
 mutateJobAbort="mutateJobAbort"
@@ -646,6 +651,11 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
         ${typeof resultSelector === "function" ? resultSelector(new SourceValidationModelSelector()).toString() : resultSelector}
       } }`, variables, options)
     },
+    queryValidateGPKGSource(variables: { data: SourceGpkgValidationParams }, resultSelector: string | ((qb: SourceValidationModelSelector) => SourceValidationModelSelector) = sourceValidationModelPrimitives.toString(), options: QueryOptions = {}) {
+      return self.query<{ validateGPKGSource: SourceValidationModelType[]}>(`query validateGPKGSource($data: SourceGPKGValidationParams!) { validateGPKGSource(data: $data) {
+        ${typeof resultSelector === "function" ? resultSelector(new SourceValidationModelSelector()).toString() : resultSelector}
+      } }`, variables, options)
+    },
     mutateUpdateStatus(variables: { data: RecordUpdatePartial }, optimisticUpdate?: () => void) {
       return self.mutate<{ updateStatus: string }>(`mutation updateStatus($data: RecordUpdatePartial!) { updateStatus(data: $data) }`, variables, optimisticUpdate)
     },
@@ -664,7 +674,7 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     mutateStartDemIngestion(variables: { data: IngestionDemData }, optimisticUpdate?: () => void) {
       return self.mutate<{ startDemIngestion: string }>(`mutation startDemIngestion($data: IngestionDemData!) { startDemIngestion(data: $data) }`, variables, optimisticUpdate)
     },
-    mutateDelete3DLayer(variables: { data: RecordDeletePartial }, optimisticUpdate?: () => void) {
+    mutateDeleteLayer(variables: { data: RecordDeletePartial }, optimisticUpdate?: () => void) {
       return self.mutate<{ deleteLayer: string }>(`mutation deleteLayer($data: RecordDeletePartial!) { deleteLayer(data: $data) }`, variables, optimisticUpdate)
     },
     mutateUpdateJob(variables: { data: JobUpdateData, id: string }, optimisticUpdate?: () => void) {

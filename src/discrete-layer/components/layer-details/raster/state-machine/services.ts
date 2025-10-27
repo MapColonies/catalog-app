@@ -49,20 +49,20 @@ const selectGpkg = async (context: IContext) => {
   const gpkgPath = context.files.gpkg.path;
 
   const result = await queryExecutor(async () => {
-    return await context.store.queryValidateSource({
+    return await context.store.queryValidateGPKGSource({
       data: {
-        fileNames: [path.basename(gpkgPath)],
-        originDirectory: path.dirname(gpkgPath),
+        gpkgFilesPath: [gpkgPath],
         type: RecordType.RECORD_RASTER,
       }
     });
   });
 
-  if (!result.validateSource[FIRST].isValid) {
-    throw (buildError('ingestion.error.invalid-source-file', result.validateSource[FIRST].message as string));
+  const validationGPKG = result.validateGPKGSource[FIRST];
+  if (!validationGPKG.isValid) {
+    throw (buildError('ingestion.error.invalid-source-file', validationGPKG.message as string));
   }
 
-  const validationResult = { ...result.validateSource[FIRST] };
+  const validationResult = { ...validationGPKG };
   const { feature, marker } = getFeatureAndMarker(validationResult.extentPolygon, FeatureType.SOURCE_EXTENT, FeatureType.SOURCE_EXTENT_MARKER);
 
   return {
@@ -188,16 +188,15 @@ export const SERVICES = {
       const gpkgPath = files.gpkg.path;
 
       const result = await queryExecutor(async () => {
-        return await input.context.store.queryValidateSource({
+        return await input.context.store.queryValidateGPKGSource({
           data: {
-            fileNames: [path.basename(gpkgPath)],
-            originDirectory: path.dirname(gpkgPath),
+            gpkgFilesPath: [gpkgPath],
             type: RecordType.RECORD_RASTER,
           }
         });
       });
 
-      const validationResult = { ...result.validateSource[FIRST] };
+      const validationResult = { ...result.validateGPKGSource[FIRST] };
       const { feature: gpkgFeature, marker: gpkgMarker } = getFeatureAndMarker(validationResult.extentPolygon, FeatureType.SOURCE_EXTENT, FeatureType.SOURCE_EXTENT_MARKER);
 
       let productFM: { feature: Feature<Geometry, GeoJsonProperties>; marker: Feature<Geometry, GeoJsonProperties>; } | undefined;
