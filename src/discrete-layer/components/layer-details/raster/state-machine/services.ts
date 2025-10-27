@@ -313,7 +313,7 @@ export const SERVICES = {
       };
     }),
     checkMetadataService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
-      const { metadata } = input.context.files ?? {};
+      const { metadata } = input.context.files || {};
       if (!metadata || !metadata.exists || !metadata.path) {
         throw buildError('ingestion.error.missing', METADATA_SHP);
       }

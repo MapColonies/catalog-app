@@ -13,7 +13,7 @@ import { get, isEmpty } from 'lodash';
 import * as Yup from 'yup';
 import { OptionalObjectSchema, TypeOfShape } from 'yup/lib/object';
 import { AnyObject } from 'yup/lib/types';
-import { Button, CircularProgress } from '@map-colonies/react-core';
+import { Button/*, CircularProgress*/ } from '@map-colonies/react-core';
 import { Box, CircularProgressBar } from '@map-colonies/react-components';
 import { ValidationsError } from '../../../../common/components/error/validations.error-presentor';
 import { mergeRecursive } from '../../../../common/helpers/object';
@@ -34,7 +34,12 @@ import { GeoFeaturesPresentorComponent } from './pp-map';
 import { FeatureType, PPMapStyles } from './pp-map.utils';
 import { StateError } from './state-error';
 import { RasterWorkflowContext } from './state-machine/context';
-import { disableUI, hasLoadingTagDeep } from './state-machine/helpers';
+import {
+  disableUI,
+  hasLoadingTagDeep,
+  isFilesSelected,
+  isJobSubmitted
+} from './state-machine/helpers';
 import { getUIIngestionFieldDescriptors } from './utils';
 
 import './layer-details-form.raster.css';
@@ -290,9 +295,9 @@ export const InnerRasterForm = (
           (mode === Mode.NEW || mode === Mode.UPDATE) &&
           <IngestionFields recordType={recordType} />
         }
-        <Box className={`content section ${(isLoading || !state.context?.files) ? 'curtainVisible' : ''}`}>
+        <Box className={`content section ${(isLoading || !isFilesSelected(state.context) || isJobSubmitted(state.context)) ? 'curtainVisible' : ''}`}>
           {
-            (isLoading || !state.context?.files) &&
+            (isLoading || !isFilesSelected(state.context) || isJobSubmitted(state.context)) &&
             <Box className="curtain"></Box>
           }
           <Box className="previewAndJobContainer">
@@ -357,7 +362,7 @@ export const InnerRasterForm = (
                 }
               >
                 <FormattedMessage id="general.ok-btn.text" />
-                {isLoading && <Box className="loadingOnTop"><CircularProgress/></Box>}
+                {/* {isLoading && <Box className="loadingOnTop"><CircularProgress/></Box>} */}
               </Button> :
               <Button
                 type="button"

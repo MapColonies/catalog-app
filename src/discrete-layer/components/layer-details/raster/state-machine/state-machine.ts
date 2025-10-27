@@ -8,16 +8,13 @@ import {
   selectFileActions,
   selectionModeActions
 } from './action-handlers';
-import { addError, warnUnexpectedStateEvent } from './helpers';
+import {
+  addError,
+  isFilesSelected,
+  warnUnexpectedStateEvent
+} from './helpers';
 import { SERVICES } from './services';
 import { IContext, STATE_TAGS, WORKFLOW } from './types';
-
-//#region --- Guards ---
-/*const hasSelectedFiles = (_: { context: IContext }) => {
-  const files = _.context.files ?? {};
-  return !!(files.gpkg && files.product && files.metadata);
-};*/
-//#endregion
 
 //#region --- FILES sub state machine ---
 const filesMachine = createMachine({
@@ -128,6 +125,9 @@ const filesMachine = createMachine({
             input: (_: { context: IContext; event: any }) => _,
             src: SERVICES[WORKFLOW.FILES.ROOT].checkMetadataService,
             onDone: {
+              actions: [
+                sendParent({ type: "FILES_SELECTED" })
+              ],
               target: WORKFLOW.FILES.AUTO.IDLE
             },
             onError: {
@@ -156,7 +156,7 @@ const filesMachine = createMachine({
             },
             SELECT_METADATA: {
               actions: selectFileActions('metadata'),
-              target: WORKFLOW.FILES.MANUAL.IDLE
+              target: WORKFLOW.FILES.MANUAL.CHECK_METADATA
             },
             AUTO: {
               actions: selectionModeActions('auto' as SelectionMode),
@@ -192,7 +192,12 @@ const filesMachine = createMachine({
                     }
                   },
                   addPolicy: "merge"
-                }))
+                })),
+                sendParent((_: { context: IContext; event: any }) => {
+                  return isFilesSelected(_.context)
+                    ? {type: "FILES_SELECTED"}
+                    : {type: "NOOP"};
+                })
               ],
               target: WORKFLOW.FILES.MANUAL.IDLE
             },
@@ -209,7 +214,31 @@ const filesMachine = createMachine({
             input: (_: { context: IContext; event: any }) => _,
             src: SERVICES[WORKFLOW.FILES.ROOT].fetchProductService,
             onDone: {
-              actions: fetchProductActions,
+              actions: [
+                ...fetchProductActions,
+                sendParent((_: { context: IContext; event: any }) => {
+                  return isFilesSelected(_.context)
+                    ? {type: "FILES_SELECTED"}
+                    : {type: "NOOP"};
+                })],
+              target: WORKFLOW.FILES.MANUAL.IDLE
+            },
+            onError: {
+              actions: filesErrorActions,
+              target: WORKFLOW.FILES.MANUAL.IDLE
+            }
+          }
+        },
+        [WORKFLOW.FILES.MANUAL.CHECK_METADATA]: {
+          entry: (_: { context: IContext; event: any }) => console.log(`>>> ${WORKFLOW.FILES.MANUAL.CHECK_METADATA}`, _),
+          tags: [STATE_TAGS.GENERAL_LOADING],
+          invoke: {
+            input: (_: { context: IContext; event: any }) => _,
+            src: SERVICES[WORKFLOW.FILES.ROOT].checkMetadataService,
+            onDone: {
+              actions: [
+                sendParent({ type: "FILES_SELECTED" })
+              ],
               target: WORKFLOW.FILES.MANUAL.IDLE
             },
             onError: {

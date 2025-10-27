@@ -19,8 +19,7 @@ export const fetchProductActions = [
       }
     },
     addPolicy: "merge"
-  })),
-  sendParent({ type: "FILES_SELECTED" })
+  }))
 ];
 
 export const selectionModeActions = (selectionMode: SelectionMode, files: IFiles = {}) => [
