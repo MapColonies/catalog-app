@@ -8,6 +8,7 @@ import { Button, Icon, Typography } from '@map-colonies/react-core';
 import { Selection } from '../../../../common/components/file-picker';
 import { FieldLabelComponent } from '../../../../common/components/form/field-label';
 import { dateFormatter } from '../../../../common/helpers/formatters';
+import { Mode } from '../../../../common/models/mode.enum';
 import { RecordType, LayerMetadataMixedUnion } from '../../../models';
 import { FilePickerDialog } from '../../dialogs/file-picker.dialog';
 // import { transformEntityToFormFields } from '../utils';
@@ -299,7 +300,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
 
   return (
     <>
-      <Box className="ingestionSwitchContainer">
+      <Box className={`ingestionSwitchContainer ${state.context.flowType === Mode.UPDATE ? 'update' : ''}`}>
         <Box className="ingestionSwitch">
           <Typography tag="p">
             <FormattedMessage id="switch.auto.text" />
