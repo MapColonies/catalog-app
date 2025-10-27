@@ -29,25 +29,6 @@ export const warnUnexpectedStateEvent = (_: any) => {
   console.warn(`[StateMachine] Unexpected event '${_.event.type}' in state '${_.self._snapshot.value}'`);
 };
 
-export const hasLoadingTagDeep = (state: SnapshotFrom<typeof workflowMachine>, tag = STATE_TAGS.GENERAL_LOADING): boolean => {
-  if (state && typeof state.hasTag === 'function' && state.hasTag(tag)) {
-    return true;
-  }
-  if (state && state.children) {
-    for (const child of Object.values(state.children)) {
-      const childSnap = child?.getSnapshot?.();
-      if (childSnap && hasLoadingTagDeep(childSnap)) {
-        return true;
-      }
-    }
-  }
-  return false;
-};
-
-export const disableUI = (state: SnapshotFrom<typeof workflowMachine>) => {
-  return state.value === WORKFLOW.DONE;
-};
-
 export const getFeatureAndMarker = (
   geometry: Geometry,
   featureFeatureType: FeatureType,
@@ -106,4 +87,34 @@ export const buildError = (
     addPolicy,
     response
   };
+};
+
+export const hasLoadingTagDeep = (state: SnapshotFrom<typeof workflowMachine>, tag = STATE_TAGS.GENERAL_LOADING): boolean => {
+  if (state && typeof state.hasTag === 'function' && state.hasTag(tag)) {
+    return true;
+  }
+  if (state && state.children) {
+    for (const child of Object.values(state.children)) {
+      const childSnap = child?.getSnapshot?.();
+      if (childSnap && hasLoadingTagDeep(childSnap)) {
+        return true;
+      }
+    }
+  }
+  return false;
+};
+
+export const isFilesSelected = (context: IContext): boolean => {
+  const files = context.files || {};
+  return !!(files.gpkg && files.gpkg?.path && files.gpkg?.exists &&
+    files.product && files.product?.path && files.product?.exists &&
+    files.metadata && files.metadata?.path && files.metadata?.exists);
+};
+
+export const isJobSubmitted = (context: IContext): boolean => {
+  return !!(context.job && context.job.jobId);
+};
+
+export const disableUI = (state: SnapshotFrom<typeof workflowMachine>) => {
+  return state.value === WORKFLOW.DONE;
 };
