@@ -1,24 +1,28 @@
 import { merge } from 'lodash';
 import { assign, createMachine, sendParent } from 'xstate';
+import { Mode } from '../../../../../common/models/mode.enum';
 import CONFIG from '../../../../../common/config';
 import { Status } from '../../../../models';
 import {
   fetchProductActions,
   filesErrorActions,
+  filesSelectedActions,
   selectFileActions,
   selectionModeActions
 } from './action-handlers';
-import { addError, warnUnexpectedStateEvent } from './helpers';
+import {
+  addError,
+  warnUnexpectedStateEvent
+} from './helpers';
 import { SERVICES } from './services';
-import { IContext, STATE_TAGS, WORKFLOW } from './types';
-import { Mode } from '../../../../../common/models/mode.enum';
-
-//#region --- Guards ---
-/*const hasSelectedFiles = (_: { context: IContext }) => {
-  const files = _.context.files ?? {};
-  return !!(files.gpkg && files.product && files.metadata);
-};*/
-//#endregion
+import {
+  GPKG_LABEL,
+  IContext,
+  METADATA_LABEL,
+  PRODUCT_LABEL,
+  STATE_TAGS,
+  WORKFLOW
+} from './types';
 
 //#region --- FILES sub state machine ---
 const filesMachine = createMachine({
@@ -56,9 +60,9 @@ const filesMachine = createMachine({
             },
             MANUAL: {
               actions: selectionModeActions('manual' as SelectionMode, {
-                gpkg: { label: 'file-name.gpkg', path: '', exists: false },
-                product: { label: 'file-name.product', path: '', exists: false },
-                metadata: { label: 'file-name.metadata', path: '', exists: false }
+                gpkg: { label: GPKG_LABEL, path: '', exists: false },
+                product: { label: PRODUCT_LABEL, path: '', exists: false },
+                metadata: { label: METADATA_LABEL, path: '', exists: false }
               }),
               target: `#${WORKFLOW.FILES.ROOT}`
             },
@@ -129,6 +133,9 @@ const filesMachine = createMachine({
             input: (_: { context: IContext; event: any }) => _,
             src: SERVICES[WORKFLOW.FILES.ROOT].checkMetadataService,
             onDone: {
+              actions: [
+                sendParent({ type: "FILES_SELECTED" })
+              ],
               target: WORKFLOW.FILES.AUTO.IDLE
             },
             onError: {
@@ -157,7 +164,7 @@ const filesMachine = createMachine({
             },
             SELECT_METADATA: {
               actions: selectFileActions('metadata'),
-              target: WORKFLOW.FILES.MANUAL.IDLE
+              target: WORKFLOW.FILES.MANUAL.CHECK_METADATA
             },
             AUTO: {
               actions: selectionModeActions('auto' as SelectionMode),
@@ -193,7 +200,8 @@ const filesMachine = createMachine({
                     }
                   },
                   addPolicy: "merge"
-                }))
+                })),
+                ...filesSelectedActions
               ],
               target: WORKFLOW.FILES.MANUAL.IDLE
             },
@@ -210,7 +218,28 @@ const filesMachine = createMachine({
             input: (_: { context: IContext; event: any }) => _,
             src: SERVICES[WORKFLOW.FILES.ROOT].fetchProductService,
             onDone: {
-              actions: fetchProductActions,
+              actions: [
+                ...fetchProductActions,
+                ...filesSelectedActions
+              ],
+              target: WORKFLOW.FILES.MANUAL.IDLE
+            },
+            onError: {
+              actions: filesErrorActions,
+              target: WORKFLOW.FILES.MANUAL.IDLE
+            }
+          }
+        },
+        [WORKFLOW.FILES.MANUAL.CHECK_METADATA]: {
+          entry: (_: { context: IContext; event: any }) => console.log(`>>> ${WORKFLOW.FILES.MANUAL.CHECK_METADATA}`, _),
+          tags: [STATE_TAGS.GENERAL_LOADING],
+          invoke: {
+            input: (_: { context: IContext; event: any }) => _,
+            src: SERVICES[WORKFLOW.FILES.ROOT].checkMetadataService,
+            onDone: {
+              actions: [
+                ...filesSelectedActions
+              ],
               target: WORKFLOW.FILES.MANUAL.IDLE
             },
             onError: {

@@ -1,4 +1,5 @@
 import { assign, sendParent } from 'xstate';
+import { isFilesSelected } from './helpers';
 import { AddPolicy, IContext, IFiles } from './types';
 
 export const fetchProductActions = [
@@ -19,8 +20,7 @@ export const fetchProductActions = [
       }
     },
     addPolicy: "merge"
-  })),
-  sendParent({ type: "FILES_SELECTED" })
+  }))
 ];
 
 export const selectionModeActions = (selectionMode: SelectionMode, files: IFiles = {}) => [
@@ -46,6 +46,14 @@ export const selectFileActions = (fileType: 'gpkg' | 'product' | 'metadata', par
     },
     addPolicy: parentAddPolicy
   }))
+];
+
+export const filesSelectedActions = [
+  sendParent((_: { context: IContext; event: any }) => {
+    return isFilesSelected(_.context)
+      ? {type: "FILES_SELECTED"}
+      : {type: "NOOP"};
+  })
 ];
 
 export const filesErrorActions = [
