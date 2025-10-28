@@ -6,6 +6,7 @@ import { Mode } from '../../../../../common/models/mode.enum';
 import {
   IBaseRootStore,
   IRootStore,
+  LayerRasterRecordModelType,
   SourceValidationModelType,
   Status
 } from '../../../../models';
@@ -66,6 +67,7 @@ export interface IContext {
   store: IRootStore | IBaseRootStore;
   errors: IStateError[];
   flowType?: Mode.NEW | Mode.UPDATE;
+  updatedLayer?: LayerRasterRecordModelType;
   selectionMode?: SelectionMode;
   files?: IFiles;
   resolutionDegree?: number;
@@ -74,7 +76,8 @@ export interface IContext {
 }
 
 export type Events =
-  | { type: "START", flowType: Mode, selectionMode: SelectionMode }
+  | { type: "START_NEW", selectionMode: SelectionMode }
+  | { type: "START_UPDATE", layerRecord: LayerRasterRecordModelType }
   | { type: "AUTO" }
   | { type: "MANUAL" }
   | { type: "SELECT_FILES", file: IGPKGFile }
@@ -111,6 +114,7 @@ export enum STATE_TAGS {
 export const WORKFLOW = {
   ROOT: "workflow",
   IDLE: "idle",
+  START_UPDATE: "startUpdate",
   FILES: {
     ROOT: "files",
     SELECTION_MODE: "selectionMode",
@@ -141,5 +145,6 @@ export const GPKG_PATH = '\\layerSources';
 export const SHAPES_DIR = '../../Shapes';
 export const PRODUCT_SHP = 'Product.shp';
 export const METADATA_SHP = 'ShapeMetadata.shp';
+export const GPKG_LABEL = 'file-name.gpkg';
 export const PRODUCT_LABEL = 'file-name.product';
 export const METADATA_LABEL = 'file-name.metadata';

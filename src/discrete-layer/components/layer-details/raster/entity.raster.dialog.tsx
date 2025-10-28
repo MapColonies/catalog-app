@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import { cloneDeep, isEmpty } from 'lodash';
 import * as Yup from 'yup';
 import { DialogContent } from '@material-ui/core';
-import { Dialog, DialogTitle, IconButton } from '@map-colonies/react-core';
+import { Dialog, DialogTitle, Icon, IconButton } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
 import { emphasizeByHTML } from '../../../../common/helpers/formatters';
 import { getTextStyle } from '../../../../common/helpers/style';
@@ -20,7 +20,8 @@ import {
   FieldConfigModelType,
   ProductType,
   ValidationValueType,
-  RecordStatus
+  RecordStatus,
+  LayerRasterRecordModelType
 } from '../../../models';
 import { ILayerImage } from '../../../models/layerImage';
 import { LayerRasterRecordInput } from '../../../models/RootStore.base';
@@ -116,11 +117,24 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
 
     useEffect(() => {
       if (actorRef) {
-        actorRef.send({
-          type: 'START',
-          flowType: (props.isSelectedLayerUpdateMode && props.layerRecord) ? Mode.UPDATE : Mode.NEW,
-          selectionMode: 'auto'
-        } satisfies Events);
+        //@ts-ignore
+        if (props.jobParams) {
+          actorRef.send({
+            type: 'RESTORE',
+            //@ts-ignore
+            data: props.jobParams,
+          } satisfies Events);
+        } else if(props.isSelectedLayerUpdateMode && props.layerRecord) {
+          actorRef.send({
+            type: 'START_UPDATE',
+            layerRecord: props.layerRecord as LayerRasterRecordModelType
+          } satisfies Events);
+        } else {
+          actorRef.send({
+            type: 'START_NEW',
+            selectionMode: 'auto'
+          } satisfies Events);
+        }
       }
     }, [props.isSelectedLayerUpdateMode, props.layerRecord, actorRef]);
     //#endregion
@@ -286,6 +300,15 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
               mode={Mode.VIEW}
             />
           </Box>
+          { 
+            state.context.selectionMode === 'restore' &&
+            <Box className='lockedIcon'>
+              <Icon
+                icon={{ icon: 'lock', size: 'xlarge' }}
+                />
+              <span>{ intl.formatMessage({ id: 'general.title.locked' }) }</span>
+            </Box>
+          }
         </Box>
       );
     };

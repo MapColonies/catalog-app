@@ -47,6 +47,7 @@
   "general.title.new": "New {value} product",
   "general.title.edit": "Edit {value} product's metadata",
   "general.title.update": "Update {value} product",
+  "general.title.locked": "The layer is locked for update",
   "general.title.delete": "Delete {value} product",
   "general.title.view": "View {value} product",
   "general.title.choose": "Choose files",
