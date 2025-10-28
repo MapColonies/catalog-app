@@ -14,7 +14,14 @@ import {
   warnUnexpectedStateEvent
 } from './helpers';
 import { SERVICES } from './services';
-import { IContext, STATE_TAGS, WORKFLOW } from './types';
+import {
+  GPKG_LABEL,
+  IContext,
+  METADATA_LABEL,
+  PRODUCT_LABEL,
+  STATE_TAGS,
+  WORKFLOW
+} from './types';
 
 //#region --- FILES sub state machine ---
 const filesMachine = createMachine({
@@ -52,9 +59,9 @@ const filesMachine = createMachine({
             },
             MANUAL: {
               actions: selectionModeActions('manual' as SelectionMode, {
-                gpkg: { label: 'file-name.gpkg', path: '', exists: false },
-                product: { label: 'file-name.product', path: '', exists: false },
-                metadata: { label: 'file-name.metadata', path: '', exists: false }
+                gpkg: { label: GPKG_LABEL, path: '', exists: false },
+                product: { label: PRODUCT_LABEL, path: '', exists: false },
+                metadata: { label: METADATA_LABEL, path: '', exists: false }
               }),
               target: `#${WORKFLOW.FILES.ROOT}`
             },
