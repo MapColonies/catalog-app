@@ -125,7 +125,7 @@ export const SERVICES = {
       }
 
       // const locked = job ? true : false;
-      const locked = false;
+      const locked = true;
       const result = { 
         locked,
         ...restoreData
