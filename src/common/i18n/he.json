@@ -47,7 +47,7 @@
   "general.title.new": "הוספת מוצר {value}",
   "general.title.edit": "עריכת מידע של מוצר {value}",
   "general.title.update": "עדכון מוצר {value}",
-  "general.title.locked": "השכבה נעולה לעדכון",
+  "general.title.locked": "בתהליך - נעול לעדכון",
   "general.title.delete": "מחיקת מוצר {value}",
   "general.title.view": "צפייה במוצר {value}",
   "general.title.choose": "בחירת קבצים",

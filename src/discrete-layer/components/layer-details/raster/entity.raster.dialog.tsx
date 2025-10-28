@@ -42,7 +42,7 @@ import {
   cleanUpEntityPayload
 } from '../utils';
 import EntityRasterForm from './layer-details-form.raster';
-import { Events, PartialIContext } from './state-machine/types';
+import { Events, IPartialContext } from './state-machine/types';
 import { RasterWorkflowProvider, RasterWorkflowContext } from './state-machine/context';
 import { getUIIngestionFieldDescriptors } from './utils';
 
@@ -58,7 +58,7 @@ interface EntityRasterDialogProps {
   recordType?: RecordType;
   layerRecord?: ILayerImage | null;
   isSelectedLayerUpdateMode?: boolean;
-  job?: PartialIContext;
+  job?: IPartialContext;
 }
 
 const setDefaultValues = (record: Record<string, unknown>, descriptors: EntityDescriptorModelType[]): void => {

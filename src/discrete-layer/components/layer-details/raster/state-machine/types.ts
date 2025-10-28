@@ -75,7 +75,7 @@ export interface IContext {
   job?: IJob;
 }
 
-export type PartialIContext = Omit<IContext, 'store' | 'errors'>;
+export interface IPartialContext extends Omit<IContext, 'store' | 'errors'> {};
 
 export type Events =
   | { type: "START_NEW", selectionMode: SelectionMode }
@@ -93,7 +93,7 @@ export type Events =
   | { type: "CLEAN_ERRORS" }
   | { type: "NOOP" }
   | { type: "SUBMIT", data: LayerRasterRecordInput, resolutionDegree: number }
-  | { type: "RESTORE", data: PartialIContext }
+  | { type: "RESTORE", data: IPartialContext }
   | { type: "RETRY" }
   | { type: "DONE" };
 
