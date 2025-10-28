@@ -59,7 +59,7 @@ body[dir='rtl'] #entityRasterDialog .closeIcon {
 
 #updateLayerHeader .lockedIcon {
   position: absolute;
-  right: 80px;
+  right: 50px;
   top: 40px;
   color: orange;
   display: flex;
