@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
+import { isEmpty } from 'lodash';
 import { observer } from 'mobx-react';
 // import path from 'path';
 import { Switch } from '@material-ui/core';
@@ -63,7 +64,7 @@ const IngestionInputs: React.FC<{ state: any }> = ({ state }) => {
       <FieldLabelComponent value={'field-names.ingestion.fileNames'} />
       <Box className="detailsFieldValue">
         {
-          !state.context?.files &&
+          isEmpty(state.context?.files) &&
           <Typography tag="span" className="empty disabledText">
             {'<'}<FormattedMessage id="general.empty.text" />{'>'}
           </Typography>
