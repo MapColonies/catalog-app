@@ -5,12 +5,12 @@ import { Status } from '../../../../models';
 import {
   fetchProductActions,
   filesErrorActions,
+  filesSelectedActions,
   selectFileActions,
   selectionModeActions
 } from './action-handlers';
 import {
   addError,
-  isFilesSelected,
   warnUnexpectedStateEvent
 } from './helpers';
 import { SERVICES } from './services';
@@ -200,11 +200,7 @@ const filesMachine = createMachine({
                   },
                   addPolicy: "merge"
                 })),
-                sendParent((_: { context: IContext; event: any }) => {
-                  return isFilesSelected(_.context)
-                    ? {type: "FILES_SELECTED"}
-                    : {type: "NOOP"};
-                })
+                ...filesSelectedActions
               ],
               target: WORKFLOW.FILES.MANUAL.IDLE
             },
@@ -223,11 +219,8 @@ const filesMachine = createMachine({
             onDone: {
               actions: [
                 ...fetchProductActions,
-                sendParent((_: { context: IContext; event: any }) => {
-                  return isFilesSelected(_.context)
-                    ? {type: "FILES_SELECTED"}
-                    : {type: "NOOP"};
-                })],
+                ...filesSelectedActions
+              ],
               target: WORKFLOW.FILES.MANUAL.IDLE
             },
             onError: {
@@ -244,7 +237,7 @@ const filesMachine = createMachine({
             src: SERVICES[WORKFLOW.FILES.ROOT].checkMetadataService,
             onDone: {
               actions: [
-                sendParent({ type: "FILES_SELECTED" })
+                ...filesSelectedActions
               ],
               target: WORKFLOW.FILES.MANUAL.IDLE
             },

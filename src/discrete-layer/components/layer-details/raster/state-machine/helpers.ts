@@ -106,9 +106,9 @@ export const hasLoadingTagDeep = (state: SnapshotFrom<typeof workflowMachine>, t
 
 export const isFilesSelected = (context: IContext): boolean => {
   const files = context.files || {};
-  return !!(files.gpkg && files.gpkg?.path && files.gpkg?.exists &&
-    files.product && files.product?.path && files.product?.exists &&
-    files.metadata && files.metadata?.path && files.metadata?.exists);
+  return !!(files.gpkg && files.gpkg.path && files.gpkg.exists === true &&
+    files.product && files.product.path && files.product.exists === true &&
+    files.metadata && files.metadata.path && files.metadata.exists === true);
 };
 
 export const isJobSubmitted = (context: IContext): boolean => {
