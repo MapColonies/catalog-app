@@ -8,6 +8,10 @@
   top: 194px;
 }
 
+#layerDetailsFormRaster .ingestionSwitchContainer.disabled {
+  opacity: 0.5;
+}
+
 body[dir='rtl'] #layerDetailsFormRaster .ingestionSwitchContainer {
   right: unset;
   left: 78px;
