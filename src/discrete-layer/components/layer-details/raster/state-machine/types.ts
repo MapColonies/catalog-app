@@ -142,5 +142,6 @@ export const GPKG_PATH = '\\layerSources';
 export const SHAPES_DIR = '../../Shapes';
 export const PRODUCT_SHP = 'Product.shp';
 export const METADATA_SHP = 'ShapeMetadata.shp';
+export const GPKG_LABEL = 'file-name.gpkg';
 export const PRODUCT_LABEL = 'file-name.product';
 export const METADATA_LABEL = 'file-name.metadata';

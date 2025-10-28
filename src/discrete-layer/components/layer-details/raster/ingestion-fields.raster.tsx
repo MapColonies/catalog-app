@@ -269,17 +269,17 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
         selectionMode: 'restore',
         files: {
           gpkg: {
-            label: 'file-name.gpkg',
+            label: GPKG_LABEL,
             path: path.resolve(GPKG_PATH, job.parameters.inputFiles.gpkgFilesPath[0]),
             exists: false
           },
           product: {
-            label: 'file-name.product',
+            label: PRODUCT_LABEL,
             path: path.resolve(GPKG_PATH, job.parameters.inputFiles.productShapefilePath),
             exists: false
           },
           metadata: {
-            label: 'file-name.metadata',
+            label: METADATA_LABEL,
             path: path.resolve(GPKG_PATH, job.parameters.inputFiles.metadataShapefilePath),
             exists: false
           }
