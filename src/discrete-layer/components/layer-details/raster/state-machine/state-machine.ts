@@ -1,5 +1,6 @@
 import { merge } from 'lodash';
 import { assign, createMachine, sendParent } from 'xstate';
+import { Mode } from '../../../../../common/models/mode.enum';
 import CONFIG from '../../../../../common/config';
 import { Status } from '../../../../models';
 import {
@@ -266,12 +267,19 @@ export const workflowMachine = createMachine<IContext, Events>({
   states: {
     [WORKFLOW.IDLE]: {
       entry: () => console.log(`>>> Enter ${WORKFLOW.ROOT.toUpperCase()}.${WORKFLOW.IDLE}`),
+      id: WORKFLOW.IDLE,
       on: {
-        START: {
+        START_NEW: {
           actions: assign((_: { context: IContext; event: any }) => ({
             ..._.event
           })),
           target: WORKFLOW.FILES.ROOT
+        },
+        START_UPDATE: {
+          actions: assign((_: { context: IContext; event: any }) => ({
+            ..._.event
+          })),
+          target: WORKFLOW.START_UPDATE
         },
         RESELECT_FILES: {
           target: WORKFLOW.FILES.ROOT
@@ -292,6 +300,36 @@ export const workflowMachine = createMachine<IContext, Events>({
           target: WORKFLOW.RESTORE_JOB
         },
         "*": { actions: warnUnexpectedStateEvent }
+      }
+    },
+    [WORKFLOW.START_UPDATE]: {
+      entry: () => console.log(`>>> Enter ${WORKFLOW.START_UPDATE}`),
+      invoke: {
+        input: (_: { context: IContext; event: any }) => _,
+        tags: [STATE_TAGS.GENERAL_LOADING],
+        src: SERVICES[WORKFLOW.ROOT].fetchActiveJobService,
+        onDone: [
+          {
+            guard: (_: { context: IContext; event: any }) => {
+              return _.event.output.locked;
+            },
+            actions: assign((_: { context: IContext; event: any }) => ({
+              ..._.event.output.data
+            })),
+            target: WORKFLOW.RESTORE_JOB
+          },
+          {
+            actions: assign((_: { context: IContext; event: any }) => ({
+              flowType: Mode.UPDATE,
+              selectionMode: 'auto'
+            })),
+            target: WORKFLOW.FILES.ROOT
+          }
+        ],
+        onError: {
+          actions: addError,
+          target: WORKFLOW.ERROR
+        }
       }
     },
     [WORKFLOW.FILES.ROOT]: {

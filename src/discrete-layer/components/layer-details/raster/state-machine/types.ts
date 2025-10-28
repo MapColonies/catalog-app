@@ -6,6 +6,7 @@ import { Mode } from '../../../../../common/models/mode.enum';
 import {
   IBaseRootStore,
   IRootStore,
+  LayerRasterRecordModelType,
   SourceValidationModelType,
   Status
 } from '../../../../models';
@@ -66,6 +67,7 @@ export interface IContext {
   store: IRootStore | IBaseRootStore;
   errors: IStateError[];
   flowType?: Mode.NEW | Mode.UPDATE;
+  updatedLayer?: LayerRasterRecordModelType;
   selectionMode?: SelectionMode;
   files?: IFiles;
   resolutionDegree?: number;
@@ -73,8 +75,11 @@ export interface IContext {
   job?: IJob;
 }
 
+export interface IPartialContext extends Omit<IContext, 'store' | 'errors'> {};
+
 export type Events =
-  | { type: "START", flowType: Mode, selectionMode: SelectionMode }
+  | { type: "START_NEW", selectionMode: SelectionMode }
+  | { type: "START_UPDATE", layerRecord: LayerRasterRecordModelType }
   | { type: "AUTO" }
   | { type: "MANUAL" }
   | { type: "SELECT_FILES", file: IGPKGFile }
@@ -88,7 +93,7 @@ export type Events =
   | { type: "CLEAN_ERRORS" }
   | { type: "NOOP" }
   | { type: "SUBMIT", data: LayerRasterRecordInput, resolutionDegree: number }
-  | { type: "RESTORE", data: Record<string, unknown> }
+  | { type: "RESTORE", data: IPartialContext }
   | { type: "RETRY" }
   | { type: "DONE" };
 
@@ -111,6 +116,7 @@ export enum STATE_TAGS {
 export const WORKFLOW = {
   ROOT: "workflow",
   IDLE: "idle",
+  START_UPDATE: "startUpdate",
   FILES: {
     ROOT: "files",
     SELECTION_MODE: "selectionMode",

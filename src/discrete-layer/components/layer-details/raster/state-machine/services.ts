@@ -5,6 +5,7 @@ import { fromPromise } from 'xstate';
 import { FileData } from '@map-colonies/react-components';
 import { Mode } from '../../../../../common/models/mode.enum';
 import {
+  LayerMetadataMixedUnion,
   RecordType,
   // EntityDescriptorModelType
 } from '../../../../models';
@@ -17,6 +18,8 @@ import { queryExecutor } from './query-executor';
 import {
   FIRST,
   FromPromiseArgs,
+  GPKG_LABEL,
+  GPKG_PATH,
   IContext,
   METADATA_LABEL,
   METADATA_SHP,
@@ -25,6 +28,8 @@ import {
   SHAPES_DIR,
   WORKFLOW
 } from './types';
+import { transformEntityToFormFields } from '../../utils';
+import { MOCK_JOB } from './MOCK';
 
 const getDetails = async (filePath: string, context: IContext): Promise<FileData | undefined> => {
   try {
@@ -77,6 +82,57 @@ const selectGpkg = async (context: IContext) => {
 
 export const SERVICES = {
   [WORKFLOW.ROOT]: {
+    fetchActiveJobService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
+
+      // const job = await queryExecutor(async () => {
+      //   return await input.context.store.queryGetActiveJob({
+      //     productId: input.context.updatedLayer?.productId,
+      //     productVersion: input.context.updatedLayer?.productVersion,
+      //     productType: input.context.updatedLayer?.productType
+      //   });
+      // });
+
+      const job = MOCK_JOB; // TODO: Mock should be removed
+
+      const restoreData = {
+        data: {
+          flowType: Mode.UPDATE,
+          selectionMode: 'restore',
+          files: {
+            gpkg: {
+              label: GPKG_LABEL,
+              path: path.resolve(GPKG_PATH, job.parameters.inputFiles.gpkgFilesPath[0]),
+              exists: false
+            },
+            product: {
+              label: PRODUCT_LABEL,
+              path: path.resolve(GPKG_PATH, job.parameters.inputFiles.productShapefilePath),
+              exists: false
+            },
+            metadata: {
+              label: METADATA_LABEL,
+              path: path.resolve(GPKG_PATH, job.parameters.inputFiles.metadataShapefilePath),
+              exists: false
+            }
+          },
+          resolutionDegree: job.parameters.ingestionResolution,
+          formData: {
+            ...transformEntityToFormFields(job.parameters.metadata as unknown as LayerMetadataMixedUnion)
+          },
+          job: {
+            jobId: job.id
+          }
+        }
+      }
+
+      // const locked = job ? true : false;
+      const locked = false;
+      const result = { 
+        locked,
+        ...restoreData
+      };
+      return result;
+    }),
     jobSubmissionService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
       /*const { store, files, resolutionDegree, formData } = input.context || {};
 
