@@ -75,6 +75,8 @@ export interface IContext {
   job?: IJob;
 }
 
+export type PartialIContext = Omit<IContext, 'store' | 'errors'>;
+
 export type Events =
   | { type: "START_NEW", selectionMode: SelectionMode }
   | { type: "START_UPDATE", layerRecord: LayerRasterRecordModelType }
@@ -91,7 +93,7 @@ export type Events =
   | { type: "CLEAN_ERRORS" }
   | { type: "NOOP" }
   | { type: "SUBMIT", data: LayerRasterRecordInput, resolutionDegree: number }
-  | { type: "RESTORE", data: Record<string, unknown> }
+  | { type: "RESTORE", data: PartialIContext }
   | { type: "RETRY" }
   | { type: "DONE" };
 

@@ -3,3 +3,4 @@ build/*
 src/icons/*
 src/**/*.spec.tsx
 src/setupTests.ts
+src/discrete-layer/components/layer-details/raster_OLD/

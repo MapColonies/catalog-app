@@ -21,7 +21,7 @@ import {
   ProductType,
   ValidationValueType,
   RecordStatus,
-  LayerRasterRecordModelType
+  LayerRasterRecordModelType,
 } from '../../../models';
 import { ILayerImage } from '../../../models/layerImage';
 import { LayerRasterRecordInput } from '../../../models/RootStore.base';
@@ -42,7 +42,7 @@ import {
   cleanUpEntityPayload
 } from '../utils';
 import EntityRasterForm from './layer-details-form.raster';
-import { Events } from './state-machine/types';
+import { Events, PartialIContext } from './state-machine/types';
 import { RasterWorkflowProvider, RasterWorkflowContext } from './state-machine/context';
 import { getUIIngestionFieldDescriptors } from './utils';
 
@@ -58,6 +58,7 @@ interface EntityRasterDialogProps {
   recordType?: RecordType;
   layerRecord?: ILayerImage | null;
   isSelectedLayerUpdateMode?: boolean;
+  job?: PartialIContext;
 }
 
 const setDefaultValues = (record: Record<string, unknown>, descriptors: EntityDescriptorModelType[]): void => {
@@ -118,12 +119,10 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
     useEffect(() => {
       if (!actorRef) return;
 
-      //@ts-ignore
-      if (props.jobParams) {
+      if (props.job) {
         actorRef.send({
           type: 'RESTORE',
-          //@ts-ignore
-          data: props.jobParams,
+          data: props.job,
         } satisfies Events);
       } else if(props.isSelectedLayerUpdateMode && props.layerRecord) {
         actorRef.send({
