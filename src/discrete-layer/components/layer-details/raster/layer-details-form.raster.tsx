@@ -295,10 +295,10 @@ export const InnerRasterForm = (
           (mode === Mode.NEW || mode === Mode.UPDATE) &&
           <IngestionFields recordType={recordType} />
         }
-        <Box className={`content section ${(isLoading || !isFilesSelected(state.context) || isJobSubmitted(state.context)) ? 'curtainVisible' : ''}`}>
+        <Box className="content section">
           {
             (isLoading || !isFilesSelected(state.context) || isJobSubmitted(state.context)) &&
-            <Box className="curtain"></Box>
+            <Box className={`curtain ${state.context.flowType === Mode.UPDATE ? 'update' : ''}`}></Box>
           }
           <Box className="previewAndJobContainer">
             <JobInfo />
