@@ -110,7 +110,8 @@ export type FromPromiseArgs<TInput> = {
 };
 
 export enum STATE_TAGS {
-  GENERAL_LOADING = 'GENERAL_LOADING'
+  FILES_LOADING = 'FILES_LOADING',
+  WORKFLOW_LOADING = 'WORKFLOW_LOADING'
 }
 
 export const WORKFLOW = {
