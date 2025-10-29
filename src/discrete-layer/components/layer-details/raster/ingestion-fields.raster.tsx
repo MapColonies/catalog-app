@@ -16,7 +16,7 @@ import { FilePickerDialog } from '../../dialogs/file-picker.dialog';
 import { RasterWorkflowContext } from './state-machine/context';
 import {
   disableUI,
-  // hasLoadingTagDeep
+  hasTagDeep
 } from './state-machine/helpers';
 // import { MOCK_JOB } from './state-machine/MOCK';
 import {
@@ -25,6 +25,7 @@ import {
   // GPKG_PATH,
   IFileBase,
   IFiles,
+  STATE_TAGS,
   // GPKG_LABEL,
   // PRODUCT_LABEL,
   // METADATA_LABEL
@@ -87,10 +88,10 @@ const IngestionInputs: React.FC<{ state: any }> = ({ state }) => {
 
 export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recordType }) => {
   const actorRef = RasterWorkflowContext.useActorRef();
-  // const isLoading = hasLoadingTagDeep(actorRef?.getSnapshot());
+  const isLoading = hasTagDeep(actorRef?.getSnapshot(), STATE_TAGS.FILES_LOADING);
   const state = RasterWorkflowContext.useSelector((s) => s);
   const filesActor = state.children?.files; // <-- the invoked child
-  // const flowState = flowActor?.getSnapshot(); // grab its snapshot
+  // const filesState = flowActor?.getSnapshot(); // grab its snapshot
 
   const [selectionMode, setSelectionMode] = useState<SelectionMode>(AUTO);
   const [isFilePickerDialogOpen, setFilePickerDialogOpen] = useState(false);
@@ -203,7 +204,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
           </Typography>
           <Switch
             checked={isManualMode}
-            disabled={disableUI(state)}
+            disabled={isLoading || disableUI(state)}
             onChange={handleSwitchClick} />
           <Typography tag="p">
             <FormattedMessage id="switch.manual.text" />
@@ -221,7 +222,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
                 raised
                 type="button"
                 className="manualButton"
-                disabled={disableUI(state)}
+                disabled={isLoading || disableUI(state)}
                 onClick={() => {
                   setSelectedAction(GPKG);
                   setFilePickerDialogOpen(true);
@@ -233,7 +234,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
                 raised
                 type="button"
                 className="manualButton"
-                disabled={disableUI(state)}
+                disabled={isLoading || disableUI(state)}
                 onClick={() => {
                   setSelectedAction(PRODUCT);
                   setFilePickerDialogOpen(true);
@@ -245,7 +246,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
                 raised
                 type="button"
                 className="manualButton"
-                disabled={disableUI(state)}
+                disabled={isLoading || disableUI(state)}
                 onClick={() => {
                   setSelectedAction(METADATA);
                   setFilePickerDialogOpen(true);
@@ -260,7 +261,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
                 raised
                 type="button"
                 className="autoButton"
-                disabled={disableUI(state)}
+                disabled={isLoading || disableUI(state)}
                 onClick={(): void => {
                   setSelectedAction(FILES);
                   setFilePickerDialogOpen(true);
