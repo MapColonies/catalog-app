@@ -59,11 +59,14 @@ const filesMachine = createMachine({
               target: WORKFLOW.FILES.AUTO.SELECT_FILES
             },
             MANUAL: {
-              actions: selectionModeActions('manual' as SelectionMode, {
-                gpkg: { label: GPKG_LABEL, path: '', exists: false },
-                product: { label: PRODUCT_LABEL, path: '', exists: false },
-                metadata: { label: METADATA_LABEL, path: '', exists: false }
-              }),
+              actions: [
+                ...selectionModeActions('manual' as SelectionMode, {
+                  gpkg: { label: GPKG_LABEL, path: '', exists: false },
+                  product: { label: PRODUCT_LABEL, path: '', exists: false },
+                  metadata: { label: METADATA_LABEL, path: '', exists: false }
+                }),
+                sendParent({ type: "CLEAN_ERRORS" })
+              ],
               target: `#${WORKFLOW.FILES.ROOT}`
             },
             "*": { actions: warnUnexpectedStateEvent }
@@ -167,7 +170,10 @@ const filesMachine = createMachine({
               target: WORKFLOW.FILES.MANUAL.CHECK_METADATA
             },
             AUTO: {
-              actions: selectionModeActions('auto' as SelectionMode),
+              actions: [
+                ...selectionModeActions('auto' as SelectionMode),
+                sendParent({ type: "CLEAN_ERRORS" })
+              ],
               target: `#${WORKFLOW.FILES.ROOT}`
             },
             "*": { actions: warnUnexpectedStateEvent }
