@@ -197,7 +197,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
 
   return (
     <>
-      <Box className={`ingestionSwitchContainer ${state.context.flowType === Mode.UPDATE ? 'update' : ''} ${disableUI(state) ? 'disabled' : ''}`}>
+      <Box className={`ingestionSwitchContainer ${state.context.flowType === Mode.UPDATE ? 'update' : ''} ${isLoading || disableUI(state) ? 'disabled' : ''}`}>
         <Box className="ingestionSwitch">
           <Typography tag="p">
             <FormattedMessage id="switch.auto.text" />

@@ -40,6 +40,7 @@ import {
   isFilesSelected,
   isJobSubmitted
 } from './state-machine/helpers';
+import { STATE_TAGS } from './state-machine/types';
 import { getUIIngestionFieldDescriptors } from './utils';
 
 import './layer-details-form.raster.css';
@@ -111,7 +112,7 @@ export const InnerRasterForm = (
 
   //#region STATE MACHINE
   const actorRef = RasterWorkflowContext.useActorRef();
-  const isLoading = hasTagDeep(actorRef?.getSnapshot());
+  const isLoading = hasTagDeep(actorRef?.getSnapshot(), STATE_TAGS.WORKFLOW_LOADING);
   const state = RasterWorkflowContext.useSelector((s) => s);
 
   useEffect(() => {
