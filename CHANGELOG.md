@@ -2,6 +2,37 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.25.0](https://github.com/MapColonies/catalog-app/compare/v2.24.1...v2.25.0) (2025-10-29)
+
+
+### Features
+
+* add delete dialog to 3D layer ([#675](https://github.com/MapColonies/catalog-app/issues/675)) ([78914a4](https://github.com/MapColonies/catalog-app/commit/78914a46ea6824d146cc6912da87f6a1bda6829f))
+* raster ingestion state machine ([#678](https://github.com/MapColonies/catalog-app/issues/678)) ([0aa2ceb](https://github.com/MapColonies/catalog-app/commit/0aa2cebee9bde203d98f16bf4b40c2e783f85ce2))
+* split source info queries ([#689](https://github.com/MapColonies/catalog-app/issues/689)) ([3da534c](https://github.com/MapColonies/catalog-app/commit/3da534c592bcda39f89f334ea9229d8876c3b3d0))
+* using callback url ( MAPCO-8712 ) ([#677](https://github.com/MapColonies/catalog-app/issues/677)) ([d9ef4a7](https://github.com/MapColonies/catalog-app/commit/d9ef4a70387a0eaad2d125582efe2b23f5a3842c))
+
+
+### Bug Fixes
+
+* cesium info panel overlap ([#674](https://github.com/MapColonies/catalog-app/issues/674)) ([bf5d091](https://github.com/MapColonies/catalog-app/commit/bf5d091d4992d295049bcf04c670bdf8a2c0f05a))
+* clean errors on mode switch ([#700](https://github.com/MapColonies/catalog-app/issues/700)) ([d5bbb97](https://github.com/MapColonies/catalog-app/commit/d5bbb97d4809003a2445b5c6b8fd9c46fdce2cad))
+* curtain ([#698](https://github.com/MapColonies/catalog-app/issues/698)) ([e97883b](https://github.com/MapColonies/catalog-app/commit/e97883be8b6afe62a202a6973de06dda61455356))
+* handle undefined filesActor ([#679](https://github.com/MapColonies/catalog-app/issues/679)) ([f27e02e](https://github.com/MapColonies/catalog-app/commit/f27e02e39945e23c0dcb7995b71a774435a7165d))
+* hardcoded labels ([#692](https://github.com/MapColonies/catalog-app/issues/692)) ([506bf57](https://github.com/MapColonies/catalog-app/commit/506bf57dc048a722b2cb4f0fc46e9698d46fa899))
+* loading ([#701](https://github.com/MapColonies/catalog-app/issues/701)) ([cc498ad](https://github.com/MapColonies/catalog-app/commit/cc498ad3ba50c82ef770e818a04b1c93715b0565))
+* loading ([#703](https://github.com/MapColonies/catalog-app/issues/703)) ([bbce7cc](https://github.com/MapColonies/catalog-app/commit/bbce7cc748552e953720dd469af96355f12758f4))
+* manual ([#690](https://github.com/MapColonies/catalog-app/issues/690)) ([c1f46d9](https://github.com/MapColonies/catalog-app/commit/c1f46d9a3376afcc6dc4d4a3d5fc13662a90c527))
+* manual mode missing labels ([#686](https://github.com/MapColonies/catalog-app/issues/686)) ([733c629](https://github.com/MapColonies/catalog-app/commit/733c629dead573d0b2a1ecc615601437938b877f))
+* maual ([#693](https://github.com/MapColonies/catalog-app/issues/693)) ([a29b2dd](https://github.com/MapColonies/catalog-app/commit/a29b2dd9cdb2ca6919526c342cd36c65b3613b65))
+* remove dolar sign ([#680](https://github.com/MapColonies/catalog-app/issues/680)) ([c5392f7](https://github.com/MapColonies/catalog-app/commit/c5392f7389bb071ec9d810fa811f5d7cf3f37468))
+* rename API to ExplorerGetByPath ([#639](https://github.com/MapColonies/catalog-app/issues/639)) ([f631e76](https://github.com/MapColonies/catalog-app/commit/f631e76151a8b52b1b871cb6c1aa649a0dedc3ec))
+* replace pp marker ([#672](https://github.com/MapColonies/catalog-app/issues/672)) ([204e4a4](https://github.com/MapColonies/catalog-app/commit/204e4a47c12205f6d2e49f5af9bcae7fa924c893))
+* restore ([#682](https://github.com/MapColonies/catalog-app/issues/682)) ([8794608](https://github.com/MapColonies/catalog-app/commit/8794608d60b61d114a669db542fdf6ec8829aef1))
+* selection mode ([#684](https://github.com/MapColonies/catalog-app/issues/684)) ([f3a1976](https://github.com/MapColonies/catalog-app/commit/f3a1976a556754cf4e9e371ce632f8d4d2e7996e))
+* share common statemachine logic ([#681](https://github.com/MapColonies/catalog-app/issues/681)) ([81ce4fd](https://github.com/MapColonies/catalog-app/commit/81ce4fdf499cbf516bfc4cf035343404ca038a43))
+* switch ([#687](https://github.com/MapColonies/catalog-app/issues/687)) ([9a48fdc](https://github.com/MapColonies/catalog-app/commit/9a48fdc686a4473162d39596655e0c9df0af3c24))
+
 ## [2.24.1](https://github.com/MapColonies/catalog-app/compare/v2.24.0...v2.24.1) (2025-09-14)
 
 
