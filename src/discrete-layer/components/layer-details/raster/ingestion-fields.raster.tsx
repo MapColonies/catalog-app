@@ -25,7 +25,6 @@ import {
   // GPKG_PATH,
   IFileBase,
   IFiles,
-  STATE_TAGS,
   // GPKG_LABEL,
   // PRODUCT_LABEL,
   // METADATA_LABEL
@@ -88,12 +87,12 @@ const IngestionInputs: React.FC<{ state: any }> = ({ state }) => {
 
 export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recordType }) => {
   const actorRef = RasterWorkflowContext.useActorRef();
-  const isLoading = hasTagDeep(actorRef?.getSnapshot(), STATE_TAGS.FILES_LOADING);
+  const isLoading = hasTagDeep(actorRef?.getSnapshot());
   const state = RasterWorkflowContext.useSelector((s) => s);
   const filesActor = state.children?.files; // <-- the invoked child
   // const filesState = flowActor?.getSnapshot(); // grab its snapshot
 
-  const [selectionMode, setSelectionMode] = useState<SelectionMode>(AUTO);
+  const [selectionMode, setSelectionMode] = useState<SelectionMode>(state.context.selectionMode as SelectionMode);
   const [isFilePickerDialogOpen, setFilePickerDialogOpen] = useState(false);
   const [selection, setSelection] = useState<Selection>({
     files: [],

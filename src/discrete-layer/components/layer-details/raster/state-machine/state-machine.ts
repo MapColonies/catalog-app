@@ -73,7 +73,7 @@ const filesMachine = createMachine({
         },
         [WORKFLOW.FILES.AUTO.SELECT_FILES]: {
           entry: () => console.log(`>>> Enter ${WORKFLOW.FILES.AUTO.SELECT_FILES}`),
-          tags: [STATE_TAGS.FILES_LOADING],
+          tags: [STATE_TAGS.GENERAL_LOADING],
           invoke: {
             input: (_: { context: IContext; event: any }) => _,
             src: SERVICES[WORKFLOW.FILES.ROOT].selectFilesService,
@@ -114,7 +114,7 @@ const filesMachine = createMachine({
         },
         [WORKFLOW.FILES.AUTO.FETCH_PRODUCT]: {
           entry: (_: { context: IContext; event: any }) => console.log(`>>> ${WORKFLOW.FILES.AUTO.FETCH_PRODUCT}`, _),
-          tags: [STATE_TAGS.FILES_LOADING],
+          tags: [STATE_TAGS.GENERAL_LOADING],
           invoke: {
             input: (_: { context: IContext; event: any }) => _,
             src: SERVICES[WORKFLOW.FILES.ROOT].fetchProductService,
@@ -130,7 +130,6 @@ const filesMachine = createMachine({
         },
         [WORKFLOW.FILES.AUTO.CHECK_METADATA]: {
           entry: (_: { context: IContext; event: any }) => console.log(`>>> ${WORKFLOW.FILES.AUTO.CHECK_METADATA}`, _),
-          tags: [STATE_TAGS.FILES_LOADING],
           invoke: {
             input: (_: { context: IContext; event: any }) => _,
             src: SERVICES[WORKFLOW.FILES.ROOT].checkMetadataService,
@@ -179,7 +178,7 @@ const filesMachine = createMachine({
         },
         [WORKFLOW.FILES.MANUAL.SELECT_GPKG]: {
           entry: () => console.log(`>>> Enter ${WORKFLOW.FILES.MANUAL.SELECT_GPKG}`),
-          tags: [STATE_TAGS.FILES_LOADING],
+          tags: [STATE_TAGS.GENERAL_LOADING],
           invoke: {
             input: (_: { context: IContext; event: any }) => _,
             src: SERVICES[WORKFLOW.FILES.ROOT].selectGpkgService,
@@ -217,7 +216,7 @@ const filesMachine = createMachine({
         },
         [WORKFLOW.FILES.MANUAL.FETCH_PRODUCT]: {
           entry: (_: { context: IContext; event: any }) => console.log(`>>> ${WORKFLOW.FILES.MANUAL.FETCH_PRODUCT}`, _),
-          tags: [STATE_TAGS.FILES_LOADING],
+          tags: [STATE_TAGS.GENERAL_LOADING],
           invoke: {
             input: (_: { context: IContext; event: any }) => _,
             src: SERVICES[WORKFLOW.FILES.ROOT].fetchProductService,
@@ -236,7 +235,6 @@ const filesMachine = createMachine({
         },
         [WORKFLOW.FILES.MANUAL.CHECK_METADATA]: {
           entry: (_: { context: IContext; event: any }) => console.log(`>>> ${WORKFLOW.FILES.MANUAL.CHECK_METADATA}`, _),
-          tags: [STATE_TAGS.FILES_LOADING],
           invoke: {
             input: (_: { context: IContext; event: any }) => _,
             src: SERVICES[WORKFLOW.FILES.ROOT].checkMetadataService,
@@ -308,7 +306,7 @@ export const workflowMachine = createMachine<IContext, Events>({
     },
     [WORKFLOW.START_UPDATE]: {
       entry: () => console.log(`>>> Enter ${WORKFLOW.START_UPDATE}`),
-      // tags: [STATE_TAGS.WORKFLOW_LOADING],
+      tags: [STATE_TAGS.GENERAL_LOADING],
       invoke: {
         input: (_: { context: IContext; event: any }) => _,
         src: SERVICES[WORKFLOW.ROOT].fetchActiveJobService,
@@ -366,7 +364,7 @@ export const workflowMachine = createMachine<IContext, Events>({
     },
     [WORKFLOW.JOB_SUBMISSION]: {
       entry: () => console.log(`>>> Enter ${WORKFLOW.JOB_SUBMISSION}`),
-      tags: [STATE_TAGS.WORKFLOW_LOADING],
+      tags: [STATE_TAGS.GENERAL_LOADING],
       invoke: {
         input: (_: { context: IContext; event: any }) => _,
         src: SERVICES[WORKFLOW.ROOT].jobSubmissionService,
