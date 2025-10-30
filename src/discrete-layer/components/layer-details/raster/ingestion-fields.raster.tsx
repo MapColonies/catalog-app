@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 // import path from 'path';
 import { Switch } from '@material-ui/core';
 import { Box, defaultFormatters, FileData } from '@map-colonies/react-components';
-import { Button, Icon, Typography } from '@map-colonies/react-core';
+import { Button, CircularProgress, Icon, Typography } from '@map-colonies/react-core';
 import { Selection } from '../../../../common/components/file-picker';
 import { FieldLabelComponent } from '../../../../common/components/form/field-label';
 import { dateFormatter } from '../../../../common/helpers/formatters';
@@ -16,7 +16,7 @@ import { FilePickerDialog } from '../../dialogs/file-picker.dialog';
 import { RasterWorkflowContext } from './state-machine/context';
 import {
   disableUI,
-  // hasLoadingTagDeep
+  hasTagDeep
 } from './state-machine/helpers';
 // import { MOCK_JOB } from './state-machine/MOCK';
 import {
@@ -87,12 +87,12 @@ const IngestionInputs: React.FC<{ state: any }> = ({ state }) => {
 
 export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recordType }) => {
   const actorRef = RasterWorkflowContext.useActorRef();
-  // const isLoading = hasLoadingTagDeep(actorRef?.getSnapshot());
+  const isLoading = hasTagDeep(actorRef?.getSnapshot());
   const state = RasterWorkflowContext.useSelector((s) => s);
   const filesActor = state.children?.files; // <-- the invoked child
-  // const flowState = flowActor?.getSnapshot(); // grab its snapshot
+  // const filesState = flowActor?.getSnapshot(); // grab its snapshot
 
-  const [selectionMode, setSelectionMode] = useState<SelectionMode>(AUTO);
+  const [selectionMode, setSelectionMode] = useState<SelectionMode>(state.context.selectionMode as SelectionMode);
   const [isFilePickerDialogOpen, setFilePickerDialogOpen] = useState(false);
   const [selection, setSelection] = useState<Selection>({
     files: [],
@@ -196,14 +196,14 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
 
   return (
     <>
-      <Box className={`ingestionSwitchContainer ${state.context.flowType === Mode.UPDATE ? 'update' : ''} ${disableUI(state) ? 'disabled' : ''}`}>
+      <Box className={`ingestionSwitchContainer ${state.context.flowType === Mode.UPDATE ? 'update' : ''} ${isLoading || disableUI(state) ? 'disabled' : ''}`}>
         <Box className="ingestionSwitch">
           <Typography tag="p">
             <FormattedMessage id="switch.auto.text" />
           </Typography>
           <Switch
             checked={isManualMode}
-            disabled={disableUI(state)}
+            disabled={isLoading || disableUI(state)}
             onChange={handleSwitchClick} />
           <Typography tag="p">
             <FormattedMessage id="switch.manual.text" />
@@ -217,11 +217,12 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
         {
           isManualMode ? (
             <Box className="ingestionManualButtons">
+              {isLoading && <Box className="loadingOnManual"><CircularProgress/></Box>}
               <Button
                 raised
                 type="button"
                 className="manualButton"
-                disabled={disableUI(state)}
+                disabled={isLoading || disableUI(state)}
                 onClick={() => {
                   setSelectedAction(GPKG);
                   setFilePickerDialogOpen(true);
@@ -233,7 +234,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
                 raised
                 type="button"
                 className="manualButton"
-                disabled={disableUI(state)}
+                disabled={isLoading || disableUI(state)}
                 onClick={() => {
                   setSelectedAction(PRODUCT);
                   setFilePickerDialogOpen(true);
@@ -245,7 +246,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
                 raised
                 type="button"
                 className="manualButton"
-                disabled={disableUI(state)}
+                disabled={isLoading || disableUI(state)}
                 onClick={() => {
                   setSelectedAction(METADATA);
                   setFilePickerDialogOpen(true);
@@ -260,13 +261,14 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
                 raised
                 type="button"
                 className="autoButton"
-                disabled={disableUI(state)}
+                disabled={isLoading || disableUI(state)}
                 onClick={(): void => {
                   setSelectedAction(FILES);
                   setFilePickerDialogOpen(true);
                 }}
               >
                 <FormattedMessage id="general.choose-btn.text" />
+                {isLoading && <Box className="loadingOnAuto"><CircularProgress/></Box>}
               </Button>
             </Box>
           )

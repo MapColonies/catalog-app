@@ -195,7 +195,7 @@ body[dir='rtl'] #layerDetailsFormRaster .enumOptions .mdc-select__dropdown-icon 
 
 #layerDetailsFormRaster .loadingOnTop {
   position: absolute;
-  top:6px;
+  top: 6px;
   left: 20px;
 }
 

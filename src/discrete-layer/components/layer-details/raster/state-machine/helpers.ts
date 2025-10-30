@@ -89,14 +89,14 @@ export const buildError = (
   };
 };
 
-export const hasLoadingTagDeep = (state: SnapshotFrom<typeof workflowMachine>, tag = STATE_TAGS.GENERAL_LOADING): boolean => {
+export const hasTagDeep = (state: SnapshotFrom<typeof workflowMachine>, tag = STATE_TAGS.GENERAL_LOADING): boolean => {
   if (state && typeof state.hasTag === 'function' && state.hasTag(tag)) {
     return true;
   }
   if (state && state.children) {
     for (const child of Object.values(state.children)) {
       const childSnap = child?.getSnapshot?.();
-      if (childSnap && hasLoadingTagDeep(childSnap)) {
+      if (childSnap && hasTagDeep(childSnap, tag)) {
         return true;
       }
     }
