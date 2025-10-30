@@ -202,6 +202,7 @@ export type LookupTableFieldInput = {
 export type ExplorerGetByPath = {
   path: string
   type: RecordType
+  selectableFile?: string
 }
 export type ExplorerGetById = {
   id: string
