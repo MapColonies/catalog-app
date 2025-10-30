@@ -46,6 +46,7 @@ interface FilePickerDialogProps {
   onFilesSelection: (selected: Selection) => void;
   selection: Selection;
   fetchMetaData?: boolean;
+  selectableFileType?: string; 
 }
 
 const getSuffixFromFolderChain = (folderChain: FileData[]): string => {
@@ -60,6 +61,7 @@ export const FilePickerDialog: React.FC<FilePickerDialogProps> = observer(
     onFilesSelection,
     selection: currentSelection,
     fetchMetaData=true,
+    selectableFileType=undefined
   }) => {
     const filePickerRef = useRef<FilePickerComponentHandle>(null);
     const [files, setFiles] = useState<FileData[]>([]);
@@ -85,6 +87,7 @@ export const FilePickerDialog: React.FC<FilePickerDialogProps> = observer(
           data: {
             path,
             type: recordType,
+            selectableFile: selectableFileType
           },
         })
       );

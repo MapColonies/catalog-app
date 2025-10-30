@@ -102,6 +102,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
   });
   const [selectedAction, setSelectedAction] = useState<string | null>(null);
   const [pendingFileEvent, setPendingFileEvent] = useState<Events | null>(null);
+  const [selectableType, setSelectableType] = useState('');
 
   useEffect(() => {
     if (pendingFileEvent && filesActor) {
@@ -227,6 +228,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
                 onClick={() => {
                   setSelectedAction(GPKG);
                   setFilePickerDialogOpen(true);
+                  setSelectableType('gpkg');
                 }}
               >
                 <FormattedMessage id="general.choose-btn.text" />
@@ -239,6 +241,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
                 onClick={() => {
                   setSelectedAction(PRODUCT);
                   setFilePickerDialogOpen(true);
+                  setSelectableType('shp');
                 }}
               >
                 <FormattedMessage id="general.choose-btn.text" />
@@ -251,6 +254,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
                 onClick={() => {
                   setSelectedAction(METADATA);
                   setFilePickerDialogOpen(true);
+                  setSelectableType('shp');
                 }}
               >
                 <FormattedMessage id="general.choose-btn.text" />
@@ -266,6 +270,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
                 onClick={(): void => {
                   setSelectedAction(FILES);
                   setFilePickerDialogOpen(true);
+                  setSelectableType('gpkg');
                 }}
               >
                 <FormattedMessage id="general.choose-btn.text" />
@@ -283,6 +288,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
           onSetOpen={setFilePickerDialogOpen}
           onFilesSelection={onFilesSelection}
           selection={selection}
+          selectableFileType={selectableType}
         />
       }
     </>
