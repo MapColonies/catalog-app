@@ -7,10 +7,8 @@ import { Mode } from '../../../../../common/models/mode.enum';
 import {
   LayerMetadataMixedUnion,
   RecordType,
-  // EntityDescriptorModelType
 } from '../../../../models';
-// import { LayerRasterRecordInput } from '../../../../models/RootStore.base';
-// import { cleanUpEntityPayload, getFlatEntityDescriptors } from '../../utils';
+import { LayerRasterRecordInput } from '../../../../models/RootStore.base';
 import { FeatureType } from '../pp-map.utils';
 import { buildError, getFeatureAndMarker, getFile } from './helpers';
 import { MOCK_POLYGON } from './MOCK';
@@ -134,46 +132,36 @@ export const SERVICES = {
       return result;
     }),
     jobSubmissionService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
-      /*const { store, files, resolutionDegree, formData } = input.context || {};
+      const { store, files, resolutionDegree, formData } = input.context || {};
 
       const data = {
         ingestionResolution: resolutionDegree as number,
         inputFiles: {
-          gpkgFilesPath: [files?.gpkg?.path],
-          productShapefilePath: files?.product?.path,
-          metadataShapefilePath: files?.metadata?.path
+          gpkgFilesPath: [files?.gpkg?.path] as string[],
+          productShapefilePath: files?.product?.path as string,
+          metadataShapefilePath: files?.metadata?.path as string
         },
-        metadata: formData ?? {},
-        callbackUrls: ['https://my-dns-for-callback'],
+        metadata: (formData ?? {}) as LayerRasterRecordInput,
         type: RecordType.RECORD_RASTER,
-      };*/
+      };
 
       let result;
       if (input.context.flowType === Mode.NEW) {
-        /* result = await queryExecutor(async () => {
+        result = await queryExecutor(async () => {
           return await store.mutateStartRasterIngestion({ data });
         });
-        if (!result || !result.startRasterIngestion.jobId || !res.startRasterIngestion.taskIds[0]) {
-          throw buildError('general.server.error');
-        } */
       } else if (input.context.flowType === Mode.UPDATE) {
-        /* result = await queryExecutor(async () => {
+        result = await queryExecutor(async () => {
           return await store.mutateStartRasterUpdateGeopkg({ data });
         });
-        if (!result || !result.startRasterUpdateGeopkg.jobId || !res.startRasterIngestion.taskIds[0]) {
-          throw buildError('general.server.error');
-        } */
       }
+
       result = {
-        jobId: '8b62987a-c1f7-4326-969e-ceca4c81b5aa',
-        taskIds: [
-          '3fa85f64-5717-4562-b3fc-2c963f66afa6'
-        ]
+        jobId: MOCK_JOB.id, // TODO: Mock should be removed
       };
 
       return {
         jobId: result.jobId,
-        taskId: result.taskIds[0]
       };
     }),
     jobPollingService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
