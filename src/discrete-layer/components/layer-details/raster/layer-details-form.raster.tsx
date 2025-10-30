@@ -13,7 +13,7 @@ import { get, isEmpty } from 'lodash';
 import * as Yup from 'yup';
 import { OptionalObjectSchema, TypeOfShape } from 'yup/lib/object';
 import { AnyObject } from 'yup/lib/types';
-import { Button, CircularProgress } from '@map-colonies/react-core';
+import { Button } from '@map-colonies/react-core';
 import { Box, CircularProgressBar } from '@map-colonies/react-components';
 import { ValidationsError } from '../../../../common/components/error/validations.error-presentor';
 import { mergeRecursive } from '../../../../common/helpers/object';
@@ -40,7 +40,6 @@ import {
   isFilesSelected,
   isJobSubmitted
 } from './state-machine/helpers';
-import { STATE_TAGS } from './state-machine/types';
 import { getUIIngestionFieldDescriptors } from './utils';
 
 import './layer-details-form.raster.css';
