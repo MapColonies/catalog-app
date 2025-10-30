@@ -25,7 +25,6 @@ import {
   // GPKG_PATH,
   IFileBase,
   IFiles,
-  STATE_TAGS,
   // GPKG_LABEL,
   // PRODUCT_LABEL,
   // METADATA_LABEL
@@ -93,7 +92,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
   const filesActor = state.children?.files; // <-- the invoked child
   // const filesState = flowActor?.getSnapshot(); // grab its snapshot
 
-  const [selectionMode, setSelectionMode] = useState<SelectionMode>(AUTO);
+  const [selectionMode, setSelectionMode] = useState<SelectionMode>(state.context.selectionMode as SelectionMode);
   const [isFilePickerDialogOpen, setFilePickerDialogOpen] = useState(false);
   const [selection, setSelection] = useState<Selection>({
     files: [],

@@ -130,7 +130,6 @@ const filesMachine = createMachine({
         },
         [WORKFLOW.FILES.AUTO.CHECK_METADATA]: {
           entry: (_: { context: IContext; event: any }) => console.log(`>>> ${WORKFLOW.FILES.AUTO.CHECK_METADATA}`, _),
-          tags: [STATE_TAGS.GENERAL_LOADING],
           invoke: {
             input: (_: { context: IContext; event: any }) => _,
             src: SERVICES[WORKFLOW.FILES.ROOT].checkMetadataService,
@@ -236,7 +235,6 @@ const filesMachine = createMachine({
         },
         [WORKFLOW.FILES.MANUAL.CHECK_METADATA]: {
           entry: (_: { context: IContext; event: any }) => console.log(`>>> ${WORKFLOW.FILES.MANUAL.CHECK_METADATA}`, _),
-          tags: [STATE_TAGS.GENERAL_LOADING],
           invoke: {
             input: (_: { context: IContext; event: any }) => _,
             src: SERVICES[WORKFLOW.FILES.ROOT].checkMetadataService,
