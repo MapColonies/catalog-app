@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 // import path from 'path';
 import { Switch } from '@material-ui/core';
 import { Box, defaultFormatters, FileData } from '@map-colonies/react-components';
-import { Button, Icon, Typography } from '@map-colonies/react-core';
+import { Button, CircularProgress, Icon, Typography } from '@map-colonies/react-core';
 import { Selection } from '../../../../common/components/file-picker';
 import { FieldLabelComponent } from '../../../../common/components/form/field-label';
 import { dateFormatter } from '../../../../common/helpers/formatters';
@@ -218,6 +218,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
         {
           isManualMode ? (
             <Box className="ingestionManualButtons">
+              {isLoading && <Box className="loadingOnManual"><CircularProgress/></Box>}
               <Button
                 raised
                 type="button"
@@ -268,6 +269,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
                 }}
               >
                 <FormattedMessage id="general.choose-btn.text" />
+                {isLoading && <Box className="loadingOnAuto"><CircularProgress/></Box>}
               </Button>
             </Box>
           )
