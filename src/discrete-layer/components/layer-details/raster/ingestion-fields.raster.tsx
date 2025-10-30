@@ -88,7 +88,7 @@ const IngestionInputs: React.FC<{ state: any }> = ({ state }) => {
 
 export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recordType }) => {
   const actorRef = RasterWorkflowContext.useActorRef();
-  const isLoading = hasTagDeep(actorRef?.getSnapshot(), STATE_TAGS.FILES_LOADING);
+  const isLoading = hasTagDeep(actorRef?.getSnapshot());
   const state = RasterWorkflowContext.useSelector((s) => s);
   const filesActor = state.children?.files; // <-- the invoked child
   // const filesState = flowActor?.getSnapshot(); // grab its snapshot
