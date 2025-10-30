@@ -132,7 +132,8 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
       } else {
         actorRef.send({
           type: 'START_NEW',
-          selectionMode: 'auto'
+          selectionMode: 'auto',
+          flowType: Mode.NEW,
         } satisfies Events);
       }
     }, [props.isSelectedLayerUpdateMode, props.layerRecord, actorRef]);

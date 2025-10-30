@@ -78,7 +78,7 @@ export interface IContext {
 export interface IPartialContext extends Omit<IContext, 'store' | 'errors'> {};
 
 export type Events =
-  | { type: "START_NEW", selectionMode: SelectionMode }
+  | { type: "START_NEW", selectionMode: SelectionMode, flowType: Mode.NEW }
   | { type: "START_UPDATE", layerRecord: LayerRasterRecordModelType }
   | { type: "AUTO" }
   | { type: "MANUAL" }
