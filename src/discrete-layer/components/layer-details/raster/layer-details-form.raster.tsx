@@ -112,7 +112,7 @@ export const InnerRasterForm = (
 
   //#region STATE MACHINE
   const actorRef = RasterWorkflowContext.useActorRef();
-  const isLoading = hasTagDeep(actorRef?.getSnapshot(), STATE_TAGS.WORKFLOW_LOADING);
+  const isLoading = hasTagDeep(actorRef?.getSnapshot());
   const state = RasterWorkflowContext.useSelector((s) => s);
 
   useEffect(() => {
@@ -363,7 +363,6 @@ export const InnerRasterForm = (
                 }
               >
                 <FormattedMessage id="general.ok-btn.text" />
-                {isLoading && <Box className="loadingOnTop"><CircularProgress/></Box>}
               </Button> :
               <Button
                 type="button"

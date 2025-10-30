@@ -89,7 +89,7 @@ export const buildError = (
   };
 };
 
-export const hasTagDeep = (state: SnapshotFrom<typeof workflowMachine>, tag: STATE_TAGS): boolean => {
+export const hasTagDeep = (state: SnapshotFrom<typeof workflowMachine>, tag = STATE_TAGS.GENERAL_LOADING): boolean => {
   if (state && typeof state.hasTag === 'function' && state.hasTag(tag)) {
     return true;
   }
