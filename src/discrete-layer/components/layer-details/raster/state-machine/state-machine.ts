@@ -308,7 +308,7 @@ export const workflowMachine = createMachine<IContext, Events>({
     },
     [WORKFLOW.START_UPDATE]: {
       entry: () => console.log(`>>> Enter ${WORKFLOW.START_UPDATE}`),
-      tags: [STATE_TAGS.WORKFLOW_LOADING],
+      // tags: [STATE_TAGS.WORKFLOW_LOADING],
       invoke: {
         input: (_: { context: IContext; event: any }) => _,
         src: SERVICES[WORKFLOW.ROOT].fetchActiveJobService,

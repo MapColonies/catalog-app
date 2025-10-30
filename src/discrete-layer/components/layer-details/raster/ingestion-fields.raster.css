@@ -100,6 +100,17 @@ body[dir='rtl'] #layerDetailsFormRaster .header {
   width: 80px;
 }
 
+#layerDetailsFormRaster .loadingOnManual {
+  position: absolute;
+  top: 100px;
+}
+
+#layerDetailsFormRaster .loadingOnAuto {
+  position: absolute;
+  top: 6px;
+  left: 26px;
+}
+
 #layerDetailsFormRaster .empty {
   margin: 0 12px;
 }
