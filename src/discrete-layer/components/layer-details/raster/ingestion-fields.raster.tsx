@@ -10,7 +10,7 @@ import { Selection } from '../../../../common/components/file-picker';
 import { FieldLabelComponent } from '../../../../common/components/form/field-label';
 import { dateFormatter } from '../../../../common/helpers/formatters';
 import { Mode } from '../../../../common/models/mode.enum';
-import { RecordType, LayerMetadataMixedUnion } from '../../../models';
+import { RecordType, LayerMetadataMixedUnion, FileType } from '../../../models';
 import { FilePickerDialog } from '../../dialogs/file-picker.dialog';
 // import { transformEntityToFormFields } from '../utils';
 import { RasterWorkflowContext } from './state-machine/context';
@@ -101,7 +101,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
   });
   const [selectedAction, setSelectedAction] = useState<string | null>(null);
   const [pendingFileEvent, setPendingFileEvent] = useState<Events | null>(null);
-  const [selectableType, setSelectableType] = useState('');
+  const [fileType, setFileType] = useState<FileType>();
 
   useEffect(() => {
     if (pendingFileEvent && filesActor) {
@@ -227,7 +227,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
                 onClick={() => {
                   setSelectedAction(GPKG);
                   setFilePickerDialogOpen(true);
-                  setSelectableType('gpkg');
+                  setFileType(FileType.GPKG);
                 }}
               >
                 <FormattedMessage id="general.choose-btn.text" />
@@ -240,7 +240,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
                 onClick={() => {
                   setSelectedAction(PRODUCT);
                   setFilePickerDialogOpen(true);
-                  setSelectableType('shp');
+                  setFileType(FileType.SHP);
                 }}
               >
                 <FormattedMessage id="general.choose-btn.text" />
@@ -253,7 +253,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
                 onClick={() => {
                   setSelectedAction(METADATA);
                   setFilePickerDialogOpen(true);
-                  setSelectableType('shp');
+                  setFileType(FileType.SHP);
                 }}
               >
                 <FormattedMessage id="general.choose-btn.text" />
@@ -269,7 +269,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
                 onClick={(): void => {
                   setSelectedAction(FILES);
                   setFilePickerDialogOpen(true);
-                  setSelectableType('gpkg');
+                  setFileType(FileType.GPKG);
                 }}
               >
                 <FormattedMessage id="general.choose-btn.text" />
@@ -287,7 +287,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
           onSetOpen={setFilePickerDialogOpen}
           onFilesSelection={onFilesSelection}
           selection={selection}
-          selectableFileType={selectableType}
+          fileType={fileType}
         />
       }
     </>

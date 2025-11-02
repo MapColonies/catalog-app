@@ -122,6 +122,7 @@ import { FractionType } from "./FractionTypeEnum"
 import { ProviderType } from "./ProviderTypeEnum"
 import { ServiceType } from "./ServiceTypeEnum"
 import { Status } from "./StatusEnum"
+import { FileType } from "./FileTypeEnum"
 
 export type CapabilitiesLayersSearchParams = {
   data: CapabilitiesLayersSearchParam[]
@@ -202,7 +203,7 @@ export type LookupTableFieldInput = {
 export type ExplorerGetByPath = {
   path: string
   type: RecordType
-  selectableFile?: string
+  fileType?: FileType
 }
 export type ExplorerGetById = {
   id: string
