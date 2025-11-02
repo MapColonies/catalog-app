@@ -323,7 +323,7 @@ export const workflowMachine = createMachine<IContext, Events>({
           {
             actions: assign((_: { context: IContext; event: any }) => ({
               flowType: Mode.UPDATE,
-              selectionMode: 'auto'
+              selectionMode: CONFIG.SELECTION_MODE ?? 'auto'
             })),
             target: WORKFLOW.FILES.ROOT
           }

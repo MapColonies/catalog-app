@@ -21,7 +21,8 @@ import { Mode } from '../../../../common/models/mode.enum';
 import {
   EntityDescriptorModelType,
   LayerMetadataMixedUnion,
-  RecordType
+  RecordType,
+  Status
 } from '../../../models';
 import { LayersDetailsComponent } from '../layer-details';
 import {
@@ -347,8 +348,22 @@ export const InnerRasterForm = (
             }
           </Box>
           <Box className="buttons">
+            <Button
+              outlined
+              type="button"
+              disabled={
+                Object.keys(errors).length > NONE ||
+                (Object.keys(getStatusErrors()).length > NONE)
+              }
+              onClick={(e): void => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+            >
+              <FormattedMessage id="general.go-to-job-manager-btn.text" />
+            </Button>
             {
-              (mode === Mode.NEW || customError === undefined) ?
+              !state.context.job &&
               <Button
                 raised
                 type="submit"
@@ -362,21 +377,25 @@ export const InnerRasterForm = (
                 }
               >
                 <FormattedMessage id="general.ok-btn.text" />
-              </Button> :
+              </Button>
+            
+            }
+            {
+              (state.context.job?.taskStatus === Status.Failed ||
+              (state.context.job?.taskStatus === Status.Completed && state.context.job?.report)) &&
               <Button
-                type="button"
                 raised
+                type="button"
                 disabled={
                   Object.keys(errors).length > NONE ||
-                  (Object.keys(getStatusErrors()).length > NONE) ||
-                  disableUI(state)
+                  (Object.keys(getStatusErrors()).length > NONE)
                 }
                 onClick={(e): void => {
                   e.preventDefault();
                   e.stopPropagation();
                 }}
               >
-                <FormattedMessage id="general.check-btn.text" />
+                <FormattedMessage id="general.rerun-btn.text" />
               </Button>
             }
             <Button

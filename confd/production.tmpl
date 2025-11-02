@@ -2,14 +2,14 @@ var MAP_SERVER = '{{ getv "/configuration/mapserver/url" "http://10.28.11.95:808
 window._env_ = {
   LANGUAGE: '{{ getv "/configuration/ui/language" "he" }}',
   BACKEND_LOCALE: '{{ getv "/configuration/ui/backend/locale" "he" }}',
+  SERVICE_PROTOCOL: '{{ getv "/configuration/service/protocol" "http://" }}',
+  SERVICE_NAME: '{{ getv "/configuration/service/name" "localhost:8080/graphql" }}',
+  CATALOG_APP_USER_ID: '{{ getv "/configuration/catalogAppUserId" "catalog-app-{CURRENT_USER}@mapcolonies.net" }}',
   MAP_SERVER: MAP_SERVER,
   PUBLISH_POINT: '{{ getv "/configuration/mapServer/publishPoint" "combined_layers" }}',
   CHANNEL: '{{ getv "/configuration/mapServer/channel" "Artzi_Planet_Optimaized" }}',
   VERSION: '{{ getv "/configuration/mapServer/version" "1" }}',
   REQUEST: '{{ getv "/configuration/mapServer/request" "ImageryMaps" }}',
-  SERVICE_PROTOCOL: '{{ getv "/configuration/service/protocol" "http://" }}',
-  SERVICE_NAME: '{{ getv "/configuration/service/url" "localhost:8080/graphql" }}',
-  CATALOG_APP_USER_ID: '{{ getv "/configuration/catalogAppUserId" "catalog-app-{CURRENT_USER}@mapcolonies.net" }}',
   ACTIVE_LAYER: '{{ getv "/configuration/activeLayer" "OSM_LAYER" }}',
   ACTIVE_LAYER_PROPERTIES: {
     urlPattern: MAP_SERVER + '{{ getv "/configuration/active/layer/properties/mapurlpath" "/service" }}',
@@ -67,6 +67,7 @@ window._env_ = {
   WHATSNEW_URL: '{{ getv "/configuration/whatsnew/url" "http://whatsnew-URL" }}',
   SITES_CONFIG: '{{ getv "/configuration/sites/config" "{\"masters\": [{ \"dns\": \"http://localhost:3000\", \"isAlias\": false }], \"slaves\": [{ \"dns\": \"http://localhost:8090\", \"isAlias\": false }], \"generics\": [{ \"dns\": \"https://catalog.mapcolonies.net\", \"isAlias\": false }]}" }}',
   BFF_PATH: '{{ getv "/configuration/bff/path" "/graphql" }}',
+  SELECTION_MODE: '{{ getv "/configuration/selection/mode" "auto" }}',
   POLYGON_PARTS: {
     featureTypePrefix: '{{ getv "/configuration/polygonparts/featuretypeprefix" "polygonParts:" }}',
     densityFactor: {{ getv "/configuration/polygonparts/densityfactor" "0.3" }},

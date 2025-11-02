@@ -7,6 +7,7 @@ import { Mode } from '../../../../../common/models/mode.enum';
 import {
   LayerMetadataMixedUnion,
   RecordType,
+  TasksGroupModelType,
   // EntityDescriptorModelType
 } from '../../../../models';
 // import { LayerRasterRecordInput } from '../../../../models/RootStore.base';
@@ -83,12 +84,13 @@ const selectGpkg = async (context: IContext) => {
 export const SERVICES = {
   [WORKFLOW.ROOT]: {
     fetchActiveJobService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
+      // const { updatedLayer } = input.context || {};
 
-      // const job = await queryExecutor(async () => {
+      // const result = await queryExecutor(async () => {
       //   return await input.context.store.queryGetActiveJob({
-      //     productId: input.context.updatedLayer?.productId,
-      //     productVersion: input.context.updatedLayer?.productVersion,
-      //     productType: input.context.updatedLayer?.productType
+      //     productId: updatedLayer?.productId,
+      //     productVersion: updatedLayer?.productVersion,
+      //     productType: updatedLayer?.productType
       //   });
       // });
 
@@ -139,9 +141,9 @@ export const SERVICES = {
       const data = {
         ingestionResolution: resolutionDegree as number,
         inputFiles: {
-          gpkgFilesPath: [files?.gpkg?.path],
-          productShapefilePath: files?.product?.path,
-          metadataShapefilePath: files?.metadata?.path
+          gpkgFilesPath: [files?.gpkg?.path] as string[],
+          productShapefilePath: files?.product?.path as string,
+          metadataShapefilePath: files?.metadata?.path as string
         },
         metadata: formData ?? {},
         callbackUrls: ['https://my-dns-for-callback'],
@@ -152,48 +154,31 @@ export const SERVICES = {
       if (input.context.flowType === Mode.NEW) {
         /* result = await queryExecutor(async () => {
           return await store.mutateStartRasterIngestion({ data });
-        });
-        if (!result || !result.startRasterIngestion.jobId || !res.startRasterIngestion.taskIds[0]) {
-          throw buildError('general.server.error');
-        } */
+        }); */
       } else if (input.context.flowType === Mode.UPDATE) {
         /* result = await queryExecutor(async () => {
           return await store.mutateStartRasterUpdateGeopkg({ data });
-        });
-        if (!result || !result.startRasterUpdateGeopkg.jobId || !res.startRasterIngestion.taskIds[0]) {
-          throw buildError('general.server.error');
-        } */
+        }); */
       }
       result = {
-        jobId: '8b62987a-c1f7-4326-969e-ceca4c81b5aa',
-        taskIds: [
-          '3fa85f64-5717-4562-b3fc-2c963f66afa6'
-        ]
+        jobId: MOCK_JOB.id
       };
 
       return {
-        jobId: result.jobId,
-        taskId: result.taskIds[0]
+        jobId: result.jobId
       };
     }),
     jobPollingService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
-      const { jobId, taskId } = input.context.job || {};
-      const missing = [];
+      const { jobId } = input.context.job || {};
       if (!jobId) {
-        missing.push('jobId');
-      }
-      if (!taskId) {
-        missing.push('taskId');
-      }
-      if (missing.length > 0) {
-        throw buildError('ingestion.error.missing', `${missing.join(', ')}`);
+        throw buildError('ingestion.error.missing', 'jobId');
       }
 
       // const result = await queryExecutor(async () => {
-      //   return await input.context.store.queryTaskById({
+      //   return await input.context.store.queryFindTask({
       //     params: {
       //       jobId: jobId as string,
-      //       taskId: taskId as string
+      //       type: 'validation'
       //     }
       //   });
       // });
@@ -204,12 +189,10 @@ export const SERVICES = {
           }
         });
       });
-      // @ts-ignore
       const task = (result.tasks as TasksGroupModelType[]).find(task => task.type === 'init');
-      // const task = (result.tasks as TasksGroupModelType[]).find(task => task.id === taskId);
 
       if (!task) {
-        throw buildError('ingestion.error.not-found', taskId);
+        throw buildError('ingestion.error.not-found', 'validation task');
       }
 
       return {
