@@ -34,6 +34,7 @@ import './ingestion-fields.raster.css';
 
 const AUTO: SelectionMode = 'auto';
 const MANUAL: SelectionMode = 'manual';
+const RESTORE: SelectionMode = 'restore';
 const FILES = 'files';
 const GPKG = 'gpkg';
 const PRODUCT = 'product';
@@ -192,86 +193,88 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
     } satisfies Events);*/
   };
 
-  const isManualMode = selectionMode === MANUAL;
-
   return (
     <>
-      <Box className={`ingestionSwitchContainer ${state.context.flowType === Mode.UPDATE ? 'update' : ''} ${isLoading || disableUI(state) ? 'disabled' : ''}`}>
-        <Box className="ingestionSwitch">
-          <Typography tag="p">
-            <FormattedMessage id="switch.auto.text" />
-          </Typography>
-          <Switch
-            checked={isManualMode}
-            disabled={isLoading || disableUI(state)}
-            onChange={handleSwitchClick} />
-          <Typography tag="p">
-            <FormattedMessage id="switch.manual.text" />
-          </Typography>
+      {
+        selectionMode !== RESTORE &&
+        <Box className={`ingestionSwitchContainer ${state.context.flowType === Mode.UPDATE ? 'update' : ''} ${isLoading || disableUI(state) ? 'disabled' : ''}`}>
+          <Box className="ingestionSwitch">
+            <Typography tag="p">
+              <FormattedMessage id="switch.auto.text" />
+            </Typography>
+            <Switch
+              checked={selectionMode === MANUAL}
+              disabled={isLoading || disableUI(state)}
+              onChange={handleSwitchClick} />
+            <Typography tag="p">
+              <FormattedMessage id="switch.manual.text" />
+            </Typography>
+          </Box>
         </Box>
-      </Box>
+      }
       <Box className="header section">
         <Box className="ingestionFields">
           <IngestionInputs state={state} />
         </Box>
         {
-          isManualMode ? (
-            <Box className="ingestionManualButtons">
-              {isLoading && <Box className="loadingOnManual"><CircularProgress/></Box>}
-              <Button
-                raised
-                type="button"
-                className="manualButton"
-                disabled={isLoading || disableUI(state)}
-                onClick={() => {
-                  setSelectedAction(GPKG);
-                  setFilePickerDialogOpen(true);
-                }}
-              >
-                <FormattedMessage id="general.choose-btn.text" />
-              </Button>
-              <Button
-                raised
-                type="button"
-                className="manualButton"
-                disabled={isLoading || disableUI(state)}
-                onClick={() => {
-                  setSelectedAction(PRODUCT);
-                  setFilePickerDialogOpen(true);
-                }}
-              >
-                <FormattedMessage id="general.choose-btn.text" />
-              </Button>
-              <Button
-                raised
-                type="button"
-                className="manualButton"
-                disabled={isLoading || disableUI(state)}
-                onClick={() => {
-                  setSelectedAction(METADATA);
-                  setFilePickerDialogOpen(true);
-                }}
-              >
-                <FormattedMessage id="general.choose-btn.text" />
-              </Button>
-            </Box>
-          ) : (
-            <Box className="ingestionAutoButtons">
-              <Button
-                raised
-                type="button"
-                className="autoButton"
-                disabled={isLoading || disableUI(state)}
-                onClick={(): void => {
-                  setSelectedAction(FILES);
-                  setFilePickerDialogOpen(true);
-                }}
-              >
-                <FormattedMessage id="general.choose-btn.text" />
-                {isLoading && <Box className="loadingOnAuto"><CircularProgress/></Box>}
-              </Button>
-            </Box>
-          )
+          selectionMode === MANUAL &&
+          <Box className="ingestionManualButtons">
+            {isLoading && <Box className="loadingOnManual"><CircularProgress/></Box>}
+            <Button
+              raised
+              type="button"
+              className="manualButton"
+              disabled={isLoading || disableUI(state)}
+              onClick={() => {
+                setSelectedAction(GPKG);
+                setFilePickerDialogOpen(true);
+              }}
+            >
+              <FormattedMessage id="general.choose-btn.text" />
+            </Button>
+            <Button
+              raised
+              type="button"
+              className="manualButton"
+              disabled={isLoading || disableUI(state)}
+              onClick={() => {
+                setSelectedAction(PRODUCT);
+                setFilePickerDialogOpen(true);
+              }}
+            >
+              <FormattedMessage id="general.choose-btn.text" />
+            </Button>
+            <Button
+              raised
+              type="button"
+              className="manualButton"
+              disabled={isLoading || disableUI(state)}
+              onClick={() => {
+                setSelectedAction(METADATA);
+                setFilePickerDialogOpen(true);
+              }}
+            >
+              <FormattedMessage id="general.choose-btn.text" />
+            </Button>
+          </Box>
+        }
+        {
+          selectionMode === AUTO &&
+          <Box className="ingestionAutoButtons">
+            {isLoading && <Box className="loadingOnAuto"><CircularProgress/></Box>}
+            <Button
+              raised
+              type="button"
+              className="autoButton"
+              disabled={isLoading || disableUI(state)}
+              onClick={(): void => {
+                setSelectedAction(FILES);
+                setFilePickerDialogOpen(true);
+              }}
+            >
+              <FormattedMessage id="general.choose-btn.text" />
+            </Button>
+          </Box>
         }
       </Box>
       {
