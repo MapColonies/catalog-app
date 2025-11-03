@@ -22,7 +22,6 @@ import {
 import {
   SelectionMode,
   Events,
-  // GPKG_PATH,
   IFileBase,
   IFiles,
   // GPKG_LABEL,
@@ -34,7 +33,6 @@ import './ingestion-fields.raster.css';
 
 const AUTO: SelectionMode = 'auto';
 const MANUAL: SelectionMode = 'manual';
-const RESTORE: SelectionMode = 'restore';
 const FILES = 'files';
 const GPKG = 'gpkg';
 const PRODUCT = 'product';
@@ -196,7 +194,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
   return (
     <>
       {
-        selectionMode !== RESTORE &&
+        (selectionMode === AUTO || selectionMode === MANUAL) &&
         <Box className={`ingestionSwitchContainer ${state.context.flowType === Mode.UPDATE ? 'update' : ''} ${isLoading || disableUI(state) ? 'disabled' : ''}`}>
           <Box className="ingestionSwitch">
             <Typography tag="p">

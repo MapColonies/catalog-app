@@ -21,8 +21,7 @@ import { Mode } from '../../../../common/models/mode.enum';
 import {
   EntityDescriptorModelType,
   LayerMetadataMixedUnion,
-  RecordType,
-  Status
+  RecordType
 } from '../../../models';
 import { LayersDetailsComponent } from '../layer-details';
 import {
@@ -37,9 +36,11 @@ import { StateError } from './state-error';
 import { RasterWorkflowContext } from './state-machine/context';
 import {
   disableUI,
+  hasActiveJob,
   hasTagDeep,
   isFilesSelected,
-  isJobSubmitted
+  isJobSubmitted,
+  isRetryEnabled
 } from './state-machine/helpers';
 import { getUIIngestionFieldDescriptors } from './utils';
 
@@ -349,25 +350,20 @@ export const InnerRasterForm = (
           </Box>
           <Box className="buttons">
             {
-              state.context.job &&
+              hasActiveJob(state.context) &&
               <Button
-                outlined
+                raised
                 type="button"
-                disabled={
-                  Object.keys(errors).length > NONE ||
-                  (Object.keys(getStatusErrors()).length > NONE)
-                }
                 onClick={(e): void => {
                   e.preventDefault();
                   e.stopPropagation();
                 }}
-                className="goToJobManagerButton"
               >
                 <FormattedMessage id="general.go-to-job-manager-btn.text" />
               </Button>
             }
             {
-              !state.context.job &&
+              !hasActiveJob(state.context) &&
               <Button
                 raised
                 type="submit"
@@ -384,9 +380,8 @@ export const InnerRasterForm = (
               </Button>
             }
             {
-              state.context.job &&
-              (state.context.job.taskStatus === Status.Failed ||
-              (state.context.job.taskStatus === Status.Completed && state.context.job.report)) &&
+              hasActiveJob(state.context) &&
+              isRetryEnabled(state.context) &&
               <Button
                 raised
                 type="button"

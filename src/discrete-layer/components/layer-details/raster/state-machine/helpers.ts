@@ -3,6 +3,7 @@ import path from 'path';
 import { assign, SnapshotFrom } from 'xstate';
 import { FileData } from '@map-colonies/react-components';
 import { getFirstPoint } from '../../../../../common/utils/geo.tools';
+import { Status } from '../../../../models';
 import { FeatureType } from '../pp-map.utils';
 import { workflowMachine } from './state-machine';
 import {
@@ -117,4 +118,14 @@ export const isJobSubmitted = (context: IContext): boolean => {
 
 export const disableUI = (state: SnapshotFrom<typeof workflowMachine>) => {
   return state.value === WORKFLOW.DONE;
+};
+
+export const hasActiveJob = (context: IContext): boolean => {
+  return !!(context.job && context.job.jobId);
+};
+
+export const isRetryEnabled = (context: IContext): boolean => {
+  return !!(context.job &&
+    (context.job.taskStatus === Status.Failed ||
+    (context.job.taskStatus === Status.Completed && context.job.report)));
 };

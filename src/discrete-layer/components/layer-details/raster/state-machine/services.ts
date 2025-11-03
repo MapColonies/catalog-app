@@ -12,15 +12,15 @@ import {
 } from '../../../../models';
 // import { LayerRasterRecordInput } from '../../../../models/RootStore.base';
 // import { cleanUpEntityPayload, getFlatEntityDescriptors } from '../../utils';
+import { transformEntityToFormFields } from '../../utils';
 import { FeatureType } from '../pp-map.utils';
 import { buildError, getFeatureAndMarker, getFile } from './helpers';
-import { MOCK_POLYGON } from './MOCK';
+import { MOCK_JOB, MOCK_POLYGON } from './MOCK';
 import { queryExecutor } from './query-executor';
 import {
   FIRST,
   FromPromiseArgs,
   GPKG_LABEL,
-  GPKG_PATH,
   IContext,
   METADATA_LABEL,
   METADATA_SHP,
@@ -29,23 +29,29 @@ import {
   SHAPES_DIR,
   WORKFLOW
 } from './types';
-import { transformEntityToFormFields } from '../../utils';
-import { MOCK_JOB } from './MOCK';
 
-const getDetails = async (filePath: string, context: IContext): Promise<FileData | undefined> => {
+const getDirectory = async (filePath: string, context: IContext): Promise<FileData[] | undefined> => {
   try {
     const result = await queryExecutor(async () => {
       return await context.store.queryGetDirectory({
         data: {
-          path: path.dirname(filePath),
+          path: filePath,
           type: RecordType.RECORD_RASTER,
         },
       });
     });
-    return (result?.getDirectory as FileData[]).filter((file: FileData) => file.name === path.basename(filePath))[0];
+    return result?.getDirectory as FileData[];
   } catch (e) {
     return undefined;
   }
+};
+
+const getDetails = async (filePath: string, context: IContext): Promise<FileData | undefined> => {
+  const files = await getDirectory(path.dirname(filePath), context);
+  if (files) {
+    return files.filter((file: FileData) => file.name === path.basename(filePath))[0];
+  }
+  return undefined;
 };
 
 const selectGpkg = async (context: IContext) => {
@@ -96,6 +102,12 @@ export const SERVICES = {
 
       const job = MOCK_JOB; // TODO: Mock should be removed
 
+      const rootDirectory = await getDirectory('/', input.context);
+      if (!rootDirectory || rootDirectory.length === 0) {
+        throw buildError('ingestion.error.not-found', '/');
+      }
+      const MOUNT_DIR = rootDirectory[FIRST].name;
+
       const restoreData = {
         data: {
           flowType: Mode.UPDATE,
@@ -103,17 +115,17 @@ export const SERVICES = {
           files: {
             gpkg: {
               label: GPKG_LABEL,
-              path: path.resolve(GPKG_PATH, job.parameters.inputFiles.gpkgFilesPath[0]),
+              path: path.resolve(MOUNT_DIR, job.parameters.inputFiles.gpkgFilesPath[0]),
               exists: false
             },
             product: {
               label: PRODUCT_LABEL,
-              path: path.resolve(GPKG_PATH, job.parameters.inputFiles.productShapefilePath),
+              path: path.resolve(MOUNT_DIR, job.parameters.inputFiles.productShapefilePath),
               exists: false
             },
             metadata: {
               label: METADATA_LABEL,
-              path: path.resolve(GPKG_PATH, job.parameters.inputFiles.metadataShapefilePath),
+              path: path.resolve(MOUNT_DIR, job.parameters.inputFiles.metadataShapefilePath),
               exists: false
             }
           },
@@ -290,20 +302,9 @@ export const SERVICES = {
     selectFilesService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
       const gpkg = await selectGpkg(input.context);
       const gpkgPath = input.context.files?.gpkg?.path as string;
-      let result;
-      try {
-        result = await queryExecutor(async () => {
-          return await input.context.store.queryGetDirectory({
-            data: {
-              path: path.resolve(gpkgPath, SHAPES_DIR),
-              type: RecordType.RECORD_RASTER,
-            },
-          });
-        });
-      } catch (e) {
-      }
-      const product = getFile(result?.getDirectory as FileData[], gpkgPath, PRODUCT_SHP, PRODUCT_LABEL);
-      const metadata = getFile(result?.getDirectory as FileData[], gpkgPath, METADATA_SHP, METADATA_LABEL);
+      const result = await getDirectory(path.resolve(gpkgPath, SHAPES_DIR), input.context);
+      const product = getFile(result ?? [], gpkgPath, PRODUCT_SHP, PRODUCT_LABEL);
+      const metadata = getFile(result ?? [], gpkgPath, METADATA_SHP, METADATA_LABEL);
 
       return {
         gpkg: {
