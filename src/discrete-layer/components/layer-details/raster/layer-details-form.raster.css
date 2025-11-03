@@ -172,42 +172,6 @@ body[dir='rtl'] #layerDetailsFormRaster .enumOptions .mdc-select__dropdown-icon 
   color: var(--mdc-theme-text-icon-on-dark);
 }
 
-#layerDetailsFormRaster .addPolygonPart{
-  display: flex;
-  justify-content: center;
-}
-
-#layerDetailsFormRaster .polygonPartsContainer .mdc-button--outlined:not(:disabled) {
-  border-color: unset;
-}
-
-#layerDetailsFormRaster .ingestionWarning {
-  display: flex;
-  flex-direction: row;
-}
-
-#layerDetailsFormRaster .ingestionWarningMessage {
-  width: 652px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-#layerDetailsFormRaster .loadingOnTop {
-  position: absolute;
-  top: 6px;
-  left: 20px;
-}
-
-#layerDetailsFormRaster .deletePolygonPart {
-  position: relative;
-  top: -44px;
-  left: 550px;
-  display: flex;
-  width: 160px;
-  align-items: center;
-}
-
-body[dir='rtl'] #layerDetailsFormRaster .deletePolygonPart { 
-  left: -550px;
+#layerDetailsFormRaster .goToJobManagerButton {
+  border-color: var(--mdc-theme-primary);
 }

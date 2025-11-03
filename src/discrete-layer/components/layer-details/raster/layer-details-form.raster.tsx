@@ -348,20 +348,24 @@ export const InnerRasterForm = (
             }
           </Box>
           <Box className="buttons">
-            <Button
-              outlined
-              type="button"
-              disabled={
-                Object.keys(errors).length > NONE ||
-                (Object.keys(getStatusErrors()).length > NONE)
-              }
-              onClick={(e): void => {
-                e.preventDefault();
-                e.stopPropagation();
-              }}
-            >
-              <FormattedMessage id="general.go-to-job-manager-btn.text" />
-            </Button>
+            {
+              state.context.job &&
+              <Button
+                outlined
+                type="button"
+                disabled={
+                  Object.keys(errors).length > NONE ||
+                  (Object.keys(getStatusErrors()).length > NONE)
+                }
+                onClick={(e): void => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
+                className="goToJobManagerButton"
+              >
+                <FormattedMessage id="general.go-to-job-manager-btn.text" />
+              </Button>
+            }
             {
               !state.context.job &&
               <Button
@@ -378,11 +382,11 @@ export const InnerRasterForm = (
               >
                 <FormattedMessage id="general.ok-btn.text" />
               </Button>
-            
             }
             {
-              (state.context.job?.taskStatus === Status.Failed ||
-              (state.context.job?.taskStatus === Status.Completed && state.context.job?.report)) &&
+              state.context.job &&
+              (state.context.job.taskStatus === Status.Failed ||
+              (state.context.job.taskStatus === Status.Completed && state.context.job.report)) &&
               <Button
                 raised
                 type="button"
@@ -395,7 +399,7 @@ export const InnerRasterForm = (
                   e.stopPropagation();
                 }}
               >
-                <FormattedMessage id="general.rerun-btn.text" />
+                <FormattedMessage id="general.retry-btn.text" />
               </Button>
             }
             <Button
