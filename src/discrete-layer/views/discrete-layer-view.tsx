@@ -886,7 +886,7 @@ const DiscreteLayerView: React.FC = observer(() => {
           }
         },
         static: [
-          ["limit", CONFIG.GEOCODER.RES_LIMIT],
+          ["limit", CONFIG.GEOCODER.RESULTS_LIMIT],
           ["disable_fuzziness", false],
           ["token", CONFIG.ACCESS_TOKEN.TOKEN_VALUE]
         ],
@@ -907,7 +907,7 @@ const DiscreteLayerView: React.FC = observer(() => {
           }
         },
         static: [
-          ["limit",CONFIG.GEOCODER.RES_LIMIT],
+          ["limit", CONFIG.GEOCODER.RESULTS_LIMIT],
           ["disable_fuzziness", false],
           ["token", CONFIG.ACCESS_TOKEN.TOKEN_VALUE]
         ],
@@ -928,7 +928,7 @@ const DiscreteLayerView: React.FC = observer(() => {
           }
         },
         static: [
-          ["limit", CONFIG.GEOCODER.RES_LIMIT],
+          ["limit", CONFIG.GEOCODER.RESULTS_LIMIT],
           ["disable_fuzziness", false],
           ["token", CONFIG.ACCESS_TOKEN.TOKEN_VALUE]
         ],

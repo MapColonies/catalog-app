@@ -15,8 +15,9 @@
   CONFIGURATION_ACCESS_TOKEN_TOKEN_VALUE: {{ quote .Values.global.shared.accessToken.tokenValue }}
   CONFIGURATION_IMAGE_TAG: {{ quote .Values.configValues.image.tag }}
   CONFIGURATION_PUBLIC_URL: {{ quote .Values.env.publicUrl }}
-  CONFIGURATION_SERVICE_URL: {{ quote .Values.env.serviceUrl }}
   CONFIGURATION_SERVICE_PROTOCOL: {{ quote .Values.env.serviceProtocol }}
+  CONFIGURATION_SERVICE_NAME: {{ quote .Values.env.serviceName }}
+  CONFIGURATION_CATALOGAPPUSERID: {{ quote .Values.env.catalogAppUserId }}
   CONFIGURATION_MAPSERVER_PUBLISH_POINT: {{ quote .Values.env.mapServerPublishPoint }}
   CONFIGURATION_MAPSERVER_URL: {{ quote .Values.env.mapServerUrl }}
   CONFIGURATION_MAPSERVER_CHANNEL: {{ quote .Values.env.mapServerChannel }}
@@ -60,6 +61,7 @@
   CONFIGURATION_WHATSNEW_URL: {{ quote .Values.env.whatsnewUrl }}
   CONFIGURATION_SITES_CONFIG: {{ quote .Values.env.sitesConfig }}
   CONFIGURATION_BFF_PATH: {{ quote .Values.env.bffPath }}
+  CONFIGURATION_SELECTION_MODE: {{ quote .Values.env.selectionMode }}
   CONFIGURATION_POLYGONPARTS_FEATURETYPEPREFIX: {{ quote .Values.env.polygonParts.featureTypePrefix }}
   CONFIGURATION_POLYGONPARTS_DENSITYFACTOR: {{ quote .Values.env.polygonParts.densityFactor }}
   CONFIGURATION_POLYGONPARTS_GEOMETRY_ERRORS_THRESHOLD: {{ quote .Values.env.polygonParts.geometryErrorsThreshold }}
@@ -75,7 +77,6 @@
   CONFIGURATION_WFS_MAX_CACHE_SIZE: {{ quote .Values.env.wfs.max.cacheSize }}
   CONFIGURATION_GEOCODER_URL: {{ quote .Values.env.geocoder.url }}
   CONFIGURATION_GEOCODER_CALLBACKURL: {{ quote .Values.env.geocoder.callbackUrl }}
-  CONFIGURATION_CATALOGAPPUSERID: {{ quote .Values.env.catalogAppUserId }}
 {{- end -}}
 
 {{ include "mc-chart.configmap" (dict "MAIN_OBJECT_BLOCK" $MAIN_OBJECT_BLOCK "COMPONENT_NAME" $COMPONENT_NAME "DATA" $DATA "WITH_TELEMETRY_TRACING" false "WITH_TELEMETRY_METRICS" false "context" .)}}

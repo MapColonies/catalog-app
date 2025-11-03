@@ -3,14 +3,14 @@ if (!window._env_) {
     return {
       LANGUAGE: 'he',
       BACKEND_LOCALE: 'he',
+      SERVICE_PROTOCOL: 'SERVICE_PROTOCOL',
+      SERVICE_NAME: 'SERVICE_NAME',
+      CATALOG_APP_USER_ID: 'catalog-app-{CURRENT_USER}@mapcolonies.net',
       MAP_SERVER: 'MAP_SERVER',
       PUBLISH_POINT: 'PUBLISH_POINT',
       CHANNEL: 1002,
       VERSION: 1,
       REQUEST: 'REQUEST',
-      SERVICE_PROTOCOL: 'SERVICE_PROTOCOL',
-      SERVICE_NAME: 'SERVICE_NAME',
-      CATALOG_APP_USER_ID: 'catalog-app-{CURRENT_USER}@mapcolonies.net',
       ACTIVE_LAYER: 'ACTIVE_LAYER',
       LOCALE: {
         DATE_FORMAT: 'DD/MM/YYYY HH:mm',
@@ -70,6 +70,7 @@ if (!window._env_) {
       WHATSNEW_URL: 'http://whatsnew-URL',
       SITES_CONFIG: '{"masters": [{ "dns": "http://localhost:3000", "isAlias": false }], "slaves": [{ "dns": "http://localhost:8090", "isAlias": false }], "generics": [{ "dns": "https://catalog.mapcolonies.net", "isAlias": false }]}',
       BFF_PATH: '/graphql',
+      SELECTION_MODE: 'auto',
       POLYGON_PARTS: {
         featureTypePrefix: 'polygonParts:',
         densityFactor: 0.3,

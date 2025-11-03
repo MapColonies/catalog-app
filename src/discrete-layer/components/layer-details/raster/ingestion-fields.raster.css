@@ -105,10 +105,17 @@ body[dir='rtl'] #layerDetailsFormRaster .header {
   top: 100px;
 }
 
+#layerDetailsFormRaster .loadingOnManual.update {
+  top: 252px;
+}
+
 #layerDetailsFormRaster .loadingOnAuto {
   position: absolute;
-  top: 6px;
-  left: 26px;
+  top: 87px;
+}
+
+#layerDetailsFormRaster .loadingOnAuto.update {
+  top: 240px;
 }
 
 #layerDetailsFormRaster .empty {
