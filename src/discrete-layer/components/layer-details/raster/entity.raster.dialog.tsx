@@ -131,11 +131,10 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
           updatedLayer: props.layerRecord as LayerRasterRecordModelType
         } satisfies Events);
       } else {
-        console.log('DEFAULTING SELECTION MODE TO CONFIG VALUE ON NEW:', CONFIG.SELECTION_MODE_DEFAULT ?? 'auto');
         actorRef.send({
           type: 'START_NEW',
           flowType: Mode.NEW,
-          selectionMode: CONFIG.SELECTION_MODE_DEFAULT ?? 'auto',
+          selectionMode: CONFIG.SELECTION_MODE_DEFAULT === '' ? 'auto' : CONFIG.SELECTION_MODE_DEFAULT
         } satisfies Events);
       }
     }, [props.isSelectedLayerUpdateMode, props.layerRecord, actorRef]);
