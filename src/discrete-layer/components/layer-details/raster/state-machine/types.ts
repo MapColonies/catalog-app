@@ -78,8 +78,8 @@ export interface IContext {
 export interface IPartialContext extends Omit<IContext, 'store' | 'errors'> {};
 
 export type Events =
-  | { type: "START_NEW", selectionMode: SelectionMode, flowType: Mode.NEW }
-  | { type: "START_UPDATE", layerRecord: LayerRasterRecordModelType }
+  | { type: "START_NEW", flowType: Mode.NEW, selectionMode: SelectionMode }
+  | { type: "START_UPDATE", updatedLayer: LayerRasterRecordModelType }
   | { type: "AUTO" }
   | { type: "MANUAL" }
   | { type: "SELECT_FILES", file: IGPKGFile }

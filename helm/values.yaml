@@ -100,8 +100,9 @@ env:
   responseCompressionEnabled: true
   requestPayloadLimit: 1mb
   publicUrl: ''
-  serviceUrl: ''
   serviceProtocol: http://
+  serviceName: ''
+  catalogAppUserId: catalog-app-{CURRENT_USER}@mapcolonies.net
   mapServerPublishPoint: ''
   mapServerUrl: ''
   mapServerChannel: ''
@@ -115,7 +116,6 @@ env:
   bboxAreaSquareKmLimit: 10000
   language: he
   backendLocale: he
-  catalogAppUserId: catalog-app-{CURRENT_USER}@mapcolonies.net
   jobStatus:
     pollingCycleInterval: 120000
   defaultUser:
@@ -153,6 +153,7 @@ env:
       projection: ''
   sitesConfig: '{"masters": [{ "dns": "http://localhost:3000", "isAlias": "false" }], "slaves": [{ "dns": "http://localhost:8090", "isAlias": "false" }], "generics": []}'
   bffPath: ''
+  selectionMode: ''
   polygonParts:
     featureTypePrefix: ''
     densityFactor: 0.3

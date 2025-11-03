@@ -7,6 +7,8 @@ import { Mode } from '../../../../../common/models/mode.enum';
 import {
   LayerMetadataMixedUnion,
   RecordType,
+  TasksGroupModelType,
+  // EntityDescriptorModelType
 } from '../../../../models';
 import { LayerRasterRecordInput } from '../../../../models/RootStore.base';
 import { FeatureType } from '../pp-map.utils';
@@ -81,12 +83,13 @@ const selectGpkg = async (context: IContext) => {
 export const SERVICES = {
   [WORKFLOW.ROOT]: {
     fetchActiveJobService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
+      // const { updatedLayer } = input.context || {};
 
-      // const job = await queryExecutor(async () => {
+      // const result = await queryExecutor(async () => {
       //   return await input.context.store.queryGetActiveJob({
-      //     productId: input.context.updatedLayer?.productId,
-      //     productVersion: input.context.updatedLayer?.productVersion,
-      //     productType: input.context.updatedLayer?.productType
+      //     productId: updatedLayer?.productId,
+      //     productVersion: updatedLayer?.productVersion,
+      //     productType: updatedLayer?.productType
       //   });
       // });
 
@@ -165,23 +168,16 @@ export const SERVICES = {
       };
     }),
     jobPollingService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
-      const { jobId, taskId } = input.context.job || {};
-      const missing = [];
+      const { jobId } = input.context.job || {};
       if (!jobId) {
-        missing.push('jobId');
-      }
-      if (!taskId) {
-        missing.push('taskId');
-      }
-      if (missing.length > 0) {
-        throw buildError('ingestion.error.missing', `${missing.join(', ')}`);
+        throw buildError('ingestion.error.missing', 'jobId');
       }
 
       // const result = await queryExecutor(async () => {
-      //   return await input.context.store.queryTaskById({
+      //   return await input.context.store.queryFindTask({
       //     params: {
       //       jobId: jobId as string,
-      //       taskId: taskId as string
+      //       type: 'validation'
       //     }
       //   });
       // });
@@ -192,12 +188,10 @@ export const SERVICES = {
           }
         });
       });
-      // @ts-ignore
       const task = (result.tasks as TasksGroupModelType[]).find(task => task.type === 'init');
-      // const task = (result.tasks as TasksGroupModelType[]).find(task => task.id === taskId);
 
       if (!task) {
-        throw buildError('ingestion.error.not-found', taskId);
+        throw buildError('ingestion.error.not-found', 'validation task');
       }
 
       return {

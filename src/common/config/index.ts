@@ -6,14 +6,14 @@ import { LinkType } from '../models/link-type.enum';
 /*eslint-disable */
 const LANGUAGE = (window as any)._env_.LANGUAGE as string;
 const BACKEND_LOCALE = (window as any)._env_.BACKEND_LOCALE as string;
+const SERVICE_PROTOCOL = (window as any)._env_.SERVICE_PROTOCOL;
+const SERVICE_NAME = (window as any)._env_.SERVICE_NAME;
+const CATALOG_APP_USER_ID = (window as any)._env_.CATALOG_APP_USER_ID;
 const MAP_SERVER = (window as any)._env_.MAP_SERVER;
 const PUBLISH_POINT = (window as any)._env_.PUBLISH_POINT;
 const CHANNEL = (window as any)._env_.CHANNEL;
 const VERSION = (window as any)._env_.VERSION;
 const REQUEST = (window as any)._env_.REQUEST;
-const SERVICE_PROTOCOL = (window as any)._env_.SERVICE_PROTOCOL;
-const SERVICE_NAME = (window as any)._env_.SERVICE_NAME;
-const CATALOG_APP_USER_ID = (window as any)._env_.CATALOG_APP_USER_ID;
 const ACTIVE_LAYER = (window as any)._env_.ACTIVE_LAYER;
 const ACTIVE_LAYER_PROPERTIES = (window as any)._env_.ACTIVE_LAYER_PROPERTIES;
 const MAP = (window as any)._env_.MAP;
@@ -32,6 +32,7 @@ const PROJECT_VERSION = (window as any)._env_.PROJECT_VERSION;
 const WHATSNEW_URL = (window as any)._env_.WHATSNEW_URL;
 const SITES_CONFIG = JSON.parse((window as any)._env_.SITES_CONFIG);
 const BFF_PATH = (window as any)._env_.BFF_PATH;
+const SELECTION_MODE = (window as any)._env_.SELECTION_MODE;
 const POLYGON_PARTS = {
   ...(window as any)._env_.POLYGON_PARTS,
   highResolutionColor: '#01FF1F',
@@ -210,6 +211,7 @@ const APP_CONFIG = {
   WHATSNEW_URL: WHATSNEW_URL,
   SITES_CONFIG: SITES_CONFIG,
   BFF_PATH: BFF_PATH,
+  SELECTION_MODE: SELECTION_MODE,
   POLYGON_PARTS: {
     STYLE: {
       highResolutionColor: POLYGON_PARTS.highResolutionColor,
@@ -241,7 +243,7 @@ const APP_CONFIG = {
   GEOCODER: {
     URL: GEOCODER.url,
     CALLBACK_URL: GEOCODER.callbackUrl,
-    RES_LIMIT: 6
+    RESULTS_LIMIT: 6
   }
 };
 

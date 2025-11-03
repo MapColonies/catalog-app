@@ -4,13 +4,14 @@ dest = "public/env-config.js"
 keys = [
   "/configuration/ui/language",
   "/configuration/ui/backend/locale",
-  "/configuration/mapServer/url",
+  "/configuration/service/protocol",
+  "/configuration/service/name",
+  "/configuration/catalogAppUserId",
   "/configuration/mapServer/publishPoint",
+  "/configuration/mapServer/url",
   "/configuration/mapServer/channel",
   "/configuration/mapServer/version",
   "/configuration/mapServer/request",
-  "/configuration/service/protocol",
-  "/configuration/service/url",
   "/configuration/active/layer",
   "/configuration/active/layer/properties/mapurlpath",
   "/configuration/active/layer/properties/url/pattern",
@@ -51,6 +52,7 @@ keys = [
   "/configuration/whatsnew/url",
   "/configuration/sites/config",
   "/configuration/bff/path",
+  "/configuration/selection/mode",
   "/configuration/polygonparts/featuretypeprefix",
   "/configuration/polygonparts/densityfactor",
   "/configuration/polygonparts/geometry/errors/threshold",
@@ -64,7 +66,6 @@ keys = [
   "/configuration/wfs/max/page/size",
   "/configuration/wfs/max/zoom/level",
   "/configuration/wfs/max/cache/size",
-  "/configuration/geocoder/url"
+  "/configuration/geocoder/url",
   "/configuration/geocoder/callbackUrl"
-  "/configuration/catalogAppUserId"
 ]

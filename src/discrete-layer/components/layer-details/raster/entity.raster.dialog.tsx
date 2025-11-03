@@ -7,6 +7,7 @@ import * as Yup from 'yup';
 import { DialogContent } from '@material-ui/core';
 import { Dialog, DialogTitle, Icon, IconButton } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
+import CONFIG from '../../../../common/config';
 import { emphasizeByHTML } from '../../../../common/helpers/formatters';
 import { getTextStyle } from '../../../../common/helpers/style';
 import { Mode } from '../../../../common/models/mode.enum';
@@ -124,16 +125,16 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
           type: 'RESTORE',
           data: props.job,
         } satisfies Events);
-      } else if(props.isSelectedLayerUpdateMode && props.layerRecord) {
+      } else if (props.isSelectedLayerUpdateMode && props.layerRecord) {
         actorRef.send({
           type: 'START_UPDATE',
-          layerRecord: props.layerRecord as LayerRasterRecordModelType
+          updatedLayer: props.layerRecord as LayerRasterRecordModelType
         } satisfies Events);
       } else {
         actorRef.send({
           type: 'START_NEW',
-          selectionMode: 'auto',
           flowType: Mode.NEW,
+          selectionMode: CONFIG.SELECTION_MODE ?? 'auto',
         } satisfies Events);
       }
     }, [props.isSelectedLayerUpdateMode, props.layerRecord, actorRef]);
