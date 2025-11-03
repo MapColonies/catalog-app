@@ -70,7 +70,8 @@ if (!window._env_) {
       WHATSNEW_URL: 'http://whatsnew-URL',
       SITES_CONFIG: '{"masters": [{ "dns": "http://localhost:3000", "isAlias": false }], "slaves": [{ "dns": "http://localhost:8090", "isAlias": false }], "generics": [{ "dns": "https://catalog.mapcolonies.net", "isAlias": false }]}',
       BFF_PATH: '/graphql',
-      SELECTION_MODE: 'auto',
+      SELECTION_MODE_DEFAULT: '',
+      SHOW_SELECTION_MODE_SWITCH: true,
       POLYGON_PARTS: {
         featureTypePrefix: 'polygonParts:',
         densityFactor: 0.3,

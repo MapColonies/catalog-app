@@ -67,7 +67,8 @@ window._env_ = {
   WHATSNEW_URL: '{{ getv "/configuration/whatsnew/url" "http://whatsnew-URL" }}',
   SITES_CONFIG: '{{ getv "/configuration/sites/config" "{\"masters\": [{ \"dns\": \"http://localhost:3000\", \"isAlias\": false }], \"slaves\": [{ \"dns\": \"http://localhost:8090\", \"isAlias\": false }], \"generics\": [{ \"dns\": \"https://catalog.mapcolonies.net\", \"isAlias\": false }]}" }}',
   BFF_PATH: '{{ getv "/configuration/bff/path" "/graphql" }}',
-  SELECTION_MODE: '{{ getv "/configuration/selection/mode" "auto" }}',
+  SELECTION_MODE_DEFAULT: '{{ getv "/configuration/selection/mode/default" "" }}',
+  SHOW_SELECTION_MODE_SWITCH: {{ getv "/configuration/show/selection/mode/switch" "true" }},
   POLYGON_PARTS: {
     featureTypePrefix: '{{ getv "/configuration/polygonparts/featuretypeprefix" "polygonParts:" }}',
     densityFactor: {{ getv "/configuration/polygonparts/densityfactor" "0.3" }},

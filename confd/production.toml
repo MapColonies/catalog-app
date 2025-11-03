@@ -53,6 +53,7 @@ keys = [
   "/configuration/sites/config",
   "/configuration/bff/path",
   "/configuration/selection/mode",
+  "/configuration/show/selection/mode/switch",
   "/configuration/polygonparts/featuretypeprefix",
   "/configuration/polygonparts/densityfactor",
   "/configuration/polygonparts/geometry/errors/threshold",

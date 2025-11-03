@@ -321,10 +321,13 @@ export const workflowMachine = createMachine<IContext, Events>({
             target: WORKFLOW.RESTORE_JOB
           },
           {
-            actions: assign((_: { context: IContext; event: any }) => ({
+            actions: assign((_: { context: IContext; event: any }) => {
+              console.log('DEFAULTING SELECTION MODE TO CONFIG VALUE ON UPDATE:', CONFIG.SELECTION_MODE_DEFAULT ?? 'auto');
+              return {
               flowType: Mode.UPDATE,
-              selectionMode: CONFIG.SELECTION_MODE ?? 'auto'
-            })),
+              selectionMode: CONFIG.SELECTION_MODE_DEFAULT ?? 'auto'
+            };
+          }),
             target: WORKFLOW.FILES.ROOT
           }
         ],

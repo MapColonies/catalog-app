@@ -153,7 +153,8 @@ env:
       projection: ''
   sitesConfig: '{"masters": [{ "dns": "http://localhost:3000", "isAlias": "false" }], "slaves": [{ "dns": "http://localhost:8090", "isAlias": "false" }], "generics": []}'
   bffPath: ''
-  selectionMode: ''
+  selectionModeDefault: ''
+  showSelectionModeSwitch: true
   polygonParts:
     featureTypePrefix: ''
     densityFactor: 0.3

@@ -32,7 +32,8 @@ const PROJECT_VERSION = (window as any)._env_.PROJECT_VERSION;
 const WHATSNEW_URL = (window as any)._env_.WHATSNEW_URL;
 const SITES_CONFIG = JSON.parse((window as any)._env_.SITES_CONFIG);
 const BFF_PATH = (window as any)._env_.BFF_PATH;
-const SELECTION_MODE = (window as any)._env_.SELECTION_MODE;
+const SELECTION_MODE_DEFAULT = (window as any)._env_.SELECTION_MODE_DEFAULT;
+const SHOW_SELECTION_MODE_SWITCH = (window as any)._env_.SHOW_SELECTION_MODE_SWITCH;
 const POLYGON_PARTS = {
   ...(window as any)._env_.POLYGON_PARTS,
   highResolutionColor: '#01FF1F',
@@ -211,7 +212,8 @@ const APP_CONFIG = {
   WHATSNEW_URL: WHATSNEW_URL,
   SITES_CONFIG: SITES_CONFIG,
   BFF_PATH: BFF_PATH,
-  SELECTION_MODE: SELECTION_MODE,
+  SELECTION_MODE_DEFAULT: SELECTION_MODE_DEFAULT,
+  SHOW_SELECTION_MODE_SWITCH: SHOW_SELECTION_MODE_SWITCH,
   POLYGON_PARTS: {
     STYLE: {
       highResolutionColor: POLYGON_PARTS.highResolutionColor,

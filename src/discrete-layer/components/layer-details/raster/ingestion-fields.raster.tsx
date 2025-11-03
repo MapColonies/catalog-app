@@ -8,6 +8,7 @@ import { Box, defaultFormatters, FileData } from '@map-colonies/react-components
 import { Button, CircularProgress, Icon, Typography } from '@map-colonies/react-core';
 import { Selection } from '../../../../common/components/file-picker';
 import { FieldLabelComponent } from '../../../../common/components/form/field-label';
+import CONFIG from '../../../../common/config';
 import { dateFormatter } from '../../../../common/helpers/formatters';
 import { Mode } from '../../../../common/models/mode.enum';
 import { RecordType, LayerMetadataMixedUnion } from '../../../models';
@@ -16,6 +17,7 @@ import { FilePickerDialog } from '../../dialogs/file-picker.dialog';
 import { RasterWorkflowContext } from './state-machine/context';
 import {
   disableUI,
+  hasActiveJob,
   hasTagDeep
 } from './state-machine/helpers';
 // import { MOCK_JOB } from './state-machine/MOCK';
@@ -194,6 +196,8 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
   return (
     <>
       {
+        CONFIG.SHOW_SELECTION_MODE_SWITCH &&
+        hasActiveJob(state.context) === false &&
         (selectionMode === AUTO || selectionMode === MANUAL) &&
         <Box className={`ingestionSwitchContainer ${state.context.flowType === Mode.UPDATE ? 'update' : ''} ${isLoading || disableUI(state) ? 'disabled' : ''}`}>
           <Box className="ingestionSwitch">
@@ -215,6 +219,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
           <IngestionInputs state={state} />
         </Box>
         {
+          hasActiveJob(state.context) === false &&
           selectionMode === MANUAL &&
           <Box className="ingestionManualButtons">
             {isLoading && <Box className={`loadingOnManual ${state.context.flowType === Mode.UPDATE ? 'update' : ''}`}><CircularProgress/></Box>}
@@ -257,6 +262,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
           </Box>
         }
         {
+          hasActiveJob(state.context) === false &&
           selectionMode === AUTO &&
           <Box className="ingestionAutoButtons">
             {isLoading && <Box className={`loadingOnAuto ${state.context.flowType === Mode.UPDATE ? 'update' : ''}`}><CircularProgress/></Box>}
