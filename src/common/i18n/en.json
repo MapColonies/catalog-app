@@ -5,7 +5,7 @@
   "general.version.tooltip": "Catalog App version",
   "general.version.text": "{projectVersion} ({appVersion})",
   "general.ok-btn.text": "Ok",
-  "general.rerun-btn.text": "Rerun",
+  "general.retry-btn.text": "Retry",
   "general.check-btn.text": "Check",
   "general.cancel-btn.text": "Cancel",
   "general.confirm-btn.text": "Approve",

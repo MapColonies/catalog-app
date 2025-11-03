@@ -219,7 +219,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
         {
           selectionMode === MANUAL &&
           <Box className="ingestionManualButtons">
-            {isLoading && <Box className="loadingOnManual"><CircularProgress/></Box>}
+            {isLoading && <Box className={`loadingOnManual ${state.context.flowType === Mode.UPDATE ? 'update' : ''}`}><CircularProgress/></Box>}
             <Button
               raised
               type="button"
@@ -261,7 +261,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
         {
           selectionMode === AUTO &&
           <Box className="ingestionAutoButtons">
-            {isLoading && <Box className="loadingOnAuto"><CircularProgress/></Box>}
+            {isLoading && <Box className={`loadingOnAuto ${state.context.flowType === Mode.UPDATE ? 'update' : ''}`}><CircularProgress/></Box>}
             <Button
               raised
               type="button"

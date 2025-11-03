@@ -5,7 +5,7 @@
   "general.version.tooltip": "אפליקצית קטלוג גרסה",
   "general.version.text": "{projectVersion} ({appVersion})",
   "general.ok-btn.text": "אישור",
-  "general.rerun-btn.text": "נסה שנית",
+  "general.retry-btn.text": "נסה שנית",
   "general.check-btn.text": "בדוק",
   "general.cancel-btn.text": "ביטול",
   "general.confirm-btn.text": "אישור",
