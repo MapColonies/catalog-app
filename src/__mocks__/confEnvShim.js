@@ -95,6 +95,11 @@ if (!window._env_) {
       GEOCODER: {
         url: 'http://geocoder-URL',
         callbackUrl: 'http://geocoder-callback-URL'
+      },
+      FP_FILES_NAME: {
+        gpkg: '',
+        product: 'Product',
+        shapeMetadata: 'shapeMetadata'
       }
     };
   })(void 0);

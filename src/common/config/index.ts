@@ -43,6 +43,7 @@ const POLYGON_PARTS = {
 };
 const WFS = (window as any)._env_.WFS;
 const GEOCODER = (window as any)._env_.GEOCODER;
+const FP_FILES_NAME = (window as any)._env_.FP_FILES_NAME;
 
 const enrichBaseMaps = (baseMaps: IBaseMaps): IBaseMaps => {
   return {
@@ -244,6 +245,11 @@ const APP_CONFIG = {
     URL: GEOCODER.url,
     CALLBACK_URL: GEOCODER.callbackUrl,
     RESULTS_LIMIT: 6
+  },
+  FP_FILES_NAME: {
+    gpkg: FP_FILES_NAME.gpkg,
+    product: FP_FILES_NAME.product,
+    shapeMetadata: FP_FILES_NAME.shapeMetadata
   }
 };
 
