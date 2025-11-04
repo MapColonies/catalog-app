@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { isEmpty } from 'lodash';
 import { observer } from 'mobx-react';
-// import path from 'path';
 import { Switch } from '@material-ui/core';
 import { Box, defaultFormatters, FileData } from '@map-colonies/react-components';
 import { Button, CircularProgress, Icon, Typography } from '@map-colonies/react-core';
@@ -13,22 +12,17 @@ import { dateFormatter } from '../../../../common/helpers/formatters';
 import { Mode } from '../../../../common/models/mode.enum';
 import { RecordType, LayerMetadataMixedUnion } from '../../../models';
 import { FilePickerDialog } from '../../dialogs/file-picker.dialog';
-// import { transformEntityToFormFields } from '../utils';
 import { RasterWorkflowContext } from './state-machine/context';
 import {
   disableUI,
   hasActiveJob,
   hasTagDeep
 } from './state-machine/helpers';
-// import { MOCK_JOB } from './state-machine/MOCK';
 import {
   SelectionMode,
   Events,
   IFileBase,
-  IFiles,
-  // GPKG_LABEL,
-  // PRODUCT_LABEL,
-  // METADATA_LABEL
+  IFiles
 } from './state-machine/types';
 
 import './ingestion-fields.raster.css';
@@ -157,40 +151,6 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
     }
 
     setSelectionMode((prev) => (prev === AUTO ? MANUAL : AUTO));
-
-    /*const job = MOCK_JOB;
-    actorRef.send({
-      type: 'RESTORE',
-      data: {
-        flowType: job.type.substring(job.type.lastIndexOf('_') + 1),
-        selectionMode: 'restore',
-        files: {
-          gpkg: {
-            label: GPKG_LABEL,
-            path: path.resolve(GPKG_PATH, job.parameters.inputFiles.gpkgFilesPath[0]),
-            exists: false
-          },
-          product: {
-            label: PRODUCT_LABEL,
-            path: path.resolve(GPKG_PATH, job.parameters.inputFiles.productShapefilePath),
-            exists: false
-          },
-          metadata: {
-            label: METADATA_LABEL,
-            path: path.resolve(GPKG_PATH, job.parameters.inputFiles.metadataShapefilePath),
-            exists: false
-          }
-        },
-        resolutionDegree: job.parameters.partsData[0].resolutionDegree,
-        formData: {
-          ...transformEntityToFormFields(job.parameters.metadata as unknown as LayerMetadataMixedUnion)
-        },
-        job: {
-          jobId: job.id,
-          taskId: '3fa85f64-5717-4562-b3fc-2c963f66afa6'
-        }
-      }
-    } satisfies Events);*/
   };
 
   return (

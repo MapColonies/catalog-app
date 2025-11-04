@@ -180,7 +180,7 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
   }, [query, pollingCycle]);
   
   useEffect(() => {
-    if (!loadingJobData && jobData){
+    if (!loadingJobData && jobData) {
       downloadJSONToClient(jobData.job, `${encodeURI(jobData.job.resourceId as string)}_job_details.json`);
     }
   }, [jobData, loadingJobData]);

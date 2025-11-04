@@ -107,6 +107,7 @@
   "action.viewer.tooltip": "Viewer",
   "action.job.retry": "Try again",
   "action.job.abort": "Abort",
+  "action.job.restore": "Restore",
   "action.job.download_details": "Download",
   "actions.wfs.buildings-title": "Building info",
   "actions.meter.sign": "m",

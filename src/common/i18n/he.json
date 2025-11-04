@@ -107,6 +107,7 @@
   "action.viewer.tooltip": "צפיין",
   "action.job.retry": "נסה שוב",
   "action.job.abort": "בטל",
+  "action.job.restore": "שחזור",
   "action.job.download_details": "הורדה",
   "actions.wfs.buildings-title": "תשאול מבנה",
   "actions.meter.sign": "מ'",
