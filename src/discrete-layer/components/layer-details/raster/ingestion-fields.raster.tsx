@@ -103,6 +103,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
   const [selectedAction, setSelectedAction] = useState<string | null>(null);
   const [pendingFileEvent, setPendingFileEvent] = useState<Events | null>(null);
   const [fileType, setFileType] = useState<FileType>();
+  const [fileNamePattern, setFileNamePattern] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     if (pendingFileEvent && filesActor) {
@@ -230,6 +231,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
                 setSelectedAction(GPKG);
                 setFilePickerDialogOpen(true);
                 setFileType(FileType.GPKG);
+                setFileNamePattern(undefined);
               }}
             >
               <FormattedMessage id="general.choose-btn.text" />
@@ -242,7 +244,8 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
               onClick={() => {
                 setSelectedAction(PRODUCT);
                 setFilePickerDialogOpen(true);
-                  setFileType(FileType.SHP);
+                setFileType(FileType.SHP);
+                setFileNamePattern('Product');
               }}
             >
               <FormattedMessage id="general.choose-btn.text" />
@@ -255,7 +258,8 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
               onClick={() => {
                 setSelectedAction(METADATA);
                 setFilePickerDialogOpen(true);
-                  setFileType(FileType.SHP);
+                setFileType(FileType.SHP);
+                setFileNamePattern('ShapeMetadata');
               }}
             >
               <FormattedMessage id="general.choose-btn.text" />
@@ -274,7 +278,8 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
               onClick={(): void => {
                 setSelectedAction(FILES);
                 setFilePickerDialogOpen(true);
-                  setFileType(FileType.GPKG);
+                setFileType(FileType.GPKG);
+                setFileNamePattern(undefined);
               }}
             >
               <FormattedMessage id="general.choose-btn.text" />
@@ -291,6 +296,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
           onFilesSelection={onFilesSelection}
           selection={selection}
           fileType={fileType}
+          fileNamePattern={fileNamePattern}
         />
       }
     </>

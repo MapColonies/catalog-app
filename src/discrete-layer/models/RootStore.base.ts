@@ -204,6 +204,7 @@ export type ExplorerGetByPath = {
   path: string
   type: RecordType
   fileType?: FileType
+  fileNamePattern?: string
 }
 export type ExplorerGetById = {
   id: string
