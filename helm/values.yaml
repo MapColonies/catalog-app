@@ -177,7 +177,7 @@ env:
   fpFilesName:
     gpkg: ''
     product: 'Product'
-    shapeMetadata: 'shapeMetadata'
+    shapeMetadata: 'ShapeMetadata'
 route:
   enabled: true
   annotations:

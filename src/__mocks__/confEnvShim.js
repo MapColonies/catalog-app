@@ -99,7 +99,7 @@ if (!window._env_) {
       FP_FILES_NAME: {
         gpkg: '',
         product: 'Product',
-        shapeMetadata: 'shapeMetadata'
+        shapeMetadata: 'ShapeMetadata'
       }
     };
   })(void 0);
