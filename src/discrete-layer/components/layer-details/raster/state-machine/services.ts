@@ -27,6 +27,7 @@ import {
   PRODUCT_LABEL,
   PRODUCT_SHP,
   SHAPES_DIR,
+  SHAPES_RELATIVE_TO_DATA_DIR,
   WORKFLOW
 } from './types';
 
@@ -302,7 +303,7 @@ export const SERVICES = {
     selectFilesService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
       const gpkg = await selectGpkg(input.context);
       const gpkgPath = input.context.files?.gpkg?.path as string;
-      const result = await getDirectory(path.resolve(gpkgPath, SHAPES_DIR), input.context);
+      const result = await getDirectory(path.resolve(path.dirname(gpkgPath), SHAPES_RELATIVE_TO_DATA_DIR, SHAPES_DIR), input.context);
       const product = getFile(result ?? [], gpkgPath, PRODUCT_SHP, PRODUCT_LABEL);
       const metadata = getFile(result ?? [], gpkgPath, METADATA_SHP, METADATA_LABEL);
 

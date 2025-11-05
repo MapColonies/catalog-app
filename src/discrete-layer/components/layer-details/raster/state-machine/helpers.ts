@@ -14,6 +14,7 @@ import {
   IContext,
   IStateError,
   SHAPES_DIR,
+  SHAPES_RELATIVE_TO_DATA_DIR,
   STATE_TAGS,
   WORKFLOW
 } from './types';
@@ -60,13 +61,13 @@ export const getFile = (files: FileData[], gpkgPath: string, fileName: string, l
   if (!matchingFiles || matchingFiles.length === 0) {
     return {
       label,
-      path: path.resolve(gpkgPath, SHAPES_DIR, fileName),
+      path: path.resolve(path.dirname(gpkgPath), SHAPES_RELATIVE_TO_DATA_DIR, SHAPES_DIR, fileName),
       exists: false
     };
   }
   return matchingFiles.map((file: FileData) => ({
     label,
-    path: path.resolve(gpkgPath, SHAPES_DIR, fileName),
+    path: path.resolve(path.dirname(gpkgPath), SHAPES_RELATIVE_TO_DATA_DIR, SHAPES_DIR, fileName),
     details: { ...file },
     exists: true
   }))[FIRST];

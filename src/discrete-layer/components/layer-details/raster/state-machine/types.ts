@@ -144,7 +144,9 @@ export const WORKFLOW = {
 } as const;
 
 export const FIRST = 0;
-export const SHAPES_DIR = '../../Shapes';
+export const DATA_DIR = 'gpkg';
+export const SHAPES_DIR = 'shape';
+export const SHAPES_RELATIVE_TO_DATA_DIR = '..';
 export const PRODUCT_SHP = 'Product.shp';
 export const METADATA_SHP = 'ShapeMetadata.shp';
 export const GPKG_LABEL = 'file-name.gpkg';
