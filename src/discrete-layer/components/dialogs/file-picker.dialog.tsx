@@ -25,8 +25,8 @@ import {
 import { GraphQLError } from '../../../common/components/error/graphql.error-presentor';
 import {
   FileModelType,
-  FileType,
   LayerMetadataMixedUnion,
+  RasterIngestionFilesType,
   RecordType,
   useQuery,
   useStore,
@@ -47,8 +47,7 @@ interface FilePickerDialogProps {
   onFilesSelection: (selected: Selection) => void;
   selection: Selection;
   fetchMetaData?: boolean;
-  fileType?: FileType;
-  fileNamePattern?: string | undefined;
+  rasterIngestionFilesType?: RasterIngestionFilesType | undefined;
 }
 
 const getSuffixFromFolderChain = (folderChain: FileData[]): string => {
@@ -63,8 +62,7 @@ export const FilePickerDialog: React.FC<FilePickerDialogProps> = observer(
     onFilesSelection,
     selection: currentSelection,
     fetchMetaData = true,
-    fileType = undefined,
-    fileNamePattern = undefined
+    rasterIngestionFilesType = undefined
   }) => {
     const filePickerRef = useRef<FilePickerComponentHandle>(null);
     const [files, setFiles] = useState<FileData[]>([]);
@@ -90,8 +88,7 @@ export const FilePickerDialog: React.FC<FilePickerDialogProps> = observer(
           data: {
             path,
             type: recordType,
-            fileType,
-            fileNamePattern
+            rasterIngestionFilesType
           },
         })
       );

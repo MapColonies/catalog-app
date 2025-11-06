@@ -43,7 +43,7 @@ const POLYGON_PARTS = {
 };
 const WFS = (window as any)._env_.WFS;
 const GEOCODER = (window as any)._env_.GEOCODER;
-const FP_FILES_NAME = (window as any)._env_.FP_FILES_NAME;
+const RASTER_INGESTION_FILES_STRUCTURE = JSON.parse((window as any)._env_.RASTER_INGESTION_FILES_STRUCTURE);
 
 const enrichBaseMaps = (baseMaps: IBaseMaps): IBaseMaps => {
   return {
@@ -246,10 +246,28 @@ const APP_CONFIG = {
     CALLBACK_URL: GEOCODER.callbackUrl,
     RESULTS_LIMIT: 6
   },
-  FP_FILES_NAME: {
-    gpkg: FP_FILES_NAME.gpkg,
-    product: FP_FILES_NAME.product,
-    shapeMetadata: FP_FILES_NAME.shapeMetadata
+  RASTER_INGESTION_FILES_STRUCTURE: {
+    data: {
+      allowedExt: RASTER_INGESTION_FILES_STRUCTURE.data.allowedExt as string[],
+      selectableExt: RASTER_INGESTION_FILES_STRUCTURE.data.selectableExt as string[],
+      relativeToAOIDirPath: RASTER_INGESTION_FILES_STRUCTURE.data.relativeToAOIDirPath as string,
+      producerFileName: RASTER_INGESTION_FILES_STRUCTURE.data.producerFileName as string,
+      selectablePattern: RASTER_INGESTION_FILES_STRUCTURE.data.selectablePattern as string
+    },
+    product: {
+      allowedExt: RASTER_INGESTION_FILES_STRUCTURE.product.allowedExt as string[],
+      selectableExt: RASTER_INGESTION_FILES_STRUCTURE.product.selectableExt as string[],
+      relativeToAOIDirPath: RASTER_INGESTION_FILES_STRUCTURE.product.relativeToAOIDirPath as string,
+      producerFileName: RASTER_INGESTION_FILES_STRUCTURE.product.producerFileName as string,
+      selectablePattern: RASTER_INGESTION_FILES_STRUCTURE.product.selectablePattern as string[]
+    },
+    shapeMetadata: {
+      allowedExt: RASTER_INGESTION_FILES_STRUCTURE.shapeMetadata.allowedExt as string[],
+      selectableExt: RASTER_INGESTION_FILES_STRUCTURE.shapeMetadata.selectableExt as string[],
+      relativeToAOIDirPath: RASTER_INGESTION_FILES_STRUCTURE.shapeMetadata.relativeToAOIDirPath as string,
+      producerFileName: RASTER_INGESTION_FILES_STRUCTURE.shapeMetadata.producerFileName as string,
+      selectablePattern: RASTER_INGESTION_FILES_STRUCTURE.shapeMetadata.selectablePattern as string
+    }
   }
 };
 

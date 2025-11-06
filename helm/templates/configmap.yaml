@@ -13,6 +13,7 @@
   CONFIGURATION_ACCESS_TOKEN_ATTRIBUTE_NAME: {{ quote .Values.global.shared.accessToken.attributeName }}
   CONFIGURATION_ACCESS_TOKEN_INJECTION_TYPE: {{ quote .Values.global.shared.accessToken.injectionType }}
   CONFIGURATION_ACCESS_TOKEN_TOKEN_VALUE: {{ quote .Values.global.shared.accessToken.tokenValue }}
+  CONFIGURATION_RASTER_INGESTION_FILES_STRUCTURE: {{ quote .Values.global.shared.rasterIngestionFilesStructure }}
   CONFIGURATION_IMAGE_TAG: {{ quote .Values.configValues.image.tag }}
   CONFIGURATION_PUBLIC_URL: {{ quote .Values.env.publicUrl }}
   CONFIGURATION_SERVICE_PROTOCOL: {{ quote .Values.env.serviceProtocol }}

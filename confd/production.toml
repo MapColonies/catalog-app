@@ -69,4 +69,5 @@ keys = [
   "/configuration/geocoder/url",
   "/configuration/geocoder/callbackUrl",
   "/configuration/fpFilesName"
+  "/configuration/rasteringestionfilesstructure"
 ]

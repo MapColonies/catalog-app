@@ -97,5 +97,28 @@ window._env_ = {
     gpkg: '{{ getv "/configuration/fpFilesName" "" }}'
     product: '{{ getv "/configuration/fpFilesName" "Product" }}'
     shapeMetadata: '{{ getv "/configuration/fpFilesName" "ShapeMetadata" }}'
-  }
+  },
+  RASTER_INGESTION_FILES_STRUCTURE: 
+  '{{ getv "/configuration/raster/ingestion/files/structure" "{ data: {
+      allowedExt: ['.gpkg'],
+      selectableExt: ['.gpkg'],
+      relativeToAOIDirPath: './data',
+      producerFileName: '*',
+      selectablePattern: '*'
+    },
+    product: {
+      allowedExt: ['.shp', '.shx', '.dbf', '.prj', '.sbn', '.sbx', '.xml', '.cpg', '.qix'],
+      selectableExt: ['.shp'],
+      relativeToAOIDirPath: './shape',
+      producerFileName: 'Product',
+      selectablePattern: 'Product'
+    },
+    shapeMetadata: {
+      allowedExt: ['.shp', '.shx', '.dbf', '.prj', '.sbn', '.sbx', '.xml', '.cpg', '.qix'],
+      selectableExt: ['.shp'],
+      relativeToAOIDirPath: './shape',
+      producerFileName: 'ShapeMetadata',
+      selectablePattern: 'ShapeMetadata'
+    }
+  }"}}'
 };
