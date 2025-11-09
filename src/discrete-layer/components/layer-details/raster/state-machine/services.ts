@@ -8,8 +8,7 @@ import {
   JobModelType,
   LayerMetadataMixedUnion,
   RecordType,
-  TasksGroupModelType,
-  // EntityDescriptorModelType
+  TasksGroupModelType
 } from '../../../../models';
 import { LayerRasterRecordInput } from '../../../../models/RootStore.base';
 import { /*cleanUpEntityPayload, getFlatEntityDescriptors, */transformEntityToFormFields } from '../../utils';
@@ -154,7 +153,7 @@ export const SERVICES = {
       };
     }),
     jobSubmissionService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
-      /*const { store, files, resolutionDegree, formData } = input.context || {};
+      const { store, files, resolutionDegree, formData } = input.context || {};
 
       const data = {
         ingestionResolution: resolutionDegree as number,
@@ -163,27 +162,27 @@ export const SERVICES = {
           productShapefilePath: files?.product?.path as string,
           metadataShapefilePath: files?.metadata?.path as string
         },
-        metadata: formData ?? {},
-        callbackUrls: ['https://my-dns-for-callback'],
+        metadata: (formData ?? {}) as LayerRasterRecordInput,
         type: RecordType.RECORD_RASTER,
-      };*/
+      };
 
       let result;
       if (input.context.flowType === Mode.NEW) {
-        /* result = await queryExecutor(async () => {
+        result = await queryExecutor(async () => {
           return await store.mutateStartRasterIngestion({ data });
-        }); */
+        });
       } else if (input.context.flowType === Mode.UPDATE) {
-        /* result = await queryExecutor(async () => {
+        result = await queryExecutor(async () => {
           return await store.mutateStartRasterUpdateGeopkg({ data });
-        }); */
+        });
       }
+
       result = {
-        jobId: MOCK_JOB.id
+        jobId: MOCK_JOB.id, // TODO: Mock should be removed
       };
 
       return {
-        jobId: result.jobId
+        jobId: result.jobId,
       };
     }),
     jobPollingService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
