@@ -122,7 +122,7 @@ import { FractionType } from "./FractionTypeEnum"
 import { ProviderType } from "./ProviderTypeEnum"
 import { ServiceType } from "./ServiceTypeEnum"
 import { Status } from "./StatusEnum"
-import { RasterIngestionFilesType } from "./RasterIngestionFilesTypeEnum"
+import { RasterIngestionFilesTypeConfig } from "./RasterIngestionFilesTypeConfigEnum"
 
 export type CapabilitiesLayersSearchParams = {
   data: CapabilitiesLayersSearchParam[]
@@ -203,7 +203,7 @@ export type LookupTableFieldInput = {
 export type ExplorerGetByPath = {
   path: string
   type: RecordType
-  rasterIngestionFilesType?: RasterIngestionFilesType
+  rasterIngestionFilesTypeConfig?: RasterIngestionFilesTypeConfig
 }
 export type ExplorerGetById = {
   id: string

@@ -7,16 +7,16 @@ import { types } from "mobx-state-tree"
  * Typescript enum
  */
 
-export enum RasterIngestionFilesType {
+export enum RasterIngestionFilesTypeConfig {
   DATA="DATA",
 PRODUCT="PRODUCT",
 SHAPEMETADATA="SHAPEMETADATA"
 }
 
 /**
-* RasterIngestionFilesType
+* RasterIngestionFilesTypeConfig
 */
-export const RasterIngestionFilesTypeEnumType = types.enumeration("RasterIngestionFilesType", [
+export const RasterIngestionFilesTypeConfigEnumType = types.enumeration("RasterIngestionFilesTypeConfig", [
         "DATA",
   "PRODUCT",
   "SHAPEMETADATA",

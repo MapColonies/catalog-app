@@ -10,7 +10,7 @@ import { Selection } from '../../../../common/components/file-picker';
 import { FieldLabelComponent } from '../../../../common/components/form/field-label';
 import { dateFormatter } from '../../../../common/helpers/formatters';
 import { Mode } from '../../../../common/models/mode.enum';
-import { RecordType, LayerMetadataMixedUnion, RasterIngestionFilesType } from '../../../models';
+import { RecordType, LayerMetadataMixedUnion, RasterIngestionFilesTypeConfig } from '../../../models';
 import { FilePickerDialog } from '../../dialogs/file-picker.dialog';
 // import { transformEntityToFormFields } from '../utils';
 import { RasterWorkflowContext } from './state-machine/context';
@@ -102,7 +102,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
   });
   const [selectedAction, setSelectedAction] = useState<string | null>(null);
   const [pendingFileEvent, setPendingFileEvent] = useState<Events | null>(null);
-  const [ingestionFilesType, setIngestionFilesType] = useState<RasterIngestionFilesType>();
+  const [IngestionFilesTypeConfig, setIngestionFilesTypeConfig] = useState<RasterIngestionFilesTypeConfig>();
 
 
   useEffect(() => {
@@ -230,7 +230,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
               onClick={() => {
                 setSelectedAction(GPKG);
                 setFilePickerDialogOpen(true);
-                setIngestionFilesType(RasterIngestionFilesType.DATA);
+                setIngestionFilesTypeConfig(RasterIngestionFilesTypeConfig.DATA);
               }}
             >
               <FormattedMessage id="general.choose-btn.text" />
@@ -243,7 +243,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
               onClick={() => {
                 setSelectedAction(PRODUCT);
                 setFilePickerDialogOpen(true);
-                setIngestionFilesType(RasterIngestionFilesType.PRODUCT);
+                setIngestionFilesTypeConfig(RasterIngestionFilesTypeConfig.PRODUCT);
               }}
             >
               <FormattedMessage id="general.choose-btn.text" />
@@ -256,7 +256,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
               onClick={() => {
                 setSelectedAction(METADATA);
                 setFilePickerDialogOpen(true);
-                setIngestionFilesType(RasterIngestionFilesType.SHAPEMETADATA);
+                setIngestionFilesTypeConfig(RasterIngestionFilesTypeConfig.SHAPEMETADATA);
               }}
             >
               <FormattedMessage id="general.choose-btn.text" />
@@ -275,7 +275,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
               onClick={(): void => {
                 setSelectedAction(FILES);
                 setFilePickerDialogOpen(true);
-                setIngestionFilesType(RasterIngestionFilesType.DATA);
+                setIngestionFilesTypeConfig(RasterIngestionFilesTypeConfig.DATA);
               }}
             >
               <FormattedMessage id="general.choose-btn.text" />
@@ -291,7 +291,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
           onSetOpen={setFilePickerDialogOpen}
           onFilesSelection={onFilesSelection}
           selection={selection}
-          rasterIngestionFilesType={ingestionFilesType}
+          rasterIngestionFilesTypeConfig={IngestionFilesTypeConfig}
         />
       }
     </>

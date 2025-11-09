@@ -1,6 +1,7 @@
-type RasterFileType = 'data' | 'product' | 'shapeMetadata';
+// RASTER GENERAL CONFIGURATION
+import { RasterIngestionFilesTypeConfig } from "../../discrete-layer/models";
 
-interface IRasterFileGroup {
+interface IRasterFileGroupConfig {
   allowedExt: string[];
   selectableExt: string[];
   relativeToAOIDirPath: string;
@@ -8,4 +9,4 @@ interface IRasterFileGroup {
   selectablePattern: string;
 }
 
-export type IRasterIngestionFilesStructure = Record<RasterFileType, IRasterFileGroup>;
+export type IRasterIngestionFilesStructureConfig = Record<RasterIngestionFilesTypeConfig, IRasterFileGroupConfig>;

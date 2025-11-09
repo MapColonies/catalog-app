@@ -94,7 +94,8 @@ window._env_ = {
     callbackUrl: '{{ getv "/configuration/geocoder/callbackUrl" "http://geocoder-callback-URL" }}'
   },
   RASTER_INGESTION_FILES_STRUCTURE: 
-  '{{ getv "/configuration/raster/ingestion/files/structure" "{ data: {
+  '{{ getv "/configuration/raster/ingestion/files/structure" "{
+    data: {
       allowedExt: ['.gpkg'],
       selectableExt: ['.gpkg'],
       relativeToAOIDirPath: './data',
