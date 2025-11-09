@@ -2,6 +2,7 @@ import { CesiumGeographicTilingScheme, Proj } from '@map-colonies/react-componen
 import { IRasterLayer } from '@map-colonies/react-components/dist/cesium-map/layers-manager';
 import { IBaseMaps, IBaseMap } from '@map-colonies/react-components/dist/cesium-map/map';
 import { LinkType } from '../models/link-type.enum';
+import { IRasterIngestionFilesStructureConfig } from '../models/raster-ingestion-files-structure';
 
 /*eslint-disable */
 const LANGUAGE = (window as any)._env_.LANGUAGE as string;
@@ -44,6 +45,7 @@ const POLYGON_PARTS = {
 };
 const WFS = (window as any)._env_.WFS;
 const GEOCODER = (window as any)._env_.GEOCODER;
+const RASTER_INGESTION_FILES_STRUCTURE = JSON.parse((window as any)._env_.RASTER_INGESTION_FILES_STRUCTURE);
 
 const enrichBaseMaps = (baseMaps: IBaseMaps): IBaseMaps => {
   return {
@@ -246,6 +248,9 @@ const APP_CONFIG = {
     URL: GEOCODER.url,
     CALLBACK_URL: GEOCODER.callbackUrl,
     RESULTS_LIMIT: 6
+  },
+  RASTER_INGESTION_FILES_STRUCTURE: {
+    ...RASTER_INGESTION_FILES_STRUCTURE as IRasterIngestionFilesStructureConfig
   }
 };
 

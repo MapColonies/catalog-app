@@ -346,6 +346,9 @@ export const workflowMachine = createMachine<IContext, Events>({
       on: {
         SET_FILES: {
           actions: assign((_: { context: IContext; event: any }) => ({
+            selectionMode: _.event.selectionMode ?
+              _.event.selectionMode :
+              _.context.selectionMode,
             files: _.event.addPolicy === 'merge' ?
               merge({}, _.context.files, _.event.files) :
               { ..._.event.files }

@@ -25,7 +25,7 @@ export const fetchProductActions = [
 
 export const selectionModeActions = (selectionMode: SelectionMode, files: IFiles = {}) => [
   assign({ selectionMode, files }),
-  sendParent({ type: "SET_FILES", files, addPolicy: "override" })
+  sendParent({ type: "SET_FILES", selectionMode, files, addPolicy: "override" })
 ];
 
 export const selectFileActions = (fileType: 'gpkg' | 'product' | 'metadata', parentAddPolicy: AddPolicy = 'merge', preserveCurrent: boolean = true) => [

@@ -27,6 +27,7 @@ import { normalizePath } from '../../../common/helpers/formatters';
 import {
   FileModelType,
   LayerMetadataMixedUnion,
+  RasterIngestionFilesTypeConfig,
   RecordType,
   useQuery,
   useStore,
@@ -47,6 +48,7 @@ interface FilePickerDialogProps {
   onFilesSelection: (selected: Selection) => void;
   selection: Selection;
   fetchMetaData?: boolean;
+  rasterIngestionFilesTypeConfig?: RasterIngestionFilesTypeConfig | undefined;
 }
 
 const getSuffixFromFolderChain = (folderChain: FileData[]): string => {
@@ -60,7 +62,8 @@ export const FilePickerDialog: React.FC<FilePickerDialogProps> = observer(
     onSetOpen,
     onFilesSelection,
     selection: currentSelection,
-    fetchMetaData=true,
+    fetchMetaData = true,
+    rasterIngestionFilesTypeConfig = undefined
   }) => {
     const filePickerRef = useRef<FilePickerComponentHandle>(null);
     const [files, setFiles] = useState<FileData[]>([]);
@@ -86,6 +89,7 @@ export const FilePickerDialog: React.FC<FilePickerDialogProps> = observer(
           data: {
             path,
             type: recordType,
+            rasterIngestionFilesTypeConfig
           },
         })
       );
