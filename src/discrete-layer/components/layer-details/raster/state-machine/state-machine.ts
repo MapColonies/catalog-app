@@ -297,7 +297,9 @@ export const workflowMachine = createMachine<IContext, Events>({
         },
         RESTORE: {
           actions: assign((_: { context: IContext; event: any }) => ({
-            ..._.event.data
+            restoreFromJob: {
+              ..._.event.data
+            }
           })),
           target: WORKFLOW.RESTORE_JOB
         },
@@ -313,20 +315,18 @@ export const workflowMachine = createMachine<IContext, Events>({
         onDone: [
           {
             guard: (_: { context: IContext; event: any }) => {
-              return _.event.output.locked;
+              return !!_.event.output.restoreFromJob;
             },
             actions: assign((_: { context: IContext; event: any }) => ({
-              ..._.event.output.data
+              ..._.event.output
             })),
             target: WORKFLOW.RESTORE_JOB
           },
           {
-            actions: assign((_: { context: IContext; event: any }) => {
-              return {
+            actions: assign((_: { context: IContext; event: any }) => ({
               flowType: Mode.UPDATE,
               selectionMode: CONFIG.SELECTION_MODE_DEFAULT === '' ? 'auto' : CONFIG.SELECTION_MODE_DEFAULT
-            };
-          }),
+            })),
             target: WORKFLOW.FILES.ROOT
           }
         ],

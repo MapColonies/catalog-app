@@ -5,14 +5,14 @@ import { fromPromise } from 'xstate';
 import { FileData } from '@map-colonies/react-components';
 import { Mode } from '../../../../../common/models/mode.enum';
 import {
+  JobModelType,
   LayerMetadataMixedUnion,
   RecordType,
   TasksGroupModelType,
   // EntityDescriptorModelType
 } from '../../../../models';
-// import { LayerRasterRecordInput } from '../../../../models/RootStore.base';
-// import { cleanUpEntityPayload, getFlatEntityDescriptors } from '../../utils';
-import { transformEntityToFormFields } from '../../utils';
+import { LayerRasterRecordInput } from '../../../../models/RootStore.base';
+import { /*cleanUpEntityPayload, getFlatEntityDescriptors, */transformEntityToFormFields } from '../../utils';
 import { FeatureType } from '../pp-map.utils';
 import { buildError, getFeatureAndMarker, getFile } from './helpers';
 import { MOCK_JOB, MOCK_POLYGON } from './MOCK';
@@ -22,6 +22,7 @@ import {
   FromPromiseArgs,
   GPKG_LABEL,
   IContext,
+  IPartialContext,
   METADATA_LABEL,
   METADATA_SHP,
   PRODUCT_LABEL,
@@ -31,6 +32,7 @@ import {
   WORKFLOW
 } from './types';
 
+//#region Helpers
 const getDirectory = async (filePath: string, context: IContext): Promise<FileData[] | undefined> => {
   try {
     const result = await queryExecutor(async () => {
@@ -88,6 +90,50 @@ const selectGpkg = async (context: IContext) => {
   };
 };
 
+const getRestoreData = async (context: IContext): Promise<IPartialContext> => {
+  const rootDirectory = await getDirectory('/', context);
+  if (!rootDirectory || rootDirectory.length === 0) {
+    throw buildError('ingestion.error.not-found', '/');
+  }
+  const MOUNT_DIR = rootDirectory[FIRST].name;
+
+  const job = context.restoreFromJob as JobModelType;
+
+  const flowTypeMap: { [key: string]: Mode } = {
+    'Ingestion_Update': Mode.UPDATE,
+    'Ingestion_New': Mode.NEW,
+  };
+  const flowType = flowTypeMap[job.type || 'Ingestion_New'];
+
+  return {
+    flowType: flowType as IPartialContext['flowType'],
+    selectionMode: 'restore',
+    files: {
+      gpkg: {
+        label: GPKG_LABEL,
+        path: path.resolve(MOUNT_DIR, job.parameters.inputFiles.gpkgFilesPath[0]),
+        exists: false
+      },
+      product: {
+        label: PRODUCT_LABEL,
+        path: path.resolve(MOUNT_DIR, job.parameters.inputFiles.productShapefilePath),
+        exists: false
+      },
+      metadata: {
+        label: METADATA_LABEL,
+        path: path.resolve(MOUNT_DIR, job.parameters.inputFiles.metadataShapefilePath),
+        exists: false
+      }
+    },
+    resolutionDegree: job.parameters.ingestionResolution,
+    formData: transformEntityToFormFields(job.parameters.metadata as unknown as LayerMetadataMixedUnion) as unknown as LayerRasterRecordInput,
+    job: {
+      jobId: job.id
+    }
+  };
+};
+//#endregion
+
 export const SERVICES = {
   [WORKFLOW.ROOT]: {
     fetchActiveJobService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
@@ -103,50 +149,9 @@ export const SERVICES = {
 
       const job = MOCK_JOB; // TODO: Mock should be removed
 
-      const rootDirectory = await getDirectory('/', input.context);
-      if (!rootDirectory || rootDirectory.length === 0) {
-        throw buildError('ingestion.error.not-found', '/');
-      }
-      const MOUNT_DIR = rootDirectory[FIRST].name;
-
-      const restoreData = {
-        data: {
-          flowType: Mode.UPDATE,
-          selectionMode: 'restore',
-          files: {
-            gpkg: {
-              label: GPKG_LABEL,
-              path: path.resolve(MOUNT_DIR, job.parameters.inputFiles.gpkgFilesPath[0]),
-              exists: false
-            },
-            product: {
-              label: PRODUCT_LABEL,
-              path: path.resolve(MOUNT_DIR, job.parameters.inputFiles.productShapefilePath),
-              exists: false
-            },
-            metadata: {
-              label: METADATA_LABEL,
-              path: path.resolve(MOUNT_DIR, job.parameters.inputFiles.metadataShapefilePath),
-              exists: false
-            }
-          },
-          resolutionDegree: job.parameters.ingestionResolution,
-          formData: {
-            ...transformEntityToFormFields(job.parameters.metadata as unknown as LayerMetadataMixedUnion)
-          },
-          job: {
-            jobId: job.id
-          }
-        }
-      }
-
-      // const locked = job ? true : false;
-      const locked = false;
-      const result = { 
-        locked,
-        ...restoreData
+      return { 
+        restoreFromJob: job
       };
-      return result;
     }),
     jobSubmissionService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
       /*const { store, files, resolutionDegree, formData } = input.context || {};
@@ -215,8 +220,8 @@ export const SERVICES = {
       };
     }),
     restoreJobService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
-      let { flowType, selectionMode, files, resolutionDegree, formData, job } = input.context || {};
-      let { gpkg, product, metadata } = files || {};
+      const { flowType, selectionMode, files, resolutionDegree, formData, job } = await getRestoreData(input.context || {});
+      const { gpkg, product, metadata } = files || {};
 
       if (files?.gpkg) {
         const gpkgRef = files.gpkg;

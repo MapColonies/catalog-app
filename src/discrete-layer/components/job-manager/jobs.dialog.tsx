@@ -16,6 +16,7 @@ import useDateNow from '../../../common/hooks/useDateNow.hook';
 import { JobModelType } from '../../models';
 import { IDispatchAction } from '../../models/actionDispatcherStore';
 import { useQuery, useStore } from '../../models/RootStore';
+import { MOCK_JOB } from '../layer-details/raster/state-machine/MOCK';
 import { downloadJSONToClient } from '../layer-details/utils';
 import JobManagerGrid from './grids/job-manager-grid.common';
 import { JOB_ENTITY } from './job.types';
@@ -222,6 +223,10 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
             store.queryJob({
               id: data.id as string
             }));
+          break;
+        case 'Job.restore':
+          // const job = data as unknown as JobModelType;
+          const job = MOCK_JOB;
           break;
         default:
           break;

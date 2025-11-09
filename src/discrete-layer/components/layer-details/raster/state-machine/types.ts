@@ -6,6 +6,7 @@ import { Mode } from '../../../../../common/models/mode.enum';
 import {
   IBaseRootStore,
   IRootStore,
+  JobModelType,
   LayerRasterRecordModelType,
   SourceValidationModelType,
   Status
@@ -68,6 +69,7 @@ export interface IContext {
   errors: IStateError[];
   flowType?: Mode.NEW | Mode.UPDATE;
   updatedLayer?: LayerRasterRecordModelType;
+  restoreFromJob?: JobModelType;
   selectionMode?: SelectionMode;
   files?: IFiles;
   resolutionDegree?: number;
@@ -93,7 +95,7 @@ export type Events =
   | { type: "CLEAN_ERRORS" }
   | { type: "NOOP" }
   | { type: "SUBMIT", data: LayerRasterRecordInput, resolutionDegree: number }
-  | { type: "RESTORE", data: IPartialContext }
+  | { type: "RESTORE", data: JobModelType }
   | { type: "RETRY" }
   | { type: "DONE" };
 
