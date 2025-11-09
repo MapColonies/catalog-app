@@ -2,6 +2,7 @@ import { CesiumGeographicTilingScheme, Proj } from '@map-colonies/react-componen
 import { IRasterLayer } from '@map-colonies/react-components/dist/cesium-map/layers-manager';
 import { IBaseMaps, IBaseMap } from '@map-colonies/react-components/dist/cesium-map/map';
 import { LinkType } from '../models/link-type.enum';
+import { IRasterIngestionFilesStructure } from '../models/raster-ingestion-files-structure';
 
 /*eslint-disable */
 const LANGUAGE = (window as any)._env_.LANGUAGE as string;
@@ -247,27 +248,7 @@ const APP_CONFIG = {
     RESULTS_LIMIT: 6
   },
   RASTER_INGESTION_FILES_STRUCTURE: {
-    data: {
-      allowedExt: RASTER_INGESTION_FILES_STRUCTURE.data.allowedExt as string[],
-      selectableExt: RASTER_INGESTION_FILES_STRUCTURE.data.selectableExt as string[],
-      relativeToAOIDirPath: RASTER_INGESTION_FILES_STRUCTURE.data.relativeToAOIDirPath as string,
-      producerFileName: RASTER_INGESTION_FILES_STRUCTURE.data.producerFileName as string,
-      selectablePattern: RASTER_INGESTION_FILES_STRUCTURE.data.selectablePattern as string
-    },
-    product: {
-      allowedExt: RASTER_INGESTION_FILES_STRUCTURE.product.allowedExt as string[],
-      selectableExt: RASTER_INGESTION_FILES_STRUCTURE.product.selectableExt as string[],
-      relativeToAOIDirPath: RASTER_INGESTION_FILES_STRUCTURE.product.relativeToAOIDirPath as string,
-      producerFileName: RASTER_INGESTION_FILES_STRUCTURE.product.producerFileName as string,
-      selectablePattern: RASTER_INGESTION_FILES_STRUCTURE.product.selectablePattern as string[]
-    },
-    shapeMetadata: {
-      allowedExt: RASTER_INGESTION_FILES_STRUCTURE.shapeMetadata.allowedExt as string[],
-      selectableExt: RASTER_INGESTION_FILES_STRUCTURE.shapeMetadata.selectableExt as string[],
-      relativeToAOIDirPath: RASTER_INGESTION_FILES_STRUCTURE.shapeMetadata.relativeToAOIDirPath as string,
-      producerFileName: RASTER_INGESTION_FILES_STRUCTURE.shapeMetadata.producerFileName as string,
-      selectablePattern: RASTER_INGESTION_FILES_STRUCTURE.shapeMetadata.selectablePattern as string
-    }
+    ...RASTER_INGESTION_FILES_STRUCTURE as IRasterIngestionFilesStructure
   }
 };
 
