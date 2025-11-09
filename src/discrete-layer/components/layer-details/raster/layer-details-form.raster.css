@@ -171,7 +171,3 @@ body[dir='rtl'] #layerDetailsFormRaster .enumOptions .mdc-select__dropdown-icon 
   padding-bottom: 6px;
   color: var(--mdc-theme-text-icon-on-dark);
 }
-
-#layerDetailsFormRaster .goToJobManagerButton {
-  border-color: var(--mdc-theme-primary);
-}

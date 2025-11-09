@@ -18,6 +18,7 @@ export const AvailableActionsModelBase = ModelBase
     __typename: types.optional(types.literal("AvailableActions"), "AvailableActions"),
     isResumable: types.union(types.undefined, types.boolean),
     isAbortable: types.union(types.undefined, types.null, types.boolean),
+    isRestorable: types.union(types.undefined, types.null, types.boolean),
   })
   .views(self => ({
     get store() {
@@ -28,9 +29,10 @@ export const AvailableActionsModelBase = ModelBase
 export class AvailableActionsModelSelector extends QueryBuilder {
   get isResumable() { return this.__attr(`isResumable`) }
   get isAbortable() { return this.__attr(`isAbortable`) }
+  get isRestorable() { return this.__attr(`isRestorable`) }
 }
 export function selectFromAvailableActions() {
   return new AvailableActionsModelSelector()
 }
 
-export const availableActionsModelPrimitives = selectFromAvailableActions().isResumable.isAbortable
+export const availableActionsModelPrimitives = selectFromAvailableActions().isResumable.isAbortable.isRestorable

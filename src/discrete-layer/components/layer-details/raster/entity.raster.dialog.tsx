@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import { cloneDeep, isEmpty } from 'lodash';
 import * as Yup from 'yup';
 import { DialogContent } from '@material-ui/core';
-import { Dialog, DialogTitle, Icon, IconButton } from '@map-colonies/react-core';
+import { Dialog, DialogTitle, Icon, IconButton, Typography } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
 import CONFIG from '../../../../common/config';
 import { emphasizeByHTML } from '../../../../common/helpers/formatters';
@@ -23,6 +23,7 @@ import {
   ValidationValueType,
   RecordStatus,
   LayerRasterRecordModelType,
+  JobModelType,
 } from '../../../models';
 import { ILayerImage } from '../../../models/layerImage';
 import { LayerRasterRecordInput } from '../../../models/RootStore.base';
@@ -43,7 +44,7 @@ import {
   cleanUpEntityPayload
 } from '../utils';
 import EntityRasterForm from './layer-details-form.raster';
-import { Events, IPartialContext } from './state-machine/types';
+import { Events } from './state-machine/types';
 import { RasterWorkflowProvider, RasterWorkflowContext } from './state-machine/context';
 import { getUIIngestionFieldDescriptors } from './utils';
 
@@ -59,7 +60,7 @@ interface EntityRasterDialogProps {
   recordType?: RecordType;
   layerRecord?: ILayerImage | null;
   isSelectedLayerUpdateMode?: boolean;
-  job?: IPartialContext;
+  job?: JobModelType;
 }
 
 const setDefaultValues = (record: Record<string, unknown>, descriptors: EntityDescriptorModelType[]): void => {
@@ -123,7 +124,7 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
       if (props.job) {
         actorRef.send({
           type: 'RESTORE',
-          data: props.job,
+          data: props.job
         } satisfies Events);
       } else if (props.isSelectedLayerUpdateMode && props.layerRecord) {
         actorRef.send({
@@ -134,7 +135,7 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
         actorRef.send({
           type: 'START_NEW',
           flowType: Mode.NEW,
-          selectionMode: CONFIG.SELECTION_MODE ?? 'auto',
+          selectionMode: CONFIG.SELECTION_MODE_DEFAULT === '' ? 'auto' : CONFIG.SELECTION_MODE_DEFAULT
         } satisfies Events);
       }
     }, [props.isSelectedLayerUpdateMode, props.layerRecord, actorRef]);
@@ -304,10 +305,8 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
           { 
             state.context.selectionMode === 'restore' &&
             <Box className='lockedIcon'>
-              <Icon
-                icon={{ icon: 'lock', size: 'xlarge' }}
-                />
-              <span>{ intl.formatMessage({ id: 'general.title.locked' }) }</span>
+              <Icon icon={{ icon: 'lock', size: 'xlarge' }} />
+              <Typography tag="span">{ intl.formatMessage({ id: 'general.title.locked' }) }</Typography>
             </Box>
           }
         </Box>

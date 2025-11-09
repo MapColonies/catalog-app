@@ -62,7 +62,8 @@
   CONFIGURATION_WHATSNEW_URL: {{ quote .Values.env.whatsnewUrl }}
   CONFIGURATION_SITES_CONFIG: {{ quote .Values.env.sitesConfig }}
   CONFIGURATION_BFF_PATH: {{ quote .Values.env.bffPath }}
-  CONFIGURATION_SELECTION_MODE: {{ quote .Values.env.selectionMode }}
+  CONFIGURATION_SELECTION_MODE_DEFAULT: {{ quote .Values.env.selectionModeDefault }}
+  CONFIGURATION_SHOW_SELECTION_MODE_SWITCH: {{ quote .Values.env.showSelectionModeSwitch }}
   CONFIGURATION_POLYGONPARTS_FEATURETYPEPREFIX: {{ quote .Values.env.polygonParts.featureTypePrefix }}
   CONFIGURATION_POLYGONPARTS_DENSITYFACTOR: {{ quote .Values.env.polygonParts.densityFactor }}
   CONFIGURATION_POLYGONPARTS_GEOMETRY_ERRORS_THRESHOLD: {{ quote .Values.env.polygonParts.geometryErrorsThreshold }}

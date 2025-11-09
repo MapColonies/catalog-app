@@ -26,67 +26,67 @@ export const MOCK_JOB = {
       tileOutputFormat: "PNG",
       layerRelativePath: "025d4fc6-3a01-4c6e-9606-e99fa12d185b/efb28079-6781-4c68-b4d0-d8ddfd8da42b"
     },
-      partsData: [
-        {
-          sensors: [
-            "WV02"
+    partsData: [
+      {
+        sensors: [
+          "WV02"
+        ],
+        sourceId: "10300500B7F94C00",
+        footprint: {
+          bbox: [
+            34.453125,
+            35.67305400967598,
+            34.456225633621216,
+            35.68359375
           ],
-          sourceId: "10300500B7F94C00",
-          footprint: {
-            bbox: [
-              34.453125,
-              35.67305400967598,
-              34.456225633621216,
-              35.68359375
-            ],
-            type: "Polygon",
-            coordinates: [
+          type: "Polygon",
+          coordinates: [
+            [
               [
-                [
-                  34.45506289601326,
-                  35.6808565557003
-                ],
-                [
-                  34.453125,
-                  35.67305400967598
-                ],
-                [
-                  34.456225633621216,
-                  35.68359375
-                ],
-                [
-                  34.453125,
-                  35.68359375
-                ],
-                [
-                  34.45461764931679,
-                  35.68273410201073
-                ],
-                [
-                  34.45506289601326,
-                  35.6808565557003
-                ]
+                34.45506289601326,
+                35.6808565557003
+              ],
+              [
+                34.453125,
+                35.67305400967598
+              ],
+              [
+                34.456225633621216,
+                35.68359375
+              ],
+              [
+                34.453125,
+                35.68359375
+              ],
+              [
+                34.45461764931679,
+                35.68273410201073
+              ],
+              [
+                34.45506289601326,
+                35.6808565557003
               ]
             ]
-          },
-          sourceName: "Cyprus_after_model22.3",
-          resolutionMeter: 1222.99,
-          resolutionDegree: 0.010986328125,
-          imagingTimeEndUTC: "2021-06-27T09:00:00.000Z",
-          imagingTimeBeginUTC: "2021-06-27T09:00:00.000Z",
-          sourceResolutionMeter: 0.48,
-          horizontalAccuracyCE90: 8.5
-        }
-      ],
-      inputFiles: {
-        gpkgFilesPath: ["test_dir/shaziri-orthophto-test.gpkg"],
-        productShapefilePath: "Shapes/Product.shp",
-        metadataShapefilePath: "Shapes/ShapeMetadata.shp"
-      },
-      ingestionResolution: 0.010986328125,
-      additionalParams: {
-        jobTrackerServiceURL: "http://raster-core-int-job-tracker-service"
+          ]
+        },
+        sourceName: "Cyprus_after_model22.3",
+        resolutionMeter: 1222.99,
+        resolutionDegree: 0.010986328125,
+        imagingTimeEndUTC: "2021-06-27T09:00:00.000Z",
+        imagingTimeBeginUTC: "2021-06-27T09:00:00.000Z",
+        sourceResolutionMeter: 0.48,
+        horizontalAccuracyCE90: 8.5
       }
+    ],
+    inputFiles: {
+      gpkgFilesPath: ["test_dir/shaziri-orthophto-test.gpkg"],
+      productShapefilePath: "shape/Product.shp",
+      metadataShapefilePath: "shape/ShapeMetadata.shp"
+    },
+    ingestionResolution: 0.010986328125,
+    additionalParams: {
+      jobTrackerServiceURL: "http://raster-core-int-job-tracker-service"
+    }
   },
   status: "Failed",
   reason: "GPKG source /layerSources/ingestion-source/test_dir/blueMarble.gpkg does not exist.",

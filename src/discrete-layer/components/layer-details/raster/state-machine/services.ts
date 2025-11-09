@@ -2,83 +2,26 @@ import { Feature, GeoJsonProperties, Geometry } from 'geojson';
 import path from 'path';
 // import shp from 'shpjs';
 import { fromPromise } from 'xstate';
-import { FileData } from '@map-colonies/react-components';
 import { Mode } from '../../../../../common/models/mode.enum';
-import {
-  LayerMetadataMixedUnion,
-  RecordType,
-  TasksGroupModelType,
-  // EntityDescriptorModelType
-} from '../../../../models';
+import { RecordType, TasksGroupModelType } from '../../../../models';
 import { LayerRasterRecordInput } from '../../../../models/RootStore.base';
 import { FeatureType } from '../pp-map.utils';
 import { buildError, getFeatureAndMarker, getFile } from './helpers';
-import { MOCK_POLYGON } from './MOCK';
+import { MOCK_JOB, MOCK_POLYGON } from './MOCK';
 import { queryExecutor } from './query-executor';
+import { getDetails, getDirectory, getRestoreData, selectGpkg } from './services-helpers';
 import {
   FIRST,
   FromPromiseArgs,
-  GPKG_LABEL,
-  GPKG_PATH,
   IContext,
   METADATA_LABEL,
   METADATA_SHP,
   PRODUCT_LABEL,
   PRODUCT_SHP,
   SHAPES_DIR,
+  SHAPES_RELATIVE_TO_DATA_DIR,
   WORKFLOW
 } from './types';
-import { transformEntityToFormFields } from '../../utils';
-import { MOCK_JOB } from './MOCK';
-
-const getDetails = async (filePath: string, context: IContext): Promise<FileData | undefined> => {
-  try {
-    const result = await queryExecutor(async () => {
-      return await context.store.queryGetDirectory({
-        data: {
-          path: path.dirname(filePath),
-          type: RecordType.RECORD_RASTER,
-        },
-      });
-    });
-    return (result?.getDirectory as FileData[]).filter((file: FileData) => file.name === path.basename(filePath))[0];
-  } catch (e) {
-    return undefined;
-  }
-};
-
-const selectGpkg = async (context: IContext) => {
-  if (!context.files?.gpkg?.path) {
-    throw (buildError('ingestion.error.missing', 'GPKG'));
-  }
-
-  const gpkgPath = context.files.gpkg.path;
-
-  const result = await queryExecutor(async () => {
-    return await context.store.queryValidateGPKGSource({
-      data: {
-        gpkgFilesPath: [gpkgPath],
-        type: RecordType.RECORD_RASTER,
-      }
-    });
-  });
-
-  const validationGPKG = result.validateGPKGSource[FIRST];
-  if (!validationGPKG.isValid) {
-    throw (buildError('ingestion.error.invalid-source-file', validationGPKG.message as string));
-  }
-
-  const validationResult = { ...validationGPKG };
-  const { feature, marker } = getFeatureAndMarker(validationResult.extentPolygon, FeatureType.SOURCE_EXTENT, FeatureType.SOURCE_EXTENT_MARKER);
-
-  return {
-    validationResult,
-    geoDetails: {
-      feature,
-      marker
-    }
-  };
-};
 
 export const SERVICES = {
   [WORKFLOW.ROOT]: {
@@ -95,44 +38,9 @@ export const SERVICES = {
 
       const job = MOCK_JOB; // TODO: Mock should be removed
 
-      const restoreData = {
-        data: {
-          flowType: Mode.UPDATE,
-          selectionMode: 'restore',
-          files: {
-            gpkg: {
-              label: GPKG_LABEL,
-              path: path.resolve(GPKG_PATH, job.parameters.inputFiles.gpkgFilesPath[0]),
-              exists: false
-            },
-            product: {
-              label: PRODUCT_LABEL,
-              path: path.resolve(GPKG_PATH, job.parameters.inputFiles.productShapefilePath),
-              exists: false
-            },
-            metadata: {
-              label: METADATA_LABEL,
-              path: path.resolve(GPKG_PATH, job.parameters.inputFiles.metadataShapefilePath),
-              exists: false
-            }
-          },
-          resolutionDegree: job.parameters.ingestionResolution,
-          formData: {
-            ...transformEntityToFormFields(job.parameters.metadata as unknown as LayerMetadataMixedUnion)
-          },
-          job: {
-            jobId: job.id
-          }
-        }
-      }
-
-      // const locked = job ? true : false;
-      const locked = false;
-      const result = { 
-        locked,
-        ...restoreData
+      return { 
+        restoreFromJob: job
       };
-      return result;
     }),
     jobSubmissionService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
       const { store, files, resolutionDegree, formData } = input.context || {};
@@ -201,8 +109,8 @@ export const SERVICES = {
       };
     }),
     restoreJobService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
-      let { flowType, selectionMode, files, resolutionDegree, formData, job } = input.context || {};
-      let { gpkg, product, metadata } = files || {};
+      const { flowType, selectionMode, files, resolutionDegree, formData, job } = await getRestoreData(input.context || {});
+      const { gpkg, product, metadata } = files || {};
 
       if (files?.gpkg) {
         const gpkgRef = files.gpkg;
@@ -236,7 +144,10 @@ export const SERVICES = {
       });
 
       const validationResult = { ...result.validateGPKGSource[FIRST] };
-      const { feature: gpkgFeature, marker: gpkgMarker } = getFeatureAndMarker(validationResult.extentPolygon, FeatureType.SOURCE_EXTENT, FeatureType.SOURCE_EXTENT_MARKER);
+      let gpkgFM: { feature: Feature<Geometry, GeoJsonProperties>; marker: Feature<Geometry, GeoJsonProperties>; } | undefined;
+      if (validationResult.extentPolygon) {
+        gpkgFM = getFeatureAndMarker(validationResult.extentPolygon, FeatureType.SOURCE_EXTENT, FeatureType.SOURCE_EXTENT_MARKER);
+      }
 
       let productFM: { feature: Feature<Geometry, GeoJsonProperties>; marker: Feature<Geometry, GeoJsonProperties>; } | undefined;
       if (files.product) {
@@ -248,10 +159,8 @@ export const SERVICES = {
         //       },
         //     });
         // });
-
         // const outlinedPolygon = await shp(result.getFile[FIRST]);
         const outlinedPolygon: Geometry = MOCK_POLYGON;
-
         productFM = getFeatureAndMarker(outlinedPolygon, FeatureType.PP_PERIMETER, FeatureType.PP_PERIMETER_MARKER);
       }
 
@@ -263,17 +172,11 @@ export const SERVICES = {
           gpkg: {
             ...gpkg,
             validationResult,
-            geoDetails: {
-              feature: gpkgFeature,
-              marker: gpkgMarker
-            }
+            geoDetails: gpkgFM
           },
           product: {
             ...product,
-            geoDetails: {
-              feature: productFM?.feature,
-              marker: productFM?.marker
-            }
+            geoDetails: productFM
           },
           metadata: {
             ...metadata
@@ -289,20 +192,9 @@ export const SERVICES = {
     selectFilesService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
       const gpkg = await selectGpkg(input.context);
       const gpkgPath = input.context.files?.gpkg?.path as string;
-      let result;
-      try {
-        result = await queryExecutor(async () => {
-          return await input.context.store.queryGetDirectory({
-            data: {
-              path: path.resolve(gpkgPath, SHAPES_DIR),
-              type: RecordType.RECORD_RASTER,
-            },
-          });
-        });
-      } catch (e) {
-      }
-      const product = getFile(result?.getDirectory as FileData[], gpkgPath, PRODUCT_SHP, PRODUCT_LABEL);
-      const metadata = getFile(result?.getDirectory as FileData[], gpkgPath, METADATA_SHP, METADATA_LABEL);
+      const result = await getDirectory(path.resolve(path.dirname(gpkgPath), SHAPES_RELATIVE_TO_DATA_DIR, SHAPES_DIR), input.context);
+      const product = getFile(result ?? [], gpkgPath, PRODUCT_SHP, PRODUCT_LABEL);
+      const metadata = getFile(result ?? [], gpkgPath, METADATA_SHP, METADATA_LABEL);
 
       return {
         gpkg: {

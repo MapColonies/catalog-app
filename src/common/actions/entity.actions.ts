@@ -240,8 +240,8 @@ const ACTIONS_CONFIG: IEntityActions[] = [
             icon: '',
             class: 'mc-icon-Job-Resume',
             titleTranslationId: 'action.job.retry',
+            dependentField: 'availableActions.isResumable',
             views: [],
-            dependentField: 'availableActions.isResumable'
           },
           {
             action: 'abort',
@@ -249,8 +249,17 @@ const ACTIONS_CONFIG: IEntityActions[] = [
             icon: '',
             class: 'mc-icon-Job-Abort',
             titleTranslationId: 'action.job.abort',
+            dependentField: 'availableActions.isAbortable',
             views: [],
-            dependentField: 'availableActions.isAbortable'
+          },
+          {
+            action: 'restore',
+            frequent: false,
+            icon: '',
+            class: 'mc-icon-Upload',
+            titleTranslationId: 'action.job.restore',
+            dependentField: 'availableActions.isRestorable',
+            views: [],
           },
         ],
       }

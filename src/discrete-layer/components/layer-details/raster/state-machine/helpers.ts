@@ -3,6 +3,7 @@ import path from 'path';
 import { assign, SnapshotFrom } from 'xstate';
 import { FileData } from '@map-colonies/react-components';
 import { getFirstPoint } from '../../../../../common/utils/geo.tools';
+import { Status } from '../../../../models';
 import { FeatureType } from '../pp-map.utils';
 import { workflowMachine } from './state-machine';
 import {
@@ -13,6 +14,7 @@ import {
   IContext,
   IStateError,
   SHAPES_DIR,
+  SHAPES_RELATIVE_TO_DATA_DIR,
   STATE_TAGS,
   WORKFLOW
 } from './types';
@@ -59,13 +61,13 @@ export const getFile = (files: FileData[], gpkgPath: string, fileName: string, l
   if (!matchingFiles || matchingFiles.length === 0) {
     return {
       label,
-      path: path.resolve(gpkgPath, SHAPES_DIR, fileName).replace('/',''),
+      path: path.resolve(path.dirname(gpkgPath), SHAPES_RELATIVE_TO_DATA_DIR, SHAPES_DIR, fileName).replace('/', ''),
       exists: false
     };
   }
   return matchingFiles.map((file: FileData) => ({
     label,
-    path: path.resolve(gpkgPath, SHAPES_DIR, fileName).replace('/',''),
+    path: path.resolve(path.dirname(gpkgPath), SHAPES_RELATIVE_TO_DATA_DIR, SHAPES_DIR, fileName).replace('/', ''),
     details: { ...file },
     exists: true
   }))[FIRST];
@@ -115,6 +117,20 @@ export const isJobSubmitted = (context: IContext): boolean => {
   return !!(context.job && context.job.jobId);
 };
 
-export const disableUI = (state: SnapshotFrom<typeof workflowMachine>) => {
+export const isDone = (state: SnapshotFrom<typeof workflowMachine>) => {
   return state.value === WORKFLOW.DONE;
+};
+
+export const hasActiveJob = (context: IContext): boolean => {
+  return !!(context.job && context.job.jobId);
+};
+
+export const isRetryEnabled = (context: IContext): boolean => {
+  return !!(context.job &&
+    (context.job.taskStatus === Status.Failed ||
+    (context.job.taskStatus === Status.Completed && context.job.report)));
+};
+
+export const isUIDisabled = (isLoading: boolean, state: any): boolean => {
+  return isLoading || isDone(state);
 };

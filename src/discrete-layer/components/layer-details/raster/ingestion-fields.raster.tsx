@@ -2,39 +2,33 @@ import React, { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { isEmpty } from 'lodash';
 import { observer } from 'mobx-react';
-// import path from 'path';
 import { Switch } from '@material-ui/core';
 import { Box, defaultFormatters, FileData } from '@map-colonies/react-components';
 import { Button, CircularProgress, Icon, Typography } from '@map-colonies/react-core';
 import { Selection } from '../../../../common/components/file-picker';
 import { FieldLabelComponent } from '../../../../common/components/form/field-label';
+import CONFIG from '../../../../common/config';
 import { dateFormatter } from '../../../../common/helpers/formatters';
 import { Mode } from '../../../../common/models/mode.enum';
 import { RecordType, LayerMetadataMixedUnion, RasterIngestionFilesTypeConfig } from '../../../models';
 import { FilePickerDialog } from '../../dialogs/file-picker.dialog';
-// import { transformEntityToFormFields } from '../utils';
 import { RasterWorkflowContext } from './state-machine/context';
 import {
-  disableUI,
-  hasTagDeep
+  hasActiveJob,
+  hasTagDeep,
+  isUIDisabled
 } from './state-machine/helpers';
-// import { MOCK_JOB } from './state-machine/MOCK';
 import {
   SelectionMode,
   Events,
-  // GPKG_PATH,
   IFileBase,
-  IFiles,
-  // GPKG_LABEL,
-  // PRODUCT_LABEL,
-  // METADATA_LABEL
+  IFiles
 } from './state-machine/types';
 
 import './ingestion-fields.raster.css';
 
 const AUTO: SelectionMode = 'auto';
 const MANUAL: SelectionMode = 'manual';
-const RESTORE: SelectionMode = 'restore';
 const FILES = 'files';
 const GPKG = 'gpkg';
 const PRODUCT = 'product';
@@ -159,54 +153,22 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
     }
 
     setSelectionMode((prev) => (prev === AUTO ? MANUAL : AUTO));
-
-    /*const job = MOCK_JOB;
-    actorRef.send({
-      type: 'RESTORE',
-      data: {
-        flowType: job.type.substring(job.type.lastIndexOf('_') + 1),
-        selectionMode: 'restore',
-        files: {
-          gpkg: {
-            label: GPKG_LABEL,
-            path: path.resolve(GPKG_PATH, job.parameters.inputFiles.gpkgFilesPath[0]),
-            exists: false
-          },
-          product: {
-            label: PRODUCT_LABEL,
-            path: path.resolve(GPKG_PATH, job.parameters.inputFiles.productShapefilePath),
-            exists: false
-          },
-          metadata: {
-            label: METADATA_LABEL,
-            path: path.resolve(GPKG_PATH, job.parameters.inputFiles.metadataShapefilePath),
-            exists: false
-          }
-        },
-        resolutionDegree: job.parameters.partsData[0].resolutionDegree,
-        formData: {
-          ...transformEntityToFormFields(job.parameters.metadata as unknown as LayerMetadataMixedUnion)
-        },
-        job: {
-          jobId: job.id,
-          taskId: '3fa85f64-5717-4562-b3fc-2c963f66afa6'
-        }
-      }
-    } satisfies Events);*/
   };
 
   return (
     <>
       {
-        selectionMode !== RESTORE &&
-        <Box className={`ingestionSwitchContainer ${state.context.flowType === Mode.UPDATE ? 'update' : ''} ${isLoading || disableUI(state) ? 'disabled' : ''}`}>
+        CONFIG.SHOW_SELECTION_MODE_SWITCH &&
+        hasActiveJob(state.context) === false &&
+        (selectionMode === AUTO || selectionMode === MANUAL) &&
+        <Box className={`ingestionSwitchContainer ${state.context.flowType === Mode.UPDATE ? 'update' : ''} ${isUIDisabled(isLoading, state) ? 'disabled' : ''}`}>
           <Box className="ingestionSwitch">
             <Typography tag="p">
               <FormattedMessage id="switch.auto.text" />
             </Typography>
             <Switch
               checked={selectionMode === MANUAL}
-              disabled={isLoading || disableUI(state)}
+              disabled={isUIDisabled(isLoading, state)}
               onChange={handleSwitchClick} />
             <Typography tag="p">
               <FormattedMessage id="switch.manual.text" />
@@ -219,6 +181,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
           <IngestionInputs state={state} />
         </Box>
         {
+          hasActiveJob(state.context) === false &&
           selectionMode === MANUAL &&
           <Box className="ingestionManualButtons">
             {isLoading && <Box className={`loadingOnManual ${state.context.flowType === Mode.UPDATE ? 'update' : ''}`}><CircularProgress/></Box>}
@@ -226,7 +189,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
               raised
               type="button"
               className="manualButton"
-              disabled={isLoading || disableUI(state)}
+              disabled={isUIDisabled(isLoading, state)}
               onClick={() => {
                 setSelectedAction(GPKG);
                 setFilePickerDialogOpen(true);
@@ -239,7 +202,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
               raised
               type="button"
               className="manualButton"
-              disabled={isLoading || disableUI(state)}
+              disabled={isUIDisabled(isLoading, state)}
               onClick={() => {
                 setSelectedAction(PRODUCT);
                 setFilePickerDialogOpen(true);
@@ -252,7 +215,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
               raised
               type="button"
               className="manualButton"
-              disabled={isLoading || disableUI(state)}
+              disabled={isUIDisabled(isLoading, state)}
               onClick={() => {
                 setSelectedAction(METADATA);
                 setFilePickerDialogOpen(true);
@@ -264,6 +227,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
           </Box>
         }
         {
+          hasActiveJob(state.context) === false &&
           selectionMode === AUTO &&
           <Box className="ingestionAutoButtons">
             {isLoading && <Box className={`loadingOnAuto ${state.context.flowType === Mode.UPDATE ? 'update' : ''}`}><CircularProgress/></Box>}
@@ -271,7 +235,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
               raised
               type="button"
               className="autoButton"
-              disabled={isLoading || disableUI(state)}
+              disabled={isUIDisabled(isLoading, state)}
               onClick={(): void => {
                 setSelectedAction(FILES);
                 setFilePickerDialogOpen(true);

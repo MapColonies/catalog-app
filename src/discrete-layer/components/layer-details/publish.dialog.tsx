@@ -101,7 +101,7 @@ export const PublishDialog: React.FC<ContinueDialogProps> = observer(({ layer, i
           <Tooltip content={intl.formatMessage({ id: 'general.warning.text' })}>
             <Icon className="icon" icon={{ icon: 'info', size: 'xsmall' }}/>
           </Tooltip>
-          <Typography tag='div' dangerouslySetInnerHTML={{__html: isUnpublished(layer as any) ? publishMessage : unpublishMessage}}></Typography>
+          <Typography tag="div" dangerouslySetInnerHTML={{__html: isUnpublished(layer as any) ? publishMessage : unpublishMessage}}></Typography>
         </DialogContent>
         <DialogActions>
           <Box className="errors">

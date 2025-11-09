@@ -6,6 +6,7 @@ import { Mode } from '../../../../../common/models/mode.enum';
 import {
   IBaseRootStore,
   IRootStore,
+  JobModelType,
   LayerRasterRecordModelType,
   SourceValidationModelType,
   Status
@@ -68,6 +69,7 @@ export interface IContext {
   errors: IStateError[];
   flowType?: Mode.NEW | Mode.UPDATE;
   updatedLayer?: LayerRasterRecordModelType;
+  restoreFromJob?: JobModelType;
   selectionMode?: SelectionMode;
   files?: IFiles;
   resolutionDegree?: number;
@@ -93,7 +95,7 @@ export type Events =
   | { type: "CLEAN_ERRORS" }
   | { type: "NOOP" }
   | { type: "SUBMIT", data: LayerRasterRecordInput, resolutionDegree: number }
-  | { type: "RESTORE", data: IPartialContext }
+  | { type: "RESTORE", data: JobModelType }
   | { type: "RETRY" }
   | { type: "DONE" };
 
@@ -144,8 +146,9 @@ export const WORKFLOW = {
 } as const;
 
 export const FIRST = 0;
-export const GPKG_PATH = '\\layerSources';
-export const SHAPES_DIR = '../../Shapes';
+export const DATA_DIR = 'gpkg';
+export const SHAPES_DIR = 'shape';
+export const SHAPES_RELATIVE_TO_DATA_DIR = '..';
 export const PRODUCT_SHP = 'Product.shp';
 export const METADATA_SHP = 'ShapeMetadata.shp';
 export const GPKG_LABEL = 'file-name.gpkg';

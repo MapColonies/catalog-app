@@ -16,6 +16,7 @@ import useDateNow from '../../../common/hooks/useDateNow.hook';
 import { JobModelType } from '../../models';
 import { IDispatchAction } from '../../models/actionDispatcherStore';
 import { useQuery, useStore } from '../../models/RootStore';
+import { MOCK_JOB } from '../layer-details/raster/state-machine/MOCK';
 import { downloadJSONToClient } from '../layer-details/utils';
 import JobManagerGrid from './grids/job-manager-grid.common';
 import { JOB_ENTITY } from './job.types';
@@ -31,6 +32,7 @@ const TILL_DATE_ACTION_REQUEST_BUFFER = Number(POLLING_CYCLE_INTERVAL);
 interface JobsDialogProps {
   isOpen: boolean;
   onSetOpen: (open: boolean) => void;
+  setJob: (job: JobModelType) => void;
 }
 
 export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialogProps) => {
@@ -180,7 +182,7 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
   }, [query, pollingCycle]);
   
   useEffect(() => {
-    if (!loadingJobData && jobData){
+    if (!loadingJobData && jobData) {
       downloadJSONToClient(jobData.job, `${encodeURI(jobData.job.resourceId as string)}_job_details.json`);
     }
   }, [jobData, loadingJobData]);
@@ -222,6 +224,14 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
             store.queryJob({
               id: data.id as string
             }));
+          break;
+        case 'Job.restore':
+          // const job = data as unknown as JobModelType;
+          const job = MOCK_JOB as unknown as JobModelType;
+          closeDialog();
+          if (job) {
+            props.setJob(job);
+          }
           break;
         default:
           break;
