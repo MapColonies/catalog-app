@@ -32,6 +32,7 @@ const TILL_DATE_ACTION_REQUEST_BUFFER = Number(POLLING_CYCLE_INTERVAL);
 interface JobsDialogProps {
   isOpen: boolean;
   onSetOpen: (open: boolean) => void;
+  setJob: (job: JobModelType) => void;
 }
 
 export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialogProps) => {
@@ -226,7 +227,11 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
           break;
         case 'Job.restore':
           // const job = data as unknown as JobModelType;
-          const job = MOCK_JOB;
+          const job = MOCK_JOB as unknown as JobModelType;
+          closeDialog();
+          if (job) {
+            props.setJob(job);
+          }
           break;
         default:
           break;

@@ -80,8 +80,8 @@ export const MOCK_JOB = {
     ],
     inputFiles: {
       gpkgFilesPath: ["test_dir/shaziri-orthophto-test.gpkg"],
-      productShapefilePath: "Shapes/Product.shp",
-      metadataShapefilePath: "Shapes/ShapeMetadata.shp"
+      productShapefilePath: "shape/Product.shp",
+      metadataShapefilePath: "shape/ShapeMetadata.shp"
     },
     ingestionResolution: 0.010986328125,
     additionalParams: {

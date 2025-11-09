@@ -94,7 +94,7 @@ const getRestoreData = async (context: IContext): Promise<IPartialContext> => {
   if (!rootDirectory || rootDirectory.length === 0) {
     throw buildError('ingestion.error.not-found', '/');
   }
-  const MOUNT_DIR = rootDirectory[FIRST].name;
+  const MOUNT_DIR = rootDirectory[FIRST].name.replace('\\', '\\\\');
 
   const job = context.restoreFromJob as JobModelType;
 

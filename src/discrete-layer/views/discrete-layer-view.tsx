@@ -53,6 +53,7 @@ import { LayersResults } from '../components/layers-results/layers-results';
 import { EntityDialog } from '../components/layer-details/entity.dialog';
 import { JobsDialog } from '../components/job-manager/jobs.dialog';
 import {
+  JobModelType,
   LayerMetadataMixedUnion,
   LinkModelType,
   RecordType
@@ -129,6 +130,7 @@ const DiscreteLayerView: React.FC = observer(() => {
   const theme = useTheme();
   const intl = useIntl();
   const [isDrawing, setIsDrawing] = useState<boolean>(false);
+  const [newRasterEntityDialogJob, setNewRasterEntityDialogJob] = useState<JobModelType | undefined>(undefined);
   const [isNewRasterEntityDialogOpen, setNewRasterEntityDialogOpen] = useState<boolean>(false);
   const [isNew3DEntityDialogOpen, setNew3DEntityDialogOpen] = useState<boolean>(false);
   const [isNewDemEntityDialogOpen, setNewDemEntityDialogOpen] = useState<boolean>(false);
@@ -836,6 +838,12 @@ const DiscreteLayerView: React.FC = observer(() => {
     }
   }, [store.discreteLayersStore.isActiveLayersImages]);
 
+  useEffect(() => {
+    if (newRasterEntityDialogJob) {
+      setNewRasterEntityDialogOpen(true);
+    }
+  }, [newRasterEntityDialogJob]);
+
   const ContextMenuByTab: React.FC<IContextMenuData> = (props) => {
     // Should add global flag or find the proper condition to whether show the context menu or not.
     return <ActionsContextMenu {...props} />;
@@ -1207,6 +1215,7 @@ const DiscreteLayerView: React.FC = observer(() => {
             isOpen={isNewRasterEntityDialogOpen}
             onSetOpen={setNewRasterEntityDialogOpen}
             recordType={RecordType.RECORD_RASTER}
+            job={newRasterEntityDialogJob}
           />
         }
         {
@@ -1230,6 +1239,7 @@ const DiscreteLayerView: React.FC = observer(() => {
           <JobsDialog
             isOpen={isSystemsJobsDialogOpen}
             onSetOpen={setSystemsJobsDialogOpen}
+            setJob={setNewRasterEntityDialogJob}
           />
         }
         {
