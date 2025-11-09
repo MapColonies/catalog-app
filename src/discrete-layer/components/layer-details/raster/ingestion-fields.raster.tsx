@@ -10,7 +10,6 @@ import { Selection } from '../../../../common/components/file-picker';
 import { FieldLabelComponent } from '../../../../common/components/form/field-label';
 import { dateFormatter } from '../../../../common/helpers/formatters';
 import { Mode } from '../../../../common/models/mode.enum';
-import CONFIG from '../../../../common/config';
 import { RecordType, LayerMetadataMixedUnion, RasterIngestionFilesType } from '../../../models';
 import { FilePickerDialog } from '../../dialogs/file-picker.dialog';
 // import { transformEntityToFormFields } from '../utils';

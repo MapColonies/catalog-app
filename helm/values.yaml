@@ -174,10 +174,7 @@ env:
   geocoder:
     url: ''
     callbackUrl: ''
-  fpFilesName:
-    gpkg: ''
-    product: 'Product'
-    shapeMetadata: 'ShapeMetadata'
+  rasterIngestionFilesStructure: "{\n  \"data\": {\n    \"allowedExt\": [\".gpkg\"],\n    \"selectableExt\": [\".gpkg\"],\n    \"relativeToAOIDirPath\": \"./data\",\n    \"producerFileName\": \"*\",\n    \"selectablePattern\": \"*\"\n  },\n  \"product\": {\n    \"allowedExt\": [\".shp\", \".shx\", \".dbf\", \".prj\", \".sbn\", \".sbx\", \".xml\", \".cpg\", \".qix\"],\n    \"selectableExt\": [\".shp\"],\n    \"relativeToAOIDirPath\": \"./shape\",\n    \"producerFileName\": \"Product\",\n    \"selectablePattern\": \"Product\"\n  },\n  \"shapeMetadata\": {\n    \"allowedExt\": [\".shp\", \".shx\", \".dbf\", \".prj\", \".sbn\", \".sbx\", \".xml\", \".cpg\", \".qix\"],\n    \"selectableExt\": [\".shp\"],\n    \"relativeToAOIDirPath\": \"./shape\",\n    \"producerFileName\": \"ShapeMetadata\",\n    \"selectablePattern\": \"ShapeMetadata\"\n  }\n}"
 route:
   enabled: true
   annotations:

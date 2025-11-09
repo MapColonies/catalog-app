@@ -93,11 +93,6 @@ window._env_ = {
     url: '{{ getv "/configuration/geocoder/url" "http://geocoder-URL" }}'
     callbackUrl: '{{ getv "/configuration/geocoder/callbackUrl" "http://geocoder-callback-URL" }}'
   },
-  FP_FILES_NAME: {
-    gpkg: '{{ getv "/configuration/fpFilesName" "" }}'
-    product: '{{ getv "/configuration/fpFilesName" "Product" }}'
-    shapeMetadata: '{{ getv "/configuration/fpFilesName" "ShapeMetadata" }}'
-  },
   RASTER_INGESTION_FILES_STRUCTURE: 
   '{{ getv "/configuration/raster/ingestion/files/structure" "{ data: {
       allowedExt: ['.gpkg'],
