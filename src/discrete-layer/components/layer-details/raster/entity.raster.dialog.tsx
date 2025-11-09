@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import { cloneDeep, isEmpty } from 'lodash';
 import * as Yup from 'yup';
 import { DialogContent } from '@material-ui/core';
-import { Dialog, DialogTitle, Icon, IconButton } from '@map-colonies/react-core';
+import { Dialog, DialogTitle, Icon, IconButton, Typography } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
 import CONFIG from '../../../../common/config';
 import { emphasizeByHTML } from '../../../../common/helpers/formatters';
@@ -305,10 +305,8 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
           { 
             state.context.selectionMode === 'restore' &&
             <Box className='lockedIcon'>
-              <Icon
-                icon={{ icon: 'lock', size: 'xlarge' }}
-                />
-              <span>{ intl.formatMessage({ id: 'general.title.locked' }) }</span>
+              <Icon icon={{ icon: 'lock', size: 'xlarge' }} />
+              <Typography tag="span">{ intl.formatMessage({ id: 'general.title.locked' }) }</Typography>
             </Box>
           }
         </Box>
