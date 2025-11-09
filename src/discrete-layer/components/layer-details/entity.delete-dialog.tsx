@@ -117,7 +117,7 @@ export const EntityDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
               <Tooltip content={intl.formatMessage({ id: 'general.warning.text' })}>
                 <Icon className="icon" icon={{ icon: 'info', size: 'xsmall' }} />
               </Tooltip>
-              <Typography tag='div' dangerouslySetInnerHTML={{ __html: deleteMessage }}></Typography>
+              <Typography tag="div" dangerouslySetInnerHTML={{ __html: deleteMessage }}></Typography>
             </Box>
             <Box id="deleteLayerDetailsContainer">
               <Box id="deleteLayerDetails">

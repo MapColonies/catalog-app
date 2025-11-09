@@ -85,7 +85,7 @@ const ExportFormValidationErrors: React.FC<{errors: FieldErrors<Record<string, u
       {validationErrors.size > NONE && 
         Array.from(validationErrors).map(([key, val], i) => {
             return <Box key={`${key}_${i}`} className='errorSelectionContainer'>
-              <Typography tag='b' className="errorSelectionText">{key}:</Typography>
+              <Typography tag="b" className="errorSelectionText">{key}:</Typography>
               {val.map(error => <Typography key={`${error}`} tag='p' className='errorText'>{error}</Typography>)}
             </Box>
           })

@@ -37,7 +37,7 @@ export const BrowserCompatibilityChecker: React.FC = () => {
       {
         (!isEngineChromium || !isBrowserVersionSupported) &&
         <Box className="compatibilityError">
-          <Typography tag='h4'>
+          <Typography tag="h4">
             {isEngineChromium ? browserTooOldErr : browserNotSupportedErr}
           </Typography>
         </Box>
