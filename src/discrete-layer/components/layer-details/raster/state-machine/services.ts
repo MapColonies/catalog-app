@@ -254,7 +254,10 @@ export const SERVICES = {
       });
 
       const validationResult = { ...result.validateGPKGSource[FIRST] };
-      const { feature: gpkgFeature, marker: gpkgMarker } = getFeatureAndMarker(validationResult.extentPolygon, FeatureType.SOURCE_EXTENT, FeatureType.SOURCE_EXTENT_MARKER);
+      let gpkgFM: { feature: Feature<Geometry, GeoJsonProperties>; marker: Feature<Geometry, GeoJsonProperties>; } | undefined;
+      if (validationResult.extentPolygon) {
+        gpkgFM = getFeatureAndMarker(validationResult.extentPolygon, FeatureType.SOURCE_EXTENT, FeatureType.SOURCE_EXTENT_MARKER);
+      }
 
       let productFM: { feature: Feature<Geometry, GeoJsonProperties>; marker: Feature<Geometry, GeoJsonProperties>; } | undefined;
       if (files.product) {
@@ -266,10 +269,8 @@ export const SERVICES = {
         //       },
         //     });
         // });
-
         // const outlinedPolygon = await shp(result.getFile[FIRST]);
         const outlinedPolygon: Geometry = MOCK_POLYGON;
-
         productFM = getFeatureAndMarker(outlinedPolygon, FeatureType.PP_PERIMETER, FeatureType.PP_PERIMETER_MARKER);
       }
 
@@ -282,15 +283,13 @@ export const SERVICES = {
             ...gpkg,
             validationResult,
             geoDetails: {
-              feature: gpkgFeature,
-              marker: gpkgMarker
+              ...(gpkgFM ?? {})
             }
           },
           product: {
             ...product,
             geoDetails: {
-              feature: productFM?.feature,
-              marker: productFM?.marker
+              ...(productFM ?? {})
             }
           },
           metadata: {
