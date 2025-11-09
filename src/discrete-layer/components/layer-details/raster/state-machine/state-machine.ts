@@ -315,8 +315,7 @@ export const workflowMachine = createMachine<IContext, Events>({
         onDone: [
           {
             guard: (_: { context: IContext; event: any }) => {
-              // return !!_.event.output.restoreFromJob;
-              return false;
+              return false; // !!_.event.output.restoreFromJob;
             },
             actions: assign((_: { context: IContext; event: any }) => ({
               ..._.event.output
