@@ -17,12 +17,13 @@ import {
   FileData,
   FilePickerActions,
 } from '@map-colonies/react-components';
+import { GraphQLError } from '../../../common/components/error/graphql.error-presentor';
 import {
   FilePickerComponent,
   FilePickerComponentHandle,
   Selection,
 } from '../../../common/components/file-picker';
-import { GraphQLError } from '../../../common/components/error/graphql.error-presentor';
+import { normalizePath } from '../../../common/helpers/formatters';
 import {
   FileModelType,
   LayerMetadataMixedUnion,
@@ -49,7 +50,7 @@ interface FilePickerDialogProps {
 }
 
 const getSuffixFromFolderChain = (folderChain: FileData[]): string => {
-  return BASE_PATH_SUFFIX + folderChain.map((file) => file.name.replaceAll('\\', '\\\\')).join('/');
+  return BASE_PATH_SUFFIX + folderChain.map((file) => normalizePath(file.name)).join('/');
 };
 
 export const FilePickerDialog: React.FC<FilePickerDialogProps> = observer(

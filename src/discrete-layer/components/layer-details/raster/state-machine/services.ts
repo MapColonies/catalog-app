@@ -2,26 +2,18 @@ import { Feature, GeoJsonProperties, Geometry } from 'geojson';
 import path from 'path';
 // import shp from 'shpjs';
 import { fromPromise } from 'xstate';
-import { FileData } from '@map-colonies/react-components';
 import { Mode } from '../../../../../common/models/mode.enum';
-import {
-  JobModelType,
-  LayerMetadataMixedUnion,
-  RecordType,
-  TasksGroupModelType
-} from '../../../../models';
+import { RecordType, TasksGroupModelType } from '../../../../models';
 import { LayerRasterRecordInput } from '../../../../models/RootStore.base';
-import { /*cleanUpEntityPayload, getFlatEntityDescriptors, */transformEntityToFormFields } from '../../utils';
 import { FeatureType } from '../pp-map.utils';
 import { buildError, getFeatureAndMarker, getFile } from './helpers';
 import { MOCK_JOB, MOCK_POLYGON } from './MOCK';
 import { queryExecutor } from './query-executor';
+import { getDetails, getDirectory, getRestoreData, selectGpkg } from './services-helpers';
 import {
   FIRST,
   FromPromiseArgs,
-  GPKG_LABEL,
   IContext,
-  IPartialContext,
   METADATA_LABEL,
   METADATA_SHP,
   PRODUCT_LABEL,
@@ -30,108 +22,6 @@ import {
   SHAPES_RELATIVE_TO_DATA_DIR,
   WORKFLOW
 } from './types';
-
-//#region Helpers
-const getDirectory = async (filePath: string, context: IContext): Promise<FileData[] | undefined> => {
-  try {
-    const result = await queryExecutor(async () => {
-      return await context.store.queryGetDirectory({
-        data: {
-          path: filePath,
-          type: RecordType.RECORD_RASTER,
-        },
-      });
-    });
-    return result?.getDirectory as FileData[];
-  } catch (e) {
-    return undefined;
-  }
-};
-
-const getDetails = async (filePath: string, context: IContext): Promise<FileData | undefined> => {
-  const files = await getDirectory(path.dirname(filePath), context);
-  if (files) {
-    return files.filter((file: FileData) => file.name === path.basename(filePath))[0];
-  }
-  return undefined;
-};
-
-const selectGpkg = async (context: IContext) => {
-  if (!context.files?.gpkg?.path) {
-    throw (buildError('ingestion.error.missing', 'GPKG'));
-  }
-
-  const gpkgPath = context.files.gpkg.path;
-
-  const result = await queryExecutor(async () => {
-    return await context.store.queryValidateGPKGSource({
-      data: {
-        gpkgFilesPath: [gpkgPath],
-        type: RecordType.RECORD_RASTER,
-      }
-    });
-  });
-
-  const validationGPKG = result.validateGPKGSource[FIRST];
-  if (!validationGPKG.isValid) {
-    throw (buildError('ingestion.error.invalid-source-file', validationGPKG.message as string));
-  }
-
-  const validationResult = { ...validationGPKG };
-  const { feature, marker } = getFeatureAndMarker(validationResult.extentPolygon, FeatureType.SOURCE_EXTENT, FeatureType.SOURCE_EXTENT_MARKER);
-
-  return {
-    validationResult,
-    geoDetails: {
-      feature,
-      marker
-    }
-  };
-};
-
-const getRestoreData = async (context: IContext): Promise<IPartialContext> => {
-  const rootDirectory = await getDirectory('/', context);
-  if (!rootDirectory || rootDirectory.length === 0) {
-    throw buildError('ingestion.error.not-found', '/');
-  }
-  const MOUNT_DIR = rootDirectory[FIRST].name.replace('\\', '\\\\');
-
-  const job = context.restoreFromJob as JobModelType;
-
-  const flowTypeMap: { [key: string]: Mode } = {
-    'Ingestion_Update': Mode.UPDATE,
-    'Ingestion_New': Mode.NEW,
-  };
-  const flowType = flowTypeMap[job.type || 'Ingestion_New'];
-
-  return {
-    flowType: flowType as IPartialContext['flowType'],
-    selectionMode: 'restore',
-    files: {
-      gpkg: {
-        label: GPKG_LABEL,
-        path: path.resolve(MOUNT_DIR, job.parameters.inputFiles.gpkgFilesPath[0]),
-        exists: false
-      },
-      product: {
-        label: PRODUCT_LABEL,
-        path: path.resolve(MOUNT_DIR, job.parameters.inputFiles.productShapefilePath),
-        exists: false
-      },
-      metadata: {
-        label: METADATA_LABEL,
-        path: path.resolve(MOUNT_DIR, job.parameters.inputFiles.metadataShapefilePath),
-        exists: false
-      }
-    },
-    resolutionDegree: job.parameters.ingestionResolution,
-    formData: transformEntityToFormFields(job.parameters.metadata as unknown as LayerMetadataMixedUnion) as unknown as LayerRasterRecordInput,
-    job: {
-      jobId: job.id
-    }
-  };
-};
-//#endregion
 
 export const SERVICES = {
   [WORKFLOW.ROOT]: {

@@ -35,12 +35,12 @@ import { FeatureType, PPMapStyles } from './pp-map.utils';
 import { StateError } from './state-error';
 import { RasterWorkflowContext } from './state-machine/context';
 import {
-  disableUI,
   hasActiveJob,
   hasTagDeep,
   isFilesSelected,
   isJobSubmitted,
-  isRetryEnabled
+  isRetryEnabled,
+  isUIDisabled
 } from './state-machine/helpers';
 import { getUIIngestionFieldDescriptors } from './utils';
 
@@ -368,12 +368,11 @@ export const InnerRasterForm = (
                 raised
                 type="submit"
                 disabled={
-                  isLoading ||
+                  isUIDisabled(isLoading, state) ||
                   !dirty ||
                   Object.keys(errors).length > NONE ||
                   (Object.keys(getStatusErrors()).length > NONE) ||
-                  !isEmpty(state.context.errors) ||
-                  disableUI(state)
+                  !isEmpty(state.context.errors)
                 }
               >
                 <FormattedMessage id="general.ok-btn.text" />

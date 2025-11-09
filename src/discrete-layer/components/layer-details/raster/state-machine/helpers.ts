@@ -117,7 +117,7 @@ export const isJobSubmitted = (context: IContext): boolean => {
   return !!(context.job && context.job.jobId);
 };
 
-export const disableUI = (state: SnapshotFrom<typeof workflowMachine>) => {
+export const isDone = (state: SnapshotFrom<typeof workflowMachine>) => {
   return state.value === WORKFLOW.DONE;
 };
 
@@ -129,4 +129,8 @@ export const isRetryEnabled = (context: IContext): boolean => {
   return !!(context.job &&
     (context.job.taskStatus === Status.Failed ||
     (context.job.taskStatus === Status.Completed && context.job.report)));
+};
+
+export const isUIDisabled = (isLoading: boolean, state: any): boolean => {
+  return isLoading || isDone(state);
 };

@@ -6,10 +6,8 @@ export const getDateformatType = (withTime = false, fnsFormat = false, humanRead
     if (humanReadable) {
       return withTime ? CONFIG.LOCALE.DATE_FNS_HUMAN_READABLE_DATE_TIME: CONFIG.LOCALE.DATE_FNS_HUMAN_READABLE_DATE; 
     }
-
     return withTime ? CONFIG.LOCALE.DATE_FNS_TIME_FORMAT : CONFIG.LOCALE.DATE_FNS_FORMAT;
   }
-
   return withTime ? CONFIG.LOCALE.DATE_TIME_FORMAT : CONFIG.LOCALE.DATE_FORMAT;
 };
 
@@ -76,4 +74,8 @@ export const formatBytes = (bytes: number, decimals = DEFAULT_DECIMALS): string 
 export const kbToBytes = (n: number): number => {
   const multiplyFactorToBytes = 1024;
   return n * multiplyFactorToBytes;
+};
+
+export const normalizePath = (path: string): string => {
+  return path.replaceAll('\\', '\\\\');
 };

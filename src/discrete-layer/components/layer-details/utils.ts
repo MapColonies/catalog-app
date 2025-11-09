@@ -10,14 +10,21 @@ import rewind from '@turf/rewind';
 import { AllGeoJSON } from '@turf/helpers';
 import truncate from '@turf/truncate';
 import convert, { Distance } from 'convert-units';
-import { polygonVertexDensityFactor, area, countSmallHoles, DEGREES_PER_METER, isSmallArea } from '../../../common/utils/geo.tools';
-import { IEnumsMapType } from '../../../common/contexts/enumsMap.context';
-import { sessionStore } from '../../../common/helpers/storage';
-import { ValidationTypeName } from '../../../common/models/validation.enum';
-import { SYNC_QUERY, syncQueries } from '../../../syncHttpClientGql';
-import { Mode } from '../../../common/models/mode.enum';
-import { emphasizeByHTML } from '../../../common/helpers/formatters';
 import CONFIG from '../../../common/config';
+import { IEnumsMapType } from '../../../common/contexts/enumsMap.context';
+import { emphasizeByHTML } from '../../../common/helpers/formatters';
+import { sessionStore } from '../../../common/helpers/storage';
+import { Mode } from '../../../common/models/mode.enum';
+import { ValidationTypeName } from '../../../common/models/validation.enum';
+import {
+  polygonVertexDensityFactor,
+  area,
+  countSmallHoles,
+  DEGREES_PER_METER,
+  isSmallArea
+} from '../../../common/utils/geo.tools';
+import { hasSelfIntersections } from '../../../common/utils/geojson.validation';
+import { SYNC_QUERY, syncQueries } from '../../../syncHttpClientGql';
 import {
   CategoryConfigModelType,
   EntityDescriptorModelType,
@@ -44,7 +51,6 @@ import {
   VectorBestRecordModel
 } from '../../models';
 import { ILayerImage } from '../../models/layerImage';
-import { FieldInfoName, IRecordCategoryFieldsInfo } from './layer-details.field-info';
 import {
   LayerRasterRecordModelArray,
   Layer3DRecordModelArray,
@@ -54,7 +60,7 @@ import {
   LayerRecordTypes,
   LayerRecordTypesKeys
 } from './entity-types-keys';
-import { hasSelfIntersections } from '../../../common/utils/geojson.validation';
+import { FieldInfoName, IRecordCategoryFieldsInfo } from './layer-details.field-info';
 
 const JSON_INDENTATION = 4;
 
