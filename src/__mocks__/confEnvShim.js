@@ -95,7 +95,30 @@ if (!window._env_) {
       GEOCODER: {
         url: 'http://geocoder-URL',
         callbackUrl: 'http://geocoder-callback-URL'
-      }
+      },  
+      RASTER_INGESTION_FILES_STRUCTURE: `{
+        "data": {
+          "allowedExt": [".gpkg"],
+          "selectableExt": [".gpkg"],
+          "relativeToAOIDirPath": "./data",
+          "producerFileName": "*",
+          "selectablePattern": "*"
+        },
+        "product": {
+          "allowedExt": [".shp", ".shx", ".dbf", ".prj", ".sbn", ".sbx", ".xml", ".cpg", ".qix"],
+          "selectableExt": [".shp"],
+          "relativeToAOIDirPath": "./shape",
+          "producerFileName": "Product",
+          "selectablePattern": "Product"
+        },
+        "shapeMetadata": {
+          "allowedExt": [".shp", ".shx", ".dbf", ".prj", ".sbn", ".sbx", ".xml", ".cpg", ".qix"],
+          "selectableExt": [".shp"],
+          "relativeToAOIDirPath": "./shape",
+          "producerFileName": "ShapeMetadata",
+          "selectablePattern": "ShapeMetadata"
+        }
+      }`
     };
   })(void 0);
 }

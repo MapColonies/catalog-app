@@ -67,5 +67,6 @@ keys = [
   "/configuration/wfs/max/zoom/level",
   "/configuration/wfs/max/cache/size",
   "/configuration/geocoder/url",
-  "/configuration/geocoder/callbackUrl"
+  "/configuration/geocoder/callbackUrl",
+  "/configuration/rasteringestionfilesstructure"
 ]
