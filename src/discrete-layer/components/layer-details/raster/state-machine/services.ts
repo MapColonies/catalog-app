@@ -282,15 +282,11 @@ export const SERVICES = {
           gpkg: {
             ...gpkg,
             validationResult,
-            geoDetails: {
-              ...(gpkgFM ?? {})
-            }
+            geoDetails: gpkgFM
           },
           product: {
             ...product,
-            geoDetails: {
-              ...(productFM ?? {})
-            }
+            geoDetails: productFM
           },
           metadata: {
             ...metadata
