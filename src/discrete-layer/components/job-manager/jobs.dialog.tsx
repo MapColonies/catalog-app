@@ -16,7 +16,6 @@ import useDateNow from '../../../common/hooks/useDateNow.hook';
 import { JobModelType } from '../../models';
 import { IDispatchAction } from '../../models/actionDispatcherStore';
 import { useQuery, useStore } from '../../models/RootStore';
-import { MOCK_JOB } from '../layer-details/raster/state-machine/MOCK';
 import { downloadJSONToClient } from '../layer-details/utils';
 import JobManagerGrid from './grids/job-manager-grid.common';
 import { JOB_ENTITY } from './job.types';
@@ -32,21 +31,21 @@ const TILL_DATE_ACTION_REQUEST_BUFFER = Number(POLLING_CYCLE_INTERVAL);
 interface JobsDialogProps {
   isOpen: boolean;
   onSetOpen: (open: boolean) => void;
-  setJob: (job: JobModelType) => void;
+  setJobId: (jobId: string) => void;
 }
 
 export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialogProps) => {
   const store = useStore();
   const intl = useIntl();
   const { isOpen, onSetOpen } = props;
-  const [updateTaskPayload, setUpdateTaskPayload] = useState<Record<string,unknown>>({}); 
-  const [gridRowData, setGridRowData] = useState<JobModelType[] | undefined>(undefined); 
-  const [gridApi, setGridApi] = useState<GridApi>();
-  const [pollingCycle, setPollingCycle] = useState(START_CYCLE_ITERATION);
-  const [fromDate, setFromDate] = useState<Date>(moment().subtract(CONFIG.JOB_MANAGER_END_OF_TIME, 'days').toDate());
+  const [ updateTaskPayload, setUpdateTaskPayload ] = useState<Record<string, unknown>>({});
+  const [ gridRowData, setGridRowData ] = useState<JobModelType[] | undefined>(undefined);
+  const [ gridApi, setGridApi ] = useState<GridApi>();
+  const [ pollingCycle, setPollingCycle ] = useState(START_CYCLE_ITERATION);
+  const [ fromDate, setFromDate ] = useState<Date>(moment().subtract(CONFIG.JOB_MANAGER_END_OF_TIME, 'days').toDate());
 
   // @ts-ignore
-  const [timeLeft, actions] = useCountDown(POLLING_CYCLE_INTERVAL, COUNTDOWN_REFRESH_RATE);
+  const [ timeLeft, actions ] = useCountDown(POLLING_CYCLE_INTERVAL, COUNTDOWN_REFRESH_RATE);
 
   const tillDate = useDateNow().current;
 
@@ -69,16 +68,14 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
   );
 
   //@ts-ignore
-  const { setQuery: setQueryForOneJob, data: jobData, loading:loadingJobData } = useQuery<Record<any,any>>((store) =>
+  const { setQuery: setQueryForOneJob, data: jobData, loading: loadingJobData } = useQuery<Record<any, any>>((store) =>
     undefined,
     {
       fetchPolicy: 'no-cache'
     }
   );
 
-
   const mutationQuery = useQuery();
-
 
   const getJobActions = useMemo(() => {
     let actions: IActionGroup[] = store.actionDispatcherStore.getEntityActionGroups(
@@ -94,8 +91,7 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
           }),
         };
       });
-
-      return {...action, group: groupsWithTranslation}
+      return { ...action, group: groupsWithTranslation };
     });
 
     return {
@@ -118,15 +114,13 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
   // const getFilterJobsPredicate = (requestedDomain: RecordType): ((cur: JobModelType) => boolean) => {
   //   return (cur: JobModelType): boolean => {
   //     const jobDomain = enumsMap?.[cur.productType as string]?.parentDomain;
-      
   //     return jobDomain === requestedDomain;
   //   }
   // }
 
   useEffect(() => {
-    if (data !== undefined){
+    if (data !== undefined) {
       const jobsData = data ? cloneDeep(data.jobs) : [];
-      
       setGridRowData(jobsData);
     }
   }, [data]);
@@ -135,12 +129,12 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
     if (mutationQuery.data) {
       setUpdateTaskPayload({});
       setQuery((store) =>
-      store.queryJobs({
-        params: {
-          fromDate,
-          tillDate: new Date(tillDate.getTime() + TILL_DATE_ACTION_REQUEST_BUFFER),
-        },
-      }));
+        store.queryJobs({
+          params: {
+            fromDate,
+            tillDate: new Date(tillDate.getTime() + TILL_DATE_ACTION_REQUEST_BUFFER),
+          },
+        }));
     }
   }, [mutationQuery.data]);
 
@@ -148,7 +142,7 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
     if (updateTaskPayload.id !== undefined) {
       // @ts-ignore
       // eslint-disable-next-line @typescript-eslint/no-empty-function
-      mutationQuery.setQuery(store.mutateUpdateJob(updateTaskPayload,() => {}));
+      mutationQuery.setQuery(store.mutateUpdateJob(updateTaskPayload, () => { }));
     }
   }, [updateTaskPayload]);
 
@@ -164,23 +158,22 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
   useEffect(() => {
     const pollingInterval = setInterval(() => {
       setPollingCycle(pollingCycle + 1);
-      
       const bufferedRequestedTime = new Date(tillDate.getTime() + Number(POLLING_CYCLE_INTERVAL));
       (actions as IActions).start(POLLING_CYCLE_INTERVAL);
       setQuery((store) =>
-          store.queryJobs({
-            params: {
-              fromDate,
-              tillDate: bufferedRequestedTime,
-            },
-          }));
+        store.queryJobs({
+          params: {
+            fromDate,
+            tillDate: bufferedRequestedTime,
+          },
+        }));
     }, POLLING_CYCLE_INTERVAL);
 
     return (): void => {
       clearInterval(pollingInterval);
     };
   }, [query, pollingCycle]);
-  
+
   useEffect(() => {
     if (!loadingJobData && jobData) {
       downloadJSONToClient(jobData.job, `${encodeURI(jobData.job.resourceId as string)}_job_details.json`);
@@ -191,17 +184,17 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
     onSetOpen(false);
   }, [onSetOpen]);
 
-  const dispatchAction = (action: Record<string,unknown> | undefined): void => {
-    const actionToDispatch = (action ? {action: action.action, data: action.data} : action) as IDispatchAction;
+  const dispatchAction = (action: Record<string, unknown> | undefined): void => {
+    const actionToDispatch = (action ? { action: action.action, data: action.data } : action) as IDispatchAction;
     store.actionDispatcherStore.dispatchAction(
       actionToDispatch
     );
   };
 
-   // Job actions handler
+  // Job actions handler
 
-   useEffect(() => {
-     if (typeof store.actionDispatcherStore.action !== 'undefined') {
+  useEffect(() => {
+    if (typeof store.actionDispatcherStore.action !== 'undefined') {
       const { action, data } = store.actionDispatcherStore.action as IDispatchAction;
       switch (action) {
         case 'Job.retry':
@@ -226,18 +219,14 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
             }));
           break;
         case 'Job.restore':
-          // const job = data as unknown as JobModelType;
-          const job = MOCK_JOB as unknown as JobModelType;
           closeDialog();
-          if (job) {
-            props.setJob(job);
-          }
+          props.setJobId(data.id as string);
           break;
         default:
           break;
-       }
-     }
-   }, [store.actionDispatcherStore.action]);
+      }
+    }
+  }, [store.actionDispatcherStore.action]);
 
 
   // Reset action value on store when unmounting
@@ -250,18 +239,18 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
 
   const renderGridList = (): JSX.Element => {
     return (
-      <Box className="gridsContainer">      
-          <JobManagerGrid 
-            dispatchAction={dispatchAction}
-            getJobActions={getJobActions}
-            rowData={gridRowData as JobModelType[]}
-            onGridReadyCB={(params): void => {
-              setGridApi(params.api)
-            }}
-            updateJobCB={setUpdateTaskPayload}
-            rowDataChangeCB={(): void => {}}
-            areJobsLoading={loading}
-          />
+      <Box className="gridsContainer">
+        <JobManagerGrid
+          dispatchAction={dispatchAction}
+          getJobActions={getJobActions}
+          rowData={gridRowData as JobModelType[]}
+          onGridReadyCB={(params): void => {
+            setGridApi(params.api)
+          }}
+          updateJobCB={setUpdateTaskPayload}
+          rowDataChangeCB={(): void => { }}
+          areJobsLoading={loading}
+        />
       </Box>
     );
   };
@@ -293,14 +282,14 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
             }),
             calendarLocale:
               SupportedLocales[
-                CONFIG.I18N.DEFAULT_LANGUAGE.toUpperCase() as keyof typeof SupportedLocales
+              CONFIG.I18N.DEFAULT_LANGUAGE.toUpperCase() as keyof typeof SupportedLocales
               ],
           }}
         />
       </Box>
     );
   };
- 
+
 
   return (
     <Box id="jobsDialog">
@@ -317,7 +306,8 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
                     fromDate,
                     tillDate,
                   },
-              }));
+                })
+              );
             }}
           >
             <IconButton className="refreshIcon mc-icon-Refresh" />
@@ -336,7 +326,6 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
         <DialogContent className="jobsBody">
           {renderDateTimeRangePicker()}
           {!error && renderGridList()}
-          
           {
             (mutationQuery.error !== undefined || error) && (
               // eslint-disable-next-line

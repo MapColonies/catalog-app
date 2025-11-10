@@ -2,7 +2,6 @@ import { CesiumGeographicTilingScheme, Proj } from '@map-colonies/react-componen
 import { IRasterLayer } from '@map-colonies/react-components/dist/cesium-map/layers-manager';
 import { IBaseMaps, IBaseMap } from '@map-colonies/react-components/dist/cesium-map/map';
 import { LinkType } from '../models/link-type.enum';
-import { IRasterIngestionFilesStructureConfig } from '../models/raster-ingestion-files-structure';
 
 /*eslint-disable */
 const LANGUAGE = (window as any)._env_.LANGUAGE as string;
@@ -249,9 +248,7 @@ const APP_CONFIG = {
     CALLBACK_URL: GEOCODER.callbackUrl,
     RESULTS_LIMIT: 6
   },
-  RASTER_INGESTION_FILES_STRUCTURE: {
-    ...RASTER_INGESTION_FILES_STRUCTURE as IRasterIngestionFilesStructureConfig
-  }
+  RASTER_INGESTION_FILES_STRUCTURE: RASTER_INGESTION_FILES_STRUCTURE
 };
 
 export default APP_CONFIG;

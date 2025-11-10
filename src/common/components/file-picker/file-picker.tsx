@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
 import { get, isFunction } from 'lodash';
 import { useTheme } from '@map-colonies/react-core';
 import {
@@ -13,7 +14,6 @@ import {
 } from '@map-colonies/react-components';
 import { LayerMetadataMixedUnion } from '../../../discrete-layer/models';
 import CONFIG from '../../config';
-import { flushSync } from 'react-dom';
 
 const NOT_FOUND = -1;
 const START = 0;
