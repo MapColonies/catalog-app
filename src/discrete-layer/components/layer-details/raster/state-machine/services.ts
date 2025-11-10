@@ -31,15 +31,14 @@ export const SERVICES = {
       // const result = await queryExecutor(async () => {
       //   return await input.context.store.queryGetActiveJob({
       //     productId: updatedLayer?.productId,
-      //     productVersion: updatedLayer?.productVersion,
       //     productType: updatedLayer?.productType
       //   });
       // });
 
       const job = MOCK_JOB; // TODO: Mock should be removed
 
-      return { 
-        restoreFromJob: job
+      return {
+        jobId: job.id
       };
     }),
     jobSubmissionService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {

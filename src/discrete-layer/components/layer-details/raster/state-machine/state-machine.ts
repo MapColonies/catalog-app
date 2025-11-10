@@ -297,8 +297,8 @@ export const workflowMachine = createMachine<IContext, Events>({
         },
         RESTORE: {
           actions: assign((_: { context: IContext; event: any }) => ({
-            restoreFromJob: {
-              ..._.event.data
+            job: {
+              ..._.event.job
             }
           })),
           target: WORKFLOW.RESTORE_JOB
@@ -315,10 +315,12 @@ export const workflowMachine = createMachine<IContext, Events>({
         onDone: [
           {
             guard: (_: { context: IContext; event: any }) => {
-              return false; // !!_.event.output.restoreFromJob;
+              return false;// !!_.event.output.jobId;
             },
             actions: assign((_: { context: IContext; event: any }) => ({
-              ..._.event.output
+              job: {
+                ..._.event.output
+              }
             })),
             target: WORKFLOW.RESTORE_JOB
           },

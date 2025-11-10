@@ -252,6 +252,7 @@
   "ingestion.error.not-found": "Not found: {value}",
   "ingestion.error.missing": "Missing: {value}",
   "ingestion.error.source-file-exception": "Cannot run validation api: {value}",
+  "ingestion.error.restore-failed": "Restore failed with an error: {value}",
   "ingestion.error.directory-comparison": "Warning: directory content is not the same between current and secondary sites",
   "ingestion.error.invalid-metadata": "Metadata file format is not valid",
   "ingestion.error.not-available": "is not available",

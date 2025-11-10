@@ -2,13 +2,21 @@ import path from 'path';
 import { FileData } from '@map-colonies/react-components';
 import { normalizePath } from '../../../../../common/helpers/formatters';
 import { Mode } from '../../../../../common/models/mode.enum';
-import { JobModelType, LayerMetadataMixedUnion, RecordType } from '../../../../models';
+import { LayerMetadataMixedUnion, RecordType } from '../../../../models';
 import { LayerRasterRecordInput } from '../../../../models/RootStore.base';
 import { transformEntityToFormFields } from '../../utils';
 import { FeatureType } from '../pp-map.utils';
 import { buildError, getFeatureAndMarker } from './helpers';
 import { queryExecutor } from './query-executor';
-import { FIRST, GPKG_LABEL, IContext, IPartialContext, METADATA_LABEL, PRODUCT_LABEL } from './types';
+import {
+  BASE_PATH,
+  FIRST,
+  GPKG_LABEL,
+  IContext,
+  IPartialContext,
+  METADATA_LABEL,
+  PRODUCT_LABEL
+} from './types';
 
 export const getDirectory = async (filePath: string, context: IContext): Promise<FileData[] | undefined> => {
   try {
@@ -66,13 +74,21 @@ export const selectGpkg = async (context: IContext) => {
 };
 
 export const getRestoreData = async (context: IContext): Promise<IPartialContext> => {
-  const rootDirectory = await getDirectory('/', context);
+  const rootDirectory = await getDirectory(BASE_PATH, context);
   if (!rootDirectory || rootDirectory.length === 0) {
-    throw buildError('ingestion.error.not-found', '/');
+    throw buildError('ingestion.error.not-found', BASE_PATH);
   }
   const MOUNT_DIR = normalizePath(rootDirectory[FIRST].name);
 
-  const job = context.restoreFromJob as JobModelType;
+  const result = await queryExecutor(async () => {
+    return await context.store.queryJob({
+      id: context.job?.jobId as string
+    });
+  });
+  if (!result?.job) {
+    throw buildError('ingestion.error.not-found', `JOB ${context.job?.jobId}`);
+  }
+  const job = { ...result.job };
 
   enum RasterJobTypeEnum {
     NEW = 'Ingestion_New',
@@ -84,30 +100,35 @@ export const getRestoreData = async (context: IContext): Promise<IPartialContext
   };
   const flowType = jobType2FlowType[job.type || RasterJobTypeEnum.NEW];
 
-  return {
-    flowType: flowType as IPartialContext['flowType'],
-    selectionMode: 'restore',
-    files: {
-      gpkg: {
-        label: GPKG_LABEL,
-        path: path.resolve(MOUNT_DIR, job.parameters.inputFiles.gpkgFilesPath[0]),
-        exists: false
+  try {
+    return {
+      flowType: flowType as IPartialContext['flowType'],
+      selectionMode: 'restore',
+      files: {
+        gpkg: {
+          label: GPKG_LABEL,
+          path: path.resolve(MOUNT_DIR, job.parameters.inputFiles.gpkgFilesPath[0]),
+          exists: false
+        },
+        product: {
+          label: PRODUCT_LABEL,
+          path: path.resolve(MOUNT_DIR, job.parameters.inputFiles.productShapefilePath),
+          exists: false
+        },
+        metadata: {
+          label: METADATA_LABEL,
+          path: path.resolve(MOUNT_DIR, job.parameters.inputFiles.metadataShapefilePath),
+          exists: false
+        }
       },
-      product: {
-        label: PRODUCT_LABEL,
-        path: path.resolve(MOUNT_DIR, job.parameters.inputFiles.productShapefilePath),
-        exists: false
-      },
-      metadata: {
-        label: METADATA_LABEL,
-        path: path.resolve(MOUNT_DIR, job.parameters.inputFiles.metadataShapefilePath),
-        exists: false
+      resolutionDegree: job.parameters.ingestionResolution,
+      formData: transformEntityToFormFields(job.parameters.metadata as unknown as LayerMetadataMixedUnion) as unknown as LayerRasterRecordInput,
+      job: {
+        jobId: job.id
       }
-    },
-    resolutionDegree: job.parameters.ingestionResolution,
-    formData: transformEntityToFormFields(job.parameters.metadata as unknown as LayerMetadataMixedUnion) as unknown as LayerRasterRecordInput,
-    job: {
-      jobId: job.id
-    }
-  };
+    };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    throw buildError('ingestion.error.restore-failed', message);
+  }
 };

@@ -2,11 +2,11 @@ import { Feature, GeoJsonProperties, Geometry } from 'geojson';
 import { /*ActionArgs, */EventObject, PromiseActorRef } from 'xstate';
 import { AnyActorSystem } from 'xstate/dist/declarations/src/system';
 import { FileData } from '@map-colonies/react-components';
+import CONFIG from '../../../../../common/config';
 import { Mode } from '../../../../../common/models/mode.enum';
 import {
   IBaseRootStore,
   IRootStore,
-  JobModelType,
   LayerRasterRecordModelType,
   SourceValidationModelType,
   Status
@@ -69,7 +69,6 @@ export interface IContext {
   errors: IStateError[];
   flowType?: Mode.NEW | Mode.UPDATE;
   updatedLayer?: LayerRasterRecordModelType;
-  restoreFromJob?: JobModelType;
   selectionMode?: SelectionMode;
   files?: IFiles;
   resolutionDegree?: number;
@@ -95,7 +94,7 @@ export type Events =
   | { type: "CLEAN_ERRORS" }
   | { type: "NOOP" }
   | { type: "SUBMIT", data: LayerRasterRecordInput, resolutionDegree: number }
-  | { type: "RESTORE", data: JobModelType }
+  | { type: "RESTORE", job: IJob }
   | { type: "RETRY" }
   | { type: "DONE" };
 
@@ -146,11 +145,12 @@ export const WORKFLOW = {
 } as const;
 
 export const FIRST = 0;
-export const DATA_DIR = 'gpkg';
-export const SHAPES_DIR = 'shape';
+export const BASE_PATH = '/';
+export const DATA_DIR = CONFIG.RASTER_INGESTION_FILES_STRUCTURE.data.relativeToAOIDirPath;
+export const SHAPES_DIR = CONFIG.RASTER_INGESTION_FILES_STRUCTURE.shapeMetadata.relativeToAOIDirPath;
 export const SHAPES_RELATIVE_TO_DATA_DIR = '..';
-export const PRODUCT_SHP = 'Product.shp';
-export const METADATA_SHP = 'ShapeMetadata.shp';
+export const PRODUCT_SHP = `${CONFIG.RASTER_INGESTION_FILES_STRUCTURE.product.producerFileName}${CONFIG.RASTER_INGESTION_FILES_STRUCTURE.product.selectableExt[0]}`;
+export const METADATA_SHP = `${CONFIG.RASTER_INGESTION_FILES_STRUCTURE.shapeMetadata.producerFileName}${CONFIG.RASTER_INGESTION_FILES_STRUCTURE.shapeMetadata.selectableExt[0]}`;
 export const GPKG_LABEL = 'file-name.gpkg';
 export const PRODUCT_LABEL = 'file-name.product';
 export const METADATA_LABEL = 'file-name.metadata';
