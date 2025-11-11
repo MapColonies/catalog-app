@@ -4,7 +4,7 @@ import { isEmpty } from 'lodash';
 import { observer } from 'mobx-react';
 import { Switch } from '@material-ui/core';
 import { Box, defaultFormatters, FileData } from '@map-colonies/react-components';
-import { Button, CircularProgress, Icon, Typography } from '@map-colonies/react-core';
+import { Button, Icon, Typography } from '@map-colonies/react-core';
 import { Selection } from '../../../../common/components/file-picker';
 import { FieldLabelComponent } from '../../../../common/components/form/field-label';
 import CONFIG from '../../../../common/config';
@@ -24,6 +24,7 @@ import {
   IFileBase,
   IFiles
 } from './state-machine/types';
+import { Curtain } from './curtain/curtain.component';
 
 import './ingestion-fields.raster.css';
 
@@ -176,7 +177,10 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
           </Box>
         </Box>
       }
-      <Box className="header section">
+      <Box className={`header section ${isLoading ? 'curtainContainer' : ''}`}>
+        {
+          isLoading && <Curtain showProgress={isLoading}/>
+        }
         <Box className="ingestionFields">
           <IngestionInputs state={state} />
         </Box>
@@ -184,7 +188,6 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
           hasActiveJob(state.context) === false &&
           selectionMode === MANUAL &&
           <Box className="ingestionManualButtons">
-            {isLoading && <Box className={`loadingOnManual ${state.context.flowType === Mode.UPDATE ? 'update' : ''}`}><CircularProgress/></Box>}
             <Button
               raised
               type="button"
@@ -230,7 +233,6 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
           hasActiveJob(state.context) === false &&
           selectionMode === AUTO &&
           <Box className="ingestionAutoButtons">
-            {isLoading && <Box className={`loadingOnAuto ${state.context.flowType === Mode.UPDATE ? 'update' : ''}`}><CircularProgress/></Box>}
             <Button
               raised
               type="button"

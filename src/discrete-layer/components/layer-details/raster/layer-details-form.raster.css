@@ -2,23 +2,6 @@
   max-height: 880px !important;
 }
 
-#layerDetailsFormRaster .curtain {
-  position: absolute;
-  width: 100%;
-  background-color: #000;
-  opacity: 0.3;
-  border-radius: 10px;
-  z-index: 4;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  margin-top: 33%;
-  margin-bottom: -11%;
-}
-
-#layerDetailsFormRaster .curtain.update {
-  margin-bottom: unset;
-}
 
 #layerDetailsFormRaster .content {
   max-height: var(--content-height);

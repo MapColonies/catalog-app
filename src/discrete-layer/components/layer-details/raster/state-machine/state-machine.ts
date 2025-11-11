@@ -431,6 +431,7 @@ export const workflowMachine = createMachine<IContext, Events>({
     },
     [WORKFLOW.RESTORE_JOB]: {
       entry: () => console.log(`>>> Enter ${WORKFLOW.RESTORE_JOB}`),
+      tags: [STATE_TAGS.GENERAL_LOADING],
       invoke: {
         input: (_: { context: IContext; event: any }) => _,
         src: SERVICES[WORKFLOW.ROOT].restoreJobService,

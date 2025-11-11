@@ -43,6 +43,7 @@ import {
   isUIDisabled
 } from './state-machine/helpers';
 import { getUIIngestionFieldDescriptors } from './utils';
+import { Curtain } from './curtain/curtain.component';
 
 import './layer-details-form.raster.css';
 import 'react-virtualized/styles.css';
@@ -298,10 +299,6 @@ export const InnerRasterForm = (
           <IngestionFields recordType={recordType} />
         }
         <Box className="content section">
-          {
-            (isLoading || !isFilesSelected(state.context) || isJobSubmitted(state.context)) &&
-            <Box className={`curtain ${state.context.flowType === Mode.UPDATE ? 'update' : ''}`}></Box>
-          }
           <Box className="previewAndJobContainer">
             <JobInfo />
             <GeoFeaturesPresentorComponent
@@ -323,21 +320,27 @@ export const InnerRasterForm = (
               ingestionResolutionMeter={getFieldMeta('resolutionMeter').value as number}
             />
           </Box>
-          <LayersDetailsComponent
-            entityDescriptors={uiIngestionFieldDescriptors as EntityDescriptorModelType[]}
-            // @ts-ignore
-            layerRecord={{__typename: 'PolygonPartRecord'}}
-            mode={mode}
-            formik={entityFormikHandlers}
-            enableMapPreview={false}
-            showFiedlsCategory={false}/>
-          <LayersDetailsComponent
-            entityDescriptors={ingestionFieldDescriptors}
-            layerRecord={layerRecord}
-            mode={mode}
-            formik={entityFormikHandlers}
-            enableMapPreview={false}
-            showFiedlsCategory={false}/>
+          <Box className="curtainContainer">
+            <LayersDetailsComponent
+              entityDescriptors={uiIngestionFieldDescriptors as EntityDescriptorModelType[]}
+              // @ts-ignore
+              layerRecord={{__typename: 'PolygonPartRecord'}}
+              mode={mode}
+              formik={entityFormikHandlers}
+              enableMapPreview={false}
+              showFiedlsCategory={false}/>
+            <LayersDetailsComponent
+              entityDescriptors={ingestionFieldDescriptors}
+              layerRecord={layerRecord}
+              mode={mode}
+              formik={entityFormikHandlers}
+              enableMapPreview={false}
+              showFiedlsCategory={false}/>
+            {
+              (isLoading || !isFilesSelected(state.context) || isJobSubmitted(state.context)) 
+              && <Curtain showProgress={isLoading}/>
+            }
+          </Box>
         </Box>
         <Box className="footer">
           <Box className="messages">
