@@ -81,7 +81,7 @@ export const SERVICES = {
       }
 
       const result = await queryExecutor(async () => {
-        return await input.context.store.mutateFindTasks({
+        return await input.context.store.queryFindTasks({
           params: {
             jobId: jobId as string,
             type: 'init'
