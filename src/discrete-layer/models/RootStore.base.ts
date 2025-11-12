@@ -89,6 +89,8 @@ import { DecryptedIdModel, DecryptedIdModelType } from "./DecryptedIdModel"
 import { decryptedIdModelPrimitives, DecryptedIdModelSelector } from "./DecryptedIdModel.base"
 import { TasksGroupModel, TasksGroupModelType } from "./TasksGroupModel"
 import { tasksGroupModelPrimitives, TasksGroupModelSelector } from "./TasksGroupModel.base"
+import { TaskModel, TaskModelType } from "./TaskModel"
+import { taskModelPrimitives, TaskModelSelector } from "./TaskModel.base"
 import { GetFeatureModel, GetFeatureModelType } from "./GetFeatureModel"
 import { getFeatureModelPrimitives, GetFeatureModelSelector } from "./GetFeatureModel.base"
 import { WfsFeatureModel, WfsFeatureModelType } from "./WfsFeatureModel"
@@ -217,6 +219,7 @@ export type ExplorerResolveMetadataAsModel = {
 }
 export type TasksSearchParams = {
   jobId: string
+  type?: string
 }
 export type WfsGetFeatureParams = {
   pointCoordinates: string[]
@@ -456,6 +459,7 @@ queryResolveMetadataAsModel="queryResolveMetadataAsModel",
 queryGetFileById="queryGetFileById",
 queryGetDecryptedId="queryGetDecryptedId",
 queryTasks="queryTasks",
+queryFindTasks="queryFindTasks",
 queryGetFeature="queryGetFeature",
 queryGetFeatureTypes="queryGetFeatureTypes",
 queryGetPointsHeights="queryGetPointsHeights",
@@ -483,7 +487,7 @@ mutateJobAbort="mutateJobAbort"
 */
 export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
   .named("RootStore")
-  .extend(configureStoreMixin([['Capability', () => CapabilityModel], ['Style', () => StyleModel], ['TileMatrixSet', () => TileMatrixSetModel], ['ResourceURL', () => ResourceUrlModel], ['Layer3DRecord', () => Layer3DRecordModel], ['Link', () => LinkModel], ['LayerRasterRecord', () => LayerRasterRecordModel], ['LayerDemRecord', () => LayerDemRecordModel], ['VectorBestRecord', () => VectorBestRecordModel], ['VectorFeatureTypeStructure', () => VectorFeatureTypeStructureModel], ['FieldFeatureType', () => FieldFeatureTypeModel], ['QuantizedMeshBestRecord', () => QuantizedMeshBestRecordModel], ['StringArrayObjectType', () => StringArrayObjectTypeModel], ['EntityDescriptor', () => EntityDescriptorModel], ['CategoryConfig', () => CategoryConfigModel], ['FieldConfig', () => FieldConfigModel], ['FilterableFieldConfig', () => FilterableFieldConfigModel], ['FilterFieldValidation', () => FilterFieldValidationModel], ['BriefFieldConfig', () => BriefFieldConfigModel], ['Autocompletion', () => AutocompletionModel], ['ValidationConfig', () => ValidationConfigModel], ['EnumAspects', () => EnumAspectsModel], ['UpdateRules', () => UpdateRulesModel], ['UpdateRulesValue', () => UpdateRulesValueModel], ['UpdateRulesOperation', () => UpdateRulesOperationModel], ['LookupTableBinding', () => LookupTableBindingModel], ['DependentField', () => DependentFieldModel], ['ShapeMapping', () => ShapeMappingModel], ['MCEnums', () => McEnumsModel], ['PolygonPartRecord', () => PolygonPartRecordModel], ['EstimatedSize', () => EstimatedSizeModel], ['FreeDiskSpace', () => FreeDiskSpaceModel], ['TriggerExportTask', () => TriggerExportTaskModel], ['ExternalService', () => ExternalServiceModel], ['Job', () => JobModel], ['AvailableActions', () => AvailableActionsModel], ['LookupTableData', () => LookupTableDataModel], ['DeploymentWithServices', () => DeploymentWithServicesModel], ['K8sService', () => K8SServiceModel], ['File', () => FileModel], ['DecryptedId', () => DecryptedIdModel], ['TasksGroup', () => TasksGroupModel], ['GetFeature', () => GetFeatureModel], ['WfsFeature', () => WfsFeatureModel], ['GetFeatureTypes', () => GetFeatureTypesModel], ['PositionsWithHeights', () => PositionsWithHeightsModel], ['PositionWithHeight', () => PositionWithHeightModel], ['UserLogin', () => UserLoginModel], ['SourceValidation', () => SourceValidationModel], ['RasterIngestion', () => RasterIngestionModel]], ['LayerRasterRecord', 'Layer3DRecord', 'LayerDemRecord', 'EntityDescriptor', 'VectorBestRecord', 'QuantizedMeshBestRecord', 'PolygonPartRecord'], "js"))
+  .extend(configureStoreMixin([['Capability', () => CapabilityModel], ['Style', () => StyleModel], ['TileMatrixSet', () => TileMatrixSetModel], ['ResourceURL', () => ResourceUrlModel], ['Layer3DRecord', () => Layer3DRecordModel], ['Link', () => LinkModel], ['LayerRasterRecord', () => LayerRasterRecordModel], ['LayerDemRecord', () => LayerDemRecordModel], ['VectorBestRecord', () => VectorBestRecordModel], ['VectorFeatureTypeStructure', () => VectorFeatureTypeStructureModel], ['FieldFeatureType', () => FieldFeatureTypeModel], ['QuantizedMeshBestRecord', () => QuantizedMeshBestRecordModel], ['StringArrayObjectType', () => StringArrayObjectTypeModel], ['EntityDescriptor', () => EntityDescriptorModel], ['CategoryConfig', () => CategoryConfigModel], ['FieldConfig', () => FieldConfigModel], ['FilterableFieldConfig', () => FilterableFieldConfigModel], ['FilterFieldValidation', () => FilterFieldValidationModel], ['BriefFieldConfig', () => BriefFieldConfigModel], ['Autocompletion', () => AutocompletionModel], ['ValidationConfig', () => ValidationConfigModel], ['EnumAspects', () => EnumAspectsModel], ['UpdateRules', () => UpdateRulesModel], ['UpdateRulesValue', () => UpdateRulesValueModel], ['UpdateRulesOperation', () => UpdateRulesOperationModel], ['LookupTableBinding', () => LookupTableBindingModel], ['DependentField', () => DependentFieldModel], ['ShapeMapping', () => ShapeMappingModel], ['MCEnums', () => McEnumsModel], ['PolygonPartRecord', () => PolygonPartRecordModel], ['EstimatedSize', () => EstimatedSizeModel], ['FreeDiskSpace', () => FreeDiskSpaceModel], ['TriggerExportTask', () => TriggerExportTaskModel], ['ExternalService', () => ExternalServiceModel], ['Job', () => JobModel], ['AvailableActions', () => AvailableActionsModel], ['LookupTableData', () => LookupTableDataModel], ['DeploymentWithServices', () => DeploymentWithServicesModel], ['K8sService', () => K8SServiceModel], ['File', () => FileModel], ['DecryptedId', () => DecryptedIdModel], ['TasksGroup', () => TasksGroupModel], ['Task', () => TaskModel], ['GetFeature', () => GetFeatureModel], ['WfsFeature', () => WfsFeatureModel], ['GetFeatureTypes', () => GetFeatureTypesModel], ['PositionsWithHeights', () => PositionsWithHeightsModel], ['PositionWithHeight', () => PositionWithHeightModel], ['UserLogin', () => UserLoginModel], ['SourceValidation', () => SourceValidationModel], ['RasterIngestion', () => RasterIngestionModel]], ['LayerRasterRecord', 'Layer3DRecord', 'LayerDemRecord', 'EntityDescriptor', 'VectorBestRecord', 'QuantizedMeshBestRecord', 'PolygonPartRecord'], "js"))
   .props({
     layerRasterRecords: types.optional(types.map(types.late((): any => LayerRasterRecordModel)), {}),
     layer3DRecords: types.optional(types.map(types.late((): any => Layer3DRecordModel)), {}),
@@ -607,6 +611,11 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     queryTasks(variables: { params?: TasksSearchParams }, resultSelector: string | ((qb: TasksGroupModelSelector) => TasksGroupModelSelector) = tasksGroupModelPrimitives.toString(), options: QueryOptions = {}) {
       return self.query<{ tasks: TasksGroupModelType[]}>(`query tasks($params: TasksSearchParams) { tasks(params: $params) {
         ${typeof resultSelector === "function" ? resultSelector(new TasksGroupModelSelector()).toString() : resultSelector}
+      } }`, variables, options)
+    },
+    queryFindTasks(variables: { params: TasksSearchParams }, resultSelector: string | ((qb: TaskModelSelector) => TaskModelSelector) = taskModelPrimitives.toString(), options: QueryOptions = {}) {
+      return self.query<{ findTasks: TaskModelType[]}>(`query findTasks($params: TasksSearchParams!) { findTasks(params: $params) {
+        ${typeof resultSelector === "function" ? resultSelector(new TaskModelSelector()).toString() : resultSelector}
       } }`, variables, options)
     },
     queryGetFeature(variables: { data: WfsGetFeatureParams }, resultSelector: string | ((qb: GetFeatureModelSelector) => GetFeatureModelSelector) = getFeatureModelPrimitives.toString(), options: QueryOptions = {}) {

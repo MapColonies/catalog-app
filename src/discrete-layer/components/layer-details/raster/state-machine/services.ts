@@ -3,7 +3,7 @@ import path from 'path';
 // import shp from 'shpjs';
 import { fromPromise } from 'xstate';
 import { Mode } from '../../../../../common/models/mode.enum';
-import { RecordType, TasksGroupModelType } from '../../../../models';
+import { RecordType } from '../../../../models';
 import { LayerRasterRecordInput } from '../../../../models/RootStore.base';
 import { FeatureType } from '../pp-map.utils';
 import { buildError, getFeatureAndMarker, getFile } from './helpers';
@@ -80,22 +80,15 @@ export const SERVICES = {
         throw buildError('ingestion.error.missing', 'jobId');
       }
 
-      // const result = await queryExecutor(async () => {
-      //   return await input.context.store.queryFindTask({
-      //     params: {
-      //       jobId: jobId as string,
-      //       type: 'validation'
-      //     }
-      //   });
-      // });
       const result = await queryExecutor(async () => {
-        return await input.context.store.queryTasks({
+        return await input.context.store.queryFindTasks({
           params: {
-            jobId: jobId as string
+            jobId: jobId as string,
+            type: 'init'
           }
         });
       });
-      const task = (result.tasks as TasksGroupModelType[]).find(task => task.type === 'init');
+      const task = result.findTasks[FIRST];
 
       if (!task) {
         throw buildError('ingestion.error.not-found', 'validation task');
