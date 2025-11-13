@@ -16,10 +16,10 @@ import {
 } from './helpers';
 import { SERVICES } from './services';
 import {
-  GPKG_LABEL,
+  DATA_LABEL,
   IContext,
-  METADATA_LABEL,
   PRODUCT_LABEL,
+  SHAPEMETADATA_LABEL,
   STATE_TAGS,
   WORKFLOW
 } from './types';
@@ -52,7 +52,7 @@ const filesMachine = createMachine({
           on: {
             SELECT_FILES: {
               actions: [
-                ...selectFileActions('gpkg', 'override', false),
+                ...selectFileActions('data', 'override', false),
                 sendParent({ type: "CLEAN_ERRORS" })
               ],
               target: WORKFLOW.FILES.AUTO.SELECT_FILES
@@ -60,9 +60,9 @@ const filesMachine = createMachine({
             MANUAL: {
               actions: [
                 ...selectionModeActions('manual' as SelectionMode, {
-                  gpkg: { label: GPKG_LABEL, path: '', exists: false },
+                  data: { label: DATA_LABEL, path: '', exists: false },
                   product: { label: PRODUCT_LABEL, path: '', exists: false },
-                  metadata: { label: METADATA_LABEL, path: '', exists: false }
+                  shapeMetadata: { label: SHAPEMETADATA_LABEL, path: '', exists: false }
                 }),
                 sendParent({ type: "CLEAN_ERRORS" })
               ],
@@ -82,17 +82,17 @@ const filesMachine = createMachine({
                 assign((_: { context: IContext; event: any }) => ({
                   files: {
                     ..._.context.files,
-                    gpkg: {
-                      ..._.context.files?.gpkg,
-                      ..._.event.output.gpkg
+                    data: {
+                      ..._.context.files?.data,
+                      ..._.event.output.data
                     },
                     product: {
                       ..._.context.files?.product,
                       ..._.event.output.product
                     },
-                    metadata: {
-                      ..._.context.files?.metadata,
-                      ..._.event.output.metadata
+                    shapeMetadata: {
+                      ..._.context.files?.shapeMetadata,
+                      ..._.event.output.shapeMetadata
                     }
                   }
                 })),
@@ -120,7 +120,7 @@ const filesMachine = createMachine({
             src: SERVICES[WORKFLOW.FILES.ROOT].fetchProductService,
             onDone: {
               actions: fetchProductActions,
-              target: WORKFLOW.FILES.AUTO.CHECK_METADATA
+              target: WORKFLOW.FILES.AUTO.CHECK_SHAPEMETADATA
             },
             onError: {
               actions: filesErrorActions,
@@ -128,11 +128,11 @@ const filesMachine = createMachine({
             }
           }
         },
-        [WORKFLOW.FILES.AUTO.CHECK_METADATA]: {
-          entry: (_: { context: IContext; event: any }) => console.log(`>>> ${WORKFLOW.FILES.AUTO.CHECK_METADATA}`, _),
+        [WORKFLOW.FILES.AUTO.CHECK_SHAPEMETADATA]: {
+          entry: (_: { context: IContext; event: any }) => console.log(`>>> ${WORKFLOW.FILES.AUTO.CHECK_SHAPEMETADATA}`, _),
           invoke: {
             input: (_: { context: IContext; event: any }) => _,
-            src: SERVICES[WORKFLOW.FILES.ROOT].checkMetadataService,
+            src: SERVICES[WORKFLOW.FILES.ROOT].checkShapeMetadataService,
             onDone: {
               actions: [
                 sendParent({ type: "FILES_SELECTED" })
@@ -155,16 +155,16 @@ const filesMachine = createMachine({
           entry: () => console.log(`>>> Enter ${WORKFLOW.FILES.MANUAL.ROOT.toLocaleUpperCase()}.${WORKFLOW.FILES.MANUAL.IDLE}`),
           on: {
             SELECT_GPKG: {
-              actions: selectFileActions('gpkg'),
-              target: WORKFLOW.FILES.MANUAL.SELECT_GPKG
+              actions: selectFileActions('data'),
+              target: WORKFLOW.FILES.MANUAL.SELECT_DATA
             },
             SELECT_PRODUCT: {
               actions: selectFileActions('product'),
               target: WORKFLOW.FILES.MANUAL.FETCH_PRODUCT
             },
             SELECT_METADATA: {
-              actions: selectFileActions('metadata'),
-              target: WORKFLOW.FILES.MANUAL.CHECK_METADATA
+              actions: selectFileActions('shapeMetadata'),
+              target: WORKFLOW.FILES.MANUAL.CHECK_SHAPEMETADATA
             },
             AUTO: {
               actions: [
@@ -176,20 +176,20 @@ const filesMachine = createMachine({
             "*": { actions: warnUnexpectedStateEvent }
           }
         },
-        [WORKFLOW.FILES.MANUAL.SELECT_GPKG]: {
-          entry: () => console.log(`>>> Enter ${WORKFLOW.FILES.MANUAL.SELECT_GPKG}`),
+        [WORKFLOW.FILES.MANUAL.SELECT_DATA]: {
+          entry: () => console.log(`>>> Enter ${WORKFLOW.FILES.MANUAL.SELECT_DATA}`),
           tags: [STATE_TAGS.GENERAL_LOADING],
           invoke: {
             input: (_: { context: IContext; event: any }) => _,
-            src: SERVICES[WORKFLOW.FILES.ROOT].selectGpkgService,
+            src: SERVICES[WORKFLOW.FILES.ROOT].selectDataService,
             onDone: {
               actions: [
                 assign((_: { context: IContext; event: any }) => ({
                   files: {
                     ..._.context.files,
-                    gpkg: {
-                      ..._.context.files?.gpkg,
-                      ..._.event.output.gpkg
+                    data: {
+                      ..._.context.files?.data,
+                      ..._.event.output.data
                     }
                   }
                 })),
@@ -197,8 +197,8 @@ const filesMachine = createMachine({
                   type: "SET_FILES",
                   files: {
                     ..._.context.files,
-                    gpkg: {
-                      ..._.context.files?.gpkg,
+                    data: {
+                      ..._.context.files?.data,
                       ..._.event.output
                     }
                   },
@@ -233,11 +233,11 @@ const filesMachine = createMachine({
             }
           }
         },
-        [WORKFLOW.FILES.MANUAL.CHECK_METADATA]: {
-          entry: (_: { context: IContext; event: any }) => console.log(`>>> ${WORKFLOW.FILES.MANUAL.CHECK_METADATA}`, _),
+        [WORKFLOW.FILES.MANUAL.CHECK_SHAPEMETADATA]: {
+          entry: (_: { context: IContext; event: any }) => console.log(`>>> ${WORKFLOW.FILES.MANUAL.CHECK_SHAPEMETADATA}`, _),
           invoke: {
             input: (_: { context: IContext; event: any }) => _,
-            src: SERVICES[WORKFLOW.FILES.ROOT].checkMetadataService,
+            src: SERVICES[WORKFLOW.FILES.ROOT].checkShapeMetadataService,
             onDone: {
               actions: [
                 ...filesSelectedActions

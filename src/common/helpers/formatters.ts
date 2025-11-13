@@ -1,3 +1,4 @@
+import { isEmpty } from 'lodash';
 import moment from 'moment';
 import { BASE_PATH } from '../../discrete-layer/components/layer-details/raster/state-machine/types';
 import CONFIG from '../config';
@@ -83,10 +84,12 @@ export const normalizePath = (path: string): string => {
 
 export const formatPath = (path: string): string => {
   let normalizedPath = path.trim();
-  if (!normalizedPath.startsWith(BASE_PATH)) {
-    normalizedPath = BASE_PATH + normalizedPath.replace(/^\\+/, '');
-  } else {
-    normalizedPath = BASE_PATH + normalizedPath.replace(/^\/\\+/, '');
+  if (!isEmpty(normalizedPath)) {
+    if (!normalizedPath.startsWith(BASE_PATH)) {
+      normalizedPath = normalizedPath.replace(/^\\+/, BASE_PATH);
+    } else {
+      normalizedPath = normalizedPath.replace(/^\/\\+/, BASE_PATH);
+    }
   }
   return normalizedPath;
 };

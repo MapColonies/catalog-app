@@ -119,7 +119,7 @@ export const InnerRasterForm = (
 
   useEffect(() => {
     const { files } = state.context || {};
-    const newResolution = files?.gpkg?.validationResult?.resolutionDegree;
+    const newResolution = files?.data?.validationResult?.resolutionDegree;
     if (newResolution !== values.resolutionDegree) {
       // resetForm();
       setValues({
@@ -266,7 +266,7 @@ export const InnerRasterForm = (
                 </Box>
                 <Box className="reportList error">
                   {
-                    Object.entries(state.context.job?.validationsReport ?? {}).map(([key, value]) => (
+                    Object.entries(state.context.job?.validationReport ?? {}).map(([key, value]) => (
                       <Fragment key={key}>
                         <Box key={`${key}-key`}><FormattedMessage id={`report.error.${key}`} /></Box>
                         <Box key={`${key}-value`}>{value as number}</Box>
@@ -306,8 +306,8 @@ export const InnerRasterForm = (
               mode={mode}
               geoFeatures={
                 [
-                  state.context.files?.gpkg?.geoDetails?.feature as Feature<Geometry, GeoJsonProperties>,
-                  state.context.files?.gpkg?.geoDetails?.marker as Feature<Geometry, GeoJsonProperties>,
+                  state.context.files?.data?.geoDetails?.feature as Feature<Geometry, GeoJsonProperties>,
+                  state.context.files?.data?.geoDetails?.marker as Feature<Geometry, GeoJsonProperties>,
                   state.context.files?.product?.geoDetails?.feature as Feature<Geometry, GeoJsonProperties>,
                   state.context.files?.product?.geoDetails?.marker as Feature<Geometry, GeoJsonProperties>
                 ]
