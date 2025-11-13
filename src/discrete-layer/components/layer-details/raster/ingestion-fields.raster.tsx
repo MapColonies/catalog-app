@@ -8,7 +8,7 @@ import { Button, Icon, Typography } from '@map-colonies/react-core';
 import { Selection } from '../../../../common/components/file-picker';
 import { FieldLabelComponent } from '../../../../common/components/form/field-label';
 import CONFIG from '../../../../common/config';
-import { dateFormatter } from '../../../../common/helpers/formatters';
+import { dateFormatter, formatPath } from '../../../../common/helpers/formatters';
 import { Mode } from '../../../../common/models/mode.enum';
 import { RecordType, LayerMetadataMixedUnion, RasterIngestionFilesTypeConfig } from '../../../models';
 import { FilePickerDialog } from '../../dialogs/file-picker.dialog';
@@ -45,7 +45,7 @@ const FileItem: React.FC<{ file: IFileBase }> = ({ file }) => {
       <Box><Icon className="fileIcon mc-icon-Map-Vector" /></Box>
       <FormattedMessage id={file.label} />
       <Box className={`fileItemName ${file.exists ? '' : 'warning'}`}>
-        {file.path?.startsWith('/\\') ? file.path?.substring(1) : file.path}
+        {formatPath(file.path)}
       </Box>
       <Box className="ltr">
         {defaultFormatters.formatFileSize(null, file.details as FileData)}

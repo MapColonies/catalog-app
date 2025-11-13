@@ -1,4 +1,5 @@
 import moment from 'moment';
+import { BASE_PATH } from '../../discrete-layer/components/layer-details/raster/state-machine/types';
 import CONFIG from '../config';
 
 export const getDateformatType = (withTime = false, fnsFormat = false, humanReadable = false): string => {
@@ -78,4 +79,14 @@ export const kbToBytes = (n: number): number => {
 
 export const normalizePath = (path: string): string => {
   return path.replaceAll('\\', '\\\\');
+};
+
+export const formatPath = (path: string): string => {
+  let normalizedPath = path.trim();
+  if (!normalizedPath.startsWith(BASE_PATH)) {
+    normalizedPath = BASE_PATH + normalizedPath.replace(/^\\+/, '');
+  } else {
+    normalizedPath = BASE_PATH + normalizedPath.replace(/^\/\\+/, '');
+  }
+  return normalizedPath;
 };

@@ -1,4 +1,6 @@
+import { Geometry } from 'geojson';
 import path from 'path';
+// import shp from 'shpjs';
 import { FileData } from '@map-colonies/react-components';
 import { normalizePath } from '../../../../../common/helpers/formatters';
 import { Mode } from '../../../../../common/models/mode.enum';
@@ -7,6 +9,7 @@ import { LayerRasterRecordInput } from '../../../../models/RootStore.base';
 import { transformEntityToFormFields } from '../../utils';
 import { FeatureType } from '../pp-map.utils';
 import { buildError, getFeatureAndMarker } from './helpers';
+import { MOCK_POLYGON } from './MOCK';
 import { queryExecutor } from './query-executor';
 import {
   BASE_PATH,
@@ -14,6 +17,7 @@ import {
   GPKG_LABEL,
   IContext,
   IPartialContext,
+  IProductFile,
   METADATA_LABEL,
   PRODUCT_LABEL
 } from './types';
@@ -66,6 +70,34 @@ export const selectGpkg = async (context: IContext) => {
 
   return {
     validationResult,
+    geoDetails: {
+      feature,
+      marker
+    }
+  };
+};
+
+export const fetchProduct = async (product: IProductFile, context: IContext) => {
+  if (!product || !product.exists || !product.path) {
+    return undefined;
+  }
+  // const result = await queryExecutor(async () => {
+  //   return await context.store.queryGetFile({
+  //       data: {
+  //         path: product?.path ?? '',
+  //         type: RecordType.RECORD_RASTER,
+  //       },
+  //     });
+  // });
+
+  // const outlinedPolygon = await shp(result.getFile[FIRST]);
+  const outlinedPolygon: Geometry = MOCK_POLYGON; // TODO: Mock should be removed
+
+  const { feature, marker } = getFeatureAndMarker(outlinedPolygon, FeatureType.PP_PERIMETER, FeatureType.PP_PERIMETER_MARKER);
+
+  return {
+    // data: new File(result.getFile[FIRST], path.basename(product.path)),
+    data: undefined,
     geoDetails: {
       feature,
       marker
@@ -128,7 +160,7 @@ export const getRestoreData = async (context: IContext): Promise<IPartialContext
       }
     };
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    throw buildError('ingestion.error.restore-failed', message);
+    console.warn(error instanceof Error ? error.message : String(error));
+    throw buildError('ingestion.error.restore-failed');
   }
 };

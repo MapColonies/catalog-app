@@ -7,6 +7,7 @@ import { Mode } from '../../../../../common/models/mode.enum';
 import {
   IBaseRootStore,
   IRootStore,
+  JobModelType,
   LayerRasterRecordModelType,
   SourceValidationModelType,
   Status
@@ -59,9 +60,10 @@ export interface IFiles {
 export interface IJob {
   jobId?: string;
   taskId?: string;
-  percentage?: number;
-  report?: Record<string, unknown>;
+  taskPercentage?: number;
+  validationsReport?: Record<string, unknown>;
   taskStatus?: Status;
+  data?: JobModelType;
 }
 
 export interface IContext {

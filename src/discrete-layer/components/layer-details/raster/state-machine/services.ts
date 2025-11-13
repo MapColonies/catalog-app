@@ -1,15 +1,20 @@
 import { Feature, GeoJsonProperties, Geometry } from 'geojson';
 import path from 'path';
-// import shp from 'shpjs';
 import { fromPromise } from 'xstate';
 import { Mode } from '../../../../../common/models/mode.enum';
 import { RecordType } from '../../../../models';
 import { LayerRasterRecordInput } from '../../../../models/RootStore.base';
 import { FeatureType } from '../pp-map.utils';
 import { buildError, getFeatureAndMarker, getFile } from './helpers';
-import { MOCK_JOB, MOCK_POLYGON } from './MOCK';
+import { MOCK_JOB } from './MOCK';
 import { queryExecutor } from './query-executor';
-import { getDetails, getDirectory, getRestoreData, selectGpkg } from './services-helpers';
+import {
+  getDetails,
+  getDirectory,
+  fetchProduct,
+  getRestoreData,
+  selectGpkg
+} from './services-helpers';
 import {
   FIRST,
   FromPromiseArgs,
@@ -136,24 +141,16 @@ export const SERVICES = {
       });
 
       const validationResult = { ...result.validateGPKGSource[FIRST] };
-      let gpkgFM: { feature: Feature<Geometry, GeoJsonProperties>; marker: Feature<Geometry, GeoJsonProperties>; } | undefined;
+      let geoDetails: { feature: Feature<Geometry, GeoJsonProperties>; marker: Feature<Geometry, GeoJsonProperties>; } | undefined;
       if (validationResult.extentPolygon) {
-        gpkgFM = getFeatureAndMarker(validationResult.extentPolygon, FeatureType.SOURCE_EXTENT, FeatureType.SOURCE_EXTENT_MARKER);
+        geoDetails = getFeatureAndMarker(validationResult.extentPolygon, FeatureType.SOURCE_EXTENT, FeatureType.SOURCE_EXTENT_MARKER);
       }
 
-      let productFM: { feature: Feature<Geometry, GeoJsonProperties>; marker: Feature<Geometry, GeoJsonProperties>; } | undefined;
       if (files.product) {
-        // const result = await queryExecutor(async () => {
-        //   return await input.context.store.queryGetFile({
-        //       data: {
-        //         path: files.product?.path ?? '',
-        //         type: RecordType.RECORD_RASTER,
-        //       },
-        //     });
-        // });
-        // const outlinedPolygon = await shp(result.getFile[FIRST]);
-        const outlinedPolygon: Geometry = MOCK_POLYGON;
-        productFM = getFeatureAndMarker(outlinedPolygon, FeatureType.PP_PERIMETER, FeatureType.PP_PERIMETER_MARKER);
+        const productRef = files.product;
+        const productFile = await fetchProduct(files.product, input.context);
+        productRef.data = productFile?.data;
+        productRef.geoDetails = productFile?.geoDetails;
       }
 
       return {
@@ -164,11 +161,10 @@ export const SERVICES = {
           gpkg: {
             ...gpkg,
             validationResult,
-            geoDetails: gpkgFM
+            geoDetails
           },
           product: {
-            ...product,
-            geoDetails: productFM
+            ...product
           },
           metadata: {
             ...metadata
@@ -204,28 +200,7 @@ export const SERVICES = {
       if (!product || !product.exists || !product.path) {
         throw buildError('ingestion.error.missing', PRODUCT_SHP);
       }
-
-      // const result = await queryExecutor(async () => {
-      //   return await input.context.store.queryGetFile({
-      //       data: {
-      //         path: product?.path ?? '',
-      //         type: RecordType.RECORD_RASTER,
-      //       },
-      //     });
-      // });
-
-      // const outlinedPolygon = await shp(result.getFile[FIRST]);
-      const outlinedPolygon: Geometry = MOCK_POLYGON;
-
-      const { feature, marker } = getFeatureAndMarker(outlinedPolygon, FeatureType.PP_PERIMETER, FeatureType.PP_PERIMETER_MARKER);
-
-      return {
-        // data: new File(result.getFile[FIRST], path.basename(product.path)),
-        geoDetails: {
-          feature,
-          marker
-        }
-      };
+      return fetchProduct(product, input.context);
     }),
     checkMetadataService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
       const { metadata } = input.context.files || {};
