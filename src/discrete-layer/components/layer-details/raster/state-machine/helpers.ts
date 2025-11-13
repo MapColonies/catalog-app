@@ -61,13 +61,13 @@ export const getFile = (files: FileData[], gpkgPath: string, fileName: string, l
   if (!matchingFiles || matchingFiles.length === 0) {
     return {
       label,
-      path: path.resolve(path.dirname(gpkgPath), SHAPES_RELATIVE_TO_DATA_DIR, SHAPES_DIR, fileName).replace('/', ''),
+      path: path.resolve(path.dirname(gpkgPath), SHAPES_RELATIVE_TO_DATA_DIR, SHAPES_DIR, fileName),
       exists: false
     };
   }
   return matchingFiles.map((file: FileData) => ({
     label,
-    path: path.resolve(path.dirname(gpkgPath), SHAPES_RELATIVE_TO_DATA_DIR, SHAPES_DIR, fileName).replace('/', ''),
+    path: path.resolve(path.dirname(gpkgPath), SHAPES_RELATIVE_TO_DATA_DIR, SHAPES_DIR, fileName),
     details: { ...file },
     exists: true
   }))[FIRST];
@@ -128,7 +128,7 @@ export const hasActiveJob = (context: IContext): boolean => {
 export const isRetryEnabled = (context: IContext): boolean => {
   return !!(context.job &&
     (context.job.taskStatus === Status.Failed ||
-    (context.job.taskStatus === Status.Completed && context.job.report)));
+    (context.job.taskStatus === Status.Completed && context.job.validationsReport)));
 };
 
 export const isUIDisabled = (isLoading: boolean, state: any): boolean => {

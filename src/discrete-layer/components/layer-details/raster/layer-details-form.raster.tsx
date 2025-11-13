@@ -253,8 +253,8 @@ export const InnerRasterForm = (
               <Box className="center">
                 <Box className="progressBar">
                   <CircularProgressBar
-                    value={state.context.job?.percentage ?? 0}
-                    text={`${state.context.job?.percentage ?? 0}%`}
+                    value={state.context.job?.taskPercentage ?? 0}
+                    text={`${state.context.job?.taskPercentage ?? 0}%`}
                   />
                 </Box>
               </Box>
@@ -266,7 +266,7 @@ export const InnerRasterForm = (
                 </Box>
                 <Box className="reportList error">
                   {
-                    Object.entries(state.context.job?.report ?? {}).map(([key, value]) => (
+                    Object.entries(state.context.job?.validationsReport ?? {}).map(([key, value]) => (
                       <Fragment key={key}>
                         <Box key={`${key}-key`}><FormattedMessage id={`report.error.${key}`} /></Box>
                         <Box key={`${key}-value`}>{value as number}</Box>
