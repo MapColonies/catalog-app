@@ -116,9 +116,9 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
         : '';
 
       if (selectedAction) {
-        const actionTypeMap: Record<string, 'SELECT_FILES' | 'SELECT_GPKG' | 'SELECT_PRODUCT' | 'SELECT_METADATA'> = {
+        const actionTypeMap: Record<string, 'SELECT_FILES' | 'SELECT_DATA' | 'SELECT_PRODUCT' | 'SELECT_METADATA'> = {
           files: 'SELECT_FILES',
-          gpkg: 'SELECT_GPKG',
+          gpkg: 'SELECT_DATA',
           product: 'SELECT_PRODUCT',
           metadata: 'SELECT_METADATA',
         };

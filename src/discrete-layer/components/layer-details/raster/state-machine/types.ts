@@ -86,7 +86,7 @@ export type Events =
   | { type: "AUTO" }
   | { type: "MANUAL" }
   | { type: "SELECT_FILES", file: IGPKGFile }
-  | { type: "SELECT_GPKG", file: IGPKGFile }
+  | { type: "SELECT_DATA", file: IGPKGFile }
   | { type: "SELECT_PRODUCT", file: IProductFile }
   | { type: "SELECT_METADATA", file: IFileBase }
   | { type: "RESELECT_FILES" }
