@@ -1129,6 +1129,8 @@ const DiscreteLayerView: React.FC = observer(() => {
                 activeTabView={activeTabView}
                 isEntityDialogOpen = {isEntityDialogOpen}
                 setEntityDialogOpen = {setEntityDialogOpen}
+                isRasterEntityDialogOpen = {isNewRasterEntityDialogOpen}
+                setRasterEntityDialogOpen = {setNewRasterEntityDialogOpen}
                 isEntityDeleteDialogOpen = {isEntityDeleteDialogOpen}
                 setEntityDeleteDialogOpen = {setEntityDeleteDialogOpen}
                 detailsPanelExpanded = {detailsPanelExpanded}

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import { observer } from 'mobx-react-lite';
 import { IconButton, Tooltip, Typography } from '@map-colonies/react-core';
@@ -21,6 +21,8 @@ import './details-panel.component.css';
 interface DetailsPanelComponentProps {
   isEntityDialogOpen: boolean;
   setEntityDialogOpen: (open: boolean) => void;
+  isRasterEntityDialogOpen: boolean;
+  setRasterEntityDialogOpen: (open: boolean) => void;
   isEntityDeleteDialogOpen: boolean;
   setEntityDeleteDialogOpen: (open: boolean) => void;
   detailsPanelExpanded: boolean;
@@ -32,6 +34,8 @@ export const DetailsPanel: React.FC<DetailsPanelComponentProps> = observer((prop
   const {
     isEntityDialogOpen,
     setEntityDialogOpen,
+    isRasterEntityDialogOpen,
+    setRasterEntityDialogOpen,
     isEntityDeleteDialogOpen,
     setEntityDeleteDialogOpen,
     detailsPanelExpanded,
@@ -53,6 +57,16 @@ export const DetailsPanel: React.FC<DetailsPanelComponentProps> = observer((prop
      isSaveMetadataAllowed: layerToPresent && store.userStore.isActionAllowed(`entity_action.${layerToPresent.__typename}.saveMetadata`),
     }
   }, [store.userStore.user, layerToPresent]);
+
+  useEffect(() => {
+    if (isEntityDialogOpen && layerToPresent?.__typename === 'LayerRasterRecord' && isSelectedLayerUpdateMode) {
+      setRasterEntityDialogOpen(true);
+    } else if (isRasterEntityDialogOpen || isEntityDialogOpen) {
+      setRasterEntityDialogOpen(false);
+      setEntityDialogOpen(!isEntityDialogOpen);
+    }
+  }, [isEntityDialogOpen, isSelectedLayerUpdateMode]);
+  
 
   const handleEntityDialogClick = (): void => {
     setEntityDialogOpen(!isEntityDialogOpen);
@@ -93,15 +107,6 @@ export const DetailsPanel: React.FC<DetailsPanelComponentProps> = observer((prop
               }}
             />
           </Tooltip>
-        }
-        {
-          isEntityDialogOpen && layerToPresent?.__typename === 'LayerRasterRecord' && isSelectedLayerUpdateMode &&
-          <EntityRasterDialog
-            isOpen={isEntityDialogOpen}
-            onSetOpen={setEntityDialogOpen}
-            layerRecord={layerToPresent}
-            isSelectedLayerUpdateMode={isSelectedLayerUpdateMode}
-          />
         }
         {
           permissions.isDeleteAllowed && layerToPresent && isEntityDeleteDialogOpen && isSelectedLayerDeleteMode &&
