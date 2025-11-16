@@ -154,7 +154,7 @@ const filesMachine = createMachine({
         [WORKFLOW.FILES.MANUAL.IDLE]: {
           entry: () => console.log(`>>> Enter ${WORKFLOW.FILES.MANUAL.ROOT.toLocaleUpperCase()}.${WORKFLOW.FILES.MANUAL.IDLE}`),
           on: {
-            SELECT_GPKG: {
+            SELECT_DATA: {
               actions: selectFileActions('data'),
               target: WORKFLOW.FILES.MANUAL.SELECT_DATA
             },
