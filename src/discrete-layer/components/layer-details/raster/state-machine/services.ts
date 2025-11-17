@@ -6,7 +6,7 @@ import { RecordType } from '../../../../models';
 import { LayerRasterRecordInput } from '../../../../models/RootStore.base';
 import { FeatureType } from '../pp-map.utils';
 import { buildError, getFeatureAndMarker, getFile } from './helpers';
-import { MOCK_JOB } from './MOCK';
+import { MOCK_JOB_UPDATE, MOCK_TASK } from './MOCK';
 import { queryExecutor } from './query-executor';
 import {
   getDetails,
@@ -41,7 +41,7 @@ export const SERVICES = {
       //   });
       // });
 
-      const job = MOCK_JOB; // TODO: Mock should be removed
+      const job = MOCK_JOB_UPDATE; // TODO: Mock should be removed
 
       return {
         jobId: job.id
@@ -73,7 +73,7 @@ export const SERVICES = {
       }
 
       result = {
-        jobId: MOCK_JOB.id, // TODO: Mock should be removed
+        jobId: MOCK_JOB_UPDATE.id, // TODO: Mock should be removed
       };
 
       return {
@@ -94,7 +94,7 @@ export const SERVICES = {
           }
         });
       });
-      const task = result.findTasks[FIRST];
+      const task = result.findTasks[FIRST] || MOCK_TASK; // TODO: Mock should be removed
 
       if (!task) {
         throw buildError('ingestion.error.not-found', 'validation task');
@@ -102,7 +102,7 @@ export const SERVICES = {
 
       return {
         taskPercentage: task.percentage ?? 0,
-        validationReport: task.parameters ?? {invalidData: 5, invalidGeometry: 10, tooManyVertices: 1, smallHoles: 1, resolutionMismatch: 13},
+        validationReport: task.parameters?.isValid === false ? task.parameters.errors : undefined,
         taskStatus: task.status ?? ''
       };
     }),

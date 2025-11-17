@@ -127,7 +127,7 @@ export const getRestoreData = async (context: IContext): Promise<IPartialContext
   }
   const job = { ...result.job };
 
-  try {
+    try {
     return {
       flowType: jobType2FlowType[job.type || RasterJobTypeEnum.NEW] as IPartialContext['flowType'],
       selectionMode: 'restore',
@@ -149,13 +149,13 @@ export const getRestoreData = async (context: IContext): Promise<IPartialContext
         }
       },
       resolutionDegree: job.parameters.ingestionResolution,
-      formData: transformEntityToFormFields(job.parameters.metadata as unknown as LayerMetadataMixedUnion) as unknown as LayerRasterRecordInput,
+      formData: transformEntityToFormFields({ ...job.parameters.metadata, resolutionDegree: job.parameters.ingestionResolution } as unknown as LayerMetadataMixedUnion) as unknown as LayerRasterRecordInput,
       job: {
-        jobId: job.id
+        jobId: job.id,
+        record: job as unknown as any
       }
     };
   } catch (error) {
-    console.warn(error instanceof Error ? error.message : String(error));
     throw buildError('ingestion.error.restore-failed');
   }
 };

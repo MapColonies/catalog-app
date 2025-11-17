@@ -31,13 +31,13 @@ const TILL_DATE_ACTION_REQUEST_BUFFER = Number(POLLING_CYCLE_INTERVAL);
 interface JobsDialogProps {
   isOpen: boolean;
   onSetOpen: (open: boolean) => void;
-  setJobId: (jobId: string) => void;
+  setJob: (job: JobModelType) => void;
 }
 
 export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialogProps) => {
   const store = useStore();
   const intl = useIntl();
-  const { isOpen, onSetOpen } = props;
+  const { isOpen, onSetOpen, setJob } = props;
   const [ updateTaskPayload, setUpdateTaskPayload ] = useState<Record<string, unknown>>({});
   const [ gridRowData, setGridRowData ] = useState<JobModelType[] | undefined>(undefined);
   const [ gridApi, setGridApi ] = useState<GridApi>();
@@ -220,14 +220,13 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
           break;
         case 'Job.restore':
           closeDialog();
-          props.setJobId(data.id as string);
+          setJob(data as unknown as JobModelType);
           break;
         default:
           break;
       }
     }
   }, [store.actionDispatcherStore.action]);
-
 
   // Reset action value on store when unmounting
 
@@ -289,7 +288,6 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
       </Box>
     );
   };
-
 
   return (
     <Box id="jobsDialog">
