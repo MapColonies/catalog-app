@@ -22,6 +22,7 @@ import { Mode } from '../../../../common/models/mode.enum';
 import {
   EntityDescriptorModelType,
   FieldConfigModelType,
+  JobModelType,
   LayerMetadataMixedUnion,
   LayerRasterRecordModel,
   LayerRasterRecordModelType,
@@ -71,7 +72,7 @@ interface EntityRasterDialogProps {
   layerRecord?: ILayerImage | null;
   isSelectedLayerUpdateMode?: boolean;
   jobId?: string;
-  setJobId?: (jobId: string | undefined) => void;
+  setJob?: (job: JobModelType | undefined) => void;
 }
 
 const setDefaultValues = (record: Record<string, unknown>, descriptors: EntityDescriptorModelType[]): void => {
@@ -156,7 +157,7 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
       return (props.isSelectedLayerUpdateMode === true && props.layerRecord) ? Mode.UPDATE : Mode.NEW;
     }, []);
 
-    const { isOpen, onSetOpen, jobId, setJobId } = props;
+    const { isOpen, onSetOpen, jobId, setJob } = props;
     const [recordType] = useState<RecordType>(props.recordType ?? (props.layerRecord?.type as RecordType));
     const [mode] = useState<Mode>(decideMode());
     const [layerRecord] = useState<LayerMetadataMixedUnion>(
@@ -307,7 +308,7 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
     const closeDialog = useCallback(() => {
       onSetOpen(false);
       if (jobId) {
-        setJobId?.(undefined);
+        setJob?.(undefined);
       }
       store.discreteLayersStore.resetUpdateMode();
       clearSyncWarnings();

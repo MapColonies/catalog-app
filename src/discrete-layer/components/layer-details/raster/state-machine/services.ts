@@ -6,7 +6,7 @@ import { RecordType } from '../../../../models';
 import { LayerRasterRecordInput } from '../../../../models/RootStore.base';
 import { FeatureType } from '../pp-map.utils';
 import { buildError, getFeatureAndMarker, getFile } from './helpers';
-import { MOCK_JOB, MOCK_TASK } from './MOCK';
+import { MOCK_JOB_UPDATE, MOCK_TASK } from './MOCK';
 import { queryExecutor } from './query-executor';
 import {
   getDetails,
@@ -41,7 +41,7 @@ export const SERVICES = {
       //   });
       // });
 
-      const job = MOCK_JOB; // TODO: Mock should be removed
+      const job = MOCK_JOB_UPDATE; // TODO: Mock should be removed
 
       return {
         jobId: job.id
@@ -73,7 +73,7 @@ export const SERVICES = {
       }
 
       result = {
-        jobId: MOCK_JOB.id, // TODO: Mock should be removed
+        jobId: MOCK_JOB_UPDATE.id, // TODO: Mock should be removed
       };
 
       return {

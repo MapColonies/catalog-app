@@ -1,6 +1,6 @@
 import { Geometry } from 'geojson';
 
-export const MOCK_JOB = {
+export const MOCK_JOB_NEW = {
   __typename: "Job",
   id: "8b62987a-c1f7-4326-969e-ceca4c81b5aa",
   resourceId: "elicy_test",
@@ -109,6 +109,176 @@ export const MOCK_JOB = {
   isCleaned: false,
   domain: "RASTER",
   availableActions: null
+};
+
+export const MOCK_JOB_UPDATE = {
+  __typename: "Job",
+  id: "9e4b0196-b8e7-4561-8ba6-d0dd1efa9d59",
+  availableActions: null,
+  resourceId: "test160625",
+  version: "4.0",
+  description: "",
+  parameters: {
+    metadata: {
+      classification: "4"
+    },
+    partsData: [
+      {
+        sensors: [
+          "OTHER"
+        ],
+        footprint: {
+          type: "Polygon",
+          coordinates: [
+            [
+              [
+                35.41505913321319,
+                33.066717443190726
+              ],
+              [
+                35.41505913321319,
+                33.074368659790565
+              ],
+              [
+                35.4046830040584,
+                33.074368659790565
+              ],
+              [
+                35.4046830040584,
+                33.066717443190726
+              ],
+              [
+                35.41505913321319,
+                33.066717443190726
+              ]
+            ]
+          ]
+        },
+        sourceName: "111",
+        resolutionMeter: 0.075,
+        resolutionDegree: 6.70552253723145e-7,
+        imagingTimeEndUTC: "2025-11-14T09:48:00.000Z",
+        imagingTimeBeginUTC: "2025-11-10T09:48:00.000Z",
+        sourceResolutionMeter: 0.075,
+        horizontalAccuracyCE90: 1
+      }
+    ],
+    inputFiles: {
+      gpkgFilesPath: ["test_dir/shaziri-orthophto-test.gpkg"],
+      productShapefilePath: "shape/Product.shp",
+      metadataShapefilePath: "shape/ShapeMetadata.shp"
+    },
+    ingestionResolution: 0.010986328125,
+    additionalParams: {
+      footprint: {
+        bbox: [
+          35.02441158152078,
+          32.7189911035896,
+          35.969258533050635,
+          33.46610955180954
+        ],
+        type: "MultiPolygon",
+        coordinates: [
+          [
+            [
+              [
+                35.024415390972734,
+                32.947998339047686
+              ],
+              [
+                35.37597650139542,
+                32.947998029528236
+              ],
+              [
+                35.375977120430726,
+                32.794190094256216
+              ],
+              [
+                35.02441158152078,
+                32.79419314182113
+              ],
+              [
+                35.024415390972734,
+                32.947998339047686
+              ]
+            ]
+          ],
+          [
+            [
+              [
+                35.41505910678474,
+                33.07436863336211
+              ],
+              [
+                35.41505910678474,
+                33.06671746961918
+              ],
+              [
+                35.40468303048685,
+                33.06671746961918
+              ],
+              [
+                35.40468303048685,
+                33.07436863336211
+              ],
+              [
+                35.41505910678474,
+                33.07436863336211
+              ]
+            ]
+          ],
+          [
+            [
+              [
+                35.96925823828957,
+                33.46610955180954
+              ],
+              [
+                35.969258533050635,
+                32.718991371922215
+              ],
+              [
+                35.92232250913328,
+                32.7189911035896
+              ],
+              [
+                35.92232248270483,
+                33.46610925704847
+              ],
+              [
+                35.96925823828957,
+                33.46610955180954
+              ]
+            ]
+          ]
+        ]
+      },
+      displayPath: "6a5b0bfa-b9c4-459d-9d7a-4829a96a71e9",
+      tileOutputFormat: "JPEG",
+      jobTrackerServiceURL: "http://raster-core-int-job-tracker-service",
+      polygonPartsEntityName: "test160625_orthophoto"
+    }
+  },
+  status: "Completed",
+  reason: "Job completed successfully",
+  type: "Ingestion_Update",
+  percentage: 100,
+  priority: 1000,
+  expirationDate: "1970-01-01T00:00:00.000Z",
+  internalId: "be616325-0f57-48ab-81a6-0f885f5eb50d",
+  producerName: null,
+  productName: "test160625",
+  productType: "ORTHOPHOTO",
+  created: "2025-11-17T09:50:24.830Z",
+  updated: "2025-11-17T09:53:51.672Z",
+  taskCount: 24,
+  completedTasks: 24,
+  failedTasks: 0,
+  expiredTasks: 0,
+  pendingTasks: 0,
+  inProgressTasks: 0,
+  isCleaned: false,
+  domain: "RASTER"
 };
 
 export const MOCK_TASK = {
