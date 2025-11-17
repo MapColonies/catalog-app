@@ -132,7 +132,7 @@ export const hasActiveJob = (context: IContext): boolean => {
 export const isRetryEnabled = (context: IContext): boolean => {
   return !!(context.job &&
     (context.job.taskStatus === Status.Failed ||
-    (context.job.taskStatus === Status.Completed && context.job.validationReport)));
+    (context.job.taskStatus === Status.Completed && context.job.validationReport?.isValid === false)));
 };
 
 export const isUIDisabled = (isLoading: boolean, state: any): boolean => {

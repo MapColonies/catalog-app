@@ -155,7 +155,6 @@ export const getRestoreData = async (context: IContext): Promise<IPartialContext
       }
     };
   } catch (error) {
-    console.warn(error instanceof Error ? error.message : String(error));
     throw buildError('ingestion.error.restore-failed');
   }
 };

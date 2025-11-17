@@ -111,6 +111,21 @@ export const MOCK_JOB = {
   availableActions: null
 };
 
+export const MOCK_TASK = {
+  percentage: 100,
+  parameters: {
+    isValid: false,
+    errors: {
+      invalidData: 5,
+      invalidGeometry: 10,
+      tooManyVertices: 1,
+      smallHoles: 1,
+      resolutionMismatch: 13
+    }
+  },
+  status: 'Completed'
+};
+
 export const MOCK_POLYGON: Geometry = {
   bbox: [47.5116117000133,29.7960044289981,48.4333988970044,32.1668865940011],
   type: "MultiPolygon",

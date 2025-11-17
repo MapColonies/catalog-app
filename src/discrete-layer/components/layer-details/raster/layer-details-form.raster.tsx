@@ -6,10 +6,11 @@ import {
   FormikErrors,
   Form,
   FormikHandlers,
-  FormikBag,
+  FormikBag
 } from 'formik';
 import { Feature, GeoJsonProperties, Geometry } from 'geojson';
 import { get, isEmpty } from 'lodash';
+import { DraftResult } from 'vest/vestResult';
 import * as Yup from 'yup';
 import { OptionalObjectSchema, TypeOfShape } from 'yup/lib/object';
 import { AnyObject } from 'yup/lib/types';
@@ -23,12 +24,16 @@ import {
   LayerMetadataMixedUnion,
   RecordType
 } from '../../../models';
+import { LayerRasterRecordInput } from '../../../models/RootStore.base';
 import { LayersDetailsComponent } from '../layer-details';
 import {
-  transformEntityToFormFields,
+  extractDescriptorRelatedFieldNames,
   filterModeDescriptors,
+  getFlatEntityDescriptors,
   prepareEntityForSubmit,
+  transformEntityToFormFields
 } from '../utils';
+import { Curtain } from './curtain/curtain.component';
 import { IngestionFields } from './ingestion-fields.raster';
 import { GeoFeaturesPresentorComponent } from './pp-map';
 import { FeatureType, PPMapStyles } from './pp-map.utils';
@@ -43,10 +48,8 @@ import {
   isUIDisabled
 } from './state-machine/helpers';
 import { getUIIngestionFieldDescriptors } from './utils';
-import { Curtain } from './curtain/curtain.component';
 
 import './layer-details-form.raster.css';
-import 'react-virtualized/styles.css';
 
 const NONE = 0;
 
@@ -60,6 +63,7 @@ interface LayerDetailsFormCustomProps {
   mode: Mode;
   entityDescriptors: EntityDescriptorModelType[];
   layerRecord: LayerMetadataMixedUnion;
+  vestValidationResults: DraftResult;
   closeDialog: () => void;
   customErrorReset: () => void;
   customError?: Record<string,string[]> | undefined;
@@ -103,6 +107,7 @@ export const InnerRasterForm = (
     entityDescriptors,
     mode,
     layerRecord,
+    vestValidationResults,
     closeDialog,
     customErrorReset,
     customError,
@@ -131,10 +136,7 @@ export const InnerRasterForm = (
 
   useEffect(() => {
     if (state.context?.formData && state.context?.selectionMode === 'restore') {
-      setValues({
-        ...values,
-        ...state.context.formData,
-      });
+      reloadFormMetadata(state.context.formData);
     }
   }, [state.context?.formData]);
   //#endregion
@@ -235,10 +237,25 @@ export const InnerRasterForm = (
     ]
   );
 
-  const topLevelFieldsErrors = {} as Record<string,string[]>;
-  firstPhaseErrors && Object.keys(firstPhaseErrors).forEach((err) => {
-    topLevelFieldsErrors[err] = firstPhaseErrors[err];
-  });
+  // const topLevelFieldsErrors = {} as Record<string,string[]>;
+  // firstPhaseErrors && Object.keys(firstPhaseErrors).forEach((err) => {
+  //   topLevelFieldsErrors[err] = firstPhaseErrors[err];
+  // });
+
+  const reloadFormMetadata = (metadata: LayerRasterRecordInput): void => {
+    delete ((metadata as unknown) as Record<string, unknown>)['__typename'];
+    const updateFields = extractDescriptorRelatedFieldNames('updateRules', getFlatEntityDescriptors(layerRecord.__typename, entityDescriptors));
+    for (const [key, val] of Object.entries(metadata)) {
+      if (val === null || (updateFields.includes(key) && mode === Mode.UPDATE)) {
+        delete ((metadata as unknown) as Record<string, unknown>)[key];
+      }
+    }
+    resetForm();
+    setValues({
+      ...values,
+      ...transformEntityToFormFields((isEmpty(metadata) ? layerRecord : (metadata as unknown as LayerMetadataMixedUnion)))
+    });
+  };
 
   const JobInfo = (): JSX.Element => {
     return (
@@ -266,7 +283,7 @@ export const InnerRasterForm = (
                 </Box>
                 <Box className="reportList error">
                   {
-                    Object.entries(state.context.job?.validationReport ?? {}).map(([key, value]) => (
+                    Object.entries(state.context.job?.validationReport?.errors ?? {}).map(([key, value]) => (
                       <Fragment key={key}>
                         <Box key={`${key}-key`}><FormattedMessage id={`report.error.${key}`} /></Box>
                         <Box key={`${key}-value`}>{value as number}</Box>
@@ -345,10 +362,20 @@ export const InnerRasterForm = (
         <Box className="footer">
           <Box className="messages">
             <StateError errors={state.context.errors} />
-            {
+            {/* {
               topLevelFieldsErrors && Object.keys(topLevelFieldsErrors).length > NONE &&
               JSON.stringify(topLevelFieldsErrors) !== '{}' &&
               <ValidationsError errors={topLevelFieldsErrors} />
+            } */}
+            {
+              Object.keys(firstPhaseErrors).length > NONE &&
+              JSON.stringify(firstPhaseErrors) !== '{}' &&
+              <ValidationsError errors={firstPhaseErrors} />
+            }
+            {
+              (Object.keys(errors).length === NONE || JSON.stringify(errors) === '{}') &&
+              vestValidationResults.errorCount > NONE &&
+              <ValidationsError errors={vestValidationResults.getErrors()} />
             }
           </Box>
           <Box className="buttons">
@@ -425,6 +452,7 @@ interface LayerDetailsFormProps {
     TypeOfShape<{ [x: string]: Yup.AnySchema<unknown, unknown, unknown> }>
   >;
   onSubmit: (values: Record<string, unknown>) => void;
+  vestValidationResults: DraftResult;
   closeDialog: () => void;
   customErrorReset: () => void;
   customError?: Record<string,string[]> | undefined;
@@ -450,7 +478,6 @@ export default withFormik<LayerDetailsFormProps, FormValues>({
     formikBag: FormikBag<LayerDetailsFormProps, FormValues>
   ) => {
     const entityForSubmit = prepareEntityForSubmit(values as unknown as Record<string, unknown>, formikBag.props.layerRecord);
-        
     formikBag.props.onSubmit(entityForSubmit);
   },
 })(InnerRasterForm);
