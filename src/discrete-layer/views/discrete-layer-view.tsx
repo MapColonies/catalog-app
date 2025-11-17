@@ -421,7 +421,6 @@ const DiscreteLayerView: React.FC = observer(() => {
   const handleNewEntityDialogClick = (recordType: RecordType): void => {
     switch (recordType) {
       case RecordType.RECORD_RASTER:
-        setNewRasterEntityDialogJobId(undefined);
         setNewRasterEntityDialogOpen(!isNewRasterEntityDialogOpen);
         break;
       case RecordType.RECORD_3D:
@@ -1216,6 +1215,7 @@ const DiscreteLayerView: React.FC = observer(() => {
             onSetOpen={setNewRasterEntityDialogOpen}
             recordType={RecordType.RECORD_RASTER}
             jobId={newRasterEntityDialogJobId}
+            setJobId={setNewRasterEntityDialogJobId}
           />
         }
         {

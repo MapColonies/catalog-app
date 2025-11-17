@@ -71,6 +71,7 @@ interface EntityRasterDialogProps {
   layerRecord?: ILayerImage | null;
   isSelectedLayerUpdateMode?: boolean;
   jobId?: string;
+  setJobId?: (jobId: string | undefined) => void;
 }
 
 const setDefaultValues = (record: Record<string, unknown>, descriptors: EntityDescriptorModelType[]): void => {
@@ -127,10 +128,10 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
     useEffect(() => {
       if (!actorRef) return;
 
-      if (props.jobId) {
+      if (jobId) {
         actorRef.send({
           type: 'RESTORE',
-          job: { jobId: props.jobId }
+          job: { jobId }
         } satisfies Events);
       } else if (props.isSelectedLayerUpdateMode && props.layerRecord) {
         actorRef.send({
@@ -155,7 +156,7 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
       return (props.isSelectedLayerUpdateMode === true && props.layerRecord) ? Mode.UPDATE : Mode.NEW;
     }, []);
 
-    const { isOpen, onSetOpen } = props;
+    const { isOpen, onSetOpen, jobId, setJobId } = props;
     const [recordType] = useState<RecordType>(props.recordType ?? (props.layerRecord?.type as RecordType));
     const [mode] = useState<Mode>(decideMode());
     const [layerRecord] = useState<LayerMetadataMixedUnion>(
@@ -305,6 +306,9 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
 
     const closeDialog = useCallback(() => {
       onSetOpen(false);
+      if (jobId) {
+        setJobId?.(undefined);
+      }
       store.discreteLayersStore.resetUpdateMode();
       clearSyncWarnings();
     }, [onSetOpen, store.discreteLayersStore]);
