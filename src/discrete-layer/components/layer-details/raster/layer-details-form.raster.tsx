@@ -24,7 +24,6 @@ import {
   LayerMetadataMixedUnion,
   RecordType
 } from '../../../models';
-import { LayerRasterRecordInput } from '../../../models/RootStore.base';
 import { LayersDetailsComponent } from '../layer-details';
 import {
   filterModeDescriptors,
@@ -134,7 +133,11 @@ export const InnerRasterForm = (
 
   useEffect(() => {
     if (state.context?.formData && state.context?.selectionMode === 'restore') {
-      reloadFormMetadata(state.context.formData);
+      resetForm();
+      setValues({
+        ...values,
+        ...state.context.formData
+      });
     }
   }, [state.context?.formData]);
   //#endregion
@@ -239,14 +242,6 @@ export const InnerRasterForm = (
   // firstPhaseErrors && Object.keys(firstPhaseErrors).forEach((err) => {
   //   topLevelFieldsErrors[err] = firstPhaseErrors[err];
   // });
-
-  const reloadFormMetadata = (metadata: LayerRasterRecordInput): void => {
-    resetForm();
-    setValues({
-      ...values,
-      ...metadata
-    });
-  };
 
   const JobInfo = (): JSX.Element => {
     return (
