@@ -27,9 +27,7 @@ import {
 import { LayerRasterRecordInput } from '../../../models/RootStore.base';
 import { LayersDetailsComponent } from '../layer-details';
 import {
-  extractDescriptorRelatedFieldNames,
   filterModeDescriptors,
-  getFlatEntityDescriptors,
   prepareEntityForSubmit,
   transformEntityToFormFields
 } from '../utils';
@@ -243,17 +241,10 @@ export const InnerRasterForm = (
   // });
 
   const reloadFormMetadata = (metadata: LayerRasterRecordInput): void => {
-    delete ((metadata as unknown) as Record<string, unknown>)['__typename'];
-    const updateFields = extractDescriptorRelatedFieldNames('updateRules', getFlatEntityDescriptors(layerRecord.__typename, entityDescriptors));
-    for (const [key, val] of Object.entries(metadata)) {
-      if (val === null || (updateFields.includes(key) && mode === Mode.UPDATE)) {
-        delete ((metadata as unknown) as Record<string, unknown>)[key];
-      }
-    }
     resetForm();
     setValues({
       ...values,
-      ...transformEntityToFormFields((isEmpty(metadata) ? layerRecord : (metadata as unknown as LayerMetadataMixedUnion)))
+      ...metadata
     });
   };
 

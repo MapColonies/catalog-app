@@ -11,7 +11,7 @@ import { LayerRasterRecordInput } from '../../../../models/RootStore.base';
 import { transformEntityToFormFields } from '../../utils';
 import { FeatureType } from '../pp-map.utils';
 import { buildError, getFeatureAndMarker, getPath } from './helpers';
-import { MOCK_JOB_UPDATE, MOCK_POLYGON } from './MOCK';
+import { MOCK_POLYGON } from './MOCK';
 import { queryExecutor } from './query-executor';
 import {
   BASE_PATH,
@@ -125,7 +125,7 @@ export const getRestoreData = async (context: IContext): Promise<IPartialContext
   if (!result?.job) {
     throw buildError('ingestion.error.not-found', `JOB ${context.job?.jobId}`);
   }
-  const job = MOCK_JOB_UPDATE;// { ...result.job }; // TODO: Mock should be removed
+  const job = { ...result.job };
 
     try {
     return {
@@ -149,7 +149,7 @@ export const getRestoreData = async (context: IContext): Promise<IPartialContext
         }
       },
       resolutionDegree: job.parameters.ingestionResolution,
-      formData: transformEntityToFormFields({ ...job.parameters.metadata, resolutionDegree: job.parameters.ingestionResolution, classification: '6' } as unknown as LayerMetadataMixedUnion) as unknown as LayerRasterRecordInput,
+      formData: transformEntityToFormFields({ ...job.parameters.metadata, resolutionDegree: job.parameters.ingestionResolution } as unknown as LayerMetadataMixedUnion) as unknown as LayerRasterRecordInput,
       job: {
         jobId: job.id,
         record: job as unknown as any
