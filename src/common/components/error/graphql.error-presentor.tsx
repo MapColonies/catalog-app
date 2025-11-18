@@ -16,6 +16,7 @@ const SERVER_ERROR_RESPONSE_CODE = 500;
 
 export interface IGpaphQLError {
   error: any;
+  iconColor?: string;
 }
 
 export interface IServerError {
@@ -29,7 +30,7 @@ interface IServerErrorResponse {
   statusText?: string;
 }
 
-export const GraphQLError: React.FC<IGpaphQLError> = ({ error }) => {
+export const GraphQLError: React.FC<IGpaphQLError> = ({ error, iconColor }) => {
 
   const intl = useIntl();
 
@@ -53,7 +54,9 @@ export const GraphQLError: React.FC<IGpaphQLError> = ({ error }) => {
       {
         !isEmpty(error?.response) &&
         <AutoDirectionBox className="errorContainer">
-          <IconButton className="errorIcon mc-icon-Status-Warnings" 
+          <IconButton
+            style={{'color': iconColor ? iconColor : 'var(--mdc-theme-gc-error-high)'}}
+            className="errorIcon mc-icon-Status-Warnings"
             onClick={(e): void => {
               e.preventDefault();
               e.stopPropagation();

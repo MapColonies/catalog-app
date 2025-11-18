@@ -9,7 +9,7 @@ import { Button, Dialog, DialogTitle, IconButton } from '@map-colonies/react-cor
 import { Box, DateTimeRangePicker, SupportedLocales } from '@map-colonies/react-components';
 import { IActionGroup } from '../../../common/actions/entity.actions';
 import { GraphQLError } from '../../../common/components/error/graphql.error-presentor';
-import { GridApi } from '../../../common/components/grid';
+import { GridApi, IFocusError } from '../../../common/components/grid';
 import CONFIG from '../../../common/config';
 import useCountDown, { IActions } from '../../../common/hooks/countdown.hook';
 import useDateNow from '../../../common/hooks/useDateNow.hook';
@@ -21,6 +21,8 @@ import JobManagerGrid from './grids/job-manager-grid.common';
 import { JOB_ENTITY } from './job.types';
 
 import './jobs.dialog.css';
+import { LogicError } from '../../../common/components/error/logic.error-presentor';
+import { dateFormatter } from '../../../common/helpers/formatters';
 
 const START_CYCLE_ITERATION = 0;
 const POLLING_CYCLE_INTERVAL = CONFIG.JOB_STATUS.POLLING_CYCLE_INTERVAL;
@@ -31,7 +33,8 @@ const TILL_DATE_ACTION_REQUEST_BUFFER = Number(POLLING_CYCLE_INTERVAL);
 interface JobsDialogProps {
   isOpen: boolean;
   onSetOpen: (open: boolean) => void;
-  setJobId: (jobId: string) => void;
+  setJob: (job: JobModelType) => void;
+  job?: JobModelType;
 }
 
 export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialogProps) => {
@@ -43,6 +46,9 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
   const [ gridApi, setGridApi ] = useState<GridApi>();
   const [ pollingCycle, setPollingCycle ] = useState(START_CYCLE_ITERATION);
   const [ fromDate, setFromDate ] = useState<Date>(moment().subtract(CONFIG.JOB_MANAGER_END_OF_TIME, 'days').toDate());
+  const [handleFocusError, setHandleFocusError] = useState<IFocusError | undefined>(undefined);
+
+  const { job } = props;
 
   // @ts-ignore
   const [ timeLeft, actions ] = useCountDown(POLLING_CYCLE_INTERVAL, COUNTDOWN_REFRESH_RATE);
@@ -220,7 +226,7 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
           break;
         case 'Job.restore':
           closeDialog();
-          props.setJobId(data.id as string);
+          props.setJob(data as unknown as JobModelType);
           break;
         default:
           break;
@@ -250,6 +256,10 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
           updateJobCB={setUpdateTaskPayload}
           rowDataChangeCB={(): void => { }}
           areJobsLoading={loading}
+          focusOnJob={job}
+          handleFocusError={(error) => {
+            setHandleFocusError(error);
+          }}
         />
       </Box>
     );
@@ -334,16 +344,28 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
               </Box>
             )
           }
-          <Box className="buttons">
-            <Button
-              raised
-              type="button"
-              onClick={(): void => {
-                closeDialog();
-              }}
-            >
-              <FormattedMessage id="system-status.close-btn.text" />
-            </Button>
+          <Box className="footer">
+            <Box className="buttons">
+              <Button
+                raised
+                type="button"
+                onClick={(): void => {
+                  closeDialog();
+                }}
+              >
+                <FormattedMessage id="system-status.close-btn.text" />
+              </Button>
+            </Box>
+
+            { handleFocusError && handleFocusError.message &&
+              <Box className="messages">
+                <LogicError iconColor='var(--mdc-theme-gc-warning-high)' errors={[{
+                  code: 'job-manager-focus.error',
+                  message: `${dateFormatter(job?.updated, true)}`,
+                  level: 'warning'
+                  }]} />
+              </Box>
+            }
           </Box>
         </DialogContent>
       </Dialog>

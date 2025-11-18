@@ -53,6 +53,7 @@ import { LayersResults } from '../components/layers-results/layers-results';
 import { EntityDialog } from '../components/layer-details/entity.dialog';
 import { JobsDialog } from '../components/job-manager/jobs.dialog';
 import {
+  JobModelType,
   LayerMetadataMixedUnion,
   LinkModelType,
   RecordType
@@ -93,6 +94,8 @@ import '@material/tab-scroller/dist/mdc.tab-scroller.css';
 import '@material/tab-indicator/dist/mdc.tab-indicator.css';
 
 import './discrete-layer-view.css';
+import { jobType2FlowType } from '../components/layer-details/raster/state-machine/helpers';
+import { Mode } from '../../common/models/mode.enum';
 
 const EXPANDED_PANEL_WIDTH = '28%';
 const COLLAPSED_PANEL_WIDTH = '40px';
@@ -129,7 +132,7 @@ const DiscreteLayerView: React.FC = observer(() => {
   const theme = useTheme();
   const intl = useIntl();
   const [isDrawing, setIsDrawing] = useState<boolean>(false);
-  const [newRasterEntityDialogJobId, setNewRasterEntityDialogJobId] = useState<string | undefined>(undefined);
+  const [newRasterEntityDialogJob, setNewRasterEntityDialogJob] = useState<JobModelType | undefined>(undefined);
   const [isNewRasterEntityDialogOpen, setNewRasterEntityDialogOpen] = useState<boolean>(false);
   const [isNew3DEntityDialogOpen, setNew3DEntityDialogOpen] = useState<boolean>(false);
   const [isNewDemEntityDialogOpen, setNewDemEntityDialogOpen] = useState<boolean>(false);
@@ -159,6 +162,7 @@ const DiscreteLayerView: React.FC = observer(() => {
   const [searchResultsError, setSearchResultsError] = useState();
   const [actionsMenuDimensions, setActionsMenuDimensions] = useState<MenuDimensions>();
   const [whatsNewVisitedCnt, setWhatsNewVisitedCnt] = useState<number>(0);
+  const [jobRecord, setJobRecord] = useState<JobModelType | undefined>(undefined);
 
   const isDrawingState = isDrawing || store.exportStore.drawingState?.drawing;
   const disableOnDrawingClassName = isDrawingState ? 'interactionsDisabled' : ''; 
@@ -421,7 +425,7 @@ const DiscreteLayerView: React.FC = observer(() => {
   const handleNewEntityDialogClick = (recordType: RecordType): void => {
     switch (recordType) {
       case RecordType.RECORD_RASTER:
-        setNewRasterEntityDialogJobId(undefined);
+        setNewRasterEntityDialogJob(undefined);
         setNewRasterEntityDialogOpen(!isNewRasterEntityDialogOpen);
         break;
       case RecordType.RECORD_3D:
@@ -839,10 +843,10 @@ const DiscreteLayerView: React.FC = observer(() => {
   }, [store.discreteLayersStore.isActiveLayersImages]);
 
   useEffect(() => {
-    if (newRasterEntityDialogJobId) {
+    if (newRasterEntityDialogJob) {
       setNewRasterEntityDialogOpen(true);
     }
-  }, [newRasterEntityDialogJobId]);
+  }, [newRasterEntityDialogJob]);
 
   const ContextMenuByTab: React.FC<IContextMenuData> = (props) => {
     // Should add global flag or find the proper condition to whether show the context menu or not.
@@ -1194,6 +1198,10 @@ const DiscreteLayerView: React.FC = observer(() => {
                   handleTabViewChange = {handleTabViewChange}
                   handleOpenEntityDeleteDialog={setEntityDeleteDialogOpen}
                   activeTabView = {activeTabView}
+                  handleOpenJobDialog = {(open, jobData) => {
+                    setJobRecord(jobData);
+                    setSystemsJobsDialogOpen(true);
+                  }}
                 />
 
                 <Terrain/>
@@ -1241,7 +1249,8 @@ const DiscreteLayerView: React.FC = observer(() => {
           <JobsDialog
             isOpen={isSystemsJobsDialogOpen}
             onSetOpen={setSystemsJobsDialogOpen}
-            setJobId={setNewRasterEntityDialogJobId}
+            setJob={setNewRasterEntityDialogJob}
+            job={jobRecord}
           />
         }
         {

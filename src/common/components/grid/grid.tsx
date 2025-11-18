@@ -20,6 +20,7 @@ import {
 } from 'ag-grid-community';
 import { useTheme } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
+import { IError } from '../../../discrete-layer/components/helpers/errorUtils';
 import { GRID_MESSAGES } from '../../i18n';
 import CONFIG from '../../config';
 import { DetailsExpanderRenderer } from './cell-renderer/details-expander.cell-renderer';
@@ -34,11 +35,17 @@ const DEFAULT_DETAILS_ROW_HEIGHT = 150;
 const EXPANDER_COLUMN_WIDTH = 60;
 export const DETAILS_ROW_ID_SUFFIX = '_details';
 
+export interface IFocusError extends IError {
+  id?: string;
+}
+
 interface GridComponentProps {
   gridOptions?: GridComponentOptions;
   rowData?: any[];
   style?: CSSProperties;
   isLoading?: boolean;
+  rowFocus?: string;
+  handleFocusError?: (error: IFocusError | undefined) => void;
 };
 
 export interface GridApi extends AgGridApi{};
@@ -70,6 +77,8 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
   const [rowData, setRowData] = useState<any[]>()
   const theme = useTheme();
   const [gridApi, setGridApi] = useState<GridApi>();
+
+  const {rowFocus, handleFocusError} = props
   
   const {detailsRowExpanderPosition, ...restGridOptions} = props.gridOptions as GridComponentOptions;
 
@@ -185,6 +194,49 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
     }
   
   }, [props.rowData, props.gridOptions, props.isLoading]);
+
+  useEffect(() => {
+    if (!gridApi || !rowFocus) return;
+    
+    const focusRowById = (gridApi: GridApi, id: string) => {
+      let rowIndex = -1;
+      let currentIndex = 0;
+
+      gridApi.forEachNodeAfterFilterAndSort((node) => {
+        if (node.data?.id === id) {
+          rowIndex = currentIndex;
+        }
+        currentIndex++;
+      });
+
+      if (rowIndex === -1) {
+        handleFocusError?.({
+          code: '',
+          message: 'Row not found',
+          level: 'warning',
+          id
+        });
+        return;
+      } else {
+        handleFocusError?.(undefined);
+      }
+
+      const pageSize = gridApi.paginationGetPageSize();
+      const pageNumber = Math.floor(rowIndex / pageSize);
+      const rowInPage = rowIndex % pageSize;
+
+      gridApi.paginationGoToPage(pageNumber);
+
+      gridApi.ensureIndexVisible(rowInPage+pageSize, 'middle');
+      gridApi.getDisplayedRowAtIndex(rowInPage+pageSize)?.setSelected(true);
+      
+      const rowNode = gridApi.getRowNode(`${id as unknown as string}${DETAILS_ROW_ID_SUFFIX}`);
+      rowNode?.setDataValue('isVisible', true);
+      gridApi.onFilterChanged();
+    }
+
+    focusRowById(gridApi, rowFocus);
+  }, [rowData])
 
   const agGridThemeOverrides = GridThemes.getTheme(theme);
   

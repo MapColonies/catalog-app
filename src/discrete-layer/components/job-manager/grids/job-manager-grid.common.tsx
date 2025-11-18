@@ -6,6 +6,7 @@ import {
   GridComponent,
   GridComponentOptions,
   GridReadyEvent,
+  IFocusError,
 } from '../../../../common/components/grid';
 import EnumsMapContext from '../../../../common/contexts/enumsMap.context';
 import { IActionGroup } from '../../../../common/actions/entity.actions';
@@ -35,6 +36,8 @@ export interface ICommonJobManagerGridProps {
   customColDef?: (ColDef | ColGroupDef)[];
   omitColDefsByRenderer?: { renderers: string[], preserveColWidth?: boolean };
   areJobsLoading?: boolean;
+  focusOnJob?: JobModelType;
+  handleFocusError?: (error: IFocusError | undefined) => void;
 }
 
 const pagination = true;
@@ -54,7 +57,9 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
       return;
     },
     omitColDefsByRenderer,
-    areJobsLoading
+    areJobsLoading,
+    focusOnJob,
+    handleFocusError
   } = props;
 
   const intl = useIntl();
@@ -378,6 +383,8 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
       rowData={rowData}
       style={{ ...defaultGridStyle, ...gridStyleOverride }}
       isLoading={areJobsLoading}
+      rowFocus={focusOnJob?.id}
+      handleFocusError={handleFocusError}
     />
   );
 };

@@ -21,7 +21,8 @@ import { Mode } from '../../../../common/models/mode.enum';
 import {
   EntityDescriptorModelType,
   LayerMetadataMixedUnion,
-  RecordType
+  RecordType,
+  useStore
 } from '../../../models';
 import { LayersDetailsComponent } from '../layer-details';
 import {
@@ -47,6 +48,7 @@ import { Curtain } from './curtain/curtain.component';
 
 import './layer-details-form.raster.css';
 import 'react-virtualized/styles.css';
+import { UserAction } from '../../../models/userStore';
 
 const NONE = 0;
 
@@ -116,6 +118,8 @@ export const InnerRasterForm = (
   const actorRef = RasterWorkflowContext.useActorRef();
   const isLoading = hasTagDeep(actorRef?.getSnapshot());
   const state = RasterWorkflowContext.useSelector((s) => s);
+
+  const store = useStore();
 
   useEffect(() => {
     const { files } = state.context || {};
@@ -360,6 +364,12 @@ export const InnerRasterForm = (
                 onClick={(e): void => {
                   e.preventDefault();
                   e.stopPropagation();
+
+                  store.actionDispatcherStore.dispatchAction({
+                    action: UserAction.SYSTEM_CALLBACK_OPEN_JOB_MANAGER,
+                    data: { job: state.context.job?.record }
+                  })
+                  closeDialog();
                 }}
               >
                 <FormattedMessage id="general.go-to-job-manager-btn.text" />

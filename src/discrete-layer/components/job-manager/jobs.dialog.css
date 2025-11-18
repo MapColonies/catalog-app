@@ -66,22 +66,35 @@ body[dir='rtl'] #jobsDialog .refreshContainer .refreshSecs {
   left: 23px;
 }
 
-#jobsDialog .buttons {
-  position: absolute;
-  bottom: 0;
-  right: 0;
+#jobsDialog .footer {
   display: flex;
-  justify-content: flex-end;
-  gap: 20px;
-  margin: 20px;
-  align-items: center;
+  flex-direction: row-reverse;
+  margin-top: var(--footer-offset);
+  width: 100%;
+  height: var(--footer-height);
 }
 
-#jobsDialog .errorContainer {
-  position: absolute;
-  bottom: 10px;
-  left: 10px;
-  gap: 10px;
+body[dir='rtl'] #jobsDialog .footer {
+  left: 20px;
+}
+
+#jobsDialog .buttons {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  margin-left: auto;
+}
+
+body[dir='rtl'] #jobsDialog .buttons {
+  margin-left: unset;
+  margin-right: auto;
+}
+
+#jobsDialog .messages {
+  display: flex;
+  flex-direction: column;
+  height: 60px;
+  overflow-y: auto;
 }
 
 #jobsDialog .errorsList {
@@ -179,7 +192,7 @@ body[dir='rtl'] .jobsBody .ag-pinned-right-cols-container {
   z-index: 2 !important;
 }
 
-.render-jobs-data-errror {
+.render-jobs-data-error {
   position: absolute;
   top: 410px;
   left: 536px;

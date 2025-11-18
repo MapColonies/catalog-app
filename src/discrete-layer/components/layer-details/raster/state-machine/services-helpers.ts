@@ -8,7 +8,7 @@ import { LayerMetadataMixedUnion, RecordType } from '../../../../models';
 import { LayerRasterRecordInput } from '../../../../models/RootStore.base';
 import { transformEntityToFormFields } from '../../utils';
 import { FeatureType } from '../pp-map.utils';
-import { buildError, getFeatureAndMarker } from './helpers';
+import { buildError, getFeatureAndMarker, jobType2FlowType, RasterJobTypeEnum } from './helpers';
 import { MOCK_POLYGON } from './MOCK';
 import { queryExecutor } from './query-executor';
 import {
@@ -122,14 +122,6 @@ export const getRestoreData = async (context: IContext): Promise<IPartialContext
   }
   const job = { ...result.job };
 
-  enum RasterJobTypeEnum {
-    NEW = 'Ingestion_New',
-    UPDATE = 'Ingestion_Update'
-  }
-  const jobType2FlowType: { [key: string]: Mode } = {
-    [RasterJobTypeEnum.NEW]: Mode.NEW,
-    [RasterJobTypeEnum.UPDATE]: Mode.UPDATE
-  };
   const flowType = jobType2FlowType[job.type || RasterJobTypeEnum.NEW];
 
   try {
@@ -156,7 +148,8 @@ export const getRestoreData = async (context: IContext): Promise<IPartialContext
       resolutionDegree: job.parameters.ingestionResolution,
       formData: transformEntityToFormFields(job.parameters.metadata as unknown as LayerMetadataMixedUnion) as unknown as LayerRasterRecordInput,
       job: {
-        jobId: job.id
+        jobId: job.id,
+        record: job
       }
     };
   } catch (error) {

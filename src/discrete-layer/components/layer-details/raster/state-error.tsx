@@ -15,7 +15,7 @@ export const StateError: React.FC<StateErrorProps> = ({ errors }) => {
   return (
     <>
       <GraphQLError error={errors[FIRST]} />
-      <LogicError errors={errors.filter((err: IStateError) => [LOGIC_ERROR, API_ERROR].includes(err.source))} />
+      <LogicError iconColor='var(--mdc-theme-gc-error-high)' errors={errors.filter((err: IStateError) => [LOGIC_ERROR, API_ERROR].includes(err.source))} />
     </>
   );
 };

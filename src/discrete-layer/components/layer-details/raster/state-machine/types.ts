@@ -13,17 +13,14 @@ import {
   Status
 } from '../../../../models';
 import { LayerRasterRecordInput } from '../../../../models/RootStore.base';
+import { IError } from '../../../helpers/errorUtils';
 
 export type ErrorSource = "api" | "logic";
-export type ErrorLevel = "error" | "warning";
 export type AddPolicy = "merge" | "override";
 export type SelectionMode = "auto" | "manual" | "restore";
 
-export interface IStateError {
+export interface IStateError extends IError {
   source: ErrorSource;
-  level: ErrorLevel;
-  code: string;
-  message: string;
   field?: string;
   addPolicy?: AddPolicy;
   response?: Record<string, unknown>;
@@ -63,7 +60,7 @@ export interface IJob {
   taskPercentage?: number;
   validationsReport?: Record<string, unknown>;
   taskStatus?: Status;
-  data?: JobModelType;
+  record?: JobModelType;
 }
 
 export interface IContext {
