@@ -72,6 +72,8 @@ body[dir='rtl'] #jobsDialog .refreshContainer .refreshSecs {
   margin-top: var(--footer-offset);
   width: 100%;
   height: var(--footer-height);
+  padding-left: 24px;
+  padding-right: 24px;
 }
 
 body[dir='rtl'] #jobsDialog .footer {
