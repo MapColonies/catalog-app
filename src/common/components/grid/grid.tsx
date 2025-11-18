@@ -45,6 +45,7 @@ interface GridComponentProps {
   style?: CSSProperties;
   isLoading?: boolean;
   rowFocus?: string;
+  setRowFocus?: (val: string) => void;
   handleFocusError?: (error: IFocusError | undefined) => void;
 };
 
@@ -78,7 +79,7 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
   const theme = useTheme();
   const [gridApi, setGridApi] = useState<GridApi>();
 
-  const {rowFocus, handleFocusError} = props
+  const {rowFocus, setRowFocus, handleFocusError} = props
   
   const {detailsRowExpanderPosition, ...restGridOptions} = props.gridOptions as GridComponentOptions;
 
@@ -219,6 +220,7 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
         return;
       } else {
         handleFocusError?.(undefined);
+        setRowFocus?.('');
       }
 
       const pageSize = gridApi.paginationGetPageSize();

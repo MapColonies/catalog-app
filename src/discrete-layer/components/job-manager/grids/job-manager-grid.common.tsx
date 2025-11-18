@@ -1,5 +1,5 @@
 import { ColDef, ColGroupDef, GetRowIdParams } from 'ag-grid-community';
-import React, { useCallback, useContext, useEffect, useMemo } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import CONFIG from '../../../../common/config';
 import {
@@ -64,6 +64,14 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
 
   const intl = useIntl();
   const { enumsMap } = useContext(EnumsMapContext);
+  const [focusJobId, setFocusJobId] = useState('');
+
+  useEffect(() => {
+    if(!props.focusOnJob?.id) return;
+
+    setFocusJobId(props.focusOnJob.id);
+  }, [props.focusOnJob])
+  
 
   const onGridReady = (params: GridReadyEvent): void => {
     onGridReadyCB(params);
@@ -383,7 +391,8 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
       rowData={rowData}
       style={{ ...defaultGridStyle, ...gridStyleOverride }}
       isLoading={areJobsLoading}
-      rowFocus={focusOnJob?.id}
+      rowFocus={focusJobId}
+      setRowFocus={setFocusJobId}
       handleFocusError={handleFocusError}
     />
   );
