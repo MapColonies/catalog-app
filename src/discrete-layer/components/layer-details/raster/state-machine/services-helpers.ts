@@ -8,7 +8,7 @@ import {
   SourceValidationModelType
 } from '../../../../models';
 import { LayerRasterRecordInput } from '../../../../models/RootStore.base';
-import { transformEntityToFormFields } from '../../utils';
+import { jobType2Mode, RasterJobTypeEnum, transformEntityToFormFields } from '../../utils';
 import { FeatureType } from '../pp-map.utils';
 import { buildError, getFeatureAndMarker, getPath } from './helpers';
 import { MOCK_POLYGON } from './MOCK';
@@ -20,9 +20,7 @@ import {
   IContext,
   IPartialContext,
   IProductFile,
-  jobType2FlowType,
   PRODUCT_LABEL,
-  RasterJobTypeEnum,
   SHAPEMETADATA_LABEL,
 } from './types';
 
@@ -129,7 +127,7 @@ export const getRestoreData = async (context: IContext): Promise<IPartialContext
 
     try {
     return {
-      flowType: jobType2FlowType[job.type || RasterJobTypeEnum.NEW] as IPartialContext['flowType'],
+      flowType: jobType2Mode[job.type || RasterJobTypeEnum.NEW] as IPartialContext['flowType'],
       selectionMode: 'restore',
       files: {
         data: {

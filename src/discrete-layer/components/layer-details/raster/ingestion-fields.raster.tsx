@@ -8,7 +8,7 @@ import { Button, Icon, Typography } from '@map-colonies/react-core';
 import { Selection } from '../../../../common/components/file-picker';
 import { FieldLabelComponent } from '../../../../common/components/form/field-label';
 import CONFIG from '../../../../common/config';
-import { formatPath, relativeDateFormatter } from '../../../../common/helpers/formatters';
+import { dateFormatter, formatPath, relativeDateFormatter } from '../../../../common/helpers/formatters';
 import { Mode } from '../../../../common/models/mode.enum';
 import { RecordType, LayerMetadataMixedUnion, RasterIngestionFilesTypeConfig } from '../../../models';
 import { FilePickerDialog } from '../../dialogs/file-picker.dialog';
@@ -51,7 +51,11 @@ const FileItem: React.FC<{ file: IFileBase }> = ({ file }) => {
         {defaultFormatters.formatFileSize(null, file.details as FileData)}
       </Box>
       <Box className="ltr">
-        {file.details?.modDate ? relativeDateFormatter(file.details.modDate) : ''}
+        {
+          file.details?.modDate
+            ? (file.path?.toLowerCase().endsWith('.gpkg') ? dateFormatter(file.details.modDate) : relativeDateFormatter(file.details.modDate))
+            : ''
+        }
       </Box>
     </>
   );

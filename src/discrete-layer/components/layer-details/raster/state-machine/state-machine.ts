@@ -419,7 +419,7 @@ export const workflowMachine = createMachine<IContext, Events>({
         ],
         onError: {
           actions: addError,
-          target: WORKFLOW.JOB_POLLING_WAIT
+          target: WORKFLOW.ERROR
         }
       }
     },

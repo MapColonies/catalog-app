@@ -94,7 +94,7 @@ export const SERVICES = {
           }
         });
       });
-      const task = result.findTasks[FIRST] || MOCK_TASK; // TODO: Mock should be removed
+      const task = result.findTasks[FIRST];
 
       if (!task) {
         throw buildError('ingestion.error.not-found', 'validation task');
