@@ -6,23 +6,24 @@ import { RecordType } from '../../../../models';
 import { LayerRasterRecordInput } from '../../../../models/RootStore.base';
 import { FeatureType } from '../pp-map.utils';
 import { buildError, getFeatureAndMarker, getFile } from './helpers';
-import { MOCK_JOB } from './MOCK';
+import { MOCK_JOB_UPDATE, MOCK_TASK } from './MOCK';
 import { queryExecutor } from './query-executor';
 import {
   getDetails,
   getDirectory,
   fetchProduct,
   getRestoreData,
-  selectGpkg
+  selectData,
+  validateGPKG
 } from './services-helpers';
 import {
   FIRST,
   FromPromiseArgs,
   IContext,
-  METADATA_LABEL,
-  METADATA_SHP,
+  SHAPEMETADATA_LABEL,
+  SHAPEMETADATA_FILENAME,
   PRODUCT_LABEL,
-  PRODUCT_SHP,
+  PRODUCT_FILENAME,
   SHAPES_DIR,
   SHAPES_RELATIVE_TO_DATA_DIR,
   WORKFLOW
@@ -40,7 +41,7 @@ export const SERVICES = {
       //   });
       // });
 
-      const job = MOCK_JOB; // TODO: Mock should be removed
+      const job = MOCK_JOB_UPDATE; // TODO: Mock should be removed
 
       return {
         jobId: job.id
@@ -52,9 +53,9 @@ export const SERVICES = {
       const data = {
         ingestionResolution: resolutionDegree as number,
         inputFiles: {
-          gpkgFilesPath: [files?.gpkg?.path] as string[],
+          gpkgFilesPath: [files?.data?.path] as string[],
           productShapefilePath: files?.product?.path as string,
-          metadataShapefilePath: files?.metadata?.path as string
+          metadataShapefilePath: files?.shapeMetadata?.path as string
         },
         metadata: (formData ?? {}) as LayerRasterRecordInput,
         type: RecordType.RECORD_RASTER,
@@ -72,7 +73,7 @@ export const SERVICES = {
       }
 
       result = {
-        jobId: MOCK_JOB.id, // TODO: Mock should be removed
+        jobId: MOCK_JOB_UPDATE.id, // TODO: Mock should be removed
       };
 
       return {
@@ -89,68 +90,54 @@ export const SERVICES = {
         return await input.context.store.queryFindTasks({
           params: {
             jobId: jobId as string,
-            type: 'init'
+            type: 'validation'
           }
         });
       });
-      const task = result.findTasks[FIRST];
+      const task = result.findTasks[FIRST] || MOCK_TASK; // TODO: Mock should be removed
 
       if (!task) {
         throw buildError('ingestion.error.not-found', 'validation task');
       }
 
       return {
-        percentage: task.percentage ?? 0,
-        report: task.parameters ?? {invalidData: 5, invalidGeometry: 10, tooManyVertices: 1, smallHoles: 1, resolutionMismatch: 13},
+        taskPercentage: task.percentage ?? 0,
+        validationReport: task.parameters?.isValid === false ? task.parameters.errors : undefined,
         taskStatus: task.status ?? ''
       };
     }),
     restoreJobService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
       const { flowType, selectionMode, files, resolutionDegree, formData, job } = await getRestoreData(input.context || {});
-      const { gpkg, product, metadata } = files || {};
+      const { data, product, shapeMetadata } = files || {};
 
-      if (files?.gpkg) {
-        const gpkgRef = files.gpkg;
-        gpkgRef.details = await getDetails(gpkgRef.path, input.context);
-        gpkgRef.exists = !!gpkgRef.details;
+      if (files?.data) {
+        files.data.details = await getDetails(files.data.path, input.context);
+        files.data.exists = !!files.data.details;
       }
       if (files?.product) {
-        const productRef = files.product;
-        productRef.details = await getDetails(productRef.path, input.context);
-        productRef.exists = !!productRef.details;
+        files.product.details = await getDetails(files.product.path, input.context);
+        files.product.exists = !!files.product.details;
       }
-      if (files?.metadata) {
-        const metadataRef = files.metadata;
-        metadataRef.details = await getDetails(metadataRef.path, input.context);
-        metadataRef.exists = !!metadataRef.details;
+      if (files?.shapeMetadata) {
+        files.shapeMetadata.details = await getDetails(files.shapeMetadata.path, input.context);
+        files.shapeMetadata.exists = !!files.shapeMetadata.details;
       }
 
-      if (!files?.gpkg?.path) {
+      if (!files?.data?.path) {
         throw (buildError('ingestion.error.missing', 'GPKG'));
       }
 
-      const gpkgPath = files.gpkg.path;
-
-      const result = await queryExecutor(async () => {
-        return await input.context.store.queryValidateGPKGSource({
-          data: {
-            gpkgFilesPath: [gpkgPath],
-            type: RecordType.RECORD_RASTER,
-          }
-        });
-      });
-
-      const validationResult = { ...result.validateGPKGSource[FIRST] };
+      const gpkgValidation = await validateGPKG(files.data.path, input.context);
+      const validationResult = { ...gpkgValidation };
       let geoDetails: { feature: Feature<Geometry, GeoJsonProperties>; marker: Feature<Geometry, GeoJsonProperties>; } | undefined;
       if (validationResult.extentPolygon) {
         geoDetails = getFeatureAndMarker(validationResult.extentPolygon, FeatureType.SOURCE_EXTENT, FeatureType.SOURCE_EXTENT_MARKER);
       }
 
       if (files.product) {
-        const productRef = files.product;
         const productFile = await fetchProduct(files.product, input.context);
-        productRef.data = productFile?.data;
-        productRef.geoDetails = productFile?.geoDetails;
+        files.product.file = productFile?.file;
+        files.product.geoDetails = productFile?.geoDetails;
       }
 
       return {
@@ -158,16 +145,16 @@ export const SERVICES = {
         selectionMode,
         files: {
           ...files,
-          gpkg: {
-            ...gpkg,
+          data: {
+            ...data,
             validationResult,
             geoDetails
           },
           product: {
             ...product
           },
-          metadata: {
-            ...metadata
+          shapeMetadata: {
+            ...shapeMetadata
           }
         },
         resolutionDegree,
@@ -178,34 +165,34 @@ export const SERVICES = {
   },
   [WORKFLOW.FILES.ROOT]: {
     selectFilesService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
-      const gpkg = await selectGpkg(input.context);
-      const gpkgPath = input.context.files?.gpkg?.path as string;
-      const result = await getDirectory(path.resolve(path.dirname(gpkgPath), SHAPES_RELATIVE_TO_DATA_DIR, SHAPES_DIR), input.context);
-      const product = getFile(result ?? [], gpkgPath, PRODUCT_SHP, PRODUCT_LABEL);
-      const metadata = getFile(result ?? [], gpkgPath, METADATA_SHP, METADATA_LABEL);
+      const data = await selectData(input.context);
+      const dataPath = input.context.files?.data?.path as string;
+      const result = await getDirectory(path.resolve(path.dirname(dataPath), SHAPES_RELATIVE_TO_DATA_DIR, SHAPES_DIR), input.context);
+      const product = getFile(result ?? [], dataPath, PRODUCT_FILENAME, PRODUCT_LABEL);
+      const shapeMetadata = getFile(result ?? [], dataPath, SHAPEMETADATA_FILENAME, SHAPEMETADATA_LABEL);
 
       return {
-        gpkg: {
-          ...gpkg
+        data: {
+          ...data
         },
         product,
-        metadata
+        shapeMetadata
       };
     }),
-    selectGpkgService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
-      return selectGpkg(input.context);
+    selectDataService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
+      return selectData(input.context);
     }),
     fetchProductService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
       const { product } = input.context.files ?? {};
       if (!product || !product.exists || !product.path) {
-        throw buildError('ingestion.error.missing', PRODUCT_SHP);
+        throw buildError('ingestion.error.missing', PRODUCT_FILENAME);
       }
       return fetchProduct(product, input.context);
     }),
-    checkMetadataService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
-      const { metadata } = input.context.files || {};
-      if (!metadata || !metadata.exists || !metadata.path) {
-        throw buildError('ingestion.error.missing', METADATA_SHP);
+    checkShapeMetadataService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
+      const { shapeMetadata } = input.context.files || {};
+      if (!shapeMetadata || !shapeMetadata.exists || !shapeMetadata.path) {
+        throw buildError('ingestion.error.missing', SHAPEMETADATA_FILENAME);
       }
       return Promise.resolve({ success: true });
     })

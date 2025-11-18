@@ -40,7 +40,7 @@ interface JobsDialogProps {
 export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialogProps) => {
   const store = useStore();
   const intl = useIntl();
-  const { isOpen, onSetOpen } = props;
+  const { isOpen, onSetOpen, setJob } = props;
   const [ updateTaskPayload, setUpdateTaskPayload ] = useState<Record<string, unknown>>({});
   const [ gridRowData, setGridRowData ] = useState<JobModelType[] | undefined>(undefined);
   const [ gridApi, setGridApi ] = useState<GridApi>();
@@ -226,14 +226,13 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
           break;
         case 'Job.restore':
           closeDialog();
-          props.setJob(data as unknown as JobModelType);
+          setJob(data as unknown as JobModelType);
           break;
         default:
           break;
       }
     }
   }, [store.actionDispatcherStore.action]);
-
 
   // Reset action value on store when unmounting
 
@@ -299,7 +298,6 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
       </Box>
     );
   };
-
 
   return (
     <Box id="jobsDialog">

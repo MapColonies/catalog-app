@@ -279,7 +279,7 @@ export const prepareEntityForSubmit = (fields: Record<string, unknown>, layerRec
   const cleanObj = removeEmptyObjFields(fields);
   const removeStrings =  removeEmptyStrings(cleanObj, layerRecord);
   return transformFormFieldsToEntity(removeStrings, layerRecord);
-}
+};
 
 const removeObjFields = (
   obj: Record<string, unknown>,
@@ -314,7 +314,7 @@ export const removeEmptyStrings = (fields: Record<string, unknown>, layerRecord:
     }
   }
   return cleanFields;
-}
+};
 
 export const getYupFieldConfig = (
   field: FieldConfigModelType,
@@ -374,11 +374,11 @@ const geometryChecks = (errors: Record<string,ParsedPolygonPartError>, desc: Fie
   
   if (doSelfIntersectCheck) {
     const selfIntersections = hasSelfIntersections(feature.geometry);
-    if (selfIntersections){
+    if (selfIntersections) {
       addError(errors, desc, GEOMETRY_ERRORS.geometryHasSelfIntersections);
     }
   }
-}
+};
 
 const addError = (errors: Record<string,ParsedPolygonPartError>, descriptor: FieldConfigModelType, code: string) => {
   if (errors[descriptor.fieldName as string]) {
@@ -401,10 +401,10 @@ const convertToMeter = (units: string) => {
 
 const getProviderResolutionValuePath = (desciptors: FieldConfigModelType[],provider: ProviderType) => {
   return desciptors
-        .find(k => k.fieldName === 'sourceResolutionMeter')
-        ?.shapeFileMapping
-        ?.find(k => k.provider === provider)
-        .valuePath;
+    .find(k => k.fieldName === 'sourceResolutionMeter')
+    ?.shapeFileMapping
+    ?.find(k => k.provider === provider)
+    .valuePath;
 };
 
 //#region NOT IN USE
@@ -854,10 +854,10 @@ export const clearSyncWarnings = (selectedFileWarningsOnly: boolean = false) => 
 };
 
 export const filterModeDescriptors = (mode: Mode, descriptors: EntityDescriptorModelType[]): EntityDescriptorModelType[] => {
-  return descriptors.map((desc)=>{
+  return descriptors.map((desc) => {
     return {
       ...desc, 
-      categories: desc.categories?.map(cat=>{
+      categories: desc.categories?.map(cat => {
         return {
           ...cat,
           fields: cat.fields.filter((field: FieldConfigModelType) => {

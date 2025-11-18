@@ -45,20 +45,20 @@ export interface IGPKGFile extends IFileBase, IGeoDetails {
 }
 
 export interface IProductFile extends IFileBase, IGeoDetails {
-  data?: File;
+  file?: File;
 }
 
 export interface IFiles {
-  gpkg?: IGPKGFile;
+  data?: IGPKGFile;
   product?: IProductFile;
-  metadata?: IFileBase;
+  shapeMetadata?: IFileBase;
 }
 
 export interface IJob {
   jobId?: string;
   taskId?: string;
   taskPercentage?: number;
-  validationsReport?: Record<string, unknown>;
+  validationReport?: Record<string, unknown>;
   taskStatus?: Status;
   record?: JobModelType;
 }
@@ -83,7 +83,7 @@ export type Events =
   | { type: "AUTO" }
   | { type: "MANUAL" }
   | { type: "SELECT_FILES", file: IGPKGFile }
-  | { type: "SELECT_GPKG", file: IGPKGFile }
+  | { type: "SELECT_DATA", file: IGPKGFile }
   | { type: "SELECT_PRODUCT", file: IProductFile }
   | { type: "SELECT_METADATA", file: IFileBase }
   | { type: "RESELECT_FILES" }
@@ -125,14 +125,14 @@ export const WORKFLOW = {
       IDLE: "idle",
       SELECT_FILES: "selectFiles",
       FETCH_PRODUCT: "fetchProduct",
-      CHECK_METADATA: "checkMetadata"
+      CHECK_SHAPEMETADATA: "checkShapeMetadata"
     },
     MANUAL: {
       ROOT: "manual",
       IDLE: "idle",
-      SELECT_GPKG: "selectGpkg",
+      SELECT_DATA: "selectData",
       FETCH_PRODUCT: "fetchProduct",
-      CHECK_METADATA: "checkMetadata"
+      CHECK_SHAPEMETADATA: "checkShapeMetadata"
     }
   },
   JOB_SUBMISSION: "jobSubmission",
@@ -148,8 +148,18 @@ export const BASE_PATH = '/';
 export const DATA_DIR = CONFIG.RASTER_INGESTION_FILES_STRUCTURE.data.relativeToAOIDirPath;
 export const SHAPES_DIR = CONFIG.RASTER_INGESTION_FILES_STRUCTURE.shapeMetadata.relativeToAOIDirPath;
 export const SHAPES_RELATIVE_TO_DATA_DIR = '..';
-export const PRODUCT_SHP = `${CONFIG.RASTER_INGESTION_FILES_STRUCTURE.product.producerFileName}${CONFIG.RASTER_INGESTION_FILES_STRUCTURE.product.selectableExt[0]}`;
-export const METADATA_SHP = `${CONFIG.RASTER_INGESTION_FILES_STRUCTURE.shapeMetadata.producerFileName}${CONFIG.RASTER_INGESTION_FILES_STRUCTURE.shapeMetadata.selectableExt[0]}`;
-export const GPKG_LABEL = 'file-name.gpkg';
+export const PRODUCT_FILENAME = `${CONFIG.RASTER_INGESTION_FILES_STRUCTURE.product.producerFileName}${CONFIG.RASTER_INGESTION_FILES_STRUCTURE.product.selectableExt[0]}`;
+export const SHAPEMETADATA_FILENAME = `${CONFIG.RASTER_INGESTION_FILES_STRUCTURE.shapeMetadata.producerFileName}${CONFIG.RASTER_INGESTION_FILES_STRUCTURE.shapeMetadata.selectableExt[0]}`;
+export const DATA_LABEL = 'file-name.data';
 export const PRODUCT_LABEL = 'file-name.product';
-export const METADATA_LABEL = 'file-name.metadata';
+export const SHAPEMETADATA_LABEL = 'file-name.shapeMetadata';
+
+export enum RasterJobTypeEnum {
+  NEW = 'Ingestion_New',
+  UPDATE = 'Ingestion_Update'
+}
+
+export const jobType2FlowType: { [key: string]: Mode } = {
+  [RasterJobTypeEnum.NEW]: Mode.NEW,
+  [RasterJobTypeEnum.UPDATE]: Mode.UPDATE
+};

@@ -1,11 +1,19 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import React, { useEffect, useCallback, useState, useLayoutEffect, useRef, useMemo } from 'react';
 import { useIntl } from 'react-intl';
+import { FormikValues } from 'formik';
+import { cloneDeep, get, isEmpty } from 'lodash';
 import { observer } from 'mobx-react';
-import { cloneDeep, isEmpty } from 'lodash';
+import { DraftResult } from 'vest/vestResult';
 import * as Yup from 'yup';
 import { DialogContent } from '@material-ui/core';
-import { Dialog, DialogTitle, Icon, IconButton, Typography } from '@map-colonies/react-core';
+import {
+  Dialog,
+  DialogTitle,
+  Icon,
+  IconButton,
+  Typography
+} from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
 import CONFIG from '../../../../common/config';
 import { emphasizeByHTML } from '../../../../common/helpers/formatters';
@@ -13,35 +21,38 @@ import { getTextStyle } from '../../../../common/helpers/style';
 import { Mode } from '../../../../common/models/mode.enum';
 import {
   EntityDescriptorModelType,
+  FieldConfigModelType,
+  JobModelType,
   LayerMetadataMixedUnion,
   LayerRasterRecordModel,
+  LayerRasterRecordModelType,
+  ProductType,
+  RecordStatus,
   RecordType,
   useStore,
   ValidationConfigModelType,
-  FieldConfigModelType,
-  ProductType,
-  ValidationValueType,
-  RecordStatus,
-  LayerRasterRecordModelType,
+  ValidationValueType
 } from '../../../models';
 import { ILayerImage } from '../../../models/layerImage';
 import { LayerRasterRecordInput } from '../../../models/RootStore.base';
 import {
   LayerRasterRecordModelKeys,
-  LayerRecordTypes,
+  LayerRecordTypes
 } from '../entity-types-keys';
 import { LayersDetailsComponent } from '../layer-details';
 import { FieldInfoName } from '../layer-details.field-info';
 import {
+  cleanUpEntityPayload,
   clearSyncWarnings,
   filterModeDescriptors,
   getFlatEntityDescriptors,
+  getRecordForUpdate,
   getValidationType,
   getYupFieldConfig,
   getBasicType,
-  isEnumType,
-  cleanUpEntityPayload
+  isEnumType
 } from '../utils';
+import suite from '../validate';
 import EntityRasterForm from './layer-details-form.raster';
 import { Events } from './state-machine/types';
 import { RasterWorkflowProvider, RasterWorkflowContext } from './state-machine/context';
@@ -51,6 +62,7 @@ import './entity.raster.dialog.css';
 
 const DEFAULT_ID = 'DEFAULT_UI_ID';
 const DEFAULT_TYPE_NAME = 'DEFAULT_TYPE_NAME';
+const NONE = 0;
 const START = 0;
 
 interface EntityRasterDialogProps {
@@ -60,11 +72,12 @@ interface EntityRasterDialogProps {
   layerRecord?: ILayerImage | null;
   isSelectedLayerUpdateMode?: boolean;
   jobId?: string;
+  setJob?: (job: JobModelType | undefined) => void;
 }
 
 const setDefaultValues = (record: Record<string, unknown>, descriptors: EntityDescriptorModelType[]): void => {
   getFlatEntityDescriptors(
-    record['__typename'] as LayerRecordTypes,
+    record.__typename as LayerRecordTypes ?? 'LayerRasterRecord',
     descriptors
   ).forEach((field) => {
       const fieldName = field.fieldName as string;
@@ -85,19 +98,15 @@ const setDefaultValues = (record: Record<string, unknown>, descriptors: EntityDe
 
 export const buildRecord = (recordType: RecordType, descriptors: EntityDescriptorModelType[]): ILayerImage => {
   const record = {} as Record<string, unknown>;
-  
   LayerRasterRecordModelKeys.forEach((key) => {
     record[key as string] = undefined;
   });
-
   setDefaultValues(record, descriptors);
-  
   record.productType = ProductType.ORTHOPHOTO;
   record.productStatus = RecordStatus.UNPUBLISHED;
   record['__typename'] = LayerRasterRecordModel.properties['__typename'].name.replaceAll('"','');
   record.id = DEFAULT_ID;
   record.type = recordType;
-
   return record as unknown as ILayerImage;
 };
 
@@ -120,10 +129,10 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
     useEffect(() => {
       if (!actorRef) return;
 
-      if (props.jobId) {
+      if (jobId) {
         actorRef.send({
           type: 'RESTORE',
-          job: { jobId: props.jobId }
+          job: { jobId }
         } satisfies Events);
       } else if (props.isSelectedLayerUpdateMode && props.layerRecord) {
         actorRef.send({
@@ -143,21 +152,28 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
     const store = useStore();
     const intl = useIntl();
     const dialogContainerRef = useRef<HTMLDivElement>(null);
-    const { isOpen, onSetOpen } = props;   
+
+    const decideMode = useCallback(() => {
+      return (props.isSelectedLayerUpdateMode === true && props.layerRecord) ? Mode.UPDATE : Mode.NEW;
+    }, []);
+
+    const { isOpen, onSetOpen, jobId, setJob } = props;
     const [recordType] = useState<RecordType>(props.recordType ?? (props.layerRecord?.type as RecordType));
-    const mode = state.context.flowType ?? Mode.NEW;
+    const [mode] = useState<Mode>(decideMode());
     const [layerRecord] = useState<LayerMetadataMixedUnion>(
-      props.layerRecord && mode !== Mode.UPDATE
+      props.layerRecord && mode === Mode.UPDATE
         ? cloneDeep(props.layerRecord)
         : buildRecord(recordType, store.discreteLayersStore.entityDescriptors as EntityDescriptorModelType[])
     );
+    const [vestValidationResults, setVestValidationResults] = useState<DraftResult>({} as DraftResult);
     const [descriptors, setDescriptors] = useState<unknown[]>([]);
     const [schema, setSchema] = useState<Record<string, Yup.AnySchema>>({});
+    const [inputValues, setInputValues] = useState<FormikValues>({});
     const [isAllInfoReady, setIsAllInfoReady] = useState<boolean>(false);
 
     const metadataPayloadKeys = useMemo(() => {
       return getFlatEntityDescriptors(
-        'LayerRasterRecord',
+        layerRecord.__typename,
         store.discreteLayersStore.entityDescriptors as EntityDescriptorModelType[]
       )
       .filter(descriptor => descriptor.isCreateEssential || descriptor.fieldName === 'id')
@@ -219,6 +235,15 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
     };
 
     useEffect(() => {
+      if (vestValidationResults.errorCount === NONE) {
+        const { __typename, ...metadata } = inputValues;
+        const data = cleanUpEntityPayload(metadata, metadataPayloadKeys as string[]) as unknown as LayerRasterRecordInput;
+        const resolutionDegree = metadata.resolutionDegree as number;
+        actorRef.send({ type: 'SUBMIT', data, resolutionDegree } satisfies Events);
+      }
+    }, [vestValidationResults]);
+
+    useEffect(() => {
       if (!isEmpty(descriptors) && !isEmpty(layerRecord)) {
         setIsAllInfoReady(true);
       }
@@ -245,7 +270,7 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
         }
       }
     }, [mode, dialogContainerRef.current]);
-            
+
     useEffect(() => {
       const descriptors = getFlatEntityDescriptors(
         layerRecord.__typename,
@@ -282,6 +307,9 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
 
     const closeDialog = useCallback(() => {
       onSetOpen(false);
+      if (jobId) {
+        setJob?.(undefined);
+      }
       store.discreteLayersStore.resetUpdateMode();
       clearSyncWarnings();
     }, [onSetOpen, store.discreteLayersStore]);
@@ -303,6 +331,7 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
           </Box>
           { 
             state.context.selectionMode === 'restore' &&
+            state.context.flowType === Mode.UPDATE &&
             <Box className='lockedIcon'>
               <Icon icon={{ icon: 'lock', size: 'xlarge' }} />
               <Typography tag="span">{ intl.formatMessage({ id: 'general.title.locked' }) }</Typography>
@@ -341,16 +370,27 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
                 recordType={recordType}
                 layerRecord={
                   mode === Mode.UPDATE
-                    ? {...props.layerRecord} as LayerMetadataMixedUnion : layerRecord
+                    ? getRecordForUpdate(
+                        props.layerRecord as LayerMetadataMixedUnion,
+                        layerRecord,
+                        descriptors as FieldConfigModelType[]
+                      )
+                    : layerRecord
                 }
                 yupSchema={Yup.object({
                   ...schema,
                 })}
                 onSubmit={(values): void => {
-                  const data = cleanUpEntityPayload(values, metadataPayloadKeys as string[]) as unknown as LayerRasterRecordInput;
-                  const resolutionDegree = values.resolutionDegree as number;
-                  actorRef.send({ type: 'SUBMIT', data, resolutionDegree } satisfies Events);
+                  setInputValues(values);
+                  // eslint-disable-next-line
+                  const vestSuite = suite(
+                    descriptors as FieldConfigModelType[],
+                    values
+                  );
+                  // eslint-disable-next-line
+                  setVestValidationResults(get(vestSuite, "get")()) ;
                 }}
+                vestValidationResults={vestValidationResults}
                 closeDialog={closeDialog}
                 customErrorReset={store.discreteLayersStore.clearCustomValidationError}
                 customError={store.discreteLayersStore.customValidationError}

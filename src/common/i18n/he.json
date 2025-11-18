@@ -239,9 +239,9 @@
   "field-names.ingestion.fileNames": "הקבצים",
 
   "file-name.files": "GPKG",
-  "file-name.gpkg": "GPKG",
+  "file-name.data": "GPKG",
   "file-name.product": "תיחום היקפי",
-  "file-name.metadata": "חלקי התיחום",
+  "file-name.shapeMetadata": "חלקי התיחום",
 
   "ingestion.warning.title": "אזהרה:",
   "ingestion.warning.invalid-secondary-file": "{title} אירעה שגיאת וולידציה באתר המשני",

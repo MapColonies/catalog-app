@@ -1,4 +1,5 @@
 import { assign, sendParent } from 'xstate';
+import { RasterFileTypeConfig } from '../../../../../common/models/raster-ingestion-files-structure';
 import { isFilesSelected } from './helpers';
 import { AddPolicy, IContext, IFiles } from './types';
 
@@ -28,7 +29,7 @@ export const selectionModeActions = (selectionMode: SelectionMode, files: IFiles
   sendParent({ type: "SET_FILES", selectionMode, files, addPolicy: "override" })
 ];
 
-export const selectFileActions = (fileType: 'gpkg' | 'product' | 'metadata', parentAddPolicy: AddPolicy = 'merge', preserveCurrent: boolean = true) => [
+export const selectFileActions = (fileType: RasterFileTypeConfig, parentAddPolicy: AddPolicy = 'merge', preserveCurrent: boolean = true) => [
   assign((_: { context: IContext; event: any }) => ({
     files: {
       ...(preserveCurrent ? _.context.files : {}),

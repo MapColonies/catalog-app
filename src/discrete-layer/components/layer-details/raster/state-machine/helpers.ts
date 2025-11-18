@@ -57,6 +57,10 @@ export const getFeatureAndMarker = (
   return { feature, marker };
 };
 
+export const getPath = (mountDir: string, filePath: string): string => {
+  return path.resolve(mountDir, filePath);
+};
+
 export const getFile = (files: FileData[], gpkgPath: string, fileName: string, label: string) => {
   const matchingFiles = files?.filter((file: FileData) => file.name === fileName);
   if (!matchingFiles || matchingFiles.length === 0) {
@@ -109,9 +113,9 @@ export const hasTagDeep = (state: SnapshotFrom<typeof workflowMachine>, tag = ST
 
 export const isFilesSelected = (context: IContext): boolean => {
   const files = context.files || {};
-  return !!(files.gpkg && files.gpkg.path && files.gpkg.exists === true &&
+  return !!(files.data && files.data.path && files.data.exists === true &&
     files.product && files.product.path && files.product.exists === true &&
-    files.metadata && files.metadata.path && files.metadata.exists === true);
+    files.shapeMetadata && files.shapeMetadata.path && files.shapeMetadata.exists === true);
 };
 
 export const isJobSubmitted = (context: IContext): boolean => {
@@ -129,7 +133,7 @@ export const hasActiveJob = (context: IContext): boolean => {
 export const isRetryEnabled = (context: IContext): boolean => {
   return !!(context.job &&
     (context.job.taskStatus === Status.Failed ||
-    (context.job.taskStatus === Status.Completed && context.job.validationsReport)));
+    (context.job.taskStatus === Status.Completed && context.job.validationReport?.isValid === false)));
 };
 
 export const isUIDisabled = (isLoading: boolean, state: any): boolean => {

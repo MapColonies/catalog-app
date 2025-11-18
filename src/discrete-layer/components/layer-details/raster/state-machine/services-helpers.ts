@@ -2,24 +2,28 @@ import { Geometry } from 'geojson';
 import path from 'path';
 // import shp from 'shpjs';
 import { FileData } from '@map-colonies/react-components';
-import { normalizePath } from '../../../../../common/helpers/formatters';
-import { Mode } from '../../../../../common/models/mode.enum';
-import { LayerMetadataMixedUnion, RecordType } from '../../../../models';
+import {
+  LayerMetadataMixedUnion,
+  RecordType,
+  SourceValidationModelType
+} from '../../../../models';
 import { LayerRasterRecordInput } from '../../../../models/RootStore.base';
 import { transformEntityToFormFields } from '../../utils';
 import { FeatureType } from '../pp-map.utils';
-import { buildError, getFeatureAndMarker, jobType2FlowType, RasterJobTypeEnum } from './helpers';
+import { buildError, getFeatureAndMarker, getPath } from './helpers';
 import { MOCK_POLYGON } from './MOCK';
 import { queryExecutor } from './query-executor';
 import {
   BASE_PATH,
+  DATA_LABEL,
   FIRST,
-  GPKG_LABEL,
   IContext,
   IPartialContext,
   IProductFile,
-  METADATA_LABEL,
-  PRODUCT_LABEL
+  jobType2FlowType,
+  PRODUCT_LABEL,
+  RasterJobTypeEnum,
+  SHAPEMETADATA_LABEL,
 } from './types';
 
 export const getDirectory = async (filePath: string, context: IContext): Promise<FileData[] | undefined> => {
@@ -46,11 +50,11 @@ export const getDetails = async (filePath: string, context: IContext): Promise<F
   return undefined;
 };
 
-export const selectGpkg = async (context: IContext) => {
-  if (!context.files?.gpkg?.path) {
-    throw (buildError('ingestion.error.missing', 'GPKG'));
+export const validateGPKG = async (filePath: string, context: IContext): Promise<SourceValidationModelType> => {
+  let gpkgPath = filePath;
+  if (gpkgPath.startsWith(BASE_PATH)) {
+    gpkgPath = gpkgPath.substring(1);
   }
-  const gpkgPath = context.files.gpkg.path;
   const result = await queryExecutor(async () => {
     return await context.store.queryValidateGPKGSource({
       data: {
@@ -59,15 +63,19 @@ export const selectGpkg = async (context: IContext) => {
       }
     });
   });
+  return result.validateGPKGSource[FIRST];
+};
 
-  const validationGPKG = result.validateGPKGSource[FIRST];
-  if (!validationGPKG.isValid) {
-    throw (buildError('ingestion.error.invalid-source-file', validationGPKG.message as string));
+export const selectData = async (context: IContext) => {
+  if (!context.files?.data?.path) {
+    throw (buildError('ingestion.error.missing', 'GPKG'));
   }
-
-  const validationResult = { ...validationGPKG };
+  const gpkgValidation = await validateGPKG(context.files.data.path, context);
+  if (!gpkgValidation.isValid) {
+    throw (buildError('ingestion.error.invalid-source-file', gpkgValidation.message as string));
+  }
+  const validationResult = { ...gpkgValidation };
   const { feature, marker } = getFeatureAndMarker(validationResult.extentPolygon, FeatureType.SOURCE_EXTENT, FeatureType.SOURCE_EXTENT_MARKER);
-
   return {
     validationResult,
     geoDetails: {
@@ -89,15 +97,12 @@ export const fetchProduct = async (product: IProductFile, context: IContext) => 
   //       },
   //     });
   // });
-
   // const outlinedPolygon = await shp(result.getFile[FIRST]);
   const outlinedPolygon: Geometry = MOCK_POLYGON; // TODO: Mock should be removed
-
   const { feature, marker } = getFeatureAndMarker(outlinedPolygon, FeatureType.PP_PERIMETER, FeatureType.PP_PERIMETER_MARKER);
-
   return {
-    // data: new File(result.getFile[FIRST], path.basename(product.path)),
-    data: undefined,
+    // file: new File(result.getFile[FIRST], path.basename(product.path)),
+    file: undefined,
     geoDetails: {
       feature,
       marker
@@ -110,7 +115,7 @@ export const getRestoreData = async (context: IContext): Promise<IPartialContext
   if (!rootDirectory || rootDirectory.length === 0) {
     throw buildError('ingestion.error.not-found', BASE_PATH);
   }
-  const MOUNT_DIR = normalizePath(rootDirectory[FIRST].name);
+  const MOUNT_DIR = rootDirectory[FIRST].name;
 
   const result = await queryExecutor(async () => {
     return await context.store.queryJob({
@@ -122,38 +127,35 @@ export const getRestoreData = async (context: IContext): Promise<IPartialContext
   }
   const job = { ...result.job };
 
-  const flowType = jobType2FlowType[job.type || RasterJobTypeEnum.NEW];
-
-  try {
+    try {
     return {
-      flowType: flowType as IPartialContext['flowType'],
+      flowType: jobType2FlowType[job.type || RasterJobTypeEnum.NEW] as IPartialContext['flowType'],
       selectionMode: 'restore',
       files: {
-        gpkg: {
-          label: GPKG_LABEL,
-          path: path.resolve(MOUNT_DIR, job.parameters.inputFiles.gpkgFilesPath[0]),
+        data: {
+          label: DATA_LABEL,
+          path: getPath(MOUNT_DIR, job.parameters.inputFiles.gpkgFilesPath[0]),
           exists: false
         },
         product: {
           label: PRODUCT_LABEL,
-          path: path.resolve(MOUNT_DIR, job.parameters.inputFiles.productShapefilePath),
+          path: getPath(MOUNT_DIR, job.parameters.inputFiles.productShapefilePath),
           exists: false
         },
-        metadata: {
-          label: METADATA_LABEL,
-          path: path.resolve(MOUNT_DIR, job.parameters.inputFiles.metadataShapefilePath),
+        shapeMetadata: {
+          label: SHAPEMETADATA_LABEL,
+          path: getPath(MOUNT_DIR, job.parameters.inputFiles.metadataShapefilePath),
           exists: false
         }
       },
       resolutionDegree: job.parameters.ingestionResolution,
-      formData: transformEntityToFormFields(job.parameters.metadata as unknown as LayerMetadataMixedUnion) as unknown as LayerRasterRecordInput,
+      formData: transformEntityToFormFields({ ...job.parameters.metadata, resolutionDegree: job.parameters.ingestionResolution } as unknown as LayerMetadataMixedUnion) as unknown as LayerRasterRecordInput,
       job: {
         jobId: job.id,
         record: job
       }
     };
   } catch (error) {
-    console.warn(error instanceof Error ? error.message : String(error));
     throw buildError('ingestion.error.restore-failed');
   }
 };

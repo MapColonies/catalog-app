@@ -8,10 +8,11 @@ import { Button, Icon, Typography } from '@map-colonies/react-core';
 import { Selection } from '../../../../common/components/file-picker';
 import { FieldLabelComponent } from '../../../../common/components/form/field-label';
 import CONFIG from '../../../../common/config';
-import { dateFormatter, formatPath } from '../../../../common/helpers/formatters';
+import { formatPath, relativeDateFormatter } from '../../../../common/helpers/formatters';
 import { Mode } from '../../../../common/models/mode.enum';
 import { RecordType, LayerMetadataMixedUnion, RasterIngestionFilesTypeConfig } from '../../../models';
 import { FilePickerDialog } from '../../dialogs/file-picker.dialog';
+import { Curtain } from './curtain/curtain.component';
 import { RasterWorkflowContext } from './state-machine/context';
 import {
   hasActiveJob,
@@ -24,7 +25,6 @@ import {
   IFileBase,
   IFiles
 } from './state-machine/types';
-import { Curtain } from './curtain/curtain.component';
 
 import './ingestion-fields.raster.css';
 
@@ -51,7 +51,7 @@ const FileItem: React.FC<{ file: IFileBase }> = ({ file }) => {
         {defaultFormatters.formatFileSize(null, file.details as FileData)}
       </Box>
       <Box className="ltr">
-        {file.details?.modDate ? dateFormatter(file.details.modDate, true) : ''}
+        {file.details?.modDate ? relativeDateFormatter(file.details.modDate) : ''}
       </Box>
     </>
   );
@@ -116,9 +116,9 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
         : '';
 
       if (selectedAction) {
-        const actionTypeMap: Record<string, 'SELECT_FILES' | 'SELECT_GPKG' | 'SELECT_PRODUCT' | 'SELECT_METADATA'> = {
+        const actionTypeMap: Record<string, 'SELECT_FILES' | 'SELECT_DATA' | 'SELECT_PRODUCT' | 'SELECT_METADATA'> = {
           files: 'SELECT_FILES',
-          gpkg: 'SELECT_GPKG',
+          gpkg: 'SELECT_DATA',
           product: 'SELECT_PRODUCT',
           metadata: 'SELECT_METADATA',
         };
