@@ -873,3 +873,13 @@ export const filterModeDescriptors = (mode: Mode, descriptors: EntityDescriptorM
       }
   });
 };
+
+export enum RasterJobTypeEnum {
+  NEW = 'Ingestion_New',
+  UPDATE = 'Ingestion_Update'
+}
+
+export const jobType2Mode: { [key: string]: Mode } = {
+  [RasterJobTypeEnum.NEW]: Mode.NEW,
+  [RasterJobTypeEnum.UPDATE]: Mode.UPDATE
+};

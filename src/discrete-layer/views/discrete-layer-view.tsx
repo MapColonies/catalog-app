@@ -75,7 +75,7 @@ import { ExportLayerComponent } from '../components/export-layer/export-layer.co
 import ExportDrawingHandler from '../components/export-layer/export-drawing-handler.component';
 import ExportPolygonsRenderer from '../components/export-layer/export-polygons-renderer.component';
 import { EntityRasterDialog } from '../components/layer-details/raster/entity.raster.dialog';
-import { jobType2FlowType, RasterJobTypeEnum } from '../components/layer-details/raster/state-machine/types';
+import { jobType2Mode, RasterJobTypeEnum } from '../components/layer-details/utils';
 import { MapActionResolver } from './components/map-action-resolver.component';
 import { ActionsContextMenu } from '../components/map-container/contextMenus/actions.context-menu';
 import { ExtentUpdater } from '../components/map-container/extent-updater';
@@ -980,7 +980,7 @@ const DiscreteLayerView: React.FC = observer(() => {
   };
 
   const isUpdateMode = (jobType: string | null | undefined): boolean => {
-    return jobType2FlowType[jobType || RasterJobTypeEnum.NEW] === Mode.UPDATE;
+    return jobType2Mode[jobType || RasterJobTypeEnum.NEW] === Mode.UPDATE;
   };
 
   return (
