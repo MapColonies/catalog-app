@@ -8,6 +8,7 @@ import { FeatureType } from '../pp-map.utils';
 import { workflowMachine } from './state-machine';
 import {
   AddPolicy,
+  BASE_PATH,
   ErrorLevel,
   ErrorSource,
   FIRST,
@@ -56,22 +57,25 @@ export const getFeatureAndMarker = (
   return { feature, marker };
 };
 
-export const getPath = (mountDir: string, filePath: string): string => {
-  return path.resolve(mountDir, filePath);
+export const getPath = (baseDir: string, filePath: string): string => {
+  const resolvedPath = path.resolve(baseDir, filePath);
+  return resolvedPath.startsWith(BASE_PATH) ? resolvedPath.substring(1) : resolvedPath;
 };
 
 export const getFile = (files: FileData[], gpkgPath: string, fileName: string, label: string) => {
+  const baseDirectory = path.dirname(gpkgPath);
+  const resolvedPath = getPath(baseDirectory, path.join(SHAPES_RELATIVE_TO_DATA_DIR, SHAPES_DIR, fileName));
   const matchingFiles = files?.filter((file: FileData) => file.name === fileName);
   if (!matchingFiles || matchingFiles.length === 0) {
     return {
       label,
-      path: path.resolve(path.dirname(gpkgPath), SHAPES_RELATIVE_TO_DATA_DIR, SHAPES_DIR, fileName),
+      path: resolvedPath,
       exists: false
     };
   }
   return matchingFiles.map((file: FileData) => ({
     label,
-    path: path.resolve(path.dirname(gpkgPath), SHAPES_RELATIVE_TO_DATA_DIR, SHAPES_DIR, fileName),
+    path: resolvedPath,
     details: { ...file },
     exists: true
   }))[FIRST];

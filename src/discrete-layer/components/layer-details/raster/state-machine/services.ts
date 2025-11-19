@@ -5,7 +5,7 @@ import { Mode } from '../../../../../common/models/mode.enum';
 import { RecordType } from '../../../../models';
 import { LayerRasterRecordInput } from '../../../../models/RootStore.base';
 import { FeatureType } from '../pp-map.utils';
-import { buildError, getFeatureAndMarker, getFile } from './helpers';
+import { buildError, getFeatureAndMarker, getFile, getPath } from './helpers';
 import { MOCK_JOB_UPDATE } from './MOCK';
 import { queryExecutor } from './query-executor';
 import {
@@ -61,23 +61,21 @@ export const SERVICES = {
         type: RecordType.RECORD_RASTER,
       };
 
-      let result;
+      let jobId: string = '';
       if (input.context.flowType === Mode.NEW) {
-        result = await queryExecutor(async () => {
+        const result = await queryExecutor(async () => {
           return await store.mutateStartRasterIngestion({ data });
         });
+        jobId = result.startRasterIngestion.jobId ?? '';
       } else if (input.context.flowType === Mode.UPDATE) {
-        result = await queryExecutor(async () => {
+        const result = await queryExecutor(async () => {
           return await store.mutateStartRasterUpdateGeopkg({ data });
         });
+        jobId = result.startRasterUpdateGeopkg.jobId ?? '';
       }
 
-      result = {
-        jobId: MOCK_JOB_UPDATE.id, // TODO: Mock should be removed
-      };
-
       return {
-        jobId: result.jobId,
+        jobId,
       };
     }),
     jobPollingService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
@@ -167,14 +165,11 @@ export const SERVICES = {
     selectFilesService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
       const data = await selectData(input.context);
       const dataPath = input.context.files?.data?.path as string;
-      const result = await getDirectory(path.resolve(path.dirname(dataPath), SHAPES_RELATIVE_TO_DATA_DIR, SHAPES_DIR), input.context);
+      const result = await getDirectory(getPath(path.dirname(dataPath), path.join(SHAPES_RELATIVE_TO_DATA_DIR, SHAPES_DIR)), input.context);
       const product = getFile(result ?? [], dataPath, PRODUCT_FILENAME, PRODUCT_LABEL);
       const shapeMetadata = getFile(result ?? [], dataPath, SHAPEMETADATA_FILENAME, SHAPEMETADATA_LABEL);
-
       return {
-        data: {
-          ...data
-        },
+        data,
         product,
         shapeMetadata
       };

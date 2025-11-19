@@ -29,7 +29,7 @@ export const getDirectory = async (filePath: string, context: IContext): Promise
     const result = await queryExecutor(async () => {
       return await context.store.queryGetDirectory({
         data: {
-          path: filePath,
+          path: filePath.startsWith(BASE_PATH) ? filePath : BASE_PATH + filePath,
           type: RecordType.RECORD_RASTER,
         },
       });
@@ -49,14 +49,10 @@ export const getDetails = async (filePath: string, context: IContext): Promise<F
 };
 
 export const validateGPKG = async (filePath: string, context: IContext): Promise<SourceValidationModelType> => {
-  let gpkgPath = filePath;
-  if (gpkgPath.startsWith(BASE_PATH)) {
-    gpkgPath = gpkgPath.substring(1);
-  }
   const result = await queryExecutor(async () => {
     return await context.store.queryValidateGPKGSource({
       data: {
-        gpkgFilesPath: [gpkgPath],
+        gpkgFilesPath: [filePath],
         type: RecordType.RECORD_RASTER,
       }
     });
@@ -73,13 +69,10 @@ export const selectData = async (context: IContext) => {
     throw (buildError('ingestion.error.invalid-source-file', gpkgValidation.message as string));
   }
   const validationResult = { ...gpkgValidation };
-  const { feature, marker } = getFeatureAndMarker(validationResult.extentPolygon, FeatureType.SOURCE_EXTENT, FeatureType.SOURCE_EXTENT_MARKER);
+  const geoDetails = getFeatureAndMarker(validationResult.extentPolygon, FeatureType.SOURCE_EXTENT, FeatureType.SOURCE_EXTENT_MARKER);
   return {
     validationResult,
-    geoDetails: {
-      feature,
-      marker
-    }
+    geoDetails
   };
 };
 

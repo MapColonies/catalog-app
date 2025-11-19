@@ -85,11 +85,7 @@ export const normalizePath = (path: string): string => {
 export const formatPath = (path: string): string => {
   let normalizedPath = path.trim();
   if (!isEmpty(normalizedPath)) {
-    if (!normalizedPath.startsWith(BASE_PATH)) {
-      normalizedPath = normalizedPath.replace(/^\\+/, BASE_PATH);
-    } else {
-      normalizedPath = normalizedPath.replace(/^\/\\+/, BASE_PATH);
-    }
+    normalizedPath = normalizedPath.replace(/^\\+/, BASE_PATH);
   }
   return normalizedPath;
 };
