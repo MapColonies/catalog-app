@@ -134,7 +134,6 @@ export const SERVICES = {
 
       if (files.product) {
         const productFile = await fetchProduct(files.product, input.context);
-        files.product.file = productFile?.file;
         files.product.geoDetails = productFile?.geoDetails;
       }
 
