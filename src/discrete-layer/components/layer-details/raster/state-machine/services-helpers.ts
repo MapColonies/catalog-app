@@ -1,4 +1,4 @@
-import { FeatureCollection, Geometry } from 'geojson';
+import { FeatureCollection } from 'geojson';
 import path from 'path';
 import shp from 'shpjs';
 import { FileData } from '@map-colonies/react-components';
