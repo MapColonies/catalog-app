@@ -47,9 +47,7 @@ export interface IGPKGFile extends IFileBase, IGeoDetails {
   validationResult?: SourceValidationModelType;
 }
 
-export interface IProductFile extends IFileBase, IGeoDetails {
-  file?: File;
-}
+export interface IProductFile extends IFileBase, IGeoDetails {}
 
 export interface IFiles {
   data?: IGPKGFile;

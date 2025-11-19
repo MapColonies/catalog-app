@@ -35,7 +35,7 @@ export interface SearchResult {
   data: any;
 }
 
-export type SearchResponse = ApiHttpResponse<SearchResult>;
+export type SearchResponse = ApiHttpResponse<SearchResult | ArrayBuffer>;
 
 export interface ITabViewData {
   idx: TabViews;

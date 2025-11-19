@@ -1,5 +1,5 @@
 import React from 'react';
-import { Method } from 'axios';
+import { AxiosRequestConfig, Method } from 'axios';
 import { types, Instance, getEnv } from 'mobx-state-tree';
 import { DocumentNode } from 'graphql';
 import { createStoreContext, createUseQueryHook } from 'mst-gql';
@@ -17,8 +17,11 @@ import { servicesAvailabilityStore } from './servicesAvailabilityStore';
 type FetchAction = (
   url: string,
   method: Method,
-  params: Record<string, unknown>
+  params: Record<string, unknown>,
+  config?: IPartialAxiosRequestConfig
 ) => Promise<SearchResponse>;
+
+export interface IPartialAxiosRequestConfig extends Omit<AxiosRequestConfig, 'url' | 'method' | 'data' | 'baseURL'> {};
 
 export const baseRootStore = RootStoreBase
   .props({

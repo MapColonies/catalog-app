@@ -2,7 +2,7 @@ import { createRoot } from 'react-dom/client';
 import Axios, { Method } from 'axios';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
-import { StoreProvider, rootStore } from './discrete-layer/models/RootStore';
+import { IPartialAxiosRequestConfig, StoreProvider, rootStore } from './discrete-layer/models/RootStore';
 import { SearchResponse } from './discrete-layer/models/discreteLayersStore';
 import CONFIG from './common/config';
 import { syncHttpClientGql } from './syncHttpClientGql';
@@ -16,7 +16,8 @@ const store = rootStore.create(
     fetch: async (
       url: string,
       method: Method,
-      params: Record<string, unknown>
+      params: Record<string, unknown>,
+      config?: IPartialAxiosRequestConfig
     ) =>
       Axios.request({
         url,
@@ -25,6 +26,7 @@ const store = rootStore.create(
         baseURL: `${CONFIG.SERVICE_PROTOCOL as string}${
           CONFIG.SERVICE_NAME as string
         }`,
+        ...(config ?? {}),
       }).then((res) => res.data as SearchResponse),
     gqlHttpClient: syncHttpClientGql(),
     // gqlHttpClient: createHttpClient("http://localhost:8080/graphql")
