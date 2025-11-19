@@ -970,7 +970,7 @@ const DiscreteLayerView: React.FC = observer(() => {
   ]) satisfies GeocoderOptions[], [intl]);
  
   const findLayer = (productName: string | null | undefined, productType: string | null | undefined): ILayerImage | null | undefined => {
-    if (!productName || !productType || isUpdateMode(rasterEntityDialogJob?.type) === false) {
+    if (!productName || !productType || isUpdateMode(jobToOpenRasterEntity?.type) === false) {
       return undefined;
     }
     const catalogLayers: LayerMetadataMixedUnion[] = [ ...(store.discreteLayersStore.layersImages ?? []) ];
@@ -1239,10 +1239,10 @@ const DiscreteLayerView: React.FC = observer(() => {
             isOpen={isRasterEntityDialogOpen}
             onSetOpen={setIsRasterEntityDialogOpen}
             recordType={RecordType.RECORD_RASTER}
-            layerRecord={findLayer(rasterEntityDialogJob?.productName, rasterEntityDialogJob?.productType)}
-            isSelectedLayerUpdateMode={isUpdateMode(rasterEntityDialogJob?.type)}
-            jobId={rasterEntityDialogJob?.id}
-            setJob={setJobToOpenRasterEntity}
+            layerRecord={findLayer(jobToOpenRasterEntity?.productName, jobToOpenRasterEntity?.productType)}
+            isSelectedLayerUpdateMode={isUpdateMode(jobToOpenRasterEntity?.type)}
+            jobId={jobToOpenRasterEntity?.id}
+            removeJobOnDialogClose={setJobToOpenRasterEntity}
           />
         }
         {

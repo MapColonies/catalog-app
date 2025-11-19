@@ -157,7 +157,7 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
       return (props.isSelectedLayerUpdateMode === true && props.layerRecord) ? Mode.UPDATE : Mode.NEW;
     }, []);
 
-    const { isOpen, onSetOpen, jobId, setJob } = props;
+    const { isOpen, onSetOpen, jobId, removeJobOnDialogClose } = props;
     const [recordType] = useState<RecordType>(props.recordType ?? (props.layerRecord?.type as RecordType));
     const [mode] = useState<Mode>(decideMode());
     const [layerRecord] = useState<LayerMetadataMixedUnion>(
