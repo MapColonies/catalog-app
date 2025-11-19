@@ -37,6 +37,7 @@ export interface ICommonJobManagerGridProps {
   omitColDefsByRenderer?: { renderers: string[], preserveColWidth?: boolean };
   areJobsLoading?: boolean;
   focusOnJob?: JobModelType;
+  setFocusOnJob?: (job: JobModelType | undefined) => void;
   handleFocusError?: (error: IFocusError | undefined) => void;
 }
 
@@ -59,6 +60,7 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
     omitColDefsByRenderer,
     areJobsLoading,
     focusOnJob,
+    setFocusOnJob,
     handleFocusError
   } = props;
 
@@ -70,7 +72,14 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
     if(!focusOnJob?.id) return;
 
     setFocusJobId(focusOnJob.id);
-  }, [focusOnJob])
+  }, [focusOnJob]);
+
+  useEffect(() => {
+    if (focusJobId === '') {
+      setFocusOnJob?.(undefined);
+    }
+  }, [focusJobId])
+  
   
 
   const onGridReady = (params: GridReadyEvent): void => {

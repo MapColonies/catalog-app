@@ -34,7 +34,8 @@ interface JobsDialogProps {
   isOpen: boolean;
   onSetOpen: (open: boolean) => void;
   setRestoredJob: (job: JobModelType) => void;
-  job?: JobModelType;
+  focusOnJob?: JobModelType;
+  setFocusOnJob?: (job: JobModelType | undefined) => void;
 }
 
 export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialogProps) => {
@@ -48,7 +49,7 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
   const [ fromDate, setFromDate ] = useState<Date>(moment().subtract(CONFIG.JOB_MANAGER_END_OF_TIME, 'days').toDate());
   const [handleFocusError, setHandleFocusError] = useState<IFocusError | undefined>(undefined);
 
-  const { job } = props;
+  const { focusOnJob, setFocusOnJob } = props;
 
   // @ts-ignore
   const [ timeLeft, actions ] = useCountDown(POLLING_CYCLE_INTERVAL, COUNTDOWN_REFRESH_RATE);
@@ -255,7 +256,8 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
           updateJobCB={setUpdateTaskPayload}
           rowDataChangeCB={(): void => { }}
           areJobsLoading={loading}
-          focusOnJob={job}
+          focusOnJob={focusOnJob}
+          setFocusOnJob={setFocusOnJob}
           handleFocusError={(error) => {
             setHandleFocusError(error);
           }}
@@ -359,7 +361,7 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
               <Box className="messages">
                 <LogicError iconColor='var(--mdc-theme-gc-warning-high)' errors={[{
                   code: 'job-manager-focus.error',
-                  message: `${dateFormatter(job?.updated, true)}`,
+                  message: `${dateFormatter(focusOnJob?.updated, true)}`,
                   level: 'warning'
                   }]} />
               </Box>

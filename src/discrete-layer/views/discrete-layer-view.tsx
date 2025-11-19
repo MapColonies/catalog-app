@@ -1267,7 +1267,8 @@ const DiscreteLayerView: React.FC = observer(() => {
             isOpen={isSystemsJobsDialogOpen}
             onSetOpen={setSystemsJobsDialogOpen}
             setRestoredJob={setJobToOpenRasterEntity}
-            job={jobToOpenJobManager}
+            focusOnJob={jobToOpenJobManager}
+            setFocusOnJob={setJobToOpenJobManager}
           />
         }
         {

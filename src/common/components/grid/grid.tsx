@@ -79,7 +79,7 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
   const theme = useTheme();
   const [gridApi, setGridApi] = useState<GridApi>();
 
-  const {focusByRowId: rowFocus, setFocusByRowId: setRowFocus, handleFocusError} = props
+  const {focusByRowId, setFocusByRowId, handleFocusError} = props
   
   const {detailsRowExpanderPosition, ...restGridOptions} = props.gridOptions as GridComponentOptions;
 
@@ -197,7 +197,7 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
   }, [props.rowData, props.gridOptions, props.isLoading]);
 
   useEffect(() => {
-    if (!gridApi || !rowFocus) return;
+    if (!gridApi || !focusByRowId) return;
     
     const focusRowById = (gridApi: GridApi, id: string) => {
       let rowIndex = -1;
@@ -220,7 +220,7 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
         return;
       } else {
         handleFocusError?.(undefined);
-        setRowFocus?.('');
+        setFocusByRowId?.('');
       }
 
       const pageSize = gridApi.paginationGetPageSize();
@@ -237,7 +237,7 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
       gridApi.onFilterChanged();
     }
 
-    focusRowById(gridApi, rowFocus);
+    focusRowById(gridApi, focusByRowId);
   }, [rowData])
 
   const agGridThemeOverrides = GridThemes.getTheme(theme);
