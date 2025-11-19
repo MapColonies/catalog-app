@@ -1242,7 +1242,7 @@ const DiscreteLayerView: React.FC = observer(() => {
             layerRecord={findLayer(rasterEntityDialogJob?.productName, rasterEntityDialogJob?.productType)}
             isSelectedLayerUpdateMode={isUpdateMode(rasterEntityDialogJob?.type)}
             jobId={rasterEntityDialogJob?.id}
-            setJob={setRasterEntityDialogJob}
+            setJob={setJobToOpenRasterEntity}
           />
         }
         {
