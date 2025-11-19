@@ -132,7 +132,8 @@ const DiscreteLayerView: React.FC = observer(() => {
   const theme = useTheme();
   const intl = useIntl();
   const [isDrawing, setIsDrawing] = useState<boolean>(false);
-  const [rasterEntityDialogJob, setRasterEntityDialogJob] = useState<JobModelType | undefined>(undefined);
+  const [jobToOpenRasterEntity, setJobToOpenRasterEntity] = useState<JobModelType | undefined>(undefined);
+  const [jobToOpenJobManager, setJobToOpenJobManager] = useState<JobModelType | undefined>(undefined);
   const [isRasterEntityDialogOpen, setIsRasterEntityDialogOpen] = useState<boolean>(false);
   const [is3DEntityDialogOpen, setIs3DEntityDialogOpen] = useState<boolean>(false);
   const [isDemEntityDialogOpen, setIsDemEntityDialogOpen] = useState<boolean>(false);
@@ -162,7 +163,6 @@ const DiscreteLayerView: React.FC = observer(() => {
   const [searchResultsError, setSearchResultsError] = useState();
   const [actionsMenuDimensions, setActionsMenuDimensions] = useState<MenuDimensions>();
   const [whatsNewVisitedCnt, setWhatsNewVisitedCnt] = useState<number>(0);
-  const [jobRecord, setJobRecord] = useState<JobModelType | undefined>(undefined);
 
   const isDrawingState = isDrawing || store.exportStore.drawingState?.drawing;
   const disableOnDrawingClassName = isDrawingState ? 'interactionsDisabled' : ''; 
@@ -842,10 +842,10 @@ const DiscreteLayerView: React.FC = observer(() => {
   }, [store.discreteLayersStore.isActiveLayersImages]);
 
   useEffect(() => {
-    if (!!rasterEntityDialogJob) {
+    if (!!jobToOpenRasterEntity) {
       setIsRasterEntityDialogOpen(true);
     }
-  }, [rasterEntityDialogJob]);
+  }, [jobToOpenRasterEntity]);
 
   const ContextMenuByTab: React.FC<IContextMenuData> = (props) => {
     // Should add global flag or find the proper condition to whether show the context menu or not.
@@ -1213,8 +1213,8 @@ const DiscreteLayerView: React.FC = observer(() => {
                   handleOpenEntityDeleteDialog={setEntityDeleteDialogOpen}
                   activeTabView = {activeTabView}
                   handleOpenJobDialog = {(open, jobData) => {
-                    setJobRecord(jobData);
-                    setSystemsJobsDialogOpen(true);
+                    setJobToOpenJobManager(jobData);
+                    setSystemsJobsDialogOpen(open);
                   }}
                 />
 
@@ -1266,8 +1266,8 @@ const DiscreteLayerView: React.FC = observer(() => {
           <JobsDialog
             isOpen={isSystemsJobsDialogOpen}
             onSetOpen={setSystemsJobsDialogOpen}
-            setJob={setRasterEntityDialogJob}
-            job={jobRecord}
+            setRestoredJob={setJobToOpenRasterEntity}
+            job={jobToOpenJobManager}
           />
         }
         {

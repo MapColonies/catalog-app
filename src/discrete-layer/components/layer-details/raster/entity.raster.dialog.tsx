@@ -72,7 +72,7 @@ interface EntityRasterDialogProps {
   layerRecord?: ILayerImage | null;
   isSelectedLayerUpdateMode?: boolean;
   jobId?: string;
-  setJob?: (job: JobModelType | undefined) => void;
+  removeJobOnDialogClose?: (job: JobModelType | undefined) => void;
 }
 
 const setDefaultValues = (record: Record<string, unknown>, descriptors: EntityDescriptorModelType[]): void => {
@@ -308,7 +308,7 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
     const closeDialog = useCallback(() => {
       onSetOpen(false);
       if (jobId) {
-        setJob?.(undefined);
+        removeJobOnDialogClose?.(undefined);
       }
       store.discreteLayersStore.resetUpdateMode();
       clearSyncWarnings();

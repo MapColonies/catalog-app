@@ -44,8 +44,8 @@ interface GridComponentProps {
   rowData?: any[];
   style?: CSSProperties;
   isLoading?: boolean;
-  rowFocus?: string;
-  setRowFocus?: (val: string) => void;
+  focusByRowId?: string;
+  setFocusByRowId?: (val: string) => void;
   handleFocusError?: (error: IFocusError | undefined) => void;
 };
 
@@ -79,7 +79,7 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
   const theme = useTheme();
   const [gridApi, setGridApi] = useState<GridApi>();
 
-  const {rowFocus, setRowFocus, handleFocusError} = props
+  const {focusByRowId: rowFocus, setFocusByRowId: setRowFocus, handleFocusError} = props
   
   const {detailsRowExpanderPosition, ...restGridOptions} = props.gridOptions as GridComponentOptions;
 

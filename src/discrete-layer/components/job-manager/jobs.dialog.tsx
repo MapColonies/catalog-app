@@ -33,14 +33,14 @@ const TILL_DATE_ACTION_REQUEST_BUFFER = Number(POLLING_CYCLE_INTERVAL);
 interface JobsDialogProps {
   isOpen: boolean;
   onSetOpen: (open: boolean) => void;
-  setJob: (job: JobModelType) => void;
+  setRestoredJob: (job: JobModelType) => void;
   job?: JobModelType;
 }
 
 export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialogProps) => {
   const store = useStore();
   const intl = useIntl();
-  const { isOpen, onSetOpen, setJob } = props;
+  const { isOpen, onSetOpen, setRestoredJob } = props;
   const [ updateTaskPayload, setUpdateTaskPayload ] = useState<Record<string, unknown>>({});
   const [ gridRowData, setGridRowData ] = useState<JobModelType[] | undefined>(undefined);
   const [ gridApi, setGridApi ] = useState<GridApi>();
@@ -226,7 +226,7 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
           break;
         case 'Job.restore':
           closeDialog();
-          setJob(data as unknown as JobModelType);
+          setRestoredJob(data as unknown as JobModelType);
           break;
         default:
           break;

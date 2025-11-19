@@ -67,10 +67,10 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
   const [focusJobId, setFocusJobId] = useState('');
 
   useEffect(() => {
-    if(!props.focusOnJob?.id) return;
+    if(!focusOnJob?.id) return;
 
-    setFocusJobId(props.focusOnJob.id);
-  }, [props.focusOnJob])
+    setFocusJobId(focusOnJob.id);
+  }, [focusOnJob])
   
 
   const onGridReady = (params: GridReadyEvent): void => {
@@ -391,8 +391,8 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
       rowData={rowData}
       style={{ ...defaultGridStyle, ...gridStyleOverride }}
       isLoading={areJobsLoading}
-      rowFocus={focusJobId}
-      setRowFocus={setFocusJobId}
+      focusByRowId={focusJobId}
+      setFocusByRowId={setFocusJobId}
       handleFocusError={handleFocusError}
     />
   );
