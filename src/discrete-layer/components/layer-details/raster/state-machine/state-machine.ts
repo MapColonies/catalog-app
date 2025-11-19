@@ -189,16 +189,14 @@ const filesMachine = createMachine({
                     ..._.context.files,
                     data: {
                       ..._.context.files?.data,
-                      ..._.event.output.data
+                      ..._.event.output
                     }
                   }
                 })),
                 sendParent((_: { context: IContext; event: any }) => ({
                   type: "SET_FILES",
                   files: {
-                    ..._.context.files,
                     data: {
-                      ..._.context.files?.data,
                       ..._.event.output
                     }
                   },

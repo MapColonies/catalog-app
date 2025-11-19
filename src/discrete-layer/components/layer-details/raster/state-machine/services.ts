@@ -6,7 +6,7 @@ import { RecordType } from '../../../../models';
 import { LayerRasterRecordInput } from '../../../../models/RootStore.base';
 import { FeatureType } from '../pp-map.utils';
 import { buildError, getFeatureAndMarker, getFile } from './helpers';
-import { MOCK_JOB_UPDATE, MOCK_TASK } from './MOCK';
+import { MOCK_JOB_UPDATE } from './MOCK';
 import { queryExecutor } from './query-executor';
 import {
   getDetails,
