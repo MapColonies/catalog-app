@@ -59,7 +59,7 @@ export interface IJob {
   jobId?: string;
   taskId?: string;
   taskPercentage?: number;
-  validationReport?: Record<string, unknown>;
+  validationReport?: TaskParams;
   taskStatus?: Status;
   record?: JobModelType;
 }
@@ -154,3 +154,28 @@ export const SHAPEMETADATA_FILENAME = `${CONFIG.RASTER_INGESTION_FILES_STRUCTURE
 export const DATA_LABEL = 'file-name.data';
 export const PRODUCT_LABEL = 'file-name.product';
 export const SHAPEMETADATA_LABEL = 'file-name.shapeMetadata';
+
+// TODO: use from @mapColonies/types and remove from here:
+//#region to be removed
+export type TaskParams = {
+  isValid: boolean;
+  errorsAggregation: ValidationErrorsAggregation;
+};
+
+export type ValidationErrorsAggregation = {
+  count: {
+    geometryValidity: number;
+    vertices: number;
+    metadata: number;
+    resolution: number;
+  };
+  smallHoles: {
+    exceeded: boolean;
+    count: number;
+  };
+  smallGeometries: {
+    exceeded: boolean;
+    count: number;
+  };
+};
+//#endregion to be removed

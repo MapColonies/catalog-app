@@ -269,12 +269,26 @@ export const InnerRasterForm = (
                 </Box>
                 <Box className="reportList error">
                   {
-                    Object.entries(state.context.job?.validationReport?.errors ?? {}).map(([key, value]) => (
+                    Object.entries(state.context.job?.validationReport?.errorsAggregation?.count || {}).map(([key, value]) => (
                       <Fragment key={key}>
-                        <Box key={`${key}-key`}><FormattedMessage id={`report.error.${key}`} /></Box>
+                        <Box key={`${key}-key`}><FormattedMessage id={`validationReport.${key}`} /></Box>
                         <Box key={`${key}-value`}>{value as number}</Box>
                       </Fragment>
                     ))
+                  }
+                  {
+                    state.context.job?.validationReport?.errorsAggregation?.smallHoles &&
+                    <Fragment key="smallHoles">
+                      <Box key="smallHoles-key"><FormattedMessage id="validationReport.smallHoles" /></Box>
+                      <Box key="smallHoles-value">{state.context.job?.validationReport?.errorsAggregation?.smallHoles?.count as number}</Box>
+                    </Fragment>
+                  }
+                  {
+                    state.context.job?.validationReport?.errorsAggregation?.smallGeometries &&
+                    <Fragment key="smallGeometries">
+                      <Box key="smallGeometries-key"><FormattedMessage id="validationReport.smallGeometries" /></Box>
+                      <Box key="smallGeometries-value">{state.context.job?.validationReport?.errorsAggregation?.smallGeometries?.count as number}</Box>
+                    </Fragment>
                   }
                 </Box>
               </Box>

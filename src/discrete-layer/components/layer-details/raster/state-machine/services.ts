@@ -41,10 +41,10 @@ export const SERVICES = {
       //   });
       // });
 
-      const job = MOCK_JOB_UPDATE; // TODO: Mock should be removed
+      const jobId = MOCK_JOB_UPDATE.id; // TODO: Mock should be removed
 
       return {
-        jobId: job.id
+        jobId
       };
     }),
     jobSubmissionService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
@@ -53,29 +53,35 @@ export const SERVICES = {
       const data = {
         ingestionResolution: resolutionDegree as number,
         inputFiles: {
-          gpkgFilesPath: [files?.data?.path] as string[],
-          productShapefilePath: files?.product?.path as string,
-          metadataShapefilePath: files?.shapeMetadata?.path as string
+          gpkgFilesPath: [files?.data?.path].filter(Boolean) as string[],
+          productShapefilePath: files?.product?.path || '',
+          metadataShapefilePath: files?.shapeMetadata?.path || ''
         },
         metadata: (formData ?? {}) as LayerRasterRecordInput,
         type: RecordType.RECORD_RASTER,
       };
 
+      let result;
       let jobId: string = '';
-      if (input.context.flowType === Mode.NEW) {
-        const result = await queryExecutor(async () => {
-          return await store.mutateStartRasterIngestion({ data });
-        });
-        jobId = result.startRasterIngestion.jobId ?? '';
-      } else if (input.context.flowType === Mode.UPDATE) {
-        const result = await queryExecutor(async () => {
-          return await store.mutateStartRasterUpdateGeopkg({ data });
-        });
-        jobId = result.startRasterUpdateGeopkg.jobId ?? '';
+      switch (input.context.flowType) {
+        case Mode.NEW:
+          result = await queryExecutor(async () => {
+            return await store.mutateStartRasterIngestion({ data });
+          });
+          jobId = result.startRasterIngestion?.jobId || '';
+          break;
+        case Mode.UPDATE:
+          result = await queryExecutor(async () => {
+            return await store.mutateStartRasterUpdateGeopkg({ data });
+          });
+          jobId = result.startRasterUpdateGeopkg?.jobId || '';
+          break;
+        default:
+          throw (buildError('ingestion.error.invalid', 'flowType'));
       }
 
       return {
-        jobId,
+        jobId
       };
     }),
     jobPollingService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
@@ -100,7 +106,7 @@ export const SERVICES = {
 
       return {
         taskPercentage: task.percentage ?? 0,
-        validationReport: task.parameters?.isValid === false ? task.parameters.errors : undefined,
+        validationReport: task.parameters || {},
         taskStatus: task.status ?? ''
       };
     }),

@@ -285,12 +285,21 @@ export const MOCK_TASK = {
   percentage: 100,
   parameters: {
     isValid: false,
-    errors: {
-      invalidData: 5,
-      invalidGeometry: 10,
-      tooManyVertices: 1,
-      smallHoles: 1,
-      resolutionMismatch: 13
+    errorsAggregation: {
+      count: {
+        geometryValidity: 5,
+        vertices: 10,
+        metadata: 1,
+        resolution: 13
+      },
+      smallHoles: {
+        exceeded: true,
+        count: 100
+      },
+      smallGeometries: {
+        exceeded: true,
+        count: 200
+      }
     }
   },
   status: 'Completed'
