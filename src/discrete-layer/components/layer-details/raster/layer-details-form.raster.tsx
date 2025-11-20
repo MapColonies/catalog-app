@@ -50,7 +50,6 @@ import { getUIIngestionFieldDescriptors } from './utils';
 
 import './layer-details-form.raster.css';
 import 'react-virtualized/styles.css';
-import { UserAction } from '../../../models/userStore';
 
 const NONE = 0;
 

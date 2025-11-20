@@ -229,8 +229,8 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
 
       gridApi.paginationGoToPage(pageNumber);
 
-      gridApi.ensureIndexVisible(rowInPage+pageSize, 'middle');
-      gridApi.getDisplayedRowAtIndex(rowInPage+pageSize)?.setSelected(true);
+      gridApi.ensureIndexVisible(rowInPage, 'middle');
+      gridApi.getDisplayedRowAtIndex(rowInPage)?.setSelected(true);
       
       const rowNode = gridApi.getRowNode(`${id as unknown as string}${DETAILS_ROW_ID_SUFFIX}`);
       rowNode?.setDataValue('isVisible', true);
