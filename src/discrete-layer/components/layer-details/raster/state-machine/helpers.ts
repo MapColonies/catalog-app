@@ -3,13 +3,13 @@ import path from 'path';
 import { assign, SnapshotFrom } from 'xstate';
 import { FileData } from '@map-colonies/react-components';
 import { getFirstPoint } from '../../../../../common/utils/geo.tools';
+import { ErrorLevel } from '../../../helpers/errorUtils';
 import { Status } from '../../../../models';
 import { FeatureType } from '../pp-map.utils';
 import { workflowMachine } from './state-machine';
 import {
   AddPolicy,
   BASE_PATH,
-  ErrorLevel,
   ErrorSource,
   FIRST,
   IContext,

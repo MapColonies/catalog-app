@@ -68,6 +68,8 @@ export enum UserAction {
   SYSTEM_CALLBACK_SHOWLAYERIMAGE = 'system_callback.showLayerImage',
   SYSTEM_CALLBACK_SHOWPOLYGONPARTS = 'system_callback.showPolygonParts',
   SYSTEM_CALLBACK_SHOW_PPERROR_ON_UPDATE = 'system_callback.showPPErrorOnUpdate',
+
+  SYSTEM_CALLBACK_OPEN_JOB_MANAGER = 'system_callback.openJobManager',
 }
 export type site = {dns: string, isAlias: boolean};
 

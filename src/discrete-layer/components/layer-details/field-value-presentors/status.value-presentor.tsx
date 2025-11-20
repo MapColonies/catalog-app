@@ -3,8 +3,6 @@ import React from 'react';
 import TooltippedValue from '../../../../common/components/form/tooltipped.value';
 import { isUnpublishedValue } from '../../../../common/helpers/style';
 
-import './status.value-presentor.css';
-
 interface StatusValuePresentorProps {
   value?: string;
 }

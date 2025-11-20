@@ -2,20 +2,18 @@ import React from 'react';
 import { useIntl } from 'react-intl';
 import { isEmpty } from 'lodash';
 import { IconButton } from '@map-colonies/react-core';
+import { ErrorLevel, IError } from '../../../discrete-layer/components/helpers/errorUtils';
 import { AutoDirectionBox } from '../auto-direction-box/auto-direction-box.component';
 
 import './error-presentor.css';
 
-interface IError {
-  code: string;
-  message: string;
-}
 
 interface ILogicErrorProps {
   errors: IError[];
+  iconType: ErrorLevel;
 }
 
-export const LogicError: React.FC<ILogicErrorProps> = ({ errors }) => {
+export const LogicError: React.FC<ILogicErrorProps> = ({ errors, iconType: iconColor }) => {
 
   const intl = useIntl();
 
@@ -24,7 +22,8 @@ export const LogicError: React.FC<ILogicErrorProps> = ({ errors }) => {
       {
         !isEmpty(errors) &&
         <AutoDirectionBox className="errorContainer">
-          <IconButton className="errorIcon mc-icon-Status-Warnings" 
+          <IconButton
+            className={`errorIcon mc-icon-Status-Warnings ${iconColor}`}
             onClick={(e): void => {
               e.preventDefault();
               e.stopPropagation();
@@ -34,7 +33,8 @@ export const LogicError: React.FC<ILogicErrorProps> = ({ errors }) => {
             {
               errors?.map((error, index) => {
                 return (
-                  <li dir="auto" 
+                  <li dir="auto"
+                    className={error.level}
                     key={index} 
                     dangerouslySetInnerHTML={{__html:  intl.formatMessage({ id: error.code }, { value: error.message })}} 
                   />

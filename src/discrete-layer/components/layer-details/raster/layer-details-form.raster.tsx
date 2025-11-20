@@ -19,10 +19,12 @@ import { Box, CircularProgressBar } from '@map-colonies/react-components';
 import { ValidationsError } from '../../../../common/components/error/validations.error-presentor';
 import { mergeRecursive } from '../../../../common/helpers/object';
 import { Mode } from '../../../../common/models/mode.enum';
+import { UserAction } from '../../../models/userStore';
 import {
   EntityDescriptorModelType,
   LayerMetadataMixedUnion,
-  RecordType
+  RecordType,
+  useStore
 } from '../../../models';
 import { LayersDetailsComponent } from '../layer-details';
 import {
@@ -118,6 +120,8 @@ export const InnerRasterForm = (
   const actorRef = RasterWorkflowContext.useActorRef();
   const isLoading = hasTagDeep(actorRef?.getSnapshot());
   const state = RasterWorkflowContext.useSelector((s) => s);
+
+  const store = useStore();
 
   useEffect(() => {
     const { files } = state.context || {};
@@ -366,13 +370,19 @@ export const InnerRasterForm = (
           </Box>
           <Box className="buttons">
             {
-              hasActiveJob(state.context) &&
+              hasActiveJob(state.context) && state.context.job?.record &&
               <Button
                 raised
                 type="button"
                 onClick={(e): void => {
                   e.preventDefault();
                   e.stopPropagation();
+
+                  store.actionDispatcherStore.dispatchAction({
+                    action: UserAction.SYSTEM_CALLBACK_OPEN_JOB_MANAGER,
+                    data: { job: state.context.job?.record }
+                  })
+                  closeDialog();
                 }}
               >
                 <FormattedMessage id="general.go-to-job-manager-btn.text" />

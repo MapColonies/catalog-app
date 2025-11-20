@@ -155,7 +155,7 @@ export const getRestoreData = async (context: IContext): Promise<IPartialContext
       formData: transformEntityToFormFields({ ...job.parameters.metadata, resolutionDegree: job.parameters.ingestionResolution } as unknown as LayerMetadataMixedUnion) as unknown as LayerRasterRecordInput,
       job: {
         jobId: job.id,
-        record: job as unknown as any
+        record: job
       }
     };
   } catch (error) {
