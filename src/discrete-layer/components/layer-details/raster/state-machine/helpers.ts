@@ -130,7 +130,7 @@ export const isDone = (state: SnapshotFrom<typeof workflowMachine>) => {
 };
 
 export const hasActiveJob = (context: IContext): boolean => {
-  return !!(context.job && context.job?.jobId);
+  return !!(context.job && context.job.jobId);
 };
 
 export const isRetryEnabled = (context: IContext): boolean => {
