@@ -19,6 +19,7 @@ import { Box, CircularProgressBar } from '@map-colonies/react-components';
 import { ValidationsError } from '../../../../common/components/error/validations.error-presentor';
 import { mergeRecursive } from '../../../../common/helpers/object';
 import { Mode } from '../../../../common/models/mode.enum';
+import { UserAction } from '../../../models/userStore';
 import {
   EntityDescriptorModelType,
   LayerMetadataMixedUnion,

@@ -33,7 +33,7 @@ const TILL_DATE_ACTION_REQUEST_BUFFER = Number(POLLING_CYCLE_INTERVAL);
 interface JobsDialogProps {
   isOpen: boolean;
   onSetOpen: (open: boolean) => void;
-  setRestoredJob: (job: JobModelType) => void;
+  setRestoreFromJob: (job: JobModelType) => void;
   focusOnJob?: JobModelType;
   setFocusOnJob?: (job: JobModelType | undefined) => void;
 }
@@ -41,15 +41,13 @@ interface JobsDialogProps {
 export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialogProps) => {
   const store = useStore();
   const intl = useIntl();
-  const { isOpen, onSetOpen, setRestoredJob } = props;
+  const { isOpen, onSetOpen, setRestoreFromJob, focusOnJob, setFocusOnJob } = props;
   const [ updateTaskPayload, setUpdateTaskPayload ] = useState<Record<string, unknown>>({});
   const [ gridRowData, setGridRowData ] = useState<JobModelType[] | undefined>(undefined);
   const [ gridApi, setGridApi ] = useState<GridApi>();
   const [ pollingCycle, setPollingCycle ] = useState(START_CYCLE_ITERATION);
   const [ fromDate, setFromDate ] = useState<Date>(moment().subtract(CONFIG.JOB_MANAGER_END_OF_TIME, 'days').toDate());
   const [handleFocusError, setHandleFocusError] = useState<IFocusError | undefined>(undefined);
-
-  const { focusOnJob, setFocusOnJob } = props;
 
   // @ts-ignore
   const [ timeLeft, actions ] = useCountDown(POLLING_CYCLE_INTERVAL, COUNTDOWN_REFRESH_RATE);
@@ -228,7 +226,7 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
           break;
         case 'Job.restore':
           closeDialog();
-          setRestoredJob(data as unknown as JobModelType);
+          setRestoreFromJob(data as unknown as JobModelType);
           break;
         default:
           break;

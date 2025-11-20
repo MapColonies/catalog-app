@@ -1240,7 +1240,7 @@ const DiscreteLayerView: React.FC = observer(() => {
             layerRecord={findLayer(jobToOpenRasterEntity?.productName, jobToOpenRasterEntity?.productType)}
             isSelectedLayerUpdateMode={isUpdateMode(jobToOpenRasterEntity?.type)}
             jobId={jobToOpenRasterEntity?.id}
-            removeJobOnDialogClose={setJobToOpenRasterEntity}
+            setJob={setJobToOpenRasterEntity}
           />
         }
         {
@@ -1264,7 +1264,7 @@ const DiscreteLayerView: React.FC = observer(() => {
           <JobsDialog
             isOpen={isSystemsJobsDialogOpen}
             onSetOpen={setSystemsJobsDialogOpen}
-            setRestoredJob={setJobToOpenRasterEntity}
+            setRestoreFromJob={setJobToOpenRasterEntity}
             focusOnJob={jobToOpenJobManager}
             setFocusOnJob={setJobToOpenJobManager}
           />
