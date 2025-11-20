@@ -14,7 +14,7 @@ import { DraftResult } from 'vest/vestResult';
 import * as Yup from 'yup';
 import { OptionalObjectSchema, TypeOfShape } from 'yup/lib/object';
 import { AnyObject } from 'yup/lib/types';
-import { Button } from '@map-colonies/react-core';
+import { Button, IconButton } from '@map-colonies/react-core';
 import { Box, CircularProgressBar } from '@map-colonies/react-components';
 import { ValidationsError } from '../../../../common/components/error/validations.error-presentor';
 import { mergeRecursive } from '../../../../common/helpers/object';
@@ -42,15 +42,11 @@ import {
   isFilesSelected,
   isJobSubmitted,
   isRetryEnabled,
-  isUIDisabled,
-  smallGeometries,
-  smallGeometriesCount,
-  smallGeometriesExceeded,
-  smallHoles,
-  smallHolesCount,
-  smallHolesExceeded,
-  validationReport
+  isTaskFailed,
+  isTaskValid,
+  isUIDisabled
 } from './state-machine/helpers';
+import { IContext } from './state-machine/types';
 import { getUIIngestionFieldDescriptors } from './utils';
 
 import './layer-details-form.raster.css';
@@ -250,67 +246,99 @@ export const InnerRasterForm = (
   //   topLevelFieldsErrors[err] = firstPhaseErrors[err];
   // });
 
-  const JobInfo = (): JSX.Element => {
+  const JobInfo = (): JSX.Element | null => {
+    const isFailed = isTaskFailed(state.context);
+    const isValid = isTaskValid(state.context);
+    
+    const color = isFailed 
+      ? 'var(--mdc-theme-gc-error-high)' 
+      : (!isValid ? 'var(--mdc-theme-gc-warning-high)' : 'var(--mdc-theme-gc-success)');
+    
+    const className = isFailed 
+      ? 'error' 
+      : (!isValid ? 'warning' : 'success');
+
+    const styles = {
+      textColor: color || 'var(--mdc-theme-gc-success)',
+      pathColor: color || 'var(--mdc-theme-gc-success)',
+      trailColor: 'var(--mdc-theme-gc-selection-background)',
+    };
+
+    if (!state.context.job) {
+      return null;
+    }
+
     return (
       <Box className="jobData section">
-        {
-          state.context.job &&
-          <>
-            <Box className="progress">
-              <Box className="title bold">
-                <FormattedMessage id="ingestion.job.progress" />
-              </Box>
-              <Box className="center">
-                <Box className="progressBar">
-                  <CircularProgressBar
-                    value={state.context.job?.taskPercentage ?? 0}
-                    text={`${state.context.job?.taskPercentage ?? 0}%`}
+        <Box className="progress">
+          <Box className="title bold">
+            <FormattedMessage id="ingestion.job.progress" />
+          </Box>
+          <Box className="center">
+            <Box className="progressBar">
+              <CircularProgressBar
+                value={state.context.job?.taskPercentage ?? 0}
+                styles={styles}
+              >
+                {
+                  (isTaskFailed(state.context) || !isTaskValid(state.context)) &&
+                  <IconButton
+                    className={`icon mc-icon-Status-Warnings ${isTaskFailed(state.context) ? 'error' : !isTaskValid(state.context) ? 'warning' : ''}`}
+                    onClick={(e): void => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                    }}
                   />
+                }
+                <Box className={`text ${className}`}>
+                  {`${state.context.job?.taskPercentage ?? 0}%`}
                 </Box>
-              </Box>
+              </CircularProgressBar>
             </Box>
-            <Box className="section">
-              <Box className="reportContainer">
-                <Box className="title underline">
-                  <FormattedMessage id="ingestion.job.report" />
-                </Box>
-                <Box className="reportList error">
-                  {
-                    Object.entries(validationReport(state.context) || {}).map(([key, value]) => (
-                      <Fragment key={key}>
-                        <Box key={`${key}-key`} className={value === 0 ? 'success' : ''}><FormattedMessage id={`validationReport.${key}`} /></Box>
-                        <Box key={`${key}-value`} className={value === 0 ? 'success' : ''}>{value}</Box>
-                      </Fragment>
-                    ))
-                  }
-                  {
-                    smallHoles(state.context) &&
-                    <Fragment key="smallHoles">
-                      <Box key="smallHoles-key" className={smallHolesExceeded(state.context) ? 'error' : (smallHolesCount(state.context) > 0 ? 'warning' : 'success')}>
-                        <FormattedMessage id="validationReport.smallHoles" />
-                      </Box>
-                      <Box key="smallHoles-value" className={smallHolesExceeded(state.context) ? 'error' : (smallHolesCount(state.context) > 0 ? 'warning' : 'success')}>
-                        {smallHolesCount(state.context)}
-                      </Box>
-                    </Fragment>
-                  }
-                  {
-                    smallGeometries(state.context) &&
-                    <Fragment key="smallGeometries">
-                      <Box key="smallGeometries-key" className={smallGeometriesExceeded(state.context) ? 'error' : (smallGeometriesCount(state.context) > 0 ? 'warning' : 'success')}>
-                        <FormattedMessage id="validationReport.smallGeometries" />
-                      </Box>
-                      <Box key="smallGeometries-value" className={smallGeometriesExceeded(state.context) ? 'error' : (smallGeometriesCount(state.context) > 0 ? 'warning' : 'success')}>
-                        {smallGeometriesCount(state.context)}
-                      </Box>
-                    </Fragment>
-                  }
-                </Box>
-              </Box>
+          </Box>
+        </Box>
+        <Box className="section">
+          <Box className="reportContainer">
+            <Box className="title underline">
+              <FormattedMessage id="ingestion.job.report" />
             </Box>
-          </>
-        }
+            <Box className="reportList error">
+              {
+                Object.entries(state.context.job?.validationReport?.errorsAggregation?.count || {}).map(([key, value]) => (
+                <Fragment key={key}>
+                  <Box className={value === 0 ? 'success' : ''}>
+                    <FormattedMessage id={`validationReport.${key}`} />
+                  </Box>
+                  <Box className={value === 0 ? 'success' : ''}>
+                    {value}
+                  </Box>
+                </Fragment>
+              ))}
+              {renderAggregation(state.context, 'smallHoles', 'validationReport.smallHoles')}
+              {renderAggregation(state.context, 'smallGeometries', 'validationReport.smallGeometries')}
+            </Box>
+          </Box>
+        </Box>
       </Box>
+    );
+  };
+
+  const renderAggregation = (context: IContext, type: 'smallHoles' | 'smallGeometries', messageId: string) => {
+    if (!context.job?.validationReport?.errorsAggregation[type]) { return null; }
+
+    const exceeded = context.job.validationReport.errorsAggregation[type].exceeded;
+    const count = context.job.validationReport.errorsAggregation[type].count;
+    const className = exceeded ? 'error' : (count > 0 ? 'warning' : 'success');
+
+    return (
+      <Fragment key={type}>
+        <Box className={className}>
+          <FormattedMessage id={messageId} />
+        </Box>
+        <Box className={className}>
+          {count}
+        </Box>
+      </Fragment>
     );
   };
 

@@ -109,6 +109,14 @@ body[dir='rtl'] #layerDetailsFormRaster .enumOptions .mdc-select__dropdown-icon 
   height: 150px;
 }
 
+#layerDetailsFormRaster .icon {
+  font-size: 52px;
+}
+
+#layerDetailsFormRaster .text {
+  font-size: 20px;
+}
+
 #layerDetailsFormRaster .map {
   border: 1px solid var(--mdc-theme-gc-selection-background, #fff);
 }

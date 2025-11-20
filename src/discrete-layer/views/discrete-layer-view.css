@@ -305,3 +305,11 @@ body[dir='rtl'] .MuiBox-root .resultsContainer {
 .success {
   color: var(--mdc-theme-gc-success);
 }
+
+.warning {
+  color: var(--mdc-theme-gc-warning-high) !important;
+}
+
+.error {
+  color: var(--mdc-theme-gc-error-high) !important;
+}
