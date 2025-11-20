@@ -9,8 +9,10 @@ import { Button, Dialog, DialogTitle, IconButton } from '@map-colonies/react-cor
 import { Box, DateTimeRangePicker, SupportedLocales } from '@map-colonies/react-components';
 import { IActionGroup } from '../../../common/actions/entity.actions';
 import { GraphQLError } from '../../../common/components/error/graphql.error-presentor';
+import { LogicError } from '../../../common/components/error/logic.error-presentor';
 import { GridApi, IFocusError } from '../../../common/components/grid';
 import CONFIG from '../../../common/config';
+import { dateFormatter } from '../../../common/helpers/formatters';
 import useCountDown, { IActions } from '../../../common/hooks/countdown.hook';
 import useDateNow from '../../../common/hooks/useDateNow.hook';
 import { JobModelType } from '../../models';
@@ -21,8 +23,6 @@ import JobManagerGrid from './grids/job-manager-grid.common';
 import { JOB_ENTITY } from './job.types';
 
 import './jobs.dialog.css';
-import { LogicError } from '../../../common/components/error/logic.error-presentor';
-import { dateFormatter } from '../../../common/helpers/formatters';
 
 const START_CYCLE_ITERATION = 0;
 const POLLING_CYCLE_INTERVAL = CONFIG.JOB_STATUS.POLLING_CYCLE_INTERVAL;

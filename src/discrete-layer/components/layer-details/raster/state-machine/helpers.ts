@@ -3,7 +3,6 @@ import path from 'path';
 import { assign, SnapshotFrom } from 'xstate';
 import { FileData } from '@map-colonies/react-components';
 import { getFirstPoint } from '../../../../../common/utils/geo.tools';
-import { Mode } from '../../../../../common/models/mode.enum';
 import { ErrorLevel } from '../../../helpers/errorUtils';
 import { Status } from '../../../../models';
 import { FeatureType } from '../pp-map.utils';
@@ -127,7 +126,7 @@ export const isDone = (state: SnapshotFrom<typeof workflowMachine>) => {
 };
 
 export const hasActiveJob = (context: IContext): boolean => {
-  return !!(context.job && context.job.record);
+  return !!(context.job && context.job?.jobId);
 };
 
 export const isRetryEnabled = (context: IContext): boolean => {
@@ -138,14 +137,4 @@ export const isRetryEnabled = (context: IContext): boolean => {
 
 export const isUIDisabled = (isLoading: boolean, state: any): boolean => {
   return isLoading || isDone(state);
-};
-
-export enum RasterJobTypeEnum {
-  NEW = 'Ingestion_New',
-  UPDATE = 'Ingestion_Update'
-}
-
-export const jobType2FlowType: { [key: string]: Mode } = {
-  [RasterJobTypeEnum.NEW]: Mode.NEW,
-  [RasterJobTypeEnum.UPDATE]: Mode.UPDATE
 };

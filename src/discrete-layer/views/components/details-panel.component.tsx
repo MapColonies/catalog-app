@@ -21,8 +21,6 @@ import './details-panel.component.css';
 interface DetailsPanelComponentProps {
   isEntityDialogOpen: boolean;
   setEntityDialogOpen: (open: boolean) => void;
-  isRasterEntityDialogOpen: boolean;
-  setRasterEntityDialogOpen: (open: boolean) => void;
   isEntityDeleteDialogOpen: boolean;
   setEntityDeleteDialogOpen: (open: boolean) => void;
   detailsPanelExpanded: boolean;
@@ -34,8 +32,6 @@ export const DetailsPanel: React.FC<DetailsPanelComponentProps> = observer((prop
   const {
     isEntityDialogOpen,
     setEntityDialogOpen,
-    isRasterEntityDialogOpen,
-    setRasterEntityDialogOpen,
     isEntityDeleteDialogOpen,
     setEntityDeleteDialogOpen,
     detailsPanelExpanded,

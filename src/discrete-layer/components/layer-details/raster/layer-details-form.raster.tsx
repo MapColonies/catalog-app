@@ -371,7 +371,7 @@ export const InnerRasterForm = (
           </Box>
           <Box className="buttons">
             {
-              hasActiveJob(state.context) &&
+              hasActiveJob(state.context) && state.context.job?.record &&
               <Button
                 raised
                 type="button"

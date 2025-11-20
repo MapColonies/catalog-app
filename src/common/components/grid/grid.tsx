@@ -238,7 +238,7 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
     }
 
     focusRowById(gridApi, focusByRowId);
-  }, [rowData])
+  }, [rowData]);
 
   const agGridThemeOverrides = GridThemes.getTheme(theme);
   

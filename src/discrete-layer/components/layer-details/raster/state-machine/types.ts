@@ -153,13 +153,3 @@ export const SHAPEMETADATA_FILENAME = `${CONFIG.RASTER_INGESTION_FILES_STRUCTURE
 export const DATA_LABEL = 'file-name.data';
 export const PRODUCT_LABEL = 'file-name.product';
 export const SHAPEMETADATA_LABEL = 'file-name.shapeMetadata';
-
-export enum RasterJobTypeEnum {
-  NEW = 'Ingestion_New',
-  UPDATE = 'Ingestion_Update'
-}
-
-export const jobType2FlowType: { [key: string]: Mode } = {
-  [RasterJobTypeEnum.NEW]: Mode.NEW,
-  [RasterJobTypeEnum.UPDATE]: Mode.UPDATE
-};

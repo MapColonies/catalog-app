@@ -24,10 +24,10 @@ export const LogicError: React.FC<ILogicErrorProps> = ({ errors, iconType: iconC
         <AutoDirectionBox className="errorContainer">
           <IconButton
             className={`errorIcon mc-icon-Status-Warnings ${iconColor}`}
-              onClick={(e): void => {
-                e.preventDefault();
-                e.stopPropagation();
-              }}
+            onClick={(e): void => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
           />
           <ul className="errorsList">
             {
