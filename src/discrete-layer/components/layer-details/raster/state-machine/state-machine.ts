@@ -80,21 +80,7 @@ const filesMachine = createMachine({
             onDone: {
               actions: [
                 assign((_: { context: IContext; event: any }) => ({
-                  files: {
-                    ..._.context.files,
-                    data: {
-                      ..._.context.files?.data,
-                      ..._.event.output.data
-                    },
-                    product: {
-                      ..._.context.files?.product,
-                      ..._.event.output.product
-                    },
-                    shapeMetadata: {
-                      ..._.context.files?.shapeMetadata,
-                      ..._.event.output.shapeMetadata
-                    }
-                  }
+                  files: merge({}, _.context.files, _.event.output)
                 })),
                 sendParent((_: { context: IContext; event: any }) => ({
                   type: "SET_FILES",
@@ -189,16 +175,14 @@ const filesMachine = createMachine({
                     ..._.context.files,
                     data: {
                       ..._.context.files?.data,
-                      ..._.event.output.data
+                      ..._.event.output
                     }
                   }
                 })),
                 sendParent((_: { context: IContext; event: any }) => ({
                   type: "SET_FILES",
                   files: {
-                    ..._.context.files,
                     data: {
-                      ..._.context.files?.data,
                       ..._.event.output
                     }
                   },
@@ -397,7 +381,8 @@ export const workflowMachine = createMachine<IContext, Events>({
         onDone: [
           {
             guard: (_: { context: IContext; event: any }) => {
-              return _.event.output.taskStatus !== Status.InProgress;
+              return _.event.output.taskStatus !== Status.InProgress &&
+                _.event.output.taskStatus !== Status.Pending;
             },
             actions: assign((_: { context: IContext; event: any }) => ({
               job: {
@@ -419,7 +404,7 @@ export const workflowMachine = createMachine<IContext, Events>({
         ],
         onError: {
           actions: addError,
-          target: WORKFLOW.JOB_POLLING_WAIT
+          target: WORKFLOW.ERROR
         }
       }
     },

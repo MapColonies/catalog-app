@@ -28,7 +28,7 @@
   "general.http-406.error": "לא מתקבל",
   "general.http-407.error": "נדרש אימות פרוקסי",
   "general.http-408.error": "בקשת פסק זמן",
-  "general.http-409.error": "סתירה",
+  "general.http-409.error": "התנגשות",
   "general.http-410.error": "נעלם",
   "general.http-411.error": "אורך נדרש",
   "general.http-412.error": "תנאי מוקדם נכשל",

@@ -75,6 +75,7 @@ import { ExportLayerComponent } from '../components/export-layer/export-layer.co
 import ExportDrawingHandler from '../components/export-layer/export-drawing-handler.component';
 import ExportPolygonsRenderer from '../components/export-layer/export-polygons-renderer.component';
 import { EntityRasterDialog } from '../components/layer-details/raster/entity.raster.dialog';
+import { jobType2Mode, RasterJobTypeEnum } from '../components/layer-details/utils';
 import { MapActionResolver } from './components/map-action-resolver.component';
 import { ActionsContextMenu } from '../components/map-container/contextMenus/actions.context-menu';
 import { ExtentUpdater } from '../components/map-container/extent-updater';
@@ -82,7 +83,6 @@ import DemHeightsFeatureComponent from '../components/map-container/geojson-map-
 import { PolygonParts } from '../components/map-container/geojson-map-features/polygonParts';
 import { PolygonPartsFeature } from '../components/map-container/geojson-map-features/polygonParts-feature.component';
 import { WfsFeature } from '../components/map-container/geojson-map-features/wfs-feature.component';
-import { jobType2Mode, RasterJobTypeEnum } from '../components/layer-details/utils';
 import { ActionResolver } from './components/action-resolver.component';
 import AppTitle from './components/app-title/app-title.component';
 import { DetailsPanel } from './components/details-panel.component';
