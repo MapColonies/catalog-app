@@ -301,3 +301,7 @@ body[dir='rtl'] .tabHeaderContainer .filterByCatalogEntitySelect {
 body[dir='rtl'] .MuiBox-root .resultsContainer {
   direction: ltr;
 }
+
+.success {
+  color: var(--mdc-theme-gc-success);
+}

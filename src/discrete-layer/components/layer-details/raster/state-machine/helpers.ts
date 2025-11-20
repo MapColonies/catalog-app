@@ -54,12 +54,19 @@ export const getFeatureAndMarker = (
       type: "Point"
     },
   };
-  return { feature, marker };
+  return {
+    feature,
+    marker
+  };
 };
 
 export const getPath = (baseDir: string, filePath: string): string => {
   const resolvedPath = path.resolve(baseDir, filePath);
   return resolvedPath.startsWith(BASE_PATH) ? resolvedPath.substring(1) : resolvedPath;
+};
+
+export const getPathWithSlash = (path: string): string => {
+  return path.startsWith(BASE_PATH) ? path : BASE_PATH + path;
 };
 
 export const getFile = (files: FileData[], gpkgPath: string, fileName: string, label: string) => {
@@ -141,4 +148,32 @@ export const isRetryEnabled = (context: IContext): boolean => {
 
 export const isUIDisabled = (isLoading: boolean, state: any): boolean => {
   return isLoading || isDone(state);
+};
+
+export const validationReport = (context: IContext): Record<string, number> => {
+  return context.job?.validationReport?.errorsAggregation?.count ?? ({} as Record<string, number>);
+};
+
+export const smallHoles = (context: IContext): boolean => {
+  return !!context.job?.validationReport?.errorsAggregation?.smallHoles;
+};
+
+export const smallHolesCount = (context: IContext): number => {
+  return context.job?.validationReport?.errorsAggregation?.smallHoles?.count ?? 0;
+};
+
+export const smallHolesExceeded = (context: IContext): boolean => {
+  return context.job?.validationReport?.errorsAggregation?.smallHoles?.exceeded ?? false;
+};
+
+export const smallGeometries = (context: IContext): boolean => {
+  return !!context.job?.validationReport?.errorsAggregation?.smallGeometries;
+};
+
+export const smallGeometriesCount = (context: IContext): number => {
+  return context.job?.validationReport?.errorsAggregation?.smallGeometries?.count ?? 0;
+};
+
+export const smallGeometriesExceeded = (context: IContext): boolean => {
+  return context.job?.validationReport?.errorsAggregation?.smallGeometries?.exceeded ?? false;
 };

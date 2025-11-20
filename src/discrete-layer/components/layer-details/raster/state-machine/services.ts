@@ -77,7 +77,7 @@ export const SERVICES = {
           jobId = result.startRasterUpdateGeopkg?.jobId || '';
           break;
         default:
-          throw (buildError('ingestion.error.invalid', 'flowType'));
+          throw buildError('ingestion.error.invalid', 'flowType');
       }
 
       return {
@@ -98,7 +98,7 @@ export const SERVICES = {
           }
         });
       });
-      const task = result.findTasks[FIRST];
+      const task = { ...result.findTasks[FIRST] };
 
       if (!task) {
         throw buildError('ingestion.error.not-found', 'validation task');
@@ -128,7 +128,7 @@ export const SERVICES = {
       }
 
       if (!files?.data?.path) {
-        throw (buildError('ingestion.error.missing', 'GPKG'));
+        throw buildError('ingestion.error.missing', 'GPKG');
       }
 
       const gpkgValidation = await validateGPKG(files.data.path, input.context);

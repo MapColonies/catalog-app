@@ -282,27 +282,54 @@ export const MOCK_JOB_UPDATE = {
 };
 
 export const MOCK_TASK = {
-  percentage: 100,
+  percentage: 75,
   parameters: {
     isValid: false,
     errorsAggregation: {
       count: {
         geometryValidity: 5,
         vertices: 10,
-        metadata: 1,
+        metadata: 0,
         resolution: 13
       },
       smallHoles: {
-        exceeded: true,
-        count: 100
+        exceeded: false,
+        count: 10
       },
       smallGeometries: {
         exceeded: true,
-        count: 200
+        count: 100
       }
-    }
+    },
+    checksums: [
+      {
+        checksum: "5e371a633204f7eb",
+        fileName: "/layerSources/north_israel/shape/ShapeMetadata.shp",
+        algorithm: "XXH64"
+      },
+      {
+        checksum: "89abcaac2015beff",
+        fileName: "/layerSources/north_israel/shape/ShapeMetadata.shx",
+        algorithm: "XXH64"
+      },
+      {
+        checksum: "1c4047022f216b6f",
+        fileName: "/layerSources/north_israel/shape/ShapeMetadata.dbf",
+        algorithm: "XXH64"
+      },
+      {
+        checksum: "691fb87c5aeebb48",
+        fileName: "/layerSources/north_israel/shape/ShapeMetadata.prj",
+        algorithm: "XXH64"
+      },
+      {
+        checksum: "a0915c78be995614",
+        fileName: "/layerSources/north_israel/shape/ShapeMetadata.cpg",
+        algorithm: "XXH64"
+      }
+    ]
   },
-  status: 'Completed'
+  status: 'In-Progress'
 };
 
 export const MOCK_POLYGON: Geometry = {

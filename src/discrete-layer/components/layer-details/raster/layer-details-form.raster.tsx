@@ -42,7 +42,14 @@ import {
   isFilesSelected,
   isJobSubmitted,
   isRetryEnabled,
-  isUIDisabled
+  isUIDisabled,
+  smallGeometries,
+  smallGeometriesCount,
+  smallGeometriesExceeded,
+  smallHoles,
+  smallHolesCount,
+  smallHolesExceeded,
+  validationReport
 } from './state-machine/helpers';
 import { getUIIngestionFieldDescriptors } from './utils';
 
@@ -269,25 +276,33 @@ export const InnerRasterForm = (
                 </Box>
                 <Box className="reportList error">
                   {
-                    Object.entries(state.context.job?.validationReport?.errorsAggregation?.count || {}).map(([key, value]) => (
+                    Object.entries(validationReport(state.context) || {}).map(([key, value]) => (
                       <Fragment key={key}>
-                        <Box key={`${key}-key`}><FormattedMessage id={`validationReport.${key}`} /></Box>
-                        <Box key={`${key}-value`}>{value as number}</Box>
+                        <Box key={`${key}-key`} className={value === 0 ? 'success' : ''}><FormattedMessage id={`validationReport.${key}`} /></Box>
+                        <Box key={`${key}-value`} className={value === 0 ? 'success' : ''}>{value}</Box>
                       </Fragment>
                     ))
                   }
                   {
-                    state.context.job?.validationReport?.errorsAggregation?.smallHoles &&
+                    smallHoles(state.context) &&
                     <Fragment key="smallHoles">
-                      <Box key="smallHoles-key"><FormattedMessage id="validationReport.smallHoles" /></Box>
-                      <Box key="smallHoles-value">{state.context.job?.validationReport?.errorsAggregation?.smallHoles?.count as number}</Box>
+                      <Box key="smallHoles-key" className={smallHolesExceeded(state.context) ? 'error' : (smallHolesCount(state.context) > 0 ? 'warning' : 'success')}>
+                        <FormattedMessage id="validationReport.smallHoles" />
+                      </Box>
+                      <Box key="smallHoles-value" className={smallHolesExceeded(state.context) ? 'error' : (smallHolesCount(state.context) > 0 ? 'warning' : 'success')}>
+                        {smallHolesCount(state.context)}
+                      </Box>
                     </Fragment>
                   }
                   {
-                    state.context.job?.validationReport?.errorsAggregation?.smallGeometries &&
+                    smallGeometries(state.context) &&
                     <Fragment key="smallGeometries">
-                      <Box key="smallGeometries-key"><FormattedMessage id="validationReport.smallGeometries" /></Box>
-                      <Box key="smallGeometries-value">{state.context.job?.validationReport?.errorsAggregation?.smallGeometries?.count as number}</Box>
+                      <Box key="smallGeometries-key" className={smallGeometriesExceeded(state.context) ? 'error' : (smallGeometriesCount(state.context) > 0 ? 'warning' : 'success')}>
+                        <FormattedMessage id="validationReport.smallGeometries" />
+                      </Box>
+                      <Box key="smallGeometries-value" className={smallGeometriesExceeded(state.context) ? 'error' : (smallGeometriesCount(state.context) > 0 ? 'warning' : 'success')}>
+                        {smallGeometriesCount(state.context)}
+                      </Box>
                     </Fragment>
                   }
                 </Box>

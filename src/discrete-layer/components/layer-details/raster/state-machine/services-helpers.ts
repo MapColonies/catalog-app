@@ -11,7 +11,12 @@ import {
 import { LayerRasterRecordInput } from '../../../../models/RootStore.base';
 import { jobType2Mode, RasterJobTypeEnum, transformEntityToFormFields } from '../../utils';
 import { FeatureType } from '../pp-map.utils';
-import { buildError, getFeatureAndMarker, getPath } from './helpers';
+import {
+  buildError,
+  getFeatureAndMarker,
+  getPath,
+  getPathWithSlash
+} from './helpers';
 import { queryExecutor } from './query-executor';
 import {
   BASE_PATH,
@@ -29,7 +34,7 @@ export const getDirectory = async (filePath: string, context: IContext): Promise
     const result = await queryExecutor(async () => {
       return await context.store.queryGetDirectory({
         data: {
-          path: filePath.startsWith(BASE_PATH) ? filePath : BASE_PATH + filePath,
+          path: getPathWithSlash(filePath),
           type: RecordType.RECORD_RASTER,
         },
       });
@@ -62,11 +67,11 @@ export const validateGPKG = async (filePath: string, context: IContext): Promise
 
 export const selectData = async (context: IContext) => {
   if (!context.files?.data?.path) {
-    throw (buildError('ingestion.error.missing', 'GPKG'));
+    throw buildError('ingestion.error.missing', 'GPKG');
   }
   const gpkgValidation = await validateGPKG(context.files.data.path, context);
   if (!gpkgValidation.isValid) {
-    throw (buildError('ingestion.error.invalid-source-file', gpkgValidation.message as string));
+    throw buildError('ingestion.error.invalid-source-file', gpkgValidation.message as string);
   }
   const validationResult = { ...gpkgValidation };
   const geoDetails = getFeatureAndMarker(validationResult.extentPolygon, FeatureType.SOURCE_EXTENT, FeatureType.SOURCE_EXTENT_MARKER);
@@ -81,33 +86,27 @@ export const fetchProduct = async (product: IProductFile, context: IContext) => 
     return undefined;
   }
 
-  async function getProductZIP() {
-    const PATH_SEPARATOR = '/';
-    const ROOT_PATH_PREFIX ='\\';
-    const apiUrl = `${CONFIG.SERVICE_PROTOCOL as string}${CONFIG.SERVICE_NAME.replace('graphql', 'zipshape') as string}`;
-    const pathArr = product.path.replace(ROOT_PATH_PREFIX, '').split(PATH_SEPARATOR);
-    let productFolder = pathArr.slice(FIRST, pathArr.length - 1).join(PATH_SEPARATOR);
-    if (productFolder.indexOf(PATH_SEPARATOR) > 0) {
-      productFolder = PATH_SEPARATOR + productFolder;
-    }
-    const params = {
-      folder: productFolder,
-      name: CONFIG.RASTER_INGESTION_FILES_STRUCTURE.product.producerFileName,
-      type: RecordType.RECORD_RASTER
-    };
-
-    const queryString = new URLSearchParams(params).toString();
-    return await context.store.fetch(`${apiUrl}?${queryString}`, 'GET', {}, { responseType: 'arraybuffer' })
-  }
+  const apiUrl = `${CONFIG.SERVICE_PROTOCOL as string}${CONFIG.SERVICE_NAME.replace('graphql', 'zipshape') as string}`;
+  const params = {
+    folder: getPathWithSlash(path.dirname(product.path)),
+    name: CONFIG.RASTER_INGESTION_FILES_STRUCTURE.product.producerFileName,
+    type: RecordType.RECORD_RASTER
+  };
+  const queryString = new URLSearchParams(params).toString();
 
   const result = await queryExecutor(async () => {
-    return await getProductZIP();
+    return await context.store.fetch(
+      `${apiUrl}?${queryString}`,
+      'GET',
+      {},
+      { responseType: 'arraybuffer' }
+    );
   });
 
   const parsedSHP = await shp(result as unknown as ArrayBuffer);
   const outlinedPolygon = (parsedSHP as FeatureCollection)?.features[FIRST];
-    
   const geoDetails = getFeatureAndMarker(outlinedPolygon.geometry, FeatureType.PP_PERIMETER, FeatureType.PP_PERIMETER_MARKER);
+
   return {
     geoDetails
   };
