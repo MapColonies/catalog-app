@@ -2,18 +2,18 @@ import React from 'react';
 import { useIntl } from 'react-intl';
 import { isEmpty } from 'lodash';
 import { IconButton } from '@map-colonies/react-core';
+import { ErrorLevel, IError } from '../../../discrete-layer/components/helpers/errorUtils';
 import { AutoDirectionBox } from '../auto-direction-box/auto-direction-box.component';
 
 import './error-presentor.css';
-import { IError } from '../../../discrete-layer/components/helpers/errorUtils';
 
 
 interface ILogicErrorProps {
   errors: IError[];
-  iconColor: string;
+  iconType: ErrorLevel;
 }
 
-export const LogicError: React.FC<ILogicErrorProps> = ({ errors, iconColor }) => {
+export const LogicError: React.FC<ILogicErrorProps> = ({ errors, iconType: iconColor }) => {
 
   const intl = useIntl();
 
@@ -23,8 +23,7 @@ export const LogicError: React.FC<ILogicErrorProps> = ({ errors, iconColor }) =>
         !isEmpty(errors) &&
         <AutoDirectionBox className="errorContainer">
           <IconButton
-            style={{'color': iconColor }}
-            className="errorIcon mc-icon-Status-Warnings" 
+            className={`errorIcon mc-icon-Status-Warnings ${iconColor}`}
               onClick={(e): void => {
                 e.preventDefault();
                 e.stopPropagation();
