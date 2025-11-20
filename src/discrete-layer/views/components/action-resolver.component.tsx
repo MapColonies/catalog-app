@@ -29,7 +29,7 @@ import { useEnums } from '../../../common/hooks/useEnum.hook';
 import { ExportActions } from '../../components/export-layer/hooks/useDomainExportActionsConfig';
 import useAddFeatureWithProps from '../../components/export-layer/hooks/useAddFeatureWithProps';
 import { getWFSFeatureTypeName } from '../../components/layer-details/raster/pp-map.utils';
-import { LayerMetadataMixedUnion, RecordType } from '../../models';
+import { JobModelType, LayerMetadataMixedUnion, RecordType } from '../../models';
 import { TabViews } from '../tab-views';
 
 const initialOrder = 0;
@@ -39,11 +39,12 @@ interface ActionResolverProps {
   handleFlyTo: () => void;
   handleTabViewChange: (tabView: TabViews) => void;
   handleOpenEntityDeleteDialog: (open: boolean) => void;
+  handleOpenJobDialog: (open: boolean, data: JobModelType) => void;
   activeTabView: TabViews;
 }
 
 export const ActionResolver: React.FC<ActionResolverProps> = observer((props) => {
-  const { handleOpenEntityDialog, handleFlyTo, handleTabViewChange, handleOpenEntityDeleteDialog, activeTabView } = props;
+  const { handleOpenEntityDialog, handleFlyTo, handleTabViewChange, handleOpenEntityDeleteDialog, handleOpenJobDialog, activeTabView } = props;
 
   const store = useStore();
   const ENUMS = useEnums();
@@ -461,6 +462,10 @@ export const ActionResolver: React.FC<ActionResolverProps> = observer((props) =>
         }
         case UserAction.SYSTEM_CALLBACK_SHOW_PPERROR_ON_UPDATE: {
           basePPUpdateErrorShow(data as Record<string,string[]>);
+          break;
+        }
+        case UserAction.SYSTEM_CALLBACK_OPEN_JOB_MANAGER: {
+          handleOpenJobDialog(true, data.job as unknown as JobModelType);
           break;
         }
         default:

@@ -132,7 +132,8 @@ const DiscreteLayerView: React.FC = observer(() => {
   const theme = useTheme();
   const intl = useIntl();
   const [isDrawing, setIsDrawing] = useState<boolean>(false);
-  const [rasterEntityDialogJob, setRasterEntityDialogJob] = useState<JobModelType | undefined>(undefined);
+  const [jobToOpenRasterEntity, setJobToOpenRasterEntity] = useState<JobModelType | undefined>(undefined);
+  const [jobToOpenJobManager, setJobToOpenJobManager] = useState<JobModelType | undefined>(undefined);
   const [isRasterEntityDialogOpen, setIsRasterEntityDialogOpen] = useState<boolean>(false);
   const [is3DEntityDialogOpen, setIs3DEntityDialogOpen] = useState<boolean>(false);
   const [isDemEntityDialogOpen, setIsDemEntityDialogOpen] = useState<boolean>(false);
@@ -841,10 +842,10 @@ const DiscreteLayerView: React.FC = observer(() => {
   }, [store.discreteLayersStore.isActiveLayersImages]);
 
   useEffect(() => {
-    if (!!rasterEntityDialogJob) {
+    if (!!jobToOpenRasterEntity) {
       setIsRasterEntityDialogOpen(true);
     }
-  }, [rasterEntityDialogJob]);
+  }, [jobToOpenRasterEntity]);
 
   const ContextMenuByTab: React.FC<IContextMenuData> = (props) => {
     // Should add global flag or find the proper condition to whether show the context menu or not.
@@ -969,7 +970,7 @@ const DiscreteLayerView: React.FC = observer(() => {
   ]) satisfies GeocoderOptions[], [intl]);
  
   const findLayer = (productName: string | null | undefined, productType: string | null | undefined): ILayerImage | null | undefined => {
-    if (!productName || !productType || isUpdateMode(rasterEntityDialogJob?.type) === false) {
+    if (!productName || !productType || isUpdateMode(jobToOpenRasterEntity?.type) === false) {
       return undefined;
     }
     const catalogLayers: LayerMetadataMixedUnion[] = [ ...(store.discreteLayersStore.layersImages ?? []) ];
@@ -1209,6 +1210,10 @@ const DiscreteLayerView: React.FC = observer(() => {
                   handleTabViewChange = {handleTabViewChange}
                   handleOpenEntityDeleteDialog={setEntityDeleteDialogOpen}
                   activeTabView = {activeTabView}
+                  handleOpenJobDialog = {(open, jobData) => {
+                    setJobToOpenJobManager(jobData);
+                    setSystemsJobsDialogOpen(open);
+                  }}
                 />
 
                 <Terrain/>
@@ -1232,10 +1237,10 @@ const DiscreteLayerView: React.FC = observer(() => {
             isOpen={isRasterEntityDialogOpen}
             onSetOpen={setIsRasterEntityDialogOpen}
             recordType={RecordType.RECORD_RASTER}
-            layerRecord={findLayer(rasterEntityDialogJob?.productName, rasterEntityDialogJob?.productType)}
-            isSelectedLayerUpdateMode={isUpdateMode(rasterEntityDialogJob?.type)}
-            jobId={rasterEntityDialogJob?.id}
-            setJob={setRasterEntityDialogJob}
+            layerRecord={findLayer(jobToOpenRasterEntity?.productName, jobToOpenRasterEntity?.productType)}
+            isSelectedLayerUpdateMode={isUpdateMode(jobToOpenRasterEntity?.type)}
+            jobId={jobToOpenRasterEntity?.id}
+            setJob={setJobToOpenRasterEntity}
           />
         }
         {
@@ -1259,7 +1264,9 @@ const DiscreteLayerView: React.FC = observer(() => {
           <JobsDialog
             isOpen={isSystemsJobsDialogOpen}
             onSetOpen={setSystemsJobsDialogOpen}
-            setJob={setRasterEntityDialogJob}
+            setRestoreFromJob={setJobToOpenRasterEntity}
+            focusOnJob={jobToOpenJobManager}
+            setFocusOnJob={setJobToOpenJobManager}
           />
         }
         {

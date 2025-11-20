@@ -9,8 +9,10 @@ import { Button, Dialog, DialogTitle, IconButton } from '@map-colonies/react-cor
 import { Box, DateTimeRangePicker, SupportedLocales } from '@map-colonies/react-components';
 import { IActionGroup } from '../../../common/actions/entity.actions';
 import { GraphQLError } from '../../../common/components/error/graphql.error-presentor';
-import { GridApi } from '../../../common/components/grid';
+import { LogicError } from '../../../common/components/error/logic.error-presentor';
+import { GridApi, IFocusError } from '../../../common/components/grid';
 import CONFIG from '../../../common/config';
+import { dateFormatter } from '../../../common/helpers/formatters';
 import useCountDown, { IActions } from '../../../common/hooks/countdown.hook';
 import useDateNow from '../../../common/hooks/useDateNow.hook';
 import { JobModelType } from '../../models';
@@ -31,18 +33,21 @@ const TILL_DATE_ACTION_REQUEST_BUFFER = Number(POLLING_CYCLE_INTERVAL);
 interface JobsDialogProps {
   isOpen: boolean;
   onSetOpen: (open: boolean) => void;
-  setJob: (job: JobModelType) => void;
+  setRestoreFromJob: (job: JobModelType) => void;
+  focusOnJob?: JobModelType;
+  setFocusOnJob?: (job: JobModelType | undefined) => void;
 }
 
 export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialogProps) => {
   const store = useStore();
   const intl = useIntl();
-  const { isOpen, onSetOpen, setJob } = props;
+  const { isOpen, onSetOpen, setRestoreFromJob, focusOnJob, setFocusOnJob } = props;
   const [ updateTaskPayload, setUpdateTaskPayload ] = useState<Record<string, unknown>>({});
   const [ gridRowData, setGridRowData ] = useState<JobModelType[] | undefined>(undefined);
   const [ gridApi, setGridApi ] = useState<GridApi>();
   const [ pollingCycle, setPollingCycle ] = useState(START_CYCLE_ITERATION);
   const [ fromDate, setFromDate ] = useState<Date>(moment().subtract(CONFIG.JOB_MANAGER_END_OF_TIME, 'days').toDate());
+  const [handleFocusError, setHandleFocusError] = useState<IFocusError | undefined>(undefined);
 
   // @ts-ignore
   const [ timeLeft, actions ] = useCountDown(POLLING_CYCLE_INTERVAL, COUNTDOWN_REFRESH_RATE);
@@ -181,6 +186,7 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
   }, [jobData, loadingJobData]);
 
   const closeDialog = useCallback(() => {
+    setFocusOnJob?.(undefined);
     onSetOpen(false);
   }, [onSetOpen]);
 
@@ -220,7 +226,7 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
           break;
         case 'Job.restore':
           closeDialog();
-          setJob(data as unknown as JobModelType);
+          setRestoreFromJob(data as unknown as JobModelType);
           break;
         default:
           break;
@@ -249,6 +255,11 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
           updateJobCB={setUpdateTaskPayload}
           rowDataChangeCB={(): void => { }}
           areJobsLoading={loading}
+          focusOnJob={focusOnJob}
+          setFocusOnJob={setFocusOnJob}
+          handleFocusError={(error) => {
+            setHandleFocusError(error);
+          }}
         />
       </Box>
     );
@@ -327,21 +338,33 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
           {
             (mutationQuery.error !== undefined || error) && (
               // eslint-disable-next-line
-              <Box className={`${error ? 'render-jobs-data-errror' : ''}`}>
+              <Box className={`${error ? 'render-jobs-data-error' : ''}`}>
                 <GraphQLError error={mutationQuery.error || error} />
               </Box>
             )
           }
-          <Box className="buttons">
-            <Button
-              raised
-              type="button"
-              onClick={(): void => {
-                closeDialog();
-              }}
-            >
-              <FormattedMessage id="system-status.close-btn.text" />
-            </Button>
+          <Box className="footer">
+            <Box className="buttons">
+              <Button
+                raised
+                type="button"
+                onClick={(): void => {
+                  closeDialog();
+                }}
+              >
+                <FormattedMessage id="system-status.close-btn.text" />
+              </Button>
+            </Box>
+
+            { handleFocusError && handleFocusError.message &&
+              <Box className="messages">
+                <LogicError iconType='warning' errors={[{
+                  code: 'job-manager-focus.error',
+                  message: `${dateFormatter(focusOnJob?.updated, true)}`,
+                  level: 'warning'
+                  }]} />
+              </Box>
+            }
           </Box>
         </DialogContent>
       </Dialog>

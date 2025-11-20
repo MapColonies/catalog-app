@@ -6,7 +6,6 @@
 }
 
 .errorIcon {
-  color: var(--mdc-theme-gc-error-high) !important;
   font-size: 32px;
   cursor: default !important;
 }

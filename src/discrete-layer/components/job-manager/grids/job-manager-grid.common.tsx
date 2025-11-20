@@ -1,11 +1,12 @@
 import { ColDef, ColGroupDef, GetRowIdParams } from 'ag-grid-community';
-import React, { useCallback, useContext, useEffect, useMemo } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import CONFIG from '../../../../common/config';
 import {
   GridComponent,
   GridComponentOptions,
   GridReadyEvent,
+  IFocusError,
 } from '../../../../common/components/grid';
 import EnumsMapContext from '../../../../common/contexts/enumsMap.context';
 import { IActionGroup } from '../../../../common/actions/entity.actions';
@@ -35,6 +36,9 @@ export interface ICommonJobManagerGridProps {
   customColDef?: (ColDef | ColGroupDef)[];
   omitColDefsByRenderer?: { renderers: string[], preserveColWidth?: boolean };
   areJobsLoading?: boolean;
+  focusOnJob?: JobModelType;
+  setFocusOnJob?: (job: JobModelType | undefined) => void;
+  handleFocusError?: (error: IFocusError | undefined) => void;
 }
 
 const pagination = true;
@@ -54,11 +58,29 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
       return;
     },
     omitColDefsByRenderer,
-    areJobsLoading
+    areJobsLoading,
+    focusOnJob,
+    setFocusOnJob,
+    handleFocusError
   } = props;
 
   const intl = useIntl();
   const { enumsMap } = useContext(EnumsMapContext);
+  const [focusJobId, setFocusJobId] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    if(!focusOnJob?.id) return;
+
+    setFocusJobId(focusOnJob?.id);
+  }, [focusOnJob]);
+
+  useEffect(() => {
+    if (focusJobId === '') {
+      setFocusOnJob?.(undefined);
+    }
+  }, [focusJobId]);
+  
+  
 
   const onGridReady = (params: GridReadyEvent): void => {
     onGridReadyCB(params);
@@ -378,6 +400,9 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
       rowData={rowData}
       style={{ ...defaultGridStyle, ...gridStyleOverride }}
       isLoading={areJobsLoading}
+      focusByRowId={focusJobId}
+      setFocusByRowId={setFocusJobId}
+      handleFocusError={handleFocusError}
     />
   );
 };
