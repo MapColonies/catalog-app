@@ -34,7 +34,7 @@ export const LogicError: React.FC<ILogicErrorProps> = ({ errors, iconType: iconC
               errors?.map((error, index) => {
                 return (
                   <li dir="auto"
-                    className={`${error.level}`}
+                    className={error.level}
                     key={index} 
                     dangerouslySetInnerHTML={{__html:  intl.formatMessage({ id: error.code }, { value: error.message })}} 
                   />
