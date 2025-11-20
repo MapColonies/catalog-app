@@ -340,7 +340,7 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
           {
             (mutationQuery.error !== undefined || error) && (
               // eslint-disable-next-line
-              <Box className={`${error ? 'render-jobs-data-errror' : ''}`}>
+              <Box className={`${error ? 'render-jobs-data-error' : ''}`}>
                 <GraphQLError error={mutationQuery.error || error} />
               </Box>
             )
