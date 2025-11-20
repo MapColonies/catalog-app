@@ -49,7 +49,6 @@ import {
 import { getUIIngestionFieldDescriptors } from './utils';
 
 import './layer-details-form.raster.css';
-import 'react-virtualized/styles.css';
 
 const NONE = 0;
 
