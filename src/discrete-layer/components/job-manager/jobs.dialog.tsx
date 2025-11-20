@@ -188,6 +188,7 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
   }, [jobData, loadingJobData]);
 
   const closeDialog = useCallback(() => {
+    setFocusOnJob?.(undefined);
     onSetOpen(false);
   }, [onSetOpen]);
 

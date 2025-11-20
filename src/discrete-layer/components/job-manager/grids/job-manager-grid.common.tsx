@@ -66,19 +66,19 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
 
   const intl = useIntl();
   const { enumsMap } = useContext(EnumsMapContext);
-  const [focusJobId, setFocusJobId] = useState('');
+  const [focusJobId, setFocusJobId] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     if(!focusOnJob?.id) return;
 
-    setFocusJobId(focusOnJob.id);
+    setFocusJobId(focusOnJob?.id);
   }, [focusOnJob]);
 
   useEffect(() => {
     if (focusJobId === '') {
       setFocusOnJob?.(undefined);
     }
-  }, [focusJobId])
+  }, [focusJobId]);
   
   
 
