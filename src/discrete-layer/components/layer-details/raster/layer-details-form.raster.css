@@ -2,7 +2,6 @@
   max-height: 880px !important;
 }
 
-
 #layerDetailsFormRaster .content {
   max-height: var(--content-height);
   overflow-y: auto;
@@ -54,11 +53,10 @@ body[dir='rtl'] #layerDetailsFormRaster .buttons {
   margin-top: inherit;
 }
 
-#layerDetailsFormRaster .rmwc-collapsible-list__handle .mdc-list-item{
+#layerDetailsFormRaster .rmwc-collapsible-list__handle .mdc-list-item {
   border: 1px solid var(--mdc-theme-gc-selection-background);
   margin-top: 2px;
 }
-
 
 #layerDetailsFormRaster .enumOptions .mdc-menu.mdc-select__menu.mdc-menu-surface.mdc-menu-surface--open {
   bottom: auto !important;
@@ -111,6 +109,14 @@ body[dir='rtl'] #layerDetailsFormRaster .enumOptions .mdc-select__dropdown-icon 
   height: 150px;
 }
 
+#layerDetailsFormRaster .icon {
+  font-size: 52px;
+}
+
+#layerDetailsFormRaster .text {
+  font-size: 20px;
+}
+
 #layerDetailsFormRaster .map {
   border: 1px solid var(--mdc-theme-gc-selection-background, #fff);
 }
@@ -124,11 +130,11 @@ body[dir='rtl'] #layerDetailsFormRaster .enumOptions .mdc-select__dropdown-icon 
   grid-template-columns: repeat(2, 1fr);
   gap: 4px;
   margin: 0 8px;
-  height: 120px;
+  height: 140px;
   overflow-y: auto;
 }
 
-#layerDetailsFormRaster .ReactVirtualized__Grid.ReactVirtualized__List{
+#layerDetailsFormRaster .ReactVirtualized__Grid.ReactVirtualized__List {
   direction: inherit !important;
 }
 

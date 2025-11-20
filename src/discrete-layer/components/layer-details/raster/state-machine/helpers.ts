@@ -54,12 +54,19 @@ export const getFeatureAndMarker = (
       type: "Point"
     },
   };
-  return { feature, marker };
+  return {
+    feature,
+    marker
+  };
 };
 
 export const getPath = (baseDir: string, filePath: string): string => {
   const resolvedPath = path.resolve(baseDir, filePath);
   return resolvedPath.startsWith(BASE_PATH) ? resolvedPath.substring(1) : resolvedPath;
+};
+
+export const getPathWithSlash = (path: string): string => {
+  return path.startsWith(BASE_PATH) ? path : BASE_PATH + path;
 };
 
 export const getFile = (files: FileData[], gpkgPath: string, fileName: string, label: string) => {
@@ -136,9 +143,28 @@ export const hasActiveJob = (context: IContext): boolean => {
 export const isRetryEnabled = (context: IContext): boolean => {
   return !!(context.job &&
     (context.job.taskStatus === Status.Failed ||
-    (context.job.taskStatus === Status.Completed && context.job.validationReport?.isValid === false)));
+    (context.job.taskStatus === Status.Completed && context.job?.validationReport?.isValid === false)));
 };
 
 export const isUIDisabled = (isLoading: boolean, state: any): boolean => {
   return isLoading || isDone(state);
+};
+
+export const isTaskFailed = (context: IContext): boolean => {
+  const status = context.job?.taskStatus;
+  return typeof status !== 'undefined' &&
+    [Status.Failed, Status.Aborted].includes(status);
+};
+
+export const isTaskValid = (context: IContext): boolean => {
+  const taskPercentage = context.job?.taskPercentage;
+  const validationReport = context.job?.validationReport;
+  const errorsAggregation = validationReport?.errorsAggregation;
+  return (
+    taskPercentage === 0 || (
+    validationReport?.isValid === true &&
+    Object.values(errorsAggregation?.count || {}).every(value => typeof value !== 'number' || value === 0) &&
+    !errorsAggregation?.smallHoles?.exceeded &&
+    !errorsAggregation?.smallGeometries?.exceeded
+  ));
 };

@@ -58,14 +58,11 @@ const filesMachine = createMachine({
               target: WORKFLOW.FILES.AUTO.SELECT_FILES
             },
             MANUAL: {
-              actions: [
-                ...selectionModeActions('manual' as SelectionMode, {
-                  data: { label: DATA_LABEL, path: '', exists: false },
-                  product: { label: PRODUCT_LABEL, path: '', exists: false },
-                  shapeMetadata: { label: SHAPEMETADATA_LABEL, path: '', exists: false }
-                }),
-                sendParent({ type: "CLEAN_ERRORS" })
-              ],
+              actions: selectionModeActions('manual' as SelectionMode, {
+                data: { label: DATA_LABEL, path: '', exists: false },
+                product: { label: PRODUCT_LABEL, path: '', exists: false },
+                shapeMetadata: { label: SHAPEMETADATA_LABEL, path: '', exists: false }
+              }),
               target: `#${WORKFLOW.FILES.ROOT}`
             },
             "*": { actions: warnUnexpectedStateEvent }
@@ -153,10 +150,7 @@ const filesMachine = createMachine({
               target: WORKFLOW.FILES.MANUAL.CHECK_SHAPEMETADATA
             },
             AUTO: {
-              actions: [
-                ...selectionModeActions('auto' as SelectionMode),
-                sendParent({ type: "CLEAN_ERRORS" })
-              ],
+              actions: selectionModeActions('auto' as SelectionMode),
               target: `#${WORKFLOW.FILES.ROOT}`
             },
             "*": { actions: warnUnexpectedStateEvent }
