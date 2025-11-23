@@ -145,7 +145,7 @@ const filesMachine = createMachine({
               actions: selectFileActions('product'),
               target: WORKFLOW.FILES.MANUAL.FETCH_PRODUCT
             },
-            SELECT_METADATA: {
+            SELECT_SHAPEMETADATA: {
               actions: selectFileActions('shapeMetadata'),
               target: WORKFLOW.FILES.MANUAL.CHECK_SHAPEMETADATA
             },

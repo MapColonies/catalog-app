@@ -31,9 +31,9 @@ import './ingestion-fields.raster.css';
 const AUTO: SelectionMode = 'auto';
 const MANUAL: SelectionMode = 'manual';
 const FILES = 'files';
-const GPKG = 'gpkg';
+const DATA = 'data';
 const PRODUCT = 'product';
-const METADATA = 'metadata';
+const SHAPEMETADATA = 'shapeMetadata';
 
 interface IngestionFieldsProps {
   recordType: RecordType;
@@ -120,11 +120,11 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
         : '';
 
       if (selectedAction) {
-        const actionTypeMap: Record<string, 'SELECT_FILES' | 'SELECT_DATA' | 'SELECT_PRODUCT' | 'SELECT_METADATA'> = {
+        const actionTypeMap: Record<string, 'SELECT_FILES' | 'SELECT_DATA' | 'SELECT_PRODUCT' | 'SELECT_SHAPEMETADATA'> = {
           files: 'SELECT_FILES',
-          gpkg: 'SELECT_DATA',
+          data: 'SELECT_DATA',
           product: 'SELECT_PRODUCT',
-          metadata: 'SELECT_METADATA',
+          shapeMetadata: 'SELECT_SHAPEMETADATA',
         };
         const eventType = actionTypeMap[selectedAction];
         const fileEvent = {
@@ -198,7 +198,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
               className="manualButton"
               disabled={isUIDisabled(isLoading, state)}
               onClick={() => {
-                setSelectedAction(GPKG);
+                setSelectedAction(DATA);
                 setFilePickerDialogOpen(true);
                 setIngestionFilesTypeConfig(RasterIngestionFilesTypeConfig.DATA);
               }}
@@ -224,7 +224,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
               className="manualButton"
               disabled={isUIDisabled(isLoading, state)}
               onClick={() => {
-                setSelectedAction(METADATA);
+                setSelectedAction(SHAPEMETADATA);
                 setFilePickerDialogOpen(true);
                 setIngestionFilesTypeConfig(RasterIngestionFilesTypeConfig.SHAPEMETADATA);
               }}

@@ -273,7 +273,7 @@ export const InnerRasterForm = (
     }
 
     return (
-      <Box className="jobData section">
+      <>
         <Box className="progress">
           <Box className="title bold">
             <FormattedMessage id="ingestion.job.progress" />
@@ -323,7 +323,7 @@ export const InnerRasterForm = (
             </Box>
           </Box>
         </Box>
-      </Box>
+      </>
     );
   };
 
@@ -364,7 +364,9 @@ export const InnerRasterForm = (
         }
         <Box className="content section">
           <Box className="previewAndJobContainer">
-            <JobInfo />
+            <Box className="jobData section">
+              <JobInfo />
+            </Box>
             <GeoFeaturesPresentorComponent
               layerRecord={layerRecord}
               mode={mode}
