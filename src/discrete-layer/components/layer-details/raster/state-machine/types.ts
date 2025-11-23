@@ -83,7 +83,7 @@ export type Events =
   | { type: "SELECT_FILES", file: IGPKGFile }
   | { type: "SELECT_DATA", file: IGPKGFile }
   | { type: "SELECT_PRODUCT", file: IProductFile }
-  | { type: "SELECT_METADATA", file: IFileBase }
+  | { type: "SELECT_SHAPEMETADATA", file: IFileBase }
   | { type: "RESELECT_FILES" }
   | { type: "SET_FILES", files: IFiles, addPolicy: AddPolicy }
   | { type: "FILES_SELECTED" }
