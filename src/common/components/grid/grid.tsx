@@ -72,6 +72,13 @@ export interface IGridRowDataDetailsExt {
   fullWidth: boolean;
   isVisible: boolean;
 };
+
+export interface IRowPosition {
+  pageSize: number;
+  pageNumber: number;
+  rowInPage: number;
+}
+
 export interface GridRowNode extends IRowNode {};
 
 export const GridComponent: React.FC<GridComponentProps> = (props) => {
@@ -162,7 +169,6 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
     return res;
   };
 
-
   useEffect(() => {
     const result: any[] = [];
     if (props.gridOptions?.detailsRowCellRenderer !== undefined) {
@@ -197,48 +203,65 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
   }, [props.rowData, props.gridOptions, props.isLoading]);
 
   useEffect(() => {
-    if (!gridApi || !focusByRowId) return;
-    
-    const focusRowById = (gridApi: GridApi, id: string) => {
-      let rowIndex = -1;
-      let currentIndex = 0;
+    if (!gridApi || !focusByRowId) { return };
 
-      gridApi.forEachNodeAfterFilterAndSort((node) => {
-        if (node.data?.id === id) {
-          rowIndex = currentIndex;
-        }
-        currentIndex++;
-      });
+    focusAndExpendRow(gridApi, focusByRowId);
+  }, [rowData]);
 
-      if (rowIndex === -1) {
-        handleFocusError?.({
-          code: '',
-          message: 'Row not found',
-          level: 'warning',
-          id
-        });
-        return;
-      } else {
-        handleFocusError?.(undefined);
-        setFocusByRowId?.('');
+  const findRow = (gridApi: GridApi, id: string): IRowPosition | undefined => {
+    let rowIndex = -1;
+    let currentIndex = 0;
+
+    gridApi.forEachNodeAfterFilterAndSort((node) => {
+      if (node.data?.id === id) {
+        rowIndex = currentIndex;
       }
+      currentIndex++;
+    });
 
-      const pageSize = gridApi.paginationGetPageSize();
-      const pageNumber = Math.floor(rowIndex / pageSize);
-      const rowInPage = rowIndex % pageSize;
-
-      gridApi.paginationGoToPage(pageNumber);
-
-      gridApi.ensureIndexVisible(rowInPage, 'middle');
-      gridApi.getDisplayedRowAtIndex(rowInPage)?.setSelected(true);
-      
-      const rowNode = gridApi.getRowNode(`${id as unknown as string}${DETAILS_ROW_ID_SUFFIX}`);
-      rowNode?.setDataValue('isVisible', true);
-      gridApi.onFilterChanged();
+    if (rowIndex === -1) {
+      return undefined;
     }
 
-    focusRowById(gridApi, focusByRowId);
-  }, [rowData]);
+    const pageSize = gridApi.paginationGetPageSize();
+    const pageNumber = Math.floor(rowIndex / pageSize);
+    const rowInPage = rowIndex % pageSize;
+
+    return {
+      pageSize,
+      pageNumber,
+      rowInPage
+    }
+  }
+
+  const focusRow = (gridApi: GridApi, row: IRowPosition) => {
+    gridApi.paginationGoToPage(row.pageNumber);
+    gridApi.ensureIndexVisible(row.rowInPage, 'middle');
+    gridApi.getDisplayedRowAtIndex(row.rowInPage)?.setSelected(true);
+  }
+
+  const focusAndExpendRow = (gridApi: GridApi, id: string) => {
+    const row = findRow(gridApi, id);
+
+    if (!row) {
+      handleFocusError?.({
+        code: 'grid.row-not-found.warning',
+        message: '',
+        level: 'warning',
+        id
+      });
+
+      return;
+    }
+
+    handleFocusError?.(undefined);
+    setFocusByRowId?.('');
+    focusRow(gridApi, row);
+    
+    const rowNode = gridApi.getRowNode(`${id as unknown as string}${DETAILS_ROW_ID_SUFFIX}`);
+    rowNode?.setDataValue('isVisible', true);
+    gridApi.onFilterChanged();
+  }
 
   const agGridThemeOverrides = GridThemes.getTheme(theme);
   
