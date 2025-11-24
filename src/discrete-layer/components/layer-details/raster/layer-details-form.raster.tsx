@@ -9,7 +9,7 @@ import {
   FormikBag
 } from 'formik';
 import { Feature, GeoJsonProperties, Geometry } from 'geojson';
-import { get, isEmpty } from 'lodash';
+import { get } from 'lodash';
 import { DraftResult } from 'vest/vestResult';
 import * as Yup from 'yup';
 import { OptionalObjectSchema, TypeOfShape } from 'yup/lib/object';
@@ -41,6 +41,7 @@ import { StateError } from './state-error';
 import { RasterWorkflowContext } from './state-machine/context';
 import {
   hasActiveJob,
+  hasError,
   hasTagDeep,
   isFilesSelected,
   isGoToJobEnabled,
@@ -360,7 +361,7 @@ export const InnerRasterForm = (
                   !dirty ||
                   Object.keys(errors).length > NONE ||
                   (Object.keys(getStatusErrors()).length > NONE) ||
-                  !isEmpty(state.context.errors)
+                  hasError(state.context)
                 }
               >
                 <FormattedMessage id="general.ok-btn.text" />

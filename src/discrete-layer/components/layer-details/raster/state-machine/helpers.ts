@@ -173,6 +173,10 @@ export const isUIDisabled = (isLoading: boolean, state: any): boolean => {
   return isLoading || isDone(state);
 };
 
+export const hasError = (context: IContext): boolean => {
+  return context.errors.some(error => error.level === 'error');
+};
+
 export const isTaskFailed = (job: IJob | undefined): boolean => {
   const status = job?.taskStatus;
   return typeof status !== 'undefined' && [Status.Failed, Status.Aborted].includes(status);
