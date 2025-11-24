@@ -78,6 +78,7 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
   useEffect(() => {
     if (isFoundRow) {
       setFocusOnJob?.(undefined);
+      setFocusJobId('');
     }
   }, [isFoundRow]);
 
