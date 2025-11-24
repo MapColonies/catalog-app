@@ -1,7 +1,9 @@
 import { Feature, GeoJsonProperties, Geometry } from 'geojson';
+import moment from 'moment';
 import path from 'path';
 import { assign, SnapshotFrom } from 'xstate';
 import { FileData } from '@map-colonies/react-components';
+import CONFIG from '../../../../../common/config';
 import { getFirstPoint } from '../../../../../common/utils/geo.tools';
 import { ErrorLevel } from '../../../helpers/errorUtils';
 import { Status } from '../../../../models';
@@ -13,6 +15,8 @@ import {
   ErrorSource,
   FIRST,
   IContext,
+  IFiles,
+  IJob,
   IStateError,
   SHAPES_DIR,
   SHAPES_RELATIVE_TO_DATA_DIR,
@@ -69,7 +73,7 @@ export const getPathWithSlash = (path: string): string => {
   return path.startsWith(BASE_PATH) ? path : BASE_PATH + path;
 };
 
-export const getFile = (files: FileData[], gpkgPath: string, fileName: string, label: string) => {
+export const getFile = (files: FileData[], gpkgPath: string, fileName: string, label: string, dateFormatterPredicate: (modDate: Date | string) => string) => {
   const baseDirectory = path.dirname(gpkgPath);
   const resolvedPath = getPath(baseDirectory, path.join(SHAPES_RELATIVE_TO_DATA_DIR, SHAPES_DIR, fileName));
   const matchingFiles = files?.filter((file: FileData) => file.name === fileName);
@@ -77,14 +81,16 @@ export const getFile = (files: FileData[], gpkgPath: string, fileName: string, l
     return {
       label,
       path: resolvedPath,
-      exists: false
+      exists: false,
+      dateFormatterPredicate
     };
   }
   return matchingFiles.map((file: FileData) => ({
     label,
     path: resolvedPath,
     details: { ...file },
-    exists: true
+    exists: true,
+    dateFormatterPredicate
   }))[FIRST];
 };
 
@@ -128,6 +134,20 @@ export const isFilesSelected = (context: IContext): boolean => {
     files.shapeMetadata && files.shapeMetadata.path && files.shapeMetadata.exists === true);
 };
 
+export const validateShapeFiles = (files: IFiles): IStateError[] => {
+  const productDetails = files.product?.details;  
+  const shapeMetadataDetails = files.shapeMetadata?.details;
+  if (productDetails && shapeMetadataDetails) {
+    const modDateProduct = moment(productDetails.modDate);
+    const modDateShapeMetadata = moment(shapeMetadataDetails.modDate);
+    const differenceInMinutes = modDateProduct.diff(modDateShapeMetadata, 'minutes');
+    if (Math.abs(differenceInMinutes) > CONFIG.UPLOAD_SHAPE_FILES_TIME_GRACE_IN_MINUTES) {
+      return [ buildError('ingestion.warning.modDateMismatch', CONFIG.UPLOAD_SHAPE_FILES_TIME_GRACE_IN_MINUTES.toString(), 'logic', 'warning') ];
+    }
+  }
+  return [];
+};
+
 export const isJobSubmitted = (context: IContext): boolean => {
   return !!(context.job && context.job.jobId);
 };
@@ -140,31 +160,39 @@ export const hasActiveJob = (context: IContext): boolean => {
   return !!(context.job && context.job.jobId);
 };
 
+export const isGoToJobEnabled = (context: IContext): boolean => {
+  return !!(context.job && context.job.jobId && context.job?.details);
+};
+
 export const isRetryEnabled = (context: IContext): boolean => {
-  return !!(context.job &&
+  return !!(context.job && context.job.jobId)  &&
     (context.job.taskStatus === Status.Failed ||
-    (context.job.taskStatus === Status.Completed && context.job?.validationReport?.isValid === false)));
+    (context.job.taskStatus === Status.Completed && context.job.validationReport?.isValid === false)) &&
+    context.job.details?.status !== Status.Aborted;
 };
 
 export const isUIDisabled = (isLoading: boolean, state: any): boolean => {
   return isLoading || isDone(state);
 };
 
-export const isTaskFailed = (context: IContext): boolean => {
-  const status = context.job?.taskStatus;
-  return typeof status !== 'undefined' &&
-    [Status.Failed, Status.Aborted].includes(status);
+export const hasError = (context: IContext): boolean => {
+  return context.errors.some(error => error.level === 'error');
 };
 
-export const isTaskValid = (context: IContext): boolean => {
-  const taskPercentage = context.job?.taskPercentage;
-  const validationReport = context.job?.validationReport;
+export const isTaskFailed = (job: IJob | undefined): boolean => {
+  const status = job?.taskStatus;
+  return typeof status !== 'undefined' && [Status.Failed, Status.Aborted].includes(status);
+};
+
+export const isTaskValid = (job: IJob | undefined): boolean => {
+  const taskPercentage = job?.taskPercentage;
+  const validationReport = job?.validationReport;
   const errorsAggregation = validationReport?.errorsAggregation;
   return (
-    taskPercentage === 0 || (
-    validationReport?.isValid === true &&
+    taskPercentage === 0 ||
+    (validationReport?.isValid === true &&
     Object.values(errorsAggregation?.count || {}).every(value => typeof value !== 'number' || value === 0) &&
     !errorsAggregation?.smallHoles?.exceeded &&
-    !errorsAggregation?.smallGeometries?.exceeded
-  ));
+    !errorsAggregation?.smallGeometries?.exceeded)
+  );
 };

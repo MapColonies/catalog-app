@@ -31,6 +31,7 @@ export interface IFileBase {
   path: string;
   exists: boolean;
   details?: FileData;
+  dateFormatterPredicate?: (modDate: Date | string) => string;
 }
 
 export interface IGeoDetails {
@@ -58,7 +59,7 @@ export interface IJob {
   taskPercentage?: number;
   validationReport?: TaskParams;
   taskStatus?: Status;
-  record?: JobModelType;
+  details?: JobModelType;
 }
 
 export interface IContext {
@@ -85,6 +86,7 @@ export type Events =
   | { type: "SELECT_PRODUCT", file: IProductFile }
   | { type: "SELECT_SHAPEMETADATA", file: IFileBase }
   | { type: "RESELECT_FILES" }
+  | { type: "SET_SELECTION_MODE", selectionMode: SelectionMode }
   | { type: "SET_FILES", files: IFiles, addPolicy: AddPolicy }
   | { type: "FILES_SELECTED" }
   | { type: "FILES_ERROR", error: IStateError }
@@ -151,6 +153,11 @@ export const SHAPEMETADATA_FILENAME = `${CONFIG.RASTER_INGESTION_FILES_STRUCTURE
 export const DATA_LABEL = 'file-name.data';
 export const PRODUCT_LABEL = 'file-name.product';
 export const SHAPEMETADATA_LABEL = 'file-name.shapeMetadata';
+
+export type Aggregation = {
+  exceeded: boolean;
+  count: number;
+};
 
 // TODO: use from @mapColonies/types and remove from here:
 //#region to be removed

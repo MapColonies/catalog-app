@@ -1,29 +1,36 @@
-import { Feature, GeoJsonProperties, Geometry } from 'geojson';
 import path from 'path';
 import { fromPromise } from 'xstate';
+import { relativeDateFormatter } from '../../../../../common/helpers/formatters';
 import { Mode } from '../../../../../common/models/mode.enum';
 import { RecordType } from '../../../../models';
 import { LayerRasterRecordInput } from '../../../../models/RootStore.base';
 import { FeatureType } from '../pp-map.utils';
-import { buildError, getFeatureAndMarker, getFile, getPath } from './helpers';
+import {
+  buildError,
+  getFeatureAndMarker,
+  getFile,
+  getPath,
+  validateShapeFiles
+} from './helpers';
 import { MOCK_JOB_UPDATE } from './MOCK';
 import { queryExecutor } from './query-executor';
 import {
+  fetchProduct,
   getDetails,
   getDirectory,
-  fetchProduct,
+  getJob,
   getRestoreData,
+  getTask,
   selectData,
   validateGPKG
 } from './services-helpers';
 import {
-  FIRST,
   FromPromiseArgs,
   IContext,
-  SHAPEMETADATA_LABEL,
-  SHAPEMETADATA_FILENAME,
   PRODUCT_LABEL,
   PRODUCT_FILENAME,
+  SHAPEMETADATA_LABEL,
+  SHAPEMETADATA_FILENAME,
   SHAPES_DIR,
   SHAPES_RELATIVE_TO_DATA_DIR,
   WORKFLOW
@@ -90,79 +97,60 @@ export const SERVICES = {
         throw buildError('ingestion.error.missing', 'jobId');
       }
 
-      const result = await queryExecutor(async () => {
-        return await input.context.store.queryFindTasks({
-          params: {
-            jobId: jobId as string,
-            type: 'validation'
-          }
-        });
-      });
-      const task = { ...result.findTasks[FIRST] };
+      const job = await getJob(input.context);
 
-      if (!task) {
-        throw buildError('ingestion.error.not-found', 'validation task');
-      }
+      const task = await getTask(input.context);
 
       return {
+        taskId: task.id,
         taskPercentage: task.percentage ?? 0,
         validationReport: task.parameters || {},
-        taskStatus: task.status ?? ''
+        taskStatus: task.status ?? '',
+        details: job
       };
     }),
     restoreJobService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
-      const { flowType, selectionMode, files, resolutionDegree, formData, job } = await getRestoreData(input.context || {});
-      const { data, product, shapeMetadata } = files || {};
+      const { flowType, selectionMode, files, resolutionDegree, formData, job } = await getRestoreData(input.context);
+      let errors = input.context.errors;
 
-      if (files?.data) {
-        files.data.details = await getDetails(files.data.path, input.context);
-        files.data.exists = !!files.data.details;
-      }
-      if (files?.product) {
-        files.product.details = await getDetails(files.product.path, input.context);
-        files.product.exists = !!files.product.details;
-      }
-      if (files?.shapeMetadata) {
-        files.shapeMetadata.details = await getDetails(files.shapeMetadata.path, input.context);
-        files.shapeMetadata.exists = !!files.shapeMetadata.details;
-      }
-
-      if (!files?.data?.path) {
-        throw buildError('ingestion.error.missing', 'GPKG');
-      }
-
-      const gpkgValidation = await validateGPKG(files.data.path, input.context);
-      const validationResult = { ...gpkgValidation };
-      let geoDetails: { feature: Feature<Geometry, GeoJsonProperties>; marker: Feature<Geometry, GeoJsonProperties>; } | undefined;
-      if (validationResult.extentPolygon) {
-        geoDetails = getFeatureAndMarker(validationResult.extentPolygon, FeatureType.SOURCE_EXTENT, FeatureType.SOURCE_EXTENT_MARKER);
-      }
-
-      if (files.product) {
-        const productFile = await fetchProduct(files.product, input.context);
-        files.product.geoDetails = productFile?.geoDetails;
+      if (files) {
+        if (files.data) {
+          files.data.details = await getDetails(files.data.path, input.context);
+          files.data.exists = !!files.data.details;
+        }
+        if (files.product) {
+          files.product.details = await getDetails(files.product.path, input.context);
+          files.product.exists = !!files.product.details;
+        }
+        if (files.shapeMetadata) {
+          files.shapeMetadata.details = await getDetails(files.shapeMetadata.path, input.context);
+          files.shapeMetadata.exists = !!files.shapeMetadata.details;
+        }
+        if (files.data) {
+          const gpkgValidation = await validateGPKG(files.data.path, input.context);
+          files.data.validationResult = { ...gpkgValidation };
+          if (!!files.data.validationResult.extentPolygon) {
+            files.data.geoDetails = getFeatureAndMarker(files.data.validationResult.extentPolygon, FeatureType.SOURCE_EXTENT, FeatureType.SOURCE_EXTENT_MARKER);
+          }
+        }
+        if (files.product) {
+          const productFile = await fetchProduct(files.product, input.context);
+          files.product.geoDetails = productFile?.geoDetails;
+        }
+        const shapeFilesValidation = validateShapeFiles(files);
+        if (shapeFilesValidation.length > 0) {
+          errors = [ ...errors, ...shapeFilesValidation ];
+        }
       }
 
       return {
         flowType,
         selectionMode,
-        files: {
-          ...files,
-          data: {
-            ...data,
-            validationResult,
-            geoDetails
-          },
-          product: {
-            ...product
-          },
-          shapeMetadata: {
-            ...shapeMetadata
-          }
-        },
+        files,
         resolutionDegree,
         formData,
-        job
+        job,
+        errors
       };
     })
   },
@@ -171,8 +159,8 @@ export const SERVICES = {
       const data = await selectData(input.context);
       const dataPath = input.context.files?.data?.path as string;
       const result = await getDirectory(getPath(path.dirname(dataPath), path.join(SHAPES_RELATIVE_TO_DATA_DIR, SHAPES_DIR)), input.context);
-      const product = getFile(result ?? [], dataPath, PRODUCT_FILENAME, PRODUCT_LABEL);
-      const shapeMetadata = getFile(result ?? [], dataPath, SHAPEMETADATA_FILENAME, SHAPEMETADATA_LABEL);
+      const product = getFile(result ?? [], dataPath, PRODUCT_FILENAME, PRODUCT_LABEL, relativeDateFormatter);
+      const shapeMetadata = getFile(result ?? [], dataPath, SHAPEMETADATA_FILENAME, SHAPEMETADATA_LABEL, relativeDateFormatter);
       return {
         data,
         product,

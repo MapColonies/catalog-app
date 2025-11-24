@@ -44,7 +44,7 @@ const FileItem: React.FC<{ file: IFileBase }> = ({ file }) => {
     <>
       <Box><Icon className="fileIcon mc-icon-Map-Vector" /></Box>
       <FormattedMessage id={file.label} />
-      <Box className={`fileItemName ${file.exists ? '' : 'warning'}`}>
+      <Box className={`fileItemName ${file.exists ? '' : 'error'}`}>
         {formatPath(file.path)}
       </Box>
       <Box className="ltr">
@@ -52,8 +52,8 @@ const FileItem: React.FC<{ file: IFileBase }> = ({ file }) => {
       </Box>
       <Box className="ltr">
         {
-          file.details?.modDate
-            ? (file.path?.toLowerCase().endsWith('.gpkg') ? dateFormatter(file.details.modDate) : relativeDateFormatter(file.details.modDate))
+          (file.details?.modDate && file.dateFormatterPredicate)
+            ? file.dateFormatterPredicate(file.details.modDate)
             : ''
         }
       </Box>
@@ -120,20 +120,21 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
         : '';
 
       if (selectedAction) {
-        const actionTypeMap: Record<string, 'SELECT_FILES' | 'SELECT_DATA' | 'SELECT_PRODUCT' | 'SELECT_SHAPEMETADATA'> = {
-          files: 'SELECT_FILES',
-          data: 'SELECT_DATA',
-          product: 'SELECT_PRODUCT',
-          shapeMetadata: 'SELECT_SHAPEMETADATA',
+        const actionTypeMap: Record<string, { type: 'SELECT_FILES' | 'SELECT_DATA' | 'SELECT_PRODUCT' | 'SELECT_SHAPEMETADATA', predicate: (modeDate: Date | string) => string }> = {
+          files: { type: 'SELECT_FILES', predicate: dateFormatter },
+          data: { type: 'SELECT_DATA', predicate: dateFormatter },
+          product: { type: 'SELECT_PRODUCT', predicate: relativeDateFormatter },
+          shapeMetadata: { type: 'SELECT_SHAPEMETADATA', predicate: relativeDateFormatter },
         };
-        const eventType = actionTypeMap[selectedAction];
+        const event = actionTypeMap[selectedAction];
         const fileEvent = {
-          type: eventType,
+          type: event.type,
           file: {
             label: `file-name.${selectedAction}`,
             path: `${directory}/${selected.files[0].name}`,
             details: { ...selected.files[0] },
-            exists: true
+            exists: true,
+            dateFormatterPredicate: event.predicate
           }
         } satisfies Events;
 

@@ -247,6 +247,7 @@
   "ingestion.warning.invalid-secondary-file": "{title} אירעה שגיאת וולידציה באתר המשני",
   "ingestion.warning.unsynched": "מספר גרסה שונה",
   "ingestion.error.unsynched": "שכבה לא קיימת באתר המשני",
+  "ingestion.warning.modDateMismatch": "הפרש תאריכים בין הקבצים ShapeMetadata ו-Product גדול מ-{value} דקות",
   "ingestion.error.invalid": "לא תקין: {value}",
   "ingestion.error.invalid-source-file": "שגיאה בקובץ הנבחר: {value}",
   "ingestion.error.file-not-found": "קובץ לא קיים: {value}",
