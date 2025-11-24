@@ -45,7 +45,7 @@ interface GridComponentProps {
   style?: CSSProperties;
   isLoading?: boolean;
   focusByRowId?: string;
-  setIsFoundRow?: (val: boolean) => void;
+  setIsRowFound?: (val: boolean) => void;
   handleFocusError?: (error: IFocusError | undefined) => void;
 };
 
@@ -85,7 +85,7 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
   const theme = useTheme();
   const [gridApi, setGridApi] = useState<GridApi>();
 
-  const {focusByRowId, setIsFoundRow, handleFocusError} = props
+  const {focusByRowId, setIsRowFound, handleFocusError} = props
   
   const {detailsRowExpanderPosition, ...restGridOptions} = props.gridOptions as GridComponentOptions;
 
@@ -202,7 +202,7 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
   }, [props.rowData, props.gridOptions, props.isLoading]);
 
   useEffect(() => {
-    if (!gridApi || !focusByRowId) { return };
+    if (!gridApi || !focusByRowId) { return; }
 
     focusAndExpandRow(gridApi, focusByRowId);
   }, [rowData]);
@@ -210,7 +210,7 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
   const getRowPosition = (gridApi: GridApi, id: string): IRowPosition | undefined => {
     const node = gridApi.getRowNode(id);
 
-    if(!node || !node.rowIndex) return;
+    if (!node || !node.rowIndex) { return; }
 
     const rowIndex = node.rowIndex;
     const pageSize = gridApi.paginationGetPageSize();
@@ -239,12 +239,12 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
         id
       });
 
-      setIsFoundRow?.(false);
+      setIsRowFound?.(false);
       return;
     }
 
     handleFocusError?.(undefined);
-    setIsFoundRow?.(true);
+    setIsRowFound?.(true);
     goToRowAndFocus(gridApi, row);
     
     const rowNode = gridApi.getRowNode(`${id as unknown as string}${DETAILS_ROW_ID_SUFFIX}`);

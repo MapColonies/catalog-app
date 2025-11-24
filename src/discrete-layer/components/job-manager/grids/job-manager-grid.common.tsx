@@ -67,7 +67,7 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
   const intl = useIntl();
   const { enumsMap } = useContext(EnumsMapContext);
   const [focusJobId, setFocusJobId] = useState<string | undefined>(undefined);
-  const [isFoundRow, setIsFoundRow] = useState<boolean>(false);
+  const [isRowFound, setIsRowFound] = useState<boolean>(false);
 
   useEffect(() => {
     if(!focusOnJob?.id) return;
@@ -76,11 +76,11 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
   }, [focusOnJob]);
 
   useEffect(() => {
-    if (isFoundRow) {
+    if (isRowFound) {
       setFocusOnJob?.(undefined);
       setFocusJobId('');
     }
-  }, [isFoundRow]);
+  }, [isRowFound]);
 
   const onGridReady = (params: GridReadyEvent): void => {
     onGridReadyCB(params);
@@ -401,7 +401,7 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
       style={{ ...defaultGridStyle, ...gridStyleOverride }}
       isLoading={areJobsLoading}
       focusByRowId={focusJobId}
-      setIsFoundRow={setIsFoundRow}
+      setIsRowFound={setIsRowFound}
       handleFocusError={handleFocusError}
     />
   );
