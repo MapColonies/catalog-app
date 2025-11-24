@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect, useCallback, Fragment } from 'react';
+import React, { useMemo, useState, useEffect, useCallback } from 'react';
 import { FormattedMessage } from 'react-intl';
 import {
   withFormik,
@@ -14,8 +14,8 @@ import { DraftResult } from 'vest/vestResult';
 import * as Yup from 'yup';
 import { OptionalObjectSchema, TypeOfShape } from 'yup/lib/object';
 import { AnyObject } from 'yup/lib/types';
-import { Button, IconButton } from '@map-colonies/react-core';
-import { Box, CircularProgressBar } from '@map-colonies/react-components';
+import { Button } from '@map-colonies/react-core';
+import { Box } from '@map-colonies/react-components';
 import { ValidationsError } from '../../../../common/components/error/validations.error-presentor';
 import { mergeRecursive } from '../../../../common/helpers/object';
 import { Mode } from '../../../../common/models/mode.enum';
@@ -34,6 +34,7 @@ import {
 } from '../utils';
 import { Curtain } from './curtain/curtain.component';
 import { IngestionFields } from './ingestion-fields.raster';
+import { JobInfo } from './job-info';
 import { GeoFeaturesPresentorComponent } from './pp-map';
 import { FeatureType, PPMapStyles } from './pp-map.utils';
 import { StateError } from './state-error';
@@ -45,11 +46,8 @@ import {
   isGoToJobEnabled,
   isJobSubmitted,
   isRetryEnabled,
-  isTaskFailed,
-  isTaskValid,
   isUIDisabled
 } from './state-machine/helpers';
-import { IContext } from './state-machine/types';
 import { getUIIngestionFieldDescriptors } from './utils';
 
 import './layer-details-form.raster.css';
@@ -251,102 +249,6 @@ export const InnerRasterForm = (
   //   topLevelFieldsErrors[err] = firstPhaseErrors[err];
   // });
 
-  const JobInfo = (): JSX.Element | null => {
-    const isFailed = isTaskFailed(state.context);
-    const isValid = isTaskValid(state.context);
-    
-    const color = isFailed 
-      ? 'var(--mdc-theme-gc-error-high)' 
-      : (!isValid ? 'var(--mdc-theme-gc-warning-high)' : 'var(--mdc-theme-gc-success)');
-    
-    const className = isFailed 
-      ? 'error' 
-      : (!isValid ? 'warning' : 'success');
-
-    const styles = {
-      textColor: color || 'var(--mdc-theme-gc-success)',
-      pathColor: color || 'var(--mdc-theme-gc-success)',
-      trailColor: 'var(--mdc-theme-gc-selection-background)',
-    };
-
-    if (!state.context.job) {
-      return null;
-    }
-
-    return (
-      <>
-        <Box className="progress">
-          <Box className="title bold">
-            <FormattedMessage id="ingestion.job.progress" />
-          </Box>
-          <Box className="center">
-            <Box className="progressBar">
-              <CircularProgressBar
-                value={state.context.job?.taskPercentage ?? 0}
-                styles={styles}
-              >
-                {
-                  (isTaskFailed(state.context) || !isTaskValid(state.context)) &&
-                  <IconButton
-                    className={`icon mc-icon-Status-Warnings ${isTaskFailed(state.context) ? 'error' : !isTaskValid(state.context) ? 'warning' : ''}`}
-                    onClick={(e): void => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                    }}
-                  />
-                }
-                <Box className={`text ${className}`}>
-                  {`${state.context.job?.taskPercentage ?? 0}%`}
-                </Box>
-              </CircularProgressBar>
-            </Box>
-          </Box>
-        </Box>
-        <Box className="section">
-          <Box className="reportContainer">
-            <Box className="title underline">
-              <FormattedMessage id="ingestion.job.report" />
-            </Box>
-            <Box className="reportList error">
-              {
-                Object.entries(state.context.job?.validationReport?.errorsAggregation?.count || {}).map(([key, value]) => (
-                <Fragment key={key}>
-                  <Box className={value === 0 ? 'success' : ''}>
-                    <FormattedMessage id={`validationReport.${key}`} />
-                  </Box>
-                  <Box className={value === 0 ? 'success' : ''}>
-                    {value}
-                  </Box>
-                </Fragment>
-              ))}
-              {renderAggregation(state.context, 'smallHoles', 'validationReport.smallHoles')}
-              {renderAggregation(state.context, 'smallGeometries', 'validationReport.smallGeometries')}
-            </Box>
-          </Box>
-        </Box>
-      </>
-    );
-  };
-
-  const renderAggregation = (context: IContext, type: 'smallHoles' | 'smallGeometries', messageId: string) => {
-    if (!context.job?.validationReport?.errorsAggregation[type]) { return null; }
-
-    const exceeded = context.job.validationReport.errorsAggregation[type].exceeded;
-    const count = context.job.validationReport.errorsAggregation[type].count;
-    const className = exceeded ? 'error' : (count > 0 ? 'warning' : 'success');
-
-    return (
-      <Fragment key={type}>
-        <Box className={className}>
-          <FormattedMessage id={messageId} />
-        </Box>
-        <Box className={className}>
-          {count}
-        </Box>
-      </Fragment>
-    );
-  };
-
   return (
     <Box id="layerDetailsFormRaster">
       <Form
@@ -366,7 +268,7 @@ export const InnerRasterForm = (
         <Box className="content section">
           <Box className="previewAndJobContainer">
             <Box className="jobData section">
-              <JobInfo />
+              <JobInfo job={state.context.job} />
             </Box>
             <GeoFeaturesPresentorComponent
               layerRecord={layerRecord}

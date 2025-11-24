@@ -1,0 +1,29 @@
+#layerDetailsFormRaster .progress {
+  flex: 1;
+}
+
+#layerDetailsFormRaster .progressBar {
+  width: 150px;
+  height: 150px;
+}
+
+#layerDetailsFormRaster .icon {
+  font-size: 52px;
+}
+
+#layerDetailsFormRaster .text {
+  font-size: 20px;
+}
+
+#layerDetailsFormRaster .reportContainer {
+  margin: 4px;
+}
+
+#layerDetailsFormRaster .reportList {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4px;
+  margin: 0 8px;
+  height: 140px;
+  overflow-y: auto;
+}

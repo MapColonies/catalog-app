@@ -16,6 +16,7 @@ import {
   FIRST,
   IContext,
   IFiles,
+  IJob,
   IStateError,
   SHAPES_DIR,
   SHAPES_RELATIVE_TO_DATA_DIR,
@@ -172,21 +173,20 @@ export const isUIDisabled = (isLoading: boolean, state: any): boolean => {
   return isLoading || isDone(state);
 };
 
-export const isTaskFailed = (context: IContext): boolean => {
-  const status = context.job?.taskStatus;
-  return typeof status !== 'undefined' &&
-    [Status.Failed, Status.Aborted].includes(status);
+export const isTaskFailed = (job: IJob | undefined): boolean => {
+  const status = job?.taskStatus;
+  return typeof status !== 'undefined' && [Status.Failed, Status.Aborted].includes(status);
 };
 
-export const isTaskValid = (context: IContext): boolean => {
-  const taskPercentage = context.job?.taskPercentage;
-  const validationReport = context.job?.validationReport;
+export const isTaskValid = (job: IJob | undefined): boolean => {
+  const taskPercentage = job?.taskPercentage;
+  const validationReport = job?.validationReport;
   const errorsAggregation = validationReport?.errorsAggregation;
   return (
-    taskPercentage === 0 || (
-    validationReport?.isValid === true &&
+    taskPercentage === 0 ||
+    (validationReport?.isValid === true &&
     Object.values(errorsAggregation?.count || {}).every(value => typeof value !== 'number' || value === 0) &&
     !errorsAggregation?.smallHoles?.exceeded &&
-    !errorsAggregation?.smallGeometries?.exceeded
-  ));
+    !errorsAggregation?.smallGeometries?.exceeded)
+  );
 };

@@ -1,4 +1,3 @@
-import { Feature, GeoJsonProperties, Geometry } from 'geojson';
 import path from 'path';
 import { fromPromise } from 'xstate';
 import { Mode } from '../../../../../common/models/mode.enum';
@@ -9,7 +8,8 @@ import {
   buildError,
   getFeatureAndMarker,
   getFile,
-  getPath
+  getPath,
+  validateShapeFiles
 } from './helpers';
 import { MOCK_JOB_UPDATE } from './MOCK';
 import { queryExecutor } from './query-executor';
@@ -109,58 +109,47 @@ export const SERVICES = {
       };
     }),
     restoreJobService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
-      const { flowType, selectionMode, files, resolutionDegree, formData, job } = await getRestoreData(input.context || {});
-      const { data, product, shapeMetadata } = files || {};
+      const { flowType, selectionMode, files, resolutionDegree, formData, job } = await getRestoreData(input.context);
+      let errors = input.context.errors;
 
-      if (files?.data) {
-        files.data.details = await getDetails(files.data.path, input.context);
-        files.data.exists = !!files.data.details;
-      }
-      if (files?.product) {
-        files.product.details = await getDetails(files.product.path, input.context);
-        files.product.exists = !!files.product.details;
-      }
-      if (files?.shapeMetadata) {
-        files.shapeMetadata.details = await getDetails(files.shapeMetadata.path, input.context);
-        files.shapeMetadata.exists = !!files.shapeMetadata.details;
-      }
-
-      if (!files?.data?.path) {
-        throw buildError('ingestion.error.missing', 'GPKG');
-      }
-
-      const gpkgValidation = await validateGPKG(files.data.path, input.context);
-      const validationResult = { ...gpkgValidation };
-      let geoDetails: { feature: Feature<Geometry, GeoJsonProperties>; marker: Feature<Geometry, GeoJsonProperties>; } | undefined;
-      if (validationResult.extentPolygon) {
-        geoDetails = getFeatureAndMarker(validationResult.extentPolygon, FeatureType.SOURCE_EXTENT, FeatureType.SOURCE_EXTENT_MARKER);
-      }
-
-      if (files.product) {
-        const productFile = await fetchProduct(files.product, input.context);
-        files.product.geoDetails = productFile?.geoDetails;
+      if (files) {
+        if (files.data) {
+          files.data.details = await getDetails(files.data.path, input.context);
+          files.data.exists = !!files.data.details;
+        }
+        if (files.product) {
+          files.product.details = await getDetails(files.product.path, input.context);
+          files.product.exists = !!files.product.details;
+        }
+        if (files.shapeMetadata) {
+          files.shapeMetadata.details = await getDetails(files.shapeMetadata.path, input.context);
+          files.shapeMetadata.exists = !!files.shapeMetadata.details;
+        }
+        if (files.data) {
+          const gpkgValidation = await validateGPKG(files.data.path, input.context);
+          files.data.validationResult = { ...gpkgValidation };
+          if (!!files.data.validationResult.extentPolygon) {
+            files.data.geoDetails = getFeatureAndMarker(files.data.validationResult.extentPolygon, FeatureType.SOURCE_EXTENT, FeatureType.SOURCE_EXTENT_MARKER);
+          }
+        }
+        if (files.product) {
+          const productFile = await fetchProduct(files.product, input.context);
+          files.product.geoDetails = productFile?.geoDetails;
+        }
+        const shapeFilesValidation = validateShapeFiles(files);
+        if (shapeFilesValidation.length > 0) {
+          errors = [ ...errors, ...shapeFilesValidation ];
+        }
       }
 
       return {
         flowType,
         selectionMode,
-        files: {
-          ...files,
-          data: {
-            ...data,
-            validationResult,
-            geoDetails
-          },
-          product: {
-            ...product
-          },
-          shapeMetadata: {
-            ...shapeMetadata
-          }
-        },
+        files,
         resolutionDegree,
         formData,
-        job
+        job,
+        errors
       };
     })
   },

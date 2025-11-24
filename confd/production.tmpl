@@ -57,12 +57,13 @@ window._env_ = {
     autocomplete: {{ getv "/configuration/running/mode/autocomplete" "false" }}
   },
   NUMBER_OF_CHARACTERS_LIMIT: {{ getv "/configuration/number/of/characters/limit" "15" }},
+  SERVED_ENTITY_TYPES: '{{ getv "/configuration/served/entity/types" "RECORD_ALL,RECORD_RASTER,RECORD_3D,RECORD_DEM,RECORD_VECTOR" }}',
   ACCESS_TOKEN: {
     attributeName: '{{ getv "/configuration/access/token/attribute/name" "token" }}',
     injectionType: '{{ getv "/configuration/access/token/injection/type" "queryParam" }}',
     tokenValue: '{{ getv "/configuration/access/token/token/value" "TOKEN" }}',
   },
-  SERVED_ENTITY_TYPES: '{{ getv "/configuration/served/entity/types" "RECORD_ALL,RECORD_RASTER,RECORD_3D,RECORD_DEM,RECORD_VECTOR" }}',
+  RASTER_INGESTION_FILES_STRUCTURE: '{{ getv "/configuration/raster/ingestion/files/structure" "{\"data\": {\"allowedExt\": [\".gpkg\"], \"selectableExt\": [\".gpkg\"], \"relativeToAOIDirPath\": \"./data\", \"producerFileName\": \"*\", \"selectablePattern\": \"*\"}, \"product\": {\"allowedExt\": [\".shp\", \".shx\", \".dbf\", \".prj\", \".sbn\", \".sbx\", \".xml\", \".cpg\", \".qix\"], \"selectableExt\": [\".shp\"], \"relativeToAOIDirPath\": \"./shape\", \"producerFileName\": \"Product\", \"selectablePattern\": \"Product\"}, \"shapeMetadata\": {\"allowedExt\": [\".shp\", \".shx\", \".dbf\", \".prj\", \".sbn\", \".sbx\", \".xml\", \".cpg\", \".qix\"], \"selectableExt\": [\".shp\"], \"relativeToAOIDirPath\": \"./shape\", \"producerFileName\": \"ShapeMetadata\", \"selectablePattern\": \"ShapeMetadata\"}}"}}',
   PROJECT_VERSION: '{{ getv "/configuration/project/version" "" }}',
   WHATSNEW_URL: '{{ getv "/configuration/whatsnew/url" "http://whatsnew-URL" }}',
   SITES_CONFIG: '{{ getv "/configuration/sites/config" "{\"masters\": [{ \"dns\": \"http://localhost:3000\", \"isAlias\": false }], \"slaves\": [{ \"dns\": \"http://localhost:8090\", \"isAlias\": false }], \"generics\": [{ \"dns\": \"https://catalog.mapcolonies.net\", \"isAlias\": false }]}" }}',
@@ -94,6 +95,5 @@ window._env_ = {
     url: '{{ getv "/configuration/geocoder/url" "http://geocoder-URL" }}',
     callbackUrl: '{{ getv "/configuration/geocoder/callbackUrl" "http://geocoder-callback-URL" }}'
   },
-  RASTER_INGESTION_FILES_STRUCTURE: '{{ getv "/configuration/raster/ingestion/files/structure" "{\"data\": {\"allowedExt\": [\".gpkg\"], \"selectableExt\": [\".gpkg\"], \"relativeToAOIDirPath\": \"./data\", \"producerFileName\": \"*\", \"selectablePattern\": \"*\"}, \"product\": {\"allowedExt\": [\".shp\", \".shx\", \".dbf\", \".prj\", \".sbn\", \".sbx\", \".xml\", \".cpg\", \".qix\"], \"selectableExt\": [\".shp\"], \"relativeToAOIDirPath\": \"./shape\", \"producerFileName\": \"Product\", \"selectablePattern\": \"Product\"}, \"shapeMetadata\": {\"allowedExt\": [\".shp\", \".shx\", \".dbf\", \".prj\", \".sbn\", \".sbx\", \".xml\", \".cpg\", \".qix\"], \"selectableExt\": [\".shp\"], \"relativeToAOIDirPath\": \"./shape\", \"producerFileName\": \"ShapeMetadata\", \"selectablePattern\": \"ShapeMetadata\"}}"}}',
   UPLOAD_SHAPE_FILES_TIME_GRACE_IN_MINUTES: {{ getv "/configuration/upload/shape/files/time/grace/in/minutes" "10" }}
 };

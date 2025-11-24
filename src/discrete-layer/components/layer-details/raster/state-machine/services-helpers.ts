@@ -41,7 +41,7 @@ export const getDirectory = async (filePath: string, context: IContext): Promise
         },
       });
     });
-    return result?.getDirectory as FileData[];
+    return [ ...(result?.getDirectory as FileData[]) ];
   } catch (e) {
     return undefined;
   }
@@ -50,7 +50,7 @@ export const getDirectory = async (filePath: string, context: IContext): Promise
 export const getDetails = async (filePath: string, context: IContext): Promise<FileData | undefined> => {
   const files = await getDirectory(path.dirname(filePath), context);
   if (files) {
-    return files.filter((file: FileData) => file.name === path.basename(filePath))[0];
+    return { ...(files.filter((file: FileData) => file.name === path.basename(filePath))[0]) };
   }
   return undefined;
 };

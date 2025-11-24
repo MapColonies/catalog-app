@@ -27,8 +27,9 @@ const MODEL_VIEWER_ROUTE = (window as any)._env_.MODEL_VIEWER_ROUTE;
 const MODEL_VIEWER_TOKEN_VALUE = (window as any)._env_.MODEL_VIEWER_TOKEN_VALUE;
 const RUNNING_MODE = (window as any)._env_.RUNNING_MODE;
 const NUMBER_OF_CHARACTERS_LIMIT = (window as any)._env_.NUMBER_OF_CHARACTERS_LIMIT;
-const ACCESS_TOKEN = (window as any)._env_.ACCESS_TOKEN;
 const SERVED_ENTITY_TYPES = (window as any)._env_.SERVED_ENTITY_TYPES;
+const ACCESS_TOKEN = (window as any)._env_.ACCESS_TOKEN;
+const RASTER_INGESTION_FILES_STRUCTURE = JSON.parse((window as any)._env_.RASTER_INGESTION_FILES_STRUCTURE);
 const PROJECT_VERSION = (window as any)._env_.PROJECT_VERSION;
 const WHATSNEW_URL = (window as any)._env_.WHATSNEW_URL;
 const SITES_CONFIG = JSON.parse((window as any)._env_.SITES_CONFIG);
@@ -45,7 +46,6 @@ const POLYGON_PARTS = {
 };
 const WFS = (window as any)._env_.WFS;
 const GEOCODER = (window as any)._env_.GEOCODER;
-const RASTER_INGESTION_FILES_STRUCTURE = JSON.parse((window as any)._env_.RASTER_INGESTION_FILES_STRUCTURE);
 const UPLOAD_SHAPE_FILES_TIME_GRACE_IN_MINUTES = parseInt((window as any)._env_.UPLOAD_SHAPE_FILES_TIME_GRACE_IN_MINUTES, 10);
 
 const enrichBaseMaps = (baseMaps: IBaseMaps): IBaseMaps => {
@@ -193,12 +193,13 @@ const APP_CONFIG = {
   },
   SYSTEM_JOBS_PRIORITY_OPTIONS: systemJobsPriorityOptions,
   NUMBER_OF_CHARACTERS_LIMIT: NUMBER_OF_CHARACTERS_LIMIT as number,
+  SERVED_ENTITY_TYPES: (SERVED_ENTITY_TYPES as string).split(','),
   ACCESS_TOKEN: {
     ATTRIBUTE_NAME: ACCESS_TOKEN.attributeName,
     INJECTION_TYPE: ACCESS_TOKEN.injectionType,
     TOKEN_VALUE: ACCESS_TOKEN.tokenValue
   },
-  SERVED_ENTITY_TYPES : (SERVED_ENTITY_TYPES as string).split(','),
+  RASTER_INGESTION_FILES_STRUCTURE: RASTER_INGESTION_FILES_STRUCTURE as IRasterIngestionFilesStructureConfig,
   JOB_MANAGER_END_OF_TIME: 21, // Days
   MINIMUM_SUPPORTED_BROWSER_VERSION: 84,
   PROJECT_VERSION: PROJECT_VERSION,
@@ -250,7 +251,6 @@ const APP_CONFIG = {
     CALLBACK_URL: GEOCODER.callbackUrl,
     RESULTS_LIMIT: 6
   },
-  RASTER_INGESTION_FILES_STRUCTURE: RASTER_INGESTION_FILES_STRUCTURE as IRasterIngestionFilesStructureConfig,
   UPLOAD_SHAPE_FILES_TIME_GRACE_IN_MINUTES: UPLOAD_SHAPE_FILES_TIME_GRACE_IN_MINUTES
 };
 

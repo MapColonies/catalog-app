@@ -351,9 +351,11 @@ export const workflowMachine = createMachine<IContext, Events>({
                 }
               ) :
               { ..._.event.files };
+            const errors = [ ..._.context.errors, ...validateShapeFiles(files) ];
+
             return {
               files,
-              errors: [ ..._.context.errors, ...validateShapeFiles(files) ]
+              errors
             };
           })
         },
