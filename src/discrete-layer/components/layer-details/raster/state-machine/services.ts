@@ -5,13 +5,19 @@ import { Mode } from '../../../../../common/models/mode.enum';
 import { RecordType } from '../../../../models';
 import { LayerRasterRecordInput } from '../../../../models/RootStore.base';
 import { FeatureType } from '../pp-map.utils';
-import { buildError, getFeatureAndMarker, getFile, getPath } from './helpers';
+import {
+  buildError,
+  getFeatureAndMarker,
+  getFile,
+  getPath
+} from './helpers';
 import { MOCK_JOB_UPDATE } from './MOCK';
 import { queryExecutor } from './query-executor';
 import {
+  fetchProduct,
   getDetails,
   getDirectory,
-  fetchProduct,
+  getJob,
   getRestoreData,
   selectData,
   validateGPKG
@@ -20,10 +26,10 @@ import {
   FIRST,
   FromPromiseArgs,
   IContext,
-  SHAPEMETADATA_LABEL,
-  SHAPEMETADATA_FILENAME,
   PRODUCT_LABEL,
   PRODUCT_FILENAME,
+  SHAPEMETADATA_LABEL,
+  SHAPEMETADATA_FILENAME,
   SHAPES_DIR,
   SHAPES_RELATIVE_TO_DATA_DIR,
   WORKFLOW
@@ -90,6 +96,8 @@ export const SERVICES = {
         throw buildError('ingestion.error.missing', 'jobId');
       }
 
+      const job = await getJob(input.context);
+
       const result = await queryExecutor(async () => {
         return await input.context.store.queryFindTasks({
           params: {
@@ -105,9 +113,11 @@ export const SERVICES = {
       }
 
       return {
+        taskId: task.id,
         taskPercentage: task.percentage ?? 0,
         validationReport: task.parameters || {},
-        taskStatus: task.status ?? ''
+        taskStatus: task.status ?? '',
+        details: job
       };
     }),
     restoreJobService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {

@@ -69,5 +69,6 @@ keys = [
   "/configuration/wfs/max/cache/size",
   "/configuration/geocoder/url",
   "/configuration/geocoder/callbackUrl",
-  "/configuration/rasteringestionfilesstructure"
+  "/configuration/rasteringestionfilesstructure",
+  "/configuration/upload/shape/files/time/grace/in/minutes"
 ]

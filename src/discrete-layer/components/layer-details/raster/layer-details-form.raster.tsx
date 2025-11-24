@@ -429,7 +429,7 @@ export const InnerRasterForm = (
           </Box>
           <Box className="buttons">
             {
-              hasActiveJob(state.context) && state.context.job?.record &&
+              hasActiveJob(state.context) && state.context.job?.details &&
               <Button
                 raised
                 type="button"
@@ -439,7 +439,7 @@ export const InnerRasterForm = (
 
                   store.actionDispatcherStore.dispatchAction({
                     action: UserAction.SYSTEM_CALLBACK_OPEN_JOB_MANAGER,
-                    data: { job: state.context.job?.record }
+                    data: { job: state.context.job?.details }
                   })
                   closeDialog();
                 }}

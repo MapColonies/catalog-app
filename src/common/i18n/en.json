@@ -246,6 +246,7 @@
   "ingestion.warning.title": "Warning:",
   "ingestion.warning.invalid-secondary-file": "{title} validation error on secondary site",
   "ingestion.warning.unsynched": "Invalid product version",
+  "ingestion.warning.modDateMismatch": "ShapeMetadata and Product files modification dates differ by more than {value} minutes",
   "ingestion.error.unsynched": "Layer does not exist on secondary site",
   "ingestion.error.invalid": "Invalid: {value}",
   "ingestion.error.invalid-source-file": "Selected file error: {value}",

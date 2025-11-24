@@ -58,7 +58,7 @@ export interface IJob {
   taskPercentage?: number;
   validationReport?: TaskParams;
   taskStatus?: Status;
-  record?: JobModelType;
+  details?: JobModelType;
 }
 
 export interface IContext {
@@ -85,6 +85,7 @@ export type Events =
   | { type: "SELECT_PRODUCT", file: IProductFile }
   | { type: "SELECT_SHAPEMETADATA", file: IFileBase }
   | { type: "RESELECT_FILES" }
+  | { type: "SET_SELECTION_MODE", selectionMode: SelectionMode }
   | { type: "SET_FILES", files: IFiles, addPolicy: AddPolicy }
   | { type: "FILES_SELECTED" }
   | { type: "FILES_ERROR", error: IStateError }

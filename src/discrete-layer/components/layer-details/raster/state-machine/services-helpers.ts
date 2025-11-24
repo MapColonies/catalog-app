@@ -4,6 +4,7 @@ import shp from 'shpjs';
 import { FileData } from '@map-colonies/react-components';
 import CONFIG from '../../../../../common/config';
 import {
+  JobModelType,
   LayerMetadataMixedUnion,
   RecordType,
   SourceValidationModelType
@@ -112,13 +113,7 @@ export const fetchProduct = async (product: IProductFile, context: IContext) => 
   };
 };
 
-export const getRestoreData = async (context: IContext): Promise<IPartialContext> => {
-  const rootDirectory = await getDirectory(BASE_PATH, context);
-  if (!rootDirectory || rootDirectory.length === 0) {
-    throw buildError('ingestion.error.not-found', BASE_PATH);
-  }
-  const MOUNT_DIR = rootDirectory[FIRST].name;
-
+export const getJob = async (context: IContext): Promise<JobModelType> => {
   const result = await queryExecutor(async () => {
     return await context.store.queryJob({
       id: context.job?.jobId as string
@@ -127,7 +122,17 @@ export const getRestoreData = async (context: IContext): Promise<IPartialContext
   if (!result?.job) {
     throw buildError('ingestion.error.not-found', `JOB ${context.job?.jobId}`);
   }
-  const job = { ...result.job };
+  return { ...result.job };
+};
+
+export const getRestoreData = async (context: IContext): Promise<IPartialContext> => {
+  const rootDirectory = await getDirectory(BASE_PATH, context);
+  if (!rootDirectory || rootDirectory.length === 0) {
+    throw buildError('ingestion.error.not-found', BASE_PATH);
+  }
+  const MOUNT_DIR = rootDirectory[FIRST].name;
+
+  const job = await getJob(context);
 
     try {
     return {
@@ -154,7 +159,7 @@ export const getRestoreData = async (context: IContext): Promise<IPartialContext
       formData: transformEntityToFormFields({ ...job.parameters.metadata, resolutionDegree: job.parameters.ingestionResolution } as unknown as LayerMetadataMixedUnion) as unknown as LayerRasterRecordInput,
       job: {
         jobId: job.id,
-        record: job
+        details: job
       }
     };
   } catch (error) {

@@ -46,6 +46,7 @@ const POLYGON_PARTS = {
 const WFS = (window as any)._env_.WFS;
 const GEOCODER = (window as any)._env_.GEOCODER;
 const RASTER_INGESTION_FILES_STRUCTURE = JSON.parse((window as any)._env_.RASTER_INGESTION_FILES_STRUCTURE);
+const UPLOAD_SHAPE_FILES_TIME_GRACE_IN_MINUTES = parseInt((window as any)._env_.UPLOAD_SHAPE_FILES_TIME_GRACE_IN_MINUTES, 10);
 
 const enrichBaseMaps = (baseMaps: IBaseMaps): IBaseMaps => {
   return {
@@ -249,7 +250,8 @@ const APP_CONFIG = {
     CALLBACK_URL: GEOCODER.callbackUrl,
     RESULTS_LIMIT: 6
   },
-  RASTER_INGESTION_FILES_STRUCTURE: RASTER_INGESTION_FILES_STRUCTURE as IRasterIngestionFilesStructureConfig
+  RASTER_INGESTION_FILES_STRUCTURE: RASTER_INGESTION_FILES_STRUCTURE as IRasterIngestionFilesStructureConfig,
+  UPLOAD_SHAPE_FILES_TIME_GRACE_IN_MINUTES: UPLOAD_SHAPE_FILES_TIME_GRACE_IN_MINUTES
 };
 
 export default APP_CONFIG;

@@ -1,4 +1,4 @@
-export type ErrorLevel = "error" | "warning";
+export type ErrorLevel = 'error' | 'warning';
 
 export interface IError {
   code?: string;

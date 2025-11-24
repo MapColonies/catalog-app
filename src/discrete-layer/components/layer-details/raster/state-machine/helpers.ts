@@ -1,7 +1,9 @@
 import { Feature, GeoJsonProperties, Geometry } from 'geojson';
+import moment from 'moment';
 import path from 'path';
 import { assign, SnapshotFrom } from 'xstate';
 import { FileData } from '@map-colonies/react-components';
+import CONFIG from '../../../../../common/config';
 import { getFirstPoint } from '../../../../../common/utils/geo.tools';
 import { ErrorLevel } from '../../../helpers/errorUtils';
 import { Status } from '../../../../models';
@@ -13,6 +15,7 @@ import {
   ErrorSource,
   FIRST,
   IContext,
+  IFiles,
   IStateError,
   SHAPES_DIR,
   SHAPES_RELATIVE_TO_DATA_DIR,
@@ -126,6 +129,20 @@ export const isFilesSelected = (context: IContext): boolean => {
   return !!(files.data && files.data.path && files.data.exists === true &&
     files.product && files.product.path && files.product.exists === true &&
     files.shapeMetadata && files.shapeMetadata.path && files.shapeMetadata.exists === true);
+};
+
+export const validateShapeFiles = (files: IFiles): IStateError[] => {
+  const productDetails = files.product?.details;  
+  const shapeMetadataDetails = files.shapeMetadata?.details;
+  if (productDetails && shapeMetadataDetails) {
+    const modDateProduct = moment(productDetails.modDate);
+    const modDateShapeMetadata = moment(shapeMetadataDetails.modDate);
+    const differenceInMinutes = modDateProduct.diff(modDateShapeMetadata, 'minutes');
+    if (Math.abs(differenceInMinutes) > CONFIG.UPLOAD_SHAPE_FILES_TIME_GRACE_IN_MINUTES) {
+      return [ buildError('ingestion.warning.modDateMismatch', CONFIG.UPLOAD_SHAPE_FILES_TIME_GRACE_IN_MINUTES.toString(), 'logic', 'warning') ];
+    }
+  }
+  return [];
 };
 
 export const isJobSubmitted = (context: IContext): boolean => {
