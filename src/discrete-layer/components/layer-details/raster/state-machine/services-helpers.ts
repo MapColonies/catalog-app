@@ -3,6 +3,7 @@ import path from 'path';
 import shp from 'shpjs';
 import { FileData } from '@map-colonies/react-components';
 import CONFIG from '../../../../../common/config';
+import { dateFormatter, relativeDateFormatter } from '../../../../../common/helpers/formatters';
 import {
   JobModelType,
   LayerMetadataMixedUnion,
@@ -158,17 +159,20 @@ export const getRestoreData = async (context: IContext): Promise<IPartialContext
         data: {
           label: DATA_LABEL,
           path: getPath(MOUNT_DIR, job.parameters.inputFiles.gpkgFilesPath[0]),
-          exists: false
+          exists: false,
+          dateFormatterPredicate: dateFormatter
         },
         product: {
           label: PRODUCT_LABEL,
           path: getPath(MOUNT_DIR, job.parameters.inputFiles.productShapefilePath),
-          exists: false
+          exists: false,
+          dateFormatterPredicate: relativeDateFormatter
         },
         shapeMetadata: {
           label: SHAPEMETADATA_LABEL,
           path: getPath(MOUNT_DIR, job.parameters.inputFiles.metadataShapefilePath),
-          exists: false
+          exists: false,
+          dateFormatterPredicate: relativeDateFormatter
         }
       },
       resolutionDegree: job.parameters.ingestionResolution,

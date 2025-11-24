@@ -73,7 +73,7 @@ export const getPathWithSlash = (path: string): string => {
   return path.startsWith(BASE_PATH) ? path : BASE_PATH + path;
 };
 
-export const getFile = (files: FileData[], gpkgPath: string, fileName: string, label: string) => {
+export const getFile = (files: FileData[], gpkgPath: string, fileName: string, label: string, dateFormatterPredicate: (modDate: Date | string) => string) => {
   const baseDirectory = path.dirname(gpkgPath);
   const resolvedPath = getPath(baseDirectory, path.join(SHAPES_RELATIVE_TO_DATA_DIR, SHAPES_DIR, fileName));
   const matchingFiles = files?.filter((file: FileData) => file.name === fileName);
@@ -81,14 +81,16 @@ export const getFile = (files: FileData[], gpkgPath: string, fileName: string, l
     return {
       label,
       path: resolvedPath,
-      exists: false
+      exists: false,
+      dateFormatterPredicate
     };
   }
   return matchingFiles.map((file: FileData) => ({
     label,
     path: resolvedPath,
     details: { ...file },
-    exists: true
+    exists: true,
+    dateFormatterPredicate
   }))[FIRST];
 };
 

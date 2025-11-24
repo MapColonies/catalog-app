@@ -31,6 +31,7 @@ export interface IFileBase {
   path: string;
   exists: boolean;
   details?: FileData;
+  dateFormatterPredicate?: (modDate: Date | string) => string;
 }
 
 export interface IGeoDetails {

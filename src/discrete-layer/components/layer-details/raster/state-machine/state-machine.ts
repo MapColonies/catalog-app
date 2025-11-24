@@ -1,7 +1,8 @@
 import { mergeWith } from 'lodash';
 import { assign, createMachine, sendParent } from 'xstate';
-import { Mode } from '../../../../../common/models/mode.enum';
 import CONFIG from '../../../../../common/config';
+import { dateFormatter, relativeDateFormatter } from '../../../../../common/helpers/formatters';
+import { Mode } from '../../../../../common/models/mode.enum';
 import { Status } from '../../../../models';
 import {
   fetchProductActions,
@@ -60,9 +61,9 @@ const filesMachine = createMachine({
             },
             MANUAL: {
               actions: selectionModeActions('manual' as SelectionMode, {
-                data: { label: DATA_LABEL, path: '', exists: false },
-                product: { label: PRODUCT_LABEL, path: '', exists: false },
-                shapeMetadata: { label: SHAPEMETADATA_LABEL, path: '', exists: false }
+                data: { label: DATA_LABEL, path: '', exists: false, dateFormatterPredicate: dateFormatter },
+                product: { label: PRODUCT_LABEL, path: '', exists: false, dateFormatterPredicate: relativeDateFormatter },
+                shapeMetadata: { label: SHAPEMETADATA_LABEL, path: '', exists: false, dateFormatterPredicate: relativeDateFormatter }
               }),
               target: `#${WORKFLOW.FILES.ROOT}`
             },
