@@ -1,7 +1,8 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Box, CircularProgressBar } from '@map-colonies/react-components';
-import { IconButton } from '@map-colonies/react-core';
+import { IconButton, Typography } from '@map-colonies/react-core';
+import { Status } from '../../../models';
 import { isTaskFailed, isTaskValid } from './state-machine/helpers';
 import { IJob } from './state-machine/types';
 
@@ -12,6 +13,27 @@ interface JobInfoProps {
 }
 
 export const JobInfo: React.FC<JobInfoProps> = ({ job }) => {
+  const [dots, setDots] = useState<string>('');
+  
+  useEffect(() => {
+    let interval: NodeJS.Timer;
+
+    if (job?.taskStatus === Status.InProgress) {
+      interval = setInterval(() => {
+        setDots(prevDots => {
+          const newDots = prevDots.length < 3 ? prevDots + '.' : '';
+          return newDots;
+        });
+      }, 500);
+    } else {
+      setDots('');
+    }
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [job?.taskStatus]);
+
   if (!job) {
     return null;
   }
@@ -57,7 +79,14 @@ export const JobInfo: React.FC<JobInfoProps> = ({ job }) => {
                     }}
                   />
                 }
-                <Box className={`text ${className}`}>
+                <Box className={`text bold ${className}`}>
+                  <FormattedMessage id={`system-status.job.status_translation.${job.taskStatus}`} />
+                  {
+                    job.taskStatus === Status.InProgress &&
+                    <Typography tag="span" className="dots">{dots}</Typography>
+                  }
+                </Box>
+                <Box className={`percentage bold ${className}`}>
                   {`${job.taskPercentage ?? 0}%`}
                 </Box>
               </CircularProgressBar>

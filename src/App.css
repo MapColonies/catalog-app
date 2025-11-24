@@ -205,3 +205,20 @@ input:disabled {
 .mdc-checkbox .mdc-checkbox__native-control:enabled:not(:checked):not(:indeterminate):not([data-indeterminate=true]) ~ .mdc-checkbox__background {
   border: 1px solid var(--mdc-theme-on-surface);
 }
+
+.blink {
+  /* Animation properties: name, duration, timing function, repetition count */
+  animation: blink_smooth 1s infinite;
+}
+
+@keyframes blink_smooth {
+  0% {
+    opacity: 1; /* Fully visible */
+  }
+  50% {
+    opacity: 0; /* Invisible */
+  }
+  100% {
+    opacity: 1; /* Fully visible again */
+  }
+}

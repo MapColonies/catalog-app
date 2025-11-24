@@ -330,7 +330,7 @@ export const MOCK_TASK = {
       }
     ]
   },
-  status: 'In-Progress'
+  status: 'InProgress'
 };
 
 export const MOCK_POLYGON: Geometry = {
