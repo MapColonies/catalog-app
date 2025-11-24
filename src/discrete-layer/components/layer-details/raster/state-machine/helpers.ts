@@ -157,10 +157,15 @@ export const hasActiveJob = (context: IContext): boolean => {
   return !!(context.job && context.job.jobId);
 };
 
+export const isGoToJobEnabled = (context: IContext): boolean => {
+  return !!(context.job && context.job.jobId && context.job?.details);
+};
+
 export const isRetryEnabled = (context: IContext): boolean => {
-  return !!(context.job &&
+  return !!(context.job && context.job.jobId)  &&
     (context.job.taskStatus === Status.Failed ||
-    (context.job.taskStatus === Status.Completed && context.job?.validationReport?.isValid === false)));
+    (context.job.taskStatus === Status.Completed && context.job.validationReport?.isValid === false)) &&
+    context.job.details?.status !== Status.Aborted;
 };
 
 export const isUIDisabled = (isLoading: boolean, state: any): boolean => {

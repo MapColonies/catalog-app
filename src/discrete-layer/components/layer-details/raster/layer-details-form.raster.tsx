@@ -42,6 +42,7 @@ import {
   hasActiveJob,
   hasTagDeep,
   isFilesSelected,
+  isGoToJobEnabled,
   isJobSubmitted,
   isRetryEnabled,
   isTaskFailed,
@@ -429,7 +430,7 @@ export const InnerRasterForm = (
           </Box>
           <Box className="buttons">
             {
-              hasActiveJob(state.context) && state.context.job?.details &&
+              isGoToJobEnabled(state.context) &&
               <Button
                 raised
                 type="button"
@@ -464,7 +465,6 @@ export const InnerRasterForm = (
               </Button>
             }
             {
-              hasActiveJob(state.context) &&
               isRetryEnabled(state.context) &&
               <Button
                 raised
