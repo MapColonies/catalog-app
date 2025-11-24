@@ -205,7 +205,7 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
   useEffect(() => {
     if (!gridApi || !focusByRowId) { return };
 
-    focusAndExpendRow(gridApi, focusByRowId);
+    focusAndExpandRow(gridApi, focusByRowId);
   }, [rowData]);
 
   const findRow = (gridApi: GridApi, id: string): IRowPosition | undefined => {
@@ -240,7 +240,7 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
     gridApi.getDisplayedRowAtIndex(row.rowInPage)?.setSelected(true);
   }
 
-  const focusAndExpendRow = (gridApi: GridApi, id: string) => {
+  const focusAndExpandRow = (gridApi: GridApi, id: string) => {
     const row = findRow(gridApi, id);
 
     if (!row) {
