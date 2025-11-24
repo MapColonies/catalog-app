@@ -45,7 +45,7 @@ interface GridComponentProps {
   style?: CSSProperties;
   isLoading?: boolean;
   focusByRowId?: string;
-  setFocusByRowId?: (val: string | typeof CLEAN_ROW) => void;
+  setIsFoundRow?: (val: boolean) => void;
   handleFocusError?: (error: IFocusError | undefined) => void;
 };
 
@@ -75,11 +75,8 @@ export interface IGridRowDataDetailsExt {
 
 export interface IRowPosition {
   pageNumber: number;
-  rowIndexInGrid: number;
-  rowInPage: number;
+  rowIndex: number;
 }
-
-export const CLEAN_ROW = '__CLEAN_ROW__';
 
 export interface GridRowNode extends IRowNode {};
 
@@ -88,7 +85,7 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
   const theme = useTheme();
   const [gridApi, setGridApi] = useState<GridApi>();
 
-  const {focusByRowId, setFocusByRowId, handleFocusError} = props
+  const {focusByRowId, setIsFoundRow, handleFocusError} = props
   
   const {detailsRowExpanderPosition, ...restGridOptions} = props.gridOptions as GridComponentOptions;
 
@@ -219,20 +216,18 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
 
     const pageSize = gridApi.paginationGetPageSize();
     const pageNumber = Math.floor(rowIndex / pageSize);
-    const rowInPage = rowIndex % pageSize;
     const rowIndexInGrid = node.rowIndex;
 
     return {
       pageNumber,
-      rowIndexInGrid,
-      rowInPage
+      rowIndex: rowIndexInGrid,
     }
   }
 
   const goToRowAndFocus = (gridApi: GridApi, row: IRowPosition) => {
     gridApi.paginationGoToPage(row.pageNumber);
-    gridApi.ensureIndexVisible(row.rowIndexInGrid, 'middle');
-    gridApi.getDisplayedRowAtIndex(row.rowIndexInGrid)?.setSelected(true);
+    gridApi.ensureIndexVisible(row.rowIndex, 'middle');
+    gridApi.getDisplayedRowAtIndex(row.rowIndex)?.setSelected(true);
   }
 
   const focusAndExpandRow = (gridApi: GridApi, id: string) => {
@@ -246,11 +241,12 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
         id
       });
 
+      setIsFoundRow?.(false);
       return;
     }
 
     handleFocusError?.(undefined);
-    setFocusByRowId?.(CLEAN_ROW);
+    setIsFoundRow?.(true);
     goToRowAndFocus(gridApi, row);
     
     const rowNode = gridApi.getRowNode(`${id as unknown as string}${DETAILS_ROW_ID_SUFFIX}`);
