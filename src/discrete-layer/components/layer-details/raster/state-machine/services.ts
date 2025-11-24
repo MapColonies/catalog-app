@@ -19,11 +19,11 @@ import {
   getDirectory,
   getJob,
   getRestoreData,
+  getTask,
   selectData,
   validateGPKG
 } from './services-helpers';
 import {
-  FIRST,
   FromPromiseArgs,
   IContext,
   PRODUCT_LABEL,
@@ -98,19 +98,7 @@ export const SERVICES = {
 
       const job = await getJob(input.context);
 
-      const result = await queryExecutor(async () => {
-        return await input.context.store.queryFindTasks({
-          params: {
-            jobId: jobId as string,
-            type: 'validation'
-          }
-        });
-      });
-      const task = { ...result.findTasks[FIRST] };
-
-      if (!task) {
-        throw buildError('ingestion.error.not-found', 'validation task');
-      }
+      const task = await getTask(input.context);
 
       return {
         taskId: task.id,

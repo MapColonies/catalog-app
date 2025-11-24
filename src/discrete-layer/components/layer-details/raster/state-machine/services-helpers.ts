@@ -7,7 +7,8 @@ import {
   JobModelType,
   LayerMetadataMixedUnion,
   RecordType,
-  SourceValidationModelType
+  SourceValidationModelType,
+  TaskModelType
 } from '../../../../models';
 import { LayerRasterRecordInput } from '../../../../models/RootStore.base';
 import { jobType2Mode, RasterJobTypeEnum, transformEntityToFormFields } from '../../utils';
@@ -123,6 +124,21 @@ export const getJob = async (context: IContext): Promise<JobModelType> => {
     throw buildError('ingestion.error.not-found', `JOB ${context.job?.jobId}`);
   }
   return { ...result.job };
+};
+
+export const getTask = async (context: IContext): Promise<TaskModelType> => {
+  const result = await queryExecutor(async () => {
+    return await context.store.queryFindTasks({
+      params: {
+        jobId: context.job?.jobId as string,
+        type: 'validation'
+      }
+    });
+  });
+  if (!result?.findTasks[FIRST]) {
+    throw buildError('ingestion.error.not-found', 'validation task');
+  }
+  return { ...result.findTasks[FIRST] };
 };
 
 export const getRestoreData = async (context: IContext): Promise<IPartialContext> => {
