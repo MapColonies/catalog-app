@@ -212,15 +212,13 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
 
     if(!node || !node.rowIndex) return;
 
-    const rowIndex = node?.rowIndex;
-
+    const rowIndex = node.rowIndex;
     const pageSize = gridApi.paginationGetPageSize();
     const pageNumber = Math.floor(rowIndex / pageSize);
-    const rowIndexInGrid = node.rowIndex;
 
     return {
       pageNumber,
-      rowIndex: rowIndexInGrid,
+      rowIndex,
     }
   }
 
