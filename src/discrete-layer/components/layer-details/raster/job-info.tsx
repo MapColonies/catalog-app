@@ -4,7 +4,7 @@ import { Box, CircularProgressBar } from '@map-colonies/react-components';
 import { IconButton, Typography } from '@map-colonies/react-core';
 import { Status } from '../../../models';
 import { isTaskFailed, isTaskValid } from './state-machine/helpers';
-import { IJob } from './state-machine/types';
+import { Aggregation, IJob } from './state-machine/types';
 
 import './job-info.css';
 
@@ -14,10 +14,9 @@ interface JobInfoProps {
 
 export const JobInfo: React.FC<JobInfoProps> = ({ job }) => {
   const [dots, setDots] = useState<string>('');
-  
+
   useEffect(() => {
     let interval: NodeJS.Timer;
-
     if (job?.taskStatus === Status.InProgress) {
       interval = setInterval(() => {
         setDots(prevDots => {
@@ -28,7 +27,6 @@ export const JobInfo: React.FC<JobInfoProps> = ({ job }) => {
     } else {
       setDots('');
     }
-
     return () => {
       clearInterval(interval);
     };
@@ -40,14 +38,18 @@ export const JobInfo: React.FC<JobInfoProps> = ({ job }) => {
 
   const isFailed = isTaskFailed(job);
   const isValid = isTaskValid(job);
-  
-  const color = isFailed 
-    ? 'var(--mdc-theme-gc-error-high)' 
-    : (!isValid ? 'var(--mdc-theme-gc-warning-high)' : 'var(--mdc-theme-gc-success)');
-  
-  const className = isFailed 
-    ? 'error' 
-    : (!isValid ? 'warning' : 'success');
+
+  const color = isFailed
+    ? 'var(--mdc-theme-gc-error-high)'
+    : !isValid
+      ? 'var(--mdc-theme-gc-warning-high)'
+      : 'var(--mdc-theme-gc-success)';
+
+  const status = isFailed
+    ? 'error'
+    : !isValid
+      ? 'warning'
+      : 'success';
 
   const styles = {
     textColor: color || 'var(--mdc-theme-gc-success)',
@@ -72,21 +74,21 @@ export const JobInfo: React.FC<JobInfoProps> = ({ job }) => {
                 {
                   (isFailed || !isValid) &&
                   <IconButton
-                    className={`icon mc-icon-Status-Warnings ${isFailed ? 'error' : !isValid ? 'warning' : ''}`}
+                    className={`icon mc-icon-Status-Warnings ${status}`}
                     onClick={(e): void => {
                       e.preventDefault();
                       e.stopPropagation();
                     }}
                   />
                 }
-                <Box className={`text bold ${className}`}>
+                <Box className={`text bold ${status}`}>
                   <FormattedMessage id={`system-status.job.status_translation.${job.taskStatus}`} />
                   {
                     job.taskStatus === Status.InProgress &&
                     <Typography tag="span" className="dots">{dots}</Typography>
                   }
                 </Box>
-                <Box className={`percentage bold ${className}`}>
+                <Box className={`percentage bold ${status}`}>
                   {`${job.taskPercentage ?? 0}%`}
                 </Box>
               </CircularProgressBar>
@@ -101,21 +103,13 @@ export const JobInfo: React.FC<JobInfoProps> = ({ job }) => {
           </Box>
           <Box className="reportList error">
             {
-              Object.entries(job.validationReport?.errorsAggregation?.count || {}).map(([key, value]) => (
-                <Fragment key={key}>
-                  <Box className={value === 0 ? 'success' : ''}>
-                    <FormattedMessage id={`validationReport.${key}`} />
-                  </Box>
-                  <Box className={value === 0 ? 'success' : ''}>
-                    {value}
-                  </Box>
-                </Fragment>
-              ))
-            }
-            {
-              (['smallHoles', 'smallGeometries'] as const).map((aggregation) => (
-                renderAggregationWithExceeded(job, aggregation)
-              ))
+              Object.entries(job.validationReport?.errorsAggregation || {}).map(([type, aggregation]) => {
+                if (typeof aggregation === 'object' && 'exceeded' in aggregation) {
+                  return renderAggregationWithExceeded(type, aggregation);
+                } else {
+                  return renderAggregationWithoutExceeded(aggregation);
+                }
+              })
             }
           </Box>
         </Box>
@@ -124,22 +118,29 @@ export const JobInfo: React.FC<JobInfoProps> = ({ job }) => {
   );
 };
 
-const renderAggregationWithExceeded = (job: IJob, type: 'smallHoles' | 'smallGeometries') => {
-  if (!job.validationReport?.errorsAggregation || !job.validationReport?.errorsAggregation[type]) {
-    return null;
-  }
+const renderAggregationWithExceeded = (type: string, aggregation: Aggregation) => {
+  return aggregationRow(
+    type,
+    aggregation,
+    (aggregation: Aggregation) => (aggregation.exceeded ? 'error' : (aggregation.count > 0 ? 'warning' : 'success')));
+};
 
-  const exceeded = job.validationReport.errorsAggregation[type].exceeded;
-  const count = job.validationReport.errorsAggregation[type].count;
-  const className = exceeded ? 'error' : (count > 0 ? 'warning' : 'success');
-
+const renderAggregationWithoutExceeded = (aggregation: Record<string, number>) => {
   return (
-    <Fragment key={type}>
-      <Box className={className}>
-        <FormattedMessage id={`validationReport.${type}`} />
+    Object.entries(aggregation || {}).map(([key, value]) => (
+      aggregationRow(key, value, (value: number) => (value === 0 ? 'success' : ''))
+    ))
+  );
+};
+
+const aggregationRow = (key: string, value: any, rowColor: (val: any) => string) => {
+  return (
+    <Fragment key={key}>
+      <Box className={rowColor(value)}>
+        <FormattedMessage id={`validationReport.${key}`} />
       </Box>
-      <Box className={className}>
-        {count}
+      <Box className={rowColor(value)}>
+        {typeof value === 'object' ? value.count : value}
       </Box>
     </Fragment>
   );

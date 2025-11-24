@@ -9,6 +9,7 @@
 
 #layerDetailsFormRaster .icon {
   font-size: 52px;
+  cursor: default;
 }
 
 #layerDetailsFormRaster .text {

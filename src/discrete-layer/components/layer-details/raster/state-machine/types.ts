@@ -153,6 +153,11 @@ export const DATA_LABEL = 'file-name.data';
 export const PRODUCT_LABEL = 'file-name.product';
 export const SHAPEMETADATA_LABEL = 'file-name.shapeMetadata';
 
+export type Aggregation = {
+  exceeded: boolean;
+  count: number;
+};
+
 // TODO: use from @mapColonies/types and remove from here:
 //#region to be removed
 export type TaskParams = {
