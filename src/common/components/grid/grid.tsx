@@ -45,7 +45,7 @@ interface GridComponentProps {
   style?: CSSProperties;
   isLoading?: boolean;
   focusByRowId?: string;
-  setFocusByRowId?: (val: string) => void;
+  setFocusByRowId?: (val: string | typeof CLEAN_ROW) => void;
   handleFocusError?: (error: IFocusError | undefined) => void;
 };
 
@@ -74,10 +74,12 @@ export interface IGridRowDataDetailsExt {
 };
 
 export interface IRowPosition {
-  pageSize: number;
   pageNumber: number;
+  rowIndexInGrid: number;
   rowInPage: number;
 }
+
+export const CLEAN_ROW = '__CLEAN_ROW__';
 
 export interface GridRowNode extends IRowNode {};
 
@@ -208,40 +210,33 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
     focusAndExpandRow(gridApi, focusByRowId);
   }, [rowData]);
 
-  const findRow = (gridApi: GridApi, id: string): IRowPosition | undefined => {
-    let rowIndex = -1;
-    let currentIndex = 0;
+  const getRowPosition = (gridApi: GridApi, id: string): IRowPosition | undefined => {
+    const node = gridApi.getRowNode(id);
 
-    gridApi.forEachNodeAfterFilterAndSort((node) => {
-      if (node.data?.id === id) {
-        rowIndex = currentIndex;
-      }
-      currentIndex++;
-    });
+    if(!node || !node.rowIndex) return;
 
-    if (rowIndex === -1) {
-      return undefined;
-    }
+    const rowIndex = node?.rowIndex;
 
     const pageSize = gridApi.paginationGetPageSize();
     const pageNumber = Math.floor(rowIndex / pageSize);
     const rowInPage = rowIndex % pageSize;
+    const rowIndexInGrid = node.rowIndex;
 
     return {
-      pageSize,
       pageNumber,
+      rowIndexInGrid,
       rowInPage
     }
   }
 
-  const focusRow = (gridApi: GridApi, row: IRowPosition) => {
+  const goToRowAndFocus = (gridApi: GridApi, row: IRowPosition) => {
     gridApi.paginationGoToPage(row.pageNumber);
-    gridApi.ensureIndexVisible(row.rowInPage, 'middle');
-    gridApi.getDisplayedRowAtIndex(row.rowInPage)?.setSelected(true);
+    gridApi.ensureIndexVisible(row.rowIndexInGrid, 'middle');
+    gridApi.getDisplayedRowAtIndex(row.rowIndexInGrid)?.setSelected(true);
   }
 
   const focusAndExpandRow = (gridApi: GridApi, id: string) => {
-    const row = findRow(gridApi, id);
+    const row = getRowPosition(gridApi, id);
 
     if (!row) {
       handleFocusError?.({
@@ -255,8 +250,8 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
     }
 
     handleFocusError?.(undefined);
-    setFocusByRowId?.('');
-    focusRow(gridApi, row);
+    setFocusByRowId?.(CLEAN_ROW);
+    goToRowAndFocus(gridApi, row);
     
     const rowNode = gridApi.getRowNode(`${id as unknown as string}${DETAILS_ROW_ID_SUFFIX}`);
     rowNode?.setDataValue('isVisible', true);

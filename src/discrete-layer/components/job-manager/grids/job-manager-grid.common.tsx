@@ -3,6 +3,7 @@ import React, { useCallback, useContext, useEffect, useMemo, useState } from 're
 import { useIntl } from 'react-intl';
 import CONFIG from '../../../../common/config';
 import {
+  CLEAN_ROW,
   GridComponent,
   GridComponentOptions,
   GridReadyEvent,
@@ -66,7 +67,7 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
 
   const intl = useIntl();
   const { enumsMap } = useContext(EnumsMapContext);
-  const [focusJobId, setFocusJobId] = useState<string | undefined>(undefined);
+  const [focusJobId, setFocusJobId] = useState<string | typeof CLEAN_ROW | undefined>(undefined);
 
   useEffect(() => {
     if(!focusOnJob?.id) return;
@@ -75,12 +76,10 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
   }, [focusOnJob]);
 
   useEffect(() => {
-    if (focusJobId === '') {
+    if (focusJobId === CLEAN_ROW) {
       setFocusOnJob?.(undefined);
     }
   }, [focusJobId]);
-  
-  
 
   const onGridReady = (params: GridReadyEvent): void => {
     onGridReadyCB(params);
