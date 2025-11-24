@@ -45,7 +45,7 @@ interface GridComponentProps {
   style?: CSSProperties;
   isLoading?: boolean;
   focusByRowId?: string;
-  setFocusByRowId?: (val: string) => void;
+  setIsRowFound?: (val: boolean) => void;
   handleFocusError?: (error: IFocusError | undefined) => void;
 };
 
@@ -72,6 +72,12 @@ export interface IGridRowDataDetailsExt {
   fullWidth: boolean;
   isVisible: boolean;
 };
+
+export interface IRowPosition {
+  pageNumber: number;
+  rowIndex: number;
+}
+
 export interface GridRowNode extends IRowNode {};
 
 export const GridComponent: React.FC<GridComponentProps> = (props) => {
@@ -79,7 +85,7 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
   const theme = useTheme();
   const [gridApi, setGridApi] = useState<GridApi>();
 
-  const {focusByRowId, setFocusByRowId, handleFocusError} = props
+  const {focusByRowId, setIsRowFound, handleFocusError} = props
   
   const {detailsRowExpanderPosition, ...restGridOptions} = props.gridOptions as GridComponentOptions;
 
@@ -162,7 +168,6 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
     return res;
   };
 
-
   useEffect(() => {
     const result: any[] = [];
     if (props.gridOptions?.detailsRowCellRenderer !== undefined) {
@@ -197,48 +202,55 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
   }, [props.rowData, props.gridOptions, props.isLoading]);
 
   useEffect(() => {
-    if (!gridApi || !focusByRowId) return;
-    
-    const focusRowById = (gridApi: GridApi, id: string) => {
-      let rowIndex = -1;
-      let currentIndex = 0;
+    if (!gridApi || !focusByRowId) { return; }
 
-      gridApi.forEachNodeAfterFilterAndSort((node) => {
-        if (node.data?.id === id) {
-          rowIndex = currentIndex;
-        }
-        currentIndex++;
+    focusAndExpandRow(gridApi, focusByRowId);
+  }, [rowData]);
+
+  const getRowPosition = (gridApi: GridApi, id: string): IRowPosition | undefined => {
+    const node = gridApi.getRowNode(id);
+
+    if (!node || !node.rowIndex) { return; }
+
+    const rowIndex = node.rowIndex;
+    const pageSize = gridApi.paginationGetPageSize();
+    const pageNumber = Math.floor(rowIndex / pageSize);
+
+    return {
+      pageNumber,
+      rowIndex,
+    }
+  }
+
+  const goToRowAndFocus = (gridApi: GridApi, row: IRowPosition) => {
+    gridApi.paginationGoToPage(row.pageNumber);
+    gridApi.ensureIndexVisible(row.rowIndex, 'middle');
+    gridApi.getDisplayedRowAtIndex(row.rowIndex)?.setSelected(true);
+  }
+
+  const focusAndExpandRow = (gridApi: GridApi, id: string) => {
+    const row = getRowPosition(gridApi, id);
+
+    if (!row) {
+      handleFocusError?.({
+        code: 'grid.row-not-found.warning',
+        message: '',
+        level: 'warning',
+        id
       });
 
-      if (rowIndex === -1) {
-        handleFocusError?.({
-          code: '',
-          message: 'Row not found',
-          level: 'warning',
-          id
-        });
-        return;
-      } else {
-        handleFocusError?.(undefined);
-        setFocusByRowId?.('');
-      }
-
-      const pageSize = gridApi.paginationGetPageSize();
-      const pageNumber = Math.floor(rowIndex / pageSize);
-      const rowInPage = rowIndex % pageSize;
-
-      gridApi.paginationGoToPage(pageNumber);
-
-      gridApi.ensureIndexVisible(rowInPage, 'middle');
-      gridApi.getDisplayedRowAtIndex(rowInPage)?.setSelected(true);
-      
-      const rowNode = gridApi.getRowNode(`${id as unknown as string}${DETAILS_ROW_ID_SUFFIX}`);
-      rowNode?.setDataValue('isVisible', true);
-      gridApi.onFilterChanged();
+      setIsRowFound?.(false);
+      return;
     }
 
-    focusRowById(gridApi, focusByRowId);
-  }, [rowData]);
+    handleFocusError?.(undefined);
+    setIsRowFound?.(true);
+    goToRowAndFocus(gridApi, row);
+    
+    const rowNode = gridApi.getRowNode(`${id as unknown as string}${DETAILS_ROW_ID_SUFFIX}`);
+    rowNode?.setDataValue('isVisible', true);
+    gridApi.onFilterChanged();
+  }
 
   const agGridThemeOverrides = GridThemes.getTheme(theme);
   

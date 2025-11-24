@@ -823,7 +823,7 @@
   "polygonParts-info.no-data.message": "לא נמצאו חלקי תיחום לשכבה במיקום המבוקש",
   "polygonParts-info.part-to-large.message": "חלק תיחום גדול מדי לתצוגה",
 
-  "job-manager-focus.error": "העבודה שנוצרה בתאריך {value} לא תואמת לקריטריוני החיפוש",
+  "grid.row-not-found.warning": "העבודה מתאריך {value} לא תואמת לקריטריוני החיפוש",
 
   "export-layer.exportSuccessContainer.title": "בקשת הייצוא נוצרה בהצלחה",
   "export-layer.exportSuccessContainer.approve": "העתקה וסיום",
