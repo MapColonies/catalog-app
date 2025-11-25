@@ -124,30 +124,29 @@ export const EntityRasterDialog: React.FC<EntityRasterDialogProps> = (props: Ent
 
   const { job } = props;
 
-  const isUpdateMode = (job: JobModelType | undefined): boolean => {
+  const determineIsUpdateMode = (job: JobModelType | undefined): boolean => {
     return job ? jobType2Mode[job.type || RasterJobTypeEnum.NEW] === Mode.UPDATE : store.discreteLayersStore.selectedLayerIsUpdateMode === true;
   };
 
-  const getLayerByMode = (productId: string | null | undefined, productType: string | null | undefined): ILayerImage => {
-    const { selectedLayer, entityDescriptors } = store.discreteLayersStore;
+  const getRecordLayerByMode = (productId: string | null | undefined, productType: string | null | undefined): ILayerImage => {
+    const { selectedLayer, entityDescriptors, findRasterUniqueLayer } = store.discreteLayersStore;
 
-    if (!isUpdateMode(job)) { 
+    // 1. START_NEW mode - always return empty base layer
+    if (!determineIsUpdateMode(job)) { 
       return buildRasterRecord(entityDescriptors as EntityDescriptorModelType[]);
     }
 
-    const predicate = (layer: ILayerImage) => 
-      get(layer, 'productId') === productId && get(layer, 'productType') === productType;
+    // 2. RESTORE mode - Try to get the matching layer
+    if (productId && productType) {
+      const layerRecord = cloneDeep(findRasterUniqueLayer(productId, productType));
 
-    const layerRecord = cloneDeep(store.discreteLayersStore.selectLayerByPredicate(predicate));
-
-    if (layerRecord) {
-      return layerRecord;
+      if (layerRecord) { return layerRecord; }
     }
 
-    if (selectedLayer) {
-      return selectedLayer;
-    }
+    // 3. START_UPDATE mode - return the currently selected layer
+    if (selectedLayer) { return selectedLayer; }
 
+    // 4. Fallback (should rarely happen) - return record for START_NEW mode
     return buildRasterRecord(entityDescriptors as EntityDescriptorModelType[]);
   };
 
@@ -155,15 +154,15 @@ export const EntityRasterDialog: React.FC<EntityRasterDialogProps> = (props: Ent
     <RasterWorkflowProvider>
       <EntityRasterDialogInner
         {...props}
-        layerRecord={getLayerByMode(job?.resourceId, job?.productType)}
-        mode={isUpdateMode(job) ? Mode.UPDATE : Mode.NEW}
+        layerRecord={getRecordLayerByMode(job?.resourceId, job?.productType)}
+        mode={determineIsUpdateMode(job) ? Mode.UPDATE : Mode.NEW}
         recordType={RecordType.RECORD_RASTER}
       />
     </RasterWorkflowProvider>
   );
 };
 
-export const EntityRasterDialogInner: React.FC<EntityRasterInnerProps> = observer((props: EntityRasterInnerProps) => {
+const EntityRasterDialogInner: React.FC<EntityRasterInnerProps> = observer((props: EntityRasterInnerProps) => {
 
     //#region STATE MACHINE
     const actorRef = RasterWorkflowContext.useActorRef();
@@ -173,6 +172,8 @@ export const EntityRasterDialogInner: React.FC<EntityRasterInnerProps> = observe
 
     const { isOpen, onSetOpen, job, setJob, mode, layerRecord } = props;
 
+    const isUpdateMode = () => mode === Mode.UPDATE;
+
     useEffect(() => {
       if (!actorRef) return;
 
@@ -181,7 +182,7 @@ export const EntityRasterDialogInner: React.FC<EntityRasterInnerProps> = observe
           type: 'RESTORE',
           job: { jobId: job.id }
         } satisfies Events);
-      } else if (mode === Mode.UPDATE) {
+      } else if (isUpdateMode()) {
         actorRef.send({
           type: 'START_UPDATE',
           updatedLayer: layerRecord as LayerRasterRecordModelType
@@ -392,7 +393,7 @@ export const EntityRasterDialogInner: React.FC<EntityRasterInnerProps> = observe
           </DialogTitle>
           <DialogContent className="dialogBody">
             {
-              mode === Mode.UPDATE &&
+              isUpdateMode() &&
               <UpdateLayerHeader />
             }
             {

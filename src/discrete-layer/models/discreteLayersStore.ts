@@ -272,15 +272,17 @@ export const discreteLayersStore = ModelBase
       self.selectedLayer = layer ? cloneDeep(layer) : undefined;
     }
 
-    function selectLayerByPredicate(predicate: (layer: ILayerImage) => boolean): ILayerImage | undefined {
+    function findLayerByPredicate(predicate: (layer: ILayerImage) => boolean): ILayerImage | undefined {
       const layer = self.layersImages?.find(predicate);
       return layer;
     }
 
-    // function selectUniqeLayer(productId: string, productType: ProductTypeEnumType): ILayerImage | undefined {
-    //   const layer = self.layersImages?.find(predicate);
-    //   return layer;
-    // }
+    function findRasterUniqueLayer(productId: string, productType: string): ILayerImage | undefined {
+      const layer = findLayerByPredicate((layer: ILayerImage) => (
+        get(layer, 'productId') === productId && get(layer, 'productType') === productType));
+
+      return layer;
+    }
 
     function setTabviewData(tabView: TabViews, customLayersImages?: ILayerImage[]): void {
       if (self.tabViews) {
@@ -499,7 +501,7 @@ export const discreteLayersStore = ModelBase
       highlightLayer,
       selectLayer,
       selectLayerByID,
-      selectLayerByPredicate,
+      findRasterUniqueLayer,
       setTabviewData,
       resetSelectedLayer,
       restoreTabviewData,
