@@ -968,21 +968,6 @@ const DiscreteLayerView: React.FC = observer(() => {
       callbackFunc: (data, options, i) => { triggerCallbackFunc(data, options, i) }
     },
   ]) satisfies GeocoderOptions[], [intl]);
- 
-  const findLayer = (productName: string | null | undefined, productType: string | null | undefined): ILayerImage | null | undefined => {
-    if (!productName || !productType || isUpdateMode(jobToOpenRasterEntity?.type) === false) {
-      return undefined;
-    }
-    const catalogLayers: LayerMetadataMixedUnion[] = [ ...(store.discreteLayersStore.layersImages ?? []) ];
-    const layerRecord = find(catalogLayers, (layer) => {
-      return get(layer, 'productName') === productName && get(layer, 'productType') === productType;
-    });
-    return layerRecord;
-  };
-
-  const isUpdateMode = (jobType: string | null | undefined): boolean => {
-    return jobType2Mode[jobType || RasterJobTypeEnum.NEW] === Mode.UPDATE;
-  };
 
   return (
     <>
@@ -1205,7 +1190,13 @@ const DiscreteLayerView: React.FC = observer(() => {
                 { activeTabView === TabViews.EXPORT_LAYER && <ExportDrawingHandler /> }
 
                 <ActionResolver
-                  handleOpenEntityDialog = {setEntityDialogOpen}
+                  handleOpenEntityDialog = {(open) => {
+                    if (store.discreteLayersStore.selectedLayer?.type === RecordType.RECORD_RASTER) {
+                      setIsRasterEntityDialogOpen(open);
+                    } else {
+                      setEntityDialogOpen(open);
+                    }
+                  }}
                   handleFlyTo = {onFlyTo}
                   handleTabViewChange = {handleTabViewChange}
                   handleOpenEntityDeleteDialog={setEntityDeleteDialogOpen}
@@ -1236,10 +1227,7 @@ const DiscreteLayerView: React.FC = observer(() => {
           <EntityRasterDialog
             isOpen={isRasterEntityDialogOpen}
             onSetOpen={setIsRasterEntityDialogOpen}
-            recordType={RecordType.RECORD_RASTER}
-            layerRecord={findLayer(jobToOpenRasterEntity?.productName, jobToOpenRasterEntity?.productType)}
-            isSelectedLayerUpdateMode={isUpdateMode(jobToOpenRasterEntity?.type)}
-            jobId={jobToOpenRasterEntity?.id}
+            job={jobToOpenRasterEntity}
             setJob={setJobToOpenRasterEntity}
           />
         }

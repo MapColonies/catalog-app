@@ -7,7 +7,6 @@ import { existStatus, getTextStyle } from '../../../common/helpers/style';
 import { isBeingDeleted } from '../../../common/helpers/layer-url';
 import { Mode } from '../../../common/models/mode.enum';
 import { EntityDialog } from '../../components/layer-details/entity.dialog';
-import { EntityRasterDialog } from '../../components/layer-details/raster/entity.raster.dialog';
 import { EntityDeleteDialog } from '../../components/layer-details/entity.delete-dialog';
 import { LayersDetailsComponent } from '../../components/layer-details/layer-details';
 import { PublishButton } from '../../components/layer-details/publish-button';
@@ -93,15 +92,6 @@ export const DetailsPanel: React.FC<DetailsPanelComponentProps> = observer((prop
               }}
             />
           </Tooltip>
-        }
-        {
-          isEntityDialogOpen && layerToPresent?.__typename === 'LayerRasterRecord' && isSelectedLayerUpdateMode &&
-          <EntityRasterDialog
-            isOpen={isEntityDialogOpen}
-            onSetOpen={setEntityDialogOpen}
-            layerRecord={layerToPresent}
-            isSelectedLayerUpdateMode={isSelectedLayerUpdateMode}
-          />
         }
         {
           permissions.isDeleteAllowed && layerToPresent && isEntityDeleteDialogOpen && isSelectedLayerDeleteMode &&

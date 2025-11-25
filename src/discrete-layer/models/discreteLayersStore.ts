@@ -272,6 +272,16 @@ export const discreteLayersStore = ModelBase
       self.selectedLayer = layer ? cloneDeep(layer) : undefined;
     }
 
+    function selectLayerByPredicate(predicate: (layer: ILayerImage) => boolean): ILayerImage | undefined {
+      const layer = self.layersImages?.find(predicate);
+      return layer;
+    }
+
+    // function selectUniqeLayer(productId: string, productType: ProductTypeEnumType): ILayerImage | undefined {
+    //   const layer = self.layersImages?.find(predicate);
+    //   return layer;
+    // }
+
     function setTabviewData(tabView: TabViews, customLayersImages?: ILayerImage[]): void {
       if (self.tabViews) {
         const idxTabViewToUpdate = self.tabViews.findIndex((tab) => tab.idx === tabView);
@@ -489,6 +499,7 @@ export const discreteLayersStore = ModelBase
       highlightLayer,
       selectLayer,
       selectLayerByID,
+      selectLayerByPredicate,
       setTabviewData,
       resetSelectedLayer,
       restoreTabviewData,
