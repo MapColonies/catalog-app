@@ -1,5 +1,5 @@
-import { CircularProgress } from "@map-colonies/react-core";
 import { Box } from '@map-colonies/react-components';
+import { CircularProgress } from '@map-colonies/react-core';
 
 import './curtain.component.css';
 
@@ -9,9 +9,9 @@ interface CurtainProps {
 
 export const Curtain: React.FC<CurtainProps> = ({showProgress}) => {
   return (
-    <Box className={'curtain'}>
+    <Box className="curtain">
       {
-        showProgress && <CircularProgress className={'progress'} size='xlarge' />
+        showProgress && <CircularProgress className="progress" size='xlarge' />
       }
     </Box>
   );

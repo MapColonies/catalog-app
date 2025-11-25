@@ -3,6 +3,7 @@ import { FormattedMessage } from 'react-intl';
 import { Box, CircularProgressBar } from '@map-colonies/react-components';
 import { IconButton, Typography } from '@map-colonies/react-core';
 import { Status } from '../../../models';
+import { Curtain } from './curtain/curtain.component';
 import { isTaskFailed, isTaskValid } from './state-machine/helpers';
 import { Aggregation, IJob } from './state-machine/types';
 
@@ -66,32 +67,35 @@ export const JobInfo: React.FC<JobInfoProps> = ({ job }) => {
         <Box className="center">
           <Box className="progressBar">
             {
-              job.taskId &&
-              <CircularProgressBar
-                value={job.taskPercentage ?? 0}
-                styles={styles}
-              >
-                {
-                  (isFailed || !isValid) &&
-                  <IconButton
-                    className={`icon mc-icon-Status-Warnings ${status}`}
-                    onClick={(e): void => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                    }}
-                  />
-                }
-                <Box className={`text bold ${status}`}>
-                  <FormattedMessage id={`system-status.job.status_translation.${job.taskStatus}`} />
+              job.taskId
+              ? <CircularProgressBar
+                  value={job.taskPercentage ?? 0}
+                  styles={styles}
+                >
                   {
-                    job.taskStatus === Status.InProgress &&
-                    <Typography tag="span" className="dots">{dots}</Typography>
+                    (isFailed || !isValid) &&
+                    <IconButton
+                      className={`icon mc-icon-Status-Warnings ${status}`}
+                      onClick={(e): void => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                      }}
+                    />
                   }
+                  <Box className={`text bold ${status}`}>
+                    <FormattedMessage id={`system-status.job.status_translation.${job.taskStatus}`} />
+                    {
+                      job.taskStatus === Status.InProgress &&
+                      <Typography tag="span" className="dots">{dots}</Typography>
+                    }
+                  </Box>
+                  <Box className={`percentage bold ${status}`}>
+                    {`${job.taskPercentage ?? 0}%`}
+                  </Box>
+                </CircularProgressBar>
+              : <Box className="curtainContainer">
+                  <Curtain showProgress={true} />
                 </Box>
-                <Box className={`percentage bold ${status}`}>
-                  {`${job.taskPercentage ?? 0}%`}
-                </Box>
-              </CircularProgressBar>
             }
           </Box>
         </Box>
