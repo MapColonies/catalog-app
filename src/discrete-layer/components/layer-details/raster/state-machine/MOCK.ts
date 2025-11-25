@@ -282,6 +282,7 @@ export const MOCK_JOB_UPDATE = {
 };
 
 export const MOCK_TASK = {
+  id: "64d035cd-b2cf-41a3-90a0-498c3b6dfe1f",
   percentage: 75,
   parameters: {
     isValid: false,
@@ -329,7 +330,7 @@ export const MOCK_TASK = {
       }
     ]
   },
-  status: 'In-Progress'
+  status: 'InProgress'
 };
 
 export const MOCK_POLYGON: Geometry = {

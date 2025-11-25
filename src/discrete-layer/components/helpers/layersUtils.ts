@@ -1,3 +1,4 @@
+import { Feature } from 'geojson';
 import { get, isEmpty } from 'lodash';
 import bbox from '@turf/bbox';
 import area from '@turf/area';
@@ -21,7 +22,6 @@ import {
 } from '../../models';
 import { ILayerImage } from '../../models/layerImage';
 import { ResourceUrlModelType } from '../../models/ResourceUrlModel';
-import { Feature } from 'geojson';
 
 const DEFAULT_RECTANGLE_FACTOR = 0.2;
 const EARTH_AREA = 509000000; //whole EARTH surface, in square km

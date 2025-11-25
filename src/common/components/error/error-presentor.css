@@ -25,7 +25,3 @@ body[dir='rtl'] .errorsList {
 body[dir='rtl'] .errorContainer {
   flex-direction: row-reverse;
 }
-
-.error {
-  color: var(--mdc-theme-gc-error-high) !important;
-}

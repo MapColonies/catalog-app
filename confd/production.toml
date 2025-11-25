@@ -43,10 +43,11 @@ keys = [
   "/configuration/model/viewer/token/value",
   "/configuration/running/mode/type",
   "/configuration/running/mode/autocomplete",
+  "/configuration/served/entity/types",
   "/configuration/access/token/attribute/name",
   "/configuration/access/token/injection/type",
   "/configuration/access/token/token/value",
-  "/configuration/served/entity/types",
+  "/configuration/raster/ingestion/files/structure",
   "/configuration/admin/password",
   "/configuration/project/version",
   "/configuration/whatsnew/url",
@@ -69,5 +70,5 @@ keys = [
   "/configuration/wfs/max/cache/size",
   "/configuration/geocoder/url",
   "/configuration/geocoder/callbackUrl",
-  "/configuration/rasteringestionfilesstructure"
+  "/configuration/upload/shape/files/time/grace/in/minutes"
 ]

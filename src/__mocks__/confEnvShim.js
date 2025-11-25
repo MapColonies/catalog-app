@@ -61,12 +61,13 @@ if (!window._env_) {
         autocomplete: false,
       },
       NUMBER_OF_CHARACTERS_LIMIT: 18,
+      SERVED_ENTITY_TYPES: 'RECORD_ALL,RECORD_RASTER,RECORD_3D,RECORD_DEM,RECORD_VECTOR',
       ACCESS_TOKEN: {
         attributeName: 'token',
         injectionType: 'queryParam',
         tokenValue: 'TOKEN'
       },
-      SERVED_ENTITY_TYPES: 'RECORD_ALL,RECORD_RASTER,RECORD_3D,RECORD_DEM,RECORD_VECTOR',
+      RASTER_INGESTION_FILES_STRUCTURE: '{"data": {"allowedExt": [".gpkg"], "selectableExt": [".gpkg"], "relativeToAOIDirPath": "./data", "producerFileName": "*", "selectablePattern": "*"}, "product": {"allowedExt": [".shp", ".shx", ".dbf", ".prj", ".sbn", ".sbx", ".xml", ".cpg", ".qix"], "selectableExt": [".shp"], "relativeToAOIDirPath": "./shape", "producerFileName": "Product", "selectablePattern": "Product"}, "shapeMetadata": {"allowedExt": [".shp", ".shx", ".dbf", ".prj", ".sbn", ".sbx", ".xml", ".cpg", ".qix"], "selectableExt": [".shp"], "relativeToAOIDirPath": "./shape", "producerFileName": "ShapeMetadata", "selectablePattern": "ShapeMetadata"}}',
       WHATSNEW_URL: 'http://whatsnew-URL',
       SITES_CONFIG: '{"masters": [{ "dns": "http://localhost:3000", "isAlias": false }], "slaves": [{ "dns": "http://localhost:8090", "isAlias": false }], "generics": [{ "dns": "https://catalog.mapcolonies.net", "isAlias": false }]}',
       BFF_PATH: '/graphql',
@@ -97,29 +98,7 @@ if (!window._env_) {
         url: 'http://geocoder-URL',
         callbackUrl: 'http://geocoder-callback-URL'
       },  
-      RASTER_INGESTION_FILES_STRUCTURE: `{
-        "data": {
-          "allowedExt": [".gpkg"],
-          "selectableExt": [".gpkg"],
-          "relativeToAOIDirPath": "./data",
-          "producerFileName": "*",
-          "selectablePattern": "*"
-        },
-        "product": {
-          "allowedExt": [".shp", ".shx", ".dbf", ".prj", ".sbn", ".sbx", ".xml", ".cpg", ".qix"],
-          "selectableExt": [".shp"],
-          "relativeToAOIDirPath": "./shape",
-          "producerFileName": "Product",
-          "selectablePattern": "Product"
-        },
-        "shapeMetadata": {
-          "allowedExt": [".shp", ".shx", ".dbf", ".prj", ".sbn", ".sbx", ".xml", ".cpg", ".qix"],
-          "selectableExt": [".shp"],
-          "relativeToAOIDirPath": "./shape",
-          "producerFileName": "ShapeMetadata",
-          "selectablePattern": "ShapeMetadata"
-        }
-      }`
+      UPLOAD_SHAPE_FILES_TIME_GRACE_IN_MINUTES: 10
     };
   })(void 0);
 }

@@ -26,7 +26,8 @@ export const fetchProductActions = [
 
 export const selectionModeActions = (selectionMode: SelectionMode, files: IFiles = {}) => [
   assign({ selectionMode, files }),
-  sendParent({ type: "SET_FILES", selectionMode, files, addPolicy: "override" }),
+  sendParent({ type: "SET_SELECTION_MODE", selectionMode }),
+  sendParent({ type: "SET_FILES", files, addPolicy: "override" }),
   sendParent({ type: "CLEAN_ERRORS" })
 ];
 

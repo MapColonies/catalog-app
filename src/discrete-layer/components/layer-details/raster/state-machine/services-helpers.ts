@@ -3,10 +3,13 @@ import path from 'path';
 import shp from 'shpjs';
 import { FileData } from '@map-colonies/react-components';
 import CONFIG from '../../../../../common/config';
+import { dateFormatter, relativeDateFormatter } from '../../../../../common/helpers/formatters';
 import {
+  JobModelType,
   LayerMetadataMixedUnion,
   RecordType,
-  SourceValidationModelType
+  SourceValidationModelType,
+  TaskModelType
 } from '../../../../models';
 import { LayerRasterRecordInput } from '../../../../models/RootStore.base';
 import { jobType2Mode, RasterJobTypeEnum, transformEntityToFormFields } from '../../utils';
@@ -39,7 +42,7 @@ export const getDirectory = async (filePath: string, context: IContext): Promise
         },
       });
     });
-    return result?.getDirectory as FileData[];
+    return [ ...(result?.getDirectory as FileData[]) ];
   } catch (e) {
     return undefined;
   }
@@ -48,7 +51,7 @@ export const getDirectory = async (filePath: string, context: IContext): Promise
 export const getDetails = async (filePath: string, context: IContext): Promise<FileData | undefined> => {
   const files = await getDirectory(path.dirname(filePath), context);
   if (files) {
-    return files.filter((file: FileData) => file.name === path.basename(filePath))[0];
+    return { ...(files.filter((file: FileData) => file.name === path.basename(filePath))[0]) };
   }
   return undefined;
 };
@@ -112,13 +115,7 @@ export const fetchProduct = async (product: IProductFile, context: IContext) => 
   };
 };
 
-export const getRestoreData = async (context: IContext): Promise<IPartialContext> => {
-  const rootDirectory = await getDirectory(BASE_PATH, context);
-  if (!rootDirectory || rootDirectory.length === 0) {
-    throw buildError('ingestion.error.not-found', BASE_PATH);
-  }
-  const MOUNT_DIR = rootDirectory[FIRST].name;
-
+export const getJob = async (context: IContext): Promise<JobModelType> => {
   const result = await queryExecutor(async () => {
     return await context.store.queryJob({
       id: context.job?.jobId as string
@@ -127,7 +124,32 @@ export const getRestoreData = async (context: IContext): Promise<IPartialContext
   if (!result?.job) {
     throw buildError('ingestion.error.not-found', `JOB ${context.job?.jobId}`);
   }
-  const job = { ...result.job };
+  return { ...result.job };
+};
+
+export const getTask = async (context: IContext): Promise<TaskModelType> => {
+  const result = await queryExecutor(async () => {
+    return await context.store.queryFindTasks({
+      params: {
+        jobId: context.job?.jobId as string,
+        type: 'validation'
+      }
+    });
+  });
+  if (!result?.findTasks[FIRST]) {
+    throw buildError('ingestion.error.not-found', 'validation task');
+  }
+  return { ...result.findTasks[FIRST] };
+};
+
+export const getRestoreData = async (context: IContext): Promise<IPartialContext> => {
+  const rootDirectory = await getDirectory(BASE_PATH, context);
+  if (!rootDirectory || rootDirectory.length === 0) {
+    throw buildError('ingestion.error.not-found', BASE_PATH);
+  }
+  const MOUNT_DIR = rootDirectory[FIRST].name;
+
+  const job = await getJob(context);
 
     try {
     return {
@@ -137,24 +159,27 @@ export const getRestoreData = async (context: IContext): Promise<IPartialContext
         data: {
           label: DATA_LABEL,
           path: getPath(MOUNT_DIR, job.parameters.inputFiles.gpkgFilesPath[0]),
-          exists: false
+          exists: false,
+          dateFormatterPredicate: dateFormatter
         },
         product: {
           label: PRODUCT_LABEL,
           path: getPath(MOUNT_DIR, job.parameters.inputFiles.productShapefilePath),
-          exists: false
+          exists: false,
+          dateFormatterPredicate: relativeDateFormatter
         },
         shapeMetadata: {
           label: SHAPEMETADATA_LABEL,
           path: getPath(MOUNT_DIR, job.parameters.inputFiles.metadataShapefilePath),
-          exists: false
+          exists: false,
+          dateFormatterPredicate: relativeDateFormatter
         }
       },
       resolutionDegree: job.parameters.ingestionResolution,
       formData: transformEntityToFormFields({ ...job.parameters.metadata, resolutionDegree: job.parameters.ingestionResolution } as unknown as LayerMetadataMixedUnion) as unknown as LayerRasterRecordInput,
       job: {
         jobId: job.id,
-        record: job
+        details: job
       }
     };
   } catch (error) {

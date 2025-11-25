@@ -79,6 +79,7 @@
   CONFIGURATION_WFS_MAX_CACHE_SIZE: {{ quote .Values.env.wfs.max.cacheSize }}
   CONFIGURATION_GEOCODER_URL: {{ quote .Values.env.geocoder.url }}
   CONFIGURATION_GEOCODER_CALLBACKURL: {{ quote .Values.env.geocoder.callbackUrl }}
+  CONFIGURATION_UPLOAD_SHAPE_FILES_TIME_GRACE_IN_MINUTES: {{ quote .Values.env.uploadShapeFilesTimeGraceInMinutes }}
 {{- end -}}
 
 {{ include "mc-chart.configmap" (dict "MAIN_OBJECT_BLOCK" $MAIN_OBJECT_BLOCK "COMPONENT_NAME" $COMPONENT_NAME "DATA" $DATA "WITH_TELEMETRY_TRACING" false "WITH_TELEMETRY_METRICS" false "context" .)}}

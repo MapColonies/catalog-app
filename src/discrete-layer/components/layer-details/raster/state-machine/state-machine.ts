@@ -1,7 +1,8 @@
-import { merge } from 'lodash';
+import { mergeWith } from 'lodash';
 import { assign, createMachine, sendParent } from 'xstate';
-import { Mode } from '../../../../../common/models/mode.enum';
 import CONFIG from '../../../../../common/config';
+import { dateFormatter, relativeDateFormatter } from '../../../../../common/helpers/formatters';
+import { Mode } from '../../../../../common/models/mode.enum';
 import { Status } from '../../../../models';
 import {
   fetchProductActions,
@@ -12,6 +13,7 @@ import {
 } from './action-handlers';
 import {
   addError,
+  validateShapeFiles,
   warnUnexpectedStateEvent
 } from './helpers';
 import { SERVICES } from './services';
@@ -59,9 +61,9 @@ const filesMachine = createMachine({
             },
             MANUAL: {
               actions: selectionModeActions('manual' as SelectionMode, {
-                data: { label: DATA_LABEL, path: '', exists: false },
-                product: { label: PRODUCT_LABEL, path: '', exists: false },
-                shapeMetadata: { label: SHAPEMETADATA_LABEL, path: '', exists: false }
+                data: { label: DATA_LABEL, path: '', exists: false, dateFormatterPredicate: dateFormatter },
+                product: { label: PRODUCT_LABEL, path: '', exists: false, dateFormatterPredicate: relativeDateFormatter },
+                shapeMetadata: { label: SHAPEMETADATA_LABEL, path: '', exists: false, dateFormatterPredicate: relativeDateFormatter }
               }),
               target: `#${WORKFLOW.FILES.ROOT}`
             },
@@ -77,7 +79,16 @@ const filesMachine = createMachine({
             onDone: {
               actions: [
                 assign((_: { context: IContext; event: any }) => ({
-                  files: merge({}, _.context.files, _.event.output)
+                  files: mergeWith(
+                    {},
+                    _.context.files,
+                    _.event.output,
+                    (objValue: any, srcValue: any, key: string) => {
+                      if (key === 'geoDetails') {
+                        return srcValue;
+                      }
+                    }
+                  )
                 })),
                 sendParent((_: { context: IContext; event: any }) => ({
                   type: "SET_FILES",
@@ -217,9 +228,7 @@ const filesMachine = createMachine({
             input: (_: { context: IContext; event: any }) => _,
             src: SERVICES[WORKFLOW.FILES.ROOT].checkShapeMetadataService,
             onDone: {
-              actions: [
-                ...filesSelectedActions
-              ],
+              actions: filesSelectedActions,
               target: WORKFLOW.FILES.MANUAL.IDLE
             },
             onError: {
@@ -324,15 +333,32 @@ export const workflowMachine = createMachine<IContext, Events>({
         src: filesMachine
       },
       on: {
-        SET_FILES: {
+        SET_SELECTION_MODE: {
           actions: assign((_: { context: IContext; event: any }) => ({
-            selectionMode: _.event.selectionMode ?
-              _.event.selectionMode :
-              _.context.selectionMode,
-            files: _.event.addPolicy === 'merge' ?
-              merge({}, _.context.files, _.event.files) :
-              { ..._.event.files }
+            selectionMode: _.event.selectionMode
           }))
+        },
+        SET_FILES: {
+          actions: assign((_: { context: IContext; event: any }) => {
+            const files = _.event.addPolicy === 'merge' ?
+              mergeWith(
+                {},
+                _.context.files,
+                _.event.files,
+                (objValue: any, srcValue: any, key: string) => {
+                  if (key === 'geoDetails') {
+                    return srcValue;
+                  }
+                }
+              ) :
+              { ..._.event.files };
+            const errors = [ ..._.context.errors, ...validateShapeFiles(files) ];
+
+            return {
+              files,
+              errors
+            };
+          })
         },
         FILES_SELECTED: {
           target: `#${WORKFLOW.ROOT}`

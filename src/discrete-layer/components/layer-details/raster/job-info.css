@@ -1,0 +1,46 @@
+#layerDetailsFormRaster .progress {
+  flex: 1;
+}
+
+#layerDetailsFormRaster .progressBar {
+  width: 150px;
+  height: 150px;
+}
+
+#layerDetailsFormRaster .icon {
+  font-size: 52px;
+  cursor: default;
+}
+
+#layerDetailsFormRaster .text {
+  position: relative;
+}
+
+#layerDetailsFormRaster .dots {
+  position: absolute;
+  left: 100%;
+  white-space: nowrap;
+  margin: 0 2px;
+}
+
+body[dir='rtl'] #layerDetailsFormRaster .dots {
+  left: unset;
+  right: 100%;
+}
+
+#layerDetailsFormRaster .percentage {
+  font-size: 20px;
+}
+
+#layerDetailsFormRaster .reportContainer {
+  margin: 4px;
+}
+
+#layerDetailsFormRaster .reportList {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4px;
+  margin: 0 8px;
+  height: 140px;
+  overflow-y: auto;
+}
