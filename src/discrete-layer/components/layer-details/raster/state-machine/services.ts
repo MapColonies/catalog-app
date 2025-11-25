@@ -10,7 +10,7 @@ import {
   getFeatureAndMarker,
   getFile,
   getPath,
-  validateShapeFiles
+  handleShapeFilesValidation
 } from './helpers';
 import { MOCK_JOB_UPDATE } from './MOCK';
 import { queryExecutor } from './query-executor';
@@ -137,10 +137,7 @@ export const SERVICES = {
           const productFile = await fetchProduct(files.product, input.context);
           files.product.geoDetails = productFile?.geoDetails;
         }
-        const shapeFilesValidation = validateShapeFiles(files);
-        if (shapeFilesValidation.length > 0) {
-          errors = [ ...errors, ...shapeFilesValidation ];
-        }
+        errors = handleShapeFilesValidation(files);
       }
 
       return {

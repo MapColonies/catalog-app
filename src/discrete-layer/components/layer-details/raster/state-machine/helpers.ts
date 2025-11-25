@@ -148,6 +148,21 @@ export const validateShapeFiles = (files: IFiles): IStateError[] => {
   return [];
 };
 
+export const handleShapeFilesValidation = (files: IFiles): IStateError[] => {
+  let errors: IStateError[] = [];
+  const shapeFilesValidation = validateShapeFiles(files);
+  if (shapeFilesValidation.length > 0) {
+    if (files.product) {
+      files.product.isModDateDiffExceeded = true;
+    }
+    if (files.shapeMetadata) {
+      files.shapeMetadata.isModDateDiffExceeded = true;
+    }
+    errors = [ ...shapeFilesValidation ];
+  }
+  return errors;
+};
+
 export const isJobSubmitted = (context: IContext): boolean => {
   return !!(context.job && context.job.jobId);
 };

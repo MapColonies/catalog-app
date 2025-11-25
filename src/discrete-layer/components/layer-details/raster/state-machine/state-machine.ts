@@ -13,7 +13,7 @@ import {
 } from './action-handlers';
 import {
   addError,
-  validateShapeFiles,
+  handleShapeFilesValidation,
   warnUnexpectedStateEvent
 } from './helpers';
 import { SERVICES } from './services';
@@ -321,7 +321,7 @@ export const workflowMachine = createMachine<IContext, Events>({
         ],
         onError: {
           actions: addError,
-          target: WORKFLOW.ERROR
+          target: WORKFLOW.IDLE
         }
       }
     },
@@ -352,7 +352,8 @@ export const workflowMachine = createMachine<IContext, Events>({
                 }
               ) :
               { ..._.event.files };
-            const errors = [ ..._.context.errors, ...validateShapeFiles(files) ];
+            let errors = _.context.errors;
+            errors = handleShapeFilesValidation(files);
 
             return {
               files,
@@ -389,7 +390,7 @@ export const workflowMachine = createMachine<IContext, Events>({
         },
         onError: {
           actions: addError,
-          target: WORKFLOW.ERROR
+          target: WORKFLOW.IDLE
         }
       }
     },
@@ -424,7 +425,7 @@ export const workflowMachine = createMachine<IContext, Events>({
         ],
         onError: {
           actions: addError,
-          target: WORKFLOW.ERROR
+          target: WORKFLOW.IDLE
         }
       }
     },
@@ -448,20 +449,13 @@ export const workflowMachine = createMachine<IContext, Events>({
         },
         onError: {
           actions: addError,
-          target: WORKFLOW.ERROR
+          target: WORKFLOW.IDLE
         }
       }
     },
     [WORKFLOW.DONE]: {
       entry: () => console.log(`>>> Enter ${WORKFLOW.DONE}`),
       type: "final"
-    },
-    [WORKFLOW.ERROR]: {
-      entry: () => console.log(`>>> Enter ${WORKFLOW.ERROR}`),
-      on: {
-        RETRY: WORKFLOW.IDLE,
-        "*": { actions: warnUnexpectedStateEvent }
-      }
     }
   }
 });

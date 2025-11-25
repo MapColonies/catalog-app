@@ -307,8 +307,8 @@ export const InnerRasterForm = (
               enableMapPreview={false}
               showFiedlsCategory={false}/>
             {
-              (isLoading || !isFilesSelected(state.context) || isJobSubmitted(state.context)) 
-              && <Curtain showProgress={isLoading}/>
+              (isLoading || !isFilesSelected(state.context) || isJobSubmitted(state.context)) &&
+              <Curtain showProgress={isLoading}/>
             }
           </Box>
         </Box>

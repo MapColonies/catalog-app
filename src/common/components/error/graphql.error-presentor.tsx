@@ -54,7 +54,7 @@ export const GraphQLError: React.FC<IGpaphQLError> = ({ error }) => {
         !isEmpty(error?.response) &&
         <AutoDirectionBox className="errorContainer">
           <IconButton
-            className="errorIcon mc-icon-Status-Warnings"
+            className="errorIcon mc-icon-Status-Warnings error"
             onClick={(e): void => {
               e.preventDefault();
               e.stopPropagation();
