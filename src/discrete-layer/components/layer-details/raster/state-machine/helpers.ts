@@ -148,6 +148,25 @@ export const validateShapeFiles = (files: IFiles): IStateError[] => {
   return [];
 };
 
+export const handleShapeFilesValidation = (files: IFiles): IStateError[] => {
+  let errors: IStateError[] = [];
+  if (files.product && files.shapeMetadata) {
+    files.product.isModDateDiffExceeded = false;
+    files.shapeMetadata.isModDateDiffExceeded = false;
+  }
+  const shapeFilesValidation = validateShapeFiles(files);
+  if (shapeFilesValidation.length > 0) {
+    if (files.product) {
+      files.product.isModDateDiffExceeded = true;
+    }
+    if (files.shapeMetadata) {
+      files.shapeMetadata.isModDateDiffExceeded = true;
+    }
+    errors = [ ...shapeFilesValidation ];
+  }
+  return errors;
+};
+
 export const isJobSubmitted = (context: IContext): boolean => {
   return !!(context.job && context.job.jobId);
 };
@@ -176,7 +195,9 @@ export const isUIDisabled = (isLoading: boolean, state: any): boolean => {
 };
 
 export const hasError = (context: IContext): boolean => {
-  return context.errors.some(error => error.level === 'error');
+  return context.errors.length > 0 && 
+    (context.errors.some(error => error.level === 'error') || 
+    context.errors.some(error => !error.level));
 };
 
 export const isTaskFailed = (job: IJob | undefined): boolean => {

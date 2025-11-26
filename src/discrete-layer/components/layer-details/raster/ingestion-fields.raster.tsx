@@ -22,7 +22,6 @@ import {
 import {
   SelectionMode,
   Events,
-  IFileBase,
   IFiles
 } from './state-machine/types';
 
@@ -39,18 +38,21 @@ interface IngestionFieldsProps {
   recordType: RecordType;
 }
 
-const FileItem: React.FC<{ file: IFileBase }> = ({ file }) => {
+const FileItem: React.FC<{ file: any }> = ({ file }) => {
+  const color = !file.exists ? 'error' : (file.isModDateDiffExceeded ? 'warning' : '');
   return (
     <>
-      <Box><Icon className="fileIcon mc-icon-Map-Vector" /></Box>
+      <Box>
+        <Icon className="fileIcon mc-icon-Map-Vector" />
+      </Box>
       <FormattedMessage id={file.label} />
-      <Box className={`fileItemName ${file.exists ? '' : 'error'}`}>
+      <Box className={`fileItemName ${color}`}>
         {formatPath(file.path)}
       </Box>
-      <Box className="ltr">
-        {defaultFormatters.formatFileSize(null, file.details as FileData)}
+      <Box className={`ltr ${color}`}>
+        {defaultFormatters.formatFileSize(null, file.details)}
       </Box>
-      <Box className="ltr">
+      <Box className={`ltr ${color}`}>
         {
           (file.details?.modDate && file.dateFormatterPredicate)
             ? file.dateFormatterPredicate(file.details.modDate)
@@ -75,7 +77,7 @@ const IngestionInputs: React.FC<{ state: any }> = ({ state }) => {
         <Box className="filesList">
           {
             state.context?.files &&
-            Object.values(state.context?.files as IFiles).map((file: IFileBase, idx: number): JSX.Element => {
+            Object.values(state.context?.files as IFiles).map((file: any, idx: number): JSX.Element => {
               return <FileItem key={idx} file={file} />;
             })
           }
