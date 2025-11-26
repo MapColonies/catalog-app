@@ -1,5 +1,6 @@
 import { FeatureCollection } from 'geojson';
 import path from 'path';
+import { merge } from 'lodash';
 import shp from 'shpjs';
 import { FileData } from '@map-colonies/react-components';
 import CONFIG from '../../../../../common/config';
@@ -31,6 +32,16 @@ import {
   PRODUCT_LABEL,
   SHAPEMETADATA_LABEL,
 } from './types';
+
+function filterByKeys<T extends object, U extends object>(
+    source: T,
+    reference: U
+  ): Partial<T> {
+    const allowedKeys = new Set(Object.keys(reference));
+    return Object.fromEntries(
+      Object.entries(source).filter(([key]) => allowedKeys.has(key))
+    ) as Partial<T>;
+}
 
 export const getDirectory = async (filePath: string, context: IContext): Promise<FileData[] | undefined> => {
   try {
@@ -124,7 +135,35 @@ export const getJob = async (context: IContext): Promise<JobModelType> => {
   if (!result?.job) {
     throw buildError('ingestion.error.not-found', `JOB ${context.job?.jobId}`);
   }
-  return { ...result.job };
+ 
+  const orgJobParamsMetadata = {...result.job.parameters.metadata};
+  
+  const resolvedJobMetadata = await queryExecutor(async () => {
+    return await context.store.queryResolveMetadataAsModel(
+      {
+        data: {
+          metadata: JSON.stringify(orgJobParamsMetadata),
+          type: RecordType.RECORD_RASTER,
+        }
+      }
+    );
+  });
+  if (!resolvedJobMetadata?.resolveMetadataAsModel) {
+    throw buildError('ingestion.error.not-found', `JOB.parameters.metadata can't be transformed to entity`);
+  }
+
+  const resolvedMergedJob = merge(
+    {},
+    result.job,
+    {
+      parameters: {
+        metadata: {
+          ...filterByKeys(resolvedJobMetadata.resolveMetadataAsModel, orgJobParamsMetadata)
+        }
+      }
+    }
+  );
+  return resolvedMergedJob;
 };
 
 export const getTask = async (context: IContext): Promise<TaskModelType> => {
@@ -150,8 +189,7 @@ export const getRestoreData = async (context: IContext): Promise<IPartialContext
   const MOUNT_DIR = rootDirectory[FIRST].name;
 
   const job = await getJob(context);
-
-    try {
+  try {
     return {
       flowType: jobType2Mode[job.type || RasterJobTypeEnum.NEW] as IPartialContext['flowType'],
       selectionMode: 'restore',
