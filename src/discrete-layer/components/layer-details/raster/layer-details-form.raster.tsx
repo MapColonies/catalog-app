@@ -269,7 +269,7 @@ export const InnerRasterForm = (
         <Box className="content section">
           <Box className="previewAndJobContainer">
             <Box className="jobData section">
-              <JobInfo job={state.context.job} />
+              <JobInfo context={state.context} />
             </Box>
             <GeoFeaturesPresentorComponent
               layerRecord={layerRecord}
