@@ -150,6 +150,10 @@ export const validateShapeFiles = (files: IFiles): IStateError[] => {
 
 export const handleShapeFilesValidation = (files: IFiles): IStateError[] => {
   let errors: IStateError[] = [];
+  if (files.product && files.shapeMetadata) {
+    files.product.isModDateDiffExceeded = false;
+    files.shapeMetadata.isModDateDiffExceeded = false;
+  }
   const shapeFilesValidation = validateShapeFiles(files);
   if (shapeFilesValidation.length > 0) {
     if (files.product) {
@@ -191,7 +195,9 @@ export const isUIDisabled = (isLoading: boolean, state: any): boolean => {
 };
 
 export const hasError = (context: IContext): boolean => {
-  return context.errors.some(error => error.level === 'error');
+  return context.errors.length > 0 && 
+    (context.errors.some(error => error.level === 'error') || 
+    context.errors.some(error => !error.level));
 };
 
 export const isTaskFailed = (job: IJob | undefined): boolean => {

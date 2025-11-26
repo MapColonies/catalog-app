@@ -42,13 +42,15 @@ const FileItem: React.FC<{ file: any }> = ({ file }) => {
   const color = !file.exists ? 'error' : (file.isModDateDiffExceeded ? 'warning' : '');
   return (
     <>
-      <Box><Icon className="fileIcon mc-icon-Map-Vector" /></Box>
+      <Box>
+        <Icon className="fileIcon mc-icon-Map-Vector" />
+      </Box>
       <FormattedMessage id={file.label} />
       <Box className={`fileItemName ${color}`}>
         {formatPath(file.path)}
       </Box>
       <Box className={`ltr ${color}`}>
-        {defaultFormatters.formatFileSize(null, file.details as FileData)}
+        {defaultFormatters.formatFileSize(null, file.details)}
       </Box>
       <Box className={`ltr ${color}`}>
         {
