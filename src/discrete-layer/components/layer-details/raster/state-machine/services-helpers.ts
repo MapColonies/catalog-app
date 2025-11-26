@@ -34,13 +34,13 @@ import {
 } from './types';
 
 function filterByKeys<T extends object, U extends object>(
-    source: T,
-    reference: U
-  ): Partial<T> {
-    const allowedKeys = new Set(Object.keys(reference));
-    return Object.fromEntries(
-      Object.entries(source).filter(([key]) => allowedKeys.has(key))
-    ) as Partial<T>;
+  source: T,
+  reference: U
+): Partial<T> {
+  const allowedKeys = new Set(Object.keys(reference));
+  return Object.fromEntries(
+    Object.entries(source).filter(([key]) => allowedKeys.has(key))
+  ) as Partial<T>;
 }
 
 export const getDirectory = async (filePath: string, context: IContext): Promise<FileData[] | undefined> => {
@@ -136,34 +136,33 @@ export const getJob = async (context: IContext): Promise<JobModelType> => {
     throw buildError('ingestion.error.not-found', `JOB ${context.job?.jobId}`);
   }
  
-  const orgJobParamsMetadata = {...result.job.parameters.metadata};
+  const jobParametersMetadata = { ...result.job.parameters.metadata };
   
-  const resolvedJobMetadata = await queryExecutor(async () => {
+  const resolvedMetadata = await queryExecutor(async () => {
     return await context.store.queryResolveMetadataAsModel(
       {
         data: {
-          metadata: JSON.stringify(orgJobParamsMetadata),
+          metadata: JSON.stringify(jobParametersMetadata),
           type: RecordType.RECORD_RASTER,
         }
       }
     );
   });
-  if (!resolvedJobMetadata?.resolveMetadataAsModel) {
-    throw buildError('ingestion.error.not-found', `JOB.parameters.metadata can't be transformed to entity`);
+  if (!resolvedMetadata?.resolveMetadataAsModel) {
+    throw buildError('ingestion.error.invalid', `JOB.parameters.metadata can't be transformed to entity`);
   }
-
-  const resolvedMergedJob = merge(
+  const resolvedJob = merge(
     {},
     result.job,
     {
       parameters: {
         metadata: {
-          ...filterByKeys(resolvedJobMetadata.resolveMetadataAsModel, orgJobParamsMetadata)
+          ...filterByKeys(resolvedMetadata.resolveMetadataAsModel, jobParametersMetadata)
         }
       }
     }
   );
-  return resolvedMergedJob;
+  return resolvedJob;
 };
 
 export const getTask = async (context: IContext): Promise<TaskModelType> => {
