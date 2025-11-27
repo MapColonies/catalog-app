@@ -1,20 +1,20 @@
 /* eslint-disable @typescript-eslint/array-type */
 /* eslint-disable @typescript-eslint/naming-convention */
 import { 
-    FieldConfigModelType,
-    FieldConfigModel,
-    Layer3DRecordModel,
-    LayerRasterRecordModel,
-    Layer3DRecordModelType,
-    LayerRasterRecordModelType,
-    LayerDemRecordModelType,
-    LayerDemRecordModel,
-    VectorBestRecordModelType,
-    VectorBestRecordModel,
-    QuantizedMeshBestRecordModelType,
-    QuantizedMeshBestRecordModel,
-    LayerMetadataMixedUnion
-  } from '../../models';
+  FieldConfigModelType,
+  FieldConfigModel,
+  Layer3DRecordModel,
+  LayerRasterRecordModel,
+  Layer3DRecordModelType,
+  LayerRasterRecordModelType,
+  LayerDemRecordModelType,
+  LayerDemRecordModel,
+  VectorBestRecordModelType,
+  VectorBestRecordModel,
+  QuantizedMeshBestRecordModelType,
+  QuantizedMeshBestRecordModel,
+  LayerMetadataMixedUnion
+} from '../../models';
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 
@@ -56,3 +56,13 @@ let tempLayerRecordTypesObject:
   };
 
 export const LayerRecordTypesKeys = Object.keys(tempLayerRecordTypesObject);
+
+export function filterByKeys<T extends object, U extends object>(
+  source: T,
+  reference: U
+): Partial<T> {
+  const allowedKeys = new Set(Object.keys(reference));
+  return Object.fromEntries(
+    Object.entries(source).filter(([key]) => allowedKeys.has(key))
+  ) as Partial<T>;
+}

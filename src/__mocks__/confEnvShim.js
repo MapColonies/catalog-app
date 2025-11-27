@@ -3,8 +3,7 @@ if (!window._env_) {
     return {
       LANGUAGE: 'he',
       BACKEND_LOCALE: 'he',
-      SERVICE_PROTOCOL: 'SERVICE_PROTOCOL',
-      SERVICE_NAME: 'SERVICE_NAME',
+      SERVICE_URL: 'SERVICE_URL',
       CATALOG_APP_USER_ID: 'catalog-app-{CURRENT_USER}@mapcolonies.net',
       MAP_SERVER: 'MAP_SERVER',
       PUBLISH_POINT: 'PUBLISH_POINT',

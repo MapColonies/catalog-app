@@ -100,8 +100,7 @@ env:
   responseCompressionEnabled: true
   requestPayloadLimit: 1mb
   publicUrl: ''
-  serviceProtocol: http://
-  serviceName: ''
+  serviceUrl: ''
   catalogAppUserId: catalog-app-{CURRENT_USER}@mapcolonies.net
   mapServerPublishPoint: ''
   mapServerUrl: ''
