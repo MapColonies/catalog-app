@@ -4,8 +4,7 @@ dest = "public/env-config.js"
 keys = [
   "/configuration/ui/language",
   "/configuration/ui/backend/locale",
-  "/configuration/service/protocol",
-  "/configuration/service/name",
+  "/configuration/service/url",
   "/configuration/catalogAppUserId",
   "/configuration/mapServer/publishPoint",
   "/configuration/mapServer/url",

@@ -23,9 +23,7 @@ const store = rootStore.create(
         url,
         method,
         data: params,
-        baseURL: `${CONFIG.SERVICE_PROTOCOL as string}${
-          CONFIG.SERVICE_NAME as string
-        }`,
+        baseURL: CONFIG.SERVICE_URL,
         ...(config ?? {}),
       }).then((res) => res.data as SearchResponse),
     gqlHttpClient: syncHttpClientGql(),

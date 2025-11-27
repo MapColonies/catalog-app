@@ -7,8 +7,7 @@ import { IRasterIngestionFilesStructureConfig } from '../models/raster-ingestion
 /*eslint-disable */
 const LANGUAGE = (window as any)._env_.LANGUAGE as string;
 const BACKEND_LOCALE = (window as any)._env_.BACKEND_LOCALE as string;
-const SERVICE_PROTOCOL = (window as any)._env_.SERVICE_PROTOCOL;
-const SERVICE_NAME = (window as any)._env_.SERVICE_NAME;
+const SERVICE_URL = (window as any)._env_.SERVICE_URL;
 const CATALOG_APP_USER_ID = (window as any)._env_.CATALOG_APP_USER_ID;
 const MAP_SERVER = (window as any)._env_.MAP_SERVER;
 const PUBLISH_POINT = (window as any)._env_.PUBLISH_POINT;
@@ -109,8 +108,7 @@ const DATE_FORMAT = 'DD/MM/YYYY';
 const DATE_FNS_FORMAT = 'dd/MM/yyyy';
 
 const APP_CONFIG = {
-  SERVICE_PROTOCOL: SERVICE_PROTOCOL,
-  SERVICE_NAME: SERVICE_NAME,
+  SERVICE_URL: SERVICE_URL,
   CATALOG_APP_USER_ID: CATALOG_APP_USER_ID,
   LOCALE: {
     DATE_FORMAT: DATE_FORMAT,

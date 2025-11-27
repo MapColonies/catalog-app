@@ -3,7 +3,7 @@ import { createHttpClient } from 'mst-gql';
 import { site, siteName } from '../../discrete-layer/models/userStore';
 import CONFIG from '../config';
 
-export const currentBffUrl = `${CONFIG.SERVICE_PROTOCOL as string}${CONFIG.SERVICE_NAME as string}`;
+export const currentBffUrl = CONFIG.SERVICE_URL;
 
 export const currentClientUrl = window.location.origin;
 

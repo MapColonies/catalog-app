@@ -13,6 +13,7 @@ import {
   TaskModelType
 } from '../../../../models';
 import { LayerRasterRecordInput } from '../../../../models/RootStore.base';
+import { filterByKeys } from '../../entity-types-keys';
 import { jobType2Mode, RasterJobTypeEnum, transformEntityToFormFields } from '../../utils';
 import { FeatureType } from '../pp-map.utils';
 import {
@@ -32,16 +33,6 @@ import {
   PRODUCT_LABEL,
   SHAPEMETADATA_LABEL,
 } from './types';
-
-function filterByKeys<T extends object, U extends object>(
-  source: T,
-  reference: U
-): Partial<T> {
-  const allowedKeys = new Set(Object.keys(reference));
-  return Object.fromEntries(
-    Object.entries(source).filter(([key]) => allowedKeys.has(key))
-  ) as Partial<T>;
-}
 
 export const getDirectory = async (filePath: string, context: IContext): Promise<FileData[] | undefined> => {
   try {
@@ -100,7 +91,7 @@ export const fetchProduct = async (product: IProductFile, context: IContext) => 
     return undefined;
   }
 
-  const apiUrl = `${CONFIG.SERVICE_PROTOCOL as string}${CONFIG.SERVICE_NAME.replace('graphql', 'zipshape') as string}`;
+  const apiUrl = CONFIG.SERVICE_URL.replace('graphql', 'zipshape');
   const params = {
     folder: getPathWithSlash(path.dirname(product.path)),
     name: CONFIG.RASTER_INGESTION_FILES_STRUCTURE.product.producerFileName,

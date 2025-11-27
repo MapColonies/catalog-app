@@ -4,17 +4,16 @@ import { Box, CircularProgressBar } from '@map-colonies/react-components';
 import { IconButton, Typography } from '@map-colonies/react-core';
 import { Status } from '../../../models';
 import { Curtain } from './curtain/curtain.component';
-import { hasError, isTaskFailed, isTaskValid } from './state-machine/helpers';
-import { Aggregation, IContext } from './state-machine/types';
+import { isTaskFailed, isTaskValid } from './state-machine/helpers';
+import { Aggregation, IJob } from './state-machine/types';
 
 import './job-info.css';
 
 interface JobInfoProps {
-  context: IContext;
+  job: IJob | undefined;
 }
 
-export const JobInfo: React.FC<JobInfoProps> = ({ context }) => {
-  const { job } = context;
+export const JobInfo: React.FC<JobInfoProps> = ({ job }) => {
   const [dots, setDots] = useState<string>('');
 
   useEffect(() => {
@@ -94,14 +93,9 @@ export const JobInfo: React.FC<JobInfoProps> = ({ context }) => {
                     {`${job.taskPercentage ?? 0}%`}
                   </Box>
                 </CircularProgressBar>
-              : <>
-                {
-                  !hasError(context) &&
-                  <Box className="curtainContainer">
-                    <Curtain showProgress={true} />
-                  </Box>
-                }
-              </>
+              : <Box className="curtainContainer">
+                  <Curtain showProgress={true} />
+                </Box>
             }
           </Box>
         </Box>
