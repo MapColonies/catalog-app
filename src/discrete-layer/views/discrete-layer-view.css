@@ -303,7 +303,7 @@ body[dir='rtl'] .MuiBox-root .resultsContainer {
 }
 
 .success {
-  color: var(--mdc-theme-gc-success);
+  color: var(--mdc-theme-gc-success) !important;
 }
 
 .warning {
