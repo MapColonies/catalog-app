@@ -402,8 +402,9 @@ export const workflowMachine = createMachine<IContext, Events>({
         onDone: [
           {
             guard: (_: { context: IContext; event: any }) => {
-              return _.event.output.taskStatus !== Status.InProgress &&
-                _.event.output.taskStatus !== Status.Pending;
+              return _.event.output.details.status !== Status.InProgress &&
+                _.event.output.details.status !== Status.Pending &&
+                _.event.output.details.status !== Status.Suspended;
             },
             actions: assign((_: { context: IContext; event: any }) => ({
               job: {
