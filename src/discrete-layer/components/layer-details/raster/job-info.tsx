@@ -25,6 +25,7 @@ export const JobInfo: React.FC<JobInfoProps> = ({ job }) => {
           show={!!job.taskId}
           percentage={job.taskPercentage}
           status={job.taskStatus}
+          reason={job.taskReason}
           isFailed={isStatusFailed(job.taskStatus ?? undefined)}
           isValid={isTaskValid(job)}
         />
@@ -33,6 +34,7 @@ export const JobInfo: React.FC<JobInfoProps> = ({ job }) => {
           show={!!job.details}
           percentage={job.details?.percentage ?? undefined}
           status={job.details?.status as Status | undefined}
+          reason={job.details?.reason as string | undefined}
           isFailed={isStatusFailed(job.details?.status as Status | undefined)}
           isValid={isJobValid(job.details?.status as Status | undefined)}
         />

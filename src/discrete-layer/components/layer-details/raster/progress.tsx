@@ -1,22 +1,27 @@
+import { truncate } from 'lodash';
 import React, { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Box, CircularProgressBar } from '@map-colonies/react-components';
-import { IconButton, Typography } from '@map-colonies/react-core';
+import { IconButton, Tooltip, Typography } from '@map-colonies/react-core';
 import { Status } from '../../../models';
+import { CopyButton } from '../../job-manager/job-details.copy-button';
 import { Curtain } from './curtain/curtain.component';
 
 import './progress.css';
+
+const FAILURE_REASON_MAX_LENGTH = 35;
 
 interface ProgressProps {
   titleId: string;
   show: boolean;
   percentage: number | undefined;
   status: Status | undefined;
+  reason: string | undefined;
   isFailed: boolean;
   isValid: boolean;
 }
 
-export const Progress: React.FC<ProgressProps> = ({ titleId, show, percentage, status, isFailed, isValid }) => {
+export const Progress: React.FC<ProgressProps> = ({ titleId, show, percentage, status, reason, isFailed, isValid }) => {
   const [dots, setDots] = useState<string>('');
 
   useEffect(() => {
@@ -92,10 +97,16 @@ export const Progress: React.FC<ProgressProps> = ({ titleId, show, percentage, s
                   <Box className="spacer" />
                 }
                 <Box className={`text bold ${getClass(isFailed, isValid)}`}>
-                  <FormattedMessage id={`system-status.job.status_translation.${status}`} />
+                  <Tooltip content={truncate(reason ?? '', { length: FAILURE_REASON_MAX_LENGTH })}>
+                    <FormattedMessage id={`system-status.job.status_translation.${status}`} />
+                  </Tooltip>
                   {
                     status === Status.InProgress &&
                     <Typography tag="span" className="dots">{dots}</Typography>
+                  }
+                  {
+                    status === Status.Failed &&
+                    <CopyButton text={reason ?? ''} />
                   }
                 </Box>
                 <Box className={`percentage bold ${getClass(isFailed, isValid)}`}>
