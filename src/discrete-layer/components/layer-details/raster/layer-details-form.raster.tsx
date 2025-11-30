@@ -270,7 +270,7 @@ export const InnerRasterForm = (
           <Box className="previewAndJobContainer">
             <Box className="jobData section">
               {
-                !hasError(state.context) &&
+                !hasError(state.context.errors) &&
                 <JobInfo job={state.context.job} />
               }
             </Box>
@@ -364,7 +364,7 @@ export const InnerRasterForm = (
                   !dirty ||
                   Object.keys(errors).length > NONE ||
                   (Object.keys(getStatusErrors()).length > NONE) ||
-                  hasError(state.context)
+                  hasError(state.context.errors)
                 }
               >
                 <FormattedMessage id="general.ok-btn.text" />

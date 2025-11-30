@@ -194,10 +194,10 @@ export const isUIDisabled = (isLoading: boolean, state: any): boolean => {
   return isLoading || isDone(state);
 };
 
-export const hasError = (context: IContext): boolean => {
-  return context.errors.length > 0 && 
-    (context.errors.some(error => error.level === 'error') || 
-    context.errors.some(error => !error.level));
+export const hasError = (errors: IStateError[]): boolean => {
+  return errors.length > 0 &&
+    (errors.some(error => error.level === 'error') ||
+    errors.some(error => !error.level));
 };
 
 export const isTaskFailed = (job: IJob | undefined): boolean => {
