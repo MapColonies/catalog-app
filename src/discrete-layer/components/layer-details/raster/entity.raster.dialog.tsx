@@ -118,14 +118,16 @@ export const buildRasterRecord = (descriptors: EntityDescriptorModelType[]): ILa
   return record as unknown as ILayerImage;
 };
 
-export const EntityRasterDialog: React.FC<EntityRasterDialogProps> = (props: EntityRasterDialogProps) => {
+export const EntityRasterDialog: React.FC<EntityRasterDialogProps> = observer((props: EntityRasterDialogProps) => {
 
   const store = useStore();
 
   const { job } = props;
 
   const determineIsUpdateMode = (job: JobModelType | undefined): boolean => {
-    return job ? jobType2Mode[job.type || RasterJobTypeEnum.NEW] === Mode.UPDATE : store.discreteLayersStore.selectedLayerIsUpdateMode === true;
+    return job ? 
+      jobType2Mode[job.type || RasterJobTypeEnum.NEW] === Mode.UPDATE :
+      store.discreteLayersStore.selectedLayerOperationMode === Mode.UPDATE;
   };
 
   const getRecordLayerByMode = (productId: string | null | undefined, productType: string | null | undefined): ILayerImage => {
@@ -160,7 +162,7 @@ export const EntityRasterDialog: React.FC<EntityRasterDialogProps> = (props: Ent
       />
     </RasterWorkflowProvider>
   );
-};
+});
 
 const EntityRasterDialogInner: React.FC<EntityRasterInnerProps> = observer((props: EntityRasterInnerProps) => {
 
@@ -207,9 +209,8 @@ const EntityRasterDialogInner: React.FC<EntityRasterInnerProps> = observer((prop
     const [schema, setSchema] = useState<Record<string, Yup.AnySchema>>({});
     const [inputValues, setInputValues] = useState<FormikValues>({});
     const [isAllInfoReady, setIsAllInfoReady] = useState<boolean>(false);
-    const { entityDescriptors } = store.discreteLayersStore;
 
-    const typedEntityDescriptors = entityDescriptors as EntityDescriptorModelType[];
+    const typedEntityDescriptors = store.discreteLayersStore.entityDescriptors as EntityDescriptorModelType[];
 
     const metadataPayloadKeys = useMemo(() => {
       return getFlatEntityDescriptors(

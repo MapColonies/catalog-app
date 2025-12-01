@@ -4,4 +4,5 @@ export enum Mode {
   EDIT = 'Edit',
   UPDATE = 'Update',
   EXPORT = 'Export',
+  DELETE = 'Delete'
 }
