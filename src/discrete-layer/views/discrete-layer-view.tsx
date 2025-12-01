@@ -456,6 +456,9 @@ const DiscreteLayerView: React.FC = observer(() => {
     } else if (recordType === RecordType.RECORD_DEM) {
       switch (selectedLayerOperationMode) {
         case Mode.NEW:
+          setIsDemEntityDialogOpen(open);
+          break;
+        case Mode.VIEW:
           setEntityDialogOpen(open);
           break;
         default:
