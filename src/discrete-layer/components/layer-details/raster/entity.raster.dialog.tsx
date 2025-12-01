@@ -403,6 +403,7 @@ const EntityRasterDialogInner: React.FC<EntityRasterInnerProps> = observer((prop
                 mode={mode}
                 entityDescriptors={typedEntityDescriptors}
                 recordType={recordType}
+                // For fields that need to be changed in update. See "getRecordForUpdate()"
                 layerRecord={layerRecord}
                 yupSchema={Yup.object({
                   ...schema,

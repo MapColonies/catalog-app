@@ -264,7 +264,6 @@ export const discreteLayersStore = ModelBase
     }
 
     function resetUpdateMode(): void {
-      self.selectedLayerIsUpdateMode = false;
       self.customValidationError = undefined;
     }
 
