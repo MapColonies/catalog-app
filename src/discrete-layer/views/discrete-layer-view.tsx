@@ -1261,8 +1261,8 @@ const DiscreteLayerView: React.FC = observer(() => {
           isRasterEntityDialogOpen &&
           <EntityRasterDialog
             isOpen={isRasterEntityDialogOpen}
-            onSetOpen={() => {
-              setIsRasterEntityDialogOpen
+            onSetOpen={(open) => {
+              setIsRasterEntityDialogOpen(open);
               handleCloseDialog();
             }}
             job={jobToOpenRasterEntity}
