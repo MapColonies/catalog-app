@@ -585,6 +585,10 @@ const DiscreteLayerView: React.FC = observer(() => {
     });
   }, []);
 
+  const handleCloseDialog = useCallback(() => {
+    store.discreteLayersStore.setSelectedLayerOperationMode(undefined);
+  }, [store.discreteLayersStore.setSelectedLayerOperationMode]);
+
   const tabViews = [
     {
       idx: TabViews.CATALOG,
@@ -1228,9 +1232,7 @@ const DiscreteLayerView: React.FC = observer(() => {
                 { activeTabView === TabViews.EXPORT_LAYER && <ExportDrawingHandler /> }
 
                 <ActionResolver
-                  handleOpenEntityDialog = {(recordType, open) => {
-                    openEntityByMode(recordType, open);
-                  }}
+                  handleOpenEntityDialog = {openEntityByMode}
                   handleFlyTo = {onFlyTo}
                   handleTabViewChange = {handleTabViewChange}
                   activeTabView = {activeTabView}
@@ -1261,14 +1263,20 @@ const DiscreteLayerView: React.FC = observer(() => {
             isOpen={isRasterEntityDialogOpen}
             onSetOpen={setIsRasterEntityDialogOpen}
             job={jobToOpenRasterEntity}
-            setJob={setJobToOpenRasterEntity}
+            setJob={(open) => {
+              setJobToOpenRasterEntity(open);
+              handleCloseDialog();
+            }}
           />
         }
         {
           is3DEntityDialogOpen &&
           <EntityDialog
             isOpen={is3DEntityDialogOpen}
-            onSetOpen={setIs3DEntityDialogOpen}
+            onSetOpen={(open) => {
+              setIs3DEntityDialogOpen(open);
+              handleCloseDialog();
+            }}
             recordType={RecordType.RECORD_3D}
           />
         }
@@ -1276,7 +1284,10 @@ const DiscreteLayerView: React.FC = observer(() => {
           isDemEntityDialogOpen &&
           <EntityDialog
             isOpen={isDemEntityDialogOpen}
-            onSetOpen={setIsDemEntityDialogOpen}
+            onSetOpen={(open) => {
+              setIsDemEntityDialogOpen(open);
+              handleCloseDialog();
+            }}
             recordType={RecordType.RECORD_DEM}
           />
         }
@@ -1284,15 +1295,21 @@ const DiscreteLayerView: React.FC = observer(() => {
           isEntityDialogOpen && 
           <EntityDialog
             isOpen={isEntityDialogOpen}
-            onSetOpen={setEntityDialogOpen}
+            onSetOpen={(open) => {
+              setEntityDialogOpen(open);
+              handleCloseDialog();
+            }}
             layerRecord={store.discreteLayersStore.selectedLayer}
           />
         }
         {
-          store.discreteLayersStore.selectedLayerOperationMode === Mode.DELETE && permissions.isDeleteAllowed && store.discreteLayersStore.selectedLayer &&
+          permissions.isDeleteAllowed && store.discreteLayersStore.selectedLayer &&
           <EntityDeleteDialog
             isOpen={isEntityDeleteDialogOpen}
-            onSetOpen={setIsEntityDeleteDialogOpen}
+            onSetOpen={(open) => {
+              setIsEntityDeleteDialogOpen(open);
+              handleCloseDialog();
+            }}
             layerRecord={store.discreteLayersStore.selectedLayer}
           />
         }
