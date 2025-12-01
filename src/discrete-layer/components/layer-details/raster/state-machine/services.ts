@@ -10,7 +10,8 @@ import {
   getFeatureAndMarker,
   getFile,
   getPath,
-  validateShapeFiles
+  handleShapeFilesValidation,
+  hasError
 } from './helpers';
 import { MOCK_JOB_UPDATE } from './MOCK';
 import { queryExecutor } from './query-executor';
@@ -121,10 +122,16 @@ export const SERVICES = {
         if (files.product) {
           files.product.details = await getDetails(files.product.path, input.context);
           files.product.exists = !!files.product.details;
+          if (files.product.exists === false) {
+            errors = [ ...errors, buildError('ingestion.error.missing', PRODUCT_FILENAME) ];
+          }
         }
         if (files.shapeMetadata) {
           files.shapeMetadata.details = await getDetails(files.shapeMetadata.path, input.context);
           files.shapeMetadata.exists = !!files.shapeMetadata.details;
+          if (files.shapeMetadata.exists === false) {
+            errors = [ ...errors, buildError('ingestion.error.missing', SHAPEMETADATA_FILENAME) ];
+          }
         }
         if (files.data) {
           const gpkgValidation = await validateGPKG(files.data.path, input.context);
@@ -137,9 +144,8 @@ export const SERVICES = {
           const productFile = await fetchProduct(files.product, input.context);
           files.product.geoDetails = productFile?.geoDetails;
         }
-        const shapeFilesValidation = validateShapeFiles(files);
-        if (shapeFilesValidation.length > 0) {
-          errors = [ ...errors, ...shapeFilesValidation ];
+        if (!hasError(errors)) {
+          errors = handleShapeFilesValidation(files);
         }
       }
 

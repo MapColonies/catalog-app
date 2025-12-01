@@ -269,7 +269,10 @@ export const InnerRasterForm = (
         <Box className="content section">
           <Box className="previewAndJobContainer">
             <Box className="jobData section">
-              <JobInfo job={state.context.job} />
+              {
+                !hasError(state.context.errors) &&
+                <JobInfo job={state.context.job} />
+              }
             </Box>
             <GeoFeaturesPresentorComponent
               layerRecord={layerRecord}
@@ -307,8 +310,8 @@ export const InnerRasterForm = (
               enableMapPreview={false}
               showFiedlsCategory={false}/>
             {
-              (isLoading || !isFilesSelected(state.context) || isJobSubmitted(state.context)) 
-              && <Curtain showProgress={isLoading}/>
+              (isLoading || !isFilesSelected(state.context) || isJobSubmitted(state.context)) &&
+              <Curtain showProgress={isLoading}/>
             }
           </Box>
         </Box>
@@ -361,7 +364,7 @@ export const InnerRasterForm = (
                   !dirty ||
                   Object.keys(errors).length > NONE ||
                   (Object.keys(getStatusErrors()).length > NONE) ||
-                  hasError(state.context)
+                  hasError(state.context.errors)
                 }
               >
                 <FormattedMessage id="general.ok-btn.text" />

@@ -2,6 +2,89 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.0.3](https://github.com/MapColonies/catalog-app/compare/v3.0.2...v3.0.3) (2025-12-01)
+
+
+### Bug Fixes
+
+* revert plus job progress ([#762](https://github.com/MapColonies/catalog-app/issues/762)) ([236dee2](https://github.com/MapColonies/catalog-app/commit/236dee2c52a2af5f2c4845783fd99fa015efa2df))
+
+## [3.0.2](https://github.com/MapColonies/catalog-app/compare/v3.0.1...v3.0.2) (2025-11-27)
+
+
+### Bug Fixes
+
+* revert ([#760](https://github.com/MapColonies/catalog-app/issues/760)) ([075dced](https://github.com/MapColonies/catalog-app/commit/075dceda65209927ac14f1d1d6c9abef6563c197))
+
+## [3.0.1](https://github.com/MapColonies/catalog-app/compare/v3.0.0...v3.0.1) (2025-11-27)
+
+
+### Bug Fixes
+
+* helm ([#758](https://github.com/MapColonies/catalog-app/issues/758)) ([d4e615e](https://github.com/MapColonies/catalog-app/commit/d4e615e99b109127ece07bd1aa1cb9c915d94181))
+
+## [3.0.0](https://github.com/MapColonies/catalog-app/compare/v2.24.1...v3.0.0) (2025-11-26)
+
+
+### ⚠ BREAKING CHANGES
+
+* new raster ingestion api ( MAPCO-8421 ) ([#711](https://github.com/MapColonies/catalog-app/issues/711))
+
+### Features
+
+* add delete dialog to 3D layer ([#675](https://github.com/MapColonies/catalog-app/issues/675)) ([78914a4](https://github.com/MapColonies/catalog-app/commit/78914a46ea6824d146cc6912da87f6a1bda6829f))
+* find tasks (MAPCO-8436) ([#726](https://github.com/MapColonies/catalog-app/issues/726)) ([cdefd39](https://github.com/MapColonies/catalog-app/commit/cdefd3987ac6893e221775f6ea6d9872adcad13c))
+* new raster ingestion api ( MAPCO-8421 ) ([#711](https://github.com/MapColonies/catalog-app/issues/711)) ([090fd2a](https://github.com/MapColonies/catalog-app/commit/090fd2a6f05c249f1d59446de99d00f08a2a21ba))
+* raster file selection by file type[shp, gpkg] ( MAPCO-8627 ) ([#707](https://github.com/MapColonies/catalog-app/issues/707)) ([68c17f7](https://github.com/MapColonies/catalog-app/commit/68c17f79748f4b46f055534c550dfcfd352c0a45))
+* raster ingestion state machine ([#678](https://github.com/MapColonies/catalog-app/issues/678)) ([0aa2ceb](https://github.com/MapColonies/catalog-app/commit/0aa2cebee9bde203d98f16bf4b40c2e783f85ce2))
+* split source info queries ([#689](https://github.com/MapColonies/catalog-app/issues/689)) ([3da534c](https://github.com/MapColonies/catalog-app/commit/3da534c592bcda39f89f334ea9229d8876c3b3d0))
+* upload shape files time warning (MAPCO-8417) ([#748](https://github.com/MapColonies/catalog-app/issues/748)) ([c2d94e8](https://github.com/MapColonies/catalog-app/commit/c2d94e8076b8b4dde8894f55231b04bfdf1e1887))
+* using callback url ( MAPCO-8712 ) ([#677](https://github.com/MapColonies/catalog-app/issues/677)) ([d9ef4a7](https://github.com/MapColonies/catalog-app/commit/d9ef4a70387a0eaad2d125582efe2b23f5a3842c))
+
+
+### Bug Fixes
+
+* backslash at begining ([#736](https://github.com/MapColonies/catalog-app/issues/736)) ([d2a990d](https://github.com/MapColonies/catalog-app/commit/d2a990dbb34929112df1aa13dcd1357d8218e640))
+* buttons ([#713](https://github.com/MapColonies/catalog-app/issues/713)) ([9330f0d](https://github.com/MapColonies/catalog-app/commit/9330f0df9f7b498645452ff2bc2ce7996b38febc))
+* cesium info panel overlap ([#674](https://github.com/MapColonies/catalog-app/issues/674)) ([bf5d091](https://github.com/MapColonies/catalog-app/commit/bf5d091d4992d295049bcf04c670bdf8a2c0f05a))
+* clean code (MAPCO-8436) ([#733](https://github.com/MapColonies/catalog-app/issues/733)) ([605be55](https://github.com/MapColonies/catalog-app/commit/605be550bd9ad4571da09bb85ed64897d2e682ac))
+* clean errors on mode switch ([#700](https://github.com/MapColonies/catalog-app/issues/700)) ([d5bbb97](https://github.com/MapColonies/catalog-app/commit/d5bbb97d4809003a2445b5c6b8fd9c46fdce2cad))
+* clean up product file removal ([#740](https://github.com/MapColonies/catalog-app/issues/740)) ([8fabbbd](https://github.com/MapColonies/catalog-app/commit/8fabbbdda474beec04be826feecd1d3b8dbd5116))
+* clean warning color on files reselection and clear progressbar in case of error during restore ([#754](https://github.com/MapColonies/catalog-app/issues/754)) ([481ab9c](https://github.com/MapColonies/catalog-app/commit/481ab9c230ef07c5fe1a3f6423c81ab0f4a09c82))
+* color shape files in case of warning ([#752](https://github.com/MapColonies/catalog-app/issues/752)) ([88c20ab](https://github.com/MapColonies/catalog-app/commit/88c20abc080752f2bd0c4c8d2751326c16183661))
+* configurable switch ([#712](https://github.com/MapColonies/catalog-app/issues/712)) ([d7375d5](https://github.com/MapColonies/catalog-app/commit/d7375d5a675c22671e977a8a9c4a8c737c4b45ee))
+* curtain ([#698](https://github.com/MapColonies/catalog-app/issues/698)) ([e97883b](https://github.com/MapColonies/catalog-app/commit/e97883be8b6afe62a202a6973de06dda61455356))
+* curtain with loading component ([#724](https://github.com/MapColonies/catalog-app/issues/724)) ([cf65c9b](https://github.com/MapColonies/catalog-app/commit/cf65c9be2c574faccb06a98a7b403dfb51ca44e6))
+* fetch product  without mocking ([#738](https://github.com/MapColonies/catalog-app/issues/738)) ([0efd300](https://github.com/MapColonies/catalog-app/commit/0efd300825937cf5bb9f73a671e60cba347cccfe))
+* fix format ([#720](https://github.com/MapColonies/catalog-app/issues/720)) ([52695fd](https://github.com/MapColonies/catalog-app/commit/52695fde742517d77ba8ba4bd4af42837f2b83fa))
+* handle undefined filesActor ([#679](https://github.com/MapColonies/catalog-app/issues/679)) ([f27e02e](https://github.com/MapColonies/catalog-app/commit/f27e02e39945e23c0dcb7995b71a774435a7165d))
+* hardcoded labels ([#692](https://github.com/MapColonies/catalog-app/issues/692)) ([506bf57](https://github.com/MapColonies/catalog-app/commit/506bf57dc048a722b2cb4f0fc46e9698d46fa899))
+* infinite loading ([#709](https://github.com/MapColonies/catalog-app/issues/709)) ([4d2f8d5](https://github.com/MapColonies/catalog-app/commit/4d2f8d552a8b9fd2e2863c48879130544cfd590d))
+* loading ([#701](https://github.com/MapColonies/catalog-app/issues/701)) ([cc498ad](https://github.com/MapColonies/catalog-app/commit/cc498ad3ba50c82ef770e818a04b1c93715b0565))
+* loading ([#703](https://github.com/MapColonies/catalog-app/issues/703)) ([bbce7cc](https://github.com/MapColonies/catalog-app/commit/bbce7cc748552e953720dd469af96355f12758f4))
+* loading css ([#705](https://github.com/MapColonies/catalog-app/issues/705)) ([e523cd4](https://github.com/MapColonies/catalog-app/commit/e523cd41f5eaf984ac3b62280838803280fef127))
+* manual ([#690](https://github.com/MapColonies/catalog-app/issues/690)) ([c1f46d9](https://github.com/MapColonies/catalog-app/commit/c1f46d9a3376afcc6dc4d4a3d5fc13662a90c527))
+* manual labels are being rendered incorrectly ([#745](https://github.com/MapColonies/catalog-app/issues/745)) ([b336ac0](https://github.com/MapColonies/catalog-app/commit/b336ac08ce68288d22f56fa06bde8ff0a10af0a7))
+* manual mode missing labels ([#686](https://github.com/MapColonies/catalog-app/issues/686)) ([733c629](https://github.com/MapColonies/catalog-app/commit/733c629dead573d0b2a1ecc615601437938b877f))
+* maual ([#693](https://github.com/MapColonies/catalog-app/issues/693)) ([a29b2dd](https://github.com/MapColonies/catalog-app/commit/a29b2dd9cdb2ca6919526c342cd36c65b3613b65))
+* mount dir for restore (MAPCO-8436) ([#716](https://github.com/MapColonies/catalog-app/issues/716)) ([1a98089](https://github.com/MapColonies/catalog-app/commit/1a98089e346273af10a1d7325cfa523e68499bc0))
+* remove dolar sign ([#680](https://github.com/MapColonies/catalog-app/issues/680)) ([c5392f7](https://github.com/MapColonies/catalog-app/commit/c5392f7389bb071ec9d810fa811f5d7cf3f37468))
+* rename API to ExplorerGetByPath ([#639](https://github.com/MapColonies/catalog-app/issues/639)) ([f631e76](https://github.com/MapColonies/catalog-app/commit/f631e76151a8b52b1b871cb6c1aa649a0dedc3ec))
+* replace pp marker ([#672](https://github.com/MapColonies/catalog-app/issues/672)) ([204e4a4](https://github.com/MapColonies/catalog-app/commit/204e4a47c12205f6d2e49f5af9bcae7fa924c893))
+* resolve job metadata as entity ([#756](https://github.com/MapColonies/catalog-app/issues/756)) ([ad50625](https://github.com/MapColonies/catalog-app/commit/ad50625b555d697ed56e430c5605ab286f794e0a))
+* restore ([#682](https://github.com/MapColonies/catalog-app/issues/682)) ([8794608](https://github.com/MapColonies/catalog-app/commit/8794608d60b61d114a669db542fdf6ec8829aef1))
+* restructure focus row function ( MAPCO-9077 ) ([#747](https://github.com/MapColonies/catalog-app/issues/747)) ([56172df](https://github.com/MapColonies/catalog-app/commit/56172dfa554685a16801ca1b74acea214aa972a2))
+* revert loading changes ([#708](https://github.com/MapColonies/catalog-app/issues/708)) ([6239782](https://github.com/MapColonies/catalog-app/commit/623978205a0cf600616dda34b608cad0a372683c))
+* selection mode ([#684](https://github.com/MapColonies/catalog-app/issues/684)) ([f3a1976](https://github.com/MapColonies/catalog-app/commit/f3a1976a556754cf4e9e371ce632f8d4d2e7996e))
+* share common statemachine logic ([#681](https://github.com/MapColonies/catalog-app/issues/681)) ([81ce4fd](https://github.com/MapColonies/catalog-app/commit/81ce4fdf499cbf516bfc4cf035343404ca038a43))
+* stable version for integration ([#727](https://github.com/MapColonies/catalog-app/issues/727)) ([17c3521](https://github.com/MapColonies/catalog-app/commit/17c3521a9185eb3459b495a829de406c08f3a4fc))
+* switch ([#687](https://github.com/MapColonies/catalog-app/issues/687)) ([9a48fdc](https://github.com/MapColonies/catalog-app/commit/9a48fdc686a4473162d39596655e0c9df0af3c24))
+* sync ([#731](https://github.com/MapColonies/catalog-app/issues/731)) ([e62ef3a](https://github.com/MapColonies/catalog-app/commit/e62ef3ad54a2aa48d47dc2ef1195b2d08680bb3e))
+* sync with bff ([#729](https://github.com/MapColonies/catalog-app/issues/729)) ([58f278b](https://github.com/MapColonies/catalog-app/commit/58f278bd418cca08c32f3a626c81e823a5b032da))
+* update selectionMode in parent ([#717](https://github.com/MapColonies/catalog-app/issues/717)) ([5d5942a](https://github.com/MapColonies/catalog-app/commit/5d5942aae34bd682eb180536f550a4372830e2d4))
+* use new raster files structure config and restore should use jobId from both invocations ([#722](https://github.com/MapColonies/catalog-app/issues/722)) ([bf4c6e2](https://github.com/MapColonies/catalog-app/commit/bf4c6e2f6537321102665770b1a540c8019aa6ee))
+* validation task report (MAPCO-8423) ([#742](https://github.com/MapColonies/catalog-app/issues/742)) ([e71b995](https://github.com/MapColonies/catalog-app/commit/e71b9957276b03e577213b611444ee92bdf68c4c))
+
 ## [2.24.1](https://github.com/MapColonies/catalog-app/compare/v2.24.0...v2.24.1) (2025-09-14)
 
 

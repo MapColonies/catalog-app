@@ -16,8 +16,7 @@
   CONFIGURATION_RASTER_INGESTION_FILES_STRUCTURE: {{ quote .Values.global.shared.rasterIngestionFilesStructure }}
   CONFIGURATION_IMAGE_TAG: {{ quote .Values.configValues.image.tag }}
   CONFIGURATION_PUBLIC_URL: {{ quote .Values.env.publicUrl }}
-  CONFIGURATION_SERVICE_PROTOCOL: {{ quote .Values.env.serviceProtocol }}
-  CONFIGURATION_SERVICE_NAME: {{ quote .Values.env.serviceName }}
+  CONFIGURATION_SERVICE_URL: {{ quote .Values.env.serviceUrl }}
   CONFIGURATION_CATALOGAPPUSERID: {{ quote .Values.env.catalogAppUserId }}
   CONFIGURATION_MAPSERVER_PUBLISH_POINT: {{ quote .Values.env.mapServerPublishPoint }}
   CONFIGURATION_MAPSERVER_URL: {{ quote .Values.env.mapServerUrl }}

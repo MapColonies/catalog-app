@@ -41,16 +41,22 @@ export interface IGeoDetails {
   };
 }
 
-export interface IGPKGFile extends IFileBase, IGeoDetails {
+export interface IDataFile extends IFileBase, IGeoDetails {
   validationResult?: SourceValidationModelType;
 }
 
-export interface IProductFile extends IFileBase, IGeoDetails {}
+export interface IProductFile extends IFileBase, IGeoDetails {
+  isModDateDiffExceeded?: boolean;
+}
+
+export interface IShapeMetadataFile extends IFileBase {
+  isModDateDiffExceeded?: boolean;
+}
 
 export interface IFiles {
-  data?: IGPKGFile;
+  data?: IDataFile;
   product?: IProductFile;
-  shapeMetadata?: IFileBase;
+  shapeMetadata?: IShapeMetadataFile;
 }
 
 export interface IJob {
@@ -59,6 +65,7 @@ export interface IJob {
   taskPercentage?: number;
   validationReport?: TaskParams;
   taskStatus?: Status;
+  taskReason?: string;
   details?: JobModelType;
 }
 
@@ -81,10 +88,10 @@ export type Events =
   | { type: "START_UPDATE", updatedLayer: LayerRasterRecordModelType }
   | { type: "AUTO" }
   | { type: "MANUAL" }
-  | { type: "SELECT_FILES", file: IGPKGFile }
-  | { type: "SELECT_DATA", file: IGPKGFile }
+  | { type: "SELECT_FILES", file: IDataFile }
+  | { type: "SELECT_DATA", file: IDataFile }
   | { type: "SELECT_PRODUCT", file: IProductFile }
-  | { type: "SELECT_SHAPEMETADATA", file: IFileBase }
+  | { type: "SELECT_SHAPEMETADATA", file: IShapeMetadataFile }
   | { type: "RESELECT_FILES" }
   | { type: "SET_SELECTION_MODE", selectionMode: SelectionMode }
   | { type: "SET_FILES", files: IFiles, addPolicy: AddPolicy }
@@ -139,8 +146,7 @@ export const WORKFLOW = {
   JOB_POLLING: "jobPolling",
   JOB_POLLING_WAIT: "jobPollingWait",
   RESTORE_JOB: "restoreJob",
-  DONE: "done",
-  ERROR: "error"
+  DONE: "done"
 } as const;
 
 export const FIRST = 0;
