@@ -614,9 +614,7 @@ const DiscreteLayerView: React.FC = observer(() => {
       isLayer3DRecordIngestAllowed: store.userStore.isActionAllowed(UserAction.ENTITY_ACTION_LAYER3DRECORD_CREATE),
       isLayerDemRecordIngestAllowed: store.userStore.isActionAllowed(UserAction.ENTITY_ACTION_LAYERDEMRECORD_CREATE),
       isSwitchUserRoleAllowed: store.userStore.isActionAllowed(UserAction.FEATURE_SWITCH_USER_ROLE),
-
       isDeleteAllowed: store.userStore.isActionAllowed(`entity_action.${store.discreteLayersStore.selectedLayer?.__typename}.delete`),
-      isEditAllowed: store.discreteLayersStore.selectedLayer && store.userStore.isActionAllowed(`entity_action.${store.discreteLayersStore.selectedLayer.__typename}.edit`),
     }
   }, [store.userStore.user, store.discreteLayersStore.selectedLayer]);
 
@@ -1283,21 +1281,19 @@ const DiscreteLayerView: React.FC = observer(() => {
           />
         }
         {
-          store.discreteLayersStore.selectedLayerOperationMode === Mode.DELETE && permissions.isDeleteAllowed && store.discreteLayersStore.selectedLayer &&
-          <EntityDeleteDialog
-            isOpen={isEntityDeleteDialogOpen}
-            onSetOpen={setIsEntityDeleteDialogOpen}
-            layerRecord={store.discreteLayersStore.selectedLayer}
-          />
-        }
-        {
           isEntityDialogOpen && 
           <EntityDialog
             isOpen={isEntityDialogOpen}
             onSetOpen={setEntityDialogOpen}
             layerRecord={store.discreteLayersStore.selectedLayer}
-            isViewMode={!permissions.isEditAllowed}
-            isSelectedLayerUpdateMode={store.discreteLayersStore.selectedLayerOperationMode === Mode.UPDATE}
+          />
+        }
+        {
+          store.discreteLayersStore.selectedLayerOperationMode === Mode.DELETE && permissions.isDeleteAllowed && store.discreteLayersStore.selectedLayer &&
+          <EntityDeleteDialog
+            isOpen={isEntityDeleteDialogOpen}
+            onSetOpen={setIsEntityDeleteDialogOpen}
+            layerRecord={store.discreteLayersStore.selectedLayer}
           />
         }
         {

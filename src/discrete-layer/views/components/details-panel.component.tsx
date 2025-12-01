@@ -85,7 +85,7 @@ export const DetailsPanel: React.FC<DetailsPanelComponentProps> = observer((prop
               label="VIEW"
               onClick={(): void => {
                 dispatchAction({
-                  action: UserAction.ENTITY_ACTION_SELECTED_ENTITY_EDIT
+                  action: UserAction.ENTITY_ACTION_SELECTED_ENTITY_VIEW
                 });
               }}
             />
