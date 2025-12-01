@@ -260,7 +260,8 @@
   "ingestion.error.not-available": "is not available",
   "ingestion.button.import-metadata": "Import Metadata",
   "ingestion.checkbox.label": "Operation failed on secondary site, please check to continue with operation on main site only",
-  "ingestion.job.progress": "Validation progress",
+  "ingestion.job.progress": "General progress",
+  "ingestion.job.validationTaskProgress": "Validation progress",
   "ingestion.job.report": "Validation results:",
   
   "validationReport.geometryValidity": "Invalid geometry",

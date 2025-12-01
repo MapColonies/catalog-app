@@ -1,10 +1,9 @@
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { Fragment } from 'react';
 import { FormattedMessage } from 'react-intl';
-import { Box, CircularProgressBar } from '@map-colonies/react-components';
-import { IconButton, Typography } from '@map-colonies/react-core';
+import { Box } from '@map-colonies/react-components';
 import { Status } from '../../../models';
-import { Curtain } from './curtain/curtain.component';
-import { isTaskFailed, isTaskValid } from './state-machine/helpers';
+import { Progress } from './progress';
+import { isJobValid, isStatusFailed, isTaskValid } from './state-machine/helpers';
 import { Aggregation, IJob } from './state-machine/types';
 
 import './job-info.css';
@@ -14,91 +13,31 @@ interface JobInfoProps {
 }
 
 export const JobInfo: React.FC<JobInfoProps> = ({ job }) => {
-  const [dots, setDots] = useState<string>('');
-
-  useEffect(() => {
-    let interval: NodeJS.Timer;
-    if (job?.taskStatus === Status.InProgress) {
-      interval = setInterval(() => {
-        setDots(prevDots => {
-          const newDots = prevDots.length < 3 ? prevDots + '.' : '';
-          return newDots;
-        });
-      }, 500);
-    } else {
-      setDots('');
-    }
-    return () => {
-      clearInterval(interval);
-    };
-  }, [job?.taskStatus]);
-
   if (!job) {
     return null;
   }
 
-  const isFailed = isTaskFailed(job);
-  const isValid = isTaskValid(job);
-
-  const color = isFailed
-    ? 'var(--mdc-theme-gc-error-high)'
-    : !isValid
-      ? 'var(--mdc-theme-gc-warning-high)'
-      : 'var(--mdc-theme-gc-success)';
-
-  const status = isFailed
-    ? 'error'
-    : !isValid
-      ? 'warning'
-      : 'success';
-
-  const styles = {
-    textColor: color || 'var(--mdc-theme-gc-success)',
-    pathColor: color || 'var(--mdc-theme-gc-success)',
-    trailColor: 'var(--mdc-theme-gc-selection-background)',
-  };
-
   return (
     <>
-      <Box className="progress">
-        <Box className="title bold">
-          <FormattedMessage id="ingestion.job.progress" />
-        </Box>
-        <Box className="center">
-          <Box className="progressBar">
-            {
-              job.taskId
-              ? <CircularProgressBar
-                  value={job.taskPercentage ?? 0}
-                  styles={styles}
-                >
-                  {
-                    (isFailed || !isValid) &&
-                    <IconButton
-                      className={`icon mc-icon-Status-Warnings ${status}`}
-                      onClick={(e): void => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                      }}
-                    />
-                  }
-                  <Box className={`text bold ${status}`}>
-                    <FormattedMessage id={`system-status.job.status_translation.${job.taskStatus}`} />
-                    {
-                      job.taskStatus === Status.InProgress &&
-                      <Typography tag="span" className="dots">{dots}</Typography>
-                    }
-                  </Box>
-                  <Box className={`percentage bold ${status}`}>
-                    {`${job.taskPercentage ?? 0}%`}
-                  </Box>
-                </CircularProgressBar>
-              : <Box className="curtainContainer">
-                  <Curtain showProgress={true} />
-                </Box>
-            }
-          </Box>
-        </Box>
+      <Box className="progressContainer">
+        <Progress
+          titleId="ingestion.job.validationTaskProgress"
+          show={!!job.taskId}
+          percentage={job.taskPercentage}
+          status={job.taskStatus}
+          reason={job.taskReason}
+          isFailed={isStatusFailed(job.taskStatus ?? undefined)}
+          isValid={isTaskValid(job)}
+        />
+        <Progress
+          titleId="ingestion.job.progress"
+          show={!!job.details}
+          percentage={job.details?.percentage ?? undefined}
+          status={job.details?.status as Status | undefined}
+          reason={job.details?.reason as string | undefined}
+          isFailed={isStatusFailed(job.details?.status as Status | undefined)}
+          isValid={isJobValid(job.details?.status as Status | undefined)}
+        />
       </Box>
       <Box className="section">
         <Box className="reportContainer">
@@ -126,7 +65,8 @@ const renderAggregationWithExceeded = (type: string, aggregation: Aggregation) =
   return aggregationRow(
     type,
     aggregation,
-    (aggregation: Aggregation) => (aggregation.exceeded ? 'error' : (aggregation.count > 0 ? 'warning' : 'success')));
+    (aggregation: Aggregation) => (aggregation.exceeded ? 'error' : (aggregation.count > 0 ? 'warning' : 'success'))
+  );
 };
 
 const renderAggregationWithoutExceeded = (aggregation: Record<string, number>) => {

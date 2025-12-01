@@ -65,6 +65,7 @@ export interface IJob {
   taskPercentage?: number;
   validationReport?: TaskParams;
   taskStatus?: Status;
+  taskReason?: string;
   details?: JobModelType;
 }
 
