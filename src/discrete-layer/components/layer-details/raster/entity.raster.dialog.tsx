@@ -23,7 +23,6 @@ import {
   EntityDescriptorModelType,
   FieldConfigModelType,
   JobModelType,
-  LayerMetadataMixedUnion,
   LayerRasterRecordModel,
   LayerRasterRecordModelType,
   ProductType,
@@ -73,14 +72,10 @@ interface EntityRasterDialogProps {
   setJob?: (job: JobModelType | undefined) => void;
 }
 
-interface EntityRasterInnerProps {
-  isOpen: boolean;
-  onSetOpen: (open: boolean) => void;
-  recordType?: RecordType;
+interface EntityRasterInnerProps extends EntityRasterDialogProps {
   layerRecord: ILayerImage;
   mode: Mode;
-  job?: JobModelType;
-  setJob?: (job: JobModelType | undefined) => void;
+  recordType?: RecordType;
 }
 
 const setDefaultValues = (record: Record<string, unknown>, descriptors: EntityDescriptorModelType[]): void => {
@@ -130,17 +125,17 @@ export const EntityRasterDialog: React.FC<EntityRasterDialogProps> = observer((p
       store.discreteLayersStore.selectedLayerOperationMode === Mode.UPDATE;
   };
 
-  const getRecordLayerByMode = (productId: string | null | undefined, productType: string | null | undefined): ILayerImage => {
+  const getRecordLayer = (jobObj: JobModelType | undefined): ILayerImage => {
     const { selectedLayer, entityDescriptors, findRasterUniqueLayer } = store.discreteLayersStore;
 
     // 1. START_NEW mode - always return empty base layer
-    if (!determineIsUpdateMode(job)) { 
+    if (!determineIsUpdateMode(jobObj)) { 
       return buildRasterRecord(entityDescriptors as EntityDescriptorModelType[]);
     }
 
     // 2. RESTORE mode - Try to get the matching layer
-    if (productId && productType) {
-      const layerRecord = cloneDeep(findRasterUniqueLayer(productId, productType));
+    if (jobObj?.resourceId && jobObj.productType) {
+      const layerRecord = cloneDeep(findRasterUniqueLayer(jobObj?.resourceId, jobObj.productType));
 
       if (layerRecord) { return layerRecord; }
     }
@@ -156,7 +151,7 @@ export const EntityRasterDialog: React.FC<EntityRasterDialogProps> = observer((p
     <RasterWorkflowProvider>
       <EntityRasterDialogInner
         {...props}
-        layerRecord={getRecordLayerByMode(job?.resourceId, job?.productType)}
+        layerRecord={getRecordLayer(job)}
         mode={determineIsUpdateMode(job) ? Mode.UPDATE : Mode.NEW}
         recordType={RecordType.RECORD_RASTER}
       />
