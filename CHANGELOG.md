@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.0.3](https://github.com/MapColonies/catalog-app/compare/v3.0.2...v3.0.3) (2025-12-01)
+
+
+### Bug Fixes
+
+* revert plus job progress ([#762](https://github.com/MapColonies/catalog-app/issues/762)) ([236dee2](https://github.com/MapColonies/catalog-app/commit/236dee2c52a2af5f2c4845783fd99fa015efa2df))
+
 ## [3.0.2](https://github.com/MapColonies/catalog-app/compare/v3.0.1...v3.0.2) (2025-11-27)
 
 
