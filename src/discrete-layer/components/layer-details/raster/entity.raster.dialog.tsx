@@ -120,9 +120,12 @@ export const EntityRasterDialog: React.FC<EntityRasterDialogProps> = observer((p
   const { job } = props;
 
   const determineIsUpdateMode = (job: JobModelType | undefined): boolean => {
-    return job ? 
-      jobType2Mode[job.type || RasterJobTypeEnum.NEW] === Mode.UPDATE :
-      store.discreteLayersStore.selectedLayerOperationMode === Mode.UPDATE;
+    if (job) {
+      const type = job.type || RasterJobTypeEnum.NEW;
+      return jobType2Mode[type] === Mode.UPDATE;
+    }
+
+    return store.discreteLayersStore.selectedLayerOperationMode === Mode.UPDATE;
   };
 
   const getRecordLayer = (jobObj: JobModelType | undefined): ILayerImage => {
