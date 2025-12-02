@@ -45,6 +45,7 @@ if (!window._env_) {
       JOB_STATUS: {
         pollingCycleInterval: 60000,
       },
+      JOB_MANAGER_END_OF_TIME: 21,
       DEFAULT_USER: {
         role: 'USER',
       },

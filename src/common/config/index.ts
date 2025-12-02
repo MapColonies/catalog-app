@@ -17,6 +17,7 @@ const ACTIVE_LAYER = (window as any)._env_.ACTIVE_LAYER;
 const ACTIVE_LAYER_PROPERTIES = (window as any)._env_.ACTIVE_LAYER_PROPERTIES;
 const MAP = (window as any)._env_.MAP;
 const JOB_STATUS = (window as any)._env_.JOB_STATUS;
+const JOB_MANAGER_END_OF_TIME = (window as any)._env_.JOB_MANAGER_END_OF_TIME;
 const DEFAULT_USER = (window as any)._env_.DEFAULT_USER;
 const BASE_MAPS = JSON.parse((window as any)._env_.BASE_MAPS);
 const DEFAULT_TERRAIN_PROVIDER_URL = (window as any)._env_.DEFAULT_TERRAIN_PROVIDER_URL;
@@ -167,6 +168,7 @@ const APP_CONFIG = {
   JOB_STATUS: {
     POLLING_CYCLE_INTERVAL: JOB_STATUS.pollingCycleInterval as number
   },
+  JOB_MANAGER_END_OF_TIME: JOB_MANAGER_END_OF_TIME as number,
   DEFAULT_USER: {
     ROLE: DEFAULT_USER.role
   },
@@ -189,7 +191,6 @@ const APP_CONFIG = {
     TOKEN_VALUE: ACCESS_TOKEN.tokenValue
   },
   SERVED_ENTITY_TYPES : (SERVED_ENTITY_TYPES as string).split(','),
-  JOB_MANAGER_END_OF_TIME: 21, // Days
   MINIMUM_SUPPORTED_BROWSER_VERSION: 84,
   PROJECT_VERSION: PROJECT_VERSION,
   CONTEXT_MENUS: {

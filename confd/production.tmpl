@@ -41,6 +41,7 @@ window._env_ = {
   JOB_STATUS: {
     pollingCycleInterval: '{{ getv "/configuration/job/status/polling/cycle/interval" "120000" }}',
   },
+  JOB_MANAGER_END_OF_TIME: '{{ getv "/configuration/job/manager/end/of/time" "21" }}',
   DEFAULT_USER: {
     role: '{{ getv "/configuration/default/user/role" "USER" }}',
   },

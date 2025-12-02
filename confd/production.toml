@@ -32,6 +32,7 @@ keys = [
   "/configuration/logger/level",
   "/configuration/logger/log2console",
   "/configuration/job/status/polling/cycle/interval",
+  "/configuration/job/manager/end/of/time",
   "/configuration/default/user/role",
   "/configuration/basemaps",
   "/configuration/default/terrain/provider/url",

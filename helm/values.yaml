@@ -117,6 +117,7 @@ env:
   backendLocale: he
   jobStatus:
     pollingCycleInterval: 60000
+  jobManagerEndOfTime: 21
   defaultUser:
     role: USER
   runningMode:
