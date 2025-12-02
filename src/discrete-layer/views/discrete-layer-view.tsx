@@ -134,14 +134,14 @@ const DiscreteLayerView: React.FC = observer(() => {
   const [isDrawing, setIsDrawing] = useState<boolean>(false);
   const [jobToOpenRasterEntity, setJobToOpenRasterEntity] = useState<JobModelType | undefined>(undefined);
   const [jobToOpenJobManager, setJobToOpenJobManager] = useState<JobModelType | undefined>(undefined);
-  const [isRasterEntityDialogOpen, setIsRasterEntityDialogOpen] = useState<boolean>(false);
-  const [is3DEntityDialogOpen, setIs3DEntityDialogOpen] = useState<boolean>(false);
-  const [isDemEntityDialogOpen, setIsDemEntityDialogOpen] = useState<boolean>(false);
-  const [isEntityDialogOpen, setEntityDialogOpen] = useState<boolean>(false);
+  const [isRasterDialogOpen, setIsRasterDialogOpen] = useState<boolean>(false);
+  const [is3DIngestDialogOpen, setIs3DIngestDialogOpen] = useState<boolean>(false);
+  const [isDemIngestDialogOpen, setIsDemIngestDialogOpen] = useState<boolean>(false);
+  const [isEntityDialogOpen, setIsEntityDialogOpen] = useState<boolean>(false);
   const [isEntityDeleteDialogOpen, setIsEntityDeleteDialogOpen] = useState<boolean>(false);
-  const [isSystemsJobsDialogOpen, setSystemsJobsDialogOpen] = useState<boolean>(false);
-  const [isSystemCoreInfoDialogOpen, setSystemCoreInfoDialogOpen] = useState<boolean>(false);
-  const [isOpenNewMenu, setIsOpenNewMenu] = useState<boolean>(false);
+  const [isSystemsJobsDialogOpen, setIsSystemsJobsDialogOpen] = useState<boolean>(false);
+  const [isSystemCoreInfoDialogOpen, setIsSystemCoreInfoDialogOpen] = useState<boolean>(false);
+  const [isCreateEntityMenuOpen, setIsCreateEntityMenuOpen] = useState<boolean>(false);
   const [tabsPanelExpanded, setTabsPanelExpanded] = useState<boolean>(true);
   const [detailsPanelExpanded, setDetailsPanelExpanded] = useState<boolean>(false);
   const [activeTabView, setActiveTabView] = useState(TabViews.CATALOG);
@@ -429,11 +429,11 @@ const DiscreteLayerView: React.FC = observer(() => {
       switch (selectedLayerOperationMode) {
         case Mode.NEW:
         case Mode.UPDATE:
-          setIsRasterEntityDialogOpen(open);
+          setIsRasterDialogOpen(open);
           break;
         case Mode.EDIT:
         case Mode.VIEW:
-          setEntityDialogOpen(open);
+          setIsEntityDialogOpen(open);
           break;
         default:
           break;
@@ -441,11 +441,11 @@ const DiscreteLayerView: React.FC = observer(() => {
     } else if (recordType === RecordType.RECORD_3D) {
       switch (selectedLayerOperationMode) {
         case Mode.NEW:
-          setIs3DEntityDialogOpen(open);
+          setIs3DIngestDialogOpen(open);
           break;
         case Mode.EDIT:
         case Mode.VIEW:
-          setEntityDialogOpen(open);
+          setIsEntityDialogOpen(open);
           break;
         case Mode.DELETE:
           setIsEntityDeleteDialogOpen(open);
@@ -456,10 +456,10 @@ const DiscreteLayerView: React.FC = observer(() => {
     } else if (recordType === RecordType.RECORD_DEM) {
       switch (selectedLayerOperationMode) {
         case Mode.NEW:
-          setIsDemEntityDialogOpen(open);
+          setIsDemIngestDialogOpen(open);
           break;
         case Mode.VIEW:
-          setEntityDialogOpen(open);
+          setIsEntityDialogOpen(open);
           break;
         default:
           break
@@ -468,11 +468,11 @@ const DiscreteLayerView: React.FC = observer(() => {
   };
 
   const handleSystemsJobsDialogClick = (): void => {
-    setSystemsJobsDialogOpen(!isSystemsJobsDialogOpen);
+    setIsSystemsJobsDialogOpen(!isSystemsJobsDialogOpen);
   };
   
   const handleSystemsCoreInfoDialogClick = (): void => {
-    setSystemCoreInfoDialogOpen(!isSystemCoreInfoDialogOpen);
+    setIsSystemCoreInfoDialogOpen(!isSystemCoreInfoDialogOpen);
   };
 
   const createDrawPrimitive = (type: DrawType): IDrawingObject => {
@@ -588,7 +588,7 @@ const DiscreteLayerView: React.FC = observer(() => {
     });
   }, []);
 
-  const handleCloseDialog = useCallback(() => {
+  const onCloseDialog = useCallback(() => {
     store.discreteLayersStore.setSelectedLayerOperationMode(undefined);
   }, [store.discreteLayersStore.setSelectedLayerOperationMode]);
 
@@ -755,7 +755,7 @@ const DiscreteLayerView: React.FC = observer(() => {
               tabIdx === TabViews.CATALOG && 
               (permissions.isLayerRasterRecordIngestAllowed as boolean || permissions.isLayer3DRecordIngestAllowed || permissions.isLayerDemRecordIngestAllowed) && 
               <MenuSurfaceAnchor id="newContainer">
-                <MenuSurface open={isOpenNewMenu} onClose={(): void => setIsOpenNewMenu(false)}>
+                <MenuSurface open={isCreateEntityMenuOpen} onClose={(): void => setIsCreateEntityMenuOpen(false)}>
                   {
                     CONFIG.SERVED_ENTITY_TYPES.includes('RECORD_RASTER') &&
                     permissions.isLayerRasterRecordIngestAllowed &&
@@ -764,7 +764,7 @@ const DiscreteLayerView: React.FC = observer(() => {
                         className="operationIcon mc-icon-Map-Orthophoto"
                         label="NEW RASTER"
                         onClick={(): void => {
-                          setIsOpenNewMenu(false);
+                          setIsCreateEntityMenuOpen(false);
                           dispatchAction({
                             action: UserAction.ENTITY_ACTION_LAYERRASTERRECORD_CREATE
                           });
@@ -780,7 +780,7 @@ const DiscreteLayerView: React.FC = observer(() => {
                         className="operationIcon mc-icon-Map-3D"
                         label="NEW 3D"
                         onClick={(): void => {
-                          setIsOpenNewMenu(false);
+                          setIsCreateEntityMenuOpen(false);
                           dispatchAction({
                             action: UserAction.ENTITY_ACTION_LAYER3DRECORD_CREATE
                           });
@@ -796,7 +796,7 @@ const DiscreteLayerView: React.FC = observer(() => {
                         className="operationIcon mc-icon-Map-DTM"
                         label="NEW DEM"
                         onClick={(): void => {
-                          setIsOpenNewMenu(false);
+                          setIsCreateEntityMenuOpen(false);
                           dispatchAction({
                             action: UserAction.ENTITY_ACTION_LAYERDEMRECORD_CREATE
                           });
@@ -806,7 +806,7 @@ const DiscreteLayerView: React.FC = observer(() => {
                   }
                 </MenuSurface>
                 <Tooltip content={intl.formatMessage({ id: 'action.operations.tooltip' })}>
-                  <IconButton className="operationIcon mc-icon-Plus" onClick={(): void => setIsOpenNewMenu(!isOpenNewMenu)}/>
+                  <IconButton className="operationIcon mc-icon-Plus" onClick={(): void => setIsCreateEntityMenuOpen(!isCreateEntityMenuOpen)}/>
                 </Tooltip>
               </MenuSurfaceAnchor>
             }
@@ -892,7 +892,7 @@ const DiscreteLayerView: React.FC = observer(() => {
 
   useEffect(() => {
     if (!!jobToOpenRasterEntity) {
-      setIsRasterEntityDialogOpen(true);
+      setIsRasterDialogOpen(true);
     }
   }, [jobToOpenRasterEntity]);
 
@@ -1241,7 +1241,7 @@ const DiscreteLayerView: React.FC = observer(() => {
                   activeTabView = {activeTabView}
                   handleOpenJobDialog = {(open, jobData) => {
                     setJobToOpenJobManager(jobData);
-                    setSystemsJobsDialogOpen(open);
+                    setIsSystemsJobsDialogOpen(open);
                   }}
                 />
 
@@ -1261,35 +1261,35 @@ const DiscreteLayerView: React.FC = observer(() => {
 
         {/* <Filters isFiltersOpened={isFilter} filtersView={activeTabView}/> */}
         {
-          isRasterEntityDialogOpen &&
+          isRasterDialogOpen &&
           <EntityRasterDialog
-            isOpen={isRasterEntityDialogOpen}
+            isOpen={isRasterDialogOpen}
             onSetOpen={(open) => {
-              setIsRasterEntityDialogOpen(open);
-              handleCloseDialog();
+              setIsRasterDialogOpen(open);
+              onCloseDialog();
             }}
             job={jobToOpenRasterEntity}
             setJob={setJobToOpenRasterEntity}
           />
         }
         {
-          is3DEntityDialogOpen &&
+          is3DIngestDialogOpen &&
           <EntityDialog
-            isOpen={is3DEntityDialogOpen}
+            isOpen={is3DIngestDialogOpen}
             onSetOpen={(open) => {
-              setIs3DEntityDialogOpen(open);
-              handleCloseDialog();
+              setIs3DIngestDialogOpen(open);
+              onCloseDialog();
             }}
             recordType={RecordType.RECORD_3D}
           />
         }
         {
-          isDemEntityDialogOpen &&
+          isDemIngestDialogOpen &&
           <EntityDialog
-            isOpen={isDemEntityDialogOpen}
+            isOpen={isDemIngestDialogOpen}
             onSetOpen={(open) => {
-              setIsDemEntityDialogOpen(open);
-              handleCloseDialog();
+              setIsDemIngestDialogOpen(open);
+              onCloseDialog();
             }}
             recordType={RecordType.RECORD_DEM}
           />
@@ -1299,8 +1299,8 @@ const DiscreteLayerView: React.FC = observer(() => {
           <EntityDialog
             isOpen={isEntityDialogOpen}
             onSetOpen={(open) => {
-              setEntityDialogOpen(open);
-              handleCloseDialog();
+              setIsEntityDialogOpen(open);
+              onCloseDialog();
             }}
             layerRecord={store.discreteLayersStore.selectedLayer}
           />
@@ -1311,7 +1311,7 @@ const DiscreteLayerView: React.FC = observer(() => {
             isOpen={isEntityDeleteDialogOpen}
             onSetOpen={(open) => {
               setIsEntityDeleteDialogOpen(open);
-              handleCloseDialog();
+              onCloseDialog();
             }}
             layerRecord={store.discreteLayersStore.selectedLayer}
           />
@@ -1320,7 +1320,7 @@ const DiscreteLayerView: React.FC = observer(() => {
           isSystemsJobsDialogOpen &&
           <JobsDialog
             isOpen={isSystemsJobsDialogOpen}
-            onSetOpen={setSystemsJobsDialogOpen}
+            onSetOpen={setIsSystemsJobsDialogOpen}
             setRestoreFromJob={setJobToOpenRasterEntity}
             focusOnJob={jobToOpenJobManager}
             setFocusOnJob={setJobToOpenJobManager}
@@ -1330,7 +1330,7 @@ const DiscreteLayerView: React.FC = observer(() => {
           isSystemCoreInfoDialogOpen &&
           <SystemCoreInfoDialog
             isOpen={isSystemCoreInfoDialogOpen}
-            onSetOpen={setSystemCoreInfoDialogOpen}
+            onSetOpen={setIsSystemCoreInfoDialogOpen}
           />
         }
       </Box>

@@ -277,9 +277,12 @@ export const discreteLayersStore = ModelBase
       return layer;
     }
 
-    function findRasterUniqueLayer(productId: string, productType: string): ILayerImage | undefined {
+    function findRasterLayer(productId: string, productType: string): ILayerImage | undefined {
       const layer = findLayerByPredicate((layer: ILayerImage) => (
-        get(layer, 'productId') === productId && get(layer, 'productType') === productType));
+        get(layer, 'type') === 'RECORD_RASTER' &&
+        get(layer, 'productId') === productId && 
+        get(layer, 'productType') === productType
+      ));
 
       return layer;
     }
@@ -501,7 +504,7 @@ export const discreteLayersStore = ModelBase
       highlightLayer,
       selectLayer,
       selectLayerByID,
-      findRasterUniqueLayer,
+      findRasterLayer,
       setSelectedLayerOperationMode,
       setTabviewData,
       resetSelectedLayer,
