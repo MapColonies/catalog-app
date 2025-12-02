@@ -187,22 +187,26 @@ export const isRetryEnabled = (context: IContext): boolean => {
   return !!(context.job && context.job.jobId)  &&
     (context.job.taskStatus === Status.Failed ||
     (context.job.taskStatus === Status.Completed && context.job.validationReport?.isValid === false)) &&
-    context.job.details?.status !== Status.Aborted;
+    context.job.details?.status !== Status.Aborted &&
+    context.selectionMode === 'restore';
 };
 
 export const isUIDisabled = (isLoading: boolean, state: any): boolean => {
   return isLoading || isDone(state);
 };
 
-export const hasError = (context: IContext): boolean => {
-  return context.errors.length > 0 && 
-    (context.errors.some(error => error.level === 'error') || 
-    context.errors.some(error => !error.level));
+export const hasError = (errors: IStateError[]): boolean => {
+  return errors.length > 0 &&
+    (errors.some(error => error.level === 'error') ||
+    errors.some(error => !error.level));
 };
 
-export const isTaskFailed = (job: IJob | undefined): boolean => {
-  const status = job?.taskStatus;
-  return typeof status !== 'undefined' && [Status.Failed, Status.Aborted].includes(status);
+export const isStatusFailed = (status: Status | undefined): boolean => {
+  return status !== null && typeof status !== 'undefined' && [Status.Failed, Status.Aborted].includes(status as Status);
+};
+
+export const isJobValid = (status: Status | undefined): boolean => {
+  return status !== null && typeof status !== 'undefined' && [Status.Suspended, Status.Expired].includes(status as Status);
 };
 
 export const isTaskValid = (job: IJob | undefined): boolean => {
