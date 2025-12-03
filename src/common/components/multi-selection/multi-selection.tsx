@@ -23,6 +23,7 @@ interface MultiSelectionWrapperProps {
 }
 
 export const MultiSelection: React.FC<MultiSelectionWrapperProps> = (props) => {
+  console.log("מתרנדר :)))")
   const { fieldInfo, lookupOptions, fieldName, customStyles, placeholder, value, formik } = props;
   const lang = CONFIG.I18N.DEFAULT_LANGUAGE;
   const backLocale = CONFIG.DEFAULT_BACKEND_LOCALE;
@@ -43,7 +44,7 @@ export const MultiSelection: React.FC<MultiSelectionWrapperProps> = (props) => {
     });
   }, [lookupOptions, lang]);
 
-  const selectedValues = useMemo(() => {
+  const getMultiSelectionValues = () => {
     const chosenValueStrings = (multiSelectionValues)?.map((value) => multiSelectionOptions.filter((option) => option.value === value))
       .flat()
       .map((filteredOption) => filteredOption.value);
@@ -53,15 +54,15 @@ export const MultiSelection: React.FC<MultiSelectionWrapperProps> = (props) => {
     }).flat();
 
     return chosenValueOptions;
-  }, [multiSelectionValues, multiSelectionOptions]);
+  };
 
-  const getFormikFieldValue = useCallback((values: { value: string, label: string }[]) => {
+  const getFormikFieldValue = (values: { value: string, label: string }[]) => {
     return values.map((val) => {
       const lookupOptionsTranslations = (lookupOptions as ILookupOption[]).map((option) => option.translation);
       const valueTranslation = lookupOptionsTranslations.find((trns) => (trns as unknown as { locale: string, text: string }[]).findIndex((trn) => trn.text === val.value) > -1);
       return valueTranslation?.find((valueTranslations) => valueTranslations.locale === backLocale)?.text;
     }).join(', ');
-  }, [lookupOptions, backLocale]);
+  };
 
   const onChangeMultiSelection = (data: MultiSelectionOption[]) => {
     formik?.setFieldValue(fieldName, getFormikFieldValue(data));
@@ -73,7 +74,7 @@ export const MultiSelection: React.FC<MultiSelectionWrapperProps> = (props) => {
   return (
     <McMultiSelection
       options={multiSelectionOptions}
-      values={selectedValues}
+      values={getMultiSelectionValues()}
       onChange={onChangeMultiSelection}
       placeholder={placeholder}
       styles={customStyles}
