@@ -141,8 +141,8 @@ export const validateShapeFiles = (files: IFiles): IStateError[] => {
     const modDateProduct = moment(productDetails.modDate);
     const modDateShapeMetadata = moment(shapeMetadataDetails.modDate);
     const differenceInMinutes = modDateProduct.diff(modDateShapeMetadata, 'minutes');
-    if (Math.abs(differenceInMinutes) > CONFIG.UPLOAD_SHAPE_FILES_TIME_GRACE_IN_MINUTES) {
-      return [ buildError('ingestion.warning.modDateMismatch', CONFIG.UPLOAD_SHAPE_FILES_TIME_GRACE_IN_MINUTES.toString(), 'logic', 'warning') ];
+    if (Math.abs(differenceInMinutes) > CONFIG.RASTER_INGESTION.CHANGES_IN_SHAPE_FILES.TIME_DIFFERENCE_GRACE_MINUTES) {
+      return [ buildError('ingestion.warning.modDateMismatch', CONFIG.RASTER_INGESTION.CHANGES_IN_SHAPE_FILES.TIME_DIFFERENCE_GRACE_MINUTES.toString(), 'logic', 'warning') ];
     }
   }
   return [];

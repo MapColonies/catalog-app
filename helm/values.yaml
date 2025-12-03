@@ -115,8 +115,9 @@ env:
   bboxAreaSquareKmLimit: 10000
   language: he
   backendLocale: he
-  jobStatus:
+  jobManager:
     pollingCycleInterval: 120000
+    filterDaysTimeSlot: 1
   defaultUser:
     role: USER
   runningMode:
@@ -174,7 +175,9 @@ env:
   geocoder:
     url: ''
     callbackUrl: ''
-  uploadShapeFilesTimeGraceInMinutes: 10
+  changesInShapeFiles:
+    timeDifferenceGraceMinutes: 10
+    timeModifiedThresholdHours: 12
 route:
   enabled: true
   annotations:

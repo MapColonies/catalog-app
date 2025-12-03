@@ -433,7 +433,7 @@ export const workflowMachine = createMachine<IContext, Events>({
     [WORKFLOW.JOB_POLLING_WAIT]: {
       entry: () => console.log(`>>> Enter ${WORKFLOW.JOB_POLLING_WAIT}`),
       after: {
-        [CONFIG.JOB_STATUS.POLLING_CYCLE_INTERVAL]: WORKFLOW.JOB_POLLING
+        [CONFIG.JOB_MANAGER.POLLING_CYCLE_INTERVAL]: WORKFLOW.JOB_POLLING
       }
     },
     [WORKFLOW.RESTORE_JOB]: {
