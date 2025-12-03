@@ -1,3 +1,11 @@
+#layerDetailsFormRaster .cursorText {
+  cursor: text;
+}
+
+#layerDetailsFormRaster .cursorDefault {
+  cursor: default;
+}
+
 #layerDetailsFormRaster .dots {
   position: absolute;
   left: 100%;

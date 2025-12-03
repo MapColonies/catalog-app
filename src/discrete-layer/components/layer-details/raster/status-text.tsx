@@ -37,12 +37,12 @@ export const StatusText: React.FC<StatusTextProps> = ({ status, reason }) => {
       {
         reason ? (
           <Tooltip content={truncate(reason, { length: FAILURE_REASON_MAX_LENGTH })}>
-            <Box>
+            <Box className="cursorText">
               <FormattedMessage id={`system-status.job.status_translation.${status}`} />
             </Box>
           </Tooltip>
         ) : (
-          <Box>
+          <Box className="cursorDefault">
             <FormattedMessage id={`system-status.job.status_translation.${status}`} />
           </Box>
         )
