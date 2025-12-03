@@ -268,8 +268,8 @@
   "validationReport.vertices": "Polygons with too many vertices",
   "validationReport.metadata": "Invalid metadata",
   "validationReport.resolution": "Resolution mismatch",
-  "validationReport.smallHoles": "Small holes",
-  "validationReport.smallGeometries": "Small geometries",
+  "validationReport.smallHoles": "Polygons with small holes",
+  "validationReport.smallGeometries": "Very small polygons",
 
   "field-names.raster.id": "ID",
   "field-names.raster.productId": "Ext. ID",

@@ -13,7 +13,6 @@ import {
 } from './action-handlers';
 import {
   addError,
-  handleShapeFilesValidation,
   warnUnexpectedStateEvent
 } from './helpers';
 import { SERVICES } from './services';
@@ -352,12 +351,9 @@ export const workflowMachine = createMachine<IContext, Events>({
                 }
               ) :
               { ..._.event.files };
-            let errors = _.context.errors;
-            errors = handleShapeFilesValidation(files);
 
             return {
-              files,
-              errors
+              files
             };
           })
         },
