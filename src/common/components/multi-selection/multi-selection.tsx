@@ -23,7 +23,6 @@ interface MultiSelectionWrapperProps {
 }
 
 export const MultiSelection: React.FC<MultiSelectionWrapperProps> = (props) => {
-  console.log("מתרנדר :)))")
   const { fieldInfo, lookupOptions, fieldName, customStyles, placeholder, value, formik } = props;
   const lang = CONFIG.I18N.DEFAULT_LANGUAGE;
   const backLocale = CONFIG.DEFAULT_BACKEND_LOCALE;
