@@ -28,6 +28,8 @@ export enum UserAction {
   ENTITY_ACTION_LAYERDEMRECORD_EDIT = 'entity_action.LayerDemRecord.edit',
   ENTITY_ACTION_VECTORBESTRECORD_EDIT = 'entity_action.VectorBestRecord.edit',
   ENTITY_ACTION_QUANTIZEDMESHBESTRECORD_EDIT = 'entity_action.QuantizedMeshBestRecord.edit',
+  ENTITY_ACTION_SELECTED_ENTITY_EDIT = 'entity_action.selected.edit',
+  ENTITY_ACTION_SELECTED_ENTITY_VIEW = 'entity_action.selected.view',
   ENTITY_ACTION_LAYERRASTERRECORD_UPDATE = 'entity_action.LayerRasterRecord.update',
   ENTITY_ACTION_LAYERRASTERRECORD_DELETE = 'entity_action.LayerRasterRecord.delete',
   ENTITY_ACTION_LAYER3DRECORD_DELETE = 'entity_action.Layer3DRecord.delete',
