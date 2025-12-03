@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { isEmpty } from 'lodash';
 import { observer } from 'mobx-react';
+import moment from 'moment';
 import { Switch } from '@material-ui/core';
 import { Box, defaultFormatters, FileData } from '@map-colonies/react-components';
 import { Button, Icon, Typography } from '@map-colonies/react-core';
@@ -17,12 +18,14 @@ import { RasterWorkflowContext } from './state-machine/context';
 import {
   hasActiveJob,
   hasTagDeep,
+  isRetryEnabled,
   isUIDisabled
 } from './state-machine/helpers';
 import {
   SelectionMode,
   Events,
-  IFiles
+  IFiles,
+  IContext
 } from './state-machine/types';
 
 import './ingestion-fields.raster.css';
@@ -38,8 +41,13 @@ interface IngestionFieldsProps {
   recordType: RecordType;
 }
 
-const FileItem: React.FC<{ file: any }> = ({ file }) => {
+const FileItem: React.FC<{ file: any; context: IContext }> = ({ file, context }) => {
   const color = !file.exists ? 'error' : (file.isModDateDiffExceeded ? 'warning' : '');
+  const modDate = file.details?.modDate;
+  const isModified = useMemo(() => {
+    return modDate ? moment().diff(moment(modDate), 'hours') <= CONFIG.RASTER_INGESTION.CHANGES_IN_SHAPE_FILES.TIME_MODIFIED_THRESHOLD_HOURS : false;
+  }, [modDate]);
+
   return (
     <>
       <Box>
@@ -54,9 +62,11 @@ const FileItem: React.FC<{ file: any }> = ({ file }) => {
       </Box>
       <Box className={`ltr ${color}`}>
         {
-          (file.details?.modDate && file.dateFormatterPredicate)
-            ? file.dateFormatterPredicate(file.details.modDate)
-            : ''
+          modDate
+          ? (isModified && isRetryEnabled(context)
+            ? file.dateFormatterPredicate(modDate)
+            : dateFormatter(modDate))
+          : ''
         }
       </Box>
     </>
@@ -78,7 +88,7 @@ const IngestionInputs: React.FC<{ state: any }> = ({ state }) => {
           {
             state.context?.files &&
             Object.values(state.context?.files as IFiles).map((file: any, idx: number): JSX.Element => {
-              return <FileItem key={idx} file={file} />;
+              return <FileItem key={idx} file={file} context={state.context} />;
             })
           }
         </Box>

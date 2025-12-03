@@ -184,7 +184,7 @@ export const isGoToJobEnabled = (context: IContext): boolean => {
 };
 
 export const isRetryEnabled = (context: IContext): boolean => {
-  return !!(context.job && context.job.jobId)  &&
+  return !!(context.job && context.job.jobId) &&
     (context.job.taskStatus === Status.Failed ||
     (context.job.taskStatus === Status.Completed && context.job.validationReport?.isValid === false)) &&
     context.job.details?.status !== Status.Aborted &&
