@@ -825,7 +825,7 @@
   "polygonParts-info.no-data.message": "No polygon parts data was found for the layer in the selected position",
   "polygonParts-info.part-to-large.message": "Polygon part too large for presentation",
 
-  "grid.row-not-found.warning": "The job dated {value} does not meet the search criteria",
+  "grid.row-not-found.warning": "The job {value} does not meet the search criteria",
 
   "export-layer.exportSuccessContainer.title": "Export request triggered",
   "export-layer.exportSuccessContainer.approve": "Copy and exit",
