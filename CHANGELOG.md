@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.0.4](https://github.com/MapColonies/catalog-app/compare/v3.0.3...v3.0.4) (2025-12-03)
+
+
+### Bug Fixes
+
+* add report list  loading indicator ([#765](https://github.com/MapColonies/catalog-app/issues/765)) ([b34c340](https://github.com/MapColonies/catalog-app/commit/b34c3404221fc56f03fe02cd4a7d241ee6425ba6))
+* allow node rowIndex to be 0 and improve error message clarity ([#768](https://github.com/MapColonies/catalog-app/issues/768)) ([70b0606](https://github.com/MapColonies/catalog-app/commit/70b06068a44226c14766bebb73581655e775e6a7))
+* refactor raster dialog and dialogs open mechanism ( MAPCO-9170 ) ([#751](https://github.com/MapColonies/catalog-app/issues/751)) ([2853131](https://github.com/MapColonies/catalog-app/commit/2853131ab61346bd824cf7c873c390396ae12fce))
+
 ## [3.0.3](https://github.com/MapColonies/catalog-app/compare/v3.0.2...v3.0.3) (2025-12-01)
 
 
