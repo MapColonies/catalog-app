@@ -5,6 +5,7 @@ import { Status } from '../../../models';
 import { Progress } from './progress';
 import { isJobValid, isStatusFailed, isTaskValid } from './state-machine/helpers';
 import { Aggregation, IJob } from './state-machine/types';
+import { Curtain } from './curtain/curtain.component';
 
 import './job-info.css';
 
@@ -39,7 +40,7 @@ export const JobInfo: React.FC<JobInfoProps> = ({ job }) => {
           isValid={isJobValid(job.details?.status as Status | undefined)}
         />
       </Box>
-      <Box className="section">
+      <Box className="section curtainContainer">
         <Box className="reportContainer">
           <Box className="title underline">
             <FormattedMessage id="ingestion.job.report" />
@@ -56,6 +57,7 @@ export const JobInfo: React.FC<JobInfoProps> = ({ job }) => {
             }
           </Box>
         </Box>
+        {job.taskId ? <></> : <Curtain showProgress={true} />}
       </Box>
     </>
   );

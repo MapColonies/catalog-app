@@ -48,7 +48,6 @@ import {
   clearSyncWarnings,
   getFlatEntityDescriptors,
   getPartialRecord,
-  getRecordForUpdate,
   getValidationType,
   getYupFieldConfig
 } from './utils';
@@ -66,8 +65,6 @@ interface EntityDialogProps {
   onSetOpen: (open: boolean) => void;
   recordType?: RecordType;
   layerRecord?: ILayerImage | null;
-  isSelectedLayerUpdateMode?: boolean;
-  isViewMode?: boolean;
 }
 
 const setDefaultValues = (record: Record<string, unknown>, descriptors: EntityDescriptorModelType[]): void => {
@@ -147,13 +144,11 @@ export const EntityDialog: React.FC<EntityDialogProps> = observer(
     const dialogContainerRef = useRef<HTMLDivElement>(null);
 
     const decideMode = useCallback(() => {
-      if (props.isSelectedLayerUpdateMode === true && props.layerRecord) {
-        return Mode.UPDATE;
+      if (!store.discreteLayersStore.selectedLayerOperationMode) {
+        return !props.layerRecord ? Mode.NEW : Mode.EDIT;
       }
-      else if (props.isViewMode === true && props.layerRecord) {
-        return Mode.VIEW;
-      }
-      return !props.layerRecord ? Mode.NEW : Mode.EDIT;
+
+      return store.discreteLayersStore.selectedLayerOperationMode;
     }, []);
 
     const { isOpen, onSetOpen } = props;   
@@ -387,8 +382,8 @@ export const EntityDialog: React.FC<EntityDialogProps> = observer(
         queryGetProduct.setQuery(
           store.queryGetProduct(
             {
-              productType: props.layerRecord?.productType as ProductType,
-              productId: (props.layerRecord as LayerRasterRecordModelType).productId as string
+              productType: layerRecord?.productType as ProductType,
+              productId: (layerRecord as LayerRasterRecordModelType).productId as string
             }
           )
         );
@@ -444,7 +439,7 @@ export const EntityDialog: React.FC<EntityDialogProps> = observer(
                 store.discreteLayersStore
                   .entityDescriptors as EntityDescriptorModelType[]
               }
-              layerRecord={props.layerRecord}
+              layerRecord={layerRecord}
               isBrief={true}
               mode={Mode.VIEW}
             />
@@ -477,15 +472,8 @@ export const EntityDialog: React.FC<EntityDialogProps> = observer(
                 }
                 ingestionFields={ingestionFields}
                 recordType={recordType}
-                layerRecord={
-                  mode === Mode.UPDATE
-                    ? getRecordForUpdate(
-                        props.layerRecord as LayerMetadataMixedUnion,
-                        layerRecord,
-                        descriptors as FieldConfigModelType[]
-                      )
-                    : layerRecord
-                }
+                // For fields that need to be changed in update. See "getRecordForUpdate()"
+                layerRecord={layerRecord}
                 yupSchema={Yup.object({
                   ...schema,
                 })}

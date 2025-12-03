@@ -10,6 +10,7 @@ import { IBaseMaps } from '@map-colonies/react-components/dist/cesium-map/map';
 import { ApiHttpResponse } from '../../common/models/api-response';
 import { ResponseState } from '../../common/models/response-state.enum';
 import { MOCK_DATA_IMAGERY_LAYERS_ISRAEL } from '../../__mocks-data__/search-results.mock';
+import { Mode } from '../../common/models/mode.enum';
 import CONFIG from '../../common/config';
 import { isUnpublished } from '../../common/helpers/style';
 import { LinkType } from '../../common/models/link-type.enum';
@@ -51,8 +52,7 @@ const INITIAL_STATE = {
   layersImages: [],
   highlightedLayer: null,
   selectedLayer: null,
-  selectedLayerIsUpdateMode: false,
-  selectedLayerIsDeleteMode: false,
+  selectedLayerOperationMode: undefined,
   tabViews: [{idx: TabViews.CATALOG}, {idx: TabViews.SEARCH_RESULTS}, {idx: TabViews.EXPORT_LAYER}],
   entityDescriptors: [],
   entityTooltipFields: new Map(),
@@ -78,8 +78,7 @@ export const discreteLayersStore = ModelBase
     layersImages: types.maybe(types.frozen<LayersImagesResponse>(INITIAL_STATE.layersImages)),
     highlightedLayer: types.maybe(types.frozen<ILayerImage>(INITIAL_STATE.highlightedLayer as unknown as ILayerImage)),
     selectedLayer: types.maybe(types.frozen<ILayerImage>(INITIAL_STATE.selectedLayer as unknown as ILayerImage)),
-    selectedLayerIsUpdateMode: types.maybe(types.frozen<boolean>(INITIAL_STATE.selectedLayerIsUpdateMode)),
-    selectedLayerIsDeleteMode: types.maybe(types.frozen<boolean>(INITIAL_STATE.selectedLayerIsDeleteMode)),
+    selectedLayerOperationMode: types.maybe(types.frozen<Mode|undefined>(INITIAL_STATE.selectedLayerOperationMode)),
     tabViews: types.maybe(types.frozen<ITabViewData[]>(INITIAL_STATE.tabViews)),
     entityDescriptors: types.maybe(types.frozen<EntityDescriptorModelType[]>(INITIAL_STATE.entityDescriptors)),
     entityTooltipFields: types.maybe(types.frozen<Map<LayerRecordTypes, FieldConfigModelType[]>>(INITIAL_STATE.entityTooltipFields)),
@@ -256,20 +255,36 @@ export const discreteLayersStore = ModelBase
       self.highlightedLayer = layer ? cloneDeep(layer) : undefined;
     }
 
-    function selectLayer(layer: ILayerImage | undefined, isUpdateMode: boolean | undefined = undefined, isDeleteMode: boolean | undefined = undefined): void {
+    function selectLayer(layer: ILayerImage | undefined): void {
       self.selectedLayer = layer ? cloneDeep(layer) : undefined;
-      self.selectedLayerIsUpdateMode = isUpdateMode;
-      self.selectedLayerIsDeleteMode = isDeleteMode;
+    }
+
+    function setSelectedLayerOperationMode(mode: Mode | undefined): void {
+      self.selectedLayerOperationMode = mode;
     }
 
     function resetUpdateMode(): void {
-      self.selectedLayerIsUpdateMode = false;
       self.customValidationError = undefined;
     }
 
     function selectLayerByID(layerID: string): void {
       const layer = self.layersImages?.find(layer => layer.id === layerID);
       self.selectedLayer = layer ? cloneDeep(layer) : undefined;
+    }
+
+    function findLayerByPredicate(predicate: (layer: ILayerImage) => boolean): ILayerImage | undefined {
+      const layer = self.layersImages?.find(predicate);
+      return layer;
+    }
+
+    function findRasterLayer(productId: string, productType: string): ILayerImage | undefined {
+      const layer = findLayerByPredicate((layer: ILayerImage) => (
+        get(layer, 'type') === 'RECORD_RASTER' &&
+        get(layer, 'productId') === productId && 
+        get(layer, 'productType') === productType
+      ));
+
+      return layer;
     }
 
     function setTabviewData(tabView: TabViews, customLayersImages?: ILayerImage[]): void {
@@ -489,6 +504,8 @@ export const discreteLayersStore = ModelBase
       highlightLayer,
       selectLayer,
       selectLayerByID,
+      findRasterLayer,
+      setSelectedLayerOperationMode,
       setTabviewData,
       resetSelectedLayer,
       restoreTabviewData,

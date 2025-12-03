@@ -706,6 +706,8 @@ export function importShapeFileFromClient(
   input.click();
 }  
 
+// This function is currently unused. It may be used later to modify fields
+// during update if the descriptors include updateRules.
 export const getRecordForUpdate = (selectedLayer: ILayerImage ,record: ILayerImage, descriptors: FieldConfigModelType[]): ILayerImage => {
   const VERSION_DELIMITER = '.';
 

@@ -21,6 +21,7 @@ import { useStore } from '../../models/RootStore';
 import { UserAction } from '../../models/userStore';
 import { ContextActions } from '../../../common/actions/context.actions';
 import CONFIG from '../../../common/config';
+import { Mode } from '../../../common/models/mode.enum';
 import { getMax } from '../../../common/helpers/array';
 import useHandleDemHeightsRequests from '../../../common/hooks/mapMenus/useHandleDemHeightsRequests';
 import useHandleWfsGetFeatureRequests from '../../../common/hooks/mapMenus/useHandleWfsGetFeatureRequests';
@@ -35,16 +36,15 @@ import { TabViews } from '../tab-views';
 const initialOrder = 0;
 
 interface ActionResolverProps {
-  handleOpenEntityDialog: (open: boolean) => void;
+  handleOpenEntityDialog: (recordType: RecordType, open: boolean) => void;
   handleFlyTo: () => void;
   handleTabViewChange: (tabView: TabViews) => void;
-  handleOpenEntityDeleteDialog: (open: boolean) => void;
   handleOpenJobDialog: (open: boolean, data: JobModelType) => void;
   activeTabView: TabViews;
 }
 
 export const ActionResolver: React.FC<ActionResolverProps> = observer((props) => {
-  const { handleOpenEntityDialog, handleFlyTo, handleTabViewChange, handleOpenEntityDeleteDialog, handleOpenJobDialog, activeTabView } = props;
+  const { handleOpenEntityDialog, handleFlyTo, handleTabViewChange, handleOpenJobDialog, activeTabView } = props;
 
   const store = useStore();
   const ENUMS = useEnums();
@@ -189,31 +189,56 @@ export const ActionResolver: React.FC<ActionResolverProps> = observer((props) =>
       console.log(`  ${action} EVENT`, data);
 
       switch (action) {
+        case UserAction.ENTITY_ACTION_LAYERRASTERRECORD_CREATE:
+          store.discreteLayersStore.setSelectedLayerOperationMode(Mode.NEW);
+          handleOpenEntityDialog(RecordType.RECORD_RASTER, true);
+          break;
+        case UserAction.ENTITY_ACTION_LAYER3DRECORD_CREATE:
+          store.discreteLayersStore.setSelectedLayerOperationMode(Mode.NEW);
+          handleOpenEntityDialog(RecordType.RECORD_3D, true);
+          break;
+        case UserAction.ENTITY_ACTION_LAYERDEMRECORD_CREATE:
+          store.discreteLayersStore.setSelectedLayerOperationMode(Mode.NEW);
+          handleOpenEntityDialog(RecordType.RECORD_DEM, true);
+          break;
         case 'LayerRasterRecord.edit':
           // @ts-ignore
           store.discreteLayersStore.selectLayer(cleanUpEntity(data, LayerRasterRecordModelKeys) as LayerMetadataMixedUnion);
-          handleOpenEntityDialog(true);
+          store.discreteLayersStore.setSelectedLayerOperationMode(Mode.EDIT);
+          handleOpenEntityDialog(RecordType.RECORD_RASTER, true);
           break;
         case 'Layer3DRecord.edit':
           // @ts-ignore
           store.discreteLayersStore.selectLayer(cleanUpEntity(data, Layer3DRecordModelKeys) as LayerMetadataMixedUnion);
-          handleOpenEntityDialog(true);
+          store.discreteLayersStore.setSelectedLayerOperationMode(Mode.EDIT);
+          handleOpenEntityDialog(RecordType.RECORD_3D, true);
           break;
         case 'LayerDemRecord.edit':
           // @ts-ignore
           store.discreteLayersStore.selectLayer(cleanUpEntity(data, LayerDemRecordModelKeys) as LayerMetadataMixedUnion);
-          handleOpenEntityDialog(true);
+          store.discreteLayersStore.setSelectedLayerOperationMode(Mode.EDIT);
+          handleOpenEntityDialog(RecordType.RECORD_DEM, true);
           break;
         case 'VectorBestRecord.edit':
           // @ts-ignore
           store.discreteLayersStore.selectLayer(cleanUpEntity(data, VectorBestRecordModelKeys) as LayerMetadataMixedUnion);
-          handleOpenEntityDialog(true);
+          store.discreteLayersStore.setSelectedLayerOperationMode(Mode.EDIT);
+          handleOpenEntityDialog(RecordType.RECORD_VECTOR, true);
           break;
         case 'QuantizedMeshBestRecord.edit':
           // @ts-ignore
           store.discreteLayersStore.selectLayer(cleanUpEntity(data, QuantizedMeshBestRecordModelKeys) as LayerMetadataMixedUnion);
-          handleOpenEntityDialog(true);
+          store.discreteLayersStore.setSelectedLayerOperationMode(Mode.EDIT);
+          handleOpenEntityDialog(RecordType.RECORD_DEM, true);
           break;
+        case UserAction.ENTITY_ACTION_SELECTED_ENTITY_EDIT:
+          store.discreteLayersStore.setSelectedLayerOperationMode(Mode.EDIT);
+          handleOpenEntityDialog(store.discreteLayersStore.selectedLayer?.type as RecordType, true);
+          break;          
+        case UserAction.ENTITY_ACTION_SELECTED_ENTITY_VIEW:
+          store.discreteLayersStore.setSelectedLayerOperationMode(Mode.VIEW);
+          handleOpenEntityDialog(store.discreteLayersStore.selectedLayer?.type as RecordType, true);
+          break;          
         case 'LayerRasterRecord.flyTo':
           // @ts-ignore
           store.discreteLayersStore.selectLayer(cleanUpEntity(data, LayerRasterRecordModelKeys) as LayerMetadataMixedUnion);
@@ -242,7 +267,8 @@ export const ActionResolver: React.FC<ActionResolverProps> = observer((props) =>
         case 'LayerRasterRecord.update':
           // @ts-ignore
           store.discreteLayersStore.selectLayer(cleanUpEntity(data, LayerRasterRecordModelKeys) as LayerMetadataMixedUnion, true);
-          handleOpenEntityDialog(true);
+          store.discreteLayersStore.setSelectedLayerOperationMode(Mode.UPDATE);
+          handleOpenEntityDialog(RecordType.RECORD_RASTER, true);
           break;
         case 'Layer3DRecord.viewer':
           window.open(`${CONFIG.WEB_TOOLS_URL}/${CONFIG.MODEL_VIEWER_ROUTE}?model_ids=${data.productId}&token=${CONFIG.MODEL_VIEWER_TOKEN_VALUE}`);
@@ -250,7 +276,8 @@ export const ActionResolver: React.FC<ActionResolverProps> = observer((props) =>
         case 'Layer3DRecord.delete':
           // @ts-ignore
           store.discreteLayersStore.selectLayer(cleanUpEntity(data, Layer3DRecordModelKeys) as LayerMetadataMixedUnion, false, true);
-          handleOpenEntityDeleteDialog(true);
+          store.discreteLayersStore.setSelectedLayerOperationMode(Mode.DELETE);
+          handleOpenEntityDialog(RecordType.RECORD_3D, true);
           break;
         case 'LayerRasterRecord.viewer':
         case 'LayerDemRecord.viewer':
