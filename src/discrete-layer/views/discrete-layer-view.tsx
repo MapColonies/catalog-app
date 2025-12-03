@@ -422,48 +422,31 @@ const DiscreteLayerView: React.FC = observer(() => {
     store.discreteLayersStore.resetTabView();
   }, [userRole]);
 
-  const openEntityByMode = (recordType: RecordType, open: boolean) => {
-    const { selectedLayerOperationMode } = store.discreteLayersStore;
+  const dialogMap = {
+    [RecordType.RECORD_RASTER]: {
+      [Mode.NEW]: setIsRasterDialogOpen,
+      [Mode.UPDATE]: setIsRasterDialogOpen,
+      [Mode.EDIT]: setIsEntityDialogOpen,
+      [Mode.VIEW]: setIsEntityDialogOpen,
+    },
+    [RecordType.RECORD_3D]: {
+      [Mode.NEW]: setIs3DIngestDialogOpen,
+      [Mode.EDIT]: setIsEntityDialogOpen,
+      [Mode.VIEW]: setIsEntityDialogOpen,
+      [Mode.DELETE]: setIsEntityDeleteDialogOpen,
+    },
+    [RecordType.RECORD_DEM]: {
+      [Mode.NEW]: setIsDemIngestDialogOpen,
+      [Mode.VIEW]: setIsEntityDialogOpen,
+    }
+  };
 
-    if (recordType === RecordType.RECORD_RASTER) {
-      switch (selectedLayerOperationMode) {
-        case Mode.NEW:
-        case Mode.UPDATE:
-          setIsRasterDialogOpen(open);
-          break;
-        case Mode.EDIT:
-        case Mode.VIEW:
-          setIsEntityDialogOpen(open);
-          break;
-        default:
-          break;
-      }
-    } else if (recordType === RecordType.RECORD_3D) {
-      switch (selectedLayerOperationMode) {
-        case Mode.NEW:
-          setIs3DIngestDialogOpen(open);
-          break;
-        case Mode.EDIT:
-        case Mode.VIEW:
-          setIsEntityDialogOpen(open);
-          break;
-        case Mode.DELETE:
-          setIsEntityDeleteDialogOpen(open);
-          break;
-        default:
-          break;
-      }
-    } else if (recordType === RecordType.RECORD_DEM) {
-      switch (selectedLayerOperationMode) {
-        case Mode.NEW:
-          setIsDemIngestDialogOpen(open);
-          break;
-        case Mode.VIEW:
-          setIsEntityDialogOpen(open);
-          break;
-        default:
-          break
-      }
+  const openEntityByMode = (recordType: RecordType, open: boolean) => {
+    const mode = store.discreteLayersStore.selectedLayerOperationMode;    
+    const dialog = get(dialogMap, `${recordType}.${mode}`);
+
+    if (dialog) {
+      dialog(open);
     }
   };
 

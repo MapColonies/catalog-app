@@ -143,9 +143,17 @@ export const EntityDialog: React.FC<EntityDialogProps> = observer(
 
     const dialogContainerRef = useRef<HTMLDivElement>(null);
 
+    const decideMode = useCallback(() => {
+      if (!store.discreteLayersStore.selectedLayerOperationMode) {
+        return !props.layerRecord ? Mode.NEW : Mode.EDIT;
+      }
+
+      return store.discreteLayersStore.selectedLayerOperationMode;
+    }, []);
+
     const { isOpen, onSetOpen } = props;   
     const [recordType] = useState<RecordType>(props.recordType ?? (props.layerRecord?.type as RecordType));
-    const [mode] = useState<Mode>(store.discreteLayersStore.selectedLayerOperationMode ?? (!props.layerRecord ? Mode.NEW : Mode.EDIT));
+    const [mode] = useState<Mode>(decideMode());
     const [layerRecord] = useState<LayerMetadataMixedUnion>(
       props.layerRecord && mode !== Mode.UPDATE
         ? cloneDeep(props.layerRecord)

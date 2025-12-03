@@ -201,70 +201,36 @@ export const ActionResolver: React.FC<ActionResolverProps> = observer((props) =>
           store.discreteLayersStore.setSelectedLayerOperationMode(Mode.NEW);
           handleOpenEntityDialog(RecordType.RECORD_DEM, true);
           break;
-        case 'LayerRasterRecord.edit': {
+        case 'LayerRasterRecord.edit':
           // @ts-ignore
-          const cleanedEntity = cleanUpEntity(data, LayerRasterRecordModelKeys) as LayerMetadataMixedUnion;
-          store.discreteLayersStore.selectLayer(cleanedEntity);
-
-          if (store.userStore.isActionAllowed(`entity_action.${cleanedEntity.__typename}.edit`)) {
-            store.discreteLayersStore.setSelectedLayerOperationMode(Mode.EDIT);
-          } else {
-            store.discreteLayersStore.setSelectedLayerOperationMode(Mode.VIEW);
-          }
+          store.discreteLayersStore.selectLayer(cleanUpEntity(data, LayerRasterRecordModelKeys) as LayerMetadataMixedUnion);
+          store.discreteLayersStore.setSelectedLayerOperationMode(Mode.EDIT);
           handleOpenEntityDialog(RecordType.RECORD_RASTER, true);
           break;
-        }
-        case 'Layer3DRecord.edit': {
+        case 'Layer3DRecord.edit':
           // @ts-ignore
-          const cleanedEntity = cleanUpEntity(data, Layer3DRecordModelKeys) as LayerMetadataMixedUnion;
-          store.discreteLayersStore.selectLayer(cleanedEntity);
-
-          if (store.userStore.isActionAllowed(`entity_action.${cleanedEntity.__typename}.edit`)) {
-            store.discreteLayersStore.setSelectedLayerOperationMode(Mode.EDIT);
-          } else {
-            store.discreteLayersStore.setSelectedLayerOperationMode(Mode.VIEW);
-          }
+          store.discreteLayersStore.selectLayer(cleanUpEntity(data, Layer3DRecordModelKeys) as LayerMetadataMixedUnion);
+          store.discreteLayersStore.setSelectedLayerOperationMode(Mode.EDIT);
           handleOpenEntityDialog(RecordType.RECORD_3D, true);
           break;
-        }
-        case 'LayerDemRecord.edit': {
+        case 'LayerDemRecord.edit':
           // @ts-ignore
-          const cleanedEntity = cleanUpEntity(data, LayerDemRecordModelKeys) as LayerMetadataMixedUnion;
-          store.discreteLayersStore.selectLayer(cleanedEntity);
-
-          if (store.userStore.isActionAllowed(`entity_action.${cleanedEntity.__typename}.edit`)) {
-            store.discreteLayersStore.setSelectedLayerOperationMode(Mode.EDIT);
-          } else {
-            store.discreteLayersStore.setSelectedLayerOperationMode(Mode.VIEW);
-          }
+          store.discreteLayersStore.selectLayer(cleanUpEntity(data, LayerDemRecordModelKeys) as LayerMetadataMixedUnion);
+          store.discreteLayersStore.setSelectedLayerOperationMode(Mode.EDIT);
           handleOpenEntityDialog(RecordType.RECORD_DEM, true);
           break;
-        }
-        case 'VectorBestRecord.edit': {
+        case 'VectorBestRecord.edit':
           // @ts-ignore
-          const cleanedEntity = cleanUpEntity(data, VectorBestRecordModelKeys) as LayerMetadataMixedUnion;
-          store.discreteLayersStore.selectLayer(cleanedEntity);
-
-          if (store.userStore.isActionAllowed(`entity_action.${cleanedEntity.__typename}.edit`)) {
-            store.discreteLayersStore.setSelectedLayerOperationMode(Mode.EDIT);
-          } else {
-            store.discreteLayersStore.setSelectedLayerOperationMode(Mode.VIEW);
-          }
+          store.discreteLayersStore.selectLayer(cleanUpEntity(data, VectorBestRecordModelKeys) as LayerMetadataMixedUnion);
+          store.discreteLayersStore.setSelectedLayerOperationMode(Mode.EDIT);
           handleOpenEntityDialog(RecordType.RECORD_VECTOR, true);
           break;
-        }
-        case 'QuantizedMeshBestRecord.edit': {
+        case 'QuantizedMeshBestRecord.edit':
           // @ts-ignore
-          const cleanedEntity = cleanUpEntity(data, VectorBestRecordModelKeys) as LayerMetadataMixedUnion;
-          store.discreteLayersStore.selectLayer(cleanedEntity);
-          if (store.userStore.isActionAllowed(`entity_action.${cleanedEntity.__typename}.edit`)) {
-            store.discreteLayersStore.setSelectedLayerOperationMode(Mode.EDIT);
-          } else {
-            store.discreteLayersStore.setSelectedLayerOperationMode(Mode.VIEW);
-          }
+          store.discreteLayersStore.selectLayer(cleanUpEntity(data, QuantizedMeshBestRecordModelKeys) as LayerMetadataMixedUnion);
+          store.discreteLayersStore.setSelectedLayerOperationMode(Mode.EDIT);
           handleOpenEntityDialog(RecordType.RECORD_DEM, true);
           break;
-        }
         case UserAction.ENTITY_ACTION_SELECTED_ENTITY_EDIT:
           store.discreteLayersStore.setSelectedLayerOperationMode(Mode.EDIT);
           handleOpenEntityDialog(store.discreteLayersStore.selectedLayer?.type as RecordType, true);

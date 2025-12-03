@@ -136,15 +136,19 @@ export const EntityRasterDialog: React.FC<EntityRasterDialogProps> = observer((p
       return buildRasterRecord(entityDescriptors as EntityDescriptorModelType[]);
     }
 
-    // 2. RESTORE mode - Try to get the matching layer
+    // 2. RESTORE mode - try to get the matching layer
     if (jobRecord?.resourceId && jobRecord.productType) {
       const layerRecord = cloneDeep(findRasterLayer(jobRecord?.resourceId, jobRecord.productType));
 
-      if (layerRecord) { return layerRecord; }
+      if (layerRecord) {
+        return layerRecord;
+      }
     }
 
     // 3. START_UPDATE mode - return the currently selected layer
-    if (selectedLayer) { return selectedLayer; }
+    if (selectedLayer) {
+      return selectedLayer;
+    }
 
     // 4. Fallback (should rarely happen) - return record for START_NEW mode
     return buildRasterRecord(entityDescriptors as EntityDescriptorModelType[]);
@@ -206,16 +210,16 @@ const EntityRasterDialogInner: React.FC<EntityRasterInnerProps> = observer((prop
     const [inputValues, setInputValues] = useState<FormikValues>({});
     const [isAllInfoReady, setIsAllInfoReady] = useState<boolean>(false);
 
-    const typedEntityDescriptors = store.discreteLayersStore.entityDescriptors as EntityDescriptorModelType[];
+    const entityDescriptors = store.discreteLayersStore.entityDescriptors as EntityDescriptorModelType[];
 
     const metadataPayloadKeys = useMemo(() => {
       return getFlatEntityDescriptors(
         layerRecord.__typename,
-        typedEntityDescriptors
+        entityDescriptors
       )
       .filter(descriptor => descriptor.isCreateEssential || descriptor.fieldName === 'id')
       .map(descriptor => descriptor.fieldName);
-    }, [typedEntityDescriptors]);
+    }, [entityDescriptors]);
 
     const dialogTitleParam = recordType;
     const dialogTitleParamTranslation = intl.formatMessage({
@@ -311,10 +315,10 @@ const EntityRasterDialogInner: React.FC<EntityRasterInnerProps> = observer((prop
     useEffect(() => {
       const descriptors = getFlatEntityDescriptors(
         layerRecord.__typename,
-        filterModeDescriptors(mode as unknown as Mode, typedEntityDescriptors)
+        filterModeDescriptors(mode as unknown as Mode, entityDescriptors)
       );
 
-      const uiIngestionFieldDescriptors = getUIIngestionFieldDescriptors(typedEntityDescriptors);
+      const uiIngestionFieldDescriptors = getUIIngestionFieldDescriptors(entityDescriptors);
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const yupSchema: Record<string, any> = {};
@@ -357,7 +361,7 @@ const EntityRasterDialogInner: React.FC<EntityRasterInnerProps> = observer((prop
           <Box id="updateLayerHeaderContent">
             <LayersDetailsComponent
               className="detailsPanelProductView"
-              entityDescriptors={typedEntityDescriptors}
+              entityDescriptors={entityDescriptors}
               layerRecord={layerRecord}
               isBrief={true}
               mode={Mode.VIEW}
@@ -397,7 +401,7 @@ const EntityRasterDialogInner: React.FC<EntityRasterInnerProps> = observer((prop
               isAllInfoReady && (
               <EntityRasterForm
                 mode={mode}
-                entityDescriptors={typedEntityDescriptors}
+                entityDescriptors={entityDescriptors}
                 recordType={recordType}
                 // For fields that need to be changed in update. See "getRecordForUpdate()"
                 layerRecord={layerRecord}
