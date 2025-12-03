@@ -6,12 +6,11 @@ import { Box } from '@map-colonies/react-components';
 import { existStatus, getTextStyle } from '../../../common/helpers/style';
 import { isBeingDeleted } from '../../../common/helpers/layer-url';
 import { Mode } from '../../../common/models/mode.enum';
-import { EntityDialog } from '../../components/layer-details/entity.dialog';
-import { EntityRasterDialog } from '../../components/layer-details/raster/entity.raster.dialog';
-import { EntityDeleteDialog } from '../../components/layer-details/entity.delete-dialog';
 import { LayersDetailsComponent } from '../../components/layer-details/layer-details';
 import { PublishButton } from '../../components/layer-details/publish-button';
 import { SaveMetadataButton } from '../../components/layer-details/save-metadata-button';
+import { IDispatchAction } from '../../models/actionDispatcherStore';
+import { UserAction } from '../../models/userStore';
 import { EntityDescriptorModelType, LayerMetadataMixedUnion } from '../../models';
 import { useStore } from '../../models/RootStore';
 import { TabViews } from '../tab-views';
@@ -19,10 +18,6 @@ import { TabViews } from '../tab-views';
 import './details-panel.component.css';
 
 interface DetailsPanelComponentProps {
-  isEntityDialogOpen: boolean;
-  setEntityDialogOpen: (open: boolean) => void;
-  isEntityDeleteDialogOpen: boolean;
-  setEntityDeleteDialogOpen: (open: boolean) => void;
   detailsPanelExpanded: boolean;
   setDetailsPanelExpanded: (isExpanded: boolean) => void;
   activeTabView: TabViews;
@@ -30,32 +25,30 @@ interface DetailsPanelComponentProps {
 
 export const DetailsPanel: React.FC<DetailsPanelComponentProps> = observer((props) => {
   const {
-    isEntityDialogOpen,
-    setEntityDialogOpen,
-    isEntityDeleteDialogOpen,
-    setEntityDeleteDialogOpen,
     detailsPanelExpanded,
     setDetailsPanelExpanded,
     activeTabView
   } = props;
-  
+
   const store = useStore();
   const intl = useIntl();
   const layerToPresent = store.discreteLayersStore.selectedLayer;
-  const isSelectedLayerUpdateMode = store.discreteLayersStore.selectedLayerIsUpdateMode ?? false;
-  const isSelectedLayerDeleteMode = store.discreteLayersStore.selectedLayerIsDeleteMode ?? false;
   
   const permissions = useMemo(() => {
     return {
-     isEditAllowed: layerToPresent && store.userStore.isActionAllowed(`entity_action.${layerToPresent.__typename}.edit`),
-     isPublishAllowed: layerToPresent && store.userStore.isActionAllowed(`entity_action.${layerToPresent.__typename}.publish`),
-     isDeleteAllowed: layerToPresent && store.userStore.isActionAllowed(`entity_action.${layerToPresent.__typename}.delete`),
-     isSaveMetadataAllowed: layerToPresent && store.userStore.isActionAllowed(`entity_action.${layerToPresent.__typename}.saveMetadata`),
+      isEditAllowed: layerToPresent && store.userStore.isActionAllowed(`entity_action.${layerToPresent.__typename}.edit`),
+      isPublishAllowed: layerToPresent && store.userStore.isActionAllowed(`entity_action.${layerToPresent.__typename}.publish`),
+      isSaveMetadataAllowed: layerToPresent && store.userStore.isActionAllowed(`entity_action.${layerToPresent.__typename}.saveMetadata`),
     }
   }, [store.userStore.user, layerToPresent]);
 
-  const handleEntityDialogClick = (): void => {
-    setEntityDialogOpen(!isEntityDialogOpen);
+  const dispatchAction = (action: Record<string, unknown>): void => {
+    store.actionDispatcherStore.dispatchAction(
+      {
+        action: action.action,
+        data: action.data,
+      } as IDispatchAction
+    );
   };
 
   return (
@@ -77,7 +70,9 @@ export const DetailsPanel: React.FC<DetailsPanelComponentProps> = observer((prop
               className="operationIcon mc-icon-Edit1"
               label="EDIT"
               onClick={(): void => {
-                handleEntityDialogClick();
+                dispatchAction({
+                  action: UserAction.ENTITY_ACTION_SELECTED_ENTITY_EDIT
+                });
               }}
             />
           </Tooltip>
@@ -89,38 +84,12 @@ export const DetailsPanel: React.FC<DetailsPanelComponentProps> = observer((prop
               className="mc-icon-Info"
               label="VIEW"
               onClick={(): void => {
-                handleEntityDialogClick();
+                dispatchAction({
+                  action: UserAction.ENTITY_ACTION_SELECTED_ENTITY_VIEW
+                });
               }}
             />
           </Tooltip>
-        }
-        {
-          isEntityDialogOpen && layerToPresent?.__typename === 'LayerRasterRecord' && isSelectedLayerUpdateMode &&
-          <EntityRasterDialog
-            isOpen={isEntityDialogOpen}
-            onSetOpen={setEntityDialogOpen}
-            layerRecord={layerToPresent}
-            isSelectedLayerUpdateMode={isSelectedLayerUpdateMode}
-          />
-        }
-        {
-          permissions.isDeleteAllowed && layerToPresent && isEntityDeleteDialogOpen && isSelectedLayerDeleteMode &&
-          <EntityDeleteDialog
-            isOpen={isEntityDeleteDialogOpen}
-            onSetOpen={setEntityDeleteDialogOpen}
-            layerRecord={layerToPresent}
-          />
-        }
-        {
-          isEntityDialogOpen && 
-          (layerToPresent?.__typename !== 'LayerRasterRecord' || (layerToPresent?.__typename === 'LayerRasterRecord' && !isSelectedLayerUpdateMode)) &&
-          <EntityDialog
-            isOpen={isEntityDialogOpen}
-            onSetOpen={setEntityDialogOpen}
-            layerRecord={layerToPresent}
-            isViewMode={!permissions.isEditAllowed}
-            isSelectedLayerUpdateMode={isSelectedLayerUpdateMode}
-          />
         }
         {
           permissions.isSaveMetadataAllowed === true && layerToPresent &&
