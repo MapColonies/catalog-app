@@ -1,5 +1,5 @@
 import { isEmpty } from 'lodash';
-import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { MultiSelection as McMultiSelection, MultiSelectionOption, StylesConfig } from '@map-colonies/react-components';
 import { EntityFormikHandlers } from '../../../discrete-layer/components/layer-details/layer-datails-form';
 import { IRecordFieldInfo } from '../../../discrete-layer/components/layer-details/layer-details.field-info';
