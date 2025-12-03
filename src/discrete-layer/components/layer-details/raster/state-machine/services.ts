@@ -107,6 +107,7 @@ export const SERVICES = {
         taskPercentage: task.percentage ?? 0,
         validationReport: task.parameters || {},
         taskStatus: task.status ?? '',
+        taskReason: task.reason ?? '',
         details: job
       };
     }),

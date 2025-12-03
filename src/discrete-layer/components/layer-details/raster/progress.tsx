@@ -9,7 +9,7 @@ import { Curtain } from './curtain/curtain.component';
 
 import './progress.css';
 
-const FAILURE_REASON_MAX_LENGTH = 35;
+const FAILURE_REASON_MAX_LENGTH = 80;
 
 interface ProgressProps {
   titleId: string;
@@ -96,19 +96,19 @@ export const Progress: React.FC<ProgressProps> = ({ titleId, show, percentage, s
                   !(isFailed || !isValid) && status !== Status.Completed &&
                   <Box className="spacer" />
                 }
-                <Box className={`text bold ${getClass(isFailed, isValid)}`}>
-                  <Tooltip content={truncate(reason ?? '', { length: FAILURE_REASON_MAX_LENGTH })}>
+                <Tooltip content={truncate(reason ?? '', { length: FAILURE_REASON_MAX_LENGTH })}>
+                  <Box className={`text bold ${getClass(isFailed, isValid)}`}>
                     <FormattedMessage id={`system-status.job.status_translation.${status}`} />
-                  </Tooltip>
-                  {
-                    status === Status.InProgress &&
-                    <Typography tag="span" className="dots">{dots}</Typography>
-                  }
-                  {
-                    status === Status.Failed &&
-                    <CopyButton text={reason ?? ''} />
-                  }
-                </Box>
+                    {
+                      status === Status.InProgress &&
+                      <Typography tag="span" className="dots">{dots}</Typography>
+                    }
+                    {
+                      status === Status.Failed &&
+                      <CopyButton text={reason ?? ''} />
+                    }
+                  </Box>
+                </Tooltip>
                 <Box className={`percentage bold ${getClass(isFailed, isValid)}`}>
                   {`${percentage ?? 0}%`}
                 </Box>
