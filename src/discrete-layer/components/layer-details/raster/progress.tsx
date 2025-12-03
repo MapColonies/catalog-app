@@ -1,15 +1,12 @@
-import { truncate } from 'lodash';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Box, CircularProgressBar } from '@map-colonies/react-components';
-import { IconButton, Tooltip, Typography } from '@map-colonies/react-core';
+import { IconButton } from '@map-colonies/react-core';
 import { Status } from '../../../models';
-import { CopyButton } from '../../job-manager/job-details.copy-button';
 import { Curtain } from './curtain/curtain.component';
+import { StatusText } from './status-text';
 
 import './progress.css';
-
-const FAILURE_REASON_MAX_LENGTH = 80;
 
 interface ProgressProps {
   titleId: string;
@@ -22,22 +19,6 @@ interface ProgressProps {
 }
 
 export const Progress: React.FC<ProgressProps> = ({ titleId, show, percentage, status, reason, isFailed, isValid }) => {
-  const [dots, setDots] = useState<string>('');
-
-  useEffect(() => {
-    let interval: NodeJS.Timer;
-    if (status === Status.InProgress) {
-      interval = setInterval(() => {
-        setDots(prevDots => (prevDots.length < 3 ? prevDots + '.' : ''));
-      }, 500);
-    } else {
-      setDots('');
-    }
-    return () => {
-      clearInterval(interval);
-    };
-  }, [status]);
-
   const getClass = (isFailed: boolean, isValid: boolean): string => (
     isFailed
       ? 'error'
@@ -96,19 +77,9 @@ export const Progress: React.FC<ProgressProps> = ({ titleId, show, percentage, s
                   !(isFailed || !isValid) && status !== Status.Completed &&
                   <Box className="spacer" />
                 }
-                <Tooltip content={truncate(reason ?? '', { length: FAILURE_REASON_MAX_LENGTH })}>
-                  <Box className={`text bold ${getClass(isFailed, isValid)}`}>
-                    <FormattedMessage id={`system-status.job.status_translation.${status}`} />
-                    {
-                      status === Status.InProgress &&
-                      <Typography tag="span" className="dots">{dots}</Typography>
-                    }
-                    {
-                      status === Status.Failed &&
-                      <CopyButton text={reason ?? ''} />
-                    }
-                  </Box>
-                </Tooltip>
+                <Box className={`text bold ${getClass(isFailed, isValid)}`}>
+                  <StatusText status={status} reason={reason} />
+                </Box>
                 <Box className={`percentage bold ${getClass(isFailed, isValid)}`}>
                   {`${percentage ?? 0}%`}
                 </Box>

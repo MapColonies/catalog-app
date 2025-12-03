@@ -22,13 +22,6 @@
   cursor: text;
 }
 
-#layerDetailsFormRaster .dots {
-  position: absolute;
-  left: 100%;
-  white-space: nowrap;
-  margin: 0 2px;
-}
-
 body[dir='rtl'] #layerDetailsFormRaster .dots {
   left: unset;
   right: 100%;
