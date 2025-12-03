@@ -441,12 +441,12 @@ const DiscreteLayerView: React.FC = observer(() => {
     }
   };
 
-  const openEntityByMode = (recordType: RecordType, open: boolean) => {
+  const handleEntityDialogOpen = (recordType: RecordType, open: boolean) => {
     const mode = store.discreteLayersStore.selectedLayerOperationMode;    
-    const dialog = get(dialogMap, `${recordType}.${mode}`);
+    const setDialogOpen = get(dialogMap, `${recordType}.${mode}`);
 
-    if (dialog) {
-      dialog(open);
+    if (setDialogOpen) {
+      setDialogOpen(open);
     }
   };
 
@@ -1218,7 +1218,7 @@ const DiscreteLayerView: React.FC = observer(() => {
                 { activeTabView === TabViews.EXPORT_LAYER && <ExportDrawingHandler /> }
 
                 <ActionResolver
-                  handleOpenEntityDialog = {openEntityByMode}
+                  handleOpenEntityDialog = {handleEntityDialogOpen}
                   handleFlyTo = {onFlyTo}
                   handleTabViewChange = {handleTabViewChange}
                   activeTabView = {activeTabView}
