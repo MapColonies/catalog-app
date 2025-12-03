@@ -377,7 +377,8 @@ export const InnerRasterForm = (
                 type="button"
                 disabled={
                   Object.keys(errors).length > NONE ||
-                  (Object.keys(getStatusErrors()).length > NONE)
+                  (Object.keys(getStatusErrors()).length > NONE) ||
+                  hasError(state.context.errors)
                 }
                 onClick={(e): void => {
                   e.preventDefault();

@@ -221,3 +221,9 @@ export const isTaskValid = (job: IJob | undefined): boolean => {
     !errorsAggregation?.smallGeometries?.exceeded)
   );
 };
+
+export const isModified = (modDate: Date | string) => {
+  return modDate
+    ? moment().diff(moment(modDate), 'hours') <= CONFIG.RASTER_INGESTION.CHANGES_IN_SHAPE_FILES.TIME_MODIFIED_THRESHOLD_HOURS
+    : false;
+};

@@ -1,8 +1,7 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { isEmpty } from 'lodash';
 import { observer } from 'mobx-react';
-import moment from 'moment';
 import { Switch } from '@material-ui/core';
 import { Box, defaultFormatters, FileData } from '@map-colonies/react-components';
 import { Button, Icon, Typography } from '@map-colonies/react-core';
@@ -18,6 +17,7 @@ import { RasterWorkflowContext } from './state-machine/context';
 import {
   hasActiveJob,
   hasTagDeep,
+  isModified,
   isRetryEnabled,
   isUIDisabled
 } from './state-machine/helpers';
@@ -44,9 +44,6 @@ interface IngestionFieldsProps {
 const FileItem: React.FC<{ file: any; context: IContext }> = ({ file, context }) => {
   const color = !file.exists ? 'error' : (file.isModDateDiffExceeded ? 'warning' : '');
   const modDate = file.details?.modDate;
-  const isModified = useMemo(() => {
-    return modDate ? moment().diff(moment(modDate), 'hours') <= CONFIG.RASTER_INGESTION.CHANGES_IN_SHAPE_FILES.TIME_MODIFIED_THRESHOLD_HOURS : false;
-  }, [modDate]);
 
   return (
     <>
@@ -63,7 +60,7 @@ const FileItem: React.FC<{ file: any; context: IContext }> = ({ file, context })
       <Box className={`ltr ${color}`}>
         {
           modDate
-          ? (isModified && isRetryEnabled(context)
+          ? (isModified(modDate) && isRetryEnabled(context)
             ? file.dateFormatterPredicate(modDate)
             : dateFormatter(modDate))
           : ''

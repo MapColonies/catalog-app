@@ -11,7 +11,8 @@ import {
   getFile,
   getPath,
   handleShapeFilesValidation,
-  hasError
+  hasError,
+  isModified
 } from './helpers';
 import { MOCK_JOB_UPDATE } from './MOCK';
 import { queryExecutor } from './query-executor';
@@ -145,7 +146,10 @@ export const SERVICES = {
           const productFile = await fetchProduct(files.product, input.context);
           files.product.geoDetails = productFile?.geoDetails;
         }
-        if (!hasError(errors)) {
+        if (!hasError(errors) &&
+          files.product?.details?.modDate &&
+          files.shapeMetadata?.details?.modDate &&
+          (isModified(files.product.details.modDate) || isModified(files.shapeMetadata.details.modDate))) {
           errors = handleShapeFilesValidation(files);
         }
       }
