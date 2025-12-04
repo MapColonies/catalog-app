@@ -19,6 +19,7 @@
 
 #layerDetailsFormRaster .text {
   position: relative;
+  font-size: medium;
 }
 
 body[dir='rtl'] #layerDetailsFormRaster .dots {
