@@ -356,11 +356,11 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
             </Box>
 
             {
-              handleFocusError && handleFocusError.code &&
+              handleFocusError && handleFocusError.code && focusOnJob &&
               <Box className="messages">
                 <LogicError errors={[{
                   code: handleFocusError.code,
-                  message: `<bdi>${dateFormatter(focusOnJob?.updated, true)}</bdi>`,
+                  message: `${focusOnJob.resourceId} <bdi>(${dateFormatter(focusOnJob.updated, true)})</bdi>`,
                   level: 'warning'
                 }]} />
               </Box>
