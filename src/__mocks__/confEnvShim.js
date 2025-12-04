@@ -10,13 +10,12 @@ if (!window._env_) {
       CHANNEL: 1002,
       VERSION: 1,
       REQUEST: 'REQUEST',
-      ACTIVE_LAYER: 'ACTIVE_LAYER',
       LOCALE: {
         DATE_FORMAT: 'DD/MM/YYYY HH:mm',
       },
+      ACTIVE_LAYER: 'ACTIVE_LAYER',
       ACTIVE_LAYER_PROPERTIES: {
-        urlPattern:
-          'arcgis/rest/services/Demographics/USA_Population_Density/MapServer/WMTS',
+        urlPattern: 'arcgis/rest/services/Demographics/USA_Population_Density/MapServer/WMTS',
         urlPatternParams: {
           service: 'WMTS',
           layers: 'USGSShadedReliefOnly',
@@ -44,8 +43,9 @@ if (!window._env_) {
           path: '',
         },
       },
-      JOB_STATUS: {
+      JOB_MANAGER: {
         pollingCycleInterval: 120000,
+        filterDaysTimeSlot: 1,
       },
       DEFAULT_USER: {
         role: 'USER',
@@ -64,7 +64,7 @@ if (!window._env_) {
       ACCESS_TOKEN: {
         attributeName: 'token',
         injectionType: 'queryParam',
-        tokenValue: 'TOKEN'
+        tokenValue: 'TOKEN',
       },
       RASTER_INGESTION_FILES_STRUCTURE: '{"data": {"allowedExt": [".gpkg"], "selectableExt": [".gpkg"], "relativeToAOIDirPath": "./data", "producerFileName": "*", "selectablePattern": "*"}, "product": {"allowedExt": [".shp", ".shx", ".dbf", ".prj", ".sbn", ".sbx", ".xml", ".cpg", ".qix"], "selectableExt": [".shp"], "relativeToAOIDirPath": "./shape", "producerFileName": "Product", "selectablePattern": "Product"}, "shapeMetadata": {"allowedExt": [".shp", ".shx", ".dbf", ".prj", ".sbn", ".sbx", ".xml", ".cpg", ".qix"], "selectableExt": [".shp"], "relativeToAOIDirPath": "./shape", "producerFileName": "ShapeMetadata", "selectablePattern": "ShapeMetadata"}}',
       WHATSNEW_URL: 'http://whatsnew-URL',
@@ -82,7 +82,7 @@ if (!window._env_) {
           showFootprintZoomLevel: 10,
           perShape: 30000,
           vertices: 30000000,
-        }
+        },
       },
       WFS: {
         style: '{"color": "#01FF1F", "hover": "#24AEE9", "pointStroke": "#01FF1F"}',
@@ -91,13 +91,16 @@ if (!window._env_) {
           pageSize: 300,
           zoomLevel: 14,
           cacheSize: 6000,
-        }
+        },
       },
       GEOCODER: {
         url: 'http://geocoder-URL',
-        callbackUrl: 'http://geocoder-callback-URL'
+        callbackUrl: 'http://geocoder-callback-URL',
       },  
-      UPLOAD_SHAPE_FILES_TIME_GRACE_IN_MINUTES: 10
+      CHANGES_IN_SHAPE_FILES: {
+        timeDifferenceGraceMinutes: 10,
+        timeModifiedThresholdHours: 12,
+      },
     };
   })(void 0);
 }

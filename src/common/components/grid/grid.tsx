@@ -202,7 +202,9 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
   }, [props.rowData, props.gridOptions, props.isLoading]);
 
   useEffect(() => {
-    if (!gridApi || !focusByRowId) { return; }
+    if (!gridApi || !focusByRowId) {
+      return;
+    }
 
     focusAndExpandRow(gridApi, focusByRowId);
   }, [rowData]);
@@ -210,7 +212,9 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
   const getRowPosition = (gridApi: GridApi, id: string): IRowPosition | undefined => {
     const node = gridApi.getRowNode(id);
 
-    if (!node || !node.rowIndex) { return; }
+    if (!node || node.rowIndex == null) {
+      return;
+    }
 
     const rowIndex = node.rowIndex;
     const pageSize = gridApi.paginationGetPageSize();

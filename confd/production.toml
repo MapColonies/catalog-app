@@ -33,7 +33,8 @@ keys = [
   "/configuration/logger/http/path",
   "/configuration/logger/level",
   "/configuration/logger/log2console",
-  "/configuration/job/status/polling/cycle/interval",
+  "/configuration/jobmanager/pollingcycleinterval",
+  "/configuration/jobmanager/filterdaystimeslot",
   "/configuration/default/user/role",
   "/configuration/basemaps",
   "/configuration/default/terrain/provider/url",
@@ -69,5 +70,6 @@ keys = [
   "/configuration/wfs/max/cache/size",
   "/configuration/geocoder/url",
   "/configuration/geocoder/callbackUrl",
-  "/configuration/upload/shape/files/time/grace/in/minutes"
+  "/configuration/changesinshapefiles/timedifferencegraceminutes",
+  "/configuration/changesinshapefiles/timemodifiedthresholdhours"
 ]

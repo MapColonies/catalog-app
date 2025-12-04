@@ -17,12 +17,15 @@ import { RasterWorkflowContext } from './state-machine/context';
 import {
   hasActiveJob,
   hasTagDeep,
+  isModified,
+  isRetryEnabled,
   isUIDisabled
 } from './state-machine/helpers';
 import {
   SelectionMode,
   Events,
-  IFiles
+  IFiles,
+  IContext
 } from './state-machine/types';
 
 import './ingestion-fields.raster.css';
@@ -38,8 +41,10 @@ interface IngestionFieldsProps {
   recordType: RecordType;
 }
 
-const FileItem: React.FC<{ file: any }> = ({ file }) => {
+const FileItem: React.FC<{ file: any; context: IContext }> = ({ file, context }) => {
   const color = !file.exists ? 'error' : (file.isModDateDiffExceeded ? 'warning' : '');
+  const modDate = file.details?.modDate;
+
   return (
     <>
       <Box>
@@ -54,9 +59,11 @@ const FileItem: React.FC<{ file: any }> = ({ file }) => {
       </Box>
       <Box className={`ltr ${color}`}>
         {
-          (file.details?.modDate && file.dateFormatterPredicate)
-            ? file.dateFormatterPredicate(file.details.modDate)
-            : ''
+          modDate
+          ? (isModified(modDate) && isRetryEnabled(context)
+            ? file.dateFormatterPredicate(modDate)
+            : dateFormatter(modDate))
+          : ''
         }
       </Box>
     </>
@@ -78,7 +85,7 @@ const IngestionInputs: React.FC<{ state: any }> = ({ state }) => {
           {
             state.context?.files &&
             Object.values(state.context?.files as IFiles).map((file: any, idx: number): JSX.Element => {
-              return <FileItem key={idx} file={file} />;
+              return <FileItem key={idx} file={file} context={state.context} />;
             })
           }
         </Box>

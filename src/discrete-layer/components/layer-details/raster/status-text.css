@@ -1,0 +1,14 @@
+#layerDetailsFormRaster .cursorText {
+  cursor: text;
+}
+
+#layerDetailsFormRaster .cursorDefault {
+  cursor: default;
+}
+
+#layerDetailsFormRaster .dots {
+  position: absolute;
+  left: 100%;
+  white-space: nowrap;
+  margin: 0 2px;
+}

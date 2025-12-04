@@ -151,11 +151,11 @@ export const WORKFLOW = {
 
 export const FIRST = 0;
 export const BASE_PATH = '/';
-export const DATA_DIR = CONFIG.RASTER_INGESTION_FILES_STRUCTURE.data.relativeToAOIDirPath;
-export const SHAPES_DIR = CONFIG.RASTER_INGESTION_FILES_STRUCTURE.shapeMetadata.relativeToAOIDirPath;
+export const DATA_DIR = CONFIG.RASTER_INGESTION.FILES_STRUCTURE.data.relativeToAOIDirPath;
+export const SHAPES_DIR = CONFIG.RASTER_INGESTION.FILES_STRUCTURE.shapeMetadata.relativeToAOIDirPath;
 export const SHAPES_RELATIVE_TO_DATA_DIR = '..';
-export const PRODUCT_FILENAME = `${CONFIG.RASTER_INGESTION_FILES_STRUCTURE.product.producerFileName}${CONFIG.RASTER_INGESTION_FILES_STRUCTURE.product.selectableExt[0]}`;
-export const SHAPEMETADATA_FILENAME = `${CONFIG.RASTER_INGESTION_FILES_STRUCTURE.shapeMetadata.producerFileName}${CONFIG.RASTER_INGESTION_FILES_STRUCTURE.shapeMetadata.selectableExt[0]}`;
+export const PRODUCT_FILENAME = `${CONFIG.RASTER_INGESTION.FILES_STRUCTURE.product.producerFileName}${CONFIG.RASTER_INGESTION.FILES_STRUCTURE.product.selectableExt[0]}`;
+export const SHAPEMETADATA_FILENAME = `${CONFIG.RASTER_INGESTION.FILES_STRUCTURE.shapeMetadata.producerFileName}${CONFIG.RASTER_INGESTION.FILES_STRUCTURE.shapeMetadata.selectableExt[0]}`;
 export const DATA_LABEL = 'file-name.data';
 export const PRODUCT_LABEL = 'file-name.product';
 export const SHAPEMETADATA_LABEL = 'file-name.shapeMetadata';

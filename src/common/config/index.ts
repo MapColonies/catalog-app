@@ -17,7 +17,7 @@ const REQUEST = (window as any)._env_.REQUEST;
 const ACTIVE_LAYER = (window as any)._env_.ACTIVE_LAYER;
 const ACTIVE_LAYER_PROPERTIES = (window as any)._env_.ACTIVE_LAYER_PROPERTIES;
 const MAP = (window as any)._env_.MAP;
-const JOB_STATUS = (window as any)._env_.JOB_STATUS;
+const JOB_MANAGER = (window as any)._env_.JOB_MANAGER;
 const DEFAULT_USER = (window as any)._env_.DEFAULT_USER;
 const BASE_MAPS = JSON.parse((window as any)._env_.BASE_MAPS);
 const DEFAULT_TERRAIN_PROVIDER_URL = (window as any)._env_.DEFAULT_TERRAIN_PROVIDER_URL;
@@ -45,9 +45,9 @@ const POLYGON_PARTS = {
 };
 const WFS = (window as any)._env_.WFS;
 const GEOCODER = (window as any)._env_.GEOCODER;
-const UPLOAD_SHAPE_FILES_TIME_GRACE_IN_MINUTES = parseInt((window as any)._env_.UPLOAD_SHAPE_FILES_TIME_GRACE_IN_MINUTES, 10);
+const CHANGES_IN_SHAPE_FILES = (window as any)._env_.CHANGES_IN_SHAPE_FILES;
 
-const enrichBaseMaps = (baseMaps: IBaseMaps): IBaseMaps => {
+function enrichBaseMaps(baseMaps: IBaseMaps): IBaseMaps {
   return {
     maps: baseMaps.maps.map((baseMap: IBaseMap) => {
       return {
@@ -65,7 +65,7 @@ const enrichBaseMaps = (baseMaps: IBaseMaps): IBaseMaps => {
       }
     })
   }
-};
+}
 
 const systemJobsPriorityOptions =
   // Priority is an integer
@@ -139,13 +139,13 @@ const APP_CONFIG = {
     USE_OPTIMIZED_TILE_REQUESTS: MAP.useOptimizedTileRequests as boolean,
     SHOW_DEBUGGER_TOOL: MAP.showDebuggerTool,
     SHOW_ACTIVE_LAYERS_TOOL: MAP.showActiveLayersTool,
-    SHOW_GEOCODER_TOOL: MAP.showGeocoderTool
+    SHOW_GEOCODER_TOOL: MAP.showGeocoderTool,
   },
   ACTIVE_LAYER: ACTIVE_LAYER, // | 'WMTS_LAYER' | 'WMS_LAYER' | 'XYZ_LAYER' | 'OSM_LAYER'
   ACTIVE_LAYER_PROPERTIES: ACTIVE_LAYER_PROPERTIES,
   THREE_D_LAYER: {
     MAXIMUM_SCREEN_SPACE_ERROR: 5,
-    CULL_REQUESTS_WHILE_MOVING_MULTIPLIER: 120
+    CULL_REQUESTS_WHILE_MOVING_MULTIPLIER: 120,
   },
   WMTS_LAYER: {
     ATTRIBUTIONS:
@@ -172,11 +172,12 @@ const APP_CONFIG = {
   OSM_LAYER: {
     URL: `https://a.tile.openstreetmap.org/`,
   },
-  JOB_STATUS: {
-    POLLING_CYCLE_INTERVAL: JOB_STATUS.pollingCycleInterval as number
+  JOB_MANAGER: {
+    POLLING_CYCLE_INTERVAL: JOB_MANAGER.pollingCycleInterval,
+    FILTER_DAYS_TIME_SLOT: JOB_MANAGER.filterDaysTimeSlot,
   },
   DEFAULT_USER: {
-    ROLE: DEFAULT_USER.role
+    ROLE: DEFAULT_USER.role,
   },
   BASE_MAPS: enrichBaseMaps(BASE_MAPS),
   DEFAULT_TERRAIN_PROVIDER_URL: DEFAULT_TERRAIN_PROVIDER_URL,
@@ -187,7 +188,7 @@ const APP_CONFIG = {
     TYPE: RUNNING_MODE.type,
     AUTOCOMPLETE: RUNNING_MODE.autocomplete,
     START_RECORD: 1,
-    END_RECORD: 1000
+    END_RECORD: 1000,
   },
   SYSTEM_JOBS_PRIORITY_OPTIONS: systemJobsPriorityOptions,
   NUMBER_OF_CHARACTERS_LIMIT: NUMBER_OF_CHARACTERS_LIMIT as number,
@@ -195,10 +196,8 @@ const APP_CONFIG = {
   ACCESS_TOKEN: {
     ATTRIBUTE_NAME: ACCESS_TOKEN.attributeName,
     INJECTION_TYPE: ACCESS_TOKEN.injectionType,
-    TOKEN_VALUE: ACCESS_TOKEN.tokenValue
+    TOKEN_VALUE: ACCESS_TOKEN.tokenValue,
   },
-  RASTER_INGESTION_FILES_STRUCTURE: RASTER_INGESTION_FILES_STRUCTURE as IRasterIngestionFilesStructureConfig,
-  JOB_MANAGER_END_OF_TIME: 21, // Days
   MINIMUM_SUPPORTED_BROWSER_VERSION: 84,
   PROJECT_VERSION: PROJECT_VERSION,
   CONTEXT_MENUS: {
@@ -207,9 +206,9 @@ const APP_CONFIG = {
       POLYGON_PARTS_FEATURE_CONFIG: {
         color: `${POLYGON_PARTS.highResolutionColor}50`, //'#00ff0030',//'#BF40BF',
         outlineColor: POLYGON_PARTS.highResolutionColor, //'#00FF00',
-        outlineWidth: 8
-      }
-    }
+        outlineWidth: 8,
+      },
+    },
   },
   WHATSNEW_URL: WHATSNEW_URL,
   SITES_CONFIG: SITES_CONFIG,
@@ -222,7 +221,7 @@ const APP_CONFIG = {
       mediumResolutionColor: POLYGON_PARTS.mediumResolutionColor,
       lowResolutionColor: POLYGON_PARTS.lowResolutionColor,
       hoverColor: POLYGON_PARTS.hoverColor,
-      billBoardStrokeColor: POLYGON_PARTS.billBoardStrokeColor
+      billBoardStrokeColor: POLYGON_PARTS.billBoardStrokeColor,
     },
     FEATURE_TYPE_PREFIX: POLYGON_PARTS.featureTypePrefix,
     DENSITY_FACTOR: POLYGON_PARTS.densityFactor,
@@ -233,7 +232,7 @@ const APP_CONFIG = {
       SHOW_FOOTPRINT_ZOOM_LEVEL: POLYGON_PARTS.max.showFootprintZoomLevel,
       PER_SHAPE: POLYGON_PARTS.max.perShape,
       VERTICES: POLYGON_PARTS.max.vertices,
-    }
+    },
   },
   WFS: {
     STYLE: JSON.parse(WFS.style),
@@ -242,14 +241,20 @@ const APP_CONFIG = {
       PAGE_SIZE: WFS.max.pageSize,
       ZOOM_LEVEL: WFS.max.zoomLevel,
       CACHE_SIZE: WFS.max.cacheSize,
-    }
+    },
   },
   GEOCODER: {
     URL: GEOCODER.url,
     CALLBACK_URL: GEOCODER.callbackUrl,
-    RESULTS_LIMIT: 6
+    RESULTS_LIMIT: 6,
   },
-  UPLOAD_SHAPE_FILES_TIME_GRACE_IN_MINUTES: UPLOAD_SHAPE_FILES_TIME_GRACE_IN_MINUTES
+  RASTER_INGESTION: {
+    FILES_STRUCTURE: RASTER_INGESTION_FILES_STRUCTURE as IRasterIngestionFilesStructureConfig,
+    CHANGES_IN_SHAPE_FILES: {
+      TIME_DIFFERENCE_GRACE_MINUTES: CHANGES_IN_SHAPE_FILES.timeDifferenceGraceMinutes,
+      TIME_MODIFIED_THRESHOLD_HOURS: CHANGES_IN_SHAPE_FILES.timeModifiedThresholdHours,
+    },
+  },
 };
 
 export default APP_CONFIG;

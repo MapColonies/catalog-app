@@ -31,7 +31,8 @@
   CONFIGURATION_BBOX_AREA_SQUARE_KM_LIMIT: {{ quote .Values.env.bboxAreaSquareKmLimit }}
   CONFIGURATION_UI_LANGUAGE: {{ quote .Values.env.language }}
   CONFIGURATION_BACKEND_LOCALE: {{ quote .Values.env.backendLocale }}
-  CONFIGURATION_JOB_STATUS_POLLING_CYCLE_INTERVAL: {{ quote .Values.env.jobStatus.pollingCycleInterval }}
+  CONFIGURATION_JOBMANAGER_POLLINGCYCLEINTERVAL: {{ quote .Values.env.jobManager.pollingCycleInterval }}
+  CONFIGURATION_JOBMANAGER_FILTERDAYSTIMESLOT: {{ quote .Values.env.jobManager.filterDaysTimeSlot }}
   CONFIGURATION_DEFAULT_USER_ROLE: {{ quote .Values.env.defaultUser.role }}
   CONFIGURATION_RUNNING_MODE_TYPE: {{ quote .Values.env.runningMode.type }}
   CONFIGURATION_RUNNING_MODE_AUTOCOMPLETE: {{ quote .Values.env.runningMode.autoComplete }}
@@ -78,7 +79,8 @@
   CONFIGURATION_WFS_MAX_CACHE_SIZE: {{ quote .Values.env.wfs.max.cacheSize }}
   CONFIGURATION_GEOCODER_URL: {{ quote .Values.env.geocoder.url }}
   CONFIGURATION_GEOCODER_CALLBACKURL: {{ quote .Values.env.geocoder.callbackUrl }}
-  CONFIGURATION_UPLOAD_SHAPE_FILES_TIME_GRACE_IN_MINUTES: {{ quote .Values.env.uploadShapeFilesTimeGraceInMinutes }}
+  CONFIGURATION_CHANGESINSHAPEFILES_TIMEDIFFERENCEGRACEMINUTES: {{ quote .Values.env.changesInShapeFiles.timeDifferenceGraceMinutes }}
+  CONFIGURATION_CHANGESINSHAPEFILES_TIMEMODIFIEDTHRESHOLDHOURS: {{ quote .Values.env.changesInShapeFiles.timeModifiedThresholdHours }}
 {{- end -}}
 
 {{ include "mc-chart.configmap" (dict "MAIN_OBJECT_BLOCK" $MAIN_OBJECT_BLOCK "COMPONENT_NAME" $COMPONENT_NAME "DATA" $DATA "WITH_TELEMETRY_TRACING" false "WITH_TELEMETRY_METRICS" false "context" .)}}
