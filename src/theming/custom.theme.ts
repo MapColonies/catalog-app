@@ -28,6 +28,9 @@ export const CustomTheme = {
 
     GC_MENU_ITEM_HEIGHT: '32px',
     GC_CONTEXT_MENU_WIDTH: '260px',
+    
+    GC_SKELETON_BASE: 'rgba(235, 235, 235, 0.1)',
+    GC_SKELETON_HIGHLIGHT: 'rgba(175, 191, 218, 0.4)',
   },
 };
   

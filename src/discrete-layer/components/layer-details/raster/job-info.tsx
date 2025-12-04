@@ -1,11 +1,11 @@
 import React, { Fragment } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Box } from '@map-colonies/react-components';
+import Skeleton from '../../../../common/components/skeleton/skeleton';
 import { Status } from '../../../models';
 import { Progress } from './progress';
 import { isJobValid, isStatusFailed, isTaskValid } from './state-machine/helpers';
 import { Aggregation, IJob } from './state-machine/types';
-import { Curtain } from './curtain/curtain.component';
 
 import './job-info.css';
 
@@ -40,24 +40,29 @@ export const JobInfo: React.FC<JobInfoProps> = ({ job }) => {
           isValid={isJobValid(job.details?.status as Status | undefined)}
         />
       </Box>
-      <Box className="section curtainContainer">
+      <Box className="section">
         <Box className="reportContainer">
           <Box className="title underline">
             <FormattedMessage id="ingestion.job.report" />
           </Box>
-          <Box className="reportList error">
-            {
-              Object.entries(job.validationReport?.errorsAggregation || {}).map(([type, aggregation]) => {
-                if (typeof aggregation === 'object' && 'exceeded' in aggregation) {
-                  return renderAggregationWithExceeded(type, aggregation);
-                } else {
-                  return renderAggregationWithoutExceeded(aggregation);
-                }
-              })
-            }
-          </Box>
+           {job.taskId ?
+            <Box className="reportList error">
+              {
+                Object.entries(job.validationReport?.errorsAggregation || {}).map(([type, aggregation]) => {
+                  if (typeof aggregation === 'object' && 'exceeded' in aggregation) {
+                    return renderAggregationWithExceeded(type, aggregation);
+                  } else {
+                    return renderAggregationWithoutExceeded(aggregation);
+                  }
+                })
+              }
+            </Box> : 
+            <Skeleton
+              width={'99%'}
+              count={7}
+            />
+          }
         </Box>
-        {job.taskId ? <></> : <Curtain showProgress={true} />}
       </Box>
     </>
   );

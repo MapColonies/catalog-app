@@ -10,9 +10,9 @@ import { FieldLabelComponent } from '../../../../common/components/form/field-la
 import CONFIG from '../../../../common/config';
 import { dateFormatter, formatPath, relativeDateFormatter } from '../../../../common/helpers/formatters';
 import { Mode } from '../../../../common/models/mode.enum';
+import Skeleton from '../../../../common/components/skeleton/skeleton';
 import { RecordType, LayerMetadataMixedUnion, RasterIngestionFilesTypeConfig } from '../../../models';
 import { FilePickerDialog } from '../../dialogs/file-picker.dialog';
-import { Curtain } from './curtain/curtain.component';
 import { RasterWorkflowContext } from './state-machine/context';
 import {
   hasActiveJob,
@@ -192,11 +192,14 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
         </Box>
       }
       <Box className={`header section ${isLoading ? 'curtainContainer' : ''}`}>
-        {
-          isLoading && <Curtain showProgress={isLoading}/>
-        }
         <Box className="ingestionFields">
-          <IngestionInputs state={state} />
+          {
+            isLoading ? <Skeleton
+              width={'99%'}
+              count={3}
+            />:
+            <IngestionInputs state={state} />
+          }
         </Box>
         {
           hasActiveJob(state.context) === false &&
