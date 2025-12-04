@@ -268,8 +268,8 @@
   "validationReport.vertices": "Polygons with too many vertices",
   "validationReport.metadata": "Invalid metadata",
   "validationReport.resolution": "Resolution mismatch",
-  "validationReport.smallHoles": "Small holes",
-  "validationReport.smallGeometries": "Small geometries",
+  "validationReport.smallHoles": "Polygons with small holes",
+  "validationReport.smallGeometries": "Very small polygons",
 
   "field-names.raster.id": "ID",
   "field-names.raster.productId": "Ext. ID",
@@ -825,7 +825,7 @@
   "polygonParts-info.no-data.message": "No polygon parts data was found for the layer in the selected position",
   "polygonParts-info.part-to-large.message": "Polygon part too large for presentation",
 
-  "grid.row-not-found.warning": "The job dated {value} does not meet the search criteria",
+  "grid.row-not-found.warning": "The job {value} does not meet the search criteria",
 
   "export-layer.exportSuccessContainer.title": "Export request triggered",
   "export-layer.exportSuccessContainer.approve": "Copy and exit",

@@ -141,8 +141,8 @@ export const validateShapeFiles = (files: IFiles): IStateError[] => {
     const modDateProduct = moment(productDetails.modDate);
     const modDateShapeMetadata = moment(shapeMetadataDetails.modDate);
     const differenceInMinutes = modDateProduct.diff(modDateShapeMetadata, 'minutes');
-    if (Math.abs(differenceInMinutes) > CONFIG.UPLOAD_SHAPE_FILES_TIME_GRACE_IN_MINUTES) {
-      return [ buildError('ingestion.warning.modDateMismatch', CONFIG.UPLOAD_SHAPE_FILES_TIME_GRACE_IN_MINUTES.toString(), 'logic', 'warning') ];
+    if (Math.abs(differenceInMinutes) > CONFIG.RASTER_INGESTION.CHANGES_IN_SHAPE_FILES.TIME_DIFFERENCE_GRACE_MINUTES) {
+      return [ buildError('ingestion.warning.modDateMismatch', CONFIG.RASTER_INGESTION.CHANGES_IN_SHAPE_FILES.TIME_DIFFERENCE_GRACE_MINUTES.toString(), 'logic', 'warning') ];
     }
   }
   return [];
@@ -184,7 +184,7 @@ export const isGoToJobEnabled = (context: IContext): boolean => {
 };
 
 export const isRetryEnabled = (context: IContext): boolean => {
-  return !!(context.job && context.job.jobId)  &&
+  return !!(context.job && context.job.jobId) &&
     (context.job.taskStatus === Status.Failed ||
     (context.job.taskStatus === Status.Completed && context.job.validationReport?.isValid === false)) &&
     context.job.details?.status !== Status.Aborted &&
@@ -220,4 +220,10 @@ export const isTaskValid = (job: IJob | undefined): boolean => {
     !errorsAggregation?.smallHoles?.exceeded &&
     !errorsAggregation?.smallGeometries?.exceeded)
   );
+};
+
+export const isModified = (modDate: Date | string) => {
+  return modDate
+    ? moment().diff(moment(modDate), 'hours') <= CONFIG.RASTER_INGESTION.CHANGES_IN_SHAPE_FILES.TIME_MODIFIED_THRESHOLD_HOURS
+    : false;
 };

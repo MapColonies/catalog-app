@@ -11,7 +11,8 @@ import {
   getFile,
   getPath,
   handleShapeFilesValidation,
-  hasError
+  hasError,
+  isModified
 } from './helpers';
 import { MOCK_JOB_UPDATE } from './MOCK';
 import { queryExecutor } from './query-executor';
@@ -107,6 +108,7 @@ export const SERVICES = {
         taskPercentage: task.percentage ?? 0,
         validationReport: task.parameters || {},
         taskStatus: task.status ?? '',
+        taskReason: task.reason ?? '',
         details: job
       };
     }),
@@ -118,12 +120,24 @@ export const SERVICES = {
         if (files.data) {
           files.data.details = await getDetails(files.data.path, input.context);
           files.data.exists = !!files.data.details;
+          if (files.data.exists === false) {
+            errors = [ ...errors, buildError('ingestion.error.missing', 'GPKG') ];
+          } else {
+            const gpkgValidation = await validateGPKG(files.data.path, input.context);
+            files.data.validationResult = { ...gpkgValidation };
+            if (!!files.data.validationResult.extentPolygon) {
+              files.data.geoDetails = getFeatureAndMarker(files.data.validationResult.extentPolygon, FeatureType.SOURCE_EXTENT, FeatureType.SOURCE_EXTENT_MARKER);
+            }
+          }
         }
         if (files.product) {
           files.product.details = await getDetails(files.product.path, input.context);
           files.product.exists = !!files.product.details;
           if (files.product.exists === false) {
             errors = [ ...errors, buildError('ingestion.error.missing', PRODUCT_FILENAME) ];
+          } else {
+            const productFile = await fetchProduct(files.product, input.context);
+            files.product.geoDetails = productFile?.geoDetails;
           }
         }
         if (files.shapeMetadata) {
@@ -133,18 +147,10 @@ export const SERVICES = {
             errors = [ ...errors, buildError('ingestion.error.missing', SHAPEMETADATA_FILENAME) ];
           }
         }
-        if (files.data) {
-          const gpkgValidation = await validateGPKG(files.data.path, input.context);
-          files.data.validationResult = { ...gpkgValidation };
-          if (!!files.data.validationResult.extentPolygon) {
-            files.data.geoDetails = getFeatureAndMarker(files.data.validationResult.extentPolygon, FeatureType.SOURCE_EXTENT, FeatureType.SOURCE_EXTENT_MARKER);
-          }
-        }
-        if (files.product) {
-          const productFile = await fetchProduct(files.product, input.context);
-          files.product.geoDetails = productFile?.geoDetails;
-        }
-        if (!hasError(errors)) {
+        if (!hasError(errors) &&
+          files.product?.details?.modDate &&
+          files.shapeMetadata?.details?.modDate &&
+          (isModified(files.product.details.modDate) || isModified(files.shapeMetadata.details.modDate))) {
           errors = handleShapeFilesValidation(files);
         }
       }

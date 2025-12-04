@@ -94,7 +94,7 @@ export const fetchProduct = async (product: IProductFile, context: IContext) => 
   const apiUrl = CONFIG.SERVICE_URL.replace('graphql', 'zipshape');
   const params = {
     folder: getPathWithSlash(path.dirname(product.path)),
-    name: CONFIG.RASTER_INGESTION_FILES_STRUCTURE.product.producerFileName,
+    name: CONFIG.RASTER_INGESTION.FILES_STRUCTURE.product.producerFileName,
     type: RecordType.RECORD_RASTER
   };
   const queryString = new URLSearchParams(params).toString();

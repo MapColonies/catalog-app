@@ -1,6 +1,6 @@
 import { isEmpty } from 'lodash';
-import React, { useContext, useState } from 'react';
-import { MultiSelection as McMultiSelection, StylesConfig } from '@map-colonies/react-components';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
+import { MultiSelection as McMultiSelection, MultiSelectionOption, StylesConfig } from '@map-colonies/react-components';
 import { EntityFormikHandlers } from '../../../discrete-layer/components/layer-details/layer-datails-form';
 import { IRecordFieldInfo } from '../../../discrete-layer/components/layer-details/layer-details.field-info';
 import CONFIG from '../../config';
@@ -24,23 +24,27 @@ interface MultiSelectionWrapperProps {
 
 export const MultiSelection: React.FC<MultiSelectionWrapperProps> = (props) => {
   const { fieldInfo, lookupOptions, fieldName, customStyles, placeholder, value, formik } = props;
-
-  const [multiSelectionValues, setMultiSelectionValues] = useState(fieldInfo.isMultiSelection && !isEmpty(value) ? value?.split(", ") : []);
-  const { lookupTablesData } = useContext(lookupTablesContext);
-
   const lang = CONFIG.I18N.DEFAULT_LANGUAGE;
   const backLocale = CONFIG.DEFAULT_BACKEND_LOCALE;
-  if (!lookupTablesData || !lookupTablesData.dictionary || fieldInfo.lookupTable == null) return null;
 
-  const getMultiSelectionOptions = () => {
-    return (lookupOptions as ILookupOption[]).map((option: ILookupOption) => {
+  const [multiSelectionValues, setMultiSelectionValues] = useState<string[]>(fieldInfo.isMultiSelection && !isEmpty(value) ? (value as string).split(", ") : []);
+  const { lookupTablesData } = useContext(lookupTablesContext);
+
+  useEffect(() => {
+    if (fieldInfo.isMultiSelection) {
+      setMultiSelectionValues(!isEmpty(value) ? (value as string).split(", ") : []);
+    }
+  }, [value, fieldInfo.isMultiSelection]);
+  
+  const multiSelectionOptions = useMemo(() => {
+    return (lookupOptions as ILookupOption[]).map((option) => {
       const text = option.translation?.find((trns) => trns.locale === lang)?.text ?? '';
       return { value: text, label: text };
     });
-  };
+  }, [lookupOptions, lang]);
 
   const getMultiSelectionValues = () => {
-    const chosenValueStrings = (multiSelectionValues)?.map((value) => getMultiSelectionOptions().filter((option) => option.value === value))
+    const chosenValueStrings = (multiSelectionValues)?.map((value) => multiSelectionOptions.filter((option) => option.value === value))
       .flat()
       .map((filteredOption) => filteredOption.value);
 
@@ -59,14 +63,16 @@ export const MultiSelection: React.FC<MultiSelectionWrapperProps> = (props) => {
     }).join(', ');
   };
 
-  const onChangeMultiSelection = (data: any) => {
+  const onChangeMultiSelection = (data: MultiSelectionOption[]) => {
     formik?.setFieldValue(fieldName, getFormikFieldValue(data));
-    setMultiSelectionValues(data);
+    setMultiSelectionValues(data.map(item => item.value));
   };
+
+  if (!lookupTablesData || !lookupTablesData.dictionary || fieldInfo.lookupTable == null) return null;
 
   return (
     <McMultiSelection
-      options={getMultiSelectionOptions()}
+      options={multiSelectionOptions}
       values={getMultiSelectionValues()}
       onChange={onChangeMultiSelection}
       placeholder={placeholder}

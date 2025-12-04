@@ -23,7 +23,6 @@ import {
   EntityDescriptorModelType,
   FieldConfigModelType,
   JobModelType,
-  LayerMetadataMixedUnion,
   LayerRasterRecordModel,
   LayerRasterRecordModelType,
   ProductType,
@@ -46,11 +45,12 @@ import {
   clearSyncWarnings,
   filterModeDescriptors,
   getFlatEntityDescriptors,
-  getRecordForUpdate,
   getValidationType,
   getYupFieldConfig,
   getBasicType,
-  isEnumType
+  isEnumType,
+  jobType2Mode,
+  RasterJobTypeEnum
 } from '../utils';
 import suite from '../validate';
 import EntityRasterForm from './layer-details-form.raster';
@@ -68,11 +68,14 @@ const START = 0;
 interface EntityRasterDialogProps {
   isOpen: boolean;
   onSetOpen: (open: boolean) => void;
-  recordType?: RecordType;
-  layerRecord?: ILayerImage | null;
-  isSelectedLayerUpdateMode?: boolean;
-  jobId?: string;
+  job?: JobModelType;
   setJob?: (job: JobModelType | undefined) => void;
+}
+
+interface EntityRasterInnerProps extends EntityRasterDialogProps {
+  layerRecord: ILayerImage;
+  mode: Mode;
+  recordType?: RecordType;
 }
 
 const setDefaultValues = (record: Record<string, unknown>, descriptors: EntityDescriptorModelType[]): void => {
@@ -96,7 +99,7 @@ const setDefaultValues = (record: Record<string, unknown>, descriptors: EntityDe
   )
 };
 
-export const buildRecord = (recordType: RecordType, descriptors: EntityDescriptorModelType[]): ILayerImage => {
+export const buildRasterRecord = (descriptors: EntityDescriptorModelType[]): ILayerImage => {
   const record = {} as Record<string, unknown>;
   LayerRasterRecordModelKeys.forEach((key) => {
     record[key as string] = undefined;
@@ -106,19 +109,64 @@ export const buildRecord = (recordType: RecordType, descriptors: EntityDescripto
   record.productStatus = RecordStatus.UNPUBLISHED;
   record['__typename'] = LayerRasterRecordModel.properties['__typename'].name.replaceAll('"','');
   record.id = DEFAULT_ID;
-  record.type = recordType;
+  record.type = RecordType.RECORD_RASTER;
   return record as unknown as ILayerImage;
 };
 
-export const EntityRasterDialog: React.FC<EntityRasterDialogProps> = (props: EntityRasterDialogProps) => {
+export const EntityRasterDialog: React.FC<EntityRasterDialogProps> = observer((props: EntityRasterDialogProps) => {
+
+  const store = useStore();
+
+  const { job } = props;
+
+  const isUpdateMode = (jobRecord: JobModelType | undefined): boolean => {
+    if (jobRecord) {
+      const type = jobRecord.type || RasterJobTypeEnum.NEW;
+      return jobType2Mode[type] === Mode.UPDATE;
+    }
+
+    return store.discreteLayersStore.selectedLayerOperationMode === Mode.UPDATE;
+  };
+
+  const getRecordLayer = (jobRecord: JobModelType | undefined): ILayerImage => {
+    const { selectedLayer, entityDescriptors, findRasterLayer } = store.discreteLayersStore;
+
+    // 1. START_NEW mode - always return empty base layer
+    if (!isUpdateMode(jobRecord)) { 
+      return buildRasterRecord(entityDescriptors as EntityDescriptorModelType[]);
+    }
+
+    // 2. RESTORE mode - try to get the matching layer
+    if (jobRecord?.resourceId && jobRecord.productType) {
+      const layerRecord = cloneDeep(findRasterLayer(jobRecord?.resourceId, jobRecord.productType));
+
+      if (layerRecord) {
+        return layerRecord;
+      }
+    }
+
+    // 3. START_UPDATE mode - return the currently selected layer
+    if (selectedLayer) {
+      return selectedLayer;
+    }
+
+    // 4. Fallback (should rarely happen) - return record for START_NEW mode
+    return buildRasterRecord(entityDescriptors as EntityDescriptorModelType[]);
+  };
+
   return (
     <RasterWorkflowProvider>
-      <EntityRasterDialogInner {...props} />
+      <EntityRasterDialogInner
+        {...props}
+        layerRecord={getRecordLayer(job)}
+        mode={isUpdateMode(job) ? Mode.UPDATE : Mode.NEW}
+        recordType={RecordType.RECORD_RASTER}
+      />
     </RasterWorkflowProvider>
   );
-};
+});
 
-export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observer((props: EntityRasterDialogProps) => {
+const EntityRasterDialogInner: React.FC<EntityRasterInnerProps> = observer((props: EntityRasterInnerProps) => {
 
     //#region STATE MACHINE
     const actorRef = RasterWorkflowContext.useActorRef();
@@ -126,18 +174,20 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
     // Subscribe to state using a selector
     const state = RasterWorkflowContext.useSelector((s) => s);
 
+    const { isOpen, onSetOpen, job, setJob, mode, layerRecord } = props;
+
     useEffect(() => {
       if (!actorRef) return;
 
-      if (jobId) {
+      if (job) {
         actorRef.send({
           type: 'RESTORE',
-          job: { jobId }
+          job: { jobId: job.id }
         } satisfies Events);
-      } else if (props.isSelectedLayerUpdateMode && props.layerRecord) {
+      } else if (mode === Mode.UPDATE) {
         actorRef.send({
           type: 'START_UPDATE',
-          updatedLayer: props.layerRecord as LayerRasterRecordModelType
+          updatedLayer: layerRecord as LayerRasterRecordModelType
         } satisfies Events);
       } else {
         actorRef.send({
@@ -146,46 +196,37 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
           selectionMode: CONFIG.SELECTION_MODE_DEFAULT === '' ? 'auto' : CONFIG.SELECTION_MODE_DEFAULT
         } satisfies Events);
       }
-    }, [props.isSelectedLayerUpdateMode, props.layerRecord, actorRef]);
+    }, [mode, layerRecord, actorRef]);
     //#endregion
 
     const store = useStore();
     const intl = useIntl();
     const dialogContainerRef = useRef<HTMLDivElement>(null);
 
-    const decideMode = useCallback(() => {
-      return (props.isSelectedLayerUpdateMode === true && props.layerRecord) ? Mode.UPDATE : Mode.NEW;
-    }, []);
-
-    const { isOpen, onSetOpen, jobId, setJob } = props;
-    const [recordType] = useState<RecordType>(props.recordType ?? (props.layerRecord?.type as RecordType));
-    const [mode] = useState<Mode>(decideMode());
-    const [layerRecord] = useState<LayerMetadataMixedUnion>(
-      props.layerRecord && mode === Mode.UPDATE
-        ? cloneDeep(props.layerRecord)
-        : buildRecord(recordType, store.discreteLayersStore.entityDescriptors as EntityDescriptorModelType[])
-    );
+    const [recordType] = useState<RecordType>(props.recordType ?? (layerRecord.type as RecordType));
     const [vestValidationResults, setVestValidationResults] = useState<DraftResult>({} as DraftResult);
     const [descriptors, setDescriptors] = useState<unknown[]>([]);
     const [schema, setSchema] = useState<Record<string, Yup.AnySchema>>({});
     const [inputValues, setInputValues] = useState<FormikValues>({});
     const [isAllInfoReady, setIsAllInfoReady] = useState<boolean>(false);
 
+    const entityDescriptors = store.discreteLayersStore.entityDescriptors as EntityDescriptorModelType[];
+
     const metadataPayloadKeys = useMemo(() => {
       return getFlatEntityDescriptors(
         layerRecord.__typename,
-        store.discreteLayersStore.entityDescriptors as EntityDescriptorModelType[]
+        entityDescriptors
       )
       .filter(descriptor => descriptor.isCreateEssential || descriptor.fieldName === 'id')
       .map(descriptor => descriptor.fieldName);
-    }, [store.discreteLayersStore.entityDescriptors]);
+    }, [entityDescriptors]);
 
     const dialogTitleParam = recordType;
     const dialogTitleParamTranslation = intl.formatMessage({
       id: `record-type.${(dialogTitleParam as string).toLowerCase()}.label`,
     });
     const dialogTitle = intl.formatMessage(
-      { id: `general.title.${(mode as string).toLowerCase()}` },
+      { id: `general.title.${(mode).toLowerCase()}` },
       { value: dialogTitleParamTranslation }
     );
 
@@ -274,10 +315,10 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
     useEffect(() => {
       const descriptors = getFlatEntityDescriptors(
         layerRecord.__typename,
-        filterModeDescriptors(mode as unknown as Mode, store.discreteLayersStore.entityDescriptors as EntityDescriptorModelType[])
+        filterModeDescriptors(mode as unknown as Mode, entityDescriptors)
       );
 
-      const uiIngestionFieldDescriptors = getUIIngestionFieldDescriptors(store.discreteLayersStore.entityDescriptors as EntityDescriptorModelType[]);
+      const uiIngestionFieldDescriptors = getUIIngestionFieldDescriptors(entityDescriptors);
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const yupSchema: Record<string, any> = {};
@@ -307,7 +348,7 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
 
     const closeDialog = useCallback(() => {
       onSetOpen(false);
-      if (jobId) {
+      if (job) {
         setJob?.(undefined);
       }
       store.discreteLayersStore.resetUpdateMode();
@@ -320,11 +361,8 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
           <Box id="updateLayerHeaderContent">
             <LayersDetailsComponent
               className="detailsPanelProductView"
-              entityDescriptors={
-                store.discreteLayersStore
-                  .entityDescriptors as EntityDescriptorModelType[]
-              }
-              layerRecord={props.layerRecord}
+              entityDescriptors={entityDescriptors}
+              layerRecord={layerRecord}
               isBrief={true}
               mode={Mode.VIEW}
             />
@@ -363,20 +401,10 @@ export const EntityRasterDialogInner: React.FC<EntityRasterDialogProps> = observ
               isAllInfoReady && (
               <EntityRasterForm
                 mode={mode}
-                entityDescriptors={
-                  store.discreteLayersStore
-                    .entityDescriptors as EntityDescriptorModelType[]
-                }
+                entityDescriptors={entityDescriptors}
                 recordType={recordType}
-                layerRecord={
-                  mode === Mode.UPDATE
-                    ? getRecordForUpdate(
-                        props.layerRecord as LayerMetadataMixedUnion,
-                        layerRecord,
-                        descriptors as FieldConfigModelType[]
-                      )
-                    : layerRecord
-                }
+                // For fields that need to be changed in update. See "getRecordForUpdate()"
+                layerRecord={layerRecord}
                 yupSchema={Yup.object({
                   ...schema,
                 })}

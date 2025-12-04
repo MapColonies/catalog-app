@@ -19,13 +19,7 @@
 
 #layerDetailsFormRaster .text {
   position: relative;
-}
-
-#layerDetailsFormRaster .dots {
-  position: absolute;
-  left: 100%;
-  white-space: nowrap;
-  margin: 0 2px;
+  font-size: medium;
 }
 
 body[dir='rtl'] #layerDetailsFormRaster .dots {
@@ -35,4 +29,5 @@ body[dir='rtl'] #layerDetailsFormRaster .dots {
 
 #layerDetailsFormRaster .percentage {
   font-size: 20px;
+  cursor: default;
 }
