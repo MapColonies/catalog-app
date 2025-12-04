@@ -3,9 +3,9 @@ import React, { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Box, CircularProgressBar } from '@map-colonies/react-components';
 import { IconButton, Tooltip, Typography } from '@map-colonies/react-core';
+import Skeleton from '../../../../common/components/skeleton/skeleton';
 import { Status } from '../../../models';
 import { CopyButton } from '../../job-manager/job-details.copy-button';
-import { Curtain } from './curtain/curtain.component';
 
 import './progress.css';
 
@@ -114,9 +114,11 @@ export const Progress: React.FC<ProgressProps> = ({ titleId, show, percentage, s
                 </Box>
               </CircularProgressBar>
             ) : (
-              <Box className="curtainContainer">
-                <Curtain showProgress={true} />
-              </Box>
+              <Skeleton 
+                circle 
+                width={150}
+                height={150}
+              />
             )
           }
         </Box>

@@ -1,6 +1,6 @@
 {
   "name": "catalog-app",
-  "version": "3.0.3",
+  "version": "2.24.1",
   "bugs": {
     "url": "https://github.com/MapColonies/catalog-app/issues"
   },
@@ -83,7 +83,7 @@
     "@formatjs/icu-messageformat-parser": "^2.6.0",
     "@map-colonies/error-types": "^1.1.5",
     "@map-colonies/mc-utils": "^1.6.1",
-    "@map-colonies/react-components": "^4.13.0",
+    "@map-colonies/react-components": "file:../shared-components/packages/react-components",
     "@map-colonies/react-core": "^4.2.0",
     "@map-colonies/static-assets": "^0.5.1",
     "@map-colonies/types": "1.6.0",
@@ -162,6 +162,7 @@
     "react-dom": "^18.2.0",
     "react-hook-form": "6.15.8",
     "react-intl": "5.7.1",
+    "react-loading-skeleton": "^3.5.0",
     "react-scripts": "5.0.1",
     "react-sortable-tree": "^2.8.0",
     "react-virtualized": "^9.22.5",
