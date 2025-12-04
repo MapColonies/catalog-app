@@ -19,8 +19,8 @@ window._env_ = {
       matrixSet: '{{ getv "/configuration/active/layer/properties/url/pattern/params/matrixset" "gridname" }}',
       style: '{{ getv "/configuration/active/layer/properties/url/pattern/params/style" "default" }}',
       projection: '{{ getv "/configuration/active/layer/properties/url/pattern/params/projection" "EPSG:4326" }}',
-      format: '{{ getv "/configuration/active/layer/properties/url/pattern/params/format" "image/png" }}'
-    }
+      format: '{{ getv "/configuration/active/layer/properties/url/pattern/params/format" "image/png" }}',
+    },
   },
   MAP: {
     center: {{ getv "/configuration/map/center" "[34.811, 31.908]" }},
@@ -37,11 +37,12 @@ window._env_ = {
     log2httpServer: {
       host: '{{ getv "/configuration/logger/http/host" "" }}',
       port: '{{ getv "/configuration/logger/http/port" "" }}',
-      path: '{{ getv "/configuration/logger/http/path" "" }}'
-    }
+      path: '{{ getv "/configuration/logger/http/path" "" }}',
+    },
   },
-  JOB_STATUS: {
-    pollingCycleInterval: '{{ getv "/configuration/job/status/polling/cycle/interval" "120000" }}',
+  JOB_MANAGER: {
+    pollingCycleInterval: {{ getv "/configuration/jobmanager/pollingcycleinterval" "120000" }},
+    filterDaysTimeSlot: {{ getv "/configuration/jobmanager/filterdaystimeslot" "1" }},
   },
   DEFAULT_USER: {
     role: '{{ getv "/configuration/default/user/role" "USER" }}',
@@ -53,7 +54,7 @@ window._env_ = {
   MODEL_VIEWER_TOKEN_VALUE: '{{ getv "/configuration/model/viewer/token/value" "TOKEN" }}',
   RUNNING_MODE: {
     type: '{{ getv "/configuration/running/mode/type" "DEVELOPMENT" }}',
-    autocomplete: {{ getv "/configuration/running/mode/autocomplete" "false" }}
+    autocomplete: {{ getv "/configuration/running/mode/autocomplete" "false" }},
   },
   NUMBER_OF_CHARACTERS_LIMIT: {{ getv "/configuration/number/of/characters/limit" "15" }},
   SERVED_ENTITY_TYPES: '{{ getv "/configuration/served/entity/types" "RECORD_ALL,RECORD_RASTER,RECORD_3D,RECORD_DEM,RECORD_VECTOR" }}',
@@ -78,8 +79,8 @@ window._env_ = {
       WFSFeatures: {{ getv "/configuration/polygonparts/max/wfs/features" "500" }},
       showFootprintZoomLevel: {{ getv "/configuration/polygonParts/max/show/footprint/zoom/level" "10" }},
       perShape: {{ getv "/configuration/polygonparts/max/pershape" "300" }},
-      vertices: {{ getv "/configuration/polygonparts/max/vertices" "300000" }}
-    }
+      vertices: {{ getv "/configuration/polygonparts/max/vertices" "300000" }},
+    },
   },
   WFS: {
     style: '{{ getv "/configuration/wfs/style" "{\"color\": \"#01FF1F\", \"hover\": \"#24AEE9\", \"pointStroke\": \"#01FF1F\"}" }}',
@@ -87,12 +88,15 @@ window._env_ = {
     max: {
       pageSize: {{ getv "/configuration/wfs/max/page/size" "300" }},
       zoomLevel: {{ getv "/configuration/wfs/max/zoom/level" "14" }},
-      cacheSize: {{ getv "/configuration/wfs/max/cache/size" "6000" }}
-    }
+      cacheSize: {{ getv "/configuration/wfs/max/cache/size" "6000" }},
+    },
   },
   GEOCODER: {
     url: '{{ getv "/configuration/geocoder/url" "http://geocoder-URL" }}',
-    callbackUrl: '{{ getv "/configuration/geocoder/callbackUrl" "http://geocoder-callback-URL" }}'
+    callbackUrl: '{{ getv "/configuration/geocoder/callbackUrl" "http://geocoder-callback-URL" }}',
   },
-  UPLOAD_SHAPE_FILES_TIME_GRACE_IN_MINUTES: {{ getv "/configuration/upload/shape/files/time/grace/in/minutes" "10" }}
+  CHANGES_IN_SHAPE_FILES: {
+    timeDifferenceGraceMinutes: {{ getv "/configuration/changesinshapefiles/timedifferencegraceminutes" "10" }},
+    timeModifiedThresholdHours: {{ getv "/configuration/changesinshapefiles/timemodifiedthresholdhours" "12" }},
+  },
 };

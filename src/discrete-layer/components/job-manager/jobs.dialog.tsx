@@ -25,10 +25,9 @@ import { JOB_ENTITY } from './job.types';
 import './jobs.dialog.css';
 
 const START_CYCLE_ITERATION = 0;
-const POLLING_CYCLE_INTERVAL = CONFIG.JOB_STATUS.POLLING_CYCLE_INTERVAL;
+const POLLING_CYCLE_INTERVAL = CONFIG.JOB_MANAGER.POLLING_CYCLE_INTERVAL;
 const COUNTDOWN_REFRESH_RATE = 1000; // interval to change remaining time amount, defaults to 1000
 const MILLISECONDS_IN_SEC = 1000;
-const TILL_DATE_ACTION_REQUEST_BUFFER = Number(POLLING_CYCLE_INTERVAL);
 
 interface JobsDialogProps {
   isOpen: boolean;
@@ -46,7 +45,7 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
   const [ gridRowData, setGridRowData ] = useState<JobModelType[] | undefined>(undefined);
   const [ gridApi, setGridApi ] = useState<GridApi>();
   const [ pollingCycle, setPollingCycle ] = useState(START_CYCLE_ITERATION);
-  const [ fromDate, setFromDate ] = useState<Date>(moment().subtract(CONFIG.JOB_MANAGER_END_OF_TIME, 'days').toDate());
+  const [ fromDate, setFromDate ] = useState<Date>(moment().subtract(CONFIG.JOB_MANAGER.FILTER_DAYS_TIME_SLOT, 'days').toDate());
   const [handleFocusError, setHandleFocusError] = useState<IFocusError | undefined>(undefined);
 
   // @ts-ignore
@@ -137,7 +136,7 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
         store.queryJobs({
           params: {
             fromDate,
-            tillDate: new Date(tillDate.getTime() + TILL_DATE_ACTION_REQUEST_BUFFER),
+            tillDate: new Date(tillDate.getTime() + Number(POLLING_CYCLE_INTERVAL)),
           },
         }));
     }
