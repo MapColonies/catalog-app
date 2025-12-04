@@ -269,10 +269,7 @@ export const InnerRasterForm = (
         <Box className="content section">
           <Box className="previewAndJobContainer">
             <Box className="jobData section">
-              {
-                !hasError(state.context.errors) &&
-                <JobInfo job={state.context.job} />
-              }
+              <JobInfo job={state.context.job} />
             </Box>
             <GeoFeaturesPresentorComponent
               layerRecord={layerRecord}
