@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.1.0](https://github.com/MapColonies/catalog-app/compare/v3.0.5...v3.1.0) (2025-12-04)
+
+
+### Features
+
+* skeleton component in raster ingestion ([#773](https://github.com/MapColonies/catalog-app/issues/773)) ([5a5214f](https://github.com/MapColonies/catalog-app/commit/5a5214faf75895d42bd0cc845a424b4c02c836a9))
+
+
+### Bug Fixes
+
+* Restore country list from job ( MAPCO-9171 ) ([#764](https://github.com/MapColonies/catalog-app/issues/764)) ([646b798](https://github.com/MapColonies/catalog-app/commit/646b798e4e4a42214e0c594f5739eaeb6edba134))
+
 ## [3.0.5](https://github.com/MapColonies/catalog-app/compare/v3.0.4...v3.0.5) (2025-12-04)
 
 
