@@ -1,5 +1,5 @@
 import { mergeWith } from 'lodash';
-import { assign, createMachine, sendParent } from 'xstate';
+import { assign, createMachine, fromCallback, sendParent } from 'xstate';
 import CONFIG from '../../../../../common/config';
 import { dateFormatter, relativeDateFormatter } from '../../../../../common/helpers/formatters';
 import { Mode } from '../../../../../common/models/mode.enum';
@@ -427,7 +427,24 @@ export const workflowMachine = createMachine<IContext, Events>({
       }
     },
     [WORKFLOW.JOB_POLLING_WAIT]: {
-      entry: () => console.log(`>>> Enter ${WORKFLOW.JOB_POLLING_WAIT}`),
+      entry: assign((_: { context: IContext; event: any }) => ({
+        remainingTime: CONFIG.JOB_MANAGER.POLLING_CYCLE_INTERVAL / 1000
+      })),
+      invoke: {
+        src: fromCallback(({ sendBack }) => {
+          const interval = setInterval(() => {
+            sendBack({ type: "TICK" });
+          }, 1000);
+          return () => clearInterval(interval);
+        })
+      },
+      on: {
+        TICK: {
+          actions: assign((_: { context: IContext; event: any }) => ({
+            remainingTime: _.context.remainingTime ? _.context.remainingTime - 1 : 0
+          }))
+        }
+      },
       after: {
         [CONFIG.JOB_MANAGER.POLLING_CYCLE_INTERVAL]: WORKFLOW.JOB_POLLING
       }
