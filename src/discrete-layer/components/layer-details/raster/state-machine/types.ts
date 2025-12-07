@@ -79,6 +79,7 @@ export interface IContext {
   resolutionDegree?: number;
   formData?: LayerRasterRecordInput;
   job?: IJob;
+  remainingTime?: number;
 }
 
 export interface IPartialContext extends Omit<IContext, 'store' | 'errors'> {};
@@ -102,7 +103,8 @@ export type Events =
   | { type: "SUBMIT", data: LayerRasterRecordInput, resolutionDegree: number }
   | { type: "RESTORE", job: IJob }
   | { type: "RETRY" }
-  | { type: "DONE" };
+  | { type: "DONE" }
+  | { type: "TICK" };
 
 // type FlowActionArgs = ActionArgs<Context, Events, Events>;
 
