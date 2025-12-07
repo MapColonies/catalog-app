@@ -433,7 +433,7 @@ export const workflowMachine = createMachine<IContext, Events>({
       invoke: {
         src: fromCallback(({ sendBack }) => {
           const interval = setInterval(() => {
-            sendBack({ type: "TICK" });
+            sendBack({ type: 'TICK' });
           }, 1000);
           return () => clearInterval(interval);
         })

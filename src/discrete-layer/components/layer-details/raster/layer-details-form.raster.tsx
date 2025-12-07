@@ -269,7 +269,7 @@ export const InnerRasterForm = (
         <Box className="content section">
           <Box className="previewAndJobContainer">
             <Box className="jobData section">
-              <Box className='remainingTime'>
+              <Box className="remainingTime">
                 {state.context.remainingTime}
               </Box>
               <JobInfo job={state.context.job} />
