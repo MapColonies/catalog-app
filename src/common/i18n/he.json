@@ -15,6 +15,7 @@
   "general.go-to-job-manager-btn.text": "מעבר למנהל המשימות",
   "general.warning.text": "אזהרה",
   "general.error.text": "שגיאה",
+  "general.errors.text": "שגיאות",
   "general.error.title": "משהו השתבש...",
   "general.error.description": "מידע נוסף:",
   "general.server.error": "התקבלה שגיאה מהשרת",

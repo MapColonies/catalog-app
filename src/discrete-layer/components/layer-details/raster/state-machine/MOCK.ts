@@ -1,4 +1,5 @@
 import { Geometry } from 'geojson';
+import { TaskModelType } from '../../../../models';
 
 export const MOCK_JOB_NEW = {
   __typename: "Job",
@@ -302,6 +303,7 @@ export const MOCK_TASK = {
         count: 100
       }
     },
+    link: 'https://ingestion-trigger-api',
     checksums: [
       {
         checksum: "5e371a633204f7eb",
@@ -331,7 +333,7 @@ export const MOCK_TASK = {
     ]
   },
   status: 'InProgress'
-};
+} as TaskModelType;
 
 export const MOCK_POLYGON: Geometry = {
   bbox: [47.5116117000133,29.7960044289981,48.4333988970044,32.1668865940011],

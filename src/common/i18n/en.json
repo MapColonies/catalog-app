@@ -15,6 +15,7 @@
   "general.go-to-job-manager-btn.text": "Go to job manager",
   "general.warning.text": "Warning",
   "general.error.text": "Error",
+  "general.errors.text": "Errors",
   "general.error.title": "Something went wrong...",
   "general.error.description": "Message:",
   "general.server.error": "Server Error",

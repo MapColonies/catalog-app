@@ -14,6 +14,7 @@ import { useQuery } from '../../../models/RootStore';
 import { CopyButton } from '../../job-manager/job-details.copy-button';
 import { JobDetailsHeader } from './job-details.header';
 import JobDetailsExportJobData from './job.details.export-job-data';
+import JobDetailsRasterJobData from './job-details.raster-job-data';
 
 import './job-details.cell-renderer.css';
 
@@ -203,6 +204,7 @@ export const JobDetailsRenderer: React.FC<ICellRendererParams> = observer((props
     <Box className="jobDetailsContainer">
       <JobDetailsHeader job={props.data as JobModelType} /> 
       <JobDetailsExportJobData key={jobId} {...propsWithJobParams} />
+      <JobDetailsRasterJobData key={jobId} {...propsWithJobParams} />
       <Box className="gridContainer">
         {taskFields.map((field) => (
           <Typography

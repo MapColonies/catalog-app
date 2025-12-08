@@ -3,6 +3,7 @@ import path from 'path';
 import { merge } from 'lodash';
 import shp from 'shpjs';
 import { FileData } from '@map-colonies/react-components';
+import { RasterJobTypeEnum } from '../../../../../common/models/raster-job';
 import CONFIG from '../../../../../common/config';
 import { dateFormatter, relativeDateFormatter } from '../../../../../common/helpers/formatters';
 import {
@@ -14,7 +15,7 @@ import {
 } from '../../../../models';
 import { LayerRasterRecordInput } from '../../../../models/RootStore.base';
 import { filterByKeys } from '../../entity-types-keys';
-import { jobType2Mode, RasterJobTypeEnum, transformEntityToFormFields } from '../../utils';
+import { jobType2Mode, transformEntityToFormFields } from '../../utils';
 import { FeatureType } from '../pp-map.utils';
 import {
   buildError,

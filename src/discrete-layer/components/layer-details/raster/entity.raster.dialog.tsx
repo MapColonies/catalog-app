@@ -19,6 +19,7 @@ import CONFIG from '../../../../common/config';
 import { emphasizeByHTML } from '../../../../common/helpers/formatters';
 import { getTextStyle } from '../../../../common/helpers/style';
 import { Mode } from '../../../../common/models/mode.enum';
+import { RasterJobTypeEnum } from '../../../../common/models/raster-job';
 import {
   EntityDescriptorModelType,
   FieldConfigModelType,
@@ -49,8 +50,7 @@ import {
   getYupFieldConfig,
   getBasicType,
   isEnumType,
-  jobType2Mode,
-  RasterJobTypeEnum
+  jobType2Mode
 } from '../utils';
 import suite from '../validate';
 import EntityRasterForm from './layer-details-form.raster';
