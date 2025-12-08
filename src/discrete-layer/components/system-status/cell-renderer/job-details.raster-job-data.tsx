@@ -31,7 +31,15 @@ const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = ({ data 
   const isRasterJob =
     jobData.domain?.toLowerCase().includes('raster') &&
     jobData.type &&
-    Object.values(RasterJobTypeEnum).includes(jobData.type as any);
+    Object.values(RasterJobTypeEnum).includes(jobData.type as RasterJobTypeEnum);
+
+  const calculateErrorsCount = (errors: ValidationErrorsAggregation): number => {
+    return (
+      Object.values(errors.count).reduce((sum, val) => sum + val, 0) +
+      (errors.smallGeometries.exceeded ? errors.smallGeometries.count : 0) +
+      (errors.smallHoles.exceeded ? errors.smallHoles.count : 0)
+    );
+  };
 
   const fetchTask = async () => {
     const result = await store.queryFindTasks({
@@ -50,41 +58,44 @@ const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = ({ data 
     if (task) {
       setTask(task);
 
-      const errors: ValidationErrorsAggregation = task?.parameters?.errorsAggregation;
+      const errorsAggregation = task?.parameters?.errorsAggregation;
 
-      let count =
-        Object.values(errors.count).reduce((sum, val) => sum + val, 0) +
-        (errors.smallGeometries.exceeded ? errors.smallGeometries.count : 0) +
-        (errors.smallHoles.exceeded ? errors.smallHoles.count : 0);
+      if (errorsAggregation) {
+        setErrorsCount(calculateErrorsCount(errorsAggregation));
+      }
+    }
+  }
 
-      setErrorsCount(count);
+  const computeZoomLevel = () => {
+    const ingestionResolution = get(jobData?.parameters, 'ingestionResolution')?.toString();
+    if (!ingestionResolution) {
+      return;
+    }
+
+    const index = Object.values(ZOOM_LEVELS_TABLE)
+      .map((value) => value.toString())
+      .findIndex(value => value === ingestionResolution);
+
+    if (index >= 0) {
+      setZoomLevel(index);
     }
   }
 
   useEffect(() => {
-    const getZoomLevel = async () => {
-      let zoomLevel = Object.values(ZOOM_LEVELS_TABLE).map((res) => {
-        return res.toString();
-      }).findIndex(val => {
-        return val === get(jobData?.parameters, 'ingestionResolution')?.toString();
-      });
-
-      if (zoomLevel >= 0) {
-        setZoomLevel(zoomLevel);
-      }
+    if (!isRasterJob) {
+      return;
     }
 
-    if (isRasterJob) {
-      fetchTask();
-      getZoomLevel();
-    }
-  }, [jobData, store, ZOOM_LEVELS_TABLE])
+    fetchTask();
+    computeZoomLevel();
+  }, [jobData, isRasterJob, ZOOM_LEVELS_TABLE])
 
   const numberOfErrorsMessage = intl.formatMessage({ id: 'general.errors.text' });
 
-  const gpkgFilePath = 'orthophoto/vivid_2025/israel/gaza_1_north_of.gpkg';
+  const gpkgFilePath = jobData.parameters?.inputFiles?.gpkgFilesPath?.[0];
+
   const zoom = zoomLevel !== undefined ? `(${zoomLevel})` : '';
-  const gpkg = gpkgFilePath ? `GPKG: ${gpkgFilePath} ${zoom}` : '';
+  const gpkgInfoText = gpkgFilePath ? `GPKG: ${gpkgFilePath} ${zoom}` : '';
 
   if (!isRasterJob) {
     return null;
@@ -92,9 +103,11 @@ const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = ({ data 
 
   return (
     <Box id='rasterJobData' className="jobDataContainer">
-      {gpkg}
       {
-        errorsCount &&
+        gpkgInfoText || <div className='spacer' />
+      }
+      {
+        errorsCount > 0 &&
         <Box className="linkItem errorsCountContainer" key={`${jobData.id}`}>
           <IconButton
             className={`error mc-icon-Status-Warnings`}
@@ -103,8 +116,8 @@ const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = ({ data 
               e.stopPropagation();
             }}
           />
-          <Hyperlink url={task?.parameters.link} label={`${numberOfErrorsMessage}: ${errorsCount.toString()}`} />
-          <CopyButton text={task?.parameters.link} key={'errorsReportLink'} />
+          <Hyperlink url={task?.parameters?.link ?? ''} label={`${numberOfErrorsMessage}: ${errorsCount.toString()}`} />
+          <CopyButton text={task?.parameters?.link ?? ''} key={'errorsReportLink'} />
         </Box>
       }
     </Box>

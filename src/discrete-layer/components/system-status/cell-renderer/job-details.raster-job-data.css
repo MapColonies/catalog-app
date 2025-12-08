@@ -40,3 +40,7 @@ body[dir='rtl'] #rasterJobData .errorsCountContainer {
   align-items: center;
   justify-content: center;
 }
+
+#rasterJobData.jobDataContainer .spacer {
+  padding: 8px;
+}
