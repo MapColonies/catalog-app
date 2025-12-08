@@ -105,7 +105,7 @@ export const SelectedLayersContainer: React.FC = observer(() => {
                 const linkUrl = (optionsWMTS.url as Record<string, any>)._url as string;
                 const cesiumLayerLinkUrl = get(cesiumLayer, '_imageryProvider._resource._url') as string;
                 const isBaseLayer = get(cesiumLayer, 'meta.parentBasetMapId') as string;
-                const isLayerFound = (linkUrl.split('?')[0] === cesiumLayerLinkUrl.split('?')[0]) &&  !isBaseLayer;
+                const isLayerFound = (linkUrl.split('?')[0] === cesiumLayerLinkUrl.split('?')[0]) && !isBaseLayer;
                 return isLayerFound;
               }) as SearchLayerPredicate,
               layerRecord: {
