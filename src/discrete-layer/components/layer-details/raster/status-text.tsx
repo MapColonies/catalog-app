@@ -44,14 +44,12 @@ export const StatusText: React.FC<StatusTextProps> = ({ status, reason }) => {
         ) : (
           <Box className="cursorDefault">
             <FormattedMessage id={`system-status.job.status_translation.${status}`} />
+            {
+              status === Status.InProgress &&
+              <Typography tag="span" className="dots">{dots}</Typography>
+            }
           </Box>
         )
-      }
-      {
-        status === Status.InProgress &&
-        <Box>
-          <Typography tag="span" className="dots">{dots}</Typography>
-        </Box>
       }
       {
         status === Status.Failed && reason &&
