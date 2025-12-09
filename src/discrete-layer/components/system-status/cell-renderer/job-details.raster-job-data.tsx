@@ -116,7 +116,7 @@ const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = ({ data 
               e.stopPropagation();
             }}
           />
-          <Hyperlink url={task?.parameters?.link ?? ''} label={`${numberOfErrorsMessage}: ${errorsCount.toString()}`} />
+          <Hyperlink url={task?.parameters?.link ?? ''} label={`${errorsCount.toString()} ${numberOfErrorsMessage}`} />
           <CopyButton text={task?.parameters?.link ?? ''} key={'errorsReportLink'} />
         </Box>
       }
