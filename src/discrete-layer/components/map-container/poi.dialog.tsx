@@ -86,7 +86,7 @@ export const PoiDialog: React.FC<PoiDialogProps> = (
     <Box id="poiDialog">
       <Dialog open={isOpen} preventOutsideDismiss={true}>
         <DialogTitle>
-          <FormattedMessage id={ 'poi.dialog.title' }/>
+          <FormattedMessage id="poi.dialog.title"/>
           <IconButton
             className="closeIcon mc-icon-Close"
             label="CLOSE"

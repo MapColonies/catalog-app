@@ -2,7 +2,7 @@ import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Box, CircularProgressBar } from '@map-colonies/react-components';
 import { IconButton } from '@map-colonies/react-core';
-import Skeleton from '../../../../common/components/skeleton/skeleton';
+import { Skeleton } from '../../../../common/components/skeleton/skeleton';
 import { Status } from '../../../models';
 import { StatusText } from './status-text';
 

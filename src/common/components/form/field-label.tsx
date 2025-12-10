@@ -18,11 +18,10 @@ export const FieldLabelComponent: React.FC<FieldLabelProps> = ({
   customClassName,
   showTooltip,
 }) => {
-
   return (
     <Box className={customClassName !== undefined ? customClassName : 'detailsFieldLabel'}>
       <TooltippedValue disableTooltip={showTooltip}>
-          <FormattedMessage id={value} />
+        <FormattedMessage id={value} />
       </TooltippedValue>
       {isRequired === true && <Box className="requiredAsterisk">{'*'}</Box>}
     </Box>

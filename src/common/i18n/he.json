@@ -270,6 +270,7 @@
   "validationReport.resolution": "תאימות רזולוציה",
   "validationReport.smallHoles": "פוליגונים עם חורים זעירים",
   "validationReport.smallGeometries": "פוליגונים זעירים",
+  "validationReport.unknown": "פוליגונים עם שגיאות לא ידועות",
 
   "field-names.raster.id": "מזהה",
   "field-names.raster.productId": "מזהה חיצוני",
