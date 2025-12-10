@@ -92,7 +92,12 @@ const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = ({ data 
 
   const numberOfErrorsMessage = intl.formatMessage({ id: 'general.errors.text' });
 
-  const gpkgFilePath = jobData.parameters?.inputFiles?.gpkgFilesPath?.[0];
+  const newGpkgPath = jobData.parameters?.inputFiles?.gpkgFilesPath?.[0];
+  const oldGpkgPath = jobData.parameters?.inputFiles?.fileNames?.[0];
+  const gpkgFilePath = newGpkgPath ??
+    (oldGpkgPath ?
+    intl.formatMessage({ id: 'general.deprecated-job.text' }) :
+    '')
 
   const zoom = zoomLevel !== undefined ? `(${zoomLevel})` : '';
   const gpkgInfoText = gpkgFilePath ? `GPKG: ${gpkgFilePath} ${zoom}` : '';
