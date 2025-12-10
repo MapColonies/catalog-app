@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.2.0](https://github.com/MapColonies/catalog-app/compare/v3.1.0...v3.2.0) (2025-12-10)
+
+
+### Features
+
+* apdate abort and retry params after scaffold ([#781](https://github.com/MapColonies/catalog-app/issues/781)) ([e5ed258](https://github.com/MapColonies/catalog-app/commit/e5ed258a0239c5220ab4bb40872112b19fb0dd32))
+
+
+### Bug Fixes
+
+* 3 dots ([0db1aa8](https://github.com/MapColonies/catalog-app/commit/0db1aa8dd0013925cb41cdfe393e2e67bd6434be))
+* add refresh countdown while monitoring job ([#775](https://github.com/MapColonies/catalog-app/issues/775)) ([b2e3cb9](https://github.com/MapColonies/catalog-app/commit/b2e3cb99a21a2d89358250556636681f4a0ebcf1))
+* layer from basemap has no cesium imagery context menu ( MAPCO-6456 ) ([#778](https://github.com/MapColonies/catalog-app/issues/778)) ([8a96a80](https://github.com/MapColonies/catalog-app/commit/8a96a80fbff4ba4f4bb35699e086bad275759a4c))
+* validation report ([#779](https://github.com/MapColonies/catalog-app/issues/779)) ([1b8f566](https://github.com/MapColonies/catalog-app/commit/1b8f566244cfc308af562010f71a6f3085ab33ec))
+
 ## [3.1.0](https://github.com/MapColonies/catalog-app/compare/v3.0.5...v3.1.0) (2025-12-04)
 
 
