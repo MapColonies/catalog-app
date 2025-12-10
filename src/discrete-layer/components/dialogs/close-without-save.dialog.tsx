@@ -29,7 +29,7 @@ export const CloseWithoutSaveDialog: React.FC<CloseWithoutSaveDialogProps> = obs
     <Box id="closeWithoutSaveDialog">
       <Dialog open={isOpen} preventOutsideDismiss={true}>
         <DialogTitle>
-          <FormattedMessage id={ 'general.dialog.exit.title' }/>
+          <FormattedMessage id="general.dialog.exit.title"/>
           <IconButton
             className="closeIcon mc-icon-Close"
             label="CLOSE"
@@ -37,7 +37,7 @@ export const CloseWithoutSaveDialog: React.FC<CloseWithoutSaveDialogProps> = obs
           />
         </DialogTitle>
         <DialogContent className="dialogBody">
-          <FormattedMessage id={ 'general.dialog.exit.message' }/>
+          <FormattedMessage id="general.dialog.exit.message"/>
         </DialogContent>
         <DialogActions>
           <Button raised type="button" onClick={(): void => { closeWithoutSaving(); }}>

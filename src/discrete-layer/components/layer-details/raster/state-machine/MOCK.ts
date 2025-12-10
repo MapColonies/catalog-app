@@ -285,23 +285,6 @@ export const MOCK_TASK = {
   id: "64d035cd-b2cf-41a3-90a0-498c3b6dfe1f",
   percentage: 75,
   parameters: {
-    isValid: false,
-    errorsAggregation: {
-      count: {
-        geometryValidity: 5,
-        vertices: 10,
-        metadata: 0,
-        resolution: 13
-      },
-      smallHoles: {
-        exceeded: false,
-        count: 10
-      },
-      smallGeometries: {
-        exceeded: true,
-        count: 100
-      }
-    },
     checksums: [
       {
         checksum: "5e371a633204f7eb",
@@ -328,9 +311,52 @@ export const MOCK_TASK = {
         fileName: "/layerSources/north_israel/shape/ShapeMetadata.cpg",
         algorithm: "XXH64"
       }
-    ]
+    ],
+    errorsSummary: {
+      thresholds: {
+        smallHoles: {
+          count: 0,
+          exceeded: false
+        },
+        smallGeometries: {
+          exceeded: false
+        }
+      },
+      errorsCount: {
+        unknown: 0,
+        metadata: 0,
+        vertices: 0,
+        resolution: 0,
+        smallHoles: 0,
+        smallGeometries: 0,
+        geometryValidity: 0
+      }
+    },
+    processingState: {
+      filePath: "/layerSources/north_israel/shape/ShapeMetadata.shp",
+      progress: {
+        startTime: 1765203110060,
+        percentage: 0,
+        totalChunks: 1,
+        elapsedTimeMs: 6552,
+        totalFeatures: 1,
+        totalVertices: 5,
+        chunksPerSecond: 0,
+        processedChunks: 0,
+        skippedFeatures: 0,
+        featuresPerSecond: 0,
+        processedFeatures: 0,
+        processedVertices: 0,
+        verticesPerSecond: 0,
+        estimatedRemainingTimeMs: 0
+      },
+      timestamp: "2025-12-08T14:11:56.612Z",
+      lastProcessedChunkIndex: 0,
+      lastProcessedFeatureIndex: -1
+    }
   },
-  status: 'InProgress'
+  status: 'InProgress',
+  reason: undefined
 };
 
 export const MOCK_POLYGON: Geometry = {

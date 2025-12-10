@@ -270,6 +270,7 @@
   "validationReport.resolution": "Resolution mismatch",
   "validationReport.smallHoles": "Polygons with small holes",
   "validationReport.smallGeometries": "Very small polygons",
+  "validationReport.unknown": "Polygons with unknown errors",
 
   "field-names.raster.id": "ID",
   "field-names.raster.productId": "Ext. ID",
