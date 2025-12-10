@@ -17,6 +17,7 @@
   "general.warning.text": "Warning",
   "general.error.text": "Error",
   "general.errors.text": "Errors",
+  "general.no-errors.text": "No errors",
   "general.error.title": "Something went wrong...",
   "general.error.description": "Message:",
   "general.server.error": "Server Error",

@@ -41,6 +41,7 @@ body[dir='rtl'] #rasterJobData .errorsCountContainer {
   justify-content: center;
 }
 
-#rasterJobData.jobDataContainer .spacer {
-  padding: 8px;
+#rasterJobData .errorsCountContainer.noErrors {
+  color: var(--mdc-theme-gc-success) !important;
+  font-size: 1rem;
 }

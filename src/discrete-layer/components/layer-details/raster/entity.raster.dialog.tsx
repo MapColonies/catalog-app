@@ -19,7 +19,7 @@ import CONFIG from '../../../../common/config';
 import { emphasizeByHTML } from '../../../../common/helpers/formatters';
 import { getTextStyle } from '../../../../common/helpers/style';
 import { Mode } from '../../../../common/models/mode.enum';
-import { RasterJobTypeEnum } from '../../../../common/models/raster-job';
+import { RasterIngestionJobType } from '../../../../common/models/raster-job';
 import {
   EntityDescriptorModelType,
   FieldConfigModelType,
@@ -121,7 +121,7 @@ export const EntityRasterDialog: React.FC<EntityRasterDialogProps> = observer((p
 
   const isUpdateMode = (jobRecord: JobModelType | undefined): boolean => {
     if (jobRecord) {
-      const type = jobRecord.type || RasterJobTypeEnum.NEW;
+      const type = jobRecord.type || RasterIngestionJobType.NEW;
       return jobType2Mode[type] === Mode.UPDATE;
     }
 

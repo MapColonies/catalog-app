@@ -3,13 +3,14 @@ import { useIntl } from 'react-intl';
 import { get } from 'lodash';
 import { ICellRendererParams } from 'ag-grid-community';
 import { Box } from '@map-colonies/react-components';
-import { IconButton } from '@map-colonies/react-core';
+import { CircularProgress, IconButton } from '@map-colonies/react-core';
+import { AutoDirectionBox } from '../../../../common/components/auto-direction-box/auto-direction-box.component';
 import { Hyperlink } from '../../../../common/components/hyperlink/hyperlink';
+import { RasterIngestionJobType } from '../../../../common/models/raster-job';
 import { DETAILS_ROW_ID_SUFFIX } from '../../../../common/components/grid';
 import { JobModelType, TaskModelType, useStore } from '../../../models';
 import { CopyButton } from '../../job-manager/job-details.copy-button';
-import { RasterJobTypeEnum } from '../../../../common/models/raster-job';
-import { ValidationErrorsAggregation } from '../../layer-details/raster/state-machine/types';
+import { ErrorsSummary, getErrorCount } from '../../helpers/jobUtils';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
 
 import './info-area.css';
@@ -18,11 +19,11 @@ import './job-details.raster-job-data.css';
 interface JobDetailsRasterJobDataProps extends ICellRendererParams { }
 
 const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = ({ data }) => {
-  const intl = useIntl();
-  const jobData = data as JobModelType;
-
   const store = useStore();
+  const intl = useIntl();
   const ZOOM_LEVELS_TABLE = useZoomLevelsTable();
+
+  const jobData = data as JobModelType;
 
   const [task, setTask] = useState<TaskModelType>();
   const [errorsCount, setErrorsCount] = useState(0);
@@ -31,14 +32,19 @@ const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = ({ data 
   const isRasterJob =
     jobData.domain?.toLowerCase().includes('raster') &&
     jobData.type &&
-    Object.values(RasterJobTypeEnum).includes(jobData.type as RasterJobTypeEnum);
+    Object.values(RasterIngestionJobType).includes(jobData.type as RasterIngestionJobType);
 
-  const calculateErrorsCount = (errors: ValidationErrorsAggregation): number => {
-    return (
-      Object.values(errors.count).reduce((sum, val) => sum + val, 0) +
-      (errors.smallGeometries.exceeded ? errors.smallGeometries.count : 0) +
-      (errors.smallHoles.exceeded ? errors.smallHoles.count : 0)
-    );
+  const calculateErrorsCount = (errors: ErrorsSummary): number => {
+    let count = 0;
+
+    Object.keys(errors.errorsCount).forEach((key) => {
+      const errorCount = getErrorCount(errors, key);
+      if (errorCount.exceeded === true || typeof errorCount.exceeded === 'undefined') {
+        count += errorCount.count ?? 0;
+      }
+    });
+
+    return count;
   };
 
   const fetchTask = async () => {
@@ -58,10 +64,10 @@ const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = ({ data 
     if (task) {
       setTask(task);
 
-      const errorsAggregation = task?.parameters?.errorsAggregation;
+      const errorsCount = task?.parameters?.errorsSummary;
 
-      if (errorsAggregation) {
-        setErrorsCount(calculateErrorsCount(errorsAggregation));
+      if (errorsCount) {
+        setErrorsCount(calculateErrorsCount(errorsCount));
       }
     }
   }
@@ -88,41 +94,53 @@ const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = ({ data 
 
     fetchTask();
     computeZoomLevel();
-  }, [jobData, isRasterJob, ZOOM_LEVELS_TABLE])
+  }, [jobData, isRasterJob]);
 
-  const numberOfErrorsMessage = intl.formatMessage({ id: 'general.errors.text' });
+  const errorsMessage = intl.formatMessage({ id: 'general.errors.text' });
 
-  const newGpkgPath = jobData.parameters?.inputFiles?.gpkgFilesPath?.[0];
-  const oldGpkgPath = jobData.parameters?.inputFiles?.fileNames?.[0];
-  const gpkgFilePath = newGpkgPath ??
-    (oldGpkgPath ?
-    intl.formatMessage({ id: 'general.deprecated-job.text' }) :
-    '')
+  const gpkgPath = jobData.parameters?.inputFiles?.gpkgFilesPath?.[0];
+  const zoomLabel = zoomLevel !== undefined ? `(${zoomLevel})` : '';
+  const info = gpkgPath ?
+    `${gpkgPath} ${zoomLabel}` :
+    intl.formatMessage({ id: 'general.deprecated-job.text' });
 
-  const zoom = zoomLevel !== undefined ? `(${zoomLevel})` : '';
-  const gpkgInfoText = gpkgFilePath ? `GPKG: ${gpkgFilePath} ${zoom}` : '';
+  const isLoading = jobData.parameters;
+  const hasErrors = errorsCount > 0;
 
   if (!isRasterJob) {
     return null;
   }
 
   return (
-    <Box id='rasterJobData' className="jobDataContainer">
+    <Box id='rasterJobData' className='jobDataContainer'>
       {
-        gpkgInfoText || <div className='spacer' />
+        <AutoDirectionBox>
+          {
+            isLoading ? info :
+              <CircularProgress size='xsmall'></CircularProgress>
+          }
+        </AutoDirectionBox>
       }
       {
-        errorsCount > 0 &&
-        <Box className="linkItem errorsCountContainer" key={`${jobData.id}`}>
-          <IconButton
-            className={`error mc-icon-Status-Warnings`}
-            onClick={(e): void => {
-              e.preventDefault();
-              e.stopPropagation();
-            }}
-          />
-          <Hyperlink url={task?.parameters?.link ?? ''} label={`${errorsCount.toString()} ${numberOfErrorsMessage}`} />
-          <CopyButton text={task?.parameters?.link ?? ''} key={'errorsReportLink'} />
+        isLoading && task?.parameters &&
+
+        <Box className={`linkItem errorsCountContainer ${errorsCount === 0 ? 'noErrors' : ''}`} key={`${jobData.id}`}>
+          {hasErrors &&
+            <>
+              <IconButton
+                className={`error mc-icon-Status-Warnings`}
+                onClick={(e): void => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
+              />
+              <Hyperlink url={task?.parameters?.TBDlinkTBD ?? ''} label={`${errorsCount.toString()} ${errorsMessage}`} />
+              <CopyButton text={task?.parameters?.TBDlinkTBD ?? ''} key={'errorsReportLink'} />
+            </>
+          }
+          {!hasErrors &&
+            intl.formatMessage({ id: 'general.no-errors.text' })
+          }
         </Box>
       }
     </Box>

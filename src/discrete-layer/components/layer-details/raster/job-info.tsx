@@ -3,6 +3,7 @@ import { FormattedMessage } from 'react-intl';
 import { Box } from '@map-colonies/react-components';
 import { Skeleton } from '../../../../common/components/skeleton/skeleton';
 import { Status } from '../../../models';
+import { getErrorCount } from '../../helpers/jobUtils';
 import { Progress } from './progress';
 import { isJobValid, isStatusFailed, isTaskValid } from './state-machine/helpers';
 import { IJob } from './state-machine/types';
@@ -54,7 +55,7 @@ export const JobInfo: React.FC<JobInfoProps> = ({ job }) => {
                       const color = (val: number): string =>
                         val === 0
                           ? 'success'
-                          : (job.validationReport?.errorsSummary?.thresholds as Record<string, { exceeded: boolean }>)?.[key]?.exceeded === false
+                          : getErrorCount(job.validationReport?.errorsSummary, key)?.exceeded === false
                             ? 'warning'
                             : 'error';
                       return count(key, value, color);
@@ -62,12 +63,14 @@ export const JobInfo: React.FC<JobInfoProps> = ({ job }) => {
                   }
                 </Box>
               ) : (
-                <Box className="error">
+                <Box className="reportError error">
                   <FormattedMessage id="ingestion.error.not-found" values={{ value: 'job.validationReport.errorsSummary.errorsCount' }} />
                 </Box>
               )
             ) : (
-              <Skeleton width="99%" count={8} />
+              <Box className="reportLoading">
+                <Skeleton width="99%" count={8} />
+              </Box>
             )
           }
         </Box>

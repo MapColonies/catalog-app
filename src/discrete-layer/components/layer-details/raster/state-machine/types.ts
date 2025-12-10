@@ -14,6 +14,7 @@ import {
 } from '../../../../models';
 import { LayerRasterRecordInput } from '../../../../models/RootStore.base';
 import { IError } from '../../../helpers/errorUtils';
+import { TaskParams } from '../../../helpers/jobUtils';
 
 export type ErrorSource = "api" | "logic";
 export type AddPolicy = "merge" | "override";
@@ -161,32 +162,3 @@ export const SHAPEMETADATA_FILENAME = `${CONFIG.RASTER_INGESTION.FILES_STRUCTURE
 export const DATA_LABEL = 'file-name.data';
 export const PRODUCT_LABEL = 'file-name.product';
 export const SHAPEMETADATA_LABEL = 'file-name.shapeMetadata';
-
-// TODO: use from @mapColonies/types and remove from here:
-//#region to be removed
-export type TaskParams = {
-  isValid: boolean;
-  errorsSummary: ErrorsSummary;
-};
-
-export type ErrorsSummary = {
-  errorsCount: {
-    geometryValidity: number;
-    vertices: number;
-    metadata: number;
-    resolution: number;
-    smallGeometries: number;
-    smallHoles: number;
-    unknown: number;
-  };
-  thresholds: {
-    smallHoles: {
-      exceeded: boolean;
-      count: number;
-    };
-    smallGeometries: {
-      exceeded: boolean;
-    };
-  }
-};
-//#endregion to be removed

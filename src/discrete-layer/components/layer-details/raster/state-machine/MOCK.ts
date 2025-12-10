@@ -1,5 +1,4 @@
 import { Geometry } from 'geojson';
-import { TaskModelType } from '../../../../models';
 
 export const MOCK_JOB_NEW = {
   __typename: "Job",

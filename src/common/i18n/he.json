@@ -17,6 +17,7 @@
   "general.warning.text": "אזהרה",
   "general.error.text": "שגיאה",
   "general.errors.text": "שגיאות",
+  "general.no-errors.text": "אין שגיאות",
   "general.error.title": "משהו השתבש...",
   "general.error.description": "מידע נוסף:",
   "general.server.error": "התקבלה שגיאה מהשרת",
