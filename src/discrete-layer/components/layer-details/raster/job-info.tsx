@@ -1,11 +1,11 @@
 import React, { Fragment } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Box } from '@map-colonies/react-components';
-import Skeleton from '../../../../common/components/skeleton/skeleton';
+import { Skeleton } from '../../../../common/components/skeleton/skeleton';
 import { Status } from '../../../models';
 import { Progress } from './progress';
 import { isJobValid, isStatusFailed, isTaskValid } from './state-machine/helpers';
-import { Aggregation, IJob } from './state-machine/types';
+import { IJob } from './state-machine/types';
 
 import './job-info.css';
 
@@ -45,22 +45,30 @@ export const JobInfo: React.FC<JobInfoProps> = ({ job }) => {
           <Box className="title underline">
             <FormattedMessage id="ingestion.job.report" />
           </Box>
-           {job.taskId ?
-            <Box className="reportList error">
-              {
-                Object.entries(job.validationReport?.errorsAggregation || {}).map(([type, aggregation]) => {
-                  if (typeof aggregation === 'object' && 'exceeded' in aggregation) {
-                    return renderAggregationWithExceeded(type, aggregation);
-                  } else {
-                    return renderAggregationWithoutExceeded(aggregation);
+          {
+            job.taskId ? (
+              job.validationReport?.errorsSummary?.errorsCount ? (
+                <Box className="reportList">
+                  {
+                    Object.entries(job.validationReport.errorsSummary.errorsCount).map(([key, value]) => {
+                      const color = (val: number): string =>
+                        val === 0
+                          ? 'success'
+                          : (job.validationReport?.errorsSummary?.thresholds as Record<string, { exceeded: boolean }>)?.[key]?.exceeded === false
+                            ? 'warning'
+                            : 'error';
+                      return count(key, value, color);
+                    })
                   }
-                })
-              }
-            </Box> : 
-            <Skeleton
-              width={'99%'}
-              count={7}
-            />
+                </Box>
+              ) : (
+                <Box className="error">
+                  <FormattedMessage id="ingestion.error.not-found" values={{ value: 'job.validationReport.errorsSummary.errorsCount' }} />
+                </Box>
+              )
+            ) : (
+              <Skeleton width="99%" count={8} />
+            )
           }
         </Box>
       </Box>
@@ -68,30 +76,14 @@ export const JobInfo: React.FC<JobInfoProps> = ({ job }) => {
   );
 };
 
-const renderAggregationWithExceeded = (type: string, aggregation: Aggregation) => {
-  return aggregationRow(
-    type,
-    aggregation,
-    (aggregation: Aggregation) => (aggregation.exceeded ? 'error' : (aggregation.count > 0 ? 'warning' : 'success'))
-  );
-};
-
-const renderAggregationWithoutExceeded = (aggregation: Record<string, number>) => {
-  return (
-    Object.entries(aggregation || {}).map(([key, value]) => (
-      aggregationRow(key, value, (value: number) => (value === 0 ? 'success' : ''))
-    ))
-  );
-};
-
-const aggregationRow = (key: string, value: any, rowColor: (val: any) => string) => {
+const count = (key: string, value: number, color: (val: number) => string) => {
   return (
     <Fragment key={key}>
-      <Box className={rowColor(value)}>
+      <Box className={color(value)}>
         <FormattedMessage id={`validationReport.${key}`} />
       </Box>
-      <Box className={rowColor(value)}>
-        {typeof value === 'object' ? value.count : value}
+      <Box className={color(value)}>
+        {value}
       </Box>
     </Fragment>
   );

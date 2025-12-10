@@ -212,13 +212,13 @@ export const isJobValid = (status: Status | undefined): boolean => {
 export const isTaskValid = (job: IJob | undefined): boolean => {
   const taskPercentage = job?.taskPercentage;
   const validationReport = job?.validationReport;
-  const errorsAggregation = validationReport?.errorsAggregation;
+  const errorsSummary = validationReport?.errorsSummary;
   return (
     taskPercentage === 0 ||
     (validationReport?.isValid === true &&
-    Object.values(errorsAggregation?.count || {}).every(value => typeof value !== 'number' || value === 0) &&
-    !errorsAggregation?.smallHoles?.exceeded &&
-    !errorsAggregation?.smallGeometries?.exceeded)
+    Object.values(errorsSummary?.errorsCount || {}).every(value => typeof value !== 'number' || value === 0) &&
+    errorsSummary?.thresholds?.smallHoles?.exceeded === false &&
+    errorsSummary?.thresholds?.smallGeometries?.exceeded === false)
   );
 };
 

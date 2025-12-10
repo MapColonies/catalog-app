@@ -7,10 +7,10 @@ import { Box, defaultFormatters, FileData } from '@map-colonies/react-components
 import { Button, Icon, Typography } from '@map-colonies/react-core';
 import { Selection } from '../../../../common/components/file-picker';
 import { FieldLabelComponent } from '../../../../common/components/form/field-label';
+import { Skeleton } from '../../../../common/components/skeleton/skeleton';
 import CONFIG from '../../../../common/config';
 import { dateFormatter, formatPath, relativeDateFormatter } from '../../../../common/helpers/formatters';
 import { Mode } from '../../../../common/models/mode.enum';
-import Skeleton from '../../../../common/components/skeleton/skeleton';
 import { RecordType, LayerMetadataMixedUnion, RasterIngestionFilesTypeConfig } from '../../../models';
 import { FilePickerDialog } from '../../dialogs/file-picker.dialog';
 import { RasterWorkflowContext } from './state-machine/context';
@@ -191,14 +191,12 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
           </Box>
         </Box>
       }
-      <Box className={`header section ${isLoading ? 'curtainContainer' : ''}`}>
+      <Box className="header section">
         <Box className="ingestionFields">
           {
-            isLoading ? <Skeleton
-              width={'99%'}
-              count={3}
-            />:
-            <IngestionInputs state={state} />
+            isLoading
+            ? <Skeleton width="99%" count={3} />
+            : <IngestionInputs state={state} />
           }
         </Box>
         {

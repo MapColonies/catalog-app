@@ -90,7 +90,7 @@ export const PublishDialog: React.FC<ContinueDialogProps> = observer(({ layer, i
     <Box id="publishDialog">
       <Dialog open={isOpen} preventOutsideDismiss={true}>
         <DialogTitle>
-          <FormattedMessage id={ 'general.dialog.exit.title' }/>
+          <FormattedMessage id="general.dialog.exit.title"/>
           <IconButton
             className="closeIcon mc-icon-Close"
             label="CLOSE"

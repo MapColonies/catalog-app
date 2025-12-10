@@ -23,7 +23,7 @@ export const BestInEditDialog: React.FC<BestInEditDialogProps> = ({ isOpen, onSe
     <Box id="bestInEditDialog">
       <Dialog open={isOpen} preventOutsideDismiss={true}>
         <DialogTitle>
-          <FormattedMessage id={ 'general.dialog.best-in-edit.title' }/>
+          <FormattedMessage id="general.dialog.best-in-edit.title"/>
           <IconButton
             className="closeIcon mc-icon-Close"
             label="CLOSE"
@@ -32,7 +32,7 @@ export const BestInEditDialog: React.FC<BestInEditDialogProps> = ({ isOpen, onSe
         </DialogTitle>
         <DialogContent className="dialogBody">
           <Box>
-            <FormattedMessage id={ 'general.dialog.best-in-edit.message' }/>
+            <FormattedMessage id="general.dialog.best-in-edit.message"/>
           </Box>
         </DialogContent>
         <DialogActions>
