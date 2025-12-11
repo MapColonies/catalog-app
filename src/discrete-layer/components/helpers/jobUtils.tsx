@@ -64,7 +64,11 @@ const errorsCountPresentor = (key: string, value: number, containerClassName: st
   );
 };
 
-export const RenderErrorCounts = (theme: IOptions, errorsSummary: RasterErrorsSummary, className: string): JSX.Element[] => {
+export const RenderErrorCounts = (theme: IOptions, errorsSummary: RasterErrorsSummary | undefined, className: string): JSX.Element[] | undefined => {
+  if (!errorsSummary) {
+    return;
+  }
+
   return Object.entries(errorsSummary.errorsCount).map(([key, value]) => {
     const color =
       value === 0
