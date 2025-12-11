@@ -5,12 +5,12 @@
 
 #rasterJobData .errorsCountContainer {
   position: absolute;
-  right: 140px;
+  right: 96px;
 }
 
 body[dir='rtl'] #rasterJobData .errorsCountContainer {
   right: unset;
-  left: 140px;
+  left: 96px;
 }
 
 #rasterJobData .errorsCountContainer>a {
@@ -43,6 +43,7 @@ body[dir='rtl'] #rasterJobData .errorsCountContainer {
 #rasterJobData .errorsCountContainer.noErrors {
   color: var(--mdc-theme-gc-success) !important;
   font-size: 1rem;
+  width: 96px;
 }
 
 .reportList {

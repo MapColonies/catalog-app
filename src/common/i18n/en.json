@@ -13,7 +13,7 @@
   "general.choose-btn.text": "Choose",
   "general.close-btn.text": "Close",
   "general.go-to-job-manager-btn.text": "Go to job manager",
-  "general.deprecated-job.text": "Old job, doesn't support showing information",
+  "general.deprecated-job.text": "Old job, not supported",
   "general.warning.text": "Warning",
   "general.error.text": "Error",
   "general.errors.text": "Errors",
