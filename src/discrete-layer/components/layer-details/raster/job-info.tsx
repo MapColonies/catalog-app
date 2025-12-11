@@ -3,7 +3,7 @@ import { FormattedMessage } from 'react-intl';
 import { Box } from '@map-colonies/react-components';
 import { Skeleton } from '../../../../common/components/skeleton/skeleton';
 import { Status } from '../../../models';
-import { ErrorsCountPresentor, getRasterErrorCount } from '../../helpers/jobUtils';
+import { RenderErrorCounts } from '../../helpers/jobUtils';
 import { Progress } from './progress';
 import { isJobValid, isStatusFailed, isTaskValid } from './state-machine/helpers';
 import { IJob } from './state-machine/types';
@@ -54,15 +54,7 @@ export const JobInfo: React.FC<JobInfoProps> = ({ job }) => {
               job.validationReport?.errorsSummary?.errorsCount ? (
                 <Box className="reportList">
                   {
-                    Object.entries(job.validationReport.errorsSummary.errorsCount).map(([key, value]) => {
-                      const color =
-                        value === 0
-                          ? theme.custom?.GC_SUCCESS
-                          : getRasterErrorCount(job.validationReport?.errorsSummary, key)?.exceeded === false
-                            ? theme.custom?.GC_WARNING_HIGH
-                            : theme.custom?.GC_ERROR_HIGH
-                      return ErrorsCountPresentor(key, value, 'countWrapper', color);
-                    })
+                    RenderErrorCounts(theme, job.validationReport.errorsSummary, 'countWrapper')
                   }
                 </Box>
               ) : (

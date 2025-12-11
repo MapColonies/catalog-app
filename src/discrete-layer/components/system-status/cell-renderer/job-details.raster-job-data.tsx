@@ -12,7 +12,7 @@ import { Domain } from '../../../../common/models/domain';
 import { JobModelType, TaskModelType, useStore } from '../../../models';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
 import { CopyButton } from '../../job-manager/job-details.copy-button';
-import { ErrorsCountPresentor, RasterErrorsSummary, getRasterErrorCount } from '../../helpers/jobUtils';
+import { RasterErrorsSummary, getRasterErrorCount, RenderErrorCounts } from '../../helpers/jobUtils';
 
 import './info-area.css';
 import './job-details.raster-job-data.css';
@@ -153,15 +153,7 @@ const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = ({ data 
               <Tooltip content={
                 <Box>
                   {
-                    Object.entries(task?.parameters?.errorsSummary.errorsCount as RasterErrorsSummary['errorsCount']).map(([key, value]) => {
-                      const color =
-                        value === 0
-                          ? theme.custom?.GC_SUCCESS
-                          : getRasterErrorCount(task?.parameters?.errorsSummary, key)?.exceeded === false
-                            ? theme.custom?.GC_WARNING_HIGH
-                            : theme.custom?.GC_ERROR_HIGH
-                      return ErrorsCountPresentor(key, value, 'reportList', color);
-                    })
+                    RenderErrorCounts(theme, task?.parameters?.errorsSummary, 'reportList')
                   }
                 </Box>
               }>

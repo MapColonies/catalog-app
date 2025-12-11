@@ -1,5 +1,6 @@
 
 import { Box } from '@map-colonies/react-components';
+import { IOptions } from '@map-colonies/react-core';
 import { FormattedMessage } from 'react-intl';
 
 // TODO: use from @mapColonies/types and remove from here:
@@ -49,7 +50,7 @@ export const getRasterErrorCount = (errorsSummary: RasterErrorsSummary | undefin
   };
 };
 
-export const ErrorsCountPresentor = (key: string, value: number, containerClassName: string, color: string) => {
+const errorsCountPresentor = (key: string, value: number, containerClassName: string, color: string): JSX.Element => {
   return (
     <Box key={key} className={containerClassName}>
       <Box style={{ color }}>
@@ -61,4 +62,16 @@ export const ErrorsCountPresentor = (key: string, value: number, containerClassN
       </Box>
     </Box>
   );
+};
+
+export const RenderErrorCounts = (theme: IOptions, errorsSummary: RasterErrorsSummary, className: string): JSX.Element[] => {
+  return Object.entries(errorsSummary.errorsCount).map(([key, value]) => {
+    const color =
+      value === 0
+        ? theme.custom?.GC_SUCCESS
+        : getRasterErrorCount(errorsSummary, key)?.exceeded === false
+          ? theme.custom?.GC_WARNING_HIGH
+          : theme.custom?.GC_ERROR_HIGH
+    return errorsCountPresentor(key, value, className, color);
+  })
 };
