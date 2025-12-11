@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { MapMode2D } from 'cesium';
-import React, { useMemo, useState, useEffect, useCallback } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { Geometry, Feature, FeatureCollection, Polygon, Point } from 'geojson';
 import { find, get, isEmpty } from 'lodash';
 import { observer } from 'mobx-react-lite';
-import { Geometry, Feature, FeatureCollection, Polygon, Point } from 'geojson';
-import { lineString } from '@turf/helpers';
+import React, { useMemo, useState, useEffect, useCallback } from 'react';
+import { FormattedMessage, useIntl } from 'react-intl';
 import bbox from '@turf/bbox';
 import bboxPolygon from '@turf/bbox-polygon';
+import { lineString } from '@turf/helpers';
 import { 
   Avatar,
   Icon,
@@ -44,6 +44,7 @@ import { MenuDimensions } from '../../common/hooks/mapMenus/useGetMenuDimensions
 import { LinkType } from '../../common/models/link-type.enum';
 import { Mode } from '../../common/models/mode.enum';
 import { ActiveLayersIcon } from '../../icons/4font/ActiveLayers';
+import { initWebSocket } from '../../syncHttpClientGql';
 import { SelectedLayersContainer } from '../components/map-container/selected-layers-container';
 import { HighlightedLayer } from '../components/map-container/highlighted-layer';
 import { LayersFootprints } from '../components/map-container/layers-footprints';
@@ -97,6 +98,7 @@ import '@material/tab-indicator/dist/mdc.tab-indicator.css';
 
 import './discrete-layer-view.css';
 
+const ZERO = 0;
 const EXPANDED_PANEL_WIDTH = '28%';
 const COLLAPSED_PANEL_WIDTH = '40px';
 const SIDE_PANEL_WIDTH_VARIABLE = '--side-panel-width';
@@ -162,10 +164,44 @@ const DiscreteLayerView: React.FC = observer(() => {
   }]);
   const [searchResultsError, setSearchResultsError] = useState();
   const [actionsMenuDimensions, setActionsMenuDimensions] = useState<MenuDimensions>();
-  const [whatsNewVisitedCnt, setWhatsNewVisitedCnt] = useState<number>(0);
+  const [whatsNewVisitedCnt, setWhatsNewVisitedCnt] = useState<number>(ZERO);
+  const [notificationCount, setNotificationCount] = useState<number>(ZERO);
 
   const isDrawingState = isDrawing || store.exportStore.drawingState?.drawing;
-  const disableOnDrawingClassName = isDrawingState ? 'interactionsDisabled' : ''; 
+  const disableOnDrawingClassName = isDrawingState ? 'interactionsDisabled' : '';
+
+  useEffect(() => {
+    const wsClient = initWebSocket();
+    const subscribeToJobStatus = () => {
+      return wsClient.subscribe(
+        {
+          query: `subscription {
+            jobStatusUpdate {
+              jobId
+              status
+            }
+          }`,
+        },
+        {
+          next: (data) => {
+            console.log('Notification received:', data);
+            setNotificationCount((prevCount) => prevCount + 1);
+          },
+          error: (err) => {
+            console.error('Subscription error:', err);
+          },
+          complete: () => {
+            console.log('WebSocket subscription completed');
+          },
+        }
+      );
+    };
+    subscribeToJobStatus();
+
+    return () => {
+      wsClient.dispose();
+    };
+  }, []);
 
   useEffect(() => {
     const val = localStore.get('whatsNewVisitedCnt');
@@ -347,7 +383,7 @@ const DiscreteLayerView: React.FC = observer(() => {
   }, [store.discreteLayersStore.searchParams.geojson, store.discreteLayersStore.searchParams.catalogFilters]);
 
   useEffect(() => {
-    const hasFiltersEnabled = store.discreteLayersStore.searchParams.catalogFilters.length > 0 || store.discreteLayersStore.searchParams.geojson;
+    const hasFiltersEnabled = store.discreteLayersStore.searchParams.catalogFilters.length > START_IDX || store.discreteLayersStore.searchParams.geojson;
     if (hasFiltersEnabled) {
       const filters = buildFilters();
       setQuery(store.querySearch({
@@ -374,7 +410,7 @@ const DiscreteLayerView: React.FC = observer(() => {
   };
 
   const handleCatalogFiltersReset = (): void => {
-    if (store.discreteLayersStore.searchParams.catalogFilters.length === 0) return;
+    if (store.discreteLayersStore.searchParams.catalogFilters.length === START_IDX) { return; }
 
     store.discreteLayersStore.searchParams.resetCatalogFilters();
 
@@ -405,7 +441,7 @@ const DiscreteLayerView: React.FC = observer(() => {
     if (activeTabView !== TabViews.CATALOG) {
       // Catalog filters are being cleaned from inside the catalog filters panel.
       // If there's any filter enabled, then we want to stay at the search results tab.
-      if (store.discreteLayersStore.searchParams.catalogFilters?.length === 0) {
+      if (store.discreteLayersStore.searchParams.catalogFilters?.length === START_IDX) {
         handleTabViewChange(TabViews.CATALOG);
       }
     }
@@ -664,7 +700,7 @@ const DiscreteLayerView: React.FC = observer(() => {
             />
             <div className='tab-title'>
               <Typography use="headline6" tag="span">
-                <FormattedMessage id={tabView?.title} />
+                <FormattedMessage id={tabView?.title}></FormattedMessage>
               </Typography>
               <Typography use="headline6" tag="span" className={`current-client-site-${site}`}>
                 {site!=='generic' && intl.formatMessage({ id: `tab-views.catalog.site.${site}` })}
@@ -897,7 +933,7 @@ const DiscreteLayerView: React.FC = observer(() => {
       console.warn('GEOCODING[FEEDBACK]: Missing request_id in response header. Ensure the "Access-Control-Expose-Headers" header includes "request_id".');
     }
 
-    if (!CONFIG.GEOCODER.CALLBACK_URL) return;
+    if (!CONFIG.GEOCODER.CALLBACK_URL) { return; }
 
     const CATALOG_APP_USER_ID = CONFIG.CATALOG_APP_USER_ID.replace('{CURRENT_USER}', store.userStore?.user?.role as string);
 
@@ -1021,7 +1057,7 @@ const DiscreteLayerView: React.FC = observer(() => {
             onStartDraw={setDrawType}
             onFiltersApply={handleCatalogFiltersApply}
             onFiltersReset={handleCatalogFiltersReset}
-            isSelectionEnabled={Array.isArray(drawEntities[0]?.coordinates) ? drawEntities[0]?.coordinates.length > 0 : !!drawEntities[0]?.coordinates}
+            isSelectionEnabled={Array.isArray(drawEntities[START_IDX]?.coordinates) ? drawEntities[START_IDX]?.coordinates.length > START_IDX : !!drawEntities[START_IDX]?.coordinates}
             onPolygonUpdate={onPolygonSelection}
             onPoiUpdate={onPoiSelection}
             poi={poi}
@@ -1032,7 +1068,7 @@ const DiscreteLayerView: React.FC = observer(() => {
         <Box className="headerSystemAreaContainer">
           <Tooltip content={intl.formatMessage({ id: 'general.whats-new.tooltip' })}>
             <Box className="position">
-              {whatsNewVisitedCnt === 0 &&<Box className="badge badge_primary"></Box>}
+              {whatsNewVisitedCnt === ZERO && <Box className="badge badge_primary"></Box>}
               <IconButton
                   className="operationIcon mc-icon-Help"
                   style={{fontSize: '38px'}}
@@ -1056,17 +1092,23 @@ const DiscreteLayerView: React.FC = observer(() => {
             </Box>
           }
           {
-            permissions.isSystemJobsAllowed as boolean &&
+            permissions.isSystemJobsAllowed &&
             <Tooltip content={intl.formatMessage({ id: 'action.system-jobs.tooltip' })}>
-              <IconButton
-                className="operationIcon mc-icon-Job-Management"
-                label="SYSTEM JOBS"
-                onClick={ (): void => { handleSystemsJobsDialogClick(); } }
-              />
+              <Box className="systemJobsIconWrapper">
+                {notificationCount > 0 && <Box className="notificationBadge">{notificationCount}</Box>}
+                <IconButton
+                  className="operationIcon mc-icon-Job-Management"
+                  label="SYSTEM JOBS"
+                  onClick={ (): void => {
+                    handleSystemsJobsDialogClick();
+                    setNotificationCount(ZERO);
+                  }}
+                />
+              </Box>
             </Tooltip>
           }
           {
-            permissions.isSystemCoreInfoAllowed as boolean &&
+            permissions.isSystemCoreInfoAllowed &&
             <Tooltip content={intl.formatMessage({ id: 'action.system-core-info.tooltip' })}>
               <IconButton
                 className="operationIcon mc-icon-System-Info"
@@ -1076,7 +1118,7 @@ const DiscreteLayerView: React.FC = observer(() => {
             </Tooltip>
           }
           {
-            permissions.isWebToolsAllowed as boolean &&
+            permissions.isWebToolsAllowed &&
             CONFIG.WEB_TOOLS_URL &&
             <Tooltip content={intl.formatMessage({ id: 'action.web-tools.tooltip' })}>
               <IconButton
