@@ -312,6 +312,7 @@ export const MOCK_TASK = {
         algorithm: "XXH64"
       }
     ],
+    link: 'https://ingestion-trigger-api',
     errorsSummary: {
       thresholds: {
         smallHoles: {

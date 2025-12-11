@@ -9,6 +9,7 @@ import { dateFormatter } from '../../../../common/helpers/formatters';
 import { JobModelType, Status } from '../../../models';
 import { CopyButton } from '../../job-manager/job-details.copy-button';
 
+import './info-area.css';
 import './job.details.export-job-data.css';
 
 interface JobDetailsExportJobDataProps extends ICellRendererParams {}
@@ -45,7 +46,7 @@ const JobDetailsExportJobData: React.FC<JobDetailsExportJobDataProps> = ({ data 
     if (!(isExportJob as boolean)) return null;
 
     return (
-      <Box className="exportJobDataContainer">
+      <Box id='exportJobData' className="jobDataContainer">
         <Box className="jobDescriptionContainer">
           {
             exportLinks && expirationTimeUTC && 
@@ -71,7 +72,7 @@ const JobDetailsExportJobData: React.FC<JobDetailsExportJobDataProps> = ({ data 
             {Object.entries(exportLinks).map(([linkType, exportLink]) => {
               const typeToPresent = linkType.replace('URI', '');
               return (
-                <Box className="linkContainer" key={`${jobData.id}_${linkType}`}>
+                <Box className="linkItem" key={`${jobData.id}_${linkType}`}>
                   <Hyperlink url={exportLink} label={typeToPresent} />
                   <CopyButton text={exportLink} key={exportLink} />
                 </Box>
