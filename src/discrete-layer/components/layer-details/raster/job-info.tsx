@@ -62,12 +62,14 @@ export const JobInfo: React.FC<JobInfoProps> = ({ job }) => {
                   }
                 </Box>
               ) : (
-                <Box className="error">
+                <Box className="reportError error">
                   <FormattedMessage id="ingestion.error.not-found" values={{ value: 'job.validationReport.errorsSummary.errorsCount' }} />
                 </Box>
               )
             ) : (
-              <Skeleton width="99%" count={8} />
+              <Box className="reportLoading">
+                <Skeleton width="99%" count={8} />
+              </Box>
             )
           }
         </Box>
