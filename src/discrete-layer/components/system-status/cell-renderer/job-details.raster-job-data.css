@@ -29,19 +29,26 @@ body[dir='rtl'] #rasterJobData .errorsCountContainer {
   align-items: flex-start;
 }
 
-#rasterJobData .errorsCountContainer {
-  display: flex;
-  align-items: center;
-  /* gap: 6px; */
-}
-
 #rasterJobData.jobDataContainer {
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
+#rasterJobData .errorsCountContainer {
+  display: flex;
+  align-items: center;
+}
+
 #rasterJobData .errorsCountContainer.noErrors {
   color: var(--mdc-theme-gc-success) !important;
   font-size: 1rem;
+}
+
+.reportList {
+  display: flex;
+  padding: 4px 2px;
+  gap: 28px;
+  font-size: 0.8rem;
+  justify-content: space-between;
 }

@@ -1,20 +1,23 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Box } from '@map-colonies/react-components';
 import { Skeleton } from '../../../../common/components/skeleton/skeleton';
 import { Status } from '../../../models';
-import { getErrorCount } from '../../helpers/jobUtils';
+import { ErrorsCountPresentor, getErrorCount } from '../../helpers/jobUtils';
 import { Progress } from './progress';
 import { isJobValid, isStatusFailed, isTaskValid } from './state-machine/helpers';
 import { IJob } from './state-machine/types';
 
 import './job-info.css';
+import { useTheme } from '@map-colonies/react-core';
 
 interface JobInfoProps {
   job: IJob | undefined;
 }
 
 export const JobInfo: React.FC<JobInfoProps> = ({ job }) => {
+  const theme = useTheme();
+
   if (!job) {
     return null;
   }
@@ -52,13 +55,13 @@ export const JobInfo: React.FC<JobInfoProps> = ({ job }) => {
                 <Box className="reportList">
                   {
                     Object.entries(job.validationReport.errorsSummary.errorsCount).map(([key, value]) => {
-                      const color = (val: number): string =>
-                        val === 0
-                          ? 'success'
+                      const color =
+                        value === 0
+                          ? theme.custom?.GC_SUCCESS
                           : getErrorCount(job.validationReport?.errorsSummary, key)?.exceeded === false
-                            ? 'warning'
-                            : 'error';
-                      return count(key, value, color);
+                            ? theme.custom?.GC_WARNING_HIGH
+                            : theme.custom?.GC_ERROR_HIGH
+                      return ErrorsCountPresentor(key, value, 'countWrapper', color);
                     })
                   }
                 </Box>
@@ -76,18 +79,5 @@ export const JobInfo: React.FC<JobInfoProps> = ({ job }) => {
         </Box>
       </Box>
     </>
-  );
-};
-
-const count = (key: string, value: number, color: (val: number) => string) => {
-  return (
-    <Fragment key={key}>
-      <Box className={color(value)}>
-        <FormattedMessage id={`validationReport.${key}`} />
-      </Box>
-      <Box className={color(value)}>
-        {value}
-      </Box>
-    </Fragment>
   );
 };

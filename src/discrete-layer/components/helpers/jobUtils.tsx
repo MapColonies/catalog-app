@@ -1,4 +1,7 @@
 
+import { Box } from '@map-colonies/react-components';
+import { FormattedMessage } from 'react-intl';
+
 // TODO: use from @mapColonies/types and remove from here:
 //#region to be removed
 export type TaskParams = {
@@ -37,11 +40,25 @@ export const getErrorCount = (errorsSummary: ErrorsSummary | undefined, key: str
   if (!errorsSummary) {
     return {};
   }
-  const count = (errorsSummary.errorsCount as Record<typeof key, number>)[key];
-  const exceeded = (errorsSummary.thresholds as Record<typeof key, ErrorCount>)[key]?.exceeded;
+  const count = (errorsSummary.errorsCount as Record<string, number>)[key];
+  const exceeded = (errorsSummary.thresholds as Record<string, ErrorCount>)[key]?.exceeded;
 
   return {
     count,
     exceeded
   };
+};
+
+export const ErrorsCountPresentor = (key: string, value: number, containerClassName: string, color: string) => {
+  return (
+    <Box key={key} className={containerClassName}>
+      <Box style={{ color }}>
+        <FormattedMessage id={`validationReport.${key}`} />
+      </Box>
+
+      <Box style={{ color }}>
+        {value}
+      </Box>
+    </Box>
+  );
 };

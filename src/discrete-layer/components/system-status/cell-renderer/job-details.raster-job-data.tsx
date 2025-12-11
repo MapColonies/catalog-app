@@ -3,14 +3,14 @@ import { useIntl } from 'react-intl';
 import { get } from 'lodash';
 import { ICellRendererParams } from 'ag-grid-community';
 import { Box } from '@map-colonies/react-components';
-import { CircularProgress, IconButton } from '@map-colonies/react-core';
+import { CircularProgress, IconButton, Tooltip, useTheme } from '@map-colonies/react-core';
 import { AutoDirectionBox } from '../../../../common/components/auto-direction-box/auto-direction-box.component';
 import { Hyperlink } from '../../../../common/components/hyperlink/hyperlink';
 import { RasterIngestionJobType } from '../../../../common/models/raster-job';
 import { DETAILS_ROW_ID_SUFFIX } from '../../../../common/components/grid';
 import { JobModelType, TaskModelType, useStore } from '../../../models';
 import { CopyButton } from '../../job-manager/job-details.copy-button';
-import { ErrorsSummary, getErrorCount } from '../../helpers/jobUtils';
+import { ErrorsCountPresentor, ErrorsSummary, getErrorCount } from '../../helpers/jobUtils';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
 
 import './info-area.css';
@@ -21,6 +21,7 @@ interface JobDetailsRasterJobDataProps extends ICellRendererParams { }
 const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = ({ data }) => {
   const store = useStore();
   const intl = useIntl();
+  const theme = useTheme();
   const ZOOM_LEVELS_TABLE = useZoomLevelsTable();
 
   const jobData = data as JobModelType;
@@ -28,6 +29,7 @@ const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = ({ data 
   const [task, setTask] = useState<TaskModelType>();
   const [errorsCount, setErrorsCount] = useState(0);
   const [zoomLevel, setZoomLevel] = useState<number | undefined>(undefined);
+  const [isLoading, setIsLoading] = useState(true);
 
   const isRasterJob =
     jobData.domain?.toLowerCase().includes('raster') &&
@@ -48,28 +50,30 @@ const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = ({ data 
   };
 
   const fetchTask = async () => {
-    const result = await store.queryFindTasks({
-      params: {
-        jobId: jobData.id.replace(DETAILS_ROW_ID_SUFFIX, ''),
-        type: 'validation'
+    try {
+      const result = await store.queryFindTasks({
+        params: {
+          jobId: jobData.id.replace(DETAILS_ROW_ID_SUFFIX, ''),
+          type: 'validation'
+        }
+      });
+
+      if (!result?.findTasks[0]) {
+        return undefined;
       }
-    });
 
-    if (!result?.findTasks[0]) {
-      return undefined;
-    }
+      const task = { ...result.findTasks[0] };
 
-    const task = { ...result.findTasks[0] };
+      if (task) {
+        setTask(task);
 
-    if (task) {
-      setTask(task);
+        const errorsCount = task?.parameters?.errorsSummary;
 
-      const errorsCount = task?.parameters?.errorsSummary;
-
-      if (errorsCount) {
-        setErrorsCount(calculateErrorsCount(errorsCount));
+        if (errorsCount) {
+          setErrorsCount(calculateErrorsCount(errorsCount));
+        }
       }
-    }
+    } catch { }
   }
 
   const computeZoomLevel = () => {
@@ -87,6 +91,14 @@ const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = ({ data 
     }
   }
 
+  const getGpkgFilesPath = () => {
+    return jobData.parameters?.inputFiles?.gpkgFilesPath?.[0];
+  }
+
+  const isNewFormatJob = () => {
+    return !!getGpkgFilesPath();
+  }
+
   useEffect(() => {
     if (!isRasterJob) {
       return;
@@ -94,17 +106,21 @@ const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = ({ data 
 
     fetchTask();
     computeZoomLevel();
-  }, [jobData, isRasterJob]);
+  }, [jobData, jobData.parameters, isRasterJob]);
+
+  useEffect(() => {
+    const loading = !jobData.parameters;
+
+    setIsLoading(loading);
+  }, [jobData]);
 
   const errorsMessage = intl.formatMessage({ id: 'general.errors.text' });
 
-  const gpkgPath = jobData.parameters?.inputFiles?.gpkgFilesPath?.[0];
   const zoomLabel = zoomLevel !== undefined ? `(${zoomLevel})` : '';
-  const info = gpkgPath ?
-    `${gpkgPath} ${zoomLabel}` :
+  const rasterInfo = (jobData.parameters && isNewFormatJob()) ?
+    `${getGpkgFilesPath()} ${zoomLabel}` :
     intl.formatMessage({ id: 'general.deprecated-job.text' });
 
-  const isLoading = jobData.parameters;
   const hasErrors = errorsCount > 0;
 
   if (!isRasterJob) {
@@ -116,14 +132,13 @@ const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = ({ data 
       {
         <AutoDirectionBox>
           {
-            isLoading ? info :
+            !isLoading ? rasterInfo :
               <CircularProgress size='xsmall'></CircularProgress>
           }
         </AutoDirectionBox>
       }
       {
-        isLoading && task?.parameters &&
-
+        !isLoading &&
         <Box className={`linkItem errorsCountContainer ${errorsCount === 0 ? 'noErrors' : ''}`} key={`${jobData.id}`}>
           {hasErrors &&
             <>
@@ -134,16 +149,34 @@ const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = ({ data 
                   e.stopPropagation();
                 }}
               />
-              <Hyperlink url={task?.parameters?.TBDlinkTBD ?? ''} label={`${errorsCount.toString()} ${errorsMessage}`} />
+
+              <Tooltip content={
+                <Box>
+                  {
+                    Object.entries(task?.parameters?.errorsSummary.errorsCount as ErrorsSummary['errorsCount']).map(([key, value]) => {
+                      const color =
+                        value === 0
+                          ? theme.custom?.GC_SUCCESS
+                          : getErrorCount(task?.parameters?.errorsSummary, key)?.exceeded === false
+                            ? theme.custom?.GC_WARNING_HIGH
+                            : theme.custom?.GC_ERROR_HIGH
+                      return ErrorsCountPresentor(key, value, 'reportList', color);
+                    })
+                  }
+                </Box>
+              }>
+                <Hyperlink url={task?.parameters?.TBDlinkTBD ?? ''} label={`${errorsCount.toString()} ${errorsMessage}`} />
+              </Tooltip>
+
               <CopyButton text={task?.parameters?.TBDlinkTBD ?? ''} key={'errorsReportLink'} />
             </>
           }
-          {!hasErrors &&
+          {!hasErrors && isNewFormatJob() && task &&
             intl.formatMessage({ id: 'general.no-errors.text' })
           }
         </Box>
       }
-    </Box>
+    </Box >
   );
 }
 

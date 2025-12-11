@@ -16,3 +16,16 @@
   height: 164px;
   overflow-y: auto;
 }
+
+#layerDetailsFormRaster .countWrapper {
+  display: contents;
+}
+
+#layerDetailsFormRaster .reportError {
+  height: 164px;
+  margin: 0 8px;
+}
+
+#layerDetailsFormRaster .reportLoading {
+  margin: 6px;
+}
