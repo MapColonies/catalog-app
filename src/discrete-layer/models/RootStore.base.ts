@@ -420,6 +420,10 @@ export type JobUpdateData = {
   isCleaned?: boolean
   priority?: number
 }
+export type JobActionParams = {
+  id: string
+  domain: string
+}
 /* The TypeScript type that explicits the refs to other models in order to prevent a circular refs issue */
 type Refs = {
   layerRasterRecords: ObservableMap<string, LayerRasterRecordModelType>,
@@ -684,10 +688,10 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     mutateUpdateJob(variables: { data: JobUpdateData, id: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ updateJob: string }>(`mutation updateJob($data: JobUpdateData!, $id: String!) { updateJob(data: $data, id: $id) }`, variables, optimisticUpdate)
     },
-    mutateJobRetry(variables: { id: string }, optimisticUpdate?: () => void) {
-      return self.mutate<{ jobRetry: string }>(`mutation jobRetry($id: String!) { jobRetry(id: $id) }`, variables, optimisticUpdate)
+    mutateJobRetry(variables: { resetJobHandlerParams: JobActionParams }, optimisticUpdate?: () => void) {
+      return self.mutate<{ jobRetry: string }>(`mutation jobRetry($resetJobHandlerParams: JobActionParams!) { jobRetry(resetJobHandlerParams: $resetJobHandlerParams) }`, variables, optimisticUpdate)
     },
-    mutateJobAbort(variables: { id: string }, optimisticUpdate?: () => void) {
-      return self.mutate<{ jobAbort: string }>(`mutation jobAbort($id: String!) { jobAbort(id: $id) }`, variables, optimisticUpdate)
+    mutateJobAbort(variables: { jobAbortParams: JobActionParams }, optimisticUpdate?: () => void) {
+      return self.mutate<{ jobAbort: string }>(`mutation jobAbort($jobAbortParams: JobActionParams!) { jobAbort(jobAbortParams: $jobAbortParams) }`, variables, optimisticUpdate)
     },
   })))
