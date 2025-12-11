@@ -4,12 +4,12 @@ import { FormattedMessage } from 'react-intl';
 
 // TODO: use from @mapColonies/types and remove from here:
 //#region to be removed
-export type TaskParams = {
+export type RasterTaskParams = {
   isValid: boolean;
-  errorsSummary: ErrorsSummary;
+  errorsSummary: RasterErrorsSummary;
 };
 
-export type ErrorsSummary = {
+export type RasterErrorsSummary = {
   errorsCount: {
     geometryValidity: number;
     vertices: number;
@@ -31,17 +31,17 @@ export type ErrorsSummary = {
 };
 //#endregion to be removed
 
-type ErrorCount = {
+type RasterErrorCount = {
   count?: number;
   exceeded?: boolean;
 }
 
-export const getErrorCount = (errorsSummary: ErrorsSummary | undefined, key: string): ErrorCount => {
+export const getRasterErrorCount = (errorsSummary: RasterErrorsSummary | undefined, key: string): RasterErrorCount => {
   if (!errorsSummary) {
     return {};
   }
   const count = (errorsSummary.errorsCount as Record<string, number>)[key];
-  const exceeded = (errorsSummary.thresholds as Record<string, ErrorCount>)[key]?.exceeded;
+  const exceeded = (errorsSummary.thresholds as Record<string, RasterErrorCount>)[key]?.exceeded;
 
   return {
     count,

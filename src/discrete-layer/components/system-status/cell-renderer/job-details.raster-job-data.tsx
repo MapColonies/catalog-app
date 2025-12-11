@@ -8,10 +8,11 @@ import { AutoDirectionBox } from '../../../../common/components/auto-direction-b
 import { Hyperlink } from '../../../../common/components/hyperlink/hyperlink';
 import { RasterIngestionJobType } from '../../../../common/models/raster-job';
 import { DETAILS_ROW_ID_SUFFIX } from '../../../../common/components/grid';
+import { Domain } from '../../../../common/models/domain';
 import { JobModelType, TaskModelType, useStore } from '../../../models';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
 import { CopyButton } from '../../job-manager/job-details.copy-button';
-import { ErrorsCountPresentor, ErrorsSummary, getErrorCount } from '../../helpers/jobUtils';
+import { ErrorsCountPresentor, RasterErrorsSummary, getRasterErrorCount } from '../../helpers/jobUtils';
 
 import './info-area.css';
 import './job-details.raster-job-data.css';
@@ -32,15 +33,15 @@ const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = ({ data 
   const [isLoading, setIsLoading] = useState(true);
 
   const isRasterJob =
-    jobData.domain?.toLowerCase().includes('raster') &&
+    jobData.domain === Domain.RASTER &&
     jobData.type &&
     Object.values(RasterIngestionJobType).includes(jobData.type as RasterIngestionJobType);
 
-  const calculateErrorsCount = (errors: ErrorsSummary): number => {
+  const calculateErrorsCount = (errors: RasterErrorsSummary): number => {
     let count = 0;
 
     Object.keys(errors.errorsCount).forEach((key) => {
-      const errorCount = getErrorCount(errors, key);
+      const errorCount = getRasterErrorCount(errors, key);
       if (errorCount.exceeded === true || typeof errorCount.exceeded === 'undefined') {
         count += errorCount.count ?? 0;
       }
@@ -152,11 +153,11 @@ const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = ({ data 
               <Tooltip content={
                 <Box>
                   {
-                    Object.entries(task?.parameters?.errorsSummary.errorsCount as ErrorsSummary['errorsCount']).map(([key, value]) => {
+                    Object.entries(task?.parameters?.errorsSummary.errorsCount as RasterErrorsSummary['errorsCount']).map(([key, value]) => {
                       const color =
                         value === 0
                           ? theme.custom?.GC_SUCCESS
-                          : getErrorCount(task?.parameters?.errorsSummary, key)?.exceeded === false
+                          : getRasterErrorCount(task?.parameters?.errorsSummary, key)?.exceeded === false
                             ? theme.custom?.GC_WARNING_HIGH
                             : theme.custom?.GC_ERROR_HIGH
                       return ErrorsCountPresentor(key, value, 'reportList', color);

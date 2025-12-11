@@ -14,7 +14,7 @@ import {
 } from '../../../../models';
 import { LayerRasterRecordInput } from '../../../../models/RootStore.base';
 import { IError } from '../../../helpers/errorUtils';
-import { TaskParams } from '../../../helpers/jobUtils';
+import { RasterTaskParams } from '../../../helpers/jobUtils';
 
 export type ErrorSource = "api" | "logic";
 export type AddPolicy = "merge" | "override";
@@ -64,7 +64,7 @@ export interface IJob {
   jobId?: string;
   taskId?: string;
   taskPercentage?: number;
-  validationReport?: TaskParams;
+  validationReport?: RasterTaskParams;
   taskStatus?: Status;
   taskReason?: string;
   details?: JobModelType;
