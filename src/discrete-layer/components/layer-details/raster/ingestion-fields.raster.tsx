@@ -18,7 +18,6 @@ import {
   hasActiveJob,
   hasTagDeep,
   isModified,
-  isRetryEnabled,
   isUIDisabled
 } from './state-machine/helpers';
 import {
