@@ -1,7 +1,9 @@
 import React, { Fragment } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Box } from '@map-colonies/react-components';
+import { Typography } from '@map-colonies/react-core';
 import { Skeleton } from '../../../../common/components/skeleton/skeleton';
+import { AutoDirectionBox } from '../../../../common/components/auto-direction-box/auto-direction-box.component';
 import { Status } from '../../../models';
 import { Progress } from './progress';
 import { isJobValid, isStatusFailed, isTaskValid } from './state-machine/helpers';
@@ -62,9 +64,14 @@ export const JobInfo: React.FC<JobInfoProps> = ({ job }) => {
                   }
                 </Box>
               ) : (
-                <Box className="error">
-                  <FormattedMessage id="ingestion.error.not-found" values={{ value: 'job.validationReport.errorsSummary.errorsCount' }} />
-                </Box>
+                  <Box className="error">
+                    {
+                      job.taskReason ? <Typography tag={'span'}>
+                        <AutoDirectionBox>{job.taskReason}</AutoDirectionBox>
+                      </Typography> :
+                      <FormattedMessage id="ingestion.error.not-found" values={{ value: 'job.validationReport.errorsSummary.errorsCount' }} />
+                    }
+                  </Box>
               )
             ) : (
               <Skeleton width="99%" count={8} />

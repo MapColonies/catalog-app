@@ -18,7 +18,6 @@ import {
   hasActiveJob,
   hasTagDeep,
   isModified,
-  isRetryEnabled,
   isUIDisabled
 } from './state-machine/helpers';
 import {
@@ -60,7 +59,7 @@ const FileItem: React.FC<{ file: any; context: IContext }> = ({ file, context })
       <Box className={`ltr ${color}`}>
         {
           modDate
-          ? (isModified(modDate) && isRetryEnabled(context)
+          ? (isModified(modDate) && context.selectionMode === 'restore'
             ? file.dateFormatterPredicate(modDate)
             : dateFormatter(modDate))
           : ''
