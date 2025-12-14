@@ -148,6 +148,7 @@ export const WORKFLOW = {
   JOB_POLLING: "jobPolling",
   JOB_POLLING_WAIT: "jobPollingWait",
   RESTORE_JOB: "restoreJob",
+  JOB_RETRY: "jobRetry",
   DONE: "done"
 } as const;
 

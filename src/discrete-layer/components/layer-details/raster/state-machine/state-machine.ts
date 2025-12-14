@@ -289,6 +289,9 @@ export const workflowMachine = createMachine<IContext, Events>({
           })),
           target: WORKFLOW.RESTORE_JOB
         },
+        RETRY: {
+          target: WORKFLOW.JOB_RETRY
+        },
         "*": { actions: warnUnexpectedStateEvent }
       }
     },
@@ -408,7 +411,7 @@ export const workflowMachine = createMachine<IContext, Events>({
                 ..._.event.output
               }
             })),
-            target: WORKFLOW.DONE
+            target: WORKFLOW.IDLE
           },
           {
             actions: assign((_: { context: IContext; event: any }) => ({
@@ -459,6 +462,21 @@ export const workflowMachine = createMachine<IContext, Events>({
           actions: assign((_: { context: IContext; event: any }) => ({
             ..._.event.output
           })),
+          target: WORKFLOW.JOB_POLLING
+        },
+        onError: {
+          actions: addError,
+          target: WORKFLOW.IDLE
+        }
+      }
+    },
+    [WORKFLOW.JOB_RETRY]: {
+      entry: () => console.log(`>>> Enter ${WORKFLOW.JOB_RETRY}`),
+      tags: [STATE_TAGS.GENERAL_LOADING],
+      invoke: {
+        input: (_: { context: IContext; event: any }) => _,
+        src: SERVICES[WORKFLOW.ROOT].retryJobService,
+        onDone: {
           target: WORKFLOW.JOB_POLLING
         },
         onError: {

@@ -49,6 +49,7 @@ import {
   isRetryEnabled,
   isUIDisabled
 } from './state-machine/helpers';
+import { Events } from './state-machine/types';
 import { getUIIngestionFieldDescriptors } from './utils';
 
 import './layer-details-form.raster.css';
@@ -383,6 +384,7 @@ export const InnerRasterForm = (
                 onClick={(e): void => {
                   e.preventDefault();
                   e.stopPropagation();
+                  actorRef.send({ type: 'RETRY' } satisfies Events);
                 }}
               >
                 <FormattedMessage id="general.retry-btn.text" />
