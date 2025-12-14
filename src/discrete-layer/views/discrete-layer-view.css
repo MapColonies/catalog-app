@@ -95,7 +95,7 @@ body[dir='rtl'] .headerSystemAreaContainer{
   background-color: var(--mdc-theme-gc-warning-high);
   color: white;
   border-radius: 50%;
-  padding: 1px;
+  padding: 2px;
   font-size: 10px;
   font-weight: bold;
   display: flex;

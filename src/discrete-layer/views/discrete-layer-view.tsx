@@ -35,6 +35,7 @@ import {
 } from '@map-colonies/react-components';
 import { GeocoderOptions } from '@map-colonies/react-components/dist/cesium-map/geocoder/geocoder-panel';
 import { IMapLegend } from '@map-colonies/react-components/dist/cesium-map/legend';
+import { AutoDirectionBox } from '../../common/components/auto-direction-box/auto-direction-box.component';
 // import { BrowserCompatibilityChecker } from '../../common/components/browser-compatibility-checker/browser-compatibility-checker';
 import GPUInsufficiencyDetector from '../../common/components/gpu-insufficiency-detector/gpu-insufficiency-detector';
 import CONFIG from '../../common/config';
@@ -45,48 +46,48 @@ import { LinkType } from '../../common/models/link-type.enum';
 import { Mode } from '../../common/models/mode.enum';
 import { ActiveLayersIcon } from '../../icons/4font/ActiveLayers';
 import { initWebSocket } from '../../syncHttpClientGql';
-import { SelectedLayersContainer } from '../components/map-container/selected-layers-container';
+import { CatalogTreeComponent } from '../components/catalog-tree/catalog-tree';
+import ExportDrawingHandler from '../components/export-layer/export-drawing-handler.component';
+import { ExportLayerComponent } from '../components/export-layer/export-layer.component';
+import ExportPolygonsRenderer from '../components/export-layer/export-polygons-renderer.component';
+// import { Filters } from '../components/filters/filters';
+import { JobsDialog } from '../components/job-manager/jobs.dialog';
+import { EntityDeleteDialog } from '../components/layer-details/entity.delete-dialog';
+import { EntityDialog } from '../components/layer-details/entity.dialog';
+import { EntityRasterDialog } from '../components/layer-details/raster/entity.raster.dialog';
+import { LayersResults } from '../components/layers-results/layers-results';
+import { ActionsContextMenu } from '../components/map-container/contextMenus/actions.context-menu';
+import { BBoxCorners } from '../components/map-container/bbox.dialog';
+import ActionsMenuDimensionsContext from '../components/map-container/contextMenus/contexts/actionsMenuDimensionsContext';
+import { ExtentUpdater } from '../components/map-container/extent-updater';
+import { FlyTo } from '../components/map-container/fly-to';
+import DemHeightsFeatureComponent from '../components/map-container/geojson-map-features/dem-heights-feature.component';
+import { PolygonParts } from '../components/map-container/geojson-map-features/polygonParts';
+import { PolygonPartsFeature } from '../components/map-container/geojson-map-features/polygonParts-feature.component';
+import { WfsFeature } from '../components/map-container/geojson-map-features/wfs-feature.component';
 import { HighlightedLayer } from '../components/map-container/highlighted-layer';
 import { LayersFootprints } from '../components/map-container/layers-footprints';
+import { IPOI } from '../components/map-container/poi.dialog';
+import { PoiEntity } from '../components/map-container/poi-entity';
 import { PolygonSelectionUi } from '../components/map-container/polygon-selection-ui_2';
-// import { Filters } from '../components/filters/filters';
-import { CatalogTreeComponent } from '../components/catalog-tree/catalog-tree';
-import { LayersResults } from '../components/layers-results/layers-results';
-import { EntityDialog } from '../components/layer-details/entity.dialog';
-import { JobsDialog } from '../components/job-manager/jobs.dialog';
+import { SelectedLayersContainer } from '../components/map-container/selected-layers-container';
+import { Terrain } from '../components/map-container/terrain';
+import { SystemCoreInfoDialog } from '../components/system-status/system-core-info/system-core-info.dialog';
 import {
   JobModelType,
   LayerMetadataMixedUnion,
   LinkModelType,
   RecordType
 } from '../models';
+import { IDispatchAction } from '../models/actionDispatcherStore';
 import { ILayerImage } from '../models/layerImage';
 import { useQuery, useStore } from '../models/RootStore';
 import { FilterField } from '../models/RootStore.base';
 import { UserAction, UserRole } from '../models/userStore';
-import { BBoxCorners } from '../components/map-container/bbox.dialog';
-import { FlyTo } from '../components/map-container/fly-to';
-import { IPOI } from '../components/map-container/poi.dialog';
-import { PoiEntity } from '../components/map-container/poi-entity';
-import { Terrain } from '../components/map-container/terrain';
-import ActionsMenuDimensionsContext from '../components/map-container/contextMenus/contexts/actionsMenuDimensionsContext';
-import { SystemCoreInfoDialog } from '../components/system-status/system-core-info/system-core-info.dialog';
-import { IDispatchAction } from '../models/actionDispatcherStore';
-import { ExportLayerComponent } from '../components/export-layer/export-layer.component';
-import ExportDrawingHandler from '../components/export-layer/export-drawing-handler.component';
-import ExportPolygonsRenderer from '../components/export-layer/export-polygons-renderer.component';
-import { EntityRasterDialog } from '../components/layer-details/raster/entity.raster.dialog';
-import { EntityDeleteDialog } from '../components/layer-details/entity.delete-dialog';
-import { MapActionResolver } from './components/map-action-resolver.component';
-import { ActionsContextMenu } from '../components/map-container/contextMenus/actions.context-menu';
-import { ExtentUpdater } from '../components/map-container/extent-updater';
-import DemHeightsFeatureComponent from '../components/map-container/geojson-map-features/dem-heights-feature.component';
-import { PolygonParts } from '../components/map-container/geojson-map-features/polygonParts';
-import { PolygonPartsFeature } from '../components/map-container/geojson-map-features/polygonParts-feature.component';
-import { WfsFeature } from '../components/map-container/geojson-map-features/wfs-feature.component';
 import { ActionResolver } from './components/action-resolver.component';
 import AppTitle from './components/app-title/app-title.component';
 import { DetailsPanel } from './components/details-panel.component';
+import { MapActionResolver } from './components/map-action-resolver.component';
 import { TabViewsSwitcher } from './components/tabs-views-switcher.component';
 import UserModeSwitch from './components/user-mode-switch/user-mode-switch.component';
 import { TabViews } from './tab-views';
@@ -1095,7 +1096,12 @@ const DiscreteLayerView: React.FC = observer(() => {
             permissions.isSystemJobsAllowed &&
             <Tooltip content={intl.formatMessage({ id: 'action.system-jobs.tooltip' })}>
               <Box className="systemJobsIconWrapper">
-                {notificationCount > 0 && <Box className="notificationBadge">{notificationCount}</Box>}
+                {
+                  notificationCount > 0 &&
+                  <AutoDirectionBox className="notificationBadge">
+                    {notificationCount < 10 ? notificationCount : '9+'}
+                  </AutoDirectionBox>
+                }
                 <IconButton
                   className="operationIcon mc-icon-Job-Management"
                   label="SYSTEM JOBS"
@@ -1132,16 +1138,16 @@ const DiscreteLayerView: React.FC = observer(() => {
       </Box>
       <Box className="mainViewContainer">
         <Box className={`sidePanelParentContainer ${disableOnDrawingClassName}`}>
-        {!tabsPanelExpanded ? (
-            <Box
-              className="sidePanelContainer"
-              style={{
-                backgroundColor: theme.custom?.GC_ALTERNATIVE_SURFACE as string,
-              }}
-            >
-              {getActiveTabHeader(activeTabView, site)}
-            </Box>
-          ) : null}
+          {
+            !tabsPanelExpanded ? (
+              <Box
+                className="sidePanelContainer"
+                style={{ backgroundColor: theme.custom?.GC_ALTERNATIVE_SURFACE as string }}
+              >
+                {getActiveTabHeader(activeTabView, site)}
+              </Box>
+            ) : null
+          }
           <Box 
             className="sidePanelContainer"
             style={{
