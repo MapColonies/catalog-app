@@ -13,6 +13,7 @@ import { catalogTreeStore } from './catalogTreeStore';
 import { mapMenusManagerStore } from './mapMenusManagerStore';
 import { exportStore } from './exportStore';
 import { servicesAvailabilityStore } from './servicesAvailabilityStore';
+import { jobsStore } from './jobsStore';
 
 type FetchAction = (
   url: string,
@@ -45,6 +46,9 @@ export const baseRootStore = RootStoreBase
       state: ResponseState.IDLE,
     }),
     servicesAvailabilityStore: types.optional(servicesAvailabilityStore, {
+      state: ResponseState.IDLE,
+    }),
+    jobsStore: types.optional(jobsStore, {
       state: ResponseState.IDLE,
     }),
   })

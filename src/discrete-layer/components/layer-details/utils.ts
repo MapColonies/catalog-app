@@ -24,6 +24,7 @@ import {
   isSmallArea
 } from '../../../common/utils/geo.tools';
 import { hasSelfIntersections } from '../../../common/utils/geojson.validation';
+import { RasterIngestionJobType } from '../../../common/models/raster-job';
 import { SYNC_QUERY, syncQueries } from '../../../syncHttpClientGql';
 import {
   CategoryConfigModelType,
@@ -876,12 +877,7 @@ export const filterModeDescriptors = (mode: Mode, descriptors: EntityDescriptorM
   });
 };
 
-export enum RasterJobTypeEnum {
-  NEW = 'Ingestion_New',
-  UPDATE = 'Ingestion_Update'
-}
-
 export const jobType2Mode: { [key: string]: Mode } = {
-  [RasterJobTypeEnum.NEW]: Mode.NEW,
-  [RasterJobTypeEnum.UPDATE]: Mode.UPDATE
+  [RasterIngestionJobType.NEW]: Mode.NEW,
+  [RasterIngestionJobType.UPDATE]: Mode.UPDATE
 };

@@ -4,6 +4,7 @@ import { AnyActorSystem } from 'xstate/dist/declarations/src/system';
 import { FileData } from '@map-colonies/react-components';
 import CONFIG from '../../../../../common/config';
 import { Mode } from '../../../../../common/models/mode.enum';
+import { RasterTaskParams } from '../../../../../common/models/task-error-summary.raster';
 import {
   IBaseRootStore,
   IRootStore,
@@ -63,7 +64,7 @@ export interface IJob {
   jobId?: string;
   taskId?: string;
   taskPercentage?: number;
-  validationReport?: TaskParams;
+  validationReport?: RasterTaskParams;
   taskStatus?: Status;
   taskReason?: string;
   details?: JobModelType;
@@ -148,6 +149,7 @@ export const WORKFLOW = {
   JOB_POLLING: "jobPolling",
   JOB_POLLING_WAIT: "jobPollingWait",
   RESTORE_JOB: "restoreJob",
+  JOB_RETRY: "jobRetry",
   DONE: "done"
 } as const;
 
@@ -161,47 +163,3 @@ export const SHAPEMETADATA_FILENAME = `${CONFIG.RASTER_INGESTION.FILES_STRUCTURE
 export const DATA_LABEL = 'file-name.data';
 export const PRODUCT_LABEL = 'file-name.product';
 export const SHAPEMETADATA_LABEL = 'file-name.shapeMetadata';
-
-// #region to be removed
-// TODO: should be taken from @map-colonies/types
-export type CallBack<T> = {
-  jobId: string;
-  taskId: string;
-  jobType: string;
-  taskType: string;
-  productId: string;
-  productType: string;
-  version: string;
-  status: Status;
-  progress: number;
-  message?: string;
-  error?: string;
-  params: T;
-};
-
-export type TaskParams = {
-  isValid: boolean;
-  errorsSummary: ErrorsSummary;
-};
-
-export type ErrorsSummary = {
-  errorsCount: {
-    geometryValidity: number;
-    vertices: number;
-    metadata: number;
-    resolution: number;
-    smallGeometries: number;
-    smallHoles: number;
-    unknown: number;
-  };
-  thresholds: {
-    smallHoles: {
-      exceeded: boolean;
-      count: number;
-    };
-    smallGeometries: {
-      exceeded: boolean;
-    };
-  }
-};
-// #endregion to be removed

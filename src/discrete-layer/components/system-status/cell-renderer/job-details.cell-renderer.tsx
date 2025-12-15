@@ -6,14 +6,16 @@ import { truncate } from 'lodash';
 import { Moment } from 'moment';
 import { IconButton, Tooltip, Typography } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
+import { AutoDirectionBox } from '../../../../common/components/auto-direction-box/auto-direction-box.component';
 import { DETAILS_ROW_ID_SUFFIX } from '../../../../common/components/grid';
 import { Loading } from '../../../../common/components/tree/statuses/loading';
 import { relativeDateFormatter, dateFormatter, } from '../../../../common/helpers/formatters';
-import { JobModelType, ProductType, Status, TasksGroupModelType } from '../../../models';
+import { JobModelType, ProductType, Status, TasksGroupModelType, useStore } from '../../../models';
 import { useQuery } from '../../../models/RootStore';
 import { CopyButton } from '../../job-manager/job-details.copy-button';
 import { JobDetailsHeader } from './job-details.header';
 import JobDetailsExportJobData from './job.details.export-job-data';
+import JobDetailsRasterJobData from './job-details.raster-job-data';
 
 import './job-details.cell-renderer.css';
 
@@ -63,6 +65,29 @@ const StatusPresentor: React.FC<StatusPresentorParams> = ({ task, reactKey = '' 
     id: `system-status.job.status_translation.${task.status as string}`,
   });
 
+  const percentageComponent = () => {
+    const NUMBER_OF_TASKS_IN_GROUP = 1;
+
+    let showPercentage = false;
+
+    if (task.counts === NUMBER_OF_TASKS_IN_GROUP && task.status === Status.InProgress) {
+      showPercentage = true;
+    }
+
+    if (showPercentage) {
+      return (
+        <Typography
+          key={`${task.jobId}`}
+          tag="div"
+          className="percentageContainer"
+          style={{ fontWeight: 'bold' }}
+        >
+          {(task.percentage as Number).toString() + '%'}
+        </Typography>
+      )
+    }
+  };
+
   if (task.status === Status.Failed) {
     const FAIL_REASON_MAX_LEN = 35;
     const ERROR_ICON_SIZE = 20;
@@ -73,17 +98,22 @@ const StatusPresentor: React.FC<StatusPresentorParams> = ({ task, reactKey = '' 
 
     return (
       <Box key={reactKey} className={`${(task.status as string).toLowerCase()} gridCell`}>
-        {statusText}
-        <Tooltip content={ellipsizedFailReason}>
-          <IconButton
-            style={{
-              fontSize: `${ERROR_ICON_SIZE}px`,
-              color: ERROR_ICON_COLOR,
-            }}
-            className="mc-icon-Warning"
-            label="FAIL REASON ICON"
-          />
-        </Tooltip>
+        <AutoDirectionBox>
+          <Tooltip content={ellipsizedFailReason}>
+            <>
+              {statusText}
+              <IconButton
+                style={{
+                  fontSize: `${ERROR_ICON_SIZE}px`,
+                  color: ERROR_ICON_COLOR,
+                }}
+                className="mc-icon-Warning"
+                label="FAIL REASON ICON"
+              />
+              {percentageComponent() ?? <></>}
+            </>
+          </Tooltip>
+        </AutoDirectionBox>
         <CopyButton text={task.reason as string} />
       </Box>
     );
@@ -91,6 +121,7 @@ const StatusPresentor: React.FC<StatusPresentorParams> = ({ task, reactKey = '' 
   return (
     <Box className={`${(task.status as string).toLowerCase()} gridCell`}>
       {statusText}
+      {percentageComponent()}
     </Box>
   );
 };
@@ -174,8 +205,9 @@ const TasksRenderer: React.FC<TasksRendererParams> = observer(({ jobId, productT
 });
 
 export const JobDetailsRenderer: React.FC<ICellRendererParams> = observer((props) => {
+  const store = useStore();
+  
   const [propsWithJobParams, setPropsWithJobParams] = useState(props);
-
   const jobId = (props.data as JobModelType).id.replace(DETAILS_ROW_ID_SUFFIX, '');
 
   const { data } = useQuery(
@@ -200,9 +232,10 @@ export const JobDetailsRenderer: React.FC<ICellRendererParams> = observer((props
   const keyPrefix = `${(props.data as JobModelType).resourceId as string}`;
 
   return (
-    <Box className="jobDetailsContainer">
+    <Box key={jobId + store.jobsStore.reloadDataCounter} className="jobDetailsContainer">
       <JobDetailsHeader job={props.data as JobModelType} /> 
       <JobDetailsExportJobData key={jobId} {...propsWithJobParams} />
+      <JobDetailsRasterJobData key={jobId} {...propsWithJobParams} />
       <Box className="gridContainer">
         {taskFields.map((field) => (
           <Typography

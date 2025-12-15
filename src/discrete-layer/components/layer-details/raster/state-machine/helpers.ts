@@ -187,7 +187,8 @@ export const isRetryEnabled = (context: IContext): boolean => {
   return !!(context.job && context.job.jobId) &&
     (context.job.taskStatus === Status.Failed ||
     (context.job.taskStatus === Status.Completed && context.job.validationReport?.isValid === false)) &&
-    context.job.details?.status !== Status.Aborted &&
+    // context.job.details?.status !== Status.Aborted && // TBD: to perform RASTER logic which is not in Job-Manager
+    context.job.details?.availableActions?.isResumable &&
     context.selectionMode === 'restore';
 };
 

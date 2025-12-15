@@ -312,6 +312,11 @@ export const MOCK_TASK = {
         algorithm: "XXH64"
       }
     ],
+    report: {
+      url: 'https://download-server/kuku.zip',
+      fileName: 'kuku.zip',
+      fileSize: 2130
+    },
     errorsSummary: {
       thresholds: {
         smallHoles: {

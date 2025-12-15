@@ -1,37 +1,25 @@
-.exportJobDataContainer {
-    padding: 10px;
-    background: var(--mdc-theme-gc-tab-active-background);
-    border: 1px solid var(--mdc-theme-text-primary-on-dark);
-    display: flex;
-    gap: 10px;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+#exportJobData.jobDataContainer {
+  flex-direction: column;
+  gap: 10px;
 }
 
-.exportJobDataContainer .jobDescription {
+#exportJobData.jobDataContainer .jobDescription {
     margin: 0;
 }
 
-.exportJobDataContainer .exportJobLinkContainer {
-    display: flex;
-    gap: 12px;
+#exportJobData.jobDataContainer .exportJobLinkContainer {
+  display: flex;
+  gap: 12px;
 }
 
-.exportJobDataContainer .exportJobLinkContainer .linkContainer > a {
-    text-decoration: underline;
-    color:  var(--mdc-theme-text-primary-on-dark);
-    font-size: 1.1rem;
-}
-
-.exportJobDataContainer .exportJobLinkContainer > a:hover {
+#exportJobData.jobDataContainer .exportJobLinkContainer > a:hover {
     filter: brightness(150%);
 }
 
-.exportJobDataContainer .jobDescriptionContainer .expired {
+#exportJobData.jobDataContainer .jobDescriptionContainer .expired {
     color: var(--mdc-theme-gc-error-medium);
 }
 
-.exportJobDataContainer .jobDescriptionContainer .valid {
+#exportJobData.jobDataContainer .jobDescriptionContainer .valid {
     color: var(--mdc-theme-gc-priority-normal);
 }
