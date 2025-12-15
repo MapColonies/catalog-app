@@ -158,10 +158,10 @@ const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = ({ data 
                   }
                 </Box>
               }>
-                <Hyperlink url={task?.parameters?.TBDlinkTBD ?? ''} label={`${errorsCount.toString()} ${errorsMessage}`} />
+                <Hyperlink url={task?.parameters?.report?.url ?? ''} label={`${errorsCount.toString()} ${errorsMessage}`} />
               </Tooltip>
 
-              <CopyButton text={task?.parameters?.TBDlinkTBD ?? ''} key={'errorsReportLink'} />
+              <CopyButton text={task?.parameters?.report?.url ?? ''} key={'errorsReportLink'} />
             </>
           }
           {!hasErrors && hasGpkgPath() && task &&
