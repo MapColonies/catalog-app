@@ -75,14 +75,16 @@ const StatusPresentor: React.FC<StatusPresentorParams> = ({ task, reactKey = '' 
     }
 
     if (showPercentage) {
-      return (<Typography
-        key={`${task.jobId}`}
-        tag="div"
-        className="percentageContainer"
-        style={{ fontWeight: 'bold' }}
-      >
-        {(task.percentage as Number).toString() + '%'}
-      </Typography>)
+      return (
+        <Typography
+          key={`${task.jobId}`}
+          tag="div"
+          className="percentageContainer"
+          style={{ fontWeight: 'bold' }}
+        >
+          {(task.percentage as Number).toString() + '%'}
+        </Typography>
+      )
     }
   };
 
