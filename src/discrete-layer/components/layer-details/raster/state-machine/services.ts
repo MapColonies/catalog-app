@@ -60,7 +60,7 @@ export const SERVICES = {
       const { store, job } = input.context || {};
       const result = await queryExecutor(async () => {
         return await store.mutateJobRetry({
-          resetJobHandlerParams: {
+          jobRetryParams: {
             id: job?.jobId as string,
             domain: 'RASTER',
           }

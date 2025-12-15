@@ -204,7 +204,7 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
       switch (action) {
         case 'Job.retry':
           mutationQuery.setQuery(
-            store.mutateJobRetry({'resetJobHandlerParams': {
+            store.mutateJobRetry({'jobRetryParams': {
               id: data.id as string,
               domain: data.domain as string,
             }})
