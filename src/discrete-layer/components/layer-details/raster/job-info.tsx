@@ -1,7 +1,7 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Box } from '@map-colonies/react-components';
-import { Typography } from '@map-colonies/react-core';
+import { Typography, useTheme } from '@map-colonies/react-core';
 import { Skeleton } from '../../../../common/components/skeleton/skeleton';
 import { AutoDirectionBox } from '../../../../common/components/auto-direction-box/auto-direction-box.component';
 import { Status } from '../../../models';
@@ -11,7 +11,6 @@ import { isJobValid, isStatusFailed, isTaskValid } from './state-machine/helpers
 import { IJob } from './state-machine/types';
 
 import './job-info.css';
-import { useTheme } from '@map-colonies/react-core';
 
 interface JobInfoProps {
   job: IJob | undefined;
