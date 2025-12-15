@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.2.0](https://github.com/MapColonies/catalog-app/compare/v3.1.0...v3.2.0) (2025-12-15)
+
+
+### Features
+
+* apdate abort and retry params after scaffold ([#781](https://github.com/MapColonies/catalog-app/issues/781)) ([e5ed258](https://github.com/MapColonies/catalog-app/commit/e5ed258a0239c5220ab4bb40872112b19fb0dd32))
+* tasks notifications web socket (MAPCO-8444) ([#783](https://github.com/MapColonies/catalog-app/issues/783)) ([8f1ac55](https://github.com/MapColonies/catalog-app/commit/8f1ac55e901e9f5289351dcde55dd927f939a7c0))
+
+
+### Bug Fixes
+
+* 3 dots ([0db1aa8](https://github.com/MapColonies/catalog-app/commit/0db1aa8dd0013925cb41cdfe393e2e67bd6434be))
+* add percentage ( MAPCO-8955 ) ([#785](https://github.com/MapColonies/catalog-app/issues/785)) ([1fad351](https://github.com/MapColonies/catalog-app/commit/1fad351ed25b6b814e922a5fcc4d075dfa81e17c))
+* add raster job manager info ( MAPCO-8443 ) ([#777](https://github.com/MapColonies/catalog-app/issues/777)) ([9c0755d](https://github.com/MapColonies/catalog-app/commit/9c0755d9113112a8049d266917113f2e575d2049))
+* add refresh countdown while monitoring job ([#775](https://github.com/MapColonies/catalog-app/issues/775)) ([b2e3cb9](https://github.com/MapColonies/catalog-app/commit/b2e3cb99a21a2d89358250556636681f4a0ebcf1))
+* layer from basemap has no cesium imagery context menu ( MAPCO-6456 ) ([#778](https://github.com/MapColonies/catalog-app/issues/778)) ([8a96a80](https://github.com/MapColonies/catalog-app/commit/8a96a80fbff4ba4f4bb35699e086bad275759a4c))
+* restore raster job action (MAPCO: 8438) ([#784](https://github.com/MapColonies/catalog-app/issues/784)) ([975035b](https://github.com/MapColonies/catalog-app/commit/975035b4506386828f00121d82c2211e645a9a95))
+* validation report ([#779](https://github.com/MapColonies/catalog-app/issues/779)) ([1b8f566](https://github.com/MapColonies/catalog-app/commit/1b8f566244cfc308af562010f71a6f3085ab33ec))
+
 ## [3.1.0](https://github.com/MapColonies/catalog-app/compare/v3.0.5...v3.1.0) (2025-12-04)
 
 
