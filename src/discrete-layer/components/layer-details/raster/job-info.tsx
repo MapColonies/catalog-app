@@ -1,7 +1,9 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Box } from '@map-colonies/react-components';
+import { Typography } from '@map-colonies/react-core';
 import { Skeleton } from '../../../../common/components/skeleton/skeleton';
+import { AutoDirectionBox } from '../../../../common/components/auto-direction-box/auto-direction-box.component';
 import { Status } from '../../../models';
 import { RenderErrorCounts } from '../../helpers/jobUtils';
 import { Progress } from './progress';
@@ -58,9 +60,14 @@ export const JobInfo: React.FC<JobInfoProps> = ({ job }) => {
                   }
                 </Box>
               ) : (
-                <Box className="reportError error">
-                  <FormattedMessage id="ingestion.error.not-found" values={{ value: 'job.validationReport.errorsSummary.errorsCount' }} />
-                </Box>
+                  <Box className="reportError error">
+                    {
+                      job.taskReason ? <Typography tag={'span'}>
+                        <AutoDirectionBox>{job.taskReason}</AutoDirectionBox>
+                      </Typography> :
+                      <FormattedMessage id="ingestion.error.not-found" values={{ value: 'job.validationReport.errorsSummary.errorsCount' }} />
+                    }
+                  </Box>
               )
             ) : (
               <Box className="reportLoading">

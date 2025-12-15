@@ -56,6 +56,19 @@ export const SERVICES = {
         jobId
       };
     }),
+    retryJobService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
+      const { store, job } = input.context || {};
+      const result = await queryExecutor(async () => {
+        return await store.mutateJobRetry({
+          resetJobHandlerParams: {
+            id: job?.jobId as string,
+            domain: 'RASTER',
+          }
+        });
+      });
+
+      return result;
+    }),
     jobSubmissionService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
       const { store, files, resolutionDegree, formData } = input.context || {};
 
