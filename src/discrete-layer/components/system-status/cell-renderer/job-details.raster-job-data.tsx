@@ -9,10 +9,11 @@ import { Hyperlink } from '../../../../common/components/hyperlink/hyperlink';
 import { RasterIngestionJobType } from '../../../../common/models/raster-job';
 import { DETAILS_ROW_ID_SUFFIX } from '../../../../common/components/grid';
 import { Domain } from '../../../../common/models/domain';
+import { RasterErrorsSummary } from '../../../../common/models/task-error-summary.raster';
 import { JobModelType, TaskModelType, useStore } from '../../../models';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
+import { getRasterErrorCount, RenderErrorCounts } from '../../job-error-summary/job-error-summary';
 import { CopyButton } from '../../job-manager/job-details.copy-button';
-import { RasterErrorsSummary, getRasterErrorCount, RenderErrorCounts } from '../../helpers/jobUtils';
 
 import './info-area.css';
 import './job-details.raster-job-data.css';

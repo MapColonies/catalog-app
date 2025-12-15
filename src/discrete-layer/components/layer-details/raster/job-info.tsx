@@ -5,7 +5,7 @@ import { Typography } from '@map-colonies/react-core';
 import { Skeleton } from '../../../../common/components/skeleton/skeleton';
 import { AutoDirectionBox } from '../../../../common/components/auto-direction-box/auto-direction-box.component';
 import { Status } from '../../../models';
-import { RenderErrorCounts } from '../../helpers/jobUtils';
+import { RenderErrorCounts } from '../../job-error-summary/job-error-summary';
 import { Progress } from './progress';
 import { isJobValid, isStatusFailed, isTaskValid } from './state-machine/helpers';
 import { IJob } from './state-machine/types';

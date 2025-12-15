@@ -4,6 +4,7 @@ import { AnyActorSystem } from 'xstate/dist/declarations/src/system';
 import { FileData } from '@map-colonies/react-components';
 import CONFIG from '../../../../../common/config';
 import { Mode } from '../../../../../common/models/mode.enum';
+import { RasterTaskParams } from '../../../../../common/models/task-error-summary.raster';
 import {
   IBaseRootStore,
   IRootStore,
@@ -14,7 +15,6 @@ import {
 } from '../../../../models';
 import { LayerRasterRecordInput } from '../../../../models/RootStore.base';
 import { IError } from '../../../helpers/errorUtils';
-import { RasterTaskParams } from '../../../helpers/jobUtils';
 
 export type ErrorSource = "api" | "logic";
 export type AddPolicy = "merge" | "override";

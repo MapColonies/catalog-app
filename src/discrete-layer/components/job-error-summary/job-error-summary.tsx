@@ -1,0 +1,47 @@
+import { IOptions } from "@map-colonies/react-core";
+import { Box } from "@material-ui/core";
+import { FormattedMessage } from "react-intl";
+import { RasterErrorCount, RasterErrorsSummary } from "../../../common/models/task-error-summary.raster";
+
+const errorsCountPresentor = (key: string, value: number, containerClassName: string, color: string): JSX.Element => {
+  return (
+    <Box key={key} className={containerClassName}>
+      <Box style={{ color }}>
+        <FormattedMessage id={`validationReport.${key}`} />
+      </Box>
+
+      <Box style={{ color }}>
+        {value}
+      </Box>
+    </Box>
+  );
+};
+
+export const getRasterErrorCount = (errorsSummary: RasterErrorsSummary | undefined, key: string): RasterErrorCount => {
+  if (!errorsSummary) {
+    return {};
+  }
+  const count = (errorsSummary.errorsCount as Record<string, number>)[key];
+  const exceeded = (errorsSummary.thresholds as Record<string, RasterErrorCount>)[key]?.exceeded;
+
+  return {
+    count,
+    exceeded
+  };
+};
+
+export const RenderErrorCounts = (theme: IOptions, errorsSummary: RasterErrorsSummary | undefined, className: string): JSX.Element[] | undefined => {
+  if (!errorsSummary) {
+    return;
+  }
+
+  return Object.entries(errorsSummary.errorsCount).map(([key, value]) => {
+    const color =
+      value === 0
+        ? theme.custom?.GC_SUCCESS
+        : getRasterErrorCount(errorsSummary, key)?.exceeded === false
+          ? theme.custom?.GC_WARNING_HIGH
+          : theme.custom?.GC_ERROR_HIGH
+    return errorsCountPresentor(key, value, className, color);
+  })
+};
