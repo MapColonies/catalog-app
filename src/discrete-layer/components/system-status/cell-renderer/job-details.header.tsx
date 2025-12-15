@@ -2,12 +2,13 @@ import React from 'react';
 import { useIntl } from 'react-intl';
 import { Typography } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
+import { AutoDirectionBox } from '../../../../common/components/auto-direction-box/auto-direction-box.component';
+import TooltippedValue from '../../../../common/components/form/tooltipped.value';
+import {DETAILS_ROW_ID_SUFFIX} from '../../../../common/components/grid';
 import { JobModelType, Status } from '../../../models';
 import { CopyButton } from '../../job-manager/job-details.copy-button';
 
 import './job-details.header.css';
-import TooltippedValue from '../../../../common/components/form/tooltipped.value';
-import {DETAILS_ROW_ID_SUFFIX} from '../../../../common/components/grid';
 
 interface JobDetailsHeaderProps {
   job: JobModelType;
@@ -136,9 +137,9 @@ export const JobDetailsHeader: React.FC<JobDetailsHeaderProps> = ({
     if (!failReason) return null;
     return (
       <>
-        <Typography tag="p" className="failReasonText">
+        <AutoDirectionBox className="failReasonText">
           {failReason}
-        </Typography>
+        </AutoDirectionBox>
         <CopyButton text={failReason}/>
       </>
     );

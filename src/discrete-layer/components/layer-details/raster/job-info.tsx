@@ -1,10 +1,11 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Box } from '@map-colonies/react-components';
-import { Typography } from '@map-colonies/react-core';
+import { Typography, useTheme } from '@map-colonies/react-core';
 import { Skeleton } from '../../../../common/components/skeleton/skeleton';
 import { AutoDirectionBox } from '../../../../common/components/auto-direction-box/auto-direction-box.component';
 import { Status } from '../../../models';
+import { RenderErrorCounts } from '../../job-error-summary/job-error-summary';
 import { Progress } from './progress';
 import { isJobValid, isStatusFailed, isTaskValid } from './state-machine/helpers';
 import { IJob } from './state-machine/types';
@@ -16,6 +17,8 @@ interface JobInfoProps {
 }
 
 export const JobInfo: React.FC<JobInfoProps> = ({ job }) => {
+  const theme = useTheme();
+
   if (!job) {
     return null;
   }
@@ -52,19 +55,11 @@ export const JobInfo: React.FC<JobInfoProps> = ({ job }) => {
               job.validationReport?.errorsSummary?.errorsCount ? (
                 <Box className="reportList">
                   {
-                    Object.entries(job.validationReport.errorsSummary.errorsCount).map(([key, value]) => {
-                      const color = (val: number): string =>
-                        val === 0
-                          ? 'success'
-                          : (job.validationReport?.errorsSummary?.thresholds as Record<string, { exceeded: boolean }>)?.[key]?.exceeded === false
-                            ? 'warning'
-                            : 'error';
-                      return count(key, value, color);
-                    })
+                    RenderErrorCounts(theme, job.validationReport.errorsSummary, 'countWrapper')
                   }
                 </Box>
               ) : (
-                  <Box className="error">
+                  <Box className="reportError error">
                     {
                       job.taskReason ? <Typography tag={'span'}>
                         <AutoDirectionBox>{job.taskReason}</AutoDirectionBox>
@@ -74,24 +69,13 @@ export const JobInfo: React.FC<JobInfoProps> = ({ job }) => {
                   </Box>
               )
             ) : (
-              <Skeleton width="99%" count={8} />
+              <Box className="reportLoading">
+                <Skeleton width="99%" count={8} />
+              </Box>
             )
           }
         </Box>
       </Box>
     </>
-  );
-};
-
-const count = (key: string, value: number, color: (val: number) => string) => {
-  return (
-    <Fragment key={key}>
-      <Box className={color(value)}>
-        <FormattedMessage id={`validationReport.${key}`} />
-      </Box>
-      <Box className={color(value)}>
-        {value}
-      </Box>
-    </Fragment>
   );
 };

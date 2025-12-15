@@ -1,0 +1,176 @@
+import React, { useCallback, useEffect, useState } from 'react';
+import { useIntl } from 'react-intl';
+import { get } from 'lodash';
+import { ICellRendererParams } from 'ag-grid-community';
+import { Box } from '@map-colonies/react-components';
+import { CircularProgress, IconButton, Tooltip, useTheme } from '@map-colonies/react-core';
+import { AutoDirectionBox } from '../../../../common/components/auto-direction-box/auto-direction-box.component';
+import { Hyperlink } from '../../../../common/components/hyperlink/hyperlink';
+import { RasterIngestionJobType } from '../../../../common/models/raster-job';
+import { DETAILS_ROW_ID_SUFFIX } from '../../../../common/components/grid';
+import { Domain } from '../../../../common/models/domain';
+import { RasterErrorsSummary } from '../../../../common/models/task-error-summary.raster';
+import { JobModelType, TaskModelType, useStore } from '../../../models';
+import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
+import { getRasterErrorCount, RenderErrorCounts } from '../../job-error-summary/job-error-summary';
+import { CopyButton } from '../../job-manager/job-details.copy-button';
+
+import './info-area.css';
+import './job-details.raster-job-data.css';
+
+interface JobDetailsRasterJobDataProps extends ICellRendererParams { }
+
+const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = ({ data }) => {
+  const store = useStore();
+  const intl = useIntl();
+  const theme = useTheme();
+  const ZOOM_LEVELS_TABLE = useZoomLevelsTable();
+
+  const jobData = data as JobModelType;
+
+  const [task, setTask] = useState<TaskModelType>();
+  const [errorsCount, setErrorsCount] = useState(0);
+  const [zoomLevel, setZoomLevel] = useState<number | undefined>(undefined);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const isRasterJob =
+    jobData.domain === Domain.RASTER &&
+    jobData.type &&
+    Object.values(RasterIngestionJobType).includes(jobData.type as RasterIngestionJobType);
+
+  const calculateErrorsCount = (errors: RasterErrorsSummary): number => {
+    let count = 0;
+
+    Object.keys(errors.errorsCount).forEach((key) => {
+      const errorCount = getRasterErrorCount(errors, key);
+      if (errorCount.exceeded === true || typeof errorCount.exceeded === 'undefined') {
+        count += errorCount.count ?? 0;
+      }
+    });
+
+    return count;
+  };
+
+  const fetchTask = useCallback(async () => {
+    try {
+      const result = await store.queryFindTasks({
+        params: {
+          jobId: jobData.id.replace(DETAILS_ROW_ID_SUFFIX, ''),
+          type: 'validation'
+        }
+      });
+
+      if (!result?.findTasks[0]) {
+        return undefined;
+      }
+
+      const task = { ...result.findTasks[0] };
+
+      if (task) {
+        setTask(task);
+
+        const errorsCount = task?.parameters?.errorsSummary;
+
+        if (errorsCount) {
+          setErrorsCount(calculateErrorsCount(errorsCount));
+        }
+      }
+    } catch { }
+  }, [store, jobData]);
+
+  const computeZoomLevel = useCallback(() => {
+    const ingestionResolution = get(jobData?.parameters, 'ingestionResolution')?.toString();
+    if (!ingestionResolution) {
+      return;
+    }
+
+    const index = Object.values(ZOOM_LEVELS_TABLE)
+      .map((value) => value.toString())
+      .findIndex(value => value === ingestionResolution);
+
+    if (index >= 0) {
+      setZoomLevel(index);
+    }
+  }, [jobData]);
+
+  const getGpkgFilesPath = () => {
+    return jobData.parameters?.inputFiles?.gpkgFilesPath?.[0];
+  }
+
+  const hasGpkgPath = () => {
+    return !!getGpkgFilesPath();
+  }
+
+  const errorsMessage = intl.formatMessage({ id: 'general.errors.text' });
+
+  const zoomLabel = zoomLevel !== undefined ? `(${zoomLevel})` : '';
+
+  const rasterInfo = (jobData.parameters && hasGpkgPath()) ?
+    `${getGpkgFilesPath()} ${zoomLabel}` :
+    intl.formatMessage({ id: 'general.deprecated-job.text' });
+
+  const hasErrors = errorsCount > 0;
+
+  useEffect(() => {
+    if (!isRasterJob) {
+      return;
+    }
+
+    fetchTask();
+    computeZoomLevel();
+  }, [jobData, jobData.parameters, isRasterJob]);
+
+  useEffect(() => {
+    const loading = !jobData.parameters;
+
+    setIsLoading(loading);
+  }, [jobData]);
+
+
+  if (!isRasterJob) {
+    return null;
+  }
+
+  return (
+    <Box id='rasterJobData' className='jobDataContainer'>
+      <AutoDirectionBox>
+        {
+          !isLoading ? rasterInfo : <CircularProgress size='xsmall'></CircularProgress>
+        }
+      </AutoDirectionBox>
+      {
+        !isLoading &&
+        <Box className={`linkItem errorsCountContainer ${errorsCount === 0 ? 'noErrors' : ''}`} key={`${jobData.id}`}>
+          {hasErrors &&
+            <>
+              <IconButton
+                className={`error mc-icon-Status-Warnings`}
+                onClick={(e): void => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
+              />
+
+              <Tooltip content={
+                <Box>
+                  {
+                    RenderErrorCounts(theme, task?.parameters?.errorsSummary, 'reportList')
+                  }
+                </Box>
+              }>
+                <Hyperlink url={task?.parameters?.report?.url ?? ''} label={`${errorsCount.toString()} ${errorsMessage}`} />
+              </Tooltip>
+
+              <CopyButton text={task?.parameters?.report?.url ?? ''} key={'errorsReportLink'} />
+            </>
+          }
+          {!hasErrors && hasGpkgPath() && task &&
+            intl.formatMessage({ id: 'general.no-errors.text' })
+          }
+        </Box>
+      }
+    </Box >
+  );
+}
+
+export default JobDetailsRasterJobData;
