@@ -162,8 +162,23 @@ export const DATA_LABEL = 'file-name.data';
 export const PRODUCT_LABEL = 'file-name.product';
 export const SHAPEMETADATA_LABEL = 'file-name.shapeMetadata';
 
-// TODO: use from @mapColonies/types and remove from here:
-//#region to be removed
+// #region to be removed
+// TODO: should be taken from @map-colonies/types
+export type CallBack<T> = {
+  jobId: string;
+  taskId: string;
+  jobType: string;
+  taskType: string;
+  productId: string;
+  productType: string;
+  version: string;
+  status: Status;
+  progress: number;
+  message?: string;
+  error?: string;
+  params: T;
+};
+
 export type TaskParams = {
   isValid: boolean;
   errorsSummary: ErrorsSummary;
@@ -189,4 +204,4 @@ export type ErrorsSummary = {
     };
   }
 };
-//#endregion to be removed
+// #endregion to be removed

@@ -206,7 +206,7 @@ export const isStatusFailed = (status: Status | undefined): boolean => {
 };
 
 export const isJobValid = (status: Status | undefined): boolean => {
-  return status !== null && typeof status !== 'undefined' && [Status.Suspended, Status.Expired].includes(status as Status);
+  return status !== null && typeof status !== 'undefined' && ![Status.Suspended, Status.Expired].includes(status as Status);
 };
 
 export const isTaskValid = (job: IJob | undefined): boolean => {

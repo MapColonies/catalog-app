@@ -1,4 +1,3 @@
-import { createClient } from 'graphql-ws';
 import { createHttpClient } from 'mst-gql';
 import CONFIG from './common/config';
 
@@ -153,26 +152,6 @@ const syncSlaves = (isRawRequest: boolean, masterResponse: any, query: string, v
     }
   });
 };*/
-
-export const initWebSocket = () => {
-  const wsClient = createClient({
-    url: `${CONFIG.WS_PROTOCOL}${CONFIG.SERVICE_NAME}/graphql-ws`,
-    connectionParams: {
-    },
-    on: {
-      connected: () => {
-        console.log("WebSocket connected");
-      },
-      closed: () => {
-        console.log("WebSocket disconnected");
-      },
-      error: (error) => {
-        console.error("WebSocket error:", error);
-      },
-    },
-  });
-  return wsClient;
-};
 
 export const syncHttpClientGql = () => {
   const clientGql = createHttpClient(`${CONFIG.SERVICE_PROTOCOL}${CONFIG.SERVICE_NAME}/graphql`);

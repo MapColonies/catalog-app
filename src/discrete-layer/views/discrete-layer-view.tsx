@@ -45,7 +45,6 @@ import { MenuDimensions } from '../../common/hooks/mapMenus/useGetMenuDimensions
 import { LinkType } from '../../common/models/link-type.enum';
 import { Mode } from '../../common/models/mode.enum';
 import { ActiveLayersIcon } from '../../icons/4font/ActiveLayers';
-import { initWebSocket } from '../../syncHttpClientGql';
 import { CatalogTreeComponent } from '../components/catalog-tree/catalog-tree';
 import ExportDrawingHandler from '../components/export-layer/export-drawing-handler.component';
 import { ExportLayerComponent } from '../components/export-layer/export-layer.component';
@@ -165,50 +164,38 @@ const DiscreteLayerView: React.FC = observer(() => {
   }]);
   const [searchResultsError, setSearchResultsError] = useState();
   const [actionsMenuDimensions, setActionsMenuDimensions] = useState<MenuDimensions>();
-  const [whatsNewVisitedCnt, setWhatsNewVisitedCnt] = useState<number>(ZERO);
-  const [notificationCount, setNotificationCount] = useState<number>(ZERO);
+  const [whatsNewVisitedCount, setWhatsNewVisitedCount] = useState<number>(ZERO);
+  const [taskNotificationCount, setTaskNotificationCount] = useState<number>(ZERO);
 
   const isDrawingState = isDrawing || store.exportStore.drawingState?.drawing;
   const disableOnDrawingClassName = isDrawingState ? 'interactionsDisabled' : '';
 
   useEffect(() => {
-    const wsClient = initWebSocket();
-    const subscribeToJobStatus = () => {
-      return wsClient.subscribe(
-        {
-          query: `subscription {
-            jobStatusUpdate {
-              jobId
-              status
-            }
-          }`,
-        },
-        {
-          next: (data) => {
-            console.log('Notification received:', data);
-            setNotificationCount((prevCount) => prevCount + 1);
-          },
-          error: (err) => {
-            console.error('Subscription error:', err);
-          },
-          complete: () => {
-            console.log('WebSocket subscription completed');
-          },
-        }
-      );
+    const visitedCount = localStore.get('whatsNewVisitedCount');
+    if (visitedCount) {
+      setWhatsNewVisitedCount(parseInt(visitedCount, 10));
+    }
+
+    const fetchTaskNotificationCount = () => {
+      const notifications = localStore.get('taskNotificationCount');
+      setTaskNotificationCount(notifications ? parseInt(notifications, 10) : 0);
     };
-    subscribeToJobStatus();
+
+    fetchTaskNotificationCount();
+
+    localStore.watchMethods(
+      ['setItem', 'removeItem'],
+      undefined,
+      (_method, key) => {
+        if (key === 'MC-taskNotificationCount') {
+          fetchTaskNotificationCount();
+        }
+      }
+    );
 
     return () => {
-      wsClient.dispose();
+      localStore.unWatchMethods();
     };
-  }, []);
-
-  useEffect(() => {
-    const val = localStore.get('whatsNewVisitedCnt');
-    if (val) {
-      setWhatsNewVisitedCnt(parseInt(val));
-    }
   }, []);
 
   useEffect(() => {
@@ -222,10 +209,10 @@ const DiscreteLayerView: React.FC = observer(() => {
   }, [data]);
   
   useEffect(() => {
-    // When search query changes, we need to refetch catalog capabilities as well.
+    // When search query changes, we need to refetch catalog capabilities as well
     let fullCatalogLayers: LayerMetadataMixedUnion[] | undefined;
     
-    // Tab data is set only when switching tabs.
+    // Tab data is set only when switching tabs
     if (activeTabView === TabViews.CATALOG) {
       fullCatalogLayers = store.discreteLayersStore.layersImages;
     } else {
@@ -485,14 +472,6 @@ const DiscreteLayerView: React.FC = observer(() => {
     if (setDialogOpen) {
       setDialogOpen(open);
     }
-  };
-
-  const handleSystemsJobsDialogClick = (): void => {
-    setIsSystemsJobsDialogOpen(!isSystemsJobsDialogOpen);
-  };
-  
-  const handleSystemsCoreInfoDialogClick = (): void => {
-    setIsSystemCoreInfoDialogOpen(!isSystemCoreInfoDialogOpen);
   };
 
   const createDrawPrimitive = (type: DrawType): IDrawingObject => {
@@ -1069,17 +1048,20 @@ const DiscreteLayerView: React.FC = observer(() => {
         <Box className="headerSystemAreaContainer">
           <Tooltip content={intl.formatMessage({ id: 'general.whats-new.tooltip' })}>
             <Box className="position">
-              {whatsNewVisitedCnt === ZERO && <Box className="badge badge_primary"></Box>}
+              {
+                whatsNewVisitedCount === ZERO &&
+                <Box className="badge badge_primary"></Box>
+              }
               <IconButton
                   className="operationIcon mc-icon-Help"
                   style={{fontSize: '38px'}}
                   label="Whats new?"
-                  onClick={ (): void => { 
-                    const val = whatsNewVisitedCnt + 1;
-                    localStore.set('whatsNewVisitedCnt',val + '');
-                    setWhatsNewVisitedCnt(val);
+                  onClick={(): void => { 
+                    const val = whatsNewVisitedCount + 1;
+                    localStore.set('whatsNewVisitedCount', val + '');
+                    setWhatsNewVisitedCount(val);
                     window.open(CONFIG.WHATSNEW_URL, '_blank');
-                  } }
+                  }}
                 />
             </Box>
           </Tooltip>
@@ -1097,17 +1079,19 @@ const DiscreteLayerView: React.FC = observer(() => {
             <Tooltip content={intl.formatMessage({ id: 'action.system-jobs.tooltip' })}>
               <Box className="systemJobsIconWrapper">
                 {
-                  notificationCount > 0 &&
+                  taskNotificationCount > 0 &&
                   <AutoDirectionBox className="notificationBadge">
-                    {notificationCount < 10 ? notificationCount : '9+'}
+                    {taskNotificationCount < 10 ? taskNotificationCount : '9+'}
                   </AutoDirectionBox>
                 }
                 <IconButton
                   className="operationIcon mc-icon-Job-Management"
                   label="SYSTEM JOBS"
-                  onClick={ (): void => {
-                    handleSystemsJobsDialogClick();
-                    setNotificationCount(ZERO);
+                  onClick={(): void => {
+                    localStore.set('taskNotificationCount', ZERO + '');
+                    localStore.remove('lastTask');
+                    setTaskNotificationCount(ZERO);
+                    setIsSystemsJobsDialogOpen(!isSystemsJobsDialogOpen);
                   }}
                 />
               </Box>
@@ -1119,7 +1103,9 @@ const DiscreteLayerView: React.FC = observer(() => {
               <IconButton
                 className="operationIcon mc-icon-System-Info"
                 label="SYSTEM CORE INFO"
-                onClick={ (): void => { handleSystemsCoreInfoDialogClick(); } }
+                onClick={(): void => {
+                  setIsSystemCoreInfoDialogOpen(!isSystemCoreInfoDialogOpen);
+                }}
               />
             </Tooltip>
           }

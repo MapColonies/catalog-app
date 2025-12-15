@@ -91,7 +91,7 @@ export const fetchProduct = async (product: IProductFile, context: IContext) => 
     return undefined;
   }
 
-  const apiUrl = `${CONFIG.SERVICE_PROTOCOL}${CONFIG.SERVICE_NAME}/zipshape`;
+  const apiUrl = `${CONFIG.SERVICE_PROTOCOL}${CONFIG.SERVICE_NAME}/api/zipshape`;
   const params = {
     folder: getPathWithSlash(path.dirname(product.path)),
     name: CONFIG.RASTER_INGESTION.FILES_STRUCTURE.product.producerFileName,

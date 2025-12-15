@@ -49,6 +49,7 @@ import { camelize } from './common/helpers/string';
 import { CustomTheme } from './theming/custom.theme';
 import EnumsMapContext, { IEnumsMapType } from './common/contexts/enumsMap.context';
 import LookupTablesContext, { ILookupTableData } from './common/contexts/lookupTables.context';
+import WebSocketNotifications from './discrete-layer/views/components/notifications/web-socket-notifications';
 import { PasswordAutofillDisabler } from './discrete-layer/views/components/password-autofill-disabler.component';
 
 const App: React.FC = () => {
@@ -84,31 +85,34 @@ const App: React.FC = () => {
   }, [lang]);
 
   return (
-    <IntlProvider onError={() => null} locale={lang} messages={MESSAGES[lang] as Record<string, string>}>
-      <RMWCProvider
-        typography={{
-          body1: 'span',
-          body2: ({ children, ...rest }): JSX.Element => (
-            <span>
-              <b>{children}</b>
-            </span>
-          ),
-        }}
-      >
-        <RMWCThemeProvider className={`app-container ${theme.type}-theme`} options={theme as IOptions}>
-          <PasswordAutofillDisabler />
-          <CssBaseline />
-          <LookupTablesContext.Provider value={{ lookupTablesData, setLookupTablesData }}>
-            <EnumsMapContext.Provider value={{ enumsMap, setEnumsMap }}>
-              <StaticDataFetcher />
-              <DiscreteLayerView />
-            </EnumsMapContext.Provider>
-          </LookupTablesContext.Provider>
-          <SnackContainer />
-          <SnackbarQueue messages={queue.messages} leading timeout={-1} />
-        </RMWCThemeProvider>
-      </RMWCProvider>
-    </IntlProvider>
+    <>
+      <WebSocketNotifications />
+      <IntlProvider onError={() => null} locale={lang} messages={MESSAGES[lang] as Record<string, string>}>
+        <RMWCProvider
+          typography={{
+            body1: 'span',
+            body2: ({ children, ...rest }): JSX.Element => (
+              <span>
+                <b>{children}</b>
+              </span>
+            ),
+          }}
+        >
+          <RMWCThemeProvider className={`app-container ${theme.type}-theme`} options={theme as IOptions}>
+            <PasswordAutofillDisabler />
+            <CssBaseline />
+            <LookupTablesContext.Provider value={{ lookupTablesData, setLookupTablesData }}>
+              <EnumsMapContext.Provider value={{ enumsMap, setEnumsMap }}>
+                <StaticDataFetcher />
+                <DiscreteLayerView />
+              </EnumsMapContext.Provider>
+            </LookupTablesContext.Provider>
+            <SnackContainer />
+            <SnackbarQueue messages={queue.messages} leading timeout={-1} />
+          </RMWCThemeProvider>
+        </RMWCProvider>
+      </IntlProvider>
+    </>
   );
 };
 
