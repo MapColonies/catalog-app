@@ -61,3 +61,7 @@ body[dir='rtl'] .column-label {
   justify-content: flex-start;
   height:24px;
 }
+
+.percentageContainer {
+  padding: 8px;
+}
