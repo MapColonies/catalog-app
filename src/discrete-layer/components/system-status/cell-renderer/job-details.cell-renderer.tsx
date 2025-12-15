@@ -175,8 +175,9 @@ const TasksRenderer: React.FC<TasksRendererParams> = observer(({ jobId, productT
 });
 
 export const JobDetailsRenderer: React.FC<ICellRendererParams> = observer((props) => {
+  const store = useStore();
+  
   const [propsWithJobParams, setPropsWithJobParams] = useState(props);
-
   const jobId = (props.data as JobModelType).id.replace(DETAILS_ROW_ID_SUFFIX, '');
 
   const { data } = useQuery(
@@ -201,7 +202,7 @@ export const JobDetailsRenderer: React.FC<ICellRendererParams> = observer((props
   const keyPrefix = `${(props.data as JobModelType).resourceId as string}`;
 
   return (
-    <Box className="jobDetailsContainer">
+    <Box key={jobId + store.jobsStore.reloadDataCounter} className="jobDetailsContainer">
       <JobDetailsHeader job={props.data as JobModelType} /> 
       <JobDetailsExportJobData key={jobId} {...propsWithJobParams} />
       <JobDetailsRasterJobData key={jobId} {...propsWithJobParams} />

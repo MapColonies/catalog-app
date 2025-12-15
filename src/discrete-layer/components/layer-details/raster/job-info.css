@@ -24,6 +24,7 @@
 #layerDetailsFormRaster .reportError {
   height: 164px;
   margin: 0 8px;
+  overflow-y: auto;
 }
 
 #layerDetailsFormRaster .reportLoading {

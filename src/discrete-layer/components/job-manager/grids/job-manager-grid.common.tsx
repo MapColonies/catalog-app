@@ -14,7 +14,7 @@ import { ActionsRenderer } from '../../../../common/components/grid/cell-rendere
 import { JobProductTypeRenderer } from '../../../../common/components/grid/cell-renderer/job-product-type.cell-renderer';
 import { Loading } from '../../../../common/components/tree/statuses/loading';
 import { Domain } from '../../../../common/models/domain';
-import { JobModelType, ProductType } from '../../../models';
+import { JobModelType, ProductType, useStore } from '../../../models';
 import { getProductDomain } from '../../layer-details/utils';
 import { DateCellRenderer } from '../../system-status/cell-renderer/date.cell-renderer';
 import { JobDetailsRenderer } from '../../system-status/cell-renderer/job-details.cell-renderer';
@@ -65,6 +65,7 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
     handleFocusError
   } = props;
 
+  const store = useStore();
   const intl = useIntl();
   const { enumsMap } = useContext(EnumsMapContext);
   const [focusJobId, setFocusJobId] = useState<string | undefined>(undefined);
@@ -96,6 +97,7 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
 
   useEffect(() => {
     rowDataChangeCB();
+    store.jobsStore.updateReloadDataCounter();
   }, [rowData]);
 
   const getPriorityOptions = useMemo(() => {

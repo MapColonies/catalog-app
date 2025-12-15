@@ -100,6 +100,16 @@ const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = ({ data 
     return !!getGpkgFilesPath();
   }
 
+  const errorsMessage = intl.formatMessage({ id: 'general.errors.text' });
+
+  const zoomLabel = zoomLevel !== undefined ? `(${zoomLevel})` : '';
+
+  const rasterInfo = (jobData.parameters && hasGpkgPath()) ?
+    `${getGpkgFilesPath()} ${zoomLabel}` :
+    intl.formatMessage({ id: 'general.deprecated-job.text' });
+
+  const hasErrors = errorsCount > 0;
+
   useEffect(() => {
     if (!isRasterJob) {
       return;
@@ -115,15 +125,6 @@ const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = ({ data 
     setIsLoading(loading);
   }, [jobData]);
 
-  const errorsMessage = intl.formatMessage({ id: 'general.errors.text' });
-
-  const zoomLabel = zoomLevel !== undefined ? `(${zoomLevel})` : '';
-
-  const rasterInfo = (jobData.parameters && hasGpkgPath()) ?
-    `${getGpkgFilesPath()} ${zoomLabel}` :
-    intl.formatMessage({ id: 'general.deprecated-job.text' });
-
-  const hasErrors = errorsCount > 0;
 
   if (!isRasterJob) {
     return null;
@@ -133,7 +134,11 @@ const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = ({ data 
     <Box id='rasterJobData' className='jobDataContainer'>
       <AutoDirectionBox>
         {
-          !isLoading ? rasterInfo :
+          !isLoading ?
+            <Box className='rasterInfo'>
+              {rasterInfo}
+            </Box>
+            :
             <CircularProgress size='xsmall'></CircularProgress>
         }
       </AutoDirectionBox>
