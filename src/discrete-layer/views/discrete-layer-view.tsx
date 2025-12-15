@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { MapMode2D } from 'cesium';
-import React, { useMemo, useState, useEffect, useCallback } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { Geometry, Feature, FeatureCollection, Polygon, Point } from 'geojson';
 import { find, get, isEmpty } from 'lodash';
 import { observer } from 'mobx-react-lite';
-import { Geometry, Feature, FeatureCollection, Polygon, Point } from 'geojson';
-import { lineString } from '@turf/helpers';
+import React, { useMemo, useState, useEffect, useCallback } from 'react';
+import { FormattedMessage, useIntl } from 'react-intl';
 import bbox from '@turf/bbox';
 import bboxPolygon from '@turf/bbox-polygon';
+import { lineString } from '@turf/helpers';
 import { 
   Avatar,
   Icon,
@@ -35,6 +35,7 @@ import {
 } from '@map-colonies/react-components';
 import { GeocoderOptions } from '@map-colonies/react-components/dist/cesium-map/geocoder/geocoder-panel';
 import { IMapLegend } from '@map-colonies/react-components/dist/cesium-map/legend';
+import { AutoDirectionBox } from '../../common/components/auto-direction-box/auto-direction-box.component';
 // import { BrowserCompatibilityChecker } from '../../common/components/browser-compatibility-checker/browser-compatibility-checker';
 import GPUInsufficiencyDetector from '../../common/components/gpu-insufficiency-detector/gpu-insufficiency-detector';
 import CONFIG from '../../common/config';
@@ -44,48 +45,48 @@ import { MenuDimensions } from '../../common/hooks/mapMenus/useGetMenuDimensions
 import { LinkType } from '../../common/models/link-type.enum';
 import { Mode } from '../../common/models/mode.enum';
 import { ActiveLayersIcon } from '../../icons/4font/ActiveLayers';
-import { SelectedLayersContainer } from '../components/map-container/selected-layers-container';
+import { CatalogTreeComponent } from '../components/catalog-tree/catalog-tree';
+import ExportDrawingHandler from '../components/export-layer/export-drawing-handler.component';
+import { ExportLayerComponent } from '../components/export-layer/export-layer.component';
+import ExportPolygonsRenderer from '../components/export-layer/export-polygons-renderer.component';
+// import { Filters } from '../components/filters/filters';
+import { JobsDialog } from '../components/job-manager/jobs.dialog';
+import { EntityDeleteDialog } from '../components/layer-details/entity.delete-dialog';
+import { EntityDialog } from '../components/layer-details/entity.dialog';
+import { EntityRasterDialog } from '../components/layer-details/raster/entity.raster.dialog';
+import { LayersResults } from '../components/layers-results/layers-results';
+import { ActionsContextMenu } from '../components/map-container/contextMenus/actions.context-menu';
+import { BBoxCorners } from '../components/map-container/bbox.dialog';
+import ActionsMenuDimensionsContext from '../components/map-container/contextMenus/contexts/actionsMenuDimensionsContext';
+import { ExtentUpdater } from '../components/map-container/extent-updater';
+import { FlyTo } from '../components/map-container/fly-to';
+import DemHeightsFeatureComponent from '../components/map-container/geojson-map-features/dem-heights-feature.component';
+import { PolygonParts } from '../components/map-container/geojson-map-features/polygonParts';
+import { PolygonPartsFeature } from '../components/map-container/geojson-map-features/polygonParts-feature.component';
+import { WfsFeature } from '../components/map-container/geojson-map-features/wfs-feature.component';
 import { HighlightedLayer } from '../components/map-container/highlighted-layer';
 import { LayersFootprints } from '../components/map-container/layers-footprints';
+import { IPOI } from '../components/map-container/poi.dialog';
+import { PoiEntity } from '../components/map-container/poi-entity';
 import { PolygonSelectionUi } from '../components/map-container/polygon-selection-ui_2';
-// import { Filters } from '../components/filters/filters';
-import { CatalogTreeComponent } from '../components/catalog-tree/catalog-tree';
-import { LayersResults } from '../components/layers-results/layers-results';
-import { EntityDialog } from '../components/layer-details/entity.dialog';
-import { JobsDialog } from '../components/job-manager/jobs.dialog';
+import { SelectedLayersContainer } from '../components/map-container/selected-layers-container';
+import { Terrain } from '../components/map-container/terrain';
+import { SystemCoreInfoDialog } from '../components/system-status/system-core-info/system-core-info.dialog';
 import {
   JobModelType,
   LayerMetadataMixedUnion,
   LinkModelType,
   RecordType
 } from '../models';
+import { IDispatchAction } from '../models/actionDispatcherStore';
 import { ILayerImage } from '../models/layerImage';
 import { useQuery, useStore } from '../models/RootStore';
 import { FilterField } from '../models/RootStore.base';
 import { UserAction, UserRole } from '../models/userStore';
-import { BBoxCorners } from '../components/map-container/bbox.dialog';
-import { FlyTo } from '../components/map-container/fly-to';
-import { IPOI } from '../components/map-container/poi.dialog';
-import { PoiEntity } from '../components/map-container/poi-entity';
-import { Terrain } from '../components/map-container/terrain';
-import ActionsMenuDimensionsContext from '../components/map-container/contextMenus/contexts/actionsMenuDimensionsContext';
-import { SystemCoreInfoDialog } from '../components/system-status/system-core-info/system-core-info.dialog';
-import { IDispatchAction } from '../models/actionDispatcherStore';
-import { ExportLayerComponent } from '../components/export-layer/export-layer.component';
-import ExportDrawingHandler from '../components/export-layer/export-drawing-handler.component';
-import ExportPolygonsRenderer from '../components/export-layer/export-polygons-renderer.component';
-import { EntityRasterDialog } from '../components/layer-details/raster/entity.raster.dialog';
-import { EntityDeleteDialog } from '../components/layer-details/entity.delete-dialog';
-import { MapActionResolver } from './components/map-action-resolver.component';
-import { ActionsContextMenu } from '../components/map-container/contextMenus/actions.context-menu';
-import { ExtentUpdater } from '../components/map-container/extent-updater';
-import DemHeightsFeatureComponent from '../components/map-container/geojson-map-features/dem-heights-feature.component';
-import { PolygonParts } from '../components/map-container/geojson-map-features/polygonParts';
-import { PolygonPartsFeature } from '../components/map-container/geojson-map-features/polygonParts-feature.component';
-import { WfsFeature } from '../components/map-container/geojson-map-features/wfs-feature.component';
 import { ActionResolver } from './components/action-resolver.component';
 import AppTitle from './components/app-title/app-title.component';
 import { DetailsPanel } from './components/details-panel.component';
+import { MapActionResolver } from './components/map-action-resolver.component';
 import { TabViewsSwitcher } from './components/tabs-views-switcher.component';
 import UserModeSwitch from './components/user-mode-switch/user-mode-switch.component';
 import { TabViews } from './tab-views';
@@ -97,6 +98,7 @@ import '@material/tab-indicator/dist/mdc.tab-indicator.css';
 
 import './discrete-layer-view.css';
 
+const ZERO = 0;
 const EXPANDED_PANEL_WIDTH = '28%';
 const COLLAPSED_PANEL_WIDTH = '40px';
 const SIDE_PANEL_WIDTH_VARIABLE = '--side-panel-width';
@@ -162,16 +164,38 @@ const DiscreteLayerView: React.FC = observer(() => {
   }]);
   const [searchResultsError, setSearchResultsError] = useState();
   const [actionsMenuDimensions, setActionsMenuDimensions] = useState<MenuDimensions>();
-  const [whatsNewVisitedCnt, setWhatsNewVisitedCnt] = useState<number>(0);
+  const [whatsNewVisitedCount, setWhatsNewVisitedCount] = useState<number>(ZERO);
+  const [taskNotificationCount, setTaskNotificationCount] = useState<number>(ZERO);
 
   const isDrawingState = isDrawing || store.exportStore.drawingState?.drawing;
-  const disableOnDrawingClassName = isDrawingState ? 'interactionsDisabled' : ''; 
+  const disableOnDrawingClassName = isDrawingState ? 'interactionsDisabled' : '';
 
   useEffect(() => {
-    const val = localStore.get('whatsNewVisitedCnt');
-    if (val) {
-      setWhatsNewVisitedCnt(parseInt(val));
+    const visitedCount = localStore.get('whatsNewVisitedCount');
+    if (visitedCount) {
+      setWhatsNewVisitedCount(parseInt(visitedCount, 10));
     }
+
+    const fetchTaskNotificationCount = () => {
+      const notifications = localStore.get('taskNotificationCount');
+      setTaskNotificationCount(notifications ? parseInt(notifications, 10) : 0);
+    };
+
+    fetchTaskNotificationCount();
+
+    localStore.watchMethods(
+      ['setItem', 'removeItem'],
+      undefined,
+      (_method, key) => {
+        if (key === 'MC-taskNotificationCount') {
+          fetchTaskNotificationCount();
+        }
+      }
+    );
+
+    return () => {
+      localStore.unWatchMethods();
+    };
   }, []);
 
   useEffect(() => {
@@ -185,10 +209,10 @@ const DiscreteLayerView: React.FC = observer(() => {
   }, [data]);
   
   useEffect(() => {
-    // When search query changes, we need to refetch catalog capabilities as well.
+    // When search query changes, we need to refetch catalog capabilities as well
     let fullCatalogLayers: LayerMetadataMixedUnion[] | undefined;
     
-    // Tab data is set only when switching tabs.
+    // Tab data is set only when switching tabs
     if (activeTabView === TabViews.CATALOG) {
       fullCatalogLayers = store.discreteLayersStore.layersImages;
     } else {
@@ -347,7 +371,7 @@ const DiscreteLayerView: React.FC = observer(() => {
   }, [store.discreteLayersStore.searchParams.geojson, store.discreteLayersStore.searchParams.catalogFilters]);
 
   useEffect(() => {
-    const hasFiltersEnabled = store.discreteLayersStore.searchParams.catalogFilters.length > 0 || store.discreteLayersStore.searchParams.geojson;
+    const hasFiltersEnabled = store.discreteLayersStore.searchParams.catalogFilters.length > START_IDX || store.discreteLayersStore.searchParams.geojson;
     if (hasFiltersEnabled) {
       const filters = buildFilters();
       setQuery(store.querySearch({
@@ -374,7 +398,7 @@ const DiscreteLayerView: React.FC = observer(() => {
   };
 
   const handleCatalogFiltersReset = (): void => {
-    if (store.discreteLayersStore.searchParams.catalogFilters.length === 0) return;
+    if (store.discreteLayersStore.searchParams.catalogFilters.length === START_IDX) { return; }
 
     store.discreteLayersStore.searchParams.resetCatalogFilters();
 
@@ -405,7 +429,7 @@ const DiscreteLayerView: React.FC = observer(() => {
     if (activeTabView !== TabViews.CATALOG) {
       // Catalog filters are being cleaned from inside the catalog filters panel.
       // If there's any filter enabled, then we want to stay at the search results tab.
-      if (store.discreteLayersStore.searchParams.catalogFilters?.length === 0) {
+      if (store.discreteLayersStore.searchParams.catalogFilters?.length === START_IDX) {
         handleTabViewChange(TabViews.CATALOG);
       }
     }
@@ -448,14 +472,6 @@ const DiscreteLayerView: React.FC = observer(() => {
     if (setDialogOpen) {
       setDialogOpen(open);
     }
-  };
-
-  const handleSystemsJobsDialogClick = (): void => {
-    setIsSystemsJobsDialogOpen(!isSystemsJobsDialogOpen);
-  };
-  
-  const handleSystemsCoreInfoDialogClick = (): void => {
-    setIsSystemCoreInfoDialogOpen(!isSystemCoreInfoDialogOpen);
   };
 
   const createDrawPrimitive = (type: DrawType): IDrawingObject => {
@@ -664,7 +680,7 @@ const DiscreteLayerView: React.FC = observer(() => {
             />
             <div className='tab-title'>
               <Typography use="headline6" tag="span">
-                <FormattedMessage id={tabView?.title} />
+                <FormattedMessage id={tabView?.title}></FormattedMessage>
               </Typography>
               <Typography use="headline6" tag="span" className={`current-client-site-${site}`}>
                 {site!=='generic' && intl.formatMessage({ id: `tab-views.catalog.site.${site}` })}
@@ -897,7 +913,7 @@ const DiscreteLayerView: React.FC = observer(() => {
       console.warn('GEOCODING[FEEDBACK]: Missing request_id in response header. Ensure the "Access-Control-Expose-Headers" header includes "request_id".');
     }
 
-    if (!CONFIG.GEOCODER.CALLBACK_URL) return;
+    if (!CONFIG.GEOCODER.CALLBACK_URL) { return; }
 
     const CATALOG_APP_USER_ID = CONFIG.CATALOG_APP_USER_ID.replace('{CURRENT_USER}', store.userStore?.user?.role as string);
 
@@ -1021,7 +1037,7 @@ const DiscreteLayerView: React.FC = observer(() => {
             onStartDraw={setDrawType}
             onFiltersApply={handleCatalogFiltersApply}
             onFiltersReset={handleCatalogFiltersReset}
-            isSelectionEnabled={Array.isArray(drawEntities[0]?.coordinates) ? drawEntities[0]?.coordinates.length > 0 : !!drawEntities[0]?.coordinates}
+            isSelectionEnabled={Array.isArray(drawEntities[START_IDX]?.coordinates) ? drawEntities[START_IDX]?.coordinates.length > START_IDX : !!drawEntities[START_IDX]?.coordinates}
             onPolygonUpdate={onPolygonSelection}
             onPoiUpdate={onPoiSelection}
             poi={poi}
@@ -1032,17 +1048,20 @@ const DiscreteLayerView: React.FC = observer(() => {
         <Box className="headerSystemAreaContainer">
           <Tooltip content={intl.formatMessage({ id: 'general.whats-new.tooltip' })}>
             <Box className="position">
-              {whatsNewVisitedCnt === 0 &&<Box className="badge badge_primary"></Box>}
+              {
+                whatsNewVisitedCount === ZERO &&
+                <Box className="badge badge_primary"></Box>
+              }
               <IconButton
                   className="operationIcon mc-icon-Help"
                   style={{fontSize: '38px'}}
                   label="Whats new?"
-                  onClick={ (): void => { 
-                    const val = whatsNewVisitedCnt + 1;
-                    localStore.set('whatsNewVisitedCnt',val + '');
-                    setWhatsNewVisitedCnt(val);
+                  onClick={(): void => { 
+                    const val = whatsNewVisitedCount + 1;
+                    localStore.set('whatsNewVisitedCount', val + '');
+                    setWhatsNewVisitedCount(val);
                     window.open(CONFIG.WHATSNEW_URL, '_blank');
-                  } }
+                  }}
                 />
             </Box>
           </Tooltip>
@@ -1056,27 +1075,42 @@ const DiscreteLayerView: React.FC = observer(() => {
             </Box>
           }
           {
-            permissions.isSystemJobsAllowed as boolean &&
+            permissions.isSystemJobsAllowed &&
             <Tooltip content={intl.formatMessage({ id: 'action.system-jobs.tooltip' })}>
-              <IconButton
-                className="operationIcon mc-icon-Job-Management"
-                label="SYSTEM JOBS"
-                onClick={ (): void => { handleSystemsJobsDialogClick(); } }
-              />
+              <Box className="systemJobsIconWrapper">
+                {
+                  taskNotificationCount > 0 &&
+                  <AutoDirectionBox className="notificationBadge">
+                    {taskNotificationCount < 10 ? taskNotificationCount : '9+'}
+                  </AutoDirectionBox>
+                }
+                <IconButton
+                  className="operationIcon mc-icon-Job-Management"
+                  label="SYSTEM JOBS"
+                  onClick={(): void => {
+                    localStore.set('taskNotificationCount', ZERO + '');
+                    localStore.remove('lastTask');
+                    setTaskNotificationCount(ZERO);
+                    setIsSystemsJobsDialogOpen(!isSystemsJobsDialogOpen);
+                  }}
+                />
+              </Box>
             </Tooltip>
           }
           {
-            permissions.isSystemCoreInfoAllowed as boolean &&
+            permissions.isSystemCoreInfoAllowed &&
             <Tooltip content={intl.formatMessage({ id: 'action.system-core-info.tooltip' })}>
               <IconButton
                 className="operationIcon mc-icon-System-Info"
                 label="SYSTEM CORE INFO"
-                onClick={ (): void => { handleSystemsCoreInfoDialogClick(); } }
+                onClick={(): void => {
+                  setIsSystemCoreInfoDialogOpen(!isSystemCoreInfoDialogOpen);
+                }}
               />
             </Tooltip>
           }
           {
-            permissions.isWebToolsAllowed as boolean &&
+            permissions.isWebToolsAllowed &&
             CONFIG.WEB_TOOLS_URL &&
             <Tooltip content={intl.formatMessage({ id: 'action.web-tools.tooltip' })}>
               <IconButton
@@ -1090,16 +1124,16 @@ const DiscreteLayerView: React.FC = observer(() => {
       </Box>
       <Box className="mainViewContainer">
         <Box className={`sidePanelParentContainer ${disableOnDrawingClassName}`}>
-        {!tabsPanelExpanded ? (
-            <Box
-              className="sidePanelContainer"
-              style={{
-                backgroundColor: theme.custom?.GC_ALTERNATIVE_SURFACE as string,
-              }}
-            >
-              {getActiveTabHeader(activeTabView, site)}
-            </Box>
-          ) : null}
+          {
+            !tabsPanelExpanded ? (
+              <Box
+                className="sidePanelContainer"
+                style={{ backgroundColor: theme.custom?.GC_ALTERNATIVE_SURFACE as string }}
+              >
+                {getActiveTabHeader(activeTabView, site)}
+              </Box>
+            ) : null
+          }
           <Box 
             className="sidePanelContainer"
             style={{

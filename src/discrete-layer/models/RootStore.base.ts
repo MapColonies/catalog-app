@@ -688,8 +688,8 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     mutateUpdateJob(variables: { data: JobUpdateData, id: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ updateJob: string }>(`mutation updateJob($data: JobUpdateData!, $id: String!) { updateJob(data: $data, id: $id) }`, variables, optimisticUpdate)
     },
-    mutateJobRetry(variables: { resetJobHandlerParams: JobActionParams }, optimisticUpdate?: () => void) {
-      return self.mutate<{ jobRetry: string }>(`mutation jobRetry($resetJobHandlerParams: JobActionParams!) { jobRetry(resetJobHandlerParams: $resetJobHandlerParams) }`, variables, optimisticUpdate)
+    mutateJobRetry(variables: { jobRetryParams: JobActionParams }, optimisticUpdate?: () => void) {
+      return self.mutate<{ jobRetry: string }>(`mutation jobRetry($jobRetryParams: JobActionParams!) { jobRetry(jobRetryParams: $jobRetryParams) }`, variables, optimisticUpdate)
     },
     mutateJobAbort(variables: { jobAbortParams: JobActionParams }, optimisticUpdate?: () => void) {
       return self.mutate<{ jobAbort: string }>(`mutation jobAbort($jobAbortParams: JobActionParams!) { jobAbort(jobAbortParams: $jobAbortParams) }`, variables, optimisticUpdate)

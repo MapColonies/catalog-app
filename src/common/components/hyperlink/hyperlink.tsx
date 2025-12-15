@@ -6,7 +6,8 @@ export const Hyperlink: React.FC<React.HTMLAttributes<HTMLAnchorElement> & { url
   return (
     <a
       href={`${url}${token ?? ''}`}
-      target="_blank" rel="noopener noreferrer"
+      target="_blank"
+      rel="noopener noreferrer"
       className='url'
       {...props}
     >

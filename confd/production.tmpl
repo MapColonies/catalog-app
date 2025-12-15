@@ -2,7 +2,9 @@ var MAP_SERVER = '{{ getv "/configuration/mapserver/url" "http://10.28.11.95:808
 window._env_ = {
   LANGUAGE: '{{ getv "/configuration/ui/language" "he" }}',
   BACKEND_LOCALE: '{{ getv "/configuration/ui/backend/locale" "he" }}',
-  SERVICE_URL: '{{ getv "/configuration/service/url" "http://localhost:8080/graphql" }}',
+  WS_PROTOCOL: '{{ getv "/configuration/ws/protocol" "ws://" }}',
+  SERVICE_PROTOCOL: '{{ getv "/configuration/service/protocol" "http://" }}',
+  SERVICE_NAME: '{{ getv "/configuration/service/name" "localhost:8080" }}',
   CATALOG_APP_USER_ID: '{{ getv "/configuration/catalogAppUserId" "catalog-app-{CURRENT_USER}@mapcolonies.net" }}',
   MAP_SERVER: MAP_SERVER,
   PUBLISH_POINT: '{{ getv "/configuration/mapServer/publishPoint" "combined_layers" }}',

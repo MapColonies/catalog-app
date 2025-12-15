@@ -59,14 +59,15 @@ export const JobInfo: React.FC<JobInfoProps> = ({ job }) => {
                   }
                 </Box>
               ) : (
-                  <Box className="reportError error">
-                    {
-                      job.taskReason ? <Typography tag={'span'}>
+                <Box className="reportError error">
+                  {
+                    job.taskReason
+                    ? <Typography tag={'span'}>
                         <AutoDirectionBox>{job.taskReason}</AutoDirectionBox>
-                      </Typography> :
-                      <FormattedMessage id="ingestion.error.not-found" values={{ value: 'job.validationReport.errorsSummary.errorsCount' }} />
-                    }
-                  </Box>
+                      </Typography>
+                    : <FormattedMessage id="ingestion.error.not-found" values={{ value: 'job.validationReport.errorsSummary.errorsCount' }} />
+                  }
+                </Box>
               )
             ) : (
               <Box className="reportLoading">

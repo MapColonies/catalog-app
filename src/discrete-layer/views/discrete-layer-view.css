@@ -84,6 +84,26 @@ body[dir='rtl'] .headerSystemAreaContainer{
   background: var(--mdc-theme-gc-selection-background);
 }
 
+.systemJobsIconWrapper {
+  position: relative;
+}
+
+.notificationBadge {
+  position: absolute;
+  top: -2px;
+  right: -4px;
+  background-color: var(--mdc-theme-gc-warning-high);
+  color: white;
+  border-radius: 50%;
+  padding: 2px;
+  font-size: 10px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+}
+
 .alignCenter {
   height: 100%;
   width: 100%;

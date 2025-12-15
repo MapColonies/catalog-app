@@ -1,9 +1,5 @@
-// import { get } from 'lodash';
 import { createHttpClient } from 'mst-gql';
-import { GraphQLClient } from 'mst-gql/node_modules/graphql-request';
-import { currentBffUrl } from './common/helpers/siteUrl';
-// import { sessionStore } from './common/helpers/storage';
-// import { RecordType } from './discrete-layer/models';
+import CONFIG from './common/config';
 
 export const enum SYNC_QUERY_NAME {
   UPDATE_META_DATA = 'updateMetadata',
@@ -158,39 +154,34 @@ const syncSlaves = (isRawRequest: boolean, masterResponse: any, query: string, v
 };*/
 
 export const syncHttpClientGql = () => {
-  const clientGql = createHttpClient(currentBffUrl);
+  const clientGql = createHttpClient(`${CONFIG.SERVICE_PROTOCOL}${CONFIG.SERVICE_NAME}/graphql`);
 
-  const createClientGql = (client: GraphQLClient) => {
-    const syncRequest = async ( isRawRequest: boolean, query: string, variables: any) => {
-      try {
-        // const relevantQuery = currentQuery(query);
-        let masterResponse: any = isRawRequest
-          ? await client.rawRequest(query, variables)
-          : await client.request(query, variables);
-        // if (relevantQuery
-        //   && !syncSlavesDns.includes(client)
-        //   && isRasterRequest(variables)
-        //   && shouldUpdateSlaves(relevantQuery.queryName)) {
-        //   syncSlaves(isRawRequest, masterResponse, query, variables, relevantQuery);
-        // }
-        return masterResponse;
-      } catch (error) {
-        console.error(`Error during ${query}`);
-        throw error;
-      }
-    };
-
-    const gqlClientObject = {
-      ...client,
-      request: async (query: string, variables?: any) => {
-        return syncRequest(false, query, variables);
-      },
-      rawRequest: async (query: string, variables?: any) => {
-        return syncRequest(true, query, variables);
-      },
-    };
-    return gqlClientObject;
+  const syncRequest = async (isRawRequest: boolean, query: string, variables: any) => {
+    try {
+      // const relevantQuery = currentQuery(query);
+      const masterResponse: any = isRawRequest
+        ? await clientGql.rawRequest(query, variables)
+        : await clientGql.request(query, variables);
+      // if (relevantQuery
+      //   && !syncSlavesDns.includes(client)
+      //   && isRasterRequest(variables)
+      //   && shouldUpdateSlaves(relevantQuery.queryName)) {
+      //   syncSlaves(isRawRequest, masterResponse, query, variables, relevantQuery);
+      // }
+      return masterResponse;
+    } catch (error) {
+      console.error(`Error during ${query}:`, error);
+      throw error;
+    }
   };
 
-  return createClientGql(clientGql);
+  return {
+    ...clientGql,
+    request: async (query: string, variables?: any) => {
+      return syncRequest(false, query, variables);
+    },
+    rawRequest: async (query: string, variables?: any) => {
+      return syncRequest(true, query, variables);
+    },
+  };
 };
