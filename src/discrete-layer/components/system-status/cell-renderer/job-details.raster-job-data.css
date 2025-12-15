@@ -1,6 +1,9 @@
 #rasterJobData.jobDataContainer {
   flex-direction: row;
   font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 #rasterJobData .errorsCountContainer {
@@ -27,12 +30,6 @@ body[dir='rtl'] #rasterJobData .errorsCountContainer {
   display: flex;
   color: var(--mdc-theme-gc-error-high);
   align-items: flex-start;
-}
-
-#rasterJobData.jobDataContainer {
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 #rasterJobData .errorsCountContainer {

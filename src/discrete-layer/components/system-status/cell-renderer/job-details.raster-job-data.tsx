@@ -134,12 +134,7 @@ const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = ({ data 
     <Box id='rasterJobData' className='jobDataContainer'>
       <AutoDirectionBox>
         {
-          !isLoading ?
-            <Box className='rasterInfo'>
-              {rasterInfo}
-            </Box>
-            :
-            <CircularProgress size='xsmall'></CircularProgress>
+          !isLoading ? rasterInfo : <CircularProgress size='xsmall'></CircularProgress>
         }
       </AutoDirectionBox>
       {
