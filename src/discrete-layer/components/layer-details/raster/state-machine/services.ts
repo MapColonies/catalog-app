@@ -1,5 +1,6 @@
 import path from 'path';
 import { fromPromise } from 'xstate';
+import CONFIG from '../../../../../common/config';
 import { relativeDateFormatter } from '../../../../../common/helpers/formatters';
 import { Mode } from '../../../../../common/models/mode.enum';
 import { RecordType } from '../../../../models';
@@ -80,6 +81,7 @@ export const SERVICES = {
           metadataShapefilePath: files?.shapeMetadata?.path || ''
         },
         metadata: (formData ?? {}) as LayerRasterRecordInput,
+        callbackUrls: [`${CONFIG.SERVICE_PROTOCOL}${CONFIG.SERVICE_NAME}/callback/task`],
         type: RecordType.RECORD_RASTER,
       };
 
