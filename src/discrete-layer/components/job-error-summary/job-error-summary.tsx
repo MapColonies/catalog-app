@@ -41,7 +41,7 @@ export const RenderErrorCounts = (theme: IOptions, errorsSummary: RasterErrorsSu
         ? theme.custom?.GC_SUCCESS
         : getRasterErrorCount(errorsSummary, key)?.exceeded === false
           ? theme.custom?.GC_WARNING_HIGH
-          : theme.custom?.GC_ERROR_HIGH
+          : theme.custom?.GC_ERROR_MEDIUM
     return errorsCountPresentor(key, value, className, color);
   })
 };

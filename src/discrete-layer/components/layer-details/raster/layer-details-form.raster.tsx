@@ -341,6 +341,7 @@ export const InnerRasterForm = (
               <Button
                 raised
                 type="button"
+                className={!isRetryEnabled((state.context)) ? "blink-for-attention" : ""}
                 onClick={(e): void => {
                   e.preventDefault();
                   e.stopPropagation();
