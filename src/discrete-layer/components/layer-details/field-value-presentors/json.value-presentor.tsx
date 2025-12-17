@@ -19,6 +19,7 @@ import { FormInputInfoTooltipComponent } from './form.input.info.tooltip';
 import { GeoJsonMapValuePresentorComponent } from './geojson-map.value-presentor';
 
 import './json.value-presentor.css';
+import { Copy } from '../../../../common/components/copy';
 
 const NONE = 0;
 const REMOVE_ERROR_DELAY = 300;
@@ -214,11 +215,13 @@ export const JsonValuePresentorComponent: React.FC<JsonValuePresentorProps> = ({
           {
             !isEmpty(value) && isCopyable &&
             <Box className="detailsFieldCopyIcon detailsFieldNoMargin">
-              <Tooltip content={intl.formatMessage({ id: 'action.copy.tooltip' })}>
+              <Copy value={stringifiedValue}/>
+
+              {/* <Tooltip content={intl.formatMessage({ id: 'action.copy.tooltip' })}>
                 <CopyToClipboard text={stringifiedValue}>
                   <IconButton type="button" className="mc-icon-Copy" />
                 </CopyToClipboard>
-              </Tooltip>
+              </Tooltip> */}
             </Box>
           }
         </Box>

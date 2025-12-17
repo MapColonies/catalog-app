@@ -18,6 +18,7 @@ import {
 import { IRecordFieldInfo } from '../layer-details.field-info';
 import { EntityFormikHandlers } from '../layer-datails-form';
 import { FormInputInfoTooltipComponent } from './form.input.info.tooltip';
+import { Copy } from '../../../../common/components/copy';
 
 const NONE = 0;
 
@@ -47,11 +48,13 @@ export const FormInputTextFieldComponent: React.FC<FormInputTextFieldProps> = ({
         {
           !isEmpty(value) && isCopyable &&
           <Box className="detailsFieldCopyIcon">
-            <Tooltip content={intl.formatMessage({ id: 'action.copy.tooltip' })}>
+            <Copy value={value as string}/>
+
+            {/* <Tooltip content={intl.formatMessage({ id: 'action.copy.tooltip' })}>
               <CopyToClipboard text={value as string}>
                 <IconButton type="button" className="mc-icon-Copy" />
               </CopyToClipboard>
-            </Tooltip>
+            </Tooltip> */}
           </Box>
         }
       </>

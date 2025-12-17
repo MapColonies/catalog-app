@@ -101,6 +101,7 @@
   "action.collapse.tooltip": "צמצום תצוגה",
   "action.close.tooltip": "סגירה",
   "action.copy-url.tooltip": "העתקת קישור",
+  "action.copied-url.tooltip": "קישור הועתק",
   "action.copy.tooltip": "העתקת טקסט",
   "action.copied.tooltip": "טקסט הועתק",
   "action.layer.move-to-top.tooltip": "העלאה מעל כולם",

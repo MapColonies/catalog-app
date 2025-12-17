@@ -11,6 +11,7 @@ import CopyToClipboard from 'react-copy-to-clipboard';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { CategorizedServices } from '../system-core-info.dialog';
 import './external-services.css';
+import { Copy } from '../../../../../common/components/copy';
 
 interface ExternalServicesProps {
   services: CategorizedServices;
@@ -43,16 +44,13 @@ export const ExternalServices: React.FC<ExternalServicesProps> = ({
                   <Typography className="urlText" tag="p">
                     {`${url as string}`}
                   </Typography>
+                  <Copy value={url as string}/>
 
-                  <Tooltip
-                    content={intl.formatMessage({
-                      id: 'action.copy-url.tooltip',
-                    })}
-                  >
+                  {/* <Tooltip content={intl.formatMessage({ id: 'action.copy-url.tooltip', })}>
                     <CopyToClipboard text={url as string}>
                       <IconButton className="mc-icon-Copy" type="button"/>
                     </CopyToClipboard>
-                  </Tooltip>
+                  </Tooltip> */}
                 </Box>
               );
             })}

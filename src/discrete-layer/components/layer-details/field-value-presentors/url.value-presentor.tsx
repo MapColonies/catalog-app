@@ -9,6 +9,7 @@ import { ILink } from '../../../models/links';
 import { getTokenParam } from '../../helpers/layersUtils';
 
 import './url.value-presentor.css';
+import { Copy } from '../../../../common/components/copy';
 
 const COPY = 'copy';
 const LINK = 'link';
@@ -40,13 +41,13 @@ export const UrlValuePresentorComponent: React.FC<UrlValuePresentorProps> = ({ v
       {
         !linkInfo || linkInfo.linkAction === COPY ? (
           <Box className="detailsUrlFieldUrlCopy">
-            <Tooltip
-              content={intl.formatMessage({ id: 'action.copy-url.tooltip' })}
-            >
+            <Copy value={value}/>
+            
+            {/* <Tooltip content={intl.formatMessage({ id: 'action.copy-url.tooltip' })} >
               <CopyToClipboard text={value} onCopy={(): void => setCopied(true)}>
                 <IconButton type="button" className="mc-icon-Copy" />
               </CopyToClipboard>
-            </Tooltip>
+            </Tooltip> */}
           </Box>
         ) : (
           <Box className="detailsUrlFieldUrlCopy"></Box>

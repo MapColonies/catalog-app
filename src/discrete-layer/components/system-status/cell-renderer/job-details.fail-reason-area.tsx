@@ -5,6 +5,7 @@ import { IconButton, Tooltip, Typography } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
 
 import './job-details.fail-reason-area.css';
+import { Copy } from '../../../../common/components/copy';
 
 interface FailReasonAreaProps {
   failReason: string;
@@ -33,11 +34,13 @@ export const FailReasonArea: React.FC<FailReasonAreaProps> = ({
           {failReason}
         </Typography>
 
-        <Tooltip content={intl.formatMessage({ id: 'action.copy.tooltip' })}>
+        <Copy value={failReason}/>
+
+        {/* <Tooltip content={intl.formatMessage({ id: 'action.copy.tooltip' })}>
           <CopyToClipboard text={failReason}>
             <IconButton type="button" className="mc-icon-Copy" />
           </CopyToClipboard>
-        </Tooltip>
+        </Tooltip> */}
       </Box>
     </td>
   );
