@@ -266,7 +266,7 @@
   "ingestion.checkbox.label": "לא ניתן לבצע את הפעולה באתר המשני, יש לסמן כדי להמשיך ולבצע את הפעולה באתר הראשי בלבד",
   "ingestion.job.progress": "התקדמות כללית",
   "ingestion.job.validationTaskProgress": "התקדמות הולידציה",
-  "ingestion.job.report": "תוצאות הולידציה שהתקבלו:",
+  "ingestion.job.report": "תוצאות הולידציה שהתקבלו",
 
   "validationReport.geometryValidity": "תקינות גיאומטרית",
   "validationReport.vertices": "פוליגונים עם עודף נקודות",

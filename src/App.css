@@ -211,6 +211,10 @@ input:disabled {
   animation: blink_smooth 1s infinite;
 }
 
+.blink-for-attention {
+  animation: blink_smooth 1s 6;
+}
+
 @keyframes blink_smooth {
   0% {
     opacity: 1; /* Fully visible */

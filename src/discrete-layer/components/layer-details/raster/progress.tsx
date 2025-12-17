@@ -42,7 +42,7 @@ export const Progress: React.FC<ProgressProps> = ({ titleId, show, percentage, s
 
   return (
     <Box className="progress">
-      <Box className="title bold">
+      <Box className="title bold center">
         <FormattedMessage id={titleId} />
       </Box>
       <Box className="center">
@@ -51,6 +51,7 @@ export const Progress: React.FC<ProgressProps> = ({ titleId, show, percentage, s
             show ? (
               <CircularProgressBar
                 value={percentage ?? 0}
+                strokeWidth={6}
                 styles={getStyles(isFailed, isValid)}
               >
                 {
@@ -80,7 +81,7 @@ export const Progress: React.FC<ProgressProps> = ({ titleId, show, percentage, s
                 <Box className={`text bold ${getClass(isFailed, isValid)}`}>
                   <StatusText status={status} reason={reason} />
                 </Box>
-                <Box className={`percentage bold ${getClass(isFailed, isValid)}`}>
+                <Box className={`percentage bold`}>
                   {`${percentage ?? 0}%`}
                 </Box>
               </CircularProgressBar>
