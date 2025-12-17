@@ -270,6 +270,7 @@ export type IngestionRasterData = {
   metadata: LayerRasterRecordInput
   ingestionResolution: number
   type: RecordType
+  callbackUrls: string[]
 }
 export type InputFilesRaster = {
   gpkgFilesPath: string[]
