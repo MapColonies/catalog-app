@@ -13,7 +13,7 @@ export const CustomTheme = {
 
     GC_WARNING_HIGH: '#FFA032', /* Orange */
     GC_WARNING_MEDIUM: '#FFEB87', /* Yellow */
-    GC_SUCCESS: 'green',
+    GC_SUCCESS: '#4CAF50',
     GC_ERROR_HIGH: '#CC1616', /* Dark Red */
     GC_ERROR_MEDIUM: '#FF3636', /* Red */
 

@@ -45,15 +45,15 @@ export const JobInfo: React.FC<JobInfoProps> = ({ job }) => {
           isValid={isJobValid(job.details?.status as Status | undefined)}
         />
       </Box>
-      <Box className="section">
+      <Box className="section panel">
         <Box className="reportContainer">
-          <Box className="title underline">
+          <Box className="title underline bold">
             <FormattedMessage id="ingestion.job.report" />
           </Box>
           {
             job.taskId ? (
               job.validationReport?.errorsSummary?.errorsCount ? (
-                <Box className="reportList">
+                <Box className="reportList bold">
                   {
                     RenderErrorCounts(theme, job.validationReport.errorsSummary, 'countWrapper')
                   }

@@ -8,10 +8,14 @@
   margin: 4px;
 }
 
+#layerDetailsFormRaster .panel {
+  background-color: rgba(0,0,0,0.3);
+}
+
 #layerDetailsFormRaster .reportList {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 4px;
+  gap: 0px;
   margin: 0 8px;
   height: 164px;
   overflow-y: auto;

@@ -265,7 +265,7 @@
   "ingestion.checkbox.label": "Operation failed on secondary site, please check to continue with operation on main site only",
   "ingestion.job.progress": "General progress",
   "ingestion.job.validationTaskProgress": "Validation progress",
-  "ingestion.job.report": "Validation results:",
+  "ingestion.job.report": "Validation results",
   
   "validationReport.geometryValidity": "Invalid geometry",
   "validationReport.vertices": "Polygons with too many vertices",

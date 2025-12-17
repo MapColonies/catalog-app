@@ -46,7 +46,7 @@ body[dir='rtl'] #rasterJobData .errorsCountContainer {
 .reportList {
   display: flex;
   padding: 4px 2px;
-  gap: 28px;
-  font-size: 0.8rem;
+  gap: 12px;
+  font-size: 0.9rem;
   justify-content: space-between;
 }
