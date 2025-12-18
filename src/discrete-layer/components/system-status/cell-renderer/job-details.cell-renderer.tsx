@@ -232,10 +232,10 @@ export const JobDetailsRenderer: React.FC<ICellRendererParams> = observer((props
   const keyPrefix = `${(props.data as JobModelType).resourceId as string}`;
 
   return (
-    <Box key={jobId + store.jobsStore.reloadDataCounter} className="jobDetailsContainer">
+    <Box key={`${jobId}_${store.jobsStore.reloadDataCounter}`} className="jobDetailsContainer">
       <JobDetailsHeader job={props.data as JobModelType} /> 
-      <JobDetailsExportJobData key={jobId} {...propsWithJobParams} />
-      <JobDetailsRasterJobData key={jobId} {...propsWithJobParams} />
+      <JobDetailsExportJobData {...propsWithJobParams} />
+      <JobDetailsRasterJobData {...propsWithJobParams} />
       <Box className="gridContainer">
         {taskFields.map((field) => (
           <Typography
