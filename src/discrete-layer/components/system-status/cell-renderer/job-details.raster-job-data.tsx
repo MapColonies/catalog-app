@@ -8,12 +8,12 @@ import { AutoDirectionBox } from '../../../../common/components/auto-direction-b
 import { Hyperlink } from '../../../../common/components/hyperlink/hyperlink';
 import { RasterIngestionJobType } from '../../../../common/models/raster-job';
 import { DETAILS_ROW_ID_SUFFIX } from '../../../../common/components/grid';
+import { Copy } from '../../../../common/components/copy';
 import { Domain } from '../../../../common/models/domain';
 import { RasterErrorsSummary } from '../../../../common/models/task-error-summary.raster';
 import { JobModelType, TaskModelType, useStore } from '../../../models';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
 import { getRasterErrorCount, RenderErrorCounts } from '../../job-error-summary/job-error-summary';
-import { CopyButton } from '../../job-manager/job-details.copy-button';
 
 import './info-area.css';
 import './job-details.raster-job-data.css';
@@ -161,7 +161,7 @@ const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = ({ data 
                 <Hyperlink url={task?.parameters?.report?.url ?? ''} label={`${errorsCount.toString()} ${errorsMessage}`} />
               </Tooltip>
 
-              <CopyButton text={task?.parameters?.report?.url ?? ''} key={'errorsReportLink'} />
+              <Copy value = {task?.parameters?.report?.url ?? ''} iconStyle = {{ fontSize: `20px` }} key={'errorsReportLink'}/>
             </>
           }
           {!hasErrors && hasGpkgPath() && task &&

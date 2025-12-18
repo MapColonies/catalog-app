@@ -4,10 +4,10 @@ import { get } from 'lodash';
 import { ICellRendererParams } from 'ag-grid-community';
 import { Box } from '@map-colonies/react-components';
 import { Typography } from '@map-colonies/react-core';
+import { Copy } from '../../../../common/components/copy';
 import { Hyperlink } from '../../../../common/components/hyperlink/hyperlink';
 import { dateFormatter } from '../../../../common/helpers/formatters';
 import { JobModelType, Status } from '../../../models';
-import { CopyButton } from '../../job-manager/job-details.copy-button';
 
 import './info-area.css';
 import './job.details.export-job-data.css';
@@ -74,7 +74,7 @@ const JobDetailsExportJobData: React.FC<JobDetailsExportJobDataProps> = ({ data 
               return (
                 <Box className="linkItem" key={`${jobData.id}_${linkType}`}>
                   <Hyperlink url={exportLink} label={typeToPresent} />
-                  <CopyButton text={exportLink} key={exportLink} />
+                  <Copy value = {exportLink} iconStyle = {{ fontSize: `20px` }} key={exportLink}/>
                 </Box>
               );
             })}

@@ -5,6 +5,7 @@ import { useIntl } from 'react-intl';
 import { isEmpty } from 'lodash';
 import { TextField, Tooltip, IconButton } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
+import { Copy } from '../../../../common/components/copy';
 import TooltippedValue from '../../../../common/components/form/tooltipped.value';
 import CONFIG from '../../../../common/config';
 import { convertExponentialToDecimal } from '../../../../common/helpers/number';
@@ -18,7 +19,6 @@ import {
 import { IRecordFieldInfo } from '../layer-details.field-info';
 import { EntityFormikHandlers } from '../layer-datails-form';
 import { FormInputInfoTooltipComponent } from './form.input.info.tooltip';
-import { Copy } from '../../../../common/components/copy';
 
 const NONE = 0;
 

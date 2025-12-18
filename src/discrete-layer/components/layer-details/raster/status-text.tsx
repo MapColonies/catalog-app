@@ -4,7 +4,8 @@ import { FormattedMessage } from 'react-intl';
 import { Box } from '@map-colonies/react-components';
 import { Tooltip, Typography } from '@map-colonies/react-core';
 import { Status } from '../../../models';
-import { CopyButton } from '../../job-manager/job-details.copy-button';
+import { Copy } from '../../../../common/components/copy';
+// import { CopyButton } from '../../job-manager/job-details.copy-button';
 
 import './status-text.css';
 
@@ -54,7 +55,8 @@ export const StatusText: React.FC<StatusTextProps> = ({ status, reason }) => {
       {
         status === Status.Failed && reason &&
         <Box>
-          <CopyButton text={reason} />
+          {/* <CopyButton text={reason} /> */}
+          <Copy value = {reason} iconStyle = {{ fontSize: `20px` }}/>
         </Box>
       }
     </Box>
