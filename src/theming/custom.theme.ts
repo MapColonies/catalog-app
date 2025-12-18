@@ -17,6 +17,13 @@ export const CustomTheme = {
     GC_ERROR_HIGH: '#CC1616', /* Dark Red */
     GC_ERROR_MEDIUM: '#FF3636', /* Red */
 
+    GC_STATUS_COMPLETED: '#4CAF50', /* Green */
+    GC_STATUS_FAILED: '#FF3636', /* Red */
+    GC_STATUS_SUSPENDED: '#de8926', /* Dark Orange */
+    GC_STATUS_PANDING: '#FFA032', /* Dark Orange */
+    GC_STATUS_IN_PROGRESS: '#e1c84a', /* Yellow */
+    GC_STATUS_EXPIRED: '#AFBFDA', /* Light Blue */
+
     GC_PRIORITY_HIGHEST: '#FF3636', /* Dark Red */
     GC_PRIORITY_HIGH: '#FE6814', /* Orange */
     GC_PRIORITY_NORMAL: '#00B45A', /* Green */
