@@ -21,7 +21,7 @@
     padding: 20px;
 }
 .catalogFilterFieldError {
-    color: var(--mdc-theme-gc-error-medium);
+    color: var(--mdc-theme-gc-error-high);
 }
 
 .catalogFilterPanelContainer.open .catalogFilterFieldContainer {

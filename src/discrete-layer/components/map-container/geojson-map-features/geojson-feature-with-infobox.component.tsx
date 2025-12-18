@@ -139,7 +139,7 @@ export const GeojsonFeatureWithInfoBox: React.FC<GeojsonFeatureWithInfoBoxProps>
             <Typography
               tag='h3'
               style={{
-                color: (theme.custom as unknown as Record<string, string>).GC_WARNING_MEDIUM,
+                color: (theme.custom as unknown as Record<string, string>).GC_WARNING_HIGH,
                 textAlign: 'center'
               }}
               dir={intl.locale === 'he' ? 'rtl' : 'ltr'}
