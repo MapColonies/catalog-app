@@ -1,5 +1,5 @@
 .pending {
-  color: var(--mdc-theme-gc-status-panding);
+  color: var(--mdc-theme-gc-status-pending);
 }
 .inprogress {
   color: var(--mdc-theme-gc-status-in-progress);
