@@ -12,7 +12,7 @@ import { Domain } from '../../../../../common/models/domain';
 import { RasterErrorsSummary } from '../../../../../common/models/task-error-summary.raster';
 import { JobModelType, TaskModelType, useStore } from '../../../../models';
 import useZoomLevelsTable from '../../../export-layer/hooks/useZoomLevelsTable';
-import { getRasterErrorCount, RenderErrorCounts } from '../../../job-error-summary/job-error-summary';
+import { getRasterErrorCount, JobErrorsSummary } from '../../../job-errors-summary/job-errors-summary';
 import { CopyButton } from '../../job-details.copy-button';
 
 import './info-area.css';
@@ -154,7 +154,7 @@ const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = ({ data 
               <Tooltip content={
                 <Box>
                   {
-                    RenderErrorCounts(theme, task?.parameters?.errorsSummary, 'reportList')
+                    JobErrorsSummary(theme, task?.parameters?.errorsSummary, 'reportList')
                   }
                 </Box>
               }>
@@ -164,12 +164,13 @@ const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = ({ data 
               <CopyButton text={task?.parameters?.report?.url ?? ''} key={'errorsReportLink'} />
             </>
           }
-          {!hasErrors && hasGpkgPath() && task &&
+          {
+            !hasErrors && hasGpkgPath() && task &&
             intl.formatMessage({ id: 'general.no-errors.text' })
           }
         </Box>
       }
-    </Box >
+    </Box>
   );
 }
 

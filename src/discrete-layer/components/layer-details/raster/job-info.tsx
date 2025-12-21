@@ -5,7 +5,7 @@ import { Typography, useTheme } from '@map-colonies/react-core';
 import { Skeleton } from '../../../../common/components/skeleton/skeleton';
 import { AutoDirectionBox } from '../../../../common/components/auto-direction-box/auto-direction-box.component';
 import { Status } from '../../../models';
-import { RenderErrorCounts } from '../../job-error-summary/job-error-summary';
+import { JobErrorsSummary } from '../../job-errors-summary/job-errors-summary';
 import { Progress } from './progress';
 import { isJobValid, isStatusFailed, isTaskValid } from './state-machine/helpers';
 import { IJob } from './state-machine/types';
@@ -55,7 +55,7 @@ export const JobInfo: React.FC<JobInfoProps> = ({ job }) => {
               job.validationReport?.errorsSummary?.errorsCount ? (
                 <Box className="reportList bold">
                   {
-                    RenderErrorCounts(theme, job.validationReport.errorsSummary, 'countWrapper')
+                    JobErrorsSummary(theme, job.validationReport.errorsSummary, 'countWrapper')
                   }
                 </Box>
               ) : (

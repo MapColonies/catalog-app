@@ -3,7 +3,7 @@ import { IOptions } from '@map-colonies/react-core';
 import { Box } from '@material-ui/core';
 import { RasterErrorCount, RasterErrorsSummary } from '../../../common/models/task-error-summary.raster';
 
-const errorsCountPresentor = (key: string, value: number, containerClassName: string, color: string): JSX.Element => {
+const ErrorCount = (key: string, value: number, containerClassName: string, color: string): JSX.Element => {
   return (
     <Box key={key} className={containerClassName}>
       <Box style={{ color }}>
@@ -28,7 +28,7 @@ export const getRasterErrorCount = (errorsSummary: RasterErrorsSummary | undefin
   };
 };
 
-export const RenderErrorCounts = (theme: IOptions, errorsSummary: RasterErrorsSummary | undefined, className: string): JSX.Element[] | undefined => {
+export const JobErrorsSummary = (theme: IOptions, errorsSummary: RasterErrorsSummary | undefined, className: string): JSX.Element[] | undefined => {
   if (!errorsSummary) {
     return;
   }
@@ -39,6 +39,6 @@ export const RenderErrorCounts = (theme: IOptions, errorsSummary: RasterErrorsSu
         : getRasterErrorCount(errorsSummary, key)?.exceeded === false
           ? theme.custom?.GC_WARNING_HIGH
           : theme.custom?.GC_ERROR_HIGH
-    return errorsCountPresentor(key, value, className, color);
+    return ErrorCount(key, value, className, color);
   });
 };
