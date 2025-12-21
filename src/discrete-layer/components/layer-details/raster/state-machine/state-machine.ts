@@ -35,6 +35,7 @@ const filesMachine = createMachine({
       always: [
         {
           guard: (_: { context: IContext }) => {
+            console.log(`>>> Enter GUARD always of ${WORKFLOW.FILES.SELECTION_MODE}`);
             return _.context.selectionMode === 'manual';
           },
           target: WORKFLOW.FILES.MANUAL.ROOT
@@ -304,6 +305,7 @@ export const workflowMachine = createMachine<IContext, Events>({
         onDone: [
           {
             guard: (_: { context: IContext; event: any }) => {
+              console.log(`>>> Enter GUARD onDone of ${WORKFLOW.START_UPDATE}`);
               return false;// !!_.event.output.jobId;
             },
             actions: assign((_: { context: IContext; event: any }) => ({
@@ -399,20 +401,21 @@ export const workflowMachine = createMachine<IContext, Events>({
         input: (_: { context: IContext; event: any }) => _,
         src: SERVICES[WORKFLOW.ROOT].jobPollingService,
         onDone: [
-          {
-            guard: (_: { context: IContext; event: any }) => {
-              return _.event.output.details.status !== Status.InProgress &&
-                _.event.output.details.status !== Status.Pending &&
-                _.event.output.details.status !== Status.Suspended;
-            },
-            actions: assign((_: { context: IContext; event: any }) => ({
-              job: {
-                ..._.context.job,
-                ..._.event.output
-              }
-            })),
-            target: WORKFLOW.IDLE
-          },
+          // {
+          //   // guard: (_: { context: IContext; event: any }) => {
+          //   //   console.log(`>>> Enter GUARD onDone of ${WORKFLOW.JOB_POLLING}`);
+          //   //   return _.event.output.details.status !== Status.InProgress &&
+          //   //     _.event.output.details.status !== Status.Pending &&
+          //   //     _.event.output.details.status !== Status.Suspended;
+          //   // },
+          //   actions: assign((_: { context: IContext; event: any }) => ({
+          //     job: {
+          //       ..._.context.job,
+          //       ..._.event.output
+          //     }
+          //   })),
+          //   target: WORKFLOW.IDLE
+          // },
           {
             actions: assign((_: { context: IContext; event: any }) => ({
               job: {
@@ -446,7 +449,11 @@ export const workflowMachine = createMachine<IContext, Events>({
           actions: assign((_: { context: IContext; event: any }) => ({
             remainingTime: _.context.remainingTime ? _.context.remainingTime - 1 : 0
           }))
-        }
+        },
+        STOP_POLLING: {
+          target: WORKFLOW.IDLE
+        },
+        "*": { actions: warnUnexpectedStateEvent }
       },
       after: {
         [CONFIG.JOB_MANAGER.POLLING_CYCLE_INTERVAL]: WORKFLOW.JOB_POLLING

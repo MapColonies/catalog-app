@@ -47,6 +47,7 @@ body[dir='rtl'] #layerDetailsFormRaster .buttons {
   flex-direction: column;
   height: 60px;
   overflow-y: auto;
+  width: 70%;
 }
 
 #layerDetailsFormRaster .categoryFieldsParentContainer {
