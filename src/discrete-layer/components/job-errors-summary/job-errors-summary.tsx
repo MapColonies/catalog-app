@@ -1,13 +1,20 @@
 import { FormattedMessage } from 'react-intl';
 import { IOptions } from '@map-colonies/react-core';
 import { Box } from '@material-ui/core';
-import { RasterErrorCount, RasterErrorsSummary } from '../../../common/models/task-error-summary.raster';
+import { RasterErrorCount, RasterErrorsSummary } from '../../../common/models/job-errors-summary.raster';
 
-const ErrorCount = (key: string, value: number, containerClassName: string, color: string): JSX.Element => {
+interface ErrorCountProps {
+  name: string;
+  value: number;
+  className: string;
+  color?: string
+}
+
+const ErrorCount = ({ name, value, className, color }: ErrorCountProps): JSX.Element => {
   return (
-    <Box key={key} className={containerClassName}>
+    <Box className={className}>
       <Box style={{ color }}>
-        <FormattedMessage id={`validationReport.${key}`} />
+        <FormattedMessage id={`validationReport.${name}`} />
       </Box>
       <Box style={{ color }}>
         {value}
@@ -38,7 +45,7 @@ export const JobErrorsSummary = (theme: IOptions, errorsSummary: RasterErrorsSum
         ? theme.custom?.GC_SUCCESS
         : getRasterErrorCount(errorsSummary, key)?.exceeded === false
           ? theme.custom?.GC_WARNING_HIGH
-          : theme.custom?.GC_ERROR_HIGH
-    return ErrorCount(key, value, className, color);
+          : theme.custom?.GC_ERROR_HIGH;
+    return <ErrorCount key={key} name={key} value={value} className={className} color={color} />;
   });
 };

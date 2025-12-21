@@ -20,7 +20,7 @@ import { ValidationsError } from '../../../../common/components/error/validation
 import { mergeRecursive } from '../../../../common/helpers/object';
 import { localStore } from '../../../../common/helpers/storage';
 import { Mode } from '../../../../common/models/mode.enum';
-import { CallBack, RasterTaskParams } from '../../../../common/models/task-error-summary.raster';
+import { CallBack, RasterTaskParams } from '../../../../common/models/job-errors-summary.raster';
 import { UserAction } from '../../../models/userStore';
 import {
   EntityDescriptorModelType,

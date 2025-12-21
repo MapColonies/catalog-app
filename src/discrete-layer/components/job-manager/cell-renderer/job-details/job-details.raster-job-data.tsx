@@ -9,7 +9,7 @@ import { Hyperlink } from '../../../../../common/components/hyperlink/hyperlink'
 import { RasterIngestionJobType } from '../../../../../common/models/raster-job';
 import { DETAILS_ROW_ID_SUFFIX } from '../../../../../common/components/grid';
 import { Domain } from '../../../../../common/models/domain';
-import { RasterErrorsSummary } from '../../../../../common/models/task-error-summary.raster';
+import { RasterErrorsSummary } from '../../../../../common/models/job-errors-summary.raster';
 import { JobModelType, TaskModelType, useStore } from '../../../../models';
 import useZoomLevelsTable from '../../../export-layer/hooks/useZoomLevelsTable';
 import { getRasterErrorCount, JobErrorsSummary } from '../../../job-errors-summary/job-errors-summary';
@@ -153,9 +153,7 @@ const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = ({ data 
 
               <Tooltip content={
                 <Box>
-                  {
-                    JobErrorsSummary(theme, task?.parameters?.errorsSummary, 'reportList')
-                  }
+                  {JobErrorsSummary(theme, task?.parameters?.errorsSummary, "reportList")}
                 </Box>
               }>
                 <Hyperlink url={task?.parameters?.report?.url ?? ''} label={`${errorsCount.toString()} ${errorsMessage}`} />

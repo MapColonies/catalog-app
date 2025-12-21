@@ -3,8 +3,8 @@ import { /*ActionArgs, */EventObject, PromiseActorRef } from 'xstate';
 import { AnyActorSystem } from 'xstate/dist/declarations/src/system';
 import { FileData } from '@map-colonies/react-components';
 import CONFIG from '../../../../../common/config';
+import { RasterTaskParams } from '../../../../../common/models/job-errors-summary.raster';
 import { Mode } from '../../../../../common/models/mode.enum';
-import { RasterTaskParams } from '../../../../../common/models/task-error-summary.raster';
 import {
   IBaseRootStore,
   IRootStore,

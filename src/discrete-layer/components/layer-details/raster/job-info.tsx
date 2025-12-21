@@ -54,15 +54,13 @@ export const JobInfo: React.FC<JobInfoProps> = ({ job }) => {
             job.taskId ? (
               job.validationReport?.errorsSummary?.errorsCount ? (
                 <Box className="reportList bold">
-                  {
-                    JobErrorsSummary(theme, job.validationReport.errorsSummary, 'countWrapper')
-                  }
+                  {JobErrorsSummary(theme, job.validationReport.errorsSummary, "countWrapper")}
                 </Box>
               ) : (
                 <Box className="reportError error">
                   {
                     job.taskReason
-                    ? <Typography tag={'span'}>
+                    ? <Typography tag="span">
                         <AutoDirectionBox>{job.taskReason}</AutoDirectionBox>
                       </Typography>
                     : <FormattedMessage id="ingestion.error.not-found" values={{ value: 'job.validationReport.errorsSummary.errorsCount' }} />
