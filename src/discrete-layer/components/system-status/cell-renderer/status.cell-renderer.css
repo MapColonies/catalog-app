@@ -1,32 +1,35 @@
 .pending {
-  color: var(--mdc-theme-gc-warning-high);
+  color: var(--mdc-theme-gc-status-pending);
 }
 .inprogress {
-  color: var(--mdc-theme-gc-warning-medium);
+  color: var(--mdc-theme-gc-status-in-progress);
 }
 .completed {
-  color: var(--mdc-theme-gc-success);
+  color: var(--mdc-theme-gc-status-completed);
 }
 .failed {
-  color: var(--mdc-theme-gc-error-medium);
+  color: var(--mdc-theme-gc-status-failed);
 }
 .expired {
-  color: var(--mdc-theme-text-disabled-on-dark);
+  color: var(--mdc-theme-gc-status-expired);
 }
 .CompletedArea {
-  background: var(--mdc-theme-gc-success);
+  background: var(--mdc-theme-gc-status-completed);
   opacity: 0.85;
 }
 .FailedArea {
-  background: var(--mdc-theme-gc-error-medium);
+  background: var(--mdc-theme-gc-status-failed);
   opacity: 0.85;
 }
 .InProgressArea {
-  background: var(--mdc-theme-gc-warning-medium);
+  background: var(--mdc-theme-gc-status-in-progress);
   opacity: 0.85;
 }
+.SuspendedArea {
+  background: var(--mdc-theme-gc-status-suspended);
+}
 .ExpiredArea {
-  background: var(--mdc-theme-text-disabled-on-dark);
+  background: var(--mdc-theme-gc-status-expired);
   opacity: 0.85;
 }
 .progressSectionsContainer {
