@@ -1,7 +1,7 @@
-import { IOptions } from "@map-colonies/react-core";
-import { Box } from "@material-ui/core";
-import { FormattedMessage } from "react-intl";
-import { RasterErrorCount, RasterErrorsSummary } from "../../../common/models/task-error-summary.raster";
+import { FormattedMessage } from 'react-intl';
+import { IOptions } from '@map-colonies/react-core';
+import { Box } from '@material-ui/core';
+import { RasterErrorCount, RasterErrorsSummary } from '../../../common/models/task-error-summary.raster';
 
 const errorsCountPresentor = (key: string, value: number, containerClassName: string, color: string): JSX.Element => {
   return (
@@ -9,7 +9,6 @@ const errorsCountPresentor = (key: string, value: number, containerClassName: st
       <Box style={{ color }}>
         <FormattedMessage id={`validationReport.${key}`} />
       </Box>
-
       <Box style={{ color }}>
         {value}
       </Box>
@@ -23,7 +22,6 @@ export const getRasterErrorCount = (errorsSummary: RasterErrorsSummary | undefin
   }
   const count = (errorsSummary.errorsCount as Record<string, number>)[key];
   const exceeded = (errorsSummary.thresholds as Record<string, RasterErrorCount>)[key]?.exceeded;
-
   return {
     count,
     exceeded
@@ -34,7 +32,6 @@ export const RenderErrorCounts = (theme: IOptions, errorsSummary: RasterErrorsSu
   if (!errorsSummary) {
     return;
   }
-
   return Object.entries(errorsSummary.errorsCount).map(([key, value]) => {
     const color =
       value === 0
@@ -43,5 +40,5 @@ export const RenderErrorCounts = (theme: IOptions, errorsSummary: RasterErrorsSu
           ? theme.custom?.GC_WARNING_HIGH
           : theme.custom?.GC_ERROR_HIGH
     return errorsCountPresentor(key, value, className, color);
-  })
+  });
 };

@@ -18,12 +18,15 @@ import { Button } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
 import { ValidationsError } from '../../../../common/components/error/validations.error-presentor';
 import { mergeRecursive } from '../../../../common/helpers/object';
+import { localStore } from '../../../../common/helpers/storage';
 import { Mode } from '../../../../common/models/mode.enum';
+import { CallBack, RasterTaskParams } from '../../../../common/models/task-error-summary.raster';
 import { UserAction } from '../../../models/userStore';
 import {
   EntityDescriptorModelType,
   LayerMetadataMixedUnion,
   RecordType,
+  Status,
   useStore
 } from '../../../models';
 import { LayersDetailsComponent } from '../layer-details';
@@ -149,6 +152,41 @@ export const InnerRasterForm = (
     }
   }, [state.context?.formData]);
   //#endregion
+
+  useEffect(() => {
+    const fetchTaskNotification = () => {
+      const lastTask = localStore.get('lastTask');
+      let notification: CallBack<RasterTaskParams> = JSON.parse(lastTask as string);
+      if (notification &&
+        state.context.job &&
+        notification.jobId === state.context.job.jobId &&
+        notification.taskId === state.context.job.taskId) {
+        actorRef.send({
+          type: 'SYNC',
+          job: {
+            taskPercentage: notification.progress ?? 0,
+            validationReport: notification.params,
+            taskStatus: notification.status as Status,
+            taskReason: notification.message ?? '',
+          }
+        } satisfies Events);
+      }
+    };
+
+    localStore.watchMethods(
+      ['setItem'],
+      undefined,
+      (_method, key) => {
+        if (key === 'MC-lastTask') {
+          fetchTaskNotification();
+        }
+      }
+    );
+
+    return () => {
+      localStore.unWatchMethods();
+    };
+  }, []);
 
   const getStatusErrors = useCallback((): StatusError | Record<string, unknown> => {
     return {
@@ -341,11 +379,10 @@ export const InnerRasterForm = (
               <Button
                 raised
                 type="button"
-                className={!isRetryEnabled(state.context) ? "blink-for-attention" : ""}
+                className={!isRetryEnabled(state.context) ? 'blink-for-attention' : ''}
                 onClick={(e): void => {
                   e.preventDefault();
                   e.stopPropagation();
-
                   store.actionDispatcherStore.dispatchAction({
                     action: UserAction.SYSTEM_CALLBACK_OPEN_JOB_MANAGER,
                     data: { job: state.context.job?.details }

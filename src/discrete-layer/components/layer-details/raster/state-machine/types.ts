@@ -102,11 +102,12 @@ export type Events =
   | { type: "CLEAN_ERRORS" }
   | { type: "NOOP" }
   | { type: "SUBMIT", data: LayerRasterRecordInput, resolutionDegree: number }
+  | { type: "TICK" }
+  | { type: "SYNC", job: IJob }
+  | { type: "STOP_POLLING"}
   | { type: "RESTORE", job: IJob }
   | { type: "RETRY" }
-  | { type: "DONE" }
-  | { type: "TICK" }
-  | { type: "STOP_POLLING"};
+  | { type: "DONE" };
 
 // type FlowActionArgs = ActionArgs<Context, Events, Events>;
 

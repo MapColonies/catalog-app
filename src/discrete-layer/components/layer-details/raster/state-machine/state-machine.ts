@@ -3,7 +3,6 @@ import { assign, createMachine, fromCallback, sendParent } from 'xstate';
 import CONFIG from '../../../../../common/config';
 import { dateFormatter, relativeDateFormatter } from '../../../../../common/helpers/formatters';
 import { Mode } from '../../../../../common/models/mode.enum';
-import { Status } from '../../../../models';
 import {
   fetchProductActions,
   filesErrorActions,
@@ -306,7 +305,7 @@ export const workflowMachine = createMachine<IContext, Events>({
           {
             guard: (_: { context: IContext; event: any }) => {
               console.log(`>>> Enter GUARD onDone of ${WORKFLOW.START_UPDATE}`);
-              return false;// !!_.event.output.jobId;
+              return !!_.event.output.jobId;
             },
             actions: assign((_: { context: IContext; event: any }) => ({
               job: {
@@ -402,12 +401,12 @@ export const workflowMachine = createMachine<IContext, Events>({
         src: SERVICES[WORKFLOW.ROOT].jobPollingService,
         onDone: [
           // {
-          //   // guard: (_: { context: IContext; event: any }) => {
-          //   //   console.log(`>>> Enter GUARD onDone of ${WORKFLOW.JOB_POLLING}`);
-          //   //   return _.event.output.details.status !== Status.InProgress &&
-          //   //     _.event.output.details.status !== Status.Pending &&
-          //   //     _.event.output.details.status !== Status.Suspended;
-          //   // },
+          //   guard: (_: { context: IContext; event: any }) => {
+          //     console.log(`>>> Enter GUARD onDone of ${WORKFLOW.JOB_POLLING}`);
+          //     return _.event.output.details.status !== Status.InProgress &&
+          //       _.event.output.details.status !== Status.Pending &&
+          //       _.event.output.details.status !== Status.Suspended;
+          //   },
           //   actions: assign((_: { context: IContext; event: any }) => ({
           //     job: {
           //       ..._.context.job,
@@ -448,6 +447,14 @@ export const workflowMachine = createMachine<IContext, Events>({
         TICK: {
           actions: assign((_: { context: IContext; event: any }) => ({
             remainingTime: _.context.remainingTime ? _.context.remainingTime - 1 : 0
+          }))
+        },
+        SYNC: {
+          actions: assign((_: { context: IContext; event: any }) => ({
+            job: {
+              ..._.context.job,
+              ..._.event.output
+            }
           }))
         },
         STOP_POLLING: {
