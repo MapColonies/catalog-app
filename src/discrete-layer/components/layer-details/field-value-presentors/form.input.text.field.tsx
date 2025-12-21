@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import React from 'react';
-import CopyToClipboard from 'react-copy-to-clipboard';
 import { useIntl } from 'react-intl';
 import { isEmpty } from 'lodash';
-import { TextField, Tooltip, IconButton } from '@map-colonies/react-core';
+import { TextField} from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
 import { Copy } from '../../../../common/components/copy';
 import TooltippedValue from '../../../../common/components/form/tooltipped.value';
@@ -32,7 +31,6 @@ interface FormInputTextFieldProps {
 }
 
 export const FormInputTextFieldComponent: React.FC<FormInputTextFieldProps> = ({mode, fieldInfo, value, formik, type, fieldNamePrefix}) => {
-  const intl = useIntl();
   const isCopyable = fieldInfo.isCopyable ?? false;
   const isPreserveNewLine = fieldInfo.rows ?? false;
   const isDataError = fieldInfo.isRequired && !value;
@@ -49,12 +47,6 @@ export const FormInputTextFieldComponent: React.FC<FormInputTextFieldProps> = ({
           !isEmpty(value) && isCopyable &&
           <Box className="detailsFieldCopyIcon">
             <Copy value={value as string}/>
-
-            {/* <Tooltip content={intl.formatMessage({ id: 'action.copy.tooltip' })}>
-              <CopyToClipboard text={value as string}>
-                <IconButton type="button" className="mc-icon-Copy" />
-              </CopyToClipboard>
-            </Tooltip> */}
           </Box>
         }
       </>

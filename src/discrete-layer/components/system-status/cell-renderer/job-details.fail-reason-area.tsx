@@ -35,12 +35,6 @@ export const FailReasonArea: React.FC<FailReasonAreaProps> = ({
         </Typography>
 
         <Copy value={failReason}/>
-
-        {/* <Tooltip content={intl.formatMessage({ id: 'action.copy.tooltip' })}>
-          <CopyToClipboard text={failReason}>
-            <IconButton type="button" className="mc-icon-Copy" />
-          </CopyToClipboard>
-        </Tooltip> */}
       </Box>
     </td>
   );

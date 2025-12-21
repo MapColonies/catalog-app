@@ -1,16 +1,16 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useIntl } from 'react-intl';
-import CopyToClipboard from 'react-copy-to-clipboard';
 import { get, isEmpty, set, unset } from 'lodash';
 import { Geometry } from 'geojson';
 import shp, { FeatureCollectionWithFilename, parseShp } from 'shpjs';
 import { useDebouncedCallback } from 'use-debounce';
-import { Button, IconButton, TextField, Tooltip, Typography } from '@map-colonies/react-core';
+import { Button, TextField, Typography } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
 import { EMPTY_JSON_STRING_VALUE, geoJSONValidation, validateGeoJSONString } from '../../../../common/utils/geojson.validation';
 import { emphasizeByHTML } from '../../../../common/helpers/formatters';
 import { Mode } from '../../../../common/models/mode.enum';
 import TooltippedValue from '../../../../common/components/form/tooltipped.value';
+import { Copy } from '../../../../common/components/copy';
 import { geoArgs } from '../../../../common/utils/geo.tools';
 import { IRecordFieldInfo } from '../layer-details.field-info';
 import { EntityFormikHandlers } from '../layer-datails-form';
@@ -19,7 +19,6 @@ import { FormInputInfoTooltipComponent } from './form.input.info.tooltip';
 import { GeoJsonMapValuePresentorComponent } from './geojson-map.value-presentor';
 
 import './json.value-presentor.css';
-import { Copy } from '../../../../common/components/copy';
 
 const NONE = 0;
 const REMOVE_ERROR_DELAY = 300;
@@ -216,12 +215,6 @@ export const JsonValuePresentorComponent: React.FC<JsonValuePresentorProps> = ({
             !isEmpty(value) && isCopyable &&
             <Box className="detailsFieldCopyIcon detailsFieldNoMargin">
               <Copy value={stringifiedValue}/>
-
-              {/* <Tooltip content={intl.formatMessage({ id: 'action.copy.tooltip' })}>
-                <CopyToClipboard text={stringifiedValue}>
-                  <IconButton type="button" className="mc-icon-Copy" />
-                </CopyToClipboard>
-              </Tooltip> */}
             </Box>
           }
         </Box>
