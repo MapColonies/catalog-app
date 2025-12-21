@@ -12,10 +12,15 @@ export const CustomTheme = {
     GC_HOVER_BACKGROUND: 'rgba(33, 150, 243, 0.1)',
 
     GC_WARNING_HIGH: '#FFA032', /* Orange */
-    GC_WARNING_MEDIUM: '#FFEB87', /* Yellow */
     GC_SUCCESS: '#4CAF50',
-    GC_ERROR_HIGH: '#CC1616', /* Dark Red */
-    GC_ERROR_MEDIUM: '#FF3636', /* Red */
+    GC_ERROR_HIGH: '#FF3636', /* Dark Red */
+
+    GC_STATUS_COMPLETED: '#4CAF50', /* Green */
+    GC_STATUS_FAILED: '#FF3636', /* Red */
+    GC_STATUS_SUSPENDED: '#d27c19', /* Dark Orange */
+    GC_STATUS_PENDING: '',
+    GC_STATUS_IN_PROGRESS: '#e1c84a', /* Yellow */
+    GC_STATUS_EXPIRED: '#AFBFDA', /* Light Blue */
 
     GC_PRIORITY_HIGHEST: '#FF3636', /* Dark Red */
     GC_PRIORITY_HIGH: '#FE6814', /* Orange */

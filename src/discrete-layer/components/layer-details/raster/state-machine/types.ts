@@ -105,7 +105,8 @@ export type Events =
   | { type: "RESTORE", job: IJob }
   | { type: "RETRY" }
   | { type: "DONE" }
-  | { type: "TICK" };
+  | { type: "TICK" }
+  | { type: "STOP_POLLING"};
 
 // type FlowActionArgs = ActionArgs<Context, Events, Events>;
 

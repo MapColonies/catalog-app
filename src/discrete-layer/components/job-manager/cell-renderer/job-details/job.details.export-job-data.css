@@ -17,7 +17,7 @@
 }
 
 #exportJobData.jobDataContainer .jobDescriptionContainer .expired {
-    color: var(--mdc-theme-gc-error-medium);
+    color: var(--mdc-theme-gc-error-high);
 }
 
 #exportJobData.jobDataContainer .jobDescriptionContainer .valid {

@@ -341,7 +341,7 @@ export const InnerRasterForm = (
               <Button
                 raised
                 type="button"
-                className={!isRetryEnabled((state.context)) ? "blink-for-attention" : ""}
+                className={!isRetryEnabled(state.context) ? "blink-for-attention" : ""}
                 onClick={(e): void => {
                   e.preventDefault();
                   e.stopPropagation();
@@ -385,6 +385,7 @@ export const InnerRasterForm = (
                 onClick={(e): void => {
                   e.preventDefault();
                   e.stopPropagation();
+                  actorRef.send({ type: 'STOP_POLLING' } satisfies Events);
                   actorRef.send({ type: 'RETRY' } satisfies Events);
                 }}
               >

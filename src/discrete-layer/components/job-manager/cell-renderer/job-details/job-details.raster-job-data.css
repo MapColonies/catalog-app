@@ -17,7 +17,7 @@ body[dir='rtl'] #rasterJobData .errorsCountContainer {
 }
 
 #rasterJobData .errorsCountContainer>a {
-  color: var(--mdc-theme-gc-error-medium) !important;
+  color: var(--mdc-theme-gc-error-high) !important;
 }
 
 #rasterJobData .errorsCountContainer .error {

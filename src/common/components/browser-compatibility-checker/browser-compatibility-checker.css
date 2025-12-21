@@ -7,7 +7,7 @@
   justify-content: center;
   width: 70%;
   min-height: 3rem;
-  background: var(--mdc-theme-gc-error-medium);
+  background: var(--mdc-theme-gc-error-high);
   z-index: 0;
   transform: translateX(-50%);
   white-space: pre-line;

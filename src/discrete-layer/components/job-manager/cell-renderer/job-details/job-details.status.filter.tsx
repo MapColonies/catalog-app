@@ -2,7 +2,7 @@ import React, { useCallback, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import { Box } from '@map-colonies/react-components';
 import { Select } from '@map-colonies/react-core';
-import { Status } from '../../../models';
+import { Status } from '../../../../models';
 
 interface IFilterOnModelChange {
   onModelChange: (model: any | null, additionalEventAttributes?: any) => void;

@@ -6,13 +6,13 @@ import { truncate } from 'lodash';
 import { Moment } from 'moment';
 import { IconButton, Tooltip, Typography } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
-import { AutoDirectionBox } from '../../../../common/components/auto-direction-box/auto-direction-box.component';
-import { DETAILS_ROW_ID_SUFFIX } from '../../../../common/components/grid';
-import { Loading } from '../../../../common/components/tree/statuses/loading';
-import { Copy } from '../../../../common/components/copy';
-import { relativeDateFormatter, dateFormatter, } from '../../../../common/helpers/formatters';
-import { JobModelType, ProductType, Status, TasksGroupModelType, useStore } from '../../../models';
-import { useQuery } from '../../../models/RootStore';
+import { Copy } from '../../../../../common/components/copy';
+import { AutoDirectionBox } from '../../../../../common/components/auto-direction-box/auto-direction-box.component';
+import { DETAILS_ROW_ID_SUFFIX } from '../../../../../common/components/grid';
+import { Loading } from '../../../../../common/components/tree/statuses/loading';
+import { relativeDateFormatter, dateFormatter, } from '../../../../../common/helpers/formatters';
+import { JobModelType, ProductType, Status, TasksGroupModelType, useStore } from '../../../../models';
+import { useQuery } from '../../../../models/RootStore';
 import { JobDetailsHeader } from './job-details.header';
 import JobDetailsExportJobData from './job.details.export-job-data';
 import JobDetailsRasterJobData from './job-details.raster-job-data';
@@ -91,7 +91,7 @@ const StatusPresentor: React.FC<StatusPresentorParams> = ({ task, reactKey = '' 
   if (task.status === Status.Failed) {
     const FAIL_REASON_MAX_LEN = 35;
     const ERROR_ICON_SIZE = 20;
-    const ERROR_ICON_COLOR = 'var(--mdc-theme-gc-error-medium)';
+    const ERROR_ICON_COLOR = 'var(--mdc-theme-gc-error-high)';
     const ellipsizedFailReason = truncate(task.reason as string, {
       length: FAIL_REASON_MAX_LEN,
     });
@@ -232,10 +232,10 @@ export const JobDetailsRenderer: React.FC<ICellRendererParams> = observer((props
   const keyPrefix = `${(props.data as JobModelType).resourceId as string}`;
 
   return (
-    <Box key={jobId + store.jobsStore.reloadDataCounter} className="jobDetailsContainer">
+    <Box key={`${jobId}_${store.jobsStore.reloadDataCounter}`} className="jobDetailsContainer">
       <JobDetailsHeader job={props.data as JobModelType} /> 
-      <JobDetailsExportJobData key={jobId} {...propsWithJobParams} />
-      <JobDetailsRasterJobData key={jobId} {...propsWithJobParams} />
+      <JobDetailsExportJobData {...propsWithJobParams} />
+      <JobDetailsRasterJobData {...propsWithJobParams} />
       <Box className="gridContainer">
         {taskFields.map((field) => (
           <Typography
