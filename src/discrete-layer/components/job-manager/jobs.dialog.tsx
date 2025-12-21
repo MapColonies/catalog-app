@@ -337,10 +337,9 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
           {renderDateTimeRangePicker()}
           {!error && renderGridList()}
           {
-            (mutationQuery.error !== undefined || error) && (
-              // eslint-disable-next-line
-              <Box className={`${error ? 'render-jobs-data-error' : ''}`}>
-                <GraphQLError error={mutationQuery.error || error} />
+            error && (
+              <Box className="render-jobs-data-error">
+                <GraphQLError error={error} />
               </Box>
             )
           }
@@ -358,13 +357,22 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
             </Box>
 
             {
-              handleFocusError && handleFocusError.code && focusOnJob &&
               <Box className="messages">
-                <LogicError errors={[{
-                  code: handleFocusError.code,
-                  message: `${focusOnJob.resourceId} <bdi>(${dateFormatter(focusOnJob.updated, true)})</bdi>`,
-                  level: 'warning'
-                }]} />
+                {
+                  (mutationQuery.error !== undefined) && (
+                    <Box>
+                      <GraphQLError error={mutationQuery.error} />
+                    </Box>
+                  )
+                }
+                {
+                  (handleFocusError && handleFocusError.code && focusOnJob) &&
+                  <LogicError errors={[{
+                    code: handleFocusError.code,
+                    message: `${focusOnJob.resourceId} <bdi>(${dateFormatter(focusOnJob.updated, true)})</bdi>`,
+                    level: 'warning'
+                  }]} />
+                }
               </Box>
             }
           </Box>
