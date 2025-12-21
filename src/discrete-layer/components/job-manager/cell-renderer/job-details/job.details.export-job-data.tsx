@@ -4,10 +4,10 @@ import { get } from 'lodash';
 import { ICellRendererParams } from 'ag-grid-community';
 import { Box } from '@map-colonies/react-components';
 import { Typography } from '@map-colonies/react-core';
-import { Hyperlink } from '../../../../common/components/hyperlink/hyperlink';
-import { dateFormatter } from '../../../../common/helpers/formatters';
-import { JobModelType, Status } from '../../../models';
-import { CopyButton } from '../../job-manager/job-details.copy-button';
+import { Hyperlink } from '../../../../../common/components/hyperlink/hyperlink';
+import { dateFormatter } from '../../../../../common/helpers/formatters';
+import { JobModelType, Status } from '../../../../models';
+import { CopyButton } from '../../job-details.copy-button';
 
 import './info-area.css';
 import './job.details.export-job-data.css';

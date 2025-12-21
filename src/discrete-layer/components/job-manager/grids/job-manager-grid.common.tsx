@@ -16,13 +16,13 @@ import { Loading } from '../../../../common/components/tree/statuses/loading';
 import { Domain } from '../../../../common/models/domain';
 import { JobModelType, ProductType, useStore } from '../../../models';
 import { getProductDomain } from '../../layer-details/utils';
-import { DateCellRenderer } from '../../system-status/cell-renderer/date.cell-renderer';
-import { JobDetailsRenderer } from '../../system-status/cell-renderer/job-details.cell-renderer';
-import { JobDetailsStatusFilter } from '../../system-status/cell-renderer/job-details.status.filter';
-import { PriorityRenderer } from '../../system-status/cell-renderer/priority.cell-renderer';
-import PlaceholderCellRenderer from '../../system-status/cell-renderer/placeholder.cell-renderer';
-import { StatusRenderer } from '../../system-status/cell-renderer/status.cell-renderer';
-import { TooltippedCellRenderer } from '../../system-status/cell-renderer/tool-tipped.cell-renderer';
+import { DateCellRenderer } from '../cell-renderer/date.cell-renderer';
+import { JobDetailsRenderer } from '../cell-renderer/job-details/job-details.cell-renderer';
+import { JobDetailsStatusFilter } from '../cell-renderer/job-details/job-details.status.filter';
+import { PriorityRenderer } from '../cell-renderer/priority.cell-renderer';
+import PlaceholderCellRenderer from '../cell-renderer/placeholder.cell-renderer';
+import { StatusRenderer } from '../cell-renderer/status.cell-renderer';
+import { TooltippedCellRenderer } from '../cell-renderer/tool-tipped.cell-renderer';
 import { JOB_ENTITY } from '../job.types';
 
 export interface ICommonJobManagerGridProps {
