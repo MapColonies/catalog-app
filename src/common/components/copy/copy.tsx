@@ -24,6 +24,7 @@ export const Copy = (props: IProps) => {
                     {props.copyToClipboardChildren ?
                         props.copyToClipboardChildren :
                         <IconButton
+                            type="button"
                             className={"mc-icon-Copy"}
                             onChange={(): void => {
                                 setIsCopied(true)
