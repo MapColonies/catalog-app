@@ -14,8 +14,6 @@ import {
 } from '@map-colonies/react-components';
 import { LayerMetadataMixedUnion } from '../../../discrete-layer/models';
 import CONFIG from '../../config';
-// import { flushSync } from 'react-dom';
-// import './file-picker.css';
 
 const NOT_FOUND = -1;
 const START = 0;
@@ -79,20 +77,6 @@ export const FilePickerComponent = React.forwardRef<
       );
       fpRef.current?.setFileSelection(selectedFiles, false);
     }, [currentSelection, files]);
-
-    // useEffect(() => {
-    //   const timer = setTimeout(() => {
-    //     // document.querySelectorAll('.chonky-file-entry-description-title-extension').forEach((element) => {
-    //     document.querySelectorAll('.listFileEntryName-0-3-3130').forEach((element) => {
-    //       const htmlElement = element as HTMLElement;
-    //       if (htmlElement.textContent !== '.shp') {
-    //         htmlElement.classList.add('eliav');
-    //       }
-    //     });
-    //   }, 0);
-
-    //   return () => clearTimeout(timer); // Cleanup the timeout on unmount
-    // }); // Empty dependency array to run once after the component is mounted
 
     const handleAction = (data: FileActionData): void => {
       flushSync(() => {
