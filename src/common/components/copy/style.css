@@ -1,0 +1,20 @@
+.icon-wrapper {
+    position: relative;
+    width: 24px;
+    height: 24px;
+}
+
+.mc-icon-Ok {
+    position: absolute;
+    font-size: 8px;
+}
+
+.mc-icon-Ok.rtl {
+    top: 10px;
+    right: 4px;
+}
+
+.mc-icon-Ok.ltr {
+    bottom: 4px;
+    left: 12px;
+}

@@ -1,7 +1,8 @@
-import React, { ReactElement, useState } from 'react';
-import { useIntl } from 'react-intl';
+import React, { ReactElement, useEffect, useState } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { IconButton } from '@map-colonies/react-core';
+import CONFIG from '../../../common/config';
+import './style.css';
 
 interface IProps {
     value: string;
@@ -10,16 +11,32 @@ interface IProps {
 }
 
 export const Copy = (props: IProps) => {
-    const intl = useIntl();
-    const [isCopied, setIsCopied] = useState(false)
+    const [isCopied, setIsCopied] = useState(false);
+
+    useEffect(() => {
+        isCopied && setTimeout(setIsCopied, 1500, false)
+    }, [isCopied])
 
     return (
         <>
             <CopyToClipboard text={props.value} onCopy={(): void => setIsCopied(true)}>
-                {props.copyToClipboardChildren ? props.copyToClipboardChildren :
-                    <IconButton className="mc-icon-Copy" type="button" style={props.iconStyle} />}
-            </CopyToClipboard>
+                <div className={`icon-wrapper`}>
+                    {props.copyToClipboardChildren ?
+                        props.copyToClipboardChildren :
+                        <IconButton
+                            className={"mc-icon-Copy"}
+                            onChange={(): void => {
+                                setIsCopied(true)
+                            }}
+                            label={isCopied ? 'Success' : 'Copy'}
+                        />}
 
+                    {isCopied && <IconButton
+                        className={`mc-icon-Ok ${CONFIG.I18N.DEFAULT_LANGUAGE === 'he' ? 'rtl' : 'ltr'}`}
+                    />}
+
+                </div>
+            </CopyToClipboard>
         </>
     )
 };
