@@ -91,7 +91,7 @@ const StatusPresentor: React.FC<StatusPresentorParams> = ({ task, reactKey = '' 
   if (task.status === Status.Failed) {
     const FAIL_REASON_MAX_LEN = 35;
     const ERROR_ICON_SIZE = 20;
-    const ERROR_ICON_COLOR = 'var(--mdc-theme-gc-error-medium)';
+    const ERROR_ICON_COLOR = 'var(--mdc-theme-gc-error-high)';
     const ellipsizedFailReason = truncate(task.reason as string, {
       length: FAIL_REASON_MAX_LEN,
     });

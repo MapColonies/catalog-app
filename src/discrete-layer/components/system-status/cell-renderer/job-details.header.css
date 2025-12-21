@@ -55,7 +55,7 @@
   max-width: 35ch;
   text-overflow: ellipsis;
   overflow: hidden;
-  color: var(--mdc-theme-gc-error-medium);
+  color: var(--mdc-theme-gc-error-high);
   margin:0;
 }
 
