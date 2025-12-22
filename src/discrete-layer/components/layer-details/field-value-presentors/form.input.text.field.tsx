@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import React from 'react';
-import { useIntl } from 'react-intl';
 import { isEmpty } from 'lodash';
 import { TextField} from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
