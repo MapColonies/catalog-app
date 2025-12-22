@@ -2,6 +2,7 @@ import { mergeWith } from 'lodash';
 import { assign, createMachine, fromCallback, sendParent } from 'xstate';
 import CONFIG from '../../../../../common/config';
 import { dateFormatter, relativeDateFormatter } from '../../../../../common/helpers/formatters';
+import { localStore } from '../../../../../common/helpers/storage';
 import { Mode } from '../../../../../common/models/mode.enum';
 import {
   fetchProductActions,
@@ -290,7 +291,7 @@ export const workflowMachine = createMachine<IContext, Events>({
           target: WORKFLOW.RESTORE_JOB
         },
         RETRY: {
-          target: WORKFLOW.JOB_RETRY
+          target: WORKFLOW.RETRY_JOB
         },
         "*": { actions: warnUnexpectedStateEvent }
       }
@@ -422,7 +423,7 @@ export const workflowMachine = createMachine<IContext, Events>({
                 ..._.event.output
               }
             })),
-            target: WORKFLOW.JOB_POLLING_WAIT
+            target: WORKFLOW.WAIT.ROOT
           }
         ],
         onError: {
@@ -431,17 +432,50 @@ export const workflowMachine = createMachine<IContext, Events>({
         }
       }
     },
-    [WORKFLOW.JOB_POLLING_WAIT]: {
-      entry: assign((_: { context: IContext; event: any }) => ({
-        remainingTime: CONFIG.JOB_MANAGER.POLLING_CYCLE_INTERVAL / 1000
-      })),
-      invoke: {
-        src: fromCallback(({ sendBack }) => {
-          const interval = setInterval(() => {
-            sendBack({ type: 'TICK' });
-          }, 1000);
-          return () => clearInterval(interval);
-        })
+    [WORKFLOW.WAIT.ROOT]: {
+      id: WORKFLOW.WAIT,
+      type: 'parallel',
+      entry: assign((_: { context: IContext; event: any }) => {
+        console.log(`>>> Enter ${WORKFLOW.WAIT.ROOT}`);
+        return {
+          remainingTime: CONFIG.JOB_MANAGER.POLLING_CYCLE_INTERVAL / 1000
+        };
+      }),
+      states: {
+        [WORKFLOW.WAIT.TIMER]: {
+          invoke: {
+            src: fromCallback(({ sendBack }) => {
+              const interval = setInterval(() => {
+                sendBack({ type: 'TICK' });
+              }, 1000);
+              return () => clearInterval(interval);
+            })
+          }
+        },
+        [WORKFLOW.WAIT.WATCHER]: {
+          invoke: {
+            input: (_: { context: IContext; event: any }) => _,
+            src: fromCallback(({ sendBack, input }) => {
+              const { jobId, taskId } = input.context.job || {};
+              const getTaskNotification = () => {
+                const lastTask = localStore.get('lastTask');
+                if (!lastTask) { return; }
+                const notification = JSON.parse(lastTask);
+                if (notification && jobId && taskId && notification.jobId === jobId && notification.taskId === taskId) {
+                  sendBack({ type: 'SYNC' });
+                }
+              };
+              localStore.watchMethods(['setItem'], undefined, (_method, key) => {
+                if (key === 'MC-lastTask') {
+                  getTaskNotification();
+                }
+              });
+              return () => {
+                localStore.unWatchMethods();
+              };
+            })
+          }
+        }
       },
       on: {
         TICK: {
@@ -450,12 +484,7 @@ export const workflowMachine = createMachine<IContext, Events>({
           }))
         },
         SYNC: {
-          actions: assign((_: { context: IContext; event: any }) => ({
-            job: {
-              ..._.context.job,
-              ..._.event.job
-            }
-          }))
+          target: WORKFLOW.JOB_POLLING
         },
         STOP_POLLING: {
           target: WORKFLOW.IDLE
@@ -484,8 +513,8 @@ export const workflowMachine = createMachine<IContext, Events>({
         }
       }
     },
-    [WORKFLOW.JOB_RETRY]: {
-      entry: () => console.log(`>>> Enter ${WORKFLOW.JOB_RETRY}`),
+    [WORKFLOW.RETRY_JOB]: {
+      entry: () => console.log(`>>> Enter ${WORKFLOW.RETRY_JOB}`),
       tags: [STATE_TAGS.GENERAL_LOADING],
       invoke: {
         input: (_: { context: IContext; event: any }) => _,
