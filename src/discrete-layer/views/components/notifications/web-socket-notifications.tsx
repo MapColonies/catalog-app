@@ -2,7 +2,7 @@ import { createClient } from 'graphql-ws';
 import React, { useEffect } from 'react';
 import CONFIG from '../../../../common/config';
 import { localStore } from '../../../../common/helpers/storage';
-import { CallBack } from '../../../../common/models/task-error-summary.raster';
+import { CallBack } from '../../../../common/models/job-errors-summary.raster';
 
 const WebSocketNotifications: React.FC = () => {
 
