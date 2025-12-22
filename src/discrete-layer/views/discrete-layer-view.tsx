@@ -176,19 +176,19 @@ const DiscreteLayerView: React.FC = observer(() => {
       setWhatsNewVisitedCount(parseInt(visitedCount, 10));
     }
 
-    const fetchTaskNotificationCount = () => {
+    const getTaskNotificationCount = () => {
       const notifications = localStore.get('taskNotificationCount');
       setTaskNotificationCount(notifications ? parseInt(notifications, 10) : 0);
     };
 
-    fetchTaskNotificationCount();
+    getTaskNotificationCount();
 
     localStore.watchMethods(
       ['setItem', 'removeItem'],
       undefined,
       (_method, key) => {
         if (key === 'MC-taskNotificationCount') {
-          fetchTaskNotificationCount();
+          getTaskNotificationCount();
         }
       }
     );
