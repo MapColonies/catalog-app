@@ -1,9 +1,10 @@
 import React, { ReactElement, useEffect, useState } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { IconButton } from '@map-colonies/react-core';
-import CONFIG from '../../../common/config';
-import './style.css';
 import { Box } from '@material-ui/core';
+import CONFIG from '../../../common/config';
+
+import './style.css';
 
 interface IProps {
   value: string;
@@ -34,7 +35,7 @@ export const Copy = (props: IProps) => {
             />}
 
           {isCopied && <IconButton
-            className={`mc-icon-Ok ${CONFIG.I18N.DEFAULT_LANGUAGE === 'he' ? 'rtl' : 'ltr'}`}
+            className={`mc-icon-Ok`}
             style={{ color: "var(--mdc-theme-gc-success)" }}
           />}
 
