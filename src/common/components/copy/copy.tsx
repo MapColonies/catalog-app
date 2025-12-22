@@ -34,6 +34,7 @@ export const Copy = (props: IProps) => {
 
                     {isCopied && <IconButton
                         className={`mc-icon-Ok ${CONFIG.I18N.DEFAULT_LANGUAGE === 'he' ? 'rtl' : 'ltr'}`}
+                        style={{color: "var(--mdc-theme-gc-success)"}}
                     />}
 
                 </div>
