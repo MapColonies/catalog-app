@@ -4,6 +4,7 @@ import { get } from 'lodash';
 import { ICellRendererParams } from 'ag-grid-community';
 import { Box } from '@map-colonies/react-components';
 import { CircularProgress, IconButton, Tooltip, useTheme } from '@map-colonies/react-core';
+import { Copy } from '../../../../../common/components/copy';
 import { AutoDirectionBox } from '../../../../../common/components/auto-direction-box/auto-direction-box.component';
 import { Hyperlink } from '../../../../../common/components/hyperlink/hyperlink';
 import { RasterIngestionJobType } from '../../../../../common/models/raster-job';
@@ -13,7 +14,6 @@ import { RasterErrorsSummary } from '../../../../../common/models/job-errors-sum
 import { JobModelType, TaskModelType, useStore } from '../../../../models';
 import useZoomLevelsTable from '../../../export-layer/hooks/useZoomLevelsTable';
 import { getRasterErrorCount, JobErrorsSummary } from '../../../job-errors-summary/job-errors-summary';
-import { CopyButton } from '../../job-details.copy-button';
 
 import './info-area.css';
 import './job-details.raster-job-data.css';
@@ -159,7 +159,7 @@ const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = ({ data 
                 <Hyperlink url={task?.parameters?.report?.url ?? ''} label={`${errorsCount.toString()} ${errorsMessage}`} />
               </Tooltip>
 
-              <CopyButton text={task?.parameters?.report?.url ?? ''} key={'errorsReportLink'} />
+              <Copy value = {task?.parameters?.report?.url ?? ''} iconStyle = {{ fontSize: `20px` }} key={'errorsReportLink'}/>
             </>
           }
           {

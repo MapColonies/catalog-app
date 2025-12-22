@@ -1,47 +1,34 @@
 import { Box } from '@map-colonies/react-components';
-import { Button, Tooltip, Typography } from '@map-colonies/react-core';
-import React, { useState } from 'react';
-import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { Button, Typography } from '@map-colonies/react-core';
+import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
+import { Copy } from '../../../common/components/copy';
 
 const ExportLayerFinalStage: React.FC<{
   onClose: () => void;
   jobId: string;
-  
-}> = ({ onClose, jobId }) => {
-  
-  const intl = useIntl();
-  const [hasCopied, setHasCopied] = useState(false);
 
-  const textCopyTooltip = intl.formatMessage({id: hasCopied ? 'action.copied.tooltip' : 'action.copy.tooltip'});
+}> = ({ onClose, jobId }) => {
+
+  const intl = useIntl();
 
   return (
     <Box className="exportLayerSuccessContainer">
-        <Box className="mainTextContainer">
-          <Typography className="jobIdTitle" tag="p">
-            {intl.formatMessage({
-              id: 'export-layer.exportSuccessContainer.jobId.title',
-            })}
-          </Typography>
+      <Box className="mainTextContainer">
+        <Typography className="jobIdTitle" tag="p">
+          {intl.formatMessage({
+            id: 'export-layer.exportSuccessContainer.jobId.title',
+          })}
+        </Typography>
 
-          <Box onMouseLeave={(): void => setHasCopied(false)}>
-            <Tooltip content={textCopyTooltip}>
-              <CopyToClipboard
-                text={jobId}
-                onCopy={(): void => {
-                  setHasCopied(true);
-                }}
-              >
-                <Typography className="jobIdText" tag="p">
-                  {jobId}
-                </Typography>
-              </CopyToClipboard>
-            </Tooltip>
-          </Box>
+        <Box>
+          <Copy value={jobId} />
         </Box>
+      </Box>
 
-        <Box className="finalStageButtonsContainer">
-          <CopyToClipboard text={jobId}>
+      <Box className="finalStageButtonsContainer">
+        <Copy value={jobId}
+          copyToClipboardChildren={
             <Button
               id="copyAndApprove"
               raised
@@ -50,8 +37,9 @@ const ExportLayerFinalStage: React.FC<{
             >
               <FormattedMessage id="export-layer.exportSuccessContainer.approve" />
             </Button>
-          </CopyToClipboard>
-        </Box>
+          }
+        ></Copy>
+      </Box>
     </Box>
   );
 };

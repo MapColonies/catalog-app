@@ -2,13 +2,11 @@ import React from 'react';
 import { Box } from '@map-colonies/react-components';
 import {
   CollapsibleList,
-  IconButton,
   SimpleListItem,
-  Tooltip,
   Typography,
 } from '@map-colonies/react-core';
-import CopyToClipboard from 'react-copy-to-clipboard';
 import { FormattedMessage, useIntl } from 'react-intl';
+import { Copy } from '../../../../../common/components/copy';
 import { CategorizedServices } from '../system-core-info.dialog';
 import './external-services.css';
 
@@ -43,16 +41,7 @@ export const ExternalServices: React.FC<ExternalServicesProps> = ({
                   <Typography className="urlText" tag="p">
                     {`${url as string}`}
                   </Typography>
-
-                  <Tooltip
-                    content={intl.formatMessage({
-                      id: 'action.copy-url.tooltip',
-                    })}
-                  >
-                    <CopyToClipboard text={url as string}>
-                      <IconButton className="mc-icon-Copy" type="button"/>
-                    </CopyToClipboard>
-                  </Tooltip>
+                  <Copy value={url as string}/>
                 </Box>
               );
             })}

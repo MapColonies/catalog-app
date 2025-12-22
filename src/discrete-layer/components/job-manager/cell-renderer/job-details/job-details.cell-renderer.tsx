@@ -6,13 +6,13 @@ import { truncate } from 'lodash';
 import { Moment } from 'moment';
 import { IconButton, Tooltip, Typography } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
+import { Copy } from '../../../../../common/components/copy';
 import { AutoDirectionBox } from '../../../../../common/components/auto-direction-box/auto-direction-box.component';
 import { DETAILS_ROW_ID_SUFFIX } from '../../../../../common/components/grid';
 import { Loading } from '../../../../../common/components/tree/statuses/loading';
 import { relativeDateFormatter, dateFormatter, } from '../../../../../common/helpers/formatters';
 import { JobModelType, ProductType, Status, TasksGroupModelType, useStore } from '../../../../models';
 import { useQuery } from '../../../../models/RootStore';
-import { CopyButton } from '../../job-details.copy-button';
 import { JobDetailsHeader } from './job-details.header';
 import JobDetailsExportJobData from './job.details.export-job-data';
 import JobDetailsRasterJobData from './job-details.raster-job-data';
@@ -114,7 +114,7 @@ const StatusPresentor: React.FC<StatusPresentorParams> = ({ task, reactKey = '' 
             </>
           </Tooltip>
         </AutoDirectionBox>
-        <CopyButton text={task.reason as string} />
+        <Copy value = {task.reason as string} iconStyle = {{ fontSize: `20px` }}/>
       </Box>
     );
   }
