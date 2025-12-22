@@ -5,40 +5,40 @@ import CONFIG from '../../../common/config';
 import './style.css';
 
 interface IProps {
-    value: string;
-    copyToClipboardChildren?: ReactElement;
-    iconStyle?: React.CSSProperties;
+  value: string;
+  copyToClipboardChildren?: ReactElement;
+  iconStyle?: React.CSSProperties;
 }
 
 export const Copy = (props: IProps) => {
-    const [isCopied, setIsCopied] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
 
-    useEffect(() => {
-        isCopied && setTimeout(setIsCopied, 1500, false)
-    }, [isCopied])
+  useEffect(() => {
+    isCopied && setTimeout(setIsCopied, 1500, false)
+  }, [isCopied])
 
-    return (
-        <>
-            <CopyToClipboard text={props.value} onCopy={(): void => setIsCopied(true)}>
-                <div className={`icon-wrapper`}>
-                    {props.copyToClipboardChildren ?
-                        props.copyToClipboardChildren :
-                        <IconButton
-                            type="button"
-                            className={"mc-icon-Copy"}
-                            onChange={(): void => {
-                                setIsCopied(true)
-                            }}
-                            label={isCopied ? 'Success' : 'Copy'}
-                        />}
+  return (
+    <>
+      <CopyToClipboard text={props.value} onCopy={(): void => setIsCopied(true)}>
+        <div className={`icon-wrapper`}>
+          {props.copyToClipboardChildren ?
+            props.copyToClipboardChildren :
+            <IconButton
+              type="button"
+              className={"mc-icon-Copy"}
+              onChange={(): void => {
+                setIsCopied(true)
+              }}
+              label={isCopied ? 'Success' : 'Copy'}
+            />}
 
-                    {isCopied && <IconButton
-                        className={`mc-icon-Ok ${CONFIG.I18N.DEFAULT_LANGUAGE === 'he' ? 'rtl' : 'ltr'}`}
-                        style={{color: "var(--mdc-theme-gc-success)"}}
-                    />}
+          {isCopied && <IconButton
+            className={`mc-icon-Ok ${CONFIG.I18N.DEFAULT_LANGUAGE === 'he' ? 'rtl' : 'ltr'}`}
+            style={{ color: "var(--mdc-theme-gc-success)" }}
+          />}
 
-                </div>
-            </CopyToClipboard>
-        </>
-    )
+        </div>
+      </CopyToClipboard>
+    </>
+  )
 };
