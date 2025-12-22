@@ -3,8 +3,8 @@ import { useIntl } from 'react-intl';
 import { Typography } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
 
-import './job-details.fail-reason-area.css';
 import { Copy } from '../../../../../common/components/copy';
+import './job-details.fail-reason-area.css';
 
 interface FailReasonAreaProps {
   failReason: string;

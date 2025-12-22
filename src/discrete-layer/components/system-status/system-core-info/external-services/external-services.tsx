@@ -6,8 +6,8 @@ import {
   Typography,
 } from '@map-colonies/react-core';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { CategorizedServices } from '../system-core-info.dialog';
 import { Copy } from '../../../../../common/components/copy';
+import { CategorizedServices } from '../system-core-info.dialog';
 import './external-services.css';
 
 interface ExternalServicesProps {
