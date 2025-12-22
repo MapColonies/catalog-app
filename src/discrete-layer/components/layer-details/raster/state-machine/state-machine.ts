@@ -453,7 +453,7 @@ export const workflowMachine = createMachine<IContext, Events>({
           actions: assign((_: { context: IContext; event: any }) => ({
             job: {
               ..._.context.job,
-              ..._.event.output
+              ..._.event.job
             }
           }))
         },
