@@ -206,16 +206,11 @@ input:disabled {
   border: 1px solid var(--mdc-theme-on-surface);
 }
 
-.blink {
-  /* Animation properties: name, duration, timing function, repetition count */
-  animation: blink_smooth 1s infinite;
-}
-
 .blink-for-attention {
-  animation: blink_smooth 1s 6;
+  animation: blinkSmooth 1s 6;
 }
 
-@keyframes blink_smooth {
+@keyframes blinkSmooth {
   0% {
     opacity: 1; /* Fully visible */
   }
