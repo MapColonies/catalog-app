@@ -281,6 +281,9 @@ export const workflowMachine = createMachine<IContext, Events>({
           })),
           target: WORKFLOW.JOB_SUBMISSION
         },
+        CLEAN_ERRORS: {
+          actions: assign({ errors: [] })
+        },
         RESTORE: {
           actions: assign((_: { context: IContext; event: any }) => ({
             job: {
