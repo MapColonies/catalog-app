@@ -37,7 +37,7 @@ export const Copy = (props: IProps) => {
           {
             isCopied &&
             <IconButton
-              className="mc-icon-Ok"
+              className="mc-icon-Ok copy-indication"
               style={{ color: "var(--mdc-theme-gc-success)" }}
             />
           }
