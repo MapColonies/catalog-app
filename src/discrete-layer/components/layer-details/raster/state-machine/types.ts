@@ -103,7 +103,7 @@ export type Events =
   | { type: "NOOP" }
   | { type: "SUBMIT", data: LayerRasterRecordInput, resolutionDegree: number }
   | { type: "TICK" }
-  | { type: "SYNC", job: IJob }
+  | { type: "SYNC" }
   | { type: "STOP_POLLING"}
   | { type: "RESTORE", job: IJob }
   | { type: "RETRY" }
@@ -149,9 +149,13 @@ export const WORKFLOW = {
   },
   JOB_SUBMISSION: "jobSubmission",
   JOB_POLLING: "jobPolling",
-  JOB_POLLING_WAIT: "jobPollingWait",
+  WAIT: {
+    ROOT: "wait",
+    TIMER: "timer",
+    WATCHER: "watcher"
+  },
   RESTORE_JOB: "restoreJob",
-  JOB_RETRY: "jobRetry",
+  RETRY_JOB: "retryJob",
   DONE: "done"
 } as const;
 
