@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Box } from '@map-colonies/react-components';
 import { Tooltip, Typography } from '@map-colonies/react-core';
-import { Copy } from '../../../../common/components/copy';
+import { Copy } from '../../../../common/components/copy/copy';
 import { Status } from '../../../models';
 
 import './status-text.css';

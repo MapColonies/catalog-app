@@ -4,7 +4,7 @@ import { get } from 'lodash';
 import { ICellRendererParams } from 'ag-grid-community';
 import { Box } from '@map-colonies/react-components';
 import { Typography } from '@map-colonies/react-core';
-import { Copy } from '../../../../../common/components/copy';
+import { Copy } from '../../../../../common/components/copy/copy';
 import { Hyperlink } from '../../../../../common/components/hyperlink/hyperlink';
 import { dateFormatter } from '../../../../../common/helpers/formatters';
 import { JobModelType, Status } from '../../../../models';

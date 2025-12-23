@@ -3,7 +3,7 @@ import React from 'react';
 import { isEmpty } from 'lodash';
 import { TextField} from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
-import { Copy } from '../../../../common/components/copy';
+import { Copy } from '../../../../common/components/copy/copy';
 import TooltippedValue from '../../../../common/components/form/tooltipped.value';
 import CONFIG from '../../../../common/config';
 import { convertExponentialToDecimal } from '../../../../common/helpers/number';

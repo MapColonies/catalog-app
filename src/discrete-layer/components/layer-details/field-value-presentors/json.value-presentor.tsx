@@ -10,7 +10,7 @@ import { EMPTY_JSON_STRING_VALUE, geoJSONValidation, validateGeoJSONString } fro
 import { emphasizeByHTML } from '../../../../common/helpers/formatters';
 import { Mode } from '../../../../common/models/mode.enum';
 import TooltippedValue from '../../../../common/components/form/tooltipped.value';
-import { Copy } from '../../../../common/components/copy';
+import { Copy } from '../../../../common/components/copy/copy';
 import { geoArgs } from '../../../../common/utils/geo.tools';
 import { IRecordFieldInfo } from '../layer-details.field-info';
 import { EntityFormikHandlers } from '../layer-datails-form';

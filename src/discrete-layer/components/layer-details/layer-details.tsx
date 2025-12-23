@@ -187,6 +187,9 @@ export const getValuePresentor = (
       const maxFieldRef = (fieldInfo.validation as ValidationConfigModelType[])
         ?.filter((valid: ValidationConfigModelType) => 
           valid.valueType === ValidationValueType.FIELD && valid.max)[0]?.max || undefined;
+      console.log("fieldNamePrefix: ", fieldNamePrefix)
+      console.log("formik?.getFieldProps(`${fieldNamePrefix ?? ''}${maxFieldRef}`): ", formik?.getFieldProps(`${fieldNamePrefix ?? ''}${maxFieldRef}`))
+
       return (
         <ResolutionValuePresentorComponent 
           value={value as string}

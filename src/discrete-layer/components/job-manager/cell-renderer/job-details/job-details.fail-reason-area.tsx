@@ -2,8 +2,8 @@ import React,{useState, useEffect} from 'react';
 import { useIntl } from 'react-intl';
 import { Typography } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
+import { Copy } from '../../../../../common/components/copy/copy';
 
-import { Copy } from '../../../../../common/components/copy';
 import './job-details.fail-reason-area.css';
 
 interface FailReasonAreaProps {
