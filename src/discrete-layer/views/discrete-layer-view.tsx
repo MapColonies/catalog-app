@@ -135,7 +135,7 @@ const DiscreteLayerView: React.FC = observer(() => {
   const intl = useIntl();
   const [isDrawing, setIsDrawing] = useState<boolean>(false);
   const [jobToOpenRasterEntity, setJobToOpenRasterEntity] = useState<JobModelType | undefined>(undefined);
-  const [jobToOpenJobManager, setJobToOpenJobManager] = useState<JobModelType | undefined>(undefined);
+  const [jobToOpenJobManager, setJobToOpenJobManager] = useState<Partial<Pick<JobModelType, 'id' | 'resourceId' | 'updated'>> | undefined>(undefined);
   const [isRasterDialogOpen, setIsRasterDialogOpen] = useState<boolean>(false);
   const [is3DIngestDialogOpen, setIs3DIngestDialogOpen] = useState<boolean>(false);
   const [isDemIngestDialogOpen, setIsDemIngestDialogOpen] = useState<boolean>(false);
@@ -176,19 +176,19 @@ const DiscreteLayerView: React.FC = observer(() => {
       setWhatsNewVisitedCount(parseInt(visitedCount, 10));
     }
 
-    const fetchTaskNotificationCount = () => {
+    const getTaskNotificationCount = () => {
       const notifications = localStore.get('taskNotificationCount');
       setTaskNotificationCount(notifications ? parseInt(notifications, 10) : 0);
     };
 
-    fetchTaskNotificationCount();
+    getTaskNotificationCount();
 
     localStore.watchMethods(
       ['setItem', 'removeItem'],
       undefined,
       (_method, key) => {
         if (key === 'MC-taskNotificationCount') {
-          fetchTaskNotificationCount();
+          getTaskNotificationCount();
         }
       }
     );
@@ -1088,8 +1088,16 @@ const DiscreteLayerView: React.FC = observer(() => {
                   className="operationIcon mc-icon-Job-Management"
                   label="SYSTEM JOBS"
                   onClick={(): void => {
-                    localStore.set('taskNotificationCount', ZERO + '');
-                    localStore.remove('lastTask');
+                    const lastTask = localStore.get('lastTask');
+                    if (lastTask) {
+                      const notification = JSON.parse(lastTask);
+                      setJobToOpenJobManager({ id: notification.jobId, resourceId: notification.productId, updated: notification.updated });
+                      localStore.remove('lastTask');
+                    }
+                    const taskNotificationCount = localStore.get('taskNotificationCount');
+                    if (taskNotificationCount) {
+                      localStore.remove('taskNotificationCount');
+                    }
                     setTaskNotificationCount(ZERO);
                     setIsSystemsJobsDialogOpen(!isSystemsJobsDialogOpen);
                   }}
@@ -1257,7 +1265,8 @@ const DiscreteLayerView: React.FC = observer(() => {
                   handleTabViewChange = {handleTabViewChange}
                   activeTabView = {activeTabView}
                   handleOpenJobDialog = {(open, jobData) => {
-                    setJobToOpenJobManager(jobData);
+                    const { id, resourceId, updated } = jobData;
+                    setJobToOpenJobManager({ id, resourceId, updated });
                     setIsSystemsJobsDialogOpen(open);
                   }}
                 />

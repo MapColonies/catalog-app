@@ -4,16 +4,16 @@ import { get } from 'lodash';
 import { ICellRendererParams } from 'ag-grid-community';
 import { Box } from '@map-colonies/react-components';
 import { CircularProgress, IconButton, Tooltip, useTheme } from '@map-colonies/react-core';
+import { Copy } from '../../../../../common/components/copy/copy';
 import { AutoDirectionBox } from '../../../../../common/components/auto-direction-box/auto-direction-box.component';
 import { Hyperlink } from '../../../../../common/components/hyperlink/hyperlink';
 import { RasterIngestionJobType } from '../../../../../common/models/raster-job';
 import { DETAILS_ROW_ID_SUFFIX } from '../../../../../common/components/grid';
 import { Domain } from '../../../../../common/models/domain';
-import { RasterErrorsSummary } from '../../../../../common/models/task-error-summary.raster';
+import { RasterErrorsSummary } from '../../../../../common/models/job-errors-summary.raster';
 import { JobModelType, TaskModelType, useStore } from '../../../../models';
 import useZoomLevelsTable from '../../../export-layer/hooks/useZoomLevelsTable';
-import { getRasterErrorCount, RenderErrorCounts } from '../../../job-error-summary/job-error-summary';
-import { CopyButton } from '../../job-details.copy-button';
+import { getRasterErrorCount, JobErrorsSummary } from '../../../job-errors-summary/job-errors-summary';
 
 import './info-area.css';
 import './job-details.raster-job-data.css';
@@ -153,23 +153,22 @@ const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = ({ data 
 
               <Tooltip content={
                 <Box>
-                  {
-                    RenderErrorCounts(theme, task?.parameters?.errorsSummary, 'reportList')
-                  }
+                  {JobErrorsSummary(theme, task?.parameters?.errorsSummary, "reportList")}
                 </Box>
               }>
                 <Hyperlink url={task?.parameters?.report?.url ?? ''} label={`${errorsCount.toString()} ${errorsMessage}`} />
               </Tooltip>
 
-              <CopyButton text={task?.parameters?.report?.url ?? ''} key={'errorsReportLink'} />
+              <Copy value = {task?.parameters?.report?.url ?? ''} iconStyle = {{ fontSize: `20px` }} key={'errorsReportLink'}/>
             </>
           }
-          {!hasErrors && hasGpkgPath() && task &&
+          {
+            !hasErrors && hasGpkgPath() && task &&
             intl.formatMessage({ id: 'general.no-errors.text' })
           }
         </Box>
       }
-    </Box >
+    </Box>
   );
 }
 

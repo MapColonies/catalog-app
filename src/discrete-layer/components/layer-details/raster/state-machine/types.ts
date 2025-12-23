@@ -3,8 +3,8 @@ import { /*ActionArgs, */EventObject, PromiseActorRef } from 'xstate';
 import { AnyActorSystem } from 'xstate/dist/declarations/src/system';
 import { FileData } from '@map-colonies/react-components';
 import CONFIG from '../../../../../common/config';
+import { RasterTaskParams } from '../../../../../common/models/job-errors-summary.raster';
 import { Mode } from '../../../../../common/models/mode.enum';
-import { RasterTaskParams } from '../../../../../common/models/task-error-summary.raster';
 import {
   IBaseRootStore,
   IRootStore,
@@ -102,11 +102,12 @@ export type Events =
   | { type: "CLEAN_ERRORS" }
   | { type: "NOOP" }
   | { type: "SUBMIT", data: LayerRasterRecordInput, resolutionDegree: number }
+  | { type: "TICK" }
+  | { type: "SYNC" }
+  | { type: "STOP_POLLING"}
   | { type: "RESTORE", job: IJob }
   | { type: "RETRY" }
-  | { type: "DONE" }
-  | { type: "TICK" }
-  | { type: "STOP_POLLING"};
+  | { type: "DONE" };
 
 // type FlowActionArgs = ActionArgs<Context, Events, Events>;
 
@@ -148,9 +149,13 @@ export const WORKFLOW = {
   },
   JOB_SUBMISSION: "jobSubmission",
   JOB_POLLING: "jobPolling",
-  JOB_POLLING_WAIT: "jobPollingWait",
+  WAIT: {
+    ROOT: "wait",
+    TIMER: "timer",
+    WATCHER: "watcher"
+  },
   RESTORE_JOB: "restoreJob",
-  JOB_RETRY: "jobRetry",
+  RETRY_JOB: "retryJob",
   DONE: "done"
 } as const;
 

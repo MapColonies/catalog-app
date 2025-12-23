@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.1.0](https://github.com/MapColonies/catalog-app/compare/v4.0.1...v4.1.0) (2025-12-23)
+
+
+### Features
+
+* suspended progress bar ( MAPCO-8973 ) ([#792](https://github.com/MapColonies/catalog-app/issues/792)) ([f1a7cd4](https://github.com/MapColonies/catalog-app/commit/f1a7cd46b38d3250e3eed4add474e3fc07f151ad))
+
+
+### Bug Fixes
+
+* add new className copy-indication ([#803](https://github.com/MapColonies/catalog-app/issues/803)) ([5b9949c](https://github.com/MapColonies/catalog-app/commit/5b9949c5fe6b4091843c2678bbb547b26fba8592))
+* change location to be under job-manager ([#796](https://github.com/MapColonies/catalog-app/issues/796)) ([a5be822](https://github.com/MapColonies/catalog-app/commit/a5be822410d7bee3f8884071b65aed0c79d893fe))
+* eslint ([7550081](https://github.com/MapColonies/catalog-app/commit/7550081e2e0e8236995277425d26b28b8446c535))
+* guards and retry sm logic ([#795](https://github.com/MapColonies/catalog-app/issues/795)) ([3907344](https://github.com/MapColonies/catalog-app/commit/39073442b7e1d61254dea8809483d5d11ffba31d))
+* handle mutationQuery errors ([#797](https://github.com/MapColonies/catalog-app/issues/797)) ([aeed7b0](https://github.com/MapColonies/catalog-app/commit/aeed7b0ac72d276caa4e4c9329a23851962440a4))
+* monitored area styling ([#790](https://github.com/MapColonies/catalog-app/issues/790)) ([ea1acbf](https://github.com/MapColonies/catalog-app/commit/ea1acbf5e940d6cdfe2e59c27985ecd001153c6e))
+* notifications for job manager ([#804](https://github.com/MapColonies/catalog-app/issues/804)) ([f6f9b51](https://github.com/MapColonies/catalog-app/commit/f6f9b518474059738027c814695ddeef660fd935))
+* remove error medium ([#793](https://github.com/MapColonies/catalog-app/issues/793)) ([bbb941a](https://github.com/MapColonies/catalog-app/commit/bbb941a1dcdc6e3cb9d03528f0b5a8c16f4a352e))
+* remove submit errors on blur ([#802](https://github.com/MapColonies/catalog-app/issues/802)) ([b58d4a4](https://github.com/MapColonies/catalog-app/commit/b58d4a44a3265384631ee16bf2f0b9aac8905879))
+* sync state machine with task notification (MAPCO-8444)  ([#798](https://github.com/MapColonies/catalog-app/issues/798)) ([a704a99](https://github.com/MapColonies/catalog-app/commit/a704a9993c85018595a495af66114c398730011d))
+* watcher ([#800](https://github.com/MapColonies/catalog-app/issues/800)) ([28288ea](https://github.com/MapColonies/catalog-app/commit/28288ea71c4b06503e73f5c013d97ba83569528b))
+
 ## [4.0.1](https://github.com/MapColonies/catalog-app/compare/v4.0.0...v4.0.1) (2025-12-16)
 
 

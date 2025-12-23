@@ -3,7 +3,7 @@ import { fromPromise } from 'xstate';
 import CONFIG from '../../../../../common/config';
 import { relativeDateFormatter } from '../../../../../common/helpers/formatters';
 import { Mode } from '../../../../../common/models/mode.enum';
-import { ProductType, RecordType } from '../../../../models';
+import { ProductType, RecordType, Status } from '../../../../models';
 import { LayerRasterRecordInput } from '../../../../models/RootStore.base';
 import { FeatureType } from '../pp-map.utils';
 import {
@@ -124,7 +124,7 @@ export const SERVICES = {
         taskId: task.id,
         taskPercentage: task.percentage ?? 0,
         validationReport: task.parameters || {},
-        taskStatus: task.status ?? '',
+        taskStatus: task.status as Status,
         taskReason: task.reason ?? '',
         details: job
       };
