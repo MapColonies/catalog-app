@@ -3,7 +3,7 @@ import CopyToClipboard from 'react-copy-to-clipboard';
 import { IconButton } from '@map-colonies/react-core';
 import { Box } from '@material-ui/core';
 
-import './style.css';
+import './copy.css';
 
 interface IProps {
   value: string;
@@ -21,7 +21,7 @@ export const Copy = (props: IProps) => {
   return (
     <>
       <CopyToClipboard text={props.value} onCopy={(): void => setIsCopied(true)}>
-        <Box className="icon-wrapper">
+        <Box className="iconWrapper">
           {
             props.copyToClipboardChildren
             ? props.copyToClipboardChildren
@@ -37,7 +37,7 @@ export const Copy = (props: IProps) => {
           {
             isCopied &&
             <IconButton
-              className="mc-icon-Ok"
+              className="mc-icon-Ok copyIndication"
               style={{ color: "var(--mdc-theme-gc-success)" }}
             />
           }

@@ -2,7 +2,7 @@ import { Box } from '@map-colonies/react-components';
 import { Button, Typography } from '@map-colonies/react-core';
 import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Copy } from '../../../common/components/copy';
+import { Copy } from '../../../common/components/copy/copy';
 
 const ExportLayerFinalStage: React.FC<{
   onClose: () => void;

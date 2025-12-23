@@ -6,7 +6,7 @@ import {
   SimpleListItem,
   Typography,
 } from '@map-colonies/react-core';
-import { Copy } from '../../../../../common/components/copy';
+import { Copy } from '../../../../../common/components/copy/copy';
 import { CategorizedServices } from '../system-core-info.dialog';
 
 import './external-services.css';

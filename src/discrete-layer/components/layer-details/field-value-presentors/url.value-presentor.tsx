@@ -1,7 +1,7 @@
 import React from 'react';
 import { Typography } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
-import { Copy } from '../../../../common/components/copy';
+import { Copy } from '../../../../common/components/copy/copy';
 import { Hyperlink } from '../../../../common/components/hyperlink/hyperlink';
 import TooltippedValue from '../../../../common/components/form/tooltipped.value';
 import { ILink } from '../../../models/links';
