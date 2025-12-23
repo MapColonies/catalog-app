@@ -282,9 +282,6 @@ export const workflowMachine = createMachine<IContext, Events>({
           })),
           target: WORKFLOW.JOB_SUBMISSION
         },
-        CLEAN_ERRORS: {
-          actions: assign({ errors: [] })
-        },
         RESTORE: {
           actions: assign((_: { context: IContext; event: any }) => ({
             job: {
@@ -295,6 +292,9 @@ export const workflowMachine = createMachine<IContext, Events>({
         },
         RETRY: {
           target: WORKFLOW.RETRY_JOB
+        },
+        CLEAN_ERRORS: {
+          actions: assign({ errors: [] })
         },
         "*": { actions: warnUnexpectedStateEvent }
       }
