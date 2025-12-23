@@ -306,7 +306,7 @@ export const workflowMachine = createMachine<IContext, Events>({
           {
             guard: (_: { context: IContext; event: any }) => {
               console.log(`>>> Enter GUARD onDone of ${WORKFLOW.START_UPDATE}`);
-              return false;// !!_.event.output.jobId;
+              return !!_.event.output.jobId;
             },
             actions: assign((_: { context: IContext; event: any }) => ({
               job: {

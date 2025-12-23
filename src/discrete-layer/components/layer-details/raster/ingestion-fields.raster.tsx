@@ -111,6 +111,9 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
   const [pendingFileEvent, setPendingFileEvent] = useState<Events | null>(null);
   const [IngestionFilesTypeConfig, setIngestionFilesTypeConfig] = useState<RasterIngestionFilesTypeConfig>();
 
+   useEffect(() => {
+    setSelectionMode(state.context.selectionMode as SelectionMode);
+  }, [state.context.selectionMode]);
 
   useEffect(() => {
     if (pendingFileEvent && filesActor) {

@@ -128,30 +128,35 @@ export const EntityRasterDialog: React.FC<EntityRasterDialogProps> = observer((p
     return store.discreteLayersStore.selectedLayerOperationMode === Mode.UPDATE;
   };
 
+  const isRestoreMode = (jobRecord: JobModelType | undefined): boolean => {
+    return !isEmpty(jobRecord?.resourceId) && !isEmpty(jobRecord?.productType);
+  }
+
   const getRecordLayer = (jobRecord: JobModelType | undefined): ILayerImage => {
     const { selectedLayer, entityDescriptors, findRasterLayer } = store.discreteLayersStore;
+    const descriptors = entityDescriptors as EntityDescriptorModelType[];
 
     // 1. START_NEW mode - always return empty base layer
     if (!isUpdateMode(jobRecord)) { 
-      return buildRasterRecord(entityDescriptors as EntityDescriptorModelType[]);
+      return buildRasterRecord(descriptors);
     }
 
     // 2. RESTORE mode - try to get the matching layer
-    if (jobRecord?.resourceId && jobRecord.productType) {
-      const layerRecord = cloneDeep(findRasterLayer(jobRecord?.resourceId, jobRecord.productType));
+    if (isRestoreMode(jobRecord)) {
+      const layerRecord = findRasterLayer(jobRecord?.resourceId as string, jobRecord?.productType as string);
 
       if (layerRecord) {
-        return layerRecord;
+        return cloneDeep(layerRecord);
       }
     }
 
     // 3. START_UPDATE mode - return the currently selected layer
-    if (selectedLayer) {
+    if (selectedLayer && !isRestoreMode(jobRecord)) {
       return selectedLayer;
     }
 
     // 4. Fallback (should rarely happen) - return record for START_NEW mode
-    return buildRasterRecord(entityDescriptors as EntityDescriptorModelType[]);
+    return buildRasterRecord(descriptors);
   };
 
   return (
