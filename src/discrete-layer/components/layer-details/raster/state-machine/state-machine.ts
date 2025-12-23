@@ -293,6 +293,9 @@ export const workflowMachine = createMachine<IContext, Events>({
         RETRY: {
           target: WORKFLOW.RETRY_JOB
         },
+        CLEAN_ERRORS: {
+          actions: assign({ errors: [] })
+        },
         "*": { actions: warnUnexpectedStateEvent }
       }
     },

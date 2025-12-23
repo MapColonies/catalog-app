@@ -119,6 +119,7 @@ export const InnerRasterForm = (
   const status = props.status as StatusError | Record<string, unknown>;
   const [firstPhaseErrors, setFirstPhaseErrors] = useState<Record<string, string[]>>({});
   const [isSubmittedForm, setIsSubmittedForm] = useState(false);
+  const [ingestionFieldsCurtain, setIngestionFieldsCurtain] = useState(false);
 
   //#region STATE MACHINE
   const actorRef = RasterWorkflowContext.useActorRef();
@@ -214,6 +215,7 @@ export const InnerRasterForm = (
       handleBlur: (e: React.FocusEvent<unknown>): void => {
         customErrorReset();
         handleBlur(e);
+        setIngestionFieldsCurtain(true);
       },
       handleSubmit,
       handleReset,
@@ -251,6 +253,12 @@ export const InnerRasterForm = (
   //   topLevelFieldsErrors[err] = firstPhaseErrors[err];
   // });
 
+  useEffect(() => {
+    if (dirty) {
+      actorRef.send({ type: "CLEAN_ERRORS" } satisfies Events);
+    }
+  }, [dirty]);
+
   return (
     <Box id="layerDetailsFormRaster">
       <Form
@@ -258,6 +266,7 @@ export const InnerRasterForm = (
           e.preventDefault();
           handleSubmit(e);
           setIsSubmittedForm(true);
+          resetForm({ values }); // After submit, reset the form to an undirty state to clear submit errors via CLEAN_ERRORS
         }}
         autoComplete={'off'}
         className="form"
@@ -265,7 +274,7 @@ export const InnerRasterForm = (
       >
         {
           (mode === Mode.NEW || mode === Mode.UPDATE) &&
-          <IngestionFields recordType={recordType} />
+          <IngestionFields recordType={recordType} curtain={ingestionFieldsCurtain} />
         }
         <Box className="content section">
           <Box className="previewAndJobContainer">

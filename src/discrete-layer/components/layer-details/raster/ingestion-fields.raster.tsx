@@ -13,10 +13,12 @@ import { dateFormatter, formatPath, relativeDateFormatter } from '../../../../co
 import { Mode } from '../../../../common/models/mode.enum';
 import { RecordType, LayerMetadataMixedUnion, RasterIngestionFilesTypeConfig } from '../../../models';
 import { FilePickerDialog } from '../../dialogs/file-picker.dialog';
+import { Curtain } from './curtain/curtain.component';
 import { RasterWorkflowContext } from './state-machine/context';
 import {
   hasActiveJob,
   hasTagDeep,
+  isFilesSelected,
   isModified,
   isUIDisabled
 } from './state-machine/helpers';
@@ -38,6 +40,7 @@ const SHAPEMETADATA = 'shapeMetadata';
 
 interface IngestionFieldsProps {
   recordType: RecordType;
+  curtain: boolean;
 }
 
 const FileItem: React.FC<{ file: any; context: IContext }> = ({ file, context }) => {
@@ -93,7 +96,7 @@ const IngestionInputs: React.FC<{ state: any }> = ({ state }) => {
   );
 };
 
-export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recordType }) => {
+export const IngestionFields: React.FC<IngestionFieldsProps> = observer((props: IngestionFieldsProps) => {
   const actorRef = RasterWorkflowContext.useActorRef();
   const isLoading = hasTagDeep(actorRef?.getSnapshot());
   const state = RasterWorkflowContext.useSelector((s) => s);
@@ -111,6 +114,13 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
   const [pendingFileEvent, setPendingFileEvent] = useState<Events | null>(null);
   const [IngestionFilesTypeConfig, setIngestionFilesTypeConfig] = useState<RasterIngestionFilesTypeConfig>();
 
+  const { recordType } = props;
+
+  const [curtain, setCurtain] = useState(false);
+
+  useEffect(() => {
+    setCurtain(isFilesSelected(state.context) && props.curtain);
+  }, [state.context, props.curtain]);
 
   useEffect(() => {
     if (pendingFileEvent && filesActor) {
@@ -190,13 +200,14 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer(({ recor
           </Box>
         </Box>
       }
-      <Box className="header section">
+      <Box className={`header section ${curtain ? 'curtainContainer' : ''}`}>
         <Box className="ingestionFields">
           {
             isLoading
             ? <Skeleton width="99%" count={3} />
             : <IngestionInputs state={state} />
           }
+          {curtain && <Curtain showProgress={false}/>}
         </Box>
         {
           hasActiveJob(state.context) === false &&
