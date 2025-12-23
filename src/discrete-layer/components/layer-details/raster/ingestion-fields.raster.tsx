@@ -13,6 +13,7 @@ import { dateFormatter, formatPath, relativeDateFormatter } from '../../../../co
 import { Mode } from '../../../../common/models/mode.enum';
 import { RecordType, LayerMetadataMixedUnion, RasterIngestionFilesTypeConfig } from '../../../models';
 import { FilePickerDialog } from '../../dialogs/file-picker.dialog';
+import { Curtain } from './curtain/curtain.component';
 import { RasterWorkflowContext } from './state-machine/context';
 import {
   hasActiveJob,
@@ -27,7 +28,6 @@ import {
   IFiles,
   IContext
 } from './state-machine/types';
-import { Curtain } from './curtain/curtain.component';
 
 import './ingestion-fields.raster.css';
 
