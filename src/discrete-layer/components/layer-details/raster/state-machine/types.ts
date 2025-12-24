@@ -100,6 +100,7 @@ export type Events =
   | { type: "SET_FILES", files: IFiles, addPolicy: AddPolicy }
   | { type: "FILES_SELECTED" }
   | { type: "FILES_ERROR", error: IStateError }
+  | { type: "CLEAN_FILES_ERROR" }
   | { type: "CLEAN_ERRORS" }
   | { type: "NOOP" }
   | { type: "SUBMIT", data: LayerRasterRecordInput, resolutionDegree: number }

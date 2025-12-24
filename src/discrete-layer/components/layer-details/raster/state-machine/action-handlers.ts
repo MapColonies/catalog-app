@@ -1,7 +1,7 @@
 import { assign, sendParent } from 'xstate';
 import { RasterFileTypeConfig } from '../../../../../common/models/raster-ingestion-files-structure';
 import { isFilesSelected } from './helpers';
-import { AddPolicy, IContext, IFiles } from './types';
+import { AddPolicy, Events, IContext, IFiles } from './types';
 
 export const fetchProductActions = [
   assign((_: { context: IContext; event: any }) => ({
@@ -93,9 +93,6 @@ export const buttonDisabledErrorActions = (fileName?: keyof IFiles) => {
 
 export const cleanFilesErrors = [
   assign({ errors: [] }),
-  sendParent((_: { context: IContext; event: any }) => ({
-    type: "FILES_ERROR",
-    error: []
-  })),
+  sendParent({ type: "CLEAN_FILES_ERROR" } satisfies Events),
   buttonDisabledErrorActions()
 ]

@@ -391,6 +391,9 @@ export const workflowMachine = createMachine<IContext, Events>({
         FILES_ERROR: {
           actions: addError
         },
+        CLEAN_FILES_ERROR: {
+          actions: assign({ errors: [] })
+        },
         NOOP: { actions: () => {} },
         "*": { actions: warnUnexpectedStateEvent }
       }
