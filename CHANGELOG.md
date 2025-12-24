@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.1.1](https://github.com/MapColonies/catalog-app/compare/v4.1.0...v4.1.1) (2025-12-23)
+
+
+### Bug Fixes
+
+* getactive job integration ([#807](https://github.com/MapColonies/catalog-app/issues/807)) ([3eb89c7](https://github.com/MapColonies/catalog-app/commit/3eb89c763024bc21b9fae2cc85c71f1a48d296e8))
+
 ## [4.1.0](https://github.com/MapColonies/catalog-app/compare/v4.0.1...v4.1.0) (2025-12-23)
 
 
