@@ -65,3 +65,37 @@ export const filesErrorActions = [
     error: { ..._.event.error }
   })),
 ];
+
+const setDisabled = (value: IFiles[keyof IFiles] | undefined, disabled: boolean) => ({
+  ...value,
+  disabled
+})
+
+export const buttonDisabledErrorActions = (fileName?: keyof IFiles) => {
+  return sendParent(
+    ({ context }: { context: IContext }) => {
+      const files = context.files ?? {};
+
+      const isDisabled = (key: keyof IFiles) => fileName ? fileName !== key : false;
+
+      return {
+        type: "SET_FILES",
+        files: {
+          ...files,
+          data: setDisabled(files.data, isDisabled("data")),
+          product: setDisabled(files.product, isDisabled("product")),
+          shapeMetadata: setDisabled(files.shapeMetadata, isDisabled("shapeMetadata")),
+        },
+      };
+    }
+  )
+};
+
+export const cleanFilesErrors = [
+  assign({ errors: [] }),
+  sendParent((_: { context: IContext; event: any }) => ({
+    type: "FILES_ERROR",
+    error: []
+  })),
+  buttonDisabledErrorActions()
+]
