@@ -44,7 +44,7 @@ interface IngestionFieldsProps {
 }
 
 const FileItem: React.FC<{ file: any; context: IContext }> = ({ file, context }) => {
-  const color = !file.exists ? 'error' : (file.isModDateDiffExceeded ? 'warning' : '');
+  const color = (!file.isExists || file.hasError) ? 'error' : (file.isModDateDiffExceeded ? 'warning' : '');
   const modDate = file.details?.modDate;
 
   return (
@@ -153,7 +153,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer((props: 
             label: `file-name.${selectedAction}`,
             path: `${directory}/${selected.files[0].name}`,
             details: { ...selected.files[0] },
-            exists: true,
+            isExists: true,
             dateFormatterPredicate: event.predicate
           }
         } satisfies Events;
@@ -221,7 +221,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer((props: 
               className="manualButton"
               disabled={
                 isUIDisabled(isLoading, state) ||
-                state.context.files?.data?.disabled
+                state.context.files?.data?.isDisabled
               }
               onClick={() => {
                 setSelectedAction(DATA);
@@ -237,7 +237,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer((props: 
               className="manualButton"
               disabled={
                 isUIDisabled(isLoading, state) ||
-                state.context.files?.product?.disabled
+                state.context.files?.product?.isDisabled
               }
               onClick={() => {
                 setSelectedAction(PRODUCT);
@@ -253,7 +253,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer((props: 
               className="manualButton"
               disabled={
                 isUIDisabled(isLoading, state) ||
-                state.context.files?.shapeMetadata?.disabled
+                state.context.files?.shapeMetadata?.isDisabled
               }
               onClick={() => {
                 setSelectedAction(SHAPEMETADATA);

@@ -30,8 +30,9 @@ export interface IStateError extends IError {
 export interface IFileBase {
   label: string;
   path: string;
-  exists: boolean;
-  disabled?: boolean;
+  isExists: boolean;
+  isDisabled?: boolean;
+  hasError?: boolean;
   details?: FileData;
   dateFormatterPredicate?: (modDate: Date | string) => string;
 }

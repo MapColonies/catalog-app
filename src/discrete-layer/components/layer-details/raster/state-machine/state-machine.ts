@@ -63,9 +63,9 @@ const filesMachine = createMachine({
             },
             MANUAL: {
               actions: selectionModeActions('manual' as SelectionMode, {
-                data: { label: DATA_LABEL, path: '', exists: false, dateFormatterPredicate: dateFormatter },
-                product: { label: PRODUCT_LABEL, path: '', exists: false, dateFormatterPredicate: relativeDateFormatter },
-                shapeMetadata: { label: SHAPEMETADATA_LABEL, path: '', exists: false, dateFormatterPredicate: relativeDateFormatter }
+                data: { label: DATA_LABEL, path: '', isExists: false, dateFormatterPredicate: dateFormatter },
+                product: { label: PRODUCT_LABEL, path: '', isExists: false, dateFormatterPredicate: relativeDateFormatter },
+                shapeMetadata: { label: SHAPEMETADATA_LABEL, path: '', isExists: false, dateFormatterPredicate: relativeDateFormatter }
               }),
               target: `#${WORKFLOW.FILES.ROOT}`
             },
