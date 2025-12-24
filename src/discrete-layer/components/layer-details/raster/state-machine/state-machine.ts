@@ -5,8 +5,8 @@ import { dateFormatter, relativeDateFormatter } from '../../../../../common/help
 import { localStore } from '../../../../../common/helpers/storage';
 import { Mode } from '../../../../../common/models/mode.enum';
 import {
-  buttonDisabledErrorActions,
-  cleanFilesErrors,
+  disableButtonOnErrorActions,
+  cleanFilesErrorActions,
   fetchProductActions,
   filesErrorActions,
   filesSelectedActions,
@@ -153,21 +153,21 @@ const filesMachine = createMachine({
             SELECT_DATA: {
               actions: [
                 ...selectFileActions('data'),
-                ...cleanFilesErrors,
+                ...cleanFilesErrorActions,
               ],
               target: WORKFLOW.FILES.MANUAL.SELECT_DATA
             },
             SELECT_PRODUCT: {
               actions: [
                 ...selectFileActions('product'),
-                ...cleanFilesErrors,
+                ...cleanFilesErrorActions,
               ],
               target: WORKFLOW.FILES.MANUAL.FETCH_PRODUCT
             },
             SELECT_SHAPEMETADATA: {
               actions: [
                 ...selectFileActions('shapeMetadata'),
-                ...cleanFilesErrors,
+                ...cleanFilesErrorActions,
               ],
               target: WORKFLOW.FILES.MANUAL.CHECK_SHAPEMETADATA
             },
@@ -211,7 +211,7 @@ const filesMachine = createMachine({
             onError: {
               actions: [
                 ...filesErrorActions,
-                buttonDisabledErrorActions('data')
+                disableButtonOnErrorActions('data')
               ],
               target: WORKFLOW.FILES.MANUAL.IDLE
             }
@@ -233,7 +233,7 @@ const filesMachine = createMachine({
             onError: {
               actions: [
                 ...filesErrorActions,
-                buttonDisabledErrorActions('product')
+                disableButtonOnErrorActions('product')
               ],
               target: WORKFLOW.FILES.MANUAL.IDLE
             }
@@ -251,7 +251,7 @@ const filesMachine = createMachine({
             onError: {
               actions: [
                 ...filesErrorActions,
-                buttonDisabledErrorActions('shapeMetadata')
+                disableButtonOnErrorActions('shapeMetadata')
               ],
               target: WORKFLOW.FILES.MANUAL.IDLE
             }

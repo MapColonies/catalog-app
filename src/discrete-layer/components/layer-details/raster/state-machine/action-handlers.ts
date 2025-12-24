@@ -66,33 +66,25 @@ export const filesErrorActions = [
   })),
 ];
 
-const setDisabled = (value: IFiles[keyof IFiles] | undefined, disabled: boolean) => ({
-  ...value,
-  disabled
-})
-
-export const buttonDisabledErrorActions = (fileName?: keyof IFiles) => {
-  return sendParent(
-    ({ context }: { context: IContext }) => {
-      const files = context.files ?? {};
-
-      const isDisabled = (key: keyof IFiles) => fileName ? fileName !== key : false;
-
-      return {
-        type: "SET_FILES",
-        files: {
-          ...files,
-          data: setDisabled(files.data, isDisabled("data")),
-          product: setDisabled(files.product, isDisabled("product")),
-          shapeMetadata: setDisabled(files.shapeMetadata, isDisabled("shapeMetadata")),
-        },
-      };
-    }
-  )
+export const disableButtonOnErrorActions = (fileName?: keyof IFiles) => {
+  return sendParent((_: { context: IContext; event: any }) => {
+    const files = _.context.files ?? {};
+    const isDisabled = (key: keyof IFiles) => fileName ? fileName !== key : false;
+    const setDisabled = (value: IFiles[keyof IFiles] | undefined, disabled: boolean) => ({ ...value, disabled });
+    return {
+      type: "SET_FILES",
+      files: {
+        ...files,
+        data: setDisabled(files.data, isDisabled('data')),
+        product: setDisabled(files.product, isDisabled('product')),
+        shapeMetadata: setDisabled(files.shapeMetadata, isDisabled('shapeMetadata'))
+      },
+    };
+  });
 };
 
-export const cleanFilesErrors = [
+export const cleanFilesErrorActions = [
   assign({ errors: [] }),
   sendParent({ type: "CLEAN_FILES_ERROR" } satisfies Events),
-  buttonDisabledErrorActions()
-]
+  disableButtonOnErrorActions()
+];

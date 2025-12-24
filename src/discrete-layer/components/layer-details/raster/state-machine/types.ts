@@ -101,7 +101,6 @@ export type Events =
   | { type: "FILES_SELECTED" }
   | { type: "FILES_ERROR", error: IStateError }
   | { type: "CLEAN_FILES_ERROR" }
-  | { type: "CLEAN_ERRORS" }
   | { type: "NOOP" }
   | { type: "SUBMIT", data: LayerRasterRecordInput, resolutionDegree: number }
   | { type: "TICK" }
@@ -109,6 +108,7 @@ export type Events =
   | { type: "STOP_POLLING"}
   | { type: "RESTORE", job: IJob }
   | { type: "RETRY" }
+  | { type: "CLEAN_ERRORS" }
   | { type: "DONE" };
 
 // type FlowActionArgs = ActionArgs<Context, Events, Events>;
