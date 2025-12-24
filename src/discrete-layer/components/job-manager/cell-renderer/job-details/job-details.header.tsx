@@ -2,7 +2,7 @@ import React from 'react';
 import { useIntl } from 'react-intl';
 import { Typography } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
-import { Copy } from '../../../../../common/components/copy';
+import { Copy } from '../../../../../common/components/copy/copy';
 import { AutoDirectionBox } from '../../../../../common/components/auto-direction-box/auto-direction-box.component';
 import TooltippedValue from '../../../../../common/components/form/tooltipped.value';
 import {DETAILS_ROW_ID_SUFFIX} from '../../../../../common/components/grid';

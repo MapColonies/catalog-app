@@ -33,8 +33,8 @@ interface JobsDialogProps {
   isOpen: boolean;
   onSetOpen: (open: boolean) => void;
   setRestoreFromJob: (job: JobModelType) => void;
-  focusOnJob?: JobModelType;
-  setFocusOnJob?: (job: JobModelType | undefined) => void;
+  focusOnJob?: Partial<Pick<JobModelType, 'id' | 'resourceId' | 'updated'>>;
+  setFocusOnJob?: (job: Partial<Pick<JobModelType, 'id' | 'resourceId' | 'updated'>> | undefined) => void;
 }
 
 export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialogProps) => {

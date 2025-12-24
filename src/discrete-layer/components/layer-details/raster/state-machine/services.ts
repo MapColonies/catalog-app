@@ -3,7 +3,7 @@ import { fromPromise } from 'xstate';
 import CONFIG from '../../../../../common/config';
 import { relativeDateFormatter } from '../../../../../common/helpers/formatters';
 import { Mode } from '../../../../../common/models/mode.enum';
-import { RecordType, Status } from '../../../../models';
+import { ProductType, RecordType, Status } from '../../../../models';
 import { LayerRasterRecordInput } from '../../../../models/RootStore.base';
 import { FeatureType } from '../pp-map.utils';
 import {
@@ -15,7 +15,6 @@ import {
   hasError,
   isModified
 } from './helpers';
-import { MOCK_JOB_UPDATE } from './MOCK';
 import { queryExecutor } from './query-executor';
 import {
   fetchProduct,
@@ -42,16 +41,19 @@ import {
 export const SERVICES = {
   [WORKFLOW.ROOT]: {
     fetchActiveJobService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
-      // const { updatedLayer } = input.context || {};
+      const { updatedLayer } = input.context;
 
-      // const result = await queryExecutor(async () => {
-      //   return await input.context.store.queryGetActiveJob({
-      //     productId: updatedLayer?.productId,
-      //     productType: updatedLayer?.productType
-      //   });
-      // });
+      const result = await queryExecutor(async () => {
+        return await input.context.store.queryActiveJob({
+          activeJobParams: {
+            resourceId: updatedLayer?.productId as string,
+            productType: updatedLayer?.productType as ProductType,
+            domain: 'RASTER'
+          }
+        });
+      });
 
-      const jobId = MOCK_JOB_UPDATE.id; // TODO: Mock should be removed
+      const jobId = result.activeJob?.id;
 
       return {
         jobId

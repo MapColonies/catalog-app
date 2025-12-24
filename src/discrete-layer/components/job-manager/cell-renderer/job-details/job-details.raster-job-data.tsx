@@ -4,7 +4,7 @@ import { get } from 'lodash';
 import { ICellRendererParams } from 'ag-grid-community';
 import { Box } from '@map-colonies/react-components';
 import { CircularProgress, IconButton, Tooltip, useTheme } from '@map-colonies/react-core';
-import { Copy } from '../../../../../common/components/copy';
+import { Copy } from '../../../../../common/components/copy/copy';
 import { AutoDirectionBox } from '../../../../../common/components/auto-direction-box/auto-direction-box.component';
 import { Hyperlink } from '../../../../../common/components/hyperlink/hyperlink';
 import { RasterIngestionJobType } from '../../../../../common/models/raster-job';

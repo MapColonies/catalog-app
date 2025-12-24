@@ -113,11 +113,13 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer((props: 
   const [selectedAction, setSelectedAction] = useState<string | null>(null);
   const [pendingFileEvent, setPendingFileEvent] = useState<Events | null>(null);
   const [IngestionFilesTypeConfig, setIngestionFilesTypeConfig] = useState<RasterIngestionFilesTypeConfig>();
-
   const { recordType } = props;
-
   const [curtain, setCurtain] = useState(false);
 
+   useEffect(() => {
+    setSelectionMode(state.context.selectionMode as SelectionMode);
+  }, [state.context.selectionMode]);
+  
   useEffect(() => {
     setCurtain(isFilesSelected(state.context) && props.curtain);
   }, [state.context, props.curtain]);

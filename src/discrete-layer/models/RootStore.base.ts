@@ -197,6 +197,11 @@ export type JobsSearchParams = {
   fromDate?: any
   tillDate?: any
 }
+export type ActiveJobFindParams = {
+  resourceId: string
+  productType: ProductType
+  domain: string
+}
 export type GetLookupTablesParams = {
   lookupFields?: LookupTableFieldInput[]
 }
@@ -455,6 +460,7 @@ queryTriggerExportTask="queryTriggerExportTask",
 queryGetExternalServices="queryGetExternalServices",
 queryJobs="queryJobs",
 queryJob="queryJob",
+queryActiveJob="queryActiveJob",
 queryGetLookupTablesData="queryGetLookupTablesData",
 queryGetClusterServices="queryGetClusterServices",
 queryGetDirectory="queryGetDirectory",
@@ -570,6 +576,11 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     },
     queryJob(variables: { id: string }, resultSelector: string | ((qb: JobModelSelector) => JobModelSelector) = jobModelPrimitives.toString(), options: QueryOptions = {}) {
       return self.query<{ job: JobModelType}>(`query job($id: String!) { job(id: $id) {
+        ${typeof resultSelector === "function" ? resultSelector(new JobModelSelector()).toString() : resultSelector}
+      } }`, variables, options)
+    },
+    queryActiveJob(variables: { activeJobParams: ActiveJobFindParams }, resultSelector: string | ((qb: JobModelSelector) => JobModelSelector) = jobModelPrimitives.toString(), options: QueryOptions = {}) {
+      return self.query<{ activeJob: JobModelType}>(`query activeJob($activeJobParams: ActiveJobFindParams!) { activeJob(activeJobParams: $activeJobParams) {
         ${typeof resultSelector === "function" ? resultSelector(new JobModelSelector()).toString() : resultSelector}
       } }`, variables, options)
     },
