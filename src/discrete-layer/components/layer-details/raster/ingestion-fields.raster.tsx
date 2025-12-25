@@ -153,7 +153,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer((props: 
             label: `file-name.${selectedAction}`,
             path: `${directory}/${selected.files[0].name}`,
             details: { ...selected.files[0] },
-            exists: true,
+            isExists: true,
             dateFormatterPredicate: event.predicate
           }
         } satisfies Events;

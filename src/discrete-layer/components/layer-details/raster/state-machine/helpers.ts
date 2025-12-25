@@ -139,9 +139,9 @@ export const hasTagDeep = (state: SnapshotFrom<typeof workflowMachine>, tag = ST
 
 export const isFilesSelected = (context: IContext): boolean => {
   const files = context.files || {};
-  return !!(files.data && files.data.path && files.data.exists === true &&
-    files.product && files.product.path && files.product.exists === true &&
-    files.shapeMetadata && files.shapeMetadata.path && files.shapeMetadata.exists === true);
+  return !!(files.data && files.data.path && files.data.isExists === true &&
+    files.product && files.product.path && files.product.isExists === true &&
+    files.shapeMetadata && files.shapeMetadata.path && files.shapeMetadata.isExists === true);
 };
 
 export const validateShapeFiles = (files: IFiles): IStateError[] => {
