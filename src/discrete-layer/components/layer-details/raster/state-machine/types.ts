@@ -31,6 +31,7 @@ export interface IFileBase {
   label: string;
   path: string;
   isExists: boolean;
+  hasError?: boolean;
   isDisabled?: boolean;
   details?: FileData;
   dateFormatterPredicate?: (modDate: Date | string) => string;
