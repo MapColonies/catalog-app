@@ -73,7 +73,7 @@ export const updateFileButtonStateWithError = (hasError: boolean, fileName?: key
     const setErrorAndDisabled = (value: IFiles[keyof IFiles] | undefined, disabled: boolean) => ({
       ...value,
       isDisabled: disabled,
-      error: !disabled && hasError ? true : false
+      error: !disabled && hasError
     });
 
     return {
