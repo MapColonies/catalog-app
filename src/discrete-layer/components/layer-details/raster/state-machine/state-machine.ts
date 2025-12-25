@@ -5,7 +5,7 @@ import { dateFormatter, relativeDateFormatter } from '../../../../../common/help
 import { localStore } from '../../../../../common/helpers/storage';
 import { Mode } from '../../../../../common/models/mode.enum';
 import {
-  disableButtonOnErrorActions,
+  updateFileButtonStateWithError,
   cleanFilesErrorActions,
   fetchProductActions,
   filesErrorActions,
@@ -211,7 +211,7 @@ const filesMachine = createMachine({
             onError: {
               actions: [
                 ...filesErrorActions,
-                disableButtonOnErrorActions('data')
+                updateFileButtonStateWithError(true, 'data')
               ],
               target: WORKFLOW.FILES.MANUAL.IDLE
             }
@@ -233,7 +233,7 @@ const filesMachine = createMachine({
             onError: {
               actions: [
                 ...filesErrorActions,
-                disableButtonOnErrorActions('product')
+                updateFileButtonStateWithError(true, 'product')
               ],
               target: WORKFLOW.FILES.MANUAL.IDLE
             }
@@ -251,7 +251,7 @@ const filesMachine = createMachine({
             onError: {
               actions: [
                 ...filesErrorActions,
-                disableButtonOnErrorActions('shapeMetadata')
+                updateFileButtonStateWithError(true, 'shapeMetadata')
               ],
               target: WORKFLOW.FILES.MANUAL.IDLE
             }

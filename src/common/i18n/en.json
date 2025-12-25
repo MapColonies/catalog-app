@@ -257,6 +257,7 @@
   "ingestion.error.restore-failed": "Cannot restore form, job format is invalid",
   "ingestion.error.directory-comparison": "Warning: directory content is not the same between current and secondary sites",
   "ingestion.error.invalid-metadata": "Metadata file format is not valid",
+  "ingestion.error.uncatched-js": "{value}",
   "ingestion.error.not-available": "is not available",
   "ingestion.button.import-metadata": "Import Metadata",
   "ingestion.checkbox.label": "Operation failed on secondary site, please check to continue with operation on main site only",

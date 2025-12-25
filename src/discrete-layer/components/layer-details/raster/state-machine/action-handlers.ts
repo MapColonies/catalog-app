@@ -1,6 +1,6 @@
 import { assign, sendParent } from 'xstate';
 import { RasterFileTypeConfig } from '../../../../../common/models/raster-ingestion-files-structure';
-import { isFilesSelected } from './helpers';
+import { isFilesSelected, normalizeError } from './helpers';
 import { AddPolicy, Events, IContext, IFiles } from './types';
 
 export const fetchProductActions = [
@@ -62,15 +62,20 @@ export const filesSelectedActions = [
 export const filesErrorActions = [
   sendParent((_: { context: IContext; event: any }) => ({
     type: "FILES_ERROR",
-    error: { ..._.event.error }
+    error: normalizeError(_.event.error)
   })),
 ];
 
-export const disableButtonOnErrorActions = (fileName?: keyof IFiles) => {
+export const updateFileButtonStateWithError = (hasError: boolean, fileName?: keyof IFiles) => {
   return sendParent((_: { context: IContext; event: any }) => {
     const files = _.context.files ?? {};
     const isDisabled = (key: keyof IFiles) => fileName ? fileName !== key : false;
-    const setDisabled = (value: IFiles[keyof IFiles] | undefined, disabled: boolean) => ({ ...value, disabled });
+    const setDisabled = (value: IFiles[keyof IFiles] | undefined, disabled: boolean) => ({
+      ...value,
+      disabled,
+      error: !disabled && hasError ? true : false
+    });
+
     return {
       type: "SET_FILES",
       files: {
@@ -86,5 +91,5 @@ export const disableButtonOnErrorActions = (fileName?: keyof IFiles) => {
 export const cleanFilesErrorActions = [
   assign({ errors: [] }),
   sendParent({ type: "CLEAN_FILES_ERROR" } satisfies Events),
-  disableButtonOnErrorActions()
+  updateFileButtonStateWithError(false)
 ];

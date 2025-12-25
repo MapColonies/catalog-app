@@ -1,6 +1,6 @@
 import { FeatureCollection } from 'geojson';
 import path from 'path';
-import { merge } from 'lodash';
+import { get, merge } from 'lodash';
 import shp from 'shpjs';
 import { FileData } from '@map-colonies/react-components';
 import { RasterIngestionJobType } from '../../../../../common/models/raster-job';

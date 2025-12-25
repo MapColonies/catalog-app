@@ -2,6 +2,7 @@ import { Feature, GeoJsonProperties, Geometry } from 'geojson';
 import moment from 'moment';
 import path from 'path';
 import { assign, SnapshotFrom } from 'xstate';
+import { get } from 'lodash';
 import { FileData } from '@map-colonies/react-components';
 import CONFIG from '../../../../../common/config';
 import { getFirstPoint } from '../../../../../common/utils/geo.tools';
@@ -24,11 +25,20 @@ import {
   WORKFLOW
 } from './types';
 
+export const normalizeError = (err: any) => {
+  let res = err;
+  if (err != null && typeof err === 'object' && Object.keys(err).length === 0){
+    res = buildError('ingestion.error.uncatched-js', get(err,'message'))
+  }
+
+  return {...res};
+}
+
 export const addError = assign((_: { context: IContext; event: any }) => { 
   return {
     errors: _.event.error.addPolicy === "merge" ?
-      [ ..._.context.errors, _.event.error] :
-      [_.event.error]
+      [ ..._.context.errors, normalizeError(_.event.error)] :
+      [normalizeError(_.event.error)]
   };
 });
 
