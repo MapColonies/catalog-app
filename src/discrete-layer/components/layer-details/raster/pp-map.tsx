@@ -113,7 +113,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   
   const LegendsArray = useMemo(() => {
     const res: LegendItem[] = [];
-    PPMapStyles.forEach((value, key) => {
+    PPMapStyles.forEach((value, key)=>{
       if (!key.includes('MARKER')) {
         res.push({
           title: intl.formatMessage({id: `polygon-parts.map-preview-legend.${key}`}) as string,
@@ -128,26 +128,12 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
     const source = useVectorSource();
     const map = useMap();
 
-    const isValidExtent = (ext: any): ext is number[] => {
-      if (!Array.isArray(ext) || ext.length !== 4) { return false; }
-      if (!ext.every((n) => Number.isFinite(n))) { return false; }
-      // empty extent in OL is usually [Infinity, Infinity, -Infinity, -Infinity]
-      if (ext[0] === Infinity && ext[1] === Infinity && ext[2] === -Infinity && ext[3] === -Infinity) { return false; }
-      // ensure extent has non-zero area
-      if ((ext[2] <= ext[0]) && (ext[3] <= ext[1])) { return false; }
-      return true;
-    };
-
     if (renderCount.current < RENDERS_TILL_FULL_FEATURES_SET) {
       source.once('change', () => {
         if (source.getState() === 'ready') {
-          setTimeout(() => {
-            const extent = source.getExtent();
-            const view = map?.getView?.();
-            if (view && isValidExtent(extent)) {
-              view.fit(extent, fitOptions);
-            }
-          }, 0);
+          setTimeout(() => { 
+            map.getView().fit(source.getExtent(), fitOptions)
+          },0);
         }
       });
     }
@@ -198,7 +184,9 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
             <GeoFeaturesInnerComponent/>
           </VectorSource>
         </VectorLayer>
-        {showExistingPolygonParts && <PolygonPartsExtentVectorLayer layerRecord={layerRecord}/>}
+        {
+          showExistingPolygonParts && <PolygonPartsExtentVectorLayer layerRecord={layerRecord}/>
+        }
         <Legend legendItems={LegendsArray} title={intl.formatMessage({id: 'polygon-parts.map-preview-legend.title'})}/>
       </Map>
     </Box>
