@@ -109,9 +109,15 @@ export const fetchProduct = async (product: IProductFile, context: IContext) => 
     );
   });
 
-  const parsedSHP = await shp(result as unknown as ArrayBuffer);
-  const outlinedPolygon = (parsedSHP as FeatureCollection)?.features[FIRST];
-  const geoDetails = getFeatureAndMarker(outlinedPolygon.geometry, FeatureType.PP_PERIMETER, FeatureType.PP_PERIMETER_MARKER);
+  let geoDetails = null;
+
+  try {
+    const parsedSHP = await shp(result as unknown as ArrayBuffer);
+    const outlinedPolygon = (parsedSHP as FeatureCollection)?.features[FIRST];
+    geoDetails = getFeatureAndMarker(outlinedPolygon.geometry, FeatureType.PP_PERIMETER, FeatureType.PP_PERIMETER_MARKER);
+  } catch (e) {
+    throw buildError('ingestion.error.invalid-shp', get(e, 'message'));
+  }
 
   return {
     geoDetails
