@@ -70,9 +70,9 @@ export const updateFileButtonStateWithError = (hasError: boolean, fileName?: key
   return sendParent((_: { context: IContext; event: any }) => {
     const files = _.context.files ?? {};
     const isDisabled = (key: keyof IFiles) => fileName ? fileName !== key : false;
-    const setDisabled = (value: IFiles[keyof IFiles] | undefined, disabled: boolean) => ({
+    const setErrorAndDisabled = (value: IFiles[keyof IFiles] | undefined, disabled: boolean) => ({
       ...value,
-      disabled,
+      isDisabled: disabled,
       error: !disabled && hasError ? true : false
     });
 
@@ -80,9 +80,9 @@ export const updateFileButtonStateWithError = (hasError: boolean, fileName?: key
       type: "SET_FILES",
       files: {
         ...files,
-        data: setDisabled(files.data, isDisabled('data')),
-        product: setDisabled(files.product, isDisabled('product')),
-        shapeMetadata: setDisabled(files.shapeMetadata, isDisabled('shapeMetadata'))
+        data: setErrorAndDisabled(files.data, isDisabled('data')),
+        product: setErrorAndDisabled(files.product, isDisabled('product')),
+        shapeMetadata: setErrorAndDisabled(files.shapeMetadata, isDisabled('shapeMetadata'))
       },
     };
   });
