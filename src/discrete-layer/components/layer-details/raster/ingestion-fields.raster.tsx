@@ -181,6 +181,10 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer((props: 
     setSelectionMode((prev) => (prev === AUTO ? MANUAL : AUTO));
   };
 
+  const isFileSelectionDisabled = (fileName: keyof IFiles) => {
+    return isUIDisabled(isLoading, state) || state.context.files?.[fileName]?.isDisabled;
+  };
+
   return (
     <>
       {
@@ -219,10 +223,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer((props: 
               raised
               type="button"
               className="manualButton"
-              disabled={
-                isUIDisabled(isLoading, state) ||
-                state.context.files?.data?.isDisabled
-              }
+              disabled={isFileSelectionDisabled(DATA)}
               onClick={() => {
                 setSelectedAction(DATA);
                 setFilePickerDialogOpen(true);
@@ -235,10 +236,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer((props: 
               raised
               type="button"
               className="manualButton"
-              disabled={
-                isUIDisabled(isLoading, state) ||
-                state.context.files?.product?.isDisabled
-              }
+              disabled={isFileSelectionDisabled(PRODUCT)}
               onClick={() => {
                 setSelectedAction(PRODUCT);
                 setFilePickerDialogOpen(true);
@@ -251,10 +249,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer((props: 
               raised
               type="button"
               className="manualButton"
-              disabled={
-                isUIDisabled(isLoading, state) ||
-                state.context.files?.shapeMetadata?.isDisabled
-              }
+              disabled={isFileSelectionDisabled(SHAPEMETADATA)}
               onClick={() => {
                 setSelectedAction(SHAPEMETADATA);
                 setFilePickerDialogOpen(true);
