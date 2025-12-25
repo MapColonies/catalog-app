@@ -1,7 +1,7 @@
 import { assign, sendParent } from 'xstate';
 import { RasterFileTypeConfig } from '../../../../../common/models/raster-ingestion-files-structure';
-import { isFilesSelected } from './helpers';
-import { AddPolicy, IContext, IFiles } from './types';
+import { isFilesSelected, normalizeError } from './helpers';
+import { AddPolicy, Events, IContext, IFiles } from './types';
 
 export const fetchProductActions = [
   assign((_: { context: IContext; event: any }) => ({
@@ -62,6 +62,34 @@ export const filesSelectedActions = [
 export const filesErrorActions = [
   sendParent((_: { context: IContext; event: any }) => ({
     type: "FILES_ERROR",
-    error: { ..._.event.error }
+    error: normalizeError(_.event.error)
   })),
+];
+
+export const updateFileButtonStateWithError = (hasError: boolean, fileName?: keyof IFiles) => {
+  return sendParent((_: { context: IContext; event: any }) => {
+    const files = _.context.files ?? {};
+    const isDisabled = (key: keyof IFiles) => fileName ? fileName !== key : false;
+    const setErrorAndDisabled = (value: IFiles[keyof IFiles] | undefined, disabled: boolean) => ({
+      ...value,
+      isDisabled: disabled,
+      hasError: !disabled && hasError
+    });
+
+    return {
+      type: "SET_FILES",
+      files: {
+        ...files,
+        data: setErrorAndDisabled(files.data, isDisabled('data')),
+        product: setErrorAndDisabled(files.product, isDisabled('product')),
+        shapeMetadata: setErrorAndDisabled(files.shapeMetadata, isDisabled('shapeMetadata'))
+      },
+    };
+  });
+};
+
+export const cleanFilesErrorActions = [
+  assign({ errors: [] }),
+  sendParent({ type: "CLEAN_FILES_ERROR" } satisfies Events),
+  updateFileButtonStateWithError(false)
 ];

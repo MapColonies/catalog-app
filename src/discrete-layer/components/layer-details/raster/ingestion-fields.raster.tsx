@@ -44,7 +44,7 @@ interface IngestionFieldsProps {
 }
 
 const FileItem: React.FC<{ file: any; context: IContext }> = ({ file, context }) => {
-  const color = !file.exists ? 'error' : (file.isModDateDiffExceeded ? 'warning' : '');
+  const color = !file.isExists || file.hasError ? 'error' : (file.isModDateDiffExceeded ? 'warning' : '');
   const modDate = file.details?.modDate;
 
   return (
@@ -153,7 +153,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer((props: 
             label: `file-name.${selectedAction}`,
             path: `${directory}/${selected.files[0].name}`,
             details: { ...selected.files[0] },
-            exists: true,
+            isExists: true,
             dateFormatterPredicate: event.predicate
           }
         } satisfies Events;
@@ -179,6 +179,10 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer((props: 
     }
 
     setSelectionMode((prev) => (prev === AUTO ? MANUAL : AUTO));
+  };
+
+  const isFileSelectionDisabled = (fileName: keyof IFiles) => {
+    return isUIDisabled(isLoading, state) || state.context.files?.[fileName]?.isDisabled;
   };
 
   return (
@@ -219,7 +223,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer((props: 
               raised
               type="button"
               className="manualButton"
-              disabled={isUIDisabled(isLoading, state)}
+              disabled={isFileSelectionDisabled(DATA)}
               onClick={() => {
                 setSelectedAction(DATA);
                 setFilePickerDialogOpen(true);
@@ -232,7 +236,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer((props: 
               raised
               type="button"
               className="manualButton"
-              disabled={isUIDisabled(isLoading, state)}
+              disabled={isFileSelectionDisabled(PRODUCT)}
               onClick={() => {
                 setSelectedAction(PRODUCT);
                 setFilePickerDialogOpen(true);
@@ -245,7 +249,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer((props: 
               raised
               type="button"
               className="manualButton"
-              disabled={isUIDisabled(isLoading, state)}
+              disabled={isFileSelectionDisabled(SHAPEMETADATA)}
               onClick={() => {
                 setSelectedAction(SHAPEMETADATA);
                 setFilePickerDialogOpen(true);
