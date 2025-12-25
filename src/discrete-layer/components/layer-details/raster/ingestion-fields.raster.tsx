@@ -221,7 +221,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer((props: 
               className="manualButton"
               disabled={
                 isUIDisabled(isLoading, state) ||
-                state.context.files?.data?.disabled
+                state.context.files?.data?.isDisabled
               }
               onClick={() => {
                 setSelectedAction(DATA);
@@ -237,7 +237,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer((props: 
               className="manualButton"
               disabled={
                 isUIDisabled(isLoading, state) ||
-                state.context.files?.product?.disabled
+                state.context.files?.product?.isDisabled
               }
               onClick={() => {
                 setSelectedAction(PRODUCT);
@@ -253,7 +253,7 @@ export const IngestionFields: React.FC<IngestionFieldsProps> = observer((props: 
               className="manualButton"
               disabled={
                 isUIDisabled(isLoading, state) ||
-                state.context.files?.shapeMetadata?.disabled
+                state.context.files?.shapeMetadata?.isDisabled
               }
               onClick={() => {
                 setSelectedAction(SHAPEMETADATA);
