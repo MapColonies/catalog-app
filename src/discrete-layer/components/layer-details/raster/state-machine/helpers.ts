@@ -91,7 +91,7 @@ export const getFile = (files: FileData[], gpkgPath: string, fileName: string, l
     return {
       label,
       path: resolvedPath,
-      exists: false,
+      isExists: false,
       dateFormatterPredicate
     };
   }
@@ -99,7 +99,7 @@ export const getFile = (files: FileData[], gpkgPath: string, fileName: string, l
     label,
     path: resolvedPath,
     details: { ...file },
-    exists: true,
+    isExists: true,
     dateFormatterPredicate
   }))[FIRST];
 };
