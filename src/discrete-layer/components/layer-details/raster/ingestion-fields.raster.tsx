@@ -44,7 +44,7 @@ interface IngestionFieldsProps {
 }
 
 const FileItem: React.FC<{ file: any; context: IContext }> = ({ file, context }) => {
-  const color = !file.isExists || file.error ? 'error' : (file.isModDateDiffExceeded ? 'warning' : '');
+  const color = !file.isExists || file.hasError ? 'error' : (file.isModDateDiffExceeded ? 'warning' : '');
   const modDate = file.details?.modDate;
 
   return (
