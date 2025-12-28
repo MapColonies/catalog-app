@@ -28,7 +28,7 @@ export const selectionModeActions = (selectionMode: SelectionMode, files: IFiles
   assign({ selectionMode, files }),
   sendParent({ type: "SET_SELECTION_MODE", selectionMode }),
   sendParent({ type: "SET_FILES", files, addPolicy: "override" }),
-  sendParent({ type: "CLEAN_ERRORS" })
+  sendParent({ type: "CLEAN_FILES_ERROR" })
 ];
 
 export const selectFileActions = (fileType: RasterFileTypeConfig, parentAddPolicy: AddPolicy = 'merge', preserveCurrent: boolean = true) => [
@@ -66,11 +66,11 @@ export const filesErrorActions = [
   })),
 ];
 
-export const updateFileButtonStateWithError = (hasError: boolean, fileName?: keyof IFiles) => {
+export const updateErrorFileAction = (hasError: boolean, fileName?: keyof IFiles) => {
   return sendParent((_: { context: IContext; event: any }) => {
     const files = _.context.files ?? {};
     const isDisabled = (key: keyof IFiles) => fileName ? fileName !== key : false;
-    const setErrorAndDisabled = (value: IFiles[keyof IFiles] | undefined, disabled: boolean) => ({
+    const updateFile = (value: IFiles[keyof IFiles] | undefined, disabled: boolean) => ({
       ...value,
       isDisabled: disabled,
       hasError: !disabled && hasError
@@ -80,16 +80,18 @@ export const updateFileButtonStateWithError = (hasError: boolean, fileName?: key
       type: "SET_FILES",
       files: {
         ...files,
-        data: setErrorAndDisabled(files.data, isDisabled('data')),
-        product: setErrorAndDisabled(files.product, isDisabled('product')),
-        shapeMetadata: setErrorAndDisabled(files.shapeMetadata, isDisabled('shapeMetadata'))
+        data: updateFile(files.data, isDisabled('data')),
+        product: updateFile(files.product, isDisabled('product')),
+        shapeMetadata: updateFile(files.shapeMetadata, isDisabled('shapeMetadata'))
       },
     };
   });
 };
 
-export const cleanFilesErrorActions = [
-  assign({ errors: [] }),
-  sendParent({ type: "CLEAN_FILES_ERROR" } satisfies Events),
-  updateFileButtonStateWithError(false)
-];
+export const cleanFilesErrorActions = (parentEvent: Events['type']) => {
+  return [
+    assign({ errors: [] }),
+    sendParent({ type: parentEvent }),
+    updateErrorFileAction(false)
+  ]
+};

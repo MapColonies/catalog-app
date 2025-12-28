@@ -5,7 +5,7 @@ import { dateFormatter, relativeDateFormatter } from '../../../../../common/help
 import { localStore } from '../../../../../common/helpers/storage';
 import { Mode } from '../../../../../common/models/mode.enum';
 import {
-  updateFileButtonStateWithError,
+  updateErrorFileAction,
   cleanFilesErrorActions,
   fetchProductActions,
   filesErrorActions,
@@ -57,7 +57,7 @@ const filesMachine = createMachine({
             SELECT_FILES: {
               actions: [
                 ...selectFileActions('data', 'override', false),
-                sendParent({ type: "CLEAN_ERRORS" })
+                sendParent({ type: "CLEAN_FILES_ERRORS" })
               ],
               target: WORKFLOW.FILES.AUTO.SELECT_FILES
             },
@@ -153,21 +153,21 @@ const filesMachine = createMachine({
             SELECT_DATA: {
               actions: [
                 ...selectFileActions('data'),
-                ...cleanFilesErrorActions,
+                ...cleanFilesErrorActions('CLEAN_FILES_ERRORS'),
               ],
               target: WORKFLOW.FILES.MANUAL.SELECT_DATA
             },
             SELECT_PRODUCT: {
               actions: [
                 ...selectFileActions('product'),
-                ...cleanFilesErrorActions,
+                ...cleanFilesErrorActions('CLEAN_FILES_ERRORS'),
               ],
               target: WORKFLOW.FILES.MANUAL.FETCH_PRODUCT
             },
             SELECT_SHAPEMETADATA: {
               actions: [
                 ...selectFileActions('shapeMetadata'),
-                ...cleanFilesErrorActions,
+                ...cleanFilesErrorActions('CLEAN_FILES_ERRORS'),
               ],
               target: WORKFLOW.FILES.MANUAL.CHECK_SHAPEMETADATA
             },
@@ -211,7 +211,7 @@ const filesMachine = createMachine({
             onError: {
               actions: [
                 ...filesErrorActions,
-                updateFileButtonStateWithError(true, 'data')
+                updateErrorFileAction(true, 'data')
               ],
               target: WORKFLOW.FILES.MANUAL.IDLE
             }
@@ -233,7 +233,7 @@ const filesMachine = createMachine({
             onError: {
               actions: [
                 ...filesErrorActions,
-                updateFileButtonStateWithError(true, 'product')
+                updateErrorFileAction(true, 'product')
               ],
               target: WORKFLOW.FILES.MANUAL.IDLE
             }
@@ -251,7 +251,7 @@ const filesMachine = createMachine({
             onError: {
               actions: [
                 ...filesErrorActions,
-                updateFileButtonStateWithError(true, 'shapeMetadata')
+                updateErrorFileAction(true, 'shapeMetadata')
               ],
               target: WORKFLOW.FILES.MANUAL.IDLE
             }
