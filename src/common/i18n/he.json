@@ -589,7 +589,7 @@
   "validation-field.heightRangeTo.min": "{fieldName} קטן מהמינימום: {value}",
   "validation-field.heightRangeTo.max": "{fieldName} גדול מהמקסימום: {value}",
   "validation-field.scale.pattern": "{fieldName} לא מספר חוקי בין 0 ל-100000000",
-  "validation-field.productId.pattern": "{fieldName} מזהה חיצוני לא חוקי",
+  "validation-field.productId.pattern": "{fieldName} לא חוקי",
   "validation-field.scale.min": "{fieldName} קטן מהמינימום: {value}",
   "validation-field.scale.max": "{fieldName} גדול מהמקסימום: {value}",
   "validation-field.footprint.json": "{fieldName} לא GEOJSON",
