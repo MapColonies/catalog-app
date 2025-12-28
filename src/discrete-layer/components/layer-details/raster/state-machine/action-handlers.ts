@@ -28,7 +28,7 @@ export const selectionModeActions = (selectionMode: SelectionMode, files: IFiles
   assign({ selectionMode, files }),
   sendParent({ type: "SET_SELECTION_MODE", selectionMode }),
   sendParent({ type: "SET_FILES", files, addPolicy: "override" }),
-  sendParent({ type: "CLEAN_FILES_ERROR" })
+  sendParent({ type: "CLEAN_FILES_ERRORS" })
 ];
 
 export const selectFileActions = (fileType: RasterFileTypeConfig, parentAddPolicy: AddPolicy = 'merge', preserveCurrent: boolean = true) => [
