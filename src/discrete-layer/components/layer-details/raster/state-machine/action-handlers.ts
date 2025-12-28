@@ -66,23 +66,35 @@ export const filesErrorActions = [
   })),
 ];
 
-export const updateErrorFileAction = (hasError: boolean, fileName?: keyof IFiles) => {
+export const updateFileErrorAction = (hasError: boolean, targetFile?: keyof IFiles) => {
   return sendParent((_: { context: IContext; event: any }) => {
     const files = _.context.files ?? {};
-    const isDisabled = (key: keyof IFiles) => fileName ? fileName !== key : false;
-    const updateFile = (value: IFiles[keyof IFiles] | undefined, disabled: boolean) => ({
-      ...value,
-      isDisabled: disabled,
-      hasError: !disabled && hasError
-    });
+
+    const updateFile = (file: IFiles[keyof IFiles] | undefined, key: keyof IFiles) => {
+      if (!file) {
+        return;
+      }
+
+      const isDisabled = targetFile ? targetFile !== key : false;
+
+      return {
+        ...file,
+        isDisabled: isDisabled,
+        hasError: !isDisabled && hasError
+      }
+    };
+
+    const dataVal = updateFile(files.data, 'data');
+    const productVal = updateFile(files.product, 'product');
+    const shapeMetadataVal = updateFile(files.shapeMetadata, 'shapeMetadata');
 
     return {
       type: "SET_FILES",
       files: {
         ...files,
-        data: updateFile(files.data, isDisabled('data')),
-        product: updateFile(files.product, isDisabled('product')),
-        shapeMetadata: updateFile(files.shapeMetadata, isDisabled('shapeMetadata'))
+        ...(dataVal ? {data: dataVal} : {}),
+        ...(productVal ? {product: productVal} : {}),
+        ...(shapeMetadataVal ? {shapeMetadata: shapeMetadataVal} : {})
       },
     };
   });
@@ -92,6 +104,6 @@ export const cleanFilesErrorActions = (parentEvent: Events['type']) => {
   return [
     assign({ errors: [] }),
     sendParent({ type: parentEvent }),
-    updateErrorFileAction(false)
+    updateFileErrorAction(false)
   ]
 };

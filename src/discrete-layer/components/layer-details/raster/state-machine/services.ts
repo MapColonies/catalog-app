@@ -187,7 +187,13 @@ export const SERVICES = {
     selectFilesService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
       const data = await selectData(input.context);
       const dataPath = input.context.files?.data?.path as string;
-      const result = await getDirectory(getPath(path.dirname(dataPath), path.join(SHAPES_RELATIVE_TO_DATA_DIR, SHAPES_DIR)), input.context);
+      const result = await getDirectory(
+        getPath(
+          path.dirname(dataPath),
+          path.join(SHAPES_RELATIVE_TO_DATA_DIR, SHAPES_DIR)
+        ),
+        input.context
+      );
       const product = getFile(result ?? [], dataPath, PRODUCT_FILENAME, PRODUCT_LABEL, relativeDateFormatter);
       const shapeMetadata = getFile(result ?? [], dataPath, SHAPEMETADATA_FILENAME, SHAPEMETADATA_LABEL, relativeDateFormatter);
       return {
