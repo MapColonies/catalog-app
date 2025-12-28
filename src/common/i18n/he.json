@@ -258,11 +258,13 @@
   "ingestion.error.directory-comparison": "אזהרה: תוכן הסיפרייה אינו זהה בין האתר הראשי והאתר המשני",
   "ingestion.error.invalid-metadata": "קובץ מטא-דאטה בפורמט לא תקין",
   "ingestion.error.not-available": "לא זמין",
+  "ingestion.error.failed-task-report": "שגיאות שהתקבלו",
   "ingestion.button.import-metadata": "בחר מטא-דאטה",
   "ingestion.checkbox.label": "לא ניתן לבצע את הפעולה באתר המשני, יש לסמן כדי להמשיך ולבצע את הפעולה באתר הראשי בלבד",
   "ingestion.job.progress": "התקדמות כללית",
   "ingestion.job.validationTaskProgress": "התקדמות הולידציה",
   "ingestion.job.report": "תוצאות הולידציה שהתקבלו",
+  "ingestion.job.report-in-progress": "דו\"ח ולידציה בהכנה",
 
   "validationReport.geometryValidity": "תקינות גיאומטרית",
   "validationReport.vertices": "פוליגונים עם עודף נקודות",
