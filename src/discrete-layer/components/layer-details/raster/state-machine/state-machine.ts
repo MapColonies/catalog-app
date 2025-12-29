@@ -104,8 +104,7 @@ const filesMachine = createMachine({
             },
             onError: {
               actions: [
-                ...filesErrorActions,
-                updateFileErrorAction('data'),
+                ...filesErrorActions('data'),
               ],
               target: WORKFLOW.FILES.AUTO.IDLE
             }
@@ -123,8 +122,7 @@ const filesMachine = createMachine({
             },
             onError: {
               actions: [
-                ...filesErrorActions,
-                updateFileErrorAction('product'),
+                ...filesErrorActions('product'),
               ],
               target: WORKFLOW.FILES.AUTO.IDLE
             }
@@ -143,8 +141,7 @@ const filesMachine = createMachine({
             },
             onError: {
               actions: [
-                ...filesErrorActions,
-                updateFileErrorAction('shapeMetadata'),
+                ...filesErrorActions('shapeMetadata'),
               ],
               target: WORKFLOW.FILES.AUTO.IDLE
             }
@@ -219,8 +216,7 @@ const filesMachine = createMachine({
             },
             onError: {
               actions: [
-                ...filesErrorActions,
-                updateFileErrorAction('data')
+                ...filesErrorActions('data'),
               ],
               target: WORKFLOW.FILES.MANUAL.IDLE
             }
@@ -241,8 +237,7 @@ const filesMachine = createMachine({
             },
             onError: {
               actions: [
-                ...filesErrorActions,
-                updateFileErrorAction('product')
+                ...filesErrorActions('product'),
               ],
               target: WORKFLOW.FILES.MANUAL.IDLE
             }
@@ -259,8 +254,7 @@ const filesMachine = createMachine({
             },
             onError: {
               actions: [
-                ...filesErrorActions,
-                updateFileErrorAction('shapeMetadata')
+                ...filesErrorActions('shapeMetadata'),
               ],
               target: WORKFLOW.FILES.MANUAL.IDLE
             }

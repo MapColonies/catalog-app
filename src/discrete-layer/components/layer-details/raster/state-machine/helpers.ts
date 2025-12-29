@@ -137,11 +137,16 @@ export const hasTagDeep = (state: SnapshotFrom<typeof workflowMachine>, tag = ST
   return false;
 };
 
+const isFilePathValid = (file: IFiles[keyof IFiles]) => {
+  return file?.path && file.isExists && !file.hasError
+}
+
 export const isFilesSelected = (context: IContext): boolean => {
   const files = context.files || {};
-  return !!(files.data && files.data.path && files.data.isExists === true && !files.data.hasError &&
-    files.product && files.product.path && files.product.isExists === true && !files.product.hasError &&
-    files.shapeMetadata && files.shapeMetadata.path && files.shapeMetadata.isExists === true && !files.shapeMetadata.hasError);
+
+  return !!(isFilePathValid(files.data) &&
+    isFilePathValid(files.product) &&
+    isFilePathValid(files.shapeMetadata));
 };
 
 export const validateShapeFiles = (files: IFiles): IStateError[] => {
