@@ -138,7 +138,7 @@ export const hasTagDeep = (state: SnapshotFrom<typeof workflowMachine>, tag = ST
 };
 
 const isFilePathValid = (file: IFiles[keyof IFiles]) => {
-  return !!(file?.path && file.isExists && !file.hasError)
+  return !!(file?.path && file.isExists && !file.hasError);
 }
 
 export const isFilesSelected = (context: IContext): boolean => {
