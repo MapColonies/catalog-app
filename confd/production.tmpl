@@ -45,6 +45,7 @@ window._env_ = {
   JOB_MANAGER: {
     pollingCycleInterval: {{ getv "/configuration/jobmanager/pollingcycleinterval" "120000" }},
     filterDaysTimeSlot: {{ getv "/configuration/jobmanager/filterdaystimeslot" "1" }},
+    maxDateRangeMonths: {{ getv "/configuration/jobmanager/maxdaterangemonths" "2" }},
   },
   DEFAULT_USER: {
     role: '{{ getv "/configuration/default/user/role" "USER" }}',

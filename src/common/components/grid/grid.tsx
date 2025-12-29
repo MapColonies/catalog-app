@@ -35,10 +35,6 @@ const DEFAULT_DETAILS_ROW_HEIGHT = 150;
 const EXPANDER_COLUMN_WIDTH = 60;
 export const DETAILS_ROW_ID_SUFFIX = '_details';
 
-export interface IFocusError extends IError {
-  id?: string;
-}
-
 interface GridComponentProps {
   gridOptions?: GridComponentOptions;
   rowData?: any[];
@@ -46,7 +42,7 @@ interface GridComponentProps {
   isLoading?: boolean;
   focusByRowId?: string;
   setIsRowFound?: (val: boolean) => void;
-  handleFocusError?: (error: IFocusError | undefined) => void;
+  handleFocusError?: (error: IError | undefined) => void;
 };
 
 export interface GridApi extends AgGridApi{};
@@ -230,17 +226,16 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
     gridApi.paginationGoToPage(row.pageNumber);
     gridApi.ensureIndexVisible(row.rowIndex, 'middle');
     gridApi.getDisplayedRowAtIndex(row.rowIndex)?.setSelected(true);
-  }
+  };
 
   const focusAndExpandRow = (gridApi: GridApi, id: string) => {
     const row = getRowPosition(gridApi, id);
 
     if (!row) {
       handleFocusError?.({
-        code: 'grid.row-not-found.warning',
+        code: 'job.warning.row-not-found',
         message: '',
-        level: 'warning',
-        id
+        level: 'warning'
       });
 
       setIsRowFound?.(false);
@@ -254,7 +249,7 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
     const rowNode = gridApi.getRowNode(`${id as unknown as string}${DETAILS_ROW_ID_SUFFIX}`);
     rowNode?.setDataValue('isVisible', true);
     gridApi.onFilterChanged();
-  }
+  };
 
   const agGridThemeOverrides = GridThemes.getTheme(theme);
   
