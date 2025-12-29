@@ -66,7 +66,7 @@ export const filesErrorActions = [
   })),
 ];
 
-export const updateFileErrorAction = (hasError: boolean, targetFile?: keyof IFiles) => {
+export const updateFileErrorAction = (targetFile?: keyof IFiles) => {
   return sendParent((_: { context: IContext; event: any }) => {
     const files = _.context.files ?? {};
 
@@ -76,11 +76,12 @@ export const updateFileErrorAction = (hasError: boolean, targetFile?: keyof IFil
       }
 
       const isDisabled = targetFile ? targetFile !== key : false;
+      const hasError = targetFile === undefined ? false : !isDisabled;
 
       return {
         ...file,
         isDisabled: isDisabled,
-        hasError: !isDisabled && hasError
+        hasError
       }
     };
 
@@ -100,10 +101,10 @@ export const updateFileErrorAction = (hasError: boolean, targetFile?: keyof IFil
   });
 };
 
-export const cleanFilesErrorActions = (parentEvent: Events['type']) => {
+export const cleanFilesErrorActions = () => {
   return [
     assign({ errors: [] }),
-    sendParent({ type: parentEvent }),
-    updateFileErrorAction(false)
+    sendParent({ type: 'CLEAN_FILES_ERRORS' }),
+    updateFileErrorAction()
   ]
 };

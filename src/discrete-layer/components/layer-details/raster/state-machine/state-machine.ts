@@ -57,7 +57,7 @@ const filesMachine = createMachine({
             SELECT_FILES: {
               actions: [
                 ...selectFileActions('data', 'override', false),
-                ...cleanFilesErrorActions('CLEAN_FILES_ERRORS')
+                ...cleanFilesErrorActions()
               ],
               target: WORKFLOW.FILES.AUTO.SELECT_FILES
             },
@@ -80,7 +80,6 @@ const filesMachine = createMachine({
             src: SERVICES[WORKFLOW.FILES.ROOT].selectFilesService,
             onDone: {
               actions: [
-                ...cleanFilesErrorActions('CLEAN_FILES_ERRORS'),
                 assign((_: { context: IContext; event: any }) => ({
                   files: mergeWith(
                     {},
@@ -106,7 +105,7 @@ const filesMachine = createMachine({
             onError: {
               actions: [
                 ...filesErrorActions,
-                updateFileErrorAction(true, 'data'),
+                updateFileErrorAction('data'),
               ],
               target: WORKFLOW.FILES.AUTO.IDLE
             }
@@ -125,7 +124,7 @@ const filesMachine = createMachine({
             onError: {
               actions: [
                 ...filesErrorActions,
-                updateFileErrorAction(true, 'product'),
+                updateFileErrorAction('product'),
               ],
               target: WORKFLOW.FILES.AUTO.IDLE
             }
@@ -145,7 +144,7 @@ const filesMachine = createMachine({
             onError: {
               actions: [
                 ...filesErrorActions,
-                updateFileErrorAction(true, 'shapeMetadata'),
+                updateFileErrorAction('shapeMetadata'),
               ],
               target: WORKFLOW.FILES.AUTO.IDLE
             }
@@ -163,21 +162,21 @@ const filesMachine = createMachine({
             SELECT_DATA: {
               actions: [
                 ...selectFileActions('data'),
-                ...cleanFilesErrorActions('CLEAN_FILES_ERRORS'),
+                ...cleanFilesErrorActions(),
               ],
               target: WORKFLOW.FILES.MANUAL.SELECT_DATA
             },
             SELECT_PRODUCT: {
               actions: [
                 ...selectFileActions('product'),
-                ...cleanFilesErrorActions('CLEAN_FILES_ERRORS'),
+                ...cleanFilesErrorActions(),
               ],
               target: WORKFLOW.FILES.MANUAL.FETCH_PRODUCT
             },
             SELECT_SHAPEMETADATA: {
               actions: [
                 ...selectFileActions('shapeMetadata'),
-                ...cleanFilesErrorActions('CLEAN_FILES_ERRORS'),
+                ...cleanFilesErrorActions(),
               ],
               target: WORKFLOW.FILES.MANUAL.CHECK_SHAPEMETADATA
             },
@@ -221,7 +220,7 @@ const filesMachine = createMachine({
             onError: {
               actions: [
                 ...filesErrorActions,
-                updateFileErrorAction(true, 'data')
+                updateFileErrorAction('data')
               ],
               target: WORKFLOW.FILES.MANUAL.IDLE
             }
@@ -243,7 +242,7 @@ const filesMachine = createMachine({
             onError: {
               actions: [
                 ...filesErrorActions,
-                updateFileErrorAction(true, 'product')
+                updateFileErrorAction('product')
               ],
               target: WORKFLOW.FILES.MANUAL.IDLE
             }
@@ -261,7 +260,7 @@ const filesMachine = createMachine({
             onError: {
               actions: [
                 ...filesErrorActions,
-                updateFileErrorAction(true, 'shapeMetadata')
+                updateFileErrorAction('shapeMetadata')
               ],
               target: WORKFLOW.FILES.MANUAL.IDLE
             }
