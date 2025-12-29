@@ -59,16 +59,6 @@ export const filesSelectedActions = [
   })
 ];
 
-export const filesErrorActions = (targetFile?: keyof IFiles) => {
-  return [
-    sendParent((_: { context: IContext; event: any }) => ({
-      type: "FILES_ERROR",
-      error: normalizeError(_.event.error)
-    })),
-    updateFileErrorAction(targetFile),
-  ]
-};
-
 export const updateFileErrorAction = (targetFile?: keyof IFiles) => {
   return sendParent((_: { context: IContext; event: any }) => {
     const files = _.context.files ?? {};
@@ -83,9 +73,9 @@ export const updateFileErrorAction = (targetFile?: keyof IFiles) => {
 
       return {
         ...file,
-        isDisabled: isDisabled,
+        isDisabled,
         hasError
-      }
+      };
     };
 
     const dataVal = updateFile(files.data, 'data');
@@ -104,10 +94,16 @@ export const updateFileErrorAction = (targetFile?: keyof IFiles) => {
   });
 };
 
-export const cleanFilesErrorActions = () => {
-  return [
-    assign({ errors: [] }),
-    sendParent({ type: 'CLEAN_FILES_ERRORS' }),
-    updateFileErrorAction()
-  ]
-};
+export const filesErrorActions = (targetFile?: keyof IFiles) => [
+  sendParent((_: { context: IContext; event: any }) => ({
+    type: "FILES_ERROR",
+    error: normalizeError(_.event.error)
+  })),
+  updateFileErrorAction(targetFile)
+];
+
+export const cleanFilesErrorActions = () => [
+  assign({ errors: [] }),
+  sendParent({ type: 'CLEAN_FILES_ERRORS' }),
+  updateFileErrorAction()
+];
