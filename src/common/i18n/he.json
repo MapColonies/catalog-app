@@ -257,6 +257,8 @@
   "ingestion.error.restore-failed": "לא ניתן לשחזר את הטופס, פורמט של הג'וב לא תקין",
   "ingestion.error.directory-comparison": "אזהרה: תוכן הסיפרייה אינו זהה בין האתר הראשי והאתר המשני",
   "ingestion.error.invalid-metadata": "קובץ מטא-דאטה בפורמט לא תקין",
+  "ingestion.error.invalid-shp": "קובץ shp לא תקין: {value}",
+  "ingestion.error.uncatched-js": "{value}",
   "ingestion.error.not-available": "לא זמין",
   "ingestion.error.failed-task-report": "שגיאות שהתקבלו",
   "ingestion.button.import-metadata": "בחר מטא-דאטה",

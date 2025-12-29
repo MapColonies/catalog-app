@@ -1,6 +1,6 @@
 import { FeatureCollection } from 'geojson';
 import path from 'path';
-import { merge } from 'lodash';
+import { get, merge } from 'lodash';
 import shp from 'shpjs';
 import { FileData } from '@map-colonies/react-components';
 import { RasterIngestionJobType } from '../../../../../common/models/raster-job';
@@ -88,7 +88,7 @@ export const selectData = async (context: IContext) => {
 };
 
 export const fetchProduct = async (product: IProductFile, context: IContext) => {
-  if (!product || !product.exists || !product.path) {
+  if (!product || !product.isExists || !product.path) {
     return undefined;
   }
 
@@ -109,9 +109,15 @@ export const fetchProduct = async (product: IProductFile, context: IContext) => 
     );
   });
 
-  const parsedSHP = await shp(result as unknown as ArrayBuffer);
-  const outlinedPolygon = (parsedSHP as FeatureCollection)?.features[FIRST];
-  const geoDetails = getFeatureAndMarker(outlinedPolygon.geometry, FeatureType.PP_PERIMETER, FeatureType.PP_PERIMETER_MARKER);
+  let geoDetails = null;
+
+  try {
+    const parsedSHP = await shp(result as unknown as ArrayBuffer);
+    const outlinedPolygon = (parsedSHP as FeatureCollection)?.features[FIRST];
+    geoDetails = getFeatureAndMarker(outlinedPolygon.geometry, FeatureType.PP_PERIMETER, FeatureType.PP_PERIMETER_MARKER);
+  } catch (e) {
+    throw buildError('ingestion.error.invalid-shp', get(e, 'message'));
+  }
 
   return {
     geoDetails
@@ -188,19 +194,19 @@ export const getRestoreData = async (context: IContext): Promise<IPartialContext
         data: {
           label: DATA_LABEL,
           path: getPath(MOUNT_DIR, job.parameters.inputFiles.gpkgFilesPath[0]),
-          exists: false,
+          isExists: false,
           dateFormatterPredicate: dateFormatter
         },
         product: {
           label: PRODUCT_LABEL,
           path: getPath(MOUNT_DIR, job.parameters.inputFiles.productShapefilePath),
-          exists: false,
+          isExists: false,
           dateFormatterPredicate: relativeDateFormatter
         },
         shapeMetadata: {
           label: SHAPEMETADATA_LABEL,
           path: getPath(MOUNT_DIR, job.parameters.inputFiles.metadataShapefilePath),
-          exists: false,
+          isExists: false,
           dateFormatterPredicate: relativeDateFormatter
         }
       },
