@@ -34,3 +34,7 @@
 #layerDetailsFormRaster .reportLoading {
   margin: 6px;
 }
+
+#layerDetailsFormRaster .reportInProgress {
+  margin: 60px 0;
+}

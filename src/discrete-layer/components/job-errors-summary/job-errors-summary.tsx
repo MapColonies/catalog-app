@@ -35,17 +35,19 @@ export const getRasterErrorCount = (errorsSummary: RasterErrorsSummary | undefin
   };
 };
 
-export const JobErrorsSummary = (theme: IOptions, errorsSummary: RasterErrorsSummary | undefined, className: string): JSX.Element[] | undefined => {
+export const JobErrorsSummary = (theme: IOptions, errorsSummary: RasterErrorsSummary | undefined, className: string, overrideColor?: string): JSX.Element[] | undefined => {
   if (!errorsSummary) {
     return;
   }
   return Object.entries(errorsSummary.errorsCount).map(([key, value]) => {
-    const color =
-      value === 0
+    let color = overrideColor;
+    if (!overrideColor) {
+      color = value === 0
         ? theme.custom?.GC_SUCCESS
         : getRasterErrorCount(errorsSummary, key)?.exceeded === false
           ? theme.custom?.GC_WARNING_HIGH
           : theme.custom?.GC_ERROR_HIGH;
+    }
     return <ErrorCount key={key} name={key} value={value} className={className} color={color} />;
   });
 };

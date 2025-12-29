@@ -260,11 +260,13 @@
   "ingestion.error.invalid-shp": "Invalid shp file: {value}",
   "ingestion.error.uncatched-js": "{value}",
   "ingestion.error.not-available": "is not available",
+  "ingestion.error.failed-task-report": "Collected errors",
   "ingestion.button.import-metadata": "Import Metadata",
   "ingestion.checkbox.label": "Operation failed on secondary site, please check to continue with operation on main site only",
   "ingestion.job.progress": "General progress",
   "ingestion.job.validationTaskProgress": "Validation progress",
   "ingestion.job.report": "Validation results",
+  "ingestion.job.report-in-progress": "Report in progress",
   
   "validationReport.geometryValidity": "Invalid geometry",
   "validationReport.vertices": "Polygons with too many vertices",

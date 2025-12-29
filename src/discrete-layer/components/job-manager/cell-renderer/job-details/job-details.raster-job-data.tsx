@@ -3,7 +3,7 @@ import { useIntl } from 'react-intl';
 import { get } from 'lodash';
 import { ICellRendererParams } from 'ag-grid-community';
 import { Box } from '@map-colonies/react-components';
-import { CircularProgress, IconButton, Tooltip, useTheme } from '@map-colonies/react-core';
+import { CircularProgress, IconButton, Tooltip, Typography, useTheme } from '@map-colonies/react-core';
 import { Copy } from '../../../../../common/components/copy/copy';
 import { AutoDirectionBox } from '../../../../../common/components/auto-direction-box/auto-direction-box.component';
 import { Hyperlink } from '../../../../../common/components/hyperlink/hyperlink';
@@ -11,7 +11,7 @@ import { RasterIngestionJobType } from '../../../../../common/models/raster-job'
 import { DETAILS_ROW_ID_SUFFIX } from '../../../../../common/components/grid';
 import { Domain } from '../../../../../common/models/domain';
 import { RasterErrorsSummary } from '../../../../../common/models/job-errors-summary.raster';
-import { JobModelType, TaskModelType, useStore } from '../../../../models';
+import { JobModelType, Status, TaskModelType, useStore } from '../../../../models';
 import useZoomLevelsTable from '../../../export-layer/hooks/useZoomLevelsTable';
 import { getRasterErrorCount, JobErrorsSummary } from '../../../job-errors-summary/job-errors-summary';
 
@@ -110,6 +110,7 @@ const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = ({ data 
     intl.formatMessage({ id: 'general.deprecated-job.text' });
 
   const hasErrors = errorsCount > 0;
+  const isTaskFailed = task?.status === Status.Failed;
 
   useEffect(() => {
     if (!isRasterJob) {
@@ -139,34 +140,50 @@ const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = ({ data 
         }
       </AutoDirectionBox>
       {
-        !isLoading &&
-        <Box className={`linkItem errorsCountContainer ${errorsCount === 0 ? 'noErrors' : ''}`} key={`${jobData.id}`}>
-          {hasErrors &&
-            <>
-              <IconButton
-                className={`error mc-icon-Status-Warnings`}
-                onClick={(e): void => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                }}
-              />
+        !isLoading && <>
+          {!isTaskFailed &&
+            <Box className={`linkItem errorsCountContainer ${errorsCount === 0 ? 'noErrors' : ''}`} key={`${jobData.id}`}>
+              {hasErrors &&
+                <>
+                  <IconButton
+                    className={`error mc-icon-Status-Warnings`}
+                    onClick={(e): void => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                    }}
+                  />
 
+                  <Tooltip content={
+                    <Box>
+                      {JobErrorsSummary(theme, task?.parameters?.errorsSummary, "reportList")}
+                    </Box>
+                  }>
+                    <Hyperlink url={task?.parameters?.report?.url ?? ''} label={`${errorsCount.toString()} ${errorsMessage}`} />
+                  </Tooltip>
+
+                  <Copy value={task?.parameters?.report?.url ?? ''} iconStyle={{ fontSize: `20px` }} key={'errorsReportLink'} />
+                </>
+              }
+              {
+                !hasErrors && hasGpkgPath() && task &&
+                intl.formatMessage({ id: 'general.no-errors.text' })
+              }</Box>
+          }
+          {isTaskFailed &&
+            <Box className={`linkItem errorsCountContainer`} key={`${jobData.id}`}>
               <Tooltip content={
                 <Box>
-                  {JobErrorsSummary(theme, task?.parameters?.errorsSummary, "reportList")}
+                  {JobErrorsSummary(theme, task?.parameters?.errorsSummary, "reportList", theme.custom?.GC_ERROR_HIGH)}
                 </Box>
               }>
-                <Hyperlink url={task?.parameters?.report?.url ?? ''} label={`${errorsCount.toString()} ${errorsMessage}`} />
+                <Typography tag="span" style={{color: theme.custom?.GC_ERROR_HIGH}}>
+                  {intl.formatMessage({ id: 'ingestion.error.failed-task-report' })}
+                </Typography>
               </Tooltip>
 
-              <Copy value = {task?.parameters?.report?.url ?? ''} iconStyle = {{ fontSize: `20px` }} key={'errorsReportLink'}/>
-            </>
+            </Box>
           }
-          {
-            !hasErrors && hasGpkgPath() && task &&
-            intl.formatMessage({ id: 'general.no-errors.text' })
-          }
-        </Box>
+         </>
       }
     </Box>
   );
