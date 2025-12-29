@@ -43,8 +43,8 @@ interface GeoFeaturesPresentorProps {
 }
 
 const DEFAULT_PROJECTION = 'EPSG:4326';
-const MIN_FEATURES_NUMBER = 5; // minimal set of fetures (source, source_marker, perimeter, perimeter_marker, PPs [at least one])
-const RENDERS_TILL_FULL_FEATURES_SET = 2; // first render with source, second with all PPs and their perimeter geometries
+const MIN_FEATURES_NUMBER = 4; // minimal set of fetures (source, source_marker, perimeter, perimeter_marker)
+const RENDERS_TILL_FULL_FEATURES_SET = 1; // first render with source, second with PPs perimeter geometry
 
 export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> = ({
   mode,
@@ -61,7 +61,11 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   const [showExistingPolygonParts, setShowExistingPolygonParts] = useState<boolean>(false);
 
   useEffect(() => {
-    if (geoFeatures && geoFeatures?.length >= MIN_FEATURES_NUMBER) {
+    const definedElements = geoFeatures?.filter(feat => feat !== undefined);
+    if(definedElements?.length === 0){
+      renderCount.current = 0;
+    }
+    if (definedElements && definedElements?.length >= MIN_FEATURES_NUMBER) {
       renderCount.current += 1;
     }
   });
