@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.1.2](https://github.com/MapColonies/catalog-app/compare/v4.1.1...v4.1.2) (2025-12-29)
+
+
+### Bug Fixes
+
+* failed validation task symbology ([#810](https://github.com/MapColonies/catalog-app/issues/810)) ([48c517e](https://github.com/MapColonies/catalog-app/commit/48c517e4ca0068772aee88550e437bdc33e4d48f))
+* remove errors when reselect file ( MAPCO-8627 ) ([#809](https://github.com/MapColonies/catalog-app/issues/809)) ([a073205](https://github.com/MapColonies/catalog-app/commit/a073205f8c948ae6b24324800bebfbd9a027a3ef))
+
 ## [4.1.1](https://github.com/MapColonies/catalog-app/compare/v4.1.0...v4.1.1) (2025-12-23)
 
 
