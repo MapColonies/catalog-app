@@ -1,12 +1,12 @@
 import { EntityDescriptorModelType } from '../../../models';
-import { getFlatEntityDescriptors } from '../utils';
+import {resolutionDegree} from '../../../../ui-descriptors/resolution/resolutionDegree';
+import {resolutionMeter} from '../../../../ui-descriptors/resolution/resolutionMeter';
 
-const PP_COMMON_PARAMS = ['resolutionMeter', 'resolutionDegree'];
+const descriptors = [resolutionDegree, resolutionMeter];
 
 export const getUIIngestionFieldDescriptors = (entityDescriptors: EntityDescriptorModelType[]) => {
-  return getFlatEntityDescriptors('PolygonPartRecord', entityDescriptors)
-    .filter((desc) => PP_COMMON_PARAMS.includes(desc.fieldName as string))
-    .map(desc => {
+
+  return descriptors.map((desc) => {
       return {
         ...desc,
         isRequired: true,

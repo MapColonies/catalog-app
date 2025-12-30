@@ -15,6 +15,8 @@ import { LinkType } from '../../../common/models/link-type.enum';
 import { Mode } from '../../../common/models/mode.enum';
 import { geoJSONValidation } from '../../../common/utils/geojson.validation';
 import { geoArgs } from '../../../common/utils/geo.tools';
+import { UiDescriptorsType } from '../../../ui-descriptors/type';
+
 import { 
   // AutocompletionModelType,
   EntityDescriptorModelType,
@@ -57,7 +59,7 @@ interface LayersDetailsComponentProps {
   mode: Mode;
   className?: string;
   isBrief?: boolean;
-  layerRecord?: ILayerImage | null;
+  layerRecord?: ILayerImage | null | {"__typename": UiDescriptorsType};
   formik?: EntityFormikHandlers;
   geoCustomChecks?:{
     validationFunc: ((value: string, args: geoArgs) => geoJSONValidation | undefined)[],
@@ -287,7 +289,7 @@ export const LayersDetailsComponent: React.FC<LayersDetailsComponentProps> = obs
             const getFilterFieldIdx = (fieldName: string | undefined) => {
               // WORKAROUND to make appropriate indication on found pattern for RASTER not common filtered field
               let aliasFilterField = fieldName;
-              if (layerRecord?.type === RecordType.RECORD_RASTER){
+              if ( layerRecord?.__typename!== 'UiDescriptors' && layerRecord?.type === RecordType.RECORD_RASTER){
                 switch(fieldName){
                   case 'mc:ingestionDate':
                     aliasFilterField = 'mc:insertDate';
@@ -387,7 +389,7 @@ export const LayersDetailsComponent: React.FC<LayersDetailsComponentProps> = obs
     <>
       {!(isBrief ?? false) ? fullInputs : briefInputs}
       {
-        layerRecord?.links &&
+        layerRecord?.__typename !== 'UiDescriptors' && layerRecord?.links &&
         getLinkUrl(layerRecord.links, LinkType.THUMBNAIL_L) !== undefined &&
         mode !== Mode.UPDATE && mode !== Mode.EXPORT &&
         <img

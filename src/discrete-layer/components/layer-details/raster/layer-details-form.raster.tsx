@@ -59,6 +59,8 @@ const NONE = 0;
 // Shape of form values - a bit problematic because we cannot extend union type
 export interface FormValues {
   resolutionDegree: number | undefined;
+  resolutionMeter: number | undefined;
+  resolutionDegreeMaxValue: number | undefined;
 }
 
 interface LayerDetailsFormCustomProps {
@@ -136,6 +138,7 @@ export const InnerRasterForm = (
       setValues({
         ...values,
         resolutionDegree: newResolution ?? values.resolutionDegree,
+        resolutionDegreeMaxValue: newResolution ?? values.resolutionDegree,
       });
     }
   }, [state.context?.files]);
@@ -197,7 +200,7 @@ export const InnerRasterForm = (
 
   const uiIngestionFieldDescriptors = useMemo(() => {
     return [{ 
-      type: 'PolygonPartRecord',
+      type: 'UiDescriptors',
       categories :[
         {
           category: 'DUMMY',
@@ -306,8 +309,7 @@ export const InnerRasterForm = (
           <Box className="curtainContainer">
             <LayersDetailsComponent
               entityDescriptors={uiIngestionFieldDescriptors as EntityDescriptorModelType[]}
-              // @ts-ignore
-              layerRecord={{__typename: 'PolygonPartRecord'}}
+              layerRecord={{__typename: "UiDescriptors"}}
               mode={mode}
               formik={entityFormikHandlers}
               enableMapPreview={false}
@@ -436,6 +438,8 @@ export default withFormik<LayerDetailsFormProps, FormValues>({
   mapPropsToValues: (props) => {
     return {
       resolutionDegree: undefined,
+      resolutionDegreeMaxValue: undefined,
+      resolutionMeter: undefined,
       ...transformEntityToFormFields(props.layerRecord)
     };
   },

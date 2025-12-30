@@ -26,6 +26,7 @@ import {
 import { hasSelfIntersections } from '../../../common/utils/geojson.validation';
 import { RasterIngestionJobType } from '../../../common/models/raster-job';
 import { SYNC_QUERY, syncQueries } from '../../../syncHttpClientGql';
+import { UiDescriptorsType } from '../../../ui-descriptors/type';
 import {
   CategoryConfigModelType,
   EntityDescriptorModelType,
@@ -86,7 +87,7 @@ export const isEnumType = (typeName: string) => {
 }
 
 export const getEntityDescriptors = (
-  layerRecordTypename: LayerRecordTypes,
+  layerRecordTypename: LayerRecordTypes | UiDescriptorsType,
   entityDescriptors: EntityDescriptorModelType[]
 ): IRecordCategoryFieldsInfo[] => {
   let entityDesc;
@@ -105,6 +106,9 @@ export const getEntityDescriptors = (
       break;
     case 'PolygonPartRecord':
       entityDesc = entityDescriptors.find(descriptor => descriptor.type === 'PolygonPartRecord')
+      break;
+    case 'UiDescriptors':
+      entityDesc = entityDescriptors.find(descriptor => descriptor.type === 'UiDescriptors')
       break;
     default:
       entityDesc = entityDescriptors.find(descriptor => descriptor.type === 'PycswLayerCatalogRecord')
@@ -160,6 +164,9 @@ export const getBasicType = (fieldName: FieldInfoName, typename: string, lookupT
     case 'Link':
       recordModel = LinkModel;
       break;
+    case 'UiDescriptors':
+      recordModel = {properties: {[fieldName]: {name: fieldName}}};
+      break;
     default:
       recordModel = LayerRasterRecordModel;
       break;
@@ -185,7 +192,7 @@ export const getBasicType = (fieldName: FieldInfoName, typename: string, lookupT
     else if (fieldNameStr.toLowerCase().includes('maxresolutiondeg') || fieldNameStr.toLowerCase().includes('resolutiondegree') ) {
       return 'resolution';
     }
-    else if (typeString.toLowerCase().includes('number')) {
+    else if (typeString.toLowerCase().includes('number') || fieldNameStr.toLowerCase().includes('resolutionmeter')) {
       return 'number';
     }
     else {
