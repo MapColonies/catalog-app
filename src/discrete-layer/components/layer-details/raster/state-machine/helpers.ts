@@ -75,7 +75,7 @@ export const getFeatureAndMarker = (
 };
 
 export const getPath = (baseDir: string, filePath: string): string => {
-  const resolvedPath = path.resolve(baseDir, filePath);
+  const resolvedPath = path.resolve(baseDir, filePath.startsWith(BASE_PATH) ? filePath.substring(1) : filePath);
   return resolvedPath.startsWith(BASE_PATH) ? resolvedPath.substring(1) : resolvedPath;
 };
 
