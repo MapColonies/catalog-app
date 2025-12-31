@@ -546,6 +546,11 @@ export const workflowMachine = createMachine<IContext, Events>({
         input: (_: { context: IContext; event: any }) => _,
         src: SERVICES[WORKFLOW.ROOT].retryJobService,
         onDone: {
+          actions: assign((_: { context: IContext; event: any }) => ({
+            job: {
+              jobId: _.context.job?.jobId
+            }
+          })),
           target: WORKFLOW.JOB_POLLING
         },
         onError: {
