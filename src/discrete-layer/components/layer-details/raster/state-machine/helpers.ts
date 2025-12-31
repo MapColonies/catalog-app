@@ -27,12 +27,11 @@ import {
 
 export const normalizeError = (err: any) => {
   let res = err;
-  if (err != null && typeof err === 'object' && Object.keys(err).length === 0){
-    res = buildError('ingestion.error.uncatched-js', get(err,'message'))
+  if (err != null && typeof err === 'object' && Object.keys(err).length === 0) {
+    res = buildError('ingestion.error.uncatched-js', get(err, 'message'));
   }
-
-  return {...res};
-}
+  return { ...res };
+};
 
 export const addError = assign((_: { context: IContext; event: any }) => { 
   return {
@@ -137,16 +136,15 @@ export const hasTagDeep = (state: SnapshotFrom<typeof workflowMachine>, tag = ST
   return false;
 };
 
-const isFilePathValid = (file: IFiles[keyof IFiles]) => {
+const isFileExistsAndValid = (file: IFiles[keyof IFiles]) => {
   return !!(file?.path && file.isExists && !file.hasError);
-}
+};
 
 export const isFilesSelected = (context: IContext): boolean => {
   const files = context.files || {};
-
-  return isFilePathValid(files.data) &&
-    isFilePathValid(files.product) &&
-    isFilePathValid(files.shapeMetadata);
+  return isFileExistsAndValid(files.data) &&
+    isFileExistsAndValid(files.product) &&
+    isFileExistsAndValid(files.shapeMetadata);
 };
 
 export const validateShapeFiles = (files: IFiles): IStateError[] => {
