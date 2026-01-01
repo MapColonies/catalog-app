@@ -72,8 +72,8 @@ const JobDetailsExportJobData: React.FC<JobDetailsExportJobDataProps> = ({ data 
             {Object.entries(exportLinks).map(([linkType, exportLink]) => {
               const typeToPresent = linkType.replace('URI', '');
               return (
-                <Box className="linkItem" key={`${jobData.id}_${linkType}`}>
-                  <Hyperlink url={exportLink} label={typeToPresent} />
+                <Box className='linkContainer' key={`${jobData.id}_${linkType}`}>
+                  <Hyperlink className='jobDataLink' url={exportLink} label={typeToPresent} />
                   <Copy value = {exportLink} iconStyle = {{ fontSize: `20px` }} key={exportLink}/>
                 </Box>
               );
