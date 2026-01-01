@@ -1,5 +1,3 @@
-
-
 #jobsDialog .mdc-dialog__surface {
   max-width: unset;
   right:12px;
@@ -19,7 +17,11 @@ body[dir='rtl'] #jobsDialog .mdc-dialog__surface {
   justify-content: center;
   margin-top: 10px;
   padding: 0;
-  gap: 12px;
+  gap: 32px;
+}
+
+#jobsDialog .jobsBody .drpContainer > div:nth-child(-n+2) {
+  width: 160px;
 }
 
 #jobsDialog .jobsBody {
@@ -175,11 +177,6 @@ body[dir='rtl'] .jobsBody .ag-pinned-right-cols-container {
   width: 80%;
   margin: 0 auto;
   border-bottom: 2px solid var(--mdc-theme-gc-selection-background);
-}
-
-#jobsDialog .jobsTimeRangePicker .drpContainer > div:nth-child(2) {
-  opacity: 0.3;
-  pointer-events: none;
 }
 
 .jobsBody .actionsContainer {

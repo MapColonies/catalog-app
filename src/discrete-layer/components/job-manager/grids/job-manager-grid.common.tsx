@@ -5,8 +5,7 @@ import CONFIG from '../../../../common/config';
 import {
   GridComponent,
   GridComponentOptions,
-  GridReadyEvent,
-  IFocusError,
+  GridReadyEvent
 } from '../../../../common/components/grid';
 import EnumsMapContext from '../../../../common/contexts/enumsMap.context';
 import { IActionGroup } from '../../../../common/actions/entity.actions';
@@ -15,6 +14,7 @@ import { JobProductTypeRenderer } from '../../../../common/components/grid/cell-
 import { Loading } from '../../../../common/components/tree/statuses/loading';
 import { Domain } from '../../../../common/models/domain';
 import { JobModelType, ProductType, useStore } from '../../../models';
+import { IError } from '../../helpers/errorUtils';
 import { getProductDomain } from '../../layer-details/utils';
 import { DateCellRenderer } from '../cell-renderer/date.cell-renderer';
 import { JobDetailsRenderer } from '../cell-renderer/job-details/job-details.cell-renderer';
@@ -39,7 +39,7 @@ export interface ICommonJobManagerGridProps {
   areJobsLoading?: boolean;
   focusOnJob?: Partial<Pick<JobModelType, 'id' | 'resourceId' | 'updated'>>;
   setFocusOnJob?: (job: Partial<Pick<JobModelType, 'id' | 'resourceId' | 'updated'>> | undefined) => void;
-  handleFocusError?: (error: IFocusError | undefined) => void;
+  handleFocusError?: (error: IError | undefined) => void;
 }
 
 const pagination = true;

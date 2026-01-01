@@ -10,14 +10,14 @@ import { Box, DateTimeRangePicker, SupportedLocales } from '@map-colonies/react-
 import { IActionGroup } from '../../../common/actions/entity.actions';
 import { GraphQLError } from '../../../common/components/error/graphql.error-presentor';
 import { LogicError } from '../../../common/components/error/logic.error-presentor';
-import { GridApi, IFocusError } from '../../../common/components/grid';
+import { GridApi } from '../../../common/components/grid';
 import CONFIG from '../../../common/config';
 import { dateFormatter } from '../../../common/helpers/formatters';
 import useCountDown, { IActions } from '../../../common/hooks/countdown.hook';
-import useDateNow from '../../../common/hooks/useDateNow.hook';
 import { JobModelType } from '../../models';
 import { IDispatchAction } from '../../models/actionDispatcherStore';
 import { useQuery, useStore } from '../../models/RootStore';
+import { IError } from '../helpers/errorUtils';
 import { downloadJSONToClient } from '../layer-details/utils';
 import JobManagerGrid from './grids/job-manager-grid.common';
 import { JOB_ENTITY } from './job.types';
@@ -25,9 +25,9 @@ import { JOB_ENTITY } from './job.types';
 import './jobs.dialog.css';
 
 const START_CYCLE_ITERATION = 0;
-const POLLING_CYCLE_INTERVAL = CONFIG.JOB_MANAGER.POLLING_CYCLE_INTERVAL;
 const COUNTDOWN_REFRESH_RATE = 1000; // interval to change remaining time amount, defaults to 1000
 const MILLISECONDS_IN_SEC = 1000;
+const POLLING_CYCLE_INTERVAL = CONFIG.JOB_MANAGER.POLLING_CYCLE_INTERVAL;
 
 interface JobsDialogProps {
   isOpen: boolean;
@@ -46,12 +46,12 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
   const [ gridApi, setGridApi ] = useState<GridApi>();
   const [ pollingCycle, setPollingCycle ] = useState(START_CYCLE_ITERATION);
   const [ fromDate, setFromDate ] = useState<Date>(moment().subtract(CONFIG.JOB_MANAGER.FILTER_DAYS_TIME_SLOT, 'days').toDate());
-  const [handleFocusError, setHandleFocusError] = useState<IFocusError | undefined>(undefined);
-
+  const [ tillDate, setTillDate ] = useState<Date>(new Date());
+  const [ focusError, setFocusError ] = useState<IError | undefined>(undefined);
+  const [ dateRangeError, setDateRangeError ] = useState<IError | undefined>(undefined);
+  const [ errorMessages, setErrorMessages ] = useState<IError[]>([]);
   // @ts-ignore
   const [ timeLeft, actions ] = useCountDown(POLLING_CYCLE_INTERVAL, COUNTDOWN_REFRESH_RATE);
-
-  const tillDate = useDateNow().current;
 
   // start the timer during the first render
   useEffect(() => {
@@ -113,14 +113,7 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
           },
         })
     );
-  }, [fromDate, setQuery]);
-
-  // const getFilterJobsPredicate = (requestedDomain: RecordType): ((cur: JobModelType) => boolean) => {
-  //   return (cur: JobModelType): boolean => {
-  //     const jobDomain = enumsMap?.[cur.productType as string]?.parentDomain;
-  //     return jobDomain === requestedDomain;
-  //   }
-  // }
+  }, [fromDate, tillDate, setQuery]);
 
   useEffect(() => {
     if (data !== undefined) {
@@ -136,7 +129,7 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
         store.queryJobs({
           params: {
             fromDate,
-            tillDate: new Date(tillDate.getTime() + Number(POLLING_CYCLE_INTERVAL)),
+            tillDate,
           },
         }));
     }
@@ -161,16 +154,16 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
 
   useEffect(() => {
     const pollingInterval = setInterval(() => {
-      setPollingCycle(pollingCycle + 1);
-      const bufferedRequestedTime = new Date(tillDate.getTime() + Number(POLLING_CYCLE_INTERVAL));
+      setPollingCycle(prevCycle => prevCycle + 1);
       (actions as IActions).start(POLLING_CYCLE_INTERVAL);
       setQuery((store) =>
         store.queryJobs({
           params: {
             fromDate,
-            tillDate: bufferedRequestedTime,
+            tillDate,
           },
-        }));
+        })
+      );
     }, POLLING_CYCLE_INTERVAL);
 
     return (): void => {
@@ -183,6 +176,24 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
       downloadJSONToClient(jobData.job, `${encodeURI(jobData.job.resourceId as string)}_job_details.json`);
     }
   }, [jobData, loadingJobData]);
+
+  useEffect(() => {
+    const newErrorMessages: IError[] = [];
+    if (focusOnJob && focusError?.code) {
+      newErrorMessages.push({
+        code: focusError.code,
+        message: `${focusOnJob.resourceId} <bdi>(${dateFormatter(focusOnJob.updated, true)})</bdi>`,
+        level: focusError.level
+      });
+    }
+    setErrorMessages(prevErrors => [...prevErrors, ...newErrorMessages]);
+  }, [focusError]);
+
+  useEffect(() => {
+    if (dateRangeError) {
+      setErrorMessages(prevErrors => [...prevErrors, dateRangeError]);
+    }
+  }, [dateRangeError]);
 
   const closeDialog = useCallback(() => {
     setFocusOnJob?.(undefined);
@@ -223,7 +234,8 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
           setQueryForOneJob((store) =>
             store.queryJob({
               id: data.id as string
-            }));
+            })
+          );
           break;
         case 'Job.restore':
           closeDialog();
@@ -259,7 +271,7 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
           focusOnJob={focusOnJob}
           setFocusOnJob={setFocusOnJob}
           handleFocusError={(error) => {
-            setHandleFocusError(error);
+            setFocusError(error);
           }}
         />
       </Box>
@@ -271,12 +283,26 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
       <Box className="jobsTimeRangePicker">
         <DateTimeRangePicker
           controlsLayout="row"
+          dateFormat="dd/MM/yyyy"
           onChange={(dateRange): void => {
             if (
               typeof dateRange.from !== 'undefined' &&
               typeof dateRange.to !== 'undefined'
             ) {
-              setFromDate(dateRange.from);
+              const from = dateRange.from;
+              const to = dateRange.to;
+              const monthsDiff = moment(to).diff(moment(from), 'months');
+              if (monthsDiff > CONFIG.JOB_MANAGER.MAX_DATE_RANGE_MONTHS) {
+                setDateRangeError({
+                  code: 'job.warning.exceeded-date-range',
+                  message: CONFIG.JOB_MANAGER.MAX_DATE_RANGE_MONTHS,
+                  level: 'warning'
+                });
+              } else {
+                setDateRangeError(undefined);
+                setFromDate(from);
+                setTillDate(to);
+              }
             }
           }}
           from={fromDate}
@@ -291,10 +317,9 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
             endPlaceHolderText: intl.formatMessage({
               id: 'filters.date-picker.end-time.label',
             }),
-            calendarLocale:
-              SupportedLocales[
+            calendarLocale: SupportedLocales[
               CONFIG.I18N.DEFAULT_LANGUAGE.toUpperCase() as keyof typeof SupportedLocales
-              ],
+            ],
           }}
         />
       </Box>
@@ -325,7 +350,6 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
               {`${(timeLeft as number) / MILLISECONDS_IN_SEC}`}
             </Box>
           </Box>
-
           <IconButton
             className="closeIcon mc-icon-Close"
             onClick={(): void => {
@@ -337,11 +361,10 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
           {renderDateTimeRangePicker()}
           {!error && renderGridList()}
           {
-            error && (
-              <Box className="render-jobs-data-error">
-                <GraphQLError error={error} />
-              </Box>
-            )
+            error &&
+            <Box className="render-jobs-data-error">
+              <GraphQLError error={error} />
+            </Box>
           }
           <Box className="footer">
             <Box className="buttons">
@@ -355,26 +378,18 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
                 <FormattedMessage id="system-status.close-btn.text" />
               </Button>
             </Box>
-
-            {
-              <Box className="messages">
-                {
-                  (mutationQuery.error !== undefined) && (
-                    <Box>
-                      <GraphQLError error={mutationQuery.error} />
-                    </Box>
-                  )
-                }
-                {
-                  (handleFocusError && handleFocusError.code && focusOnJob) &&
-                  <LogicError errors={[{
-                    code: handleFocusError.code,
-                    message: `${focusOnJob.resourceId} <bdi>(${dateFormatter(focusOnJob.updated, true)})</bdi>`,
-                    level: 'warning'
-                  }]} />
-                }
-              </Box>
-            }
+            <Box className="messages">
+              {
+                mutationQuery.error !== undefined &&
+                <Box>
+                  <GraphQLError error={mutationQuery.error} />
+                </Box>
+              }
+              {
+                errorMessages.length > 0 &&
+                <LogicError errors={errorMessages} />
+              }
+            </Box>
           </Box>
         </DialogContent>
       </Dialog>
