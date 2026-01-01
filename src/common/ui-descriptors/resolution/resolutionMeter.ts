@@ -1,5 +1,6 @@
 export const resolutionMeter= {
     "autocomplete": null,
+    "typeD": "number",
     "lookupTable": null,
     "lookupExcludeFields": null,
     "fieldName": "resolutionMeter",

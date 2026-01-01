@@ -26,7 +26,7 @@ import {
 import { hasSelfIntersections } from '../../../common/utils/geojson.validation';
 import { RasterIngestionJobType } from '../../../common/models/raster-job';
 import { SYNC_QUERY, syncQueries } from '../../../syncHttpClientGql';
-import { UiDescriptorsType } from '../../../ui-descriptors/type';
+import { UiDescriptorsType } from '../../../common/ui-descriptors/type';
 import {
   CategoryConfigModelType,
   EntityDescriptorModelType,
@@ -141,38 +141,43 @@ export const getFieldNamesByEntityDescriptorMap = (
   return fieldNamesMap;
 };
 
-export const getBasicType = (fieldName: FieldInfoName, typename: string, lookupTable?: string): string => {
+export const getBasicType = (fieldName: FieldInfoName, layerTypeName: string, lookupTable?: string, fieldTypeName?: string): string => {
   let recordModel;
+  let typeString: string;
+  const fieldNameStr = fieldName as string;
+
   if (lookupTable != null && lookupTable !== 'zoomlevelresolutions') return 'LookupTableType';
 
-  switch (typename) {
-    case 'LayerDemRecord':
-      recordModel = LayerDemRecordModel;
-      break;
-    case 'Layer3DRecord':
-      recordModel = Layer3DRecordModel;
-      break;
-    case 'VectorBestRecord':
-      recordModel = VectorBestRecordModel;
-      break;
-    case 'QuantizedMeshBestRecord':
-      recordModel = QuantizedMeshBestRecordModel;
-      break;
-    case 'PolygonPartRecord':
-      recordModel = PolygonPartRecordModel;
-      break;
-    case 'Link':
-      recordModel = LinkModel;
-      break;
-    case 'UiDescriptors':
-      recordModel = {properties: {[fieldName]: {name: fieldName}}};
-      break;
-    default:
-      recordModel = LayerRasterRecordModel;
-      break;
+  // Check if UiDexcriptorField
+  if(fieldTypeName){
+    typeString = fieldTypeName;
+  } else {
+    switch (layerTypeName) {
+      case 'LayerDemRecord':
+        recordModel = LayerDemRecordModel;
+        break;
+      case 'Layer3DRecord':
+        recordModel = Layer3DRecordModel;
+        break;
+      case 'VectorBestRecord':
+        recordModel = VectorBestRecordModel;
+        break;
+      case 'QuantizedMeshBestRecord':
+        recordModel = QuantizedMeshBestRecordModel;
+        break;
+      case 'PolygonPartRecord':
+        recordModel = PolygonPartRecordModel;
+        break;
+      case 'Link':
+        recordModel = LinkModel;
+        break;
+      default:
+        recordModel = LayerRasterRecordModel;
+        break;
+    };
+    typeString = get(recordModel,`properties.${fieldNameStr}.name`) as string;
   }
-  const fieldNameStr = fieldName as string;
-  const typeString = get(recordModel,`properties.${fieldNameStr}.name`) as string;
+  
   if (typeString) {
     if (fieldNameStr.toLowerCase().includes('url')) {
       return 'url';

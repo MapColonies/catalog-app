@@ -53,6 +53,7 @@ import { Events } from './state-machine/types';
 import { getUIIngestionFieldDescriptors } from './utils';
 
 import './layer-details-form.raster.css';
+import { UiDescriptorsTypeName } from '../../../../common/ui-descriptors/type';
 
 const NONE = 0;
 
@@ -200,7 +201,7 @@ export const InnerRasterForm = (
 
   const uiIngestionFieldDescriptors = useMemo(() => {
     return [{ 
-      type: 'UiDescriptors',
+      type: UiDescriptorsTypeName,
       categories :[
         {
           category: 'DUMMY',
@@ -309,7 +310,7 @@ export const InnerRasterForm = (
           <Box className="curtainContainer">
             <LayersDetailsComponent
               entityDescriptors={uiIngestionFieldDescriptors as EntityDescriptorModelType[]}
-              layerRecord={{__typename: "UiDescriptors"}}
+              layerRecord={{__typename: UiDescriptorsTypeName}}
               mode={mode}
               formik={entityFormikHandlers}
               enableMapPreview={false}

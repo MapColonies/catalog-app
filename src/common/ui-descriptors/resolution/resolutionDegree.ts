@@ -1,4 +1,5 @@
 export const resolutionDegree = {
+    "typeD": "resolution",
     "autocomplete": null,
     "lookupTable": "zoomlevelresolutions",
     "lookupExcludeFields": null,
