@@ -20,6 +20,8 @@ import './job-details.raster-job-data.css';
 
 interface JobDetailsRasterJobDataProps extends ICellRendererParams { }
 
+const MAX_ERRORS_SHOWN = 99;
+
 const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = ({ data }) => {
   const store = useStore();
   const intl = useIntl();
@@ -140,50 +142,49 @@ const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = ({ data 
         }
       </AutoDirectionBox>
       {
-        !isLoading && <>
-          {!isTaskFailed &&
-            <Box className={`linkItem errorsCountContainer ${errorsCount === 0 ? 'noErrors' : ''}`} key={`${jobData.id}`}>
-              {hasErrors &&
-                <>
-                  <IconButton
-                    className={`error mc-icon-Status-Warnings`}
-                    onClick={(e): void => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                    }}
-                  />
+        !isLoading &&
+        <Box className='errorsContainerPosition' key={`${jobData.id}`}>
+          {
+            !isTaskFailed && hasErrors &&
+            <Box className='errorsSummaryContainer'>
+              <IconButton
+                className='mc-icon-Status-Warnings error'
+                onClick={(e): void => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
+              />
 
-                  <Tooltip content={
-                    <Box>
-                      {JobErrorsSummary(theme, task?.parameters?.errorsSummary, "reportList")}
-                    </Box>
-                  }>
-                    <Hyperlink url={task?.parameters?.report?.url ?? ''} label={`${errorsCount.toString()} ${errorsMessage}`} />
-                  </Tooltip>
-
-                  <Copy value={task?.parameters?.report?.url ?? ''} iconStyle={{ fontSize: `20px` }} key={'errorsReportLink'} />
-                </>
-              }
-              {
-                !hasErrors && hasGpkgPath() && task &&
-                intl.formatMessage({ id: 'general.no-errors.text' })
-              }</Box>
-          }
-          {isTaskFailed &&
-            <Box className={`linkItem errorsCountContainer`} key={`${jobData.id}`}>
               <Tooltip content={
                 <Box>
-                  {JobErrorsSummary(theme, task?.parameters?.errorsSummary, "reportList", theme.custom?.GC_ERROR_HIGH)}
+                  {JobErrorsSummary(theme, task?.parameters?.errorsSummary, "reportItem")}
                 </Box>
               }>
-                <Typography tag="span" style={{color: theme.custom?.GC_ERROR_HIGH}}>
-                  {intl.formatMessage({ id: 'ingestion.error.failed-task-report' })}
-                </Typography>
+                <Hyperlink className='error' url={task?.parameters?.report?.url ?? ''} label={`${errorsCount > MAX_ERRORS_SHOWN ? `+${MAX_ERRORS_SHOWN}` : errorsCount} ${errorsMessage}`} />
               </Tooltip>
 
+              <Copy value={task?.parameters?.report?.url ?? ''} iconStyle={{ fontSize: `20px` }} key={'errorsReportLink'} />
             </Box>
           }
-         </>
+          {
+            !isTaskFailed && !hasErrors && hasGpkgPath() && task &&
+            <Box className='success'>
+              {intl.formatMessage({ id: 'general.no-errors.text' })}
+            </Box>
+          }
+          {
+            isTaskFailed &&
+            <Tooltip content={
+              <Box>
+                {JobErrorsSummary(theme, task?.parameters?.errorsSummary, "reportItem", theme.custom?.GC_ERROR_HIGH)}
+              </Box>
+            }>
+              <Typography className="error" tag="span">
+                {intl.formatMessage({ id: 'ingestion.error.failed-task-report' })}
+              </Typography>
+            </Tooltip>
+          }
+        </Box>
       }
     </Box>
   );

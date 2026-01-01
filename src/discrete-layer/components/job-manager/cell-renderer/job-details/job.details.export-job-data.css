@@ -23,3 +23,13 @@
 #exportJobData.jobDataContainer .jobDescriptionContainer .valid {
     color: var(--mdc-theme-gc-priority-normal);
 }
+
+#exportJobData .linkContainer {
+  display: flex;
+  align-items: end;
+}
+
+#exportJobData .jobDataLink {
+  color: var(--mdc-theme-text-primary-on-dark);
+  font-size: 1.1rem;
+}
