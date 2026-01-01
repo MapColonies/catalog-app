@@ -15,6 +15,9 @@ import { LinkType } from '../../../common/models/link-type.enum';
 import { Mode } from '../../../common/models/mode.enum';
 import { geoJSONValidation } from '../../../common/utils/geojson.validation';
 import { geoArgs } from '../../../common/utils/geo.tools';
+import { UiFieldDescriptor } from '../../../common/ui-descriptors/type';
+import {isUiDescriptor} from '../../../common/ui-descriptors/helper'
+
 import { 
   // AutocompletionModelType,
   EntityDescriptorModelType,
@@ -57,7 +60,7 @@ interface LayersDetailsComponentProps {
   mode: Mode;
   className?: string;
   isBrief?: boolean;
-  layerRecord?: ILayerImage | null;
+  layerRecord?: ILayerImage | null | UiFieldDescriptor;
   formik?: EntityFormikHandlers;
   geoCustomChecks?:{
     validationFunc: ((value: string, args: geoArgs) => geoJSONValidation | undefined)[],
@@ -86,7 +89,8 @@ export const getValuePresentor = (
   intl?: IntlShape
 ): JSX.Element => {
   const { fieldName, lookupTable } = fieldInfo;
-  const basicType = getBasicType(fieldName as FieldInfoName, layerRecord.__typename, lookupTable as string);
+  const fieldTypeName = isUiDescriptor(layerRecord) && get(fieldInfo,'uiDescriptorFieldType');
+  const basicType = getBasicType(fieldName as FieldInfoName, layerRecord.__typename, lookupTable as string, fieldTypeName);
   const value = formik?.getFieldProps(`${fieldNamePrefix ?? ''}${fieldInfo.fieldName}`).value ?? fieldValue as unknown;
   
   switch (basicType) {
@@ -287,7 +291,7 @@ export const LayersDetailsComponent: React.FC<LayersDetailsComponentProps> = obs
             const getFilterFieldIdx = (fieldName: string | undefined) => {
               // WORKAROUND to make appropriate indication on found pattern for RASTER not common filtered field
               let aliasFilterField = fieldName;
-              if (layerRecord?.type === RecordType.RECORD_RASTER){
+              if ( !isUiDescriptor(layerRecord) && layerRecord?.type === RecordType.RECORD_RASTER){
                 switch(fieldName){
                   case 'mc:ingestionDate':
                     aliasFilterField = 'mc:insertDate';
@@ -387,7 +391,7 @@ export const LayersDetailsComponent: React.FC<LayersDetailsComponentProps> = obs
     <>
       {!(isBrief ?? false) ? fullInputs : briefInputs}
       {
-        layerRecord?.links &&
+       !isUiDescriptor(layerRecord) && layerRecord?.links &&
         getLinkUrl(layerRecord.links, LinkType.THUMBNAIL_L) !== undefined &&
         mode !== Mode.UPDATE && mode !== Mode.EXPORT &&
         <img
