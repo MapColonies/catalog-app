@@ -360,7 +360,7 @@ const EntityRasterDialogInner: React.FC<EntityRasterInnerProps> = observer((prop
       clearSyncWarnings();
     }, [onSetOpen, store.discreteLayersStore]);
 
-    const UpdateLayerHeader = (): JSX.Element => {
+    const UpdateLayerHeader = useMemo(() => {
       return (
         <Box id="updateLayerHeader">
           <Box id="updateLayerHeaderContent">
@@ -372,17 +372,17 @@ const EntityRasterDialogInner: React.FC<EntityRasterInnerProps> = observer((prop
               mode={Mode.VIEW}
             />
           </Box>
-          { 
+          {
             state.context.selectionMode === 'restore' &&
             state.context.flowType === Mode.UPDATE &&
             <Box className='lockedIcon'>
               <Icon icon={{ icon: 'lock', size: 'xlarge' }} />
-              <Typography tag="span">{ intl.formatMessage({ id: 'general.title.locked' }) }</Typography>
+              <Typography tag="span">{intl.formatMessage({ id: 'general.title.locked' })}</Typography>
             </Box>
           }
         </Box>
       );
-    };
+    }, [entityDescriptors,layerRecord, state.context.selectionMode, state.context.flowType]);
 
     return (
       <div id="entityRasterDialog" ref={dialogContainerRef}>
@@ -400,7 +400,7 @@ const EntityRasterDialogInner: React.FC<EntityRasterInnerProps> = observer((prop
           <DialogContent className="dialogBody">
             {
               mode === Mode.UPDATE &&
-              <UpdateLayerHeader />
+              UpdateLayerHeader
             }
             {
               isAllInfoReady && (
