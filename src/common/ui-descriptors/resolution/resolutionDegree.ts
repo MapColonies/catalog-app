@@ -1,5 +1,5 @@
 export const resolutionDegree = {
-    "typeD": "resolution",
+    "uiDescriptorFieldType": "resolution",
     "autocomplete": null,
     "lookupTable": "zoomlevelresolutions",
     "lookupExcludeFields": null,

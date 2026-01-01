@@ -89,7 +89,7 @@ export const getValuePresentor = (
   intl?: IntlShape
 ): JSX.Element => {
   const { fieldName, lookupTable } = fieldInfo;
-  const fieldTypeName = isUiDescriptor(layerRecord) && get(fieldInfo,'typeD');
+  const fieldTypeName = isUiDescriptor(layerRecord) && get(fieldInfo,'uiDescriptorFieldType');
   const basicType = getBasicType(fieldName as FieldInfoName, layerRecord.__typename, lookupTable as string, fieldTypeName);
   const value = formik?.getFieldProps(`${fieldNamePrefix ?? ''}${fieldInfo.fieldName}`).value ?? fieldValue as unknown;
   

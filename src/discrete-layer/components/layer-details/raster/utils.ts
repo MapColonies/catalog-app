@@ -1,9 +1,11 @@
+import { resolutionDegree } from '../../../../common/ui-descriptors/resolution/resolutionDegree';
+import { resolutionMeter } from '../../../../common/ui-descriptors/resolution/resolutionMeter';
 import { EntityDescriptorModelType } from '../../../models';
-import { uidescriptorFielsdName } from '../../../../common/ui-descriptors/helper';
 
 export const getUIIngestionFieldDescriptors = (entityDescriptors: EntityDescriptorModelType[]) => {
+  const ingestionUiDescriptorFieldNames = [resolutionDegree, resolutionMeter];
 
-  return uidescriptorFielsdName.map((desc) => {
+  return ingestionUiDescriptorFieldNames.map((desc) => {
       return {
         ...desc,
         isRequired: true,
