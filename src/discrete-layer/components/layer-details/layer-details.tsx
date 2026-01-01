@@ -15,7 +15,7 @@ import { LinkType } from '../../../common/models/link-type.enum';
 import { Mode } from '../../../common/models/mode.enum';
 import { geoJSONValidation } from '../../../common/utils/geojson.validation';
 import { geoArgs } from '../../../common/utils/geo.tools';
-import { UiDescriptorsTypeName, UiFieldDescriptor } from '../../../common/ui-descriptors/type';
+import { UiFieldDescriptor } from '../../../common/ui-descriptors/type';
 import {isUiDescriptor} from '../../../common/ui-descriptors/helper'
 
 import { 
