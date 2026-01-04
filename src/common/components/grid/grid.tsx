@@ -237,7 +237,6 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
         message: '',
         level: 'warning'
       });
-
       setIsRowFound?.(false);
       return;
     }

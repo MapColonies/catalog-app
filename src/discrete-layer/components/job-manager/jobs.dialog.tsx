@@ -180,19 +180,29 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
   useEffect(() => {
     const newErrorMessages: IError[] = [];
     if (focusOnJob && focusError?.code) {
-      newErrorMessages.push({
+      const newError: IError = {
         code: focusError.code,
         message: `${focusOnJob.resourceId} <bdi>(${dateFormatter(focusOnJob.updated, true)})</bdi>`,
         level: focusError.level
-      });
+      };
+      const updatedErrors = errorMessages.filter(error => error.code !== newError.code);
+      newErrorMessages.push(newError);
+      setErrorMessages([...updatedErrors, ...newErrorMessages]);
+    } else if (!focusError) {
+      setErrorMessages(prevErrors => 
+        prevErrors.filter(error => error.code !== 'warning.row-not-found')
+      );
     }
-    setErrorMessages(prevErrors => [...prevErrors, ...newErrorMessages]);
   }, [focusError]);
 
   useEffect(() => {
-    if (dateRangeError) {
-      setErrorMessages(prevErrors => [...prevErrors, dateRangeError]);
-    }
+    setErrorMessages(prevErrors => {
+      if (dateRangeError) {
+        return [...prevErrors, dateRangeError];
+      } else {
+        return prevErrors.filter(err => err.code !== 'warning.exceeded-date-range');
+      }
+    });
   }, [dateRangeError]);
 
   const closeDialog = useCallback(() => {
