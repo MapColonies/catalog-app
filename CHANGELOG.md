@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.2.0](https://github.com/MapColonies/catalog-app/compare/v4.1.1...v4.2.0) (2026-01-04)
+
+
+### Features
+
+* no poligonParts type wile raster ingestion and maxResolution bugfix ([#815](https://github.com/MapColonies/catalog-app/issues/815)) ([e9bec3b](https://github.com/MapColonies/catalog-app/commit/e9bec3ba06802eb11fd5b80de00ecee8b173d565))
+
+
+### Bug Fixes
+
+* add limit for error count display on link (max 99) and cleanup css ([#817](https://github.com/MapColonies/catalog-app/issues/817)) ([b3c4369](https://github.com/MapColonies/catalog-app/commit/b3c43697bbc395fac9d2d81260668dddd989044d))
+* failed validation task symbology ([#810](https://github.com/MapColonies/catalog-app/issues/810)) ([48c517e](https://github.com/MapColonies/catalog-app/commit/48c517e4ca0068772aee88550e437bdc33e4d48f))
+* fit geometries in pp preview map ([#812](https://github.com/MapColonies/catalog-app/issues/812)) ([fc35916](https://github.com/MapColonies/catalog-app/commit/fc35916c2da61fea3b2590ba174613cfd2ecedc9))
+* lint ([68e6616](https://github.com/MapColonies/catalog-app/commit/68e6616c161e8852efdfe832f0452bd461bf7a55))
+* nemoize header of ingestion dialog ([#818](https://github.com/MapColonies/catalog-app/issues/818)) ([13e2505](https://github.com/MapColonies/catalog-app/commit/13e250573326bbe5e0566f756b68a304d8f21be0))
+* remove errors when reselect file ( MAPCO-8627 ) ([#809](https://github.com/MapColonies/catalog-app/issues/809)) ([a073205](https://github.com/MapColonies/catalog-app/commit/a073205f8c948ae6b24324800bebfbd9a027a3ef))
+* retry job polling clean up and files path resolving triggered strictly from api ([#816](https://github.com/MapColonies/catalog-app/issues/816)) ([ea565c9](https://github.com/MapColonies/catalog-app/commit/ea565c98a0620cfc7eb917fe4b6add10902b1943))
+
 ## [4.1.1](https://github.com/MapColonies/catalog-app/compare/v4.1.0...v4.1.1) (2025-12-23)
 
 
