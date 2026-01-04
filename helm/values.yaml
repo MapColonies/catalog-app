@@ -120,7 +120,7 @@ env:
   jobManager:
     pollingCycleInterval: 120000
     filterDaysTimeSlot: 1
-    maxDateRangeMonths: 2
+    maxDateRangeDays: 60
   defaultUser:
     role: USER
   runningMode:

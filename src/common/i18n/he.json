@@ -831,7 +831,7 @@
   "polygonParts-info.part-to-large.message": "חלק תיחום גדול מדי לתצוגה",
 
   "warning.row-not-found": "המשימה של {value} לא תואמת לקריטריוני החיפוש",
-  "warning.exceeded-date-range": "קריטריוני החיפוש חורגים מהמגבלה המרבית של {value} חודשים",
+  "warning.exceeded-date-range": "קריטריוני החיפוש חורגים מהמגבלה המרבית של {value} ימים",
 
   "export-layer.exportSuccessContainer.title": "בקשת הייצוא נוצרה בהצלחה",
   "export-layer.exportSuccessContainer.approve": "העתקה וסיום",

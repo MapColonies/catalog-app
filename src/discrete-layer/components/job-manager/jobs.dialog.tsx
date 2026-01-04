@@ -198,7 +198,8 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
   useEffect(() => {
     setErrorMessages(prevErrors => {
       if (dateRangeError) {
-        return [...prevErrors, dateRangeError];
+        const updatedErrors = prevErrors.filter(err => err.code !== dateRangeError.code);
+        return [...updatedErrors, dateRangeError];
       } else {
         return prevErrors.filter(err => err.code !== 'warning.exceeded-date-range');
       }
@@ -301,11 +302,11 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
             ) {
               const from = dateRange.from;
               const to = dateRange.to;
-              const monthsDiff = moment(to).diff(moment(from), 'months');
-              if (monthsDiff > CONFIG.JOB_MANAGER.MAX_DATE_RANGE_MONTHS) {
+              const diff = moment(to).diff(moment(from), 'days');
+              if (diff > CONFIG.JOB_MANAGER.MAX_DATE_RANGE_DAYS) {
                 setDateRangeError({
                   code: 'warning.exceeded-date-range',
-                  message: CONFIG.JOB_MANAGER.MAX_DATE_RANGE_MONTHS,
+                  message: CONFIG.JOB_MANAGER.MAX_DATE_RANGE_DAYS,
                   level: 'warning'
                 });
               } else {

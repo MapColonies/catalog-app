@@ -179,7 +179,7 @@ const APP_CONFIG = {
   JOB_MANAGER: {
     POLLING_CYCLE_INTERVAL: JOB_MANAGER.pollingCycleInterval,
     FILTER_DAYS_TIME_SLOT: JOB_MANAGER.filterDaysTimeSlot,
-    MAX_DATE_RANGE_MONTHS: JOB_MANAGER.maxDateRangeMonths,
+    MAX_DATE_RANGE_DAYS: JOB_MANAGER.maxDateRangeDays,
   },
   DEFAULT_USER: {
     ROLE: DEFAULT_USER.role,
