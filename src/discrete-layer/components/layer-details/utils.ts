@@ -15,7 +15,9 @@ import { IEnumsMapType } from '../../../common/contexts/enumsMap.context';
 import { emphasizeByHTML } from '../../../common/helpers/formatters';
 import { sessionStore } from '../../../common/helpers/storage';
 import { Mode } from '../../../common/models/mode.enum';
+import { RasterIngestionJobType } from '../../../common/models/raster-job';
 import { ValidationTypeName } from '../../../common/models/validation.enum';
+import { UiDescriptorsType } from '../../../common/ui-descriptors/type';
 import {
   polygonVertexDensityFactor,
   area,
@@ -24,7 +26,6 @@ import {
   isSmallArea
 } from '../../../common/utils/geo.tools';
 import { hasSelfIntersections } from '../../../common/utils/geojson.validation';
-import { RasterIngestionJobType } from '../../../common/models/raster-job';
 import { SYNC_QUERY, syncQueries } from '../../../syncHttpClientGql';
 import {
   CategoryConfigModelType,
@@ -86,28 +87,31 @@ export const isEnumType = (typeName: string) => {
 }
 
 export const getEntityDescriptors = (
-  layerRecordTypename: LayerRecordTypes,
+  layerRecordTypename: LayerRecordTypes | UiDescriptorsType,
   entityDescriptors: EntityDescriptorModelType[]
 ): IRecordCategoryFieldsInfo[] => {
   let entityDesc;
   switch (layerRecordTypename) {
     case 'LayerDemRecord':
-      entityDesc = entityDescriptors.find(descriptor => descriptor.type === 'PycswDemCatalogRecord')
+      entityDesc = entityDescriptors.find(descriptor => descriptor.type === 'PycswDemCatalogRecord');
       break;
     case 'Layer3DRecord':
-      entityDesc = entityDescriptors.find(descriptor => descriptor.type === 'Pycsw3DCatalogRecord')
+      entityDesc = entityDescriptors.find(descriptor => descriptor.type === 'Pycsw3DCatalogRecord');
       break;
     case 'VectorBestRecord':
-      entityDesc = entityDescriptors.find(descriptor => descriptor.type === 'VectorBestMetadata')
+      entityDesc = entityDescriptors.find(descriptor => descriptor.type === 'VectorBestMetadata');
       break;
     case 'QuantizedMeshBestRecord':
-      entityDesc = entityDescriptors.find(descriptor => descriptor.type === 'PycswQuantizedMeshBestCatalogRecord')
+      entityDesc = entityDescriptors.find(descriptor => descriptor.type === 'PycswQuantizedMeshBestCatalogRecord');
       break;
     case 'PolygonPartRecord':
-      entityDesc = entityDescriptors.find(descriptor => descriptor.type === 'PolygonPartRecord')
+      entityDesc = entityDescriptors.find(descriptor => descriptor.type === 'PolygonPartRecord');
+      break;
+    case 'UiDescriptors':
+      entityDesc = entityDescriptors.find(descriptor => descriptor.type === 'UiDescriptors');
       break;
     default:
-      entityDesc = entityDescriptors.find(descriptor => descriptor.type === 'PycswLayerCatalogRecord')
+      entityDesc = entityDescriptors.find(descriptor => descriptor.type === 'PycswLayerCatalogRecord');
       break;
   }
   return (get(entityDesc, 'categories') ?? []) as IRecordCategoryFieldsInfo[];
@@ -137,35 +141,43 @@ export const getFieldNamesByEntityDescriptorMap = (
   return fieldNamesMap;
 };
 
-export const getBasicType = (fieldName: FieldInfoName, typename: string, lookupTable?: string): string => {
+export const getBasicType = (fieldName: FieldInfoName, layerTypeName: string, lookupTable?: string, fieldTypeName?: string): string => {
   let recordModel;
+  let typeString: string;
+  const fieldNameStr = fieldName as string;
+
   if (lookupTable != null && lookupTable !== 'zoomlevelresolutions') return 'LookupTableType';
 
-  switch (typename) {
-    case 'LayerDemRecord':
-      recordModel = LayerDemRecordModel;
-      break;
-    case 'Layer3DRecord':
-      recordModel = Layer3DRecordModel;
-      break;
-    case 'VectorBestRecord':
-      recordModel = VectorBestRecordModel;
-      break;
-    case 'QuantizedMeshBestRecord':
-      recordModel = QuantizedMeshBestRecordModel;
-      break;
-    case 'PolygonPartRecord':
-      recordModel = PolygonPartRecordModel;
-      break;
-    case 'Link':
-      recordModel = LinkModel;
-      break;
-    default:
-      recordModel = LayerRasterRecordModel;
-      break;
+  // Check if UiDexcriptorField
+  if (fieldTypeName) {
+    typeString = fieldTypeName;
+  } else {
+    switch (layerTypeName) {
+      case 'LayerDemRecord':
+        recordModel = LayerDemRecordModel;
+        break;
+      case 'Layer3DRecord':
+        recordModel = Layer3DRecordModel;
+        break;
+      case 'VectorBestRecord':
+        recordModel = VectorBestRecordModel;
+        break;
+      case 'QuantizedMeshBestRecord':
+        recordModel = QuantizedMeshBestRecordModel;
+        break;
+      case 'PolygonPartRecord':
+        recordModel = PolygonPartRecordModel;
+        break;
+      case 'Link':
+        recordModel = LinkModel;
+        break;
+      default:
+        recordModel = LayerRasterRecordModel;
+        break;
+    };
+    typeString = get(recordModel,`properties.${fieldNameStr}.name`) as string;
   }
-  const fieldNameStr = fieldName as string;
-  const typeString = get(recordModel,`properties.${fieldNameStr}.name`) as string;
+  
   if (typeString) {
     if (fieldNameStr.toLowerCase().includes('url')) {
       return 'url';
@@ -185,7 +197,7 @@ export const getBasicType = (fieldName: FieldInfoName, typename: string, lookupT
     else if (fieldNameStr.toLowerCase().includes('maxresolutiondeg') || fieldNameStr.toLowerCase().includes('resolutiondegree') ) {
       return 'resolution';
     }
-    else if (typeString.toLowerCase().includes('number')) {
+    else if (typeString.toLowerCase().includes('number') || fieldNameStr.toLowerCase().includes('resolutionmeter')) {
       return 'number';
     }
     else {
