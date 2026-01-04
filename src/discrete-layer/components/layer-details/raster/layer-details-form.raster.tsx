@@ -19,6 +19,7 @@ import { Box } from '@map-colonies/react-components';
 import { ValidationsError } from '../../../../common/components/error/validations.error-presentor';
 import { mergeRecursive } from '../../../../common/helpers/object';
 import { Mode } from '../../../../common/models/mode.enum';
+import { UiDescriptorsTypeName } from '../../../../common/ui-descriptors/type';
 import { UserAction } from '../../../models/userStore';
 import {
   EntityDescriptorModelType,
@@ -53,7 +54,6 @@ import { Events } from './state-machine/types';
 import { getUIIngestionFieldDescriptors } from './utils';
 
 import './layer-details-form.raster.css';
-import { UiDescriptorsTypeName } from '../../../../common/ui-descriptors/type';
 
 const NONE = 0;
 
@@ -439,8 +439,8 @@ export default withFormik<LayerDetailsFormProps, FormValues>({
   mapPropsToValues: (props) => {
     return {
       resolutionDegree: undefined,
-      resolutionDegreeMaxValue: undefined,
       resolutionMeter: undefined,
+      resolutionDegreeMaxValue: undefined,
       ...transformEntityToFormFields(props.layerRecord)
     };
   },

@@ -13,10 +13,10 @@ import CONFIG from '../../../common/config';
 import EnumsMapContext, { IEnumsMapType } from '../../../common/contexts/enumsMap.context';
 import { LinkType } from '../../../common/models/link-type.enum';
 import { Mode } from '../../../common/models/mode.enum';
+import { isUiDescriptor } from '../../../common/ui-descriptors/helper';
+import { UiFieldDescriptor } from '../../../common/ui-descriptors/type';
 import { geoJSONValidation } from '../../../common/utils/geojson.validation';
 import { geoArgs } from '../../../common/utils/geo.tools';
-import { UiFieldDescriptor } from '../../../common/ui-descriptors/type';
-import {isUiDescriptor} from '../../../common/ui-descriptors/helper'
 
 import { 
   // AutocompletionModelType,
@@ -291,8 +291,8 @@ export const LayersDetailsComponent: React.FC<LayersDetailsComponentProps> = obs
             const getFilterFieldIdx = (fieldName: string | undefined) => {
               // WORKAROUND to make appropriate indication on found pattern for RASTER not common filtered field
               let aliasFilterField = fieldName;
-              if ( !isUiDescriptor(layerRecord) && layerRecord?.type === RecordType.RECORD_RASTER){
-                switch(fieldName){
+              if (!isUiDescriptor(layerRecord) && layerRecord?.type === RecordType.RECORD_RASTER) {
+                switch (fieldName) {
                   case 'mc:ingestionDate':
                     aliasFilterField = 'mc:insertDate';
                     break;
@@ -303,7 +303,7 @@ export const LayersDetailsComponent: React.FC<LayersDetailsComponentProps> = obs
               }
               return store.discreteLayersStore.searchParams.catalogFilters.findIndex((filter) => {
                 return filter.field === aliasFilterField;
-               });
+              });
             };
             const stringifyFieldValue = (val: unknown) => (val + '').toLowerCase();
 
@@ -391,7 +391,7 @@ export const LayersDetailsComponent: React.FC<LayersDetailsComponentProps> = obs
     <>
       {!(isBrief ?? false) ? fullInputs : briefInputs}
       {
-       !isUiDescriptor(layerRecord) && layerRecord?.links &&
+        !isUiDescriptor(layerRecord) && layerRecord?.links &&
         getLinkUrl(layerRecord.links, LinkType.THUMBNAIL_L) !== undefined &&
         mode !== Mode.UPDATE && mode !== Mode.EXPORT &&
         <img
