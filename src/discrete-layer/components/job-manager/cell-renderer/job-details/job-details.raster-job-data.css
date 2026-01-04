@@ -1,52 +1,22 @@
 #rasterJobData.jobDataContainer {
-  flex-direction: row;
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  height: 40px;
   font-size: 1rem;
+  font-weight: bold;
 }
 
-#rasterJobData .errorsCountContainer {
+#rasterJobData .errorsContainerPosition {
   position: absolute;
-  right: 72px;
-  width: 150px;
+  inset-inline-end: 100px;
 }
 
-body[dir='rtl'] #rasterJobData .errorsCountContainer {
-  right: unset;
-  left: 72px;
-}
-
-#rasterJobData .errorsCountContainer>a {
-  color: var(--mdc-theme-gc-error-high) !important;
-}
-
-#rasterJobData .errorsCountContainer .error {
-  cursor: default !important;
-}
-
-#rasterJobData .errorsCountContainer{
-  cursor: pointer;
-}
-
-#rasterJobData .errorContainer {
-  flex-grow: 1;
-  display: flex;
-  color: var(--mdc-theme-gc-error-high);
-  align-items: flex-start;
-}
-
-#rasterJobData .errorsCountContainer {
+#rasterJobData .errorsSummaryContainer {
   display: flex;
   align-items: center;
 }
 
-#rasterJobData .errorsCountContainer.noErrors {
-  color: var(--mdc-theme-gc-success) !important;
-}
-
-.reportList {
+/* This class is used inside a tooltip that is rendered directly under the <body>,
+   so it cannot rely on a more specific parent selector */
+.reportItem {
   display: flex;
   padding: 4px 2px;
   gap: 12px;

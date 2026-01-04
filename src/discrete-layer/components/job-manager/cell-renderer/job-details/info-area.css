@@ -5,11 +5,4 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 40px;
-}
-
-.jobDataContainer .linkItem>a {
-  text-decoration: underline;
-  color: var(--mdc-theme-text-primary-on-dark);
-  font-size: 1rem;
 }

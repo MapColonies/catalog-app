@@ -5,7 +5,6 @@ import { dateFormatter, relativeDateFormatter } from '../../../../../common/help
 import { localStore } from '../../../../../common/helpers/storage';
 import { Mode } from '../../../../../common/models/mode.enum';
 import {
-  updateFileErrorAction,
   cleanFilesErrorActions,
   fetchProductActions,
   filesErrorActions,
@@ -103,9 +102,7 @@ const filesMachine = createMachine({
               target: WORKFLOW.FILES.AUTO.FETCH_PRODUCT
             },
             onError: {
-              actions: [
-                ...filesErrorActions('data'),
-              ],
+              actions: filesErrorActions('data'),
               target: WORKFLOW.FILES.AUTO.IDLE
             }
           }
@@ -121,9 +118,7 @@ const filesMachine = createMachine({
               target: WORKFLOW.FILES.AUTO.CHECK_SHAPEMETADATA
             },
             onError: {
-              actions: [
-                ...filesErrorActions('product'),
-              ],
+              actions: filesErrorActions('product'),
               target: WORKFLOW.FILES.AUTO.IDLE
             }
           }
@@ -140,9 +135,7 @@ const filesMachine = createMachine({
               target: WORKFLOW.FILES.AUTO.IDLE
             },
             onError: {
-              actions: [
-                ...filesErrorActions('shapeMetadata'),
-              ],
+              actions: filesErrorActions('shapeMetadata'),
               target: WORKFLOW.FILES.AUTO.IDLE
             }
           }
@@ -159,21 +152,21 @@ const filesMachine = createMachine({
             SELECT_DATA: {
               actions: [
                 ...selectFileActions('data'),
-                ...cleanFilesErrorActions(),
+                ...cleanFilesErrorActions()
               ],
               target: WORKFLOW.FILES.MANUAL.SELECT_DATA
             },
             SELECT_PRODUCT: {
               actions: [
                 ...selectFileActions('product'),
-                ...cleanFilesErrorActions(),
+                ...cleanFilesErrorActions()
               ],
               target: WORKFLOW.FILES.MANUAL.FETCH_PRODUCT
             },
             SELECT_SHAPEMETADATA: {
               actions: [
                 ...selectFileActions('shapeMetadata'),
-                ...cleanFilesErrorActions(),
+                ...cleanFilesErrorActions()
               ],
               target: WORKFLOW.FILES.MANUAL.CHECK_SHAPEMETADATA
             },
@@ -215,9 +208,7 @@ const filesMachine = createMachine({
               target: WORKFLOW.FILES.MANUAL.IDLE
             },
             onError: {
-              actions: [
-                ...filesErrorActions('data'),
-              ],
+              actions: filesErrorActions('data'),
               target: WORKFLOW.FILES.MANUAL.IDLE
             }
           }
@@ -236,9 +227,7 @@ const filesMachine = createMachine({
               target: WORKFLOW.FILES.MANUAL.IDLE
             },
             onError: {
-              actions: [
-                ...filesErrorActions('product'),
-              ],
+              actions: filesErrorActions('product'),
               target: WORKFLOW.FILES.MANUAL.IDLE
             }
           }
@@ -253,9 +242,7 @@ const filesMachine = createMachine({
               target: WORKFLOW.FILES.MANUAL.IDLE
             },
             onError: {
-              actions: [
-                ...filesErrorActions('shapeMetadata'),
-              ],
+              actions: filesErrorActions('shapeMetadata'),
               target: WORKFLOW.FILES.MANUAL.IDLE
             }
           }
@@ -546,6 +533,11 @@ export const workflowMachine = createMachine<IContext, Events>({
         input: (_: { context: IContext; event: any }) => _,
         src: SERVICES[WORKFLOW.ROOT].retryJobService,
         onDone: {
+          actions: assign((_: { context: IContext; event: any }) => ({
+            job: {
+              jobId: _.context.job?.jobId
+            }
+          })),
           target: WORKFLOW.JOB_POLLING
         },
         onError: {
