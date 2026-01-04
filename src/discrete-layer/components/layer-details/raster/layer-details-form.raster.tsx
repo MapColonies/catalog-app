@@ -204,7 +204,7 @@ export const InnerRasterForm = (
       categories :[
         {
           category: 'DUMMY',
-          fields: getUIIngestionFieldDescriptors(entityDescriptors)
+          fields: getUIIngestionFieldDescriptors()
         }
       ]
     }];

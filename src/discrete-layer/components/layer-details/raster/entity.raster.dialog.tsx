@@ -323,7 +323,7 @@ const EntityRasterDialogInner: React.FC<EntityRasterInnerProps> = observer((prop
         filterModeDescriptors(mode as unknown as Mode, entityDescriptors)
       );
 
-      const uiIngestionFieldDescriptors = getUIIngestionFieldDescriptors(entityDescriptors);
+      const uiIngestionFieldDescriptors = getUIIngestionFieldDescriptors();
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const yupSchema: Record<string, any> = {};
