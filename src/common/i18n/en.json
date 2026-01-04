@@ -830,8 +830,8 @@
   "polygonParts-info.no-data.message": "No polygon parts data was found for the layer in the selected position",
   "polygonParts-info.part-to-large.message": "Polygon part too large for presentation",
 
-  "job.warning.row-not-found": "The job {value} does not meet the search criteria",
-  "job.warning.exceeded-date-range": "Search criteria exceeds the maximum date range of {value} months",
+  "warning.row-not-found": "The job {value} does not meet the search criteria",
+  "warning.exceeded-date-range": "Search criteria exceeds the maximum date range of {value} months",
 
   "export-layer.exportSuccessContainer.title": "Export request triggered",
   "export-layer.exportSuccessContainer.approve": "Copy and exit",

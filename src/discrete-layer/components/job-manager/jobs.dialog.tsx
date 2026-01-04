@@ -294,7 +294,7 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
               const monthsDiff = moment(to).diff(moment(from), 'months');
               if (monthsDiff > CONFIG.JOB_MANAGER.MAX_DATE_RANGE_MONTHS) {
                 setDateRangeError({
-                  code: 'job.warning.exceeded-date-range',
+                  code: 'warning.exceeded-date-range',
                   message: CONFIG.JOB_MANAGER.MAX_DATE_RANGE_MONTHS,
                   level: 'warning'
                 });
