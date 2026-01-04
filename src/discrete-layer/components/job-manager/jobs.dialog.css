@@ -65,7 +65,7 @@ body[dir='rtl'] #jobsDialog .closeIcon {
 
 body[dir='rtl'] #jobsDialog .refreshContainer .refreshSecs {
   right: unset;
-  left: 23px;
+  left: 24px;
 }
 
 #jobsDialog .footer {

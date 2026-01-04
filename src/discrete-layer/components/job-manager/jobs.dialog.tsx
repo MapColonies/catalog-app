@@ -45,8 +45,8 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
   const [ gridRowData, setGridRowData ] = useState<JobModelType[] | undefined>(undefined);
   const [ gridApi, setGridApi ] = useState<GridApi>();
   const [ pollingCycle, setPollingCycle ] = useState(START_CYCLE_ITERATION);
-  const [ fromDate, setFromDate ] = useState<Date>(moment().subtract(CONFIG.JOB_MANAGER.FILTER_DAYS_TIME_SLOT, 'days').toDate());
-  const [ tillDate, setTillDate ] = useState<Date>(new Date());
+  const [ fromDate, setFromDate ] = useState<Date | undefined>(moment().subtract(CONFIG.JOB_MANAGER.FILTER_DAYS_TIME_SLOT, 'days').toDate());
+  const [ tillDate, setTillDate ] = useState<Date | undefined>(new Date());
   const [ focusError, setFocusError ] = useState<IError | undefined>(undefined);
   const [ dateRangeError, setDateRangeError ] = useState<IError | undefined>(undefined);
   const [ errorMessages, setErrorMessages ] = useState<IError[]>([]);
@@ -104,15 +104,20 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
   }, []);
 
   useEffect(() => {
-    setQuery(
-      (store) =>
-        store.queryJobs({
-          params: {
-            fromDate,
-            tillDate,
-          },
-        })
-    );
+    if (
+      typeof fromDate !== 'undefined' &&
+      typeof tillDate !== 'undefined'
+    ) {
+      setQuery(
+        (store) =>
+          store.queryJobs({
+            params: {
+              fromDate,
+              tillDate,
+            },
+          })
+      );
+    }
   }, [fromDate, tillDate, setQuery]);
 
   useEffect(() => {
@@ -296,24 +301,19 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
           controlsLayout="row"
           dateFormat="dd/MM/yyyy"
           onChange={(dateRange): void => {
-            if (
-              typeof dateRange.from !== 'undefined' &&
-              typeof dateRange.to !== 'undefined'
-            ) {
-              const from = dateRange.from;
-              const to = dateRange.to;
-              const diff = moment(to).diff(moment(from), 'days');
-              if (diff > CONFIG.JOB_MANAGER.MAX_DATE_RANGE_DAYS) {
-                setDateRangeError({
-                  code: 'warning.exceeded-date-range',
-                  message: CONFIG.JOB_MANAGER.MAX_DATE_RANGE_DAYS,
-                  level: 'warning'
-                });
-              } else {
-                setDateRangeError(undefined);
-                setFromDate(from);
-                setTillDate(to);
-              }
+            const from = dateRange.from;
+            const to = dateRange.to;
+            const diff = moment(to).diff(moment(from), 'days');
+            if (diff > CONFIG.JOB_MANAGER.MAX_DATE_RANGE_DAYS) {
+              setDateRangeError({
+                code: 'warning.exceeded-date-range',
+                message: CONFIG.JOB_MANAGER.MAX_DATE_RANGE_DAYS,
+                level: 'warning'
+              });
+            } else {
+              setDateRangeError(undefined);
+              setFromDate(from);
+              setTillDate(to);
             }
           }}
           from={fromDate}
@@ -370,7 +370,12 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
         </DialogTitle>
         <DialogContent className="jobsBody">
           {renderDateTimeRangePicker()}
-          {!error && renderGridList()}
+          {
+            !error &&
+            typeof fromDate !== 'undefined' &&
+            typeof tillDate !== 'undefined' &&
+            renderGridList()
+          }
           {
             error &&
             <Box className="render-jobs-data-error">
