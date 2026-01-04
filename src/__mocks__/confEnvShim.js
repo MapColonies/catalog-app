@@ -48,6 +48,7 @@ if (!window._env_) {
       JOB_MANAGER: {
         pollingCycleInterval: 120000,
         filterDaysTimeSlot: 1,
+        maxDateRangeDays: 60,
       },
       DEFAULT_USER: {
         role: 'USER',

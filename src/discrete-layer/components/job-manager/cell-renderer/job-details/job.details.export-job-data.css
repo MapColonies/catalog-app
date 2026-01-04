@@ -4,7 +4,7 @@
 }
 
 #exportJobData.jobDataContainer .jobDescription {
-    margin: 0;
+  margin: 0;
 }
 
 #exportJobData.jobDataContainer .exportJobLinkContainer {
@@ -12,21 +12,21 @@
   gap: 12px;
 }
 
-#exportJobData.jobDataContainer .exportJobLinkContainer > a:hover {
-    filter: brightness(150%);
+#exportJobData.jobDataContainer .exportJobLinkContainer>a:hover {
+  filter: brightness(150%);
 }
 
 #exportJobData.jobDataContainer .jobDescriptionContainer .expired {
-    color: var(--mdc-theme-gc-error-high);
+  color: var(--mdc-theme-gc-error-high);
 }
 
 #exportJobData.jobDataContainer .jobDescriptionContainer .valid {
-    color: var(--mdc-theme-gc-priority-normal);
+  color: var(--mdc-theme-gc-priority-normal);
 }
 
 #exportJobData .linkContainer {
   display: flex;
-  align-items: end;
+  align-items: flex-end;
 }
 
 #exportJobData .jobDataLink {

@@ -35,6 +35,7 @@
   CONFIGURATION_BACKEND_LOCALE: {{ quote .Values.env.backendLocale }}
   CONFIGURATION_JOBMANAGER_POLLINGCYCLEINTERVAL: {{ quote .Values.env.jobManager.pollingCycleInterval }}
   CONFIGURATION_JOBMANAGER_FILTERDAYSTIMESLOT: {{ quote .Values.env.jobManager.filterDaysTimeSlot }}
+  CONFIGURATION_JOBMANAGER_MAXDATERANGEDAYS: {{ quote .Values.env.jobManager.maxDateRangeDays }}
   CONFIGURATION_DEFAULT_USER_ROLE: {{ quote .Values.env.defaultUser.role }}
   CONFIGURATION_RUNNING_MODE_TYPE: {{ quote .Values.env.runningMode.type }}
   CONFIGURATION_RUNNING_MODE_AUTOCOMPLETE: {{ quote .Values.env.runningMode.autoComplete }}

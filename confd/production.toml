@@ -37,6 +37,7 @@ keys = [
   "/configuration/logger/log2console",
   "/configuration/jobmanager/pollingcycleinterval",
   "/configuration/jobmanager/filterdaystimeslot",
+  "/configuration/jobmanager/maxdaterangedays",
   "/configuration/default/user/role",
   "/configuration/basemaps",
   "/configuration/default/terrain/provider/url",
