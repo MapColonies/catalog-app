@@ -54,16 +54,18 @@ export const JobInfo: React.FC<JobInfoProps> = ({ job }) => {
             job.taskId ? (
               job.validationReport?.errorsSummary?.errorsCount ? (
                 <Box className="reportList bold">
-                  {JobErrorsSummary(theme, job.validationReport.errorsSummary, "countWrapper")}
+                  {JobErrorsSummary(theme, job.validationReport.errorsSummary, "countWrapper", job.taskStatus === Status.Failed ? theme.custom?.GC_ERROR_HIGH : '')}
                 </Box>
               ) : (
-                <Box className="reportError error">
+                <Box className="reportError">
                   {
                     job.taskReason
-                    ? <Typography tag="span">
+                    ? <Typography className="error" tag="span">
                         <AutoDirectionBox>{job.taskReason}</AutoDirectionBox>
                       </Typography>
-                    : <FormattedMessage id="ingestion.error.not-found" values={{ value: 'job.validationReport.errorsSummary.errorsCount' }} />
+                    : <Box className="reportInProgress">
+                        <FormattedMessage id="ingestion.job.report-in-progress" />
+                      </Box>
                   }
                 </Box>
               )

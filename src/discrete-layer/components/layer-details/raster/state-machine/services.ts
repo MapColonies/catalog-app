@@ -3,7 +3,7 @@ import { fromPromise } from 'xstate';
 import CONFIG from '../../../../../common/config';
 import { relativeDateFormatter } from '../../../../../common/helpers/formatters';
 import { Mode } from '../../../../../common/models/mode.enum';
-import { RecordType, Status } from '../../../../models';
+import { ProductType, RecordType, Status } from '../../../../models';
 import { LayerRasterRecordInput } from '../../../../models/RootStore.base';
 import { FeatureType } from '../pp-map.utils';
 import {
@@ -15,7 +15,6 @@ import {
   hasError,
   isModified
 } from './helpers';
-import { MOCK_JOB_UPDATE } from './MOCK';
 import { queryExecutor } from './query-executor';
 import {
   fetchProduct,
@@ -42,16 +41,19 @@ import {
 export const SERVICES = {
   [WORKFLOW.ROOT]: {
     fetchActiveJobService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
-      // const { updatedLayer } = input.context || {};
+      const { updatedLayer } = input.context;
 
-      // const result = await queryExecutor(async () => {
-      //   return await input.context.store.queryGetActiveJob({
-      //     productId: updatedLayer?.productId,
-      //     productType: updatedLayer?.productType
-      //   });
-      // });
+      const result = await queryExecutor(async () => {
+        return await input.context.store.queryActiveJob({
+          activeJobParams: {
+            resourceId: updatedLayer?.productId as string,
+            productType: updatedLayer?.productType as ProductType,
+            domain: 'RASTER'
+          }
+        });
+      });
 
-      const jobId = MOCK_JOB_UPDATE.id; // TODO: Mock should be removed
+      const jobId = result.activeJob?.id;
 
       return {
         jobId
@@ -134,8 +136,8 @@ export const SERVICES = {
       if (files) {
         if (files.data) {
           files.data.details = await getDetails(files.data.path, input.context);
-          files.data.exists = !!files.data.details;
-          if (files.data.exists === false) {
+          files.data.isExists = !!files.data.details;
+          if (files.data.isExists === false) {
             errors = [ ...errors, buildError('ingestion.error.missing', 'GPKG') ];
           } else {
             const gpkgValidation = await validateGPKG(files.data.path, input.context);
@@ -147,8 +149,8 @@ export const SERVICES = {
         }
         if (files.product) {
           files.product.details = await getDetails(files.product.path, input.context);
-          files.product.exists = !!files.product.details;
-          if (files.product.exists === false) {
+          files.product.isExists = !!files.product.details;
+          if (files.product.isExists === false) {
             errors = [ ...errors, buildError('ingestion.error.missing', PRODUCT_FILENAME) ];
           } else {
             const productFile = await fetchProduct(files.product, input.context);
@@ -157,8 +159,8 @@ export const SERVICES = {
         }
         if (files.shapeMetadata) {
           files.shapeMetadata.details = await getDetails(files.shapeMetadata.path, input.context);
-          files.shapeMetadata.exists = !!files.shapeMetadata.details;
-          if (files.shapeMetadata.exists === false) {
+          files.shapeMetadata.isExists = !!files.shapeMetadata.details;
+          if (files.shapeMetadata.isExists === false) {
             errors = [ ...errors, buildError('ingestion.error.missing', SHAPEMETADATA_FILENAME) ];
           }
         }
@@ -185,7 +187,13 @@ export const SERVICES = {
     selectFilesService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
       const data = await selectData(input.context);
       const dataPath = input.context.files?.data?.path as string;
-      const result = await getDirectory(getPath(path.dirname(dataPath), path.join(SHAPES_RELATIVE_TO_DATA_DIR, SHAPES_DIR)), input.context);
+      const result = await getDirectory(
+        getPath(
+          path.dirname(dataPath),
+          path.join(SHAPES_RELATIVE_TO_DATA_DIR, SHAPES_DIR)
+        ),
+        input.context
+      );
       const product = getFile(result ?? [], dataPath, PRODUCT_FILENAME, PRODUCT_LABEL, relativeDateFormatter);
       const shapeMetadata = getFile(result ?? [], dataPath, SHAPEMETADATA_FILENAME, SHAPEMETADATA_LABEL, relativeDateFormatter);
       return {
@@ -199,14 +207,14 @@ export const SERVICES = {
     }),
     fetchProductService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
       const { product } = input.context.files ?? {};
-      if (!product || !product.exists || !product.path) {
+      if (!product || !product.isExists || !product.path) {
         throw buildError('ingestion.error.missing', PRODUCT_FILENAME);
       }
       return fetchProduct(product, input.context);
     }),
     checkShapeMetadataService: fromPromise(async ({ input }: FromPromiseArgs<IContext>) => {
       const { shapeMetadata } = input.context.files || {};
-      if (!shapeMetadata || !shapeMetadata.exists || !shapeMetadata.path) {
+      if (!shapeMetadata || !shapeMetadata.isExists || !shapeMetadata.path) {
         throw buildError('ingestion.error.missing', SHAPEMETADATA_FILENAME);
       }
       return Promise.resolve({ success: true });

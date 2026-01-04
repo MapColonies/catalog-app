@@ -30,7 +30,9 @@ export interface IStateError extends IError {
 export interface IFileBase {
   label: string;
   path: string;
-  exists: boolean;
+  isExists: boolean;
+  hasError?: boolean;
+  isDisabled?: boolean;
   details?: FileData;
   dateFormatterPredicate?: (modDate: Date | string) => string;
 }
@@ -99,7 +101,7 @@ export type Events =
   | { type: "SET_FILES", files: IFiles, addPolicy: AddPolicy }
   | { type: "FILES_SELECTED" }
   | { type: "FILES_ERROR", error: IStateError }
-  | { type: "CLEAN_ERRORS" }
+  | { type: "CLEAN_FILES_ERRORS" }
   | { type: "NOOP" }
   | { type: "SUBMIT", data: LayerRasterRecordInput, resolutionDegree: number }
   | { type: "TICK" }
@@ -107,6 +109,7 @@ export type Events =
   | { type: "STOP_POLLING"}
   | { type: "RESTORE", job: IJob }
   | { type: "RETRY" }
+  | { type: "CLEAN_ERRORS" }
   | { type: "DONE" };
 
 // type FlowActionArgs = ActionArgs<Context, Events, Events>;

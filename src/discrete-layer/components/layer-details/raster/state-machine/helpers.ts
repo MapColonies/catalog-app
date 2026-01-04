@@ -2,6 +2,7 @@ import { Feature, GeoJsonProperties, Geometry } from 'geojson';
 import moment from 'moment';
 import path from 'path';
 import { assign, SnapshotFrom } from 'xstate';
+import { get } from 'lodash';
 import { FileData } from '@map-colonies/react-components';
 import CONFIG from '../../../../../common/config';
 import { getFirstPoint } from '../../../../../common/utils/geo.tools';
@@ -24,11 +25,19 @@ import {
   WORKFLOW
 } from './types';
 
+export const normalizeError = (err: any) => {
+  let res = err;
+  if (err != null && typeof err === 'object' && Object.keys(err).length === 0) {
+    res = buildError('ingestion.error.uncatched-js', get(err, 'message'));
+  }
+  return { ...res };
+};
+
 export const addError = assign((_: { context: IContext; event: any }) => { 
   return {
     errors: _.event.error.addPolicy === "merge" ?
-      [ ..._.context.errors, _.event.error] :
-      [_.event.error]
+      [ ..._.context.errors, normalizeError(_.event.error)] :
+      [normalizeError(_.event.error)]
   };
 });
 
@@ -65,7 +74,7 @@ export const getFeatureAndMarker = (
 };
 
 export const getPath = (baseDir: string, filePath: string): string => {
-  const resolvedPath = path.resolve(baseDir, filePath);
+  const resolvedPath = path.resolve(baseDir, filePath.startsWith(BASE_PATH) ? filePath.substring(1) : filePath);
   return resolvedPath.startsWith(BASE_PATH) ? resolvedPath.substring(1) : resolvedPath;
 };
 
@@ -81,7 +90,7 @@ export const getFile = (files: FileData[], gpkgPath: string, fileName: string, l
     return {
       label,
       path: resolvedPath,
-      exists: false,
+      isExists: false,
       dateFormatterPredicate
     };
   }
@@ -89,7 +98,7 @@ export const getFile = (files: FileData[], gpkgPath: string, fileName: string, l
     label,
     path: resolvedPath,
     details: { ...file },
-    exists: true,
+    isExists: true,
     dateFormatterPredicate
   }))[FIRST];
 };
@@ -127,11 +136,15 @@ export const hasTagDeep = (state: SnapshotFrom<typeof workflowMachine>, tag = ST
   return false;
 };
 
+const isFileExistsAndValid = (file: IFiles[keyof IFiles]) => {
+  return !!(file?.path && file.isExists && !file.hasError);
+};
+
 export const isFilesSelected = (context: IContext): boolean => {
   const files = context.files || {};
-  return !!(files.data && files.data.path && files.data.exists === true &&
-    files.product && files.product.path && files.product.exists === true &&
-    files.shapeMetadata && files.shapeMetadata.path && files.shapeMetadata.exists === true);
+  return isFileExistsAndValid(files.data) &&
+    isFileExistsAndValid(files.product) &&
+    isFileExistsAndValid(files.shapeMetadata);
 };
 
 export const validateShapeFiles = (files: IFiles): IStateError[] => {
