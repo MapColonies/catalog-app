@@ -17,7 +17,7 @@ import { sessionStore } from '../../../common/helpers/storage';
 import { Mode } from '../../../common/models/mode.enum';
 import { RasterIngestionJobType } from '../../../common/models/raster-job';
 import { ValidationTypeName } from '../../../common/models/validation.enum';
-import { UiDescriptorsType } from '../../../common/ui-descriptors/type';
+import { UiDescriptorsType, UiDescriptorsTypeName } from '../../../common/ui-descriptors/type';
 import {
   polygonVertexDensityFactor,
   area,
@@ -107,8 +107,8 @@ export const getEntityDescriptors = (
     case 'PolygonPartRecord':
       entityDesc = entityDescriptors.find(descriptor => descriptor.type === 'PolygonPartRecord');
       break;
-    case 'UiDescriptors':
-      entityDesc = entityDescriptors.find(descriptor => descriptor.type === 'UiDescriptors');
+    case UiDescriptorsTypeName:
+      entityDesc = entityDescriptors.find(descriptor => descriptor.type === UiDescriptorsTypeName);
       break;
     default:
       entityDesc = entityDescriptors.find(descriptor => descriptor.type === 'PycswLayerCatalogRecord');
