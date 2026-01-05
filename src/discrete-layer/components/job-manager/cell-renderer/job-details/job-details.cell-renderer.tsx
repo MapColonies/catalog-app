@@ -14,8 +14,8 @@ import { relativeDateFormatter, dateFormatter, } from '../../../../../common/hel
 import { JobModelType, ProductType, Status, TasksGroupModelType, useStore } from '../../../../models';
 import { useQuery } from '../../../../models/RootStore';
 import { JobDetailsHeader } from './job-details.header';
-import JobDetailsExportJobData from './job.details.export-job-data';
-import JobDetailsRasterJobData from './job-details.raster-job-data';
+import { JobDetailsExportJobData } from './job.details.export-job-data';
+import { JobDetailsRasterJobData } from './job-details.raster-job-data';
 
 import './job-details.cell-renderer.css';
 
@@ -107,7 +107,7 @@ const StatusPresentor: React.FC<StatusPresentorParams> = ({ task, reactKey = '' 
                   fontSize: `${ERROR_ICON_SIZE}px`,
                   color: ERROR_ICON_COLOR,
                 }}
-                className="mc-icon-Warning"
+                className="mc-icon-Warning taskStatusIcon"
                 label="FAIL REASON ICON"
               />
               {percentageComponent() ?? <></>}
