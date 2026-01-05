@@ -1,17 +1,31 @@
 #rasterJobData.jobDataContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   height: 40px;
   font-size: 1rem;
   font-weight: bold;
 }
 
+#rasterJobData .content {
+  flex-grow: 1;
+  text-align: center;
+}
+
 #rasterJobData .errorsContainerPosition {
-  position: absolute;
-  inset-inline-end: 100px;
+  display: flex;
+  align-items: center;
+  min-width: 168px;
 }
 
 #rasterJobData .errorsSummaryContainer {
   display: flex;
   align-items: center;
+}
+
+#rasterJobData .statusIcon {
+  cursor: default;
+  padding-top: 8px;
 }
 
 /* This class is used inside a tooltip that is rendered directly under the <body>,

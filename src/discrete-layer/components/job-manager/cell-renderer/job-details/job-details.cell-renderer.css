@@ -1,4 +1,4 @@
-.tasksTable{
+.tasksTable {
   margin: 0 auto 20px auto;
   width: 100%;
   border: solid 1px var(--mdc-theme-text-secondary-on-dark);
@@ -16,9 +16,9 @@
   background:var(--ag-selected-details-row-background);
   padding-left: 20px;
 }
+
 body[dir="rtl"] .jobDetailsContainer {
   padding-left: unset;
-  
 }
 
 .gridContainer {
@@ -33,9 +33,8 @@ body[dir="rtl"] .jobDetailsContainer {
 
 .jobDetailsContainer .loadingContainer{
   grid-column: 1 / -1;
-  height:10em;
+  height: 10em;
   justify-self: center;
-  
 }
 
 .column-label {
@@ -43,11 +42,11 @@ body[dir="rtl"] .jobDetailsContainer {
   text-align: left;
   position: sticky;
   font-size: var(--ag-font-size);
-  top:0;
-  background:var(--ag-selected-details-row-background);
-  width:100%;
-  height:100%;
-  padding:12px 0;
+  top: 0;
+  background: var(--ag-selected-details-row-background);
+  width: 100%;
+  height: 100%;
+  padding: 12px 0;
   border-bottom: solid 1px var(--mdc-theme-text-secondary-on-dark);
 }
 
@@ -55,13 +54,18 @@ body[dir='rtl'] .column-label {
   text-align: right;
 }
 
-.gridCell{
-  display:flex;
+.gridCell {
+  display: flex;
   align-items: center;
   justify-content: flex-start;
-  height:24px;
+  height: 24px;
 }
 
 .percentageContainer {
   padding: 8px;
+}
+
+.taskStatusIcon {
+  vertical-align: sub;
+  cursor: default !important;
 }
