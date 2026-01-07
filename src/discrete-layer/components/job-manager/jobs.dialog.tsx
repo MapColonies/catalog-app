@@ -45,8 +45,12 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
   const [ gridRowData, setGridRowData ] = useState<JobModelType[] | undefined>(undefined);
   const [ gridApi, setGridApi ] = useState<GridApi>();
   const [ pollingCycle, setPollingCycle ] = useState(START_CYCLE_ITERATION);
-  const [ fromDate, setFromDate ] = useState<Date | undefined>(moment().subtract(CONFIG.JOB_MANAGER.FILTER_DAYS_TIME_SLOT, 'days').toDate());
-  const [ tillDate, setTillDate ] = useState<Date | undefined>(new Date());
+  const [ fromDate, setFromDate ] = useState<Date | undefined>(
+    moment().subtract(CONFIG.JOB_MANAGER.FILTER_DAYS_TIME_SLOT, 'days').startOf('day').toDate()
+  );
+  const [ tillDate, setTillDate ] = useState<Date | undefined>(
+    moment().endOf('day').toDate()
+  );
   const [ focusError, setFocusError ] = useState<IError | undefined>(undefined);
   const [ dateRangeError, setDateRangeError ] = useState<IError | undefined>(undefined);
   const [ errorMessages, setErrorMessages ] = useState<IError[]>([]);
