@@ -10,11 +10,16 @@ const WebSocketNotifications: React.FC = () => {
     const initWebSocket = () => {
       const wsClient = createClient({
         url: `${CONFIG.WS_PROTOCOL}${CONFIG.SERVICE_NAME}/graphql-ws`,
+        keepAlive: 300000,
         connectionParams: {
         },
         on: {
           connected: () => {
             console.log("WebSocket connected");
+            // if (unsubscribe) {
+            //   unsubscribe();
+            // }
+            // subscribeToTask();
           },
           error: (error) => {
             console.error("WebSocket error:", error);
@@ -51,6 +56,7 @@ const WebSocketNotifications: React.FC = () => {
         },
         {
           next: (res: { data: { taskUpdateDetails: CallBack<unknown>}, errors: Record<string, unknown>[]}) => {
+            console.log('WebSocket notification received ', `job:${res.data.taskUpdateDetails.jobId} task:${res.data.taskUpdateDetails.taskId}`);
             const newCount = parseInt(localStore.get('taskNotificationCount') || '0', 10) + 1;
             localStore.set('taskNotificationCount', newCount.toString());
             localStore.setObject('lastTask', res.data.taskUpdateDetails);
@@ -65,7 +71,7 @@ const WebSocketNotifications: React.FC = () => {
       );
     };
     
-    subscribeToTask();
+    const unsubscribe = subscribeToTask();
 
     return () => {
       wsClient.dispose();
