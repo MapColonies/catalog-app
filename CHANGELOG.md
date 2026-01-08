@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.2.3](https://github.com/MapColonies/catalog-app/compare/v4.2.2...v4.2.3) (2026-01-08)
+
+
+### Bug Fixes
+
+* job manager polling counter ([#831](https://github.com/MapColonies/catalog-app/issues/831)) ([eaebf7d](https://github.com/MapColonies/catalog-app/commit/eaebf7d23228a49d20884769292afdf0bc50e562))
+* lint ([#829](https://github.com/MapColonies/catalog-app/issues/829)) ([bf72488](https://github.com/MapColonies/catalog-app/commit/bf724884ad2b47acf43c41f5555fd6199187bafd))
+
 ## [4.2.2](https://github.com/MapColonies/catalog-app/compare/v4.2.1...v4.2.2) (2026-01-07)
 
 
