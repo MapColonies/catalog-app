@@ -16,10 +16,6 @@ const WebSocketNotifications: React.FC = () => {
         on: {
           connected: () => {
             console.log("WebSocket connected");
-            // if (unsubscribe) {
-            //   unsubscribe();
-            // }
-            // subscribeToTask();
           },
           error: (error) => {
             console.error("WebSocket error:", error);
@@ -56,13 +52,13 @@ const WebSocketNotifications: React.FC = () => {
         },
         {
           next: (res: { data: { taskUpdateDetails: CallBack<unknown>}, errors: Record<string, unknown>[]}) => {
-            console.log('WebSocket notification received ', `job:${res.data.taskUpdateDetails.jobId} task:${res.data.taskUpdateDetails.taskId}`);
+            console.log('WebSocket notification received for', `job:${res.data.taskUpdateDetails.jobId} task:${res.data.taskUpdateDetails.taskId}`);
             const newCount = parseInt(localStore.get('taskNotificationCount') || '0', 10) + 1;
             localStore.set('taskNotificationCount', newCount.toString());
             localStore.setObject('lastTask', res.data.taskUpdateDetails);
           },
           error: (err) => {
-            console.error('Subscription error:', err);
+            console.error('WebSocket subscription error:', err);
           },
           complete: () => {
             console.log('WebSocket subscription completed');
@@ -71,7 +67,7 @@ const WebSocketNotifications: React.FC = () => {
       );
     };
     
-    const unsubscribe = subscribeToTask();
+    subscribeToTask();
 
     return () => {
       wsClient.dispose();
