@@ -112,6 +112,7 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
       typeof fromDate !== 'undefined' &&
       typeof tillDate !== 'undefined'
     ) {
+      (actions as IActions).start(POLLING_CYCLE_INTERVAL);
       setQuery(
         (store) =>
           store.queryJobs({
