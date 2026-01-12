@@ -305,7 +305,8 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
         <DateTimeRangePicker
           controlsLayout="row"
           dateFormat="dd/MM/yyyy"
-          onChange={(dateRange): void => {
+          showTime={false}
+          onChange={(dateRange: { from?: Date; to?: Date; }): void => {
             const from = dateRange.from;
             const to = dateRange.to;
             const diff = moment(to).diff(moment(from), 'days');
