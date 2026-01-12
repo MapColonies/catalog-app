@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.2.4](https://github.com/MapColonies/catalog-app/compare/v4.2.3...v4.2.4) (2026-01-12)
+
+
+### Bug Fixes
+
+* hide time in job manager filter (MAPCO-9507) ([#833](https://github.com/MapColonies/catalog-app/issues/833)) ([5478984](https://github.com/MapColonies/catalog-app/commit/54789844b3ff7827d4163b795ae16f892e1037a1))
+
 ## [4.2.3](https://github.com/MapColonies/catalog-app/compare/v4.2.2...v4.2.3) (2026-01-08)
 
 
