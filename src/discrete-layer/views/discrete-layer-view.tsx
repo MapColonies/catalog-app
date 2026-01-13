@@ -315,6 +315,13 @@ const DiscreteLayerView: React.FC = observer(() => {
     );
   }, []);
 
+  const LayersResultsStyle = useMemo(() => {
+    return {
+      height: 'calc(100% - 50px)',
+      width: 'calc(100% - 8px)'
+    }
+  }, []);
+
   const handleTabViewChange = (targetViewIdx: TabViews): void => {
     if (activeTabView !== targetViewIdx) {
       store.discreteLayersStore.setTabviewData(activeTabView);
@@ -1170,10 +1177,7 @@ const DiscreteLayerView: React.FC = observer(() => {
                 <LayersResults
                   searchLoading={searchLoading}
                   searchError={searchResultsError} 
-                  style={{
-                    height: 'calc(100% - 50px)',
-                    width: 'calc(100% - 8px)'
-                  }}
+                  style={LayersResultsStyle}
                 />
               </Box>
             }
