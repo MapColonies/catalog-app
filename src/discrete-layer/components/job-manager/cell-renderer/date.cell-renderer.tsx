@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ICellRendererParams } from 'ag-grid-community';
 import { Tooltip } from '@map-colonies/react-core';
 import { Box, DateTimePicker, SupportedLocales } from '@map-colonies/react-components';
@@ -33,13 +33,19 @@ const DATE_GRANULARITY = DateGranularityType.DATE_AND_TIME;
 
 export const DateCellRenderer: React.FC<IDateCellRendererParams> = (props) => {
   const {field, shouldShowPredicate, comingSoonDaysIndication, onChange, datePickerProps} = props;
-  const currentDate = typeof get(props.data, field) === 'undefined' ? undefined : moment(get(props.data, field)); 
+  const isChangeable = typeof onChange !== 'undefined';
+  const currentDate = useMemo(() => {
+    return typeof get(props.data, field) === 'undefined' ? undefined : moment(get(props.data, field))
+  }, [props.data]);
   const [date, setDate] = useState<Moment | undefined>(currentDate);
   const prevDate = useRef<Moment | undefined>(currentDate);
-  const isChangeable = typeof onChange !== 'undefined';
 
   const shouldShowTime = useMemo(() => DATE_GRANULARITY as DateGranularityType === DateGranularityType.DATE_AND_TIME, []);
   const dateFnsFormat = useMemo(() => shouldShowTime ? 'dd/LL/yyyy HH:mm' : 'dd/LL/yyyy', [shouldShowTime]);
+
+  useEffect(() => {
+    setDate(currentDate);
+  }, [currentDate]);
 
   const isComingSoonClassName = (): string => {
     if (typeof date === 'undefined') return '';
