@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.2.6](https://github.com/MapColonies/catalog-app/compare/v4.2.5...v4.2.6) (2026-01-14)
+
+
+### Bug Fixes
+
+* handle update of job date ([#840](https://github.com/MapColonies/catalog-app/issues/840)) ([092346f](https://github.com/MapColonies/catalog-app/commit/092346f413a397a1b2eff2fcdbee68d6c4cc4fac))
+* job manager error handling ([#839](https://github.com/MapColonies/catalog-app/issues/839)) ([c6f0256](https://github.com/MapColonies/catalog-app/commit/c6f0256d4cc713e56f25b36c67ddb2f317246c18))
+* memorization layers results style ([#837](https://github.com/MapColonies/catalog-app/issues/837)) ([f05aad5](https://github.com/MapColonies/catalog-app/commit/f05aad565f887d05952218bac783dabd7c544aac))
+
 ## [4.2.5](https://github.com/MapColonies/catalog-app/compare/v4.2.4...v4.2.5) (2026-01-12)
 
 
