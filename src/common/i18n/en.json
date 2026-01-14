@@ -832,6 +832,7 @@
 
   "warning.row-not-found": "The job {value} does not meet the search criteria",
   "warning.exceeded-date-range": "Search criteria exceeds the maximum date range of {value} days",
+  "error.server-error": "Error received: {value}",
 
   "export-layer.exportSuccessContainer.title": "Export request triggered",
   "export-layer.exportSuccessContainer.approve": "Copy and exit",
