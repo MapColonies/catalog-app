@@ -832,6 +832,7 @@
 
   "warning.row-not-found": "המשימה של {value} לא תואמת לקריטריוני החיפוש",
   "warning.exceeded-date-range": "קריטריוני החיפוש חורגים מהמגבלה המרבית של {value} ימים",
+  "error.server-error": "התקבלה שגיאה: {value}",
 
   "export-layer.exportSuccessContainer.title": "בקשת הייצוא נוצרה בהצלחה",
   "export-layer.exportSuccessContainer.approve": "העתקה וסיום",
