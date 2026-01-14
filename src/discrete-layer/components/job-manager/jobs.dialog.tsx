@@ -154,6 +154,7 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
 
   useEffect(() => {
     const pollingInterval = setInterval(() => {
+      setErrorMessages(prev => upsertOrRemoveError(prev, undefined, 'error.server-error'));
       setPollingCycle(prevCycle => prevCycle + 1);
       (actions as IActions).start(POLLING_CYCLE_INTERVAL);
       setQuery((store) =>
@@ -327,6 +328,7 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
           dateFormat="dd/MM/yyyy"
           showTime={false}
           onChange={(dateRange: { from?: Date; to?: Date; }): void => {
+            setErrorMessages(prev => upsertOrRemoveError(prev, undefined, 'error.server-error'));
             const from = dateRange.from;
             const to = dateRange.to;
             const diff = moment(to).diff(moment(from), 'days');
@@ -371,6 +373,7 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
           <Box
             className="refreshContainer"
             onClick={(): void => {
+              setErrorMessages(prev => upsertOrRemoveError(prev, undefined, 'error.server-error'));
               (actions as IActions).start(POLLING_CYCLE_INTERVAL);
               setQuery((store) =>
                 store.queryJobs({
