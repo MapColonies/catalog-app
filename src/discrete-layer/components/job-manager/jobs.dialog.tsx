@@ -54,7 +54,6 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
   const [ focusError, setFocusError ] = useState<IError | undefined>(undefined);
   const [ dateRangeError, setDateRangeError ] = useState<IError | undefined>(undefined);
   const [ errorMessages, setErrorMessages ] = useState<IError[]>([]);
-  // @ts-ignore
   const [ timeLeft, actions ] = useCountDown(POLLING_CYCLE_INTERVAL, COUNTDOWN_REFRESH_RATE);
 
   // start the timer during the first render
@@ -154,15 +153,6 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
   }, [updateTaskPayload]);
 
   useEffect(() => {
-    if (!isEmpty(mutationQuery.error)) {
-      gridApi?.refreshCells({
-        suppressFlash: true,
-        force: true
-      });
-    }
-  }, [mutationQuery.error]);
-
-  useEffect(() => {
     const pollingInterval = setInterval(() => {
       setPollingCycle(prevCycle => prevCycle + 1);
       (actions as IActions).start(POLLING_CYCLE_INTERVAL);
@@ -187,33 +177,63 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
     }
   }, [jobData, loadingJobData]);
 
+  const upsertOrRemoveError = (
+    prevErrors: IError[],
+    newError?: IError,
+    newErrorCode?: string
+  ): IError[] => {
+    if (newError) {
+      const filtered = prevErrors.filter(e => e.code !== newError.code);
+      return [...filtered, newError];
+    } else {
+      return prevErrors.filter(e => e.code !== newErrorCode);
+    }
+  };
+
   useEffect(() => {
-    const newErrorMessages: IError[] = [];
+    let newError: IError | undefined = undefined;
+    if (!isEmpty(mutationQuery.error)) {
+      gridApi?.refreshCells({
+        suppressFlash: true,
+        force: true
+      });
+      const NONE = 0;
+      const serverError = mutationQuery.error.response.errors[0];
+      const status = serverError.serverResponse?.status ?? NONE;
+      let message = serverError.serverResponse?.data.message ?
+        serverError.serverResponse.data.message :
+        serverError.serverResponse?.statusText ?
+          serverError.serverResponse?.statusText :
+          serverError.message.substring(+serverError.message.indexOf('; ') + 1);
+      newError = {
+        code: 'error.server-error',
+        message: `${(status > NONE) ? status + ' ' : ''}${message}`,
+        level: "error"
+      };
+    }
+    setErrorMessages(prev =>
+      upsertOrRemoveError(prev, newError, 'error.server-error')
+    );
+  }, [mutationQuery.error]);
+
+  useEffect(() => {
+    let newError: IError | undefined = undefined;
     if (focusOnJob && focusError?.code) {
-      const newError: IError = {
+      newError = {
         code: focusError.code,
         message: `${focusOnJob.resourceId} <bdi>(${dateFormatter(focusOnJob.updated, true)})</bdi>`,
         level: focusError.level
       };
-      const updatedErrors = errorMessages.filter(error => error.code !== newError.code);
-      newErrorMessages.push(newError);
-      setErrorMessages([...updatedErrors, ...newErrorMessages]);
-    } else if (!focusError) {
-      setErrorMessages(prevErrors => 
-        prevErrors.filter(error => error.code !== 'warning.row-not-found')
-      );
     }
+    setErrorMessages(prev =>
+      upsertOrRemoveError(prev, newError, 'warning.row-not-found')
+    );
   }, [focusError]);
 
   useEffect(() => {
-    setErrorMessages(prevErrors => {
-      if (dateRangeError) {
-        const updatedErrors = prevErrors.filter(err => err.code !== dateRangeError.code);
-        return [...updatedErrors, dateRangeError];
-      } else {
-        return prevErrors.filter(err => err.code !== 'warning.exceeded-date-range');
-      }
-    });
+    setErrorMessages(prev =>
+      upsertOrRemoveError(prev, dateRangeError, 'warning.exceeded-date-range')
+    );
   }, [dateRangeError]);
 
   const closeDialog = useCallback(() => {
@@ -291,8 +311,8 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
           areJobsLoading={loading}
           focusOnJob={focusOnJob}
           setFocusOnJob={setFocusOnJob}
-          handleFocusError={(error) => {
-            setFocusError(error);
+          handleFocusError={(err) => {
+            setFocusError(err);
           }}
         />
       </Box>
@@ -384,7 +404,7 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
           }
           {
             error &&
-            <Box className="render-jobs-data-error">
+            <Box className="jobsDataError">
               <GraphQLError error={error} />
             </Box>
           }
@@ -401,12 +421,6 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
               </Button>
             </Box>
             <Box className="messages">
-              {
-                mutationQuery.error !== undefined &&
-                <Box>
-                  <GraphQLError error={mutationQuery.error} />
-                </Box>
-              }
               {
                 errorMessages.length > 0 &&
                 <LogicError errors={errorMessages} />

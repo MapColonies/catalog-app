@@ -1,12 +1,12 @@
 #jobsDialog .mdc-dialog__surface {
   max-width: unset;
-  right:12px;
-  top:20px;
+  right: 12px;
+  top: 20px;
 }
 
 body[dir='rtl'] #jobsDialog .mdc-dialog__surface {
   right: unset;
-  left:12px;
+  left: 12px;
 }
 
 #jobsDialog .mdc-dialog {
@@ -136,7 +136,6 @@ body[dir='rtl'] .jobsBody .ag-pinned-right-cols-container {
   border-radius: 50% !important;
 }
 
-
 /* Show action buttons only for row that is being hovered. For rows which are not being hovered, hide them by setting their width and padding to 0.*/
 #jobsDialog .ag-pinned-right-cols-container .ag-row:not(.ag-row-hover),
 #jobsDialog .ag-pinned-right-cols-container .ag-row:not(.ag-row-hover) .ag-cell {
@@ -180,8 +179,8 @@ body[dir='rtl'] .jobsBody .ag-pinned-right-cols-container {
 }
 
 .jobsBody .actionsContainer {
-  right:0 !important;
-  position:relative;
+  right: 0 !important;
+  position: relative;
   overflow: visible !important;
   width: 15px !important;
   height: 5px !important;
@@ -191,7 +190,7 @@ body[dir='rtl'] .jobsBody .ag-pinned-right-cols-container {
   z-index: 2 !important;
 }
 
-.render-jobs-data-error {
+#jobsDialog .jobsDataError {
   position: absolute;
   top: 410px;
   left: 536px;
