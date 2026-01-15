@@ -1336,7 +1336,9 @@ const DiscreteLayerView: React.FC = observer(() => {
           />
         }
         {
-          permissions.isDeleteAllowed && store.discreteLayersStore.selectedLayer &&
+          permissions.isDeleteAllowed &&
+          store.discreteLayersStore.selectedLayer &&
+          isEntityDeleteDialogOpen &&
           <EntityDeleteDialog
             isOpen={isEntityDeleteDialogOpen}
             onSetOpen={(open) => {
