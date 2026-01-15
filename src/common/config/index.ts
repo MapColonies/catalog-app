@@ -5,6 +5,7 @@ import { LinkType } from '../models/link-type.enum';
 import { IRasterIngestionFilesStructureConfig } from '../models/raster-ingestion-files-structure';
 
 /*eslint-disable */
+const MODE = (window as any)._env_.MODE as string;
 const LANGUAGE = (window as any)._env_.LANGUAGE as string;
 const BACKEND_LOCALE = (window as any)._env_.BACKEND_LOCALE as string;
 const WS_PROTOCOL = (window as any)._env_.WS_PROTOCOL;
@@ -110,6 +111,7 @@ const DATE_FORMAT = 'DD/MM/YYYY';
 const DATE_FNS_FORMAT = 'dd/MM/yyyy';
 
 const APP_CONFIG = {
+  MODE: MODE,
   WS_PROTOCOL: WS_PROTOCOL,
   SERVICE_PROTOCOL: SERVICE_PROTOCOL,
   SERVICE_NAME: SERVICE_NAME,

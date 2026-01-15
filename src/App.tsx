@@ -51,6 +51,7 @@ import EnumsMapContext, { IEnumsMapType } from './common/contexts/enumsMap.conte
 import LookupTablesContext, { ILookupTableData } from './common/contexts/lookupTables.context';
 import WebSocketNotifications from './discrete-layer/views/components/notifications/web-socket-notifications';
 import { PasswordAutofillDisabler } from './discrete-layer/views/components/password-autofill-disabler.component';
+import ExtraMetadataView from './discrete-layer/views/extra-metadata-view';
 
 const App: React.FC = () => {
   /*const prefersDarkMode = */useMediaQuery('(prefers-color-scheme: dark)');
@@ -104,7 +105,14 @@ const App: React.FC = () => {
             <LookupTablesContext.Provider value={{ lookupTablesData, setLookupTablesData }}>
               <EnumsMapContext.Provider value={{ enumsMap, setEnumsMap }}>
                 <StaticDataFetcher />
-                <DiscreteLayerView />
+                {
+                  CONFIG.MODE === 'app' &&
+                  <DiscreteLayerView />
+                }
+                {
+                  CONFIG.MODE === 'extra-metadata' &&
+                  <ExtraMetadataView />
+                }
               </EnumsMapContext.Provider>
             </LookupTablesContext.Provider>
             <SnackContainer />
