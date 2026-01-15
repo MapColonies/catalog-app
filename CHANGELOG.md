@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.2.7](https://github.com/MapColonies/catalog-app/compare/v4.2.6...v4.2.7) (2026-01-15)
+
+
+### Bug Fixes
+
+* delete preview map extreme zoom-in ([#842](https://github.com/MapColonies/catalog-app/issues/842)) ([f051788](https://github.com/MapColonies/catalog-app/commit/f0517883bed13a0b71d4400f5928dd9aad685dcc))
+
 ## [4.2.6](https://github.com/MapColonies/catalog-app/compare/v4.2.5...v4.2.6) (2026-01-14)
 
 
