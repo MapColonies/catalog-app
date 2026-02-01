@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.2.8](https://github.com/MapColonies/catalog-app/compare/v4.2.7...v4.2.8) (2026-02-01)
+
+
+### Bug Fixes
+
+* export ([#846](https://github.com/MapColonies/catalog-app/issues/846)) ([60c3942](https://github.com/MapColonies/catalog-app/commit/60c3942c40ba0450ccd91f53e8372270c46be005))
+* hyperlink for download with icon ([#844](https://github.com/MapColonies/catalog-app/issues/844)) ([603e650](https://github.com/MapColonies/catalog-app/commit/603e650fd7c5deff5203f46c749ecc08eee23bb4))
+
 ## [4.2.7](https://github.com/MapColonies/catalog-app/compare/v4.2.6...v4.2.7) (2026-01-15)
 
 
