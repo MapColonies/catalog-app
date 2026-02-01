@@ -28,6 +28,11 @@
   padding-top: 8px;
 }
 
+#rasterJobData .downloadIcon {
+  font-size: 20px;
+  padding: 0 20px 0 20px;
+  cursor: pointer;
+}
 /* This class is used inside a tooltip that is rendered directly under the <body>,
    so it cannot rely on a more specific parent selector */
 .reportItem {
