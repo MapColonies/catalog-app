@@ -5,7 +5,6 @@ import { useIntl } from 'react-intl';
 import { Box } from '@map-colonies/react-components';
 import { CircularProgress, IconButton, Tooltip, Typography, useTheme } from '@map-colonies/react-core';
 import { AutoDirectionBox } from '../../../../../common/components/auto-direction-box/auto-direction-box.component';
-import { Copy } from '../../../../../common/components/copy/copy';
 import { DETAILS_ROW_ID_SUFFIX } from '../../../../../common/components/grid';
 import { Hyperlink } from '../../../../../common/components/hyperlink/hyperlink';
 import { Domain } from '../../../../../common/models/domain';

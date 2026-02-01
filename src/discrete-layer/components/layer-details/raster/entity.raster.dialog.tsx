@@ -29,6 +29,7 @@ import {
   ProductType,
   RecordStatus,
   RecordType,
+  Status,
   useStore,
   ValidationConfigModelType,
   ValidationValueType
@@ -375,6 +376,7 @@ const EntityRasterDialogInner: React.FC<EntityRasterInnerProps> = observer((prop
           {
             state.context.selectionMode === 'restore' &&
             state.context.flowType === Mode.UPDATE &&
+            ![Status.Completed, Status.Aborted].includes(state.context.job?.details?.status as Status) &&
             <Box className='lockedIcon'>
               <Icon icon={{ icon: 'lock', size: 'xlarge' }} />
               <Typography tag="span">{intl.formatMessage({ id: 'general.title.locked' })}</Typography>
@@ -382,7 +384,7 @@ const EntityRasterDialogInner: React.FC<EntityRasterInnerProps> = observer((prop
           }
         </Box>
       );
-    }, [entityDescriptors,layerRecord, state.context.selectionMode, state.context.flowType]);
+    }, [entityDescriptors,layerRecord, state.context.selectionMode, state.context.flowType, state.context.job?.details?.status]);
 
     return (
       <div id="entityRasterDialog" ref={dialogContainerRef}>
