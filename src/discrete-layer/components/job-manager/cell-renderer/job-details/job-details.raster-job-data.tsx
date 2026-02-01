@@ -149,9 +149,22 @@ export const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = (
                   {JobErrorsSummary(theme, task?.parameters?.errorsSummary, "reportItem")}
                 </Box>
               }>
-                <Hyperlink className="error" url={task?.parameters?.report?.url ?? ''} label={`${errorsCount > MAX_ERRORS_SHOWN ? `+${MAX_ERRORS_SHOWN}` : errorsCount} ${errorsMessage}`} />
+                <Hyperlink 
+                  className="error"
+                  url={task?.parameters?.report?.url ?? ''}
+                  label={`${errorsCount > MAX_ERRORS_SHOWN ? `+${MAX_ERRORS_SHOWN}` : errorsCount} ${errorsMessage}`} 
+                >
+                </Hyperlink>
               </Tooltip>
-              <Copy value={task?.parameters?.report?.url ?? ''} iconStyle={{ fontSize: `20px` }} key={'errorsReportLink'} />
+              <Hyperlink 
+                  className="error"
+                  url={task?.parameters?.report?.url ?? ''}
+                  label={`${errorsCount > MAX_ERRORS_SHOWN ? `+${MAX_ERRORS_SHOWN}` : errorsCount} ${errorsMessage}`} 
+                >
+                  <IconButton
+                    className="mc-icon-Download downloadIcon error statusIcon"
+                  />
+                </Hyperlink>
             </Box>
           }
           {
