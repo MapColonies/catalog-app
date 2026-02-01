@@ -891,5 +891,6 @@ export const filterModeDescriptors = (mode: Mode, descriptors: EntityDescriptorM
 
 export const jobType2Mode: { [key: string]: Mode } = {
   [RasterIngestionJobType.NEW]: Mode.NEW,
-  [RasterIngestionJobType.UPDATE]: Mode.UPDATE
+  [RasterIngestionJobType.UPDATE]: Mode.UPDATE,
+  [RasterIngestionJobType.SWAP_UPDATE]: Mode.UPDATE,
 };
