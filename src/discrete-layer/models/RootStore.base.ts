@@ -429,6 +429,7 @@ export type JobUpdateData = {
 export type JobActionParams = {
   id: string
   domain: string
+  type: string
 }
 /* The TypeScript type that explicits the refs to other models in order to prevent a circular refs issue */
 type Refs = {
