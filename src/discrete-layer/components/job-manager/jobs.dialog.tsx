@@ -260,6 +260,7 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
             store.mutateJobRetry({'jobRetryParams': {
               id: data.id as string,
               domain: data.domain as string,
+              type: data.type as string,
             }})
           );
           break;
@@ -268,6 +269,7 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
             store.mutateJobAbort({'jobAbortParams': {
               id: data.id as string,
               domain: data.domain as string,
+              type: data.type as string,
             }})
           );
           break;

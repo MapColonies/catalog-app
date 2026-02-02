@@ -261,7 +261,7 @@
   "ingestion.error.uncatched-js": "{value}",
   "ingestion.error.not-available": "לא זמין",
   "ingestion.error.failed-task-report": "שגיאות שהתקבלו",
-  "ingestion.button.import-metadata": "בחר מטא-דאטה",
+  "ingestion.button.import-metadata": "בחר מטאדטה",
   "ingestion.checkbox.label": "לא ניתן לבצע את הפעולה באתר המשני, יש לסמן כדי להמשיך ולבצע את הפעולה באתר הראשי בלבד",
   "ingestion.job.progress": "התקדמות כללית",
   "ingestion.job.validationTaskProgress": "התקדמות הולידציה",
