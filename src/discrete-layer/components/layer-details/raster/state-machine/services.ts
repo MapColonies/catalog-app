@@ -66,6 +66,7 @@ export const SERVICES = {
           jobRetryParams: {
             id: job?.jobId as string,
             domain: 'RASTER',
+            type: job?.details?.type as string
           }
         });
       });
