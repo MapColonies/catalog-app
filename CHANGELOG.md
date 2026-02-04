@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.3.1](https://github.com/MapColonies/catalog-app/compare/v4.3.0...v4.3.1) (2026-02-04)
+
+
+### Bug Fixes
+
+* retry job from raster ingestion dialog ([#851](https://github.com/MapColonies/catalog-app/issues/851)) ([91996ea](https://github.com/MapColonies/catalog-app/commit/91996ea3026c6a196ac3a2fe6a6a9e788f700a27))
+
 ## [4.3.0](https://github.com/MapColonies/catalog-app/compare/v4.2.8...v4.3.0) (2026-02-02)
 
 
