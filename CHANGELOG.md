@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.3.2](https://github.com/MapColonies/catalog-app/compare/v4.3.1...v4.3.2) (2026-02-09)
+
+
+### Bug Fixes
+
+* remove tenant logo ([#853](https://github.com/MapColonies/catalog-app/issues/853)) ([5033fcb](https://github.com/MapColonies/catalog-app/commit/5033fcb5d3b05eed3830ca95b0dc64a7cdd129b6))
+
 ## [4.3.1](https://github.com/MapColonies/catalog-app/compare/v4.3.0...v4.3.1) (2026-02-04)
 
 
