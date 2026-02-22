@@ -5,7 +5,7 @@
   top: 0;
   right: -82px;
   width: 100px;
-  /*background-color: rgb(44,65,89);*/
+  /*background-color: rgb(44,65,89);
   border-radius: 50px;
   margin-top: 1px;
   /* 
@@ -32,6 +32,22 @@ body[dir='rtl'] #gridActionsCellRenderer.actionsContainer {
 body[dir='rtl'] #gridActionsCellRenderer.actionsContainer .actionIcon {
   left: unset;
   right: unset;
+}
+
+#gridActionsCellRenderer.actionsContainer button {
+  background-color: rgb(44, 65, 89);
+}
+
+#gridActionsCellRenderer.actionsContainer > button:not(#allActionsIcon) {
+  height: 32px;
+  margin-top: 4px;
+  position: relative;
+  right: 0;
+}
+
+body[dir='rtl'] #gridActionsCellRenderer.actionsContainer > button:not(#allActionsIcon) {
+  right: unset;
+  left: -20px;
 }
 
 #gridActionsMenuContainer .mdc-menu-surface.mdc-menu-surface--open {
