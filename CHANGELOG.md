@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.3.3](https://github.com/MapColonies/catalog-app/compare/v4.3.2...v4.3.3) (2026-02-22)
+
+
+### Bug Fixes
+
+* ag-grid frequent actions should display fly-to ([#855](https://github.com/MapColonies/catalog-app/issues/855)) ([6b51ce7](https://github.com/MapColonies/catalog-app/commit/6b51ce704efd98efe175b6f224918a8efa0fa7b8))
+
 ## [4.3.2](https://github.com/MapColonies/catalog-app/compare/v4.3.1...v4.3.2) (2026-02-09)
 
 
