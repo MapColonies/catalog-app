@@ -109,7 +109,6 @@ export const LayersResults: React.FC<LayersResultsProps> = observer((props) => {
             .map((action) => {
               return {
                 ...action,
-                frequent: false,
                 titleTranslationId: intl.formatMessage({ id: action.titleTranslationId }),
               };
             }),

@@ -31,14 +31,14 @@ body[dir='rtl'] .ag-theme-alpine-dark .ag-header-cell[col-id="footprintShown"]{
 /* Add absolute position so that action buttons column will appear on top of other columns. pointer-events: none to pass on mousemove event to behind columns */
 #layerResults .ag-pinned-right-cols-container {
   position: absolute !important;
-  right: 80px;
+  right: 26px;
   pointer-events: none;
   padding-left: 20px;
 }
 
 body[dir='rtl'] #layerResults .ag-pinned-right-cols-container {
   right: unset;
-  left: 80px;
+  left: 26px;
   padding-left: unset;
   padding-right: 20px;
 }
@@ -52,6 +52,7 @@ body[dir='rtl'] #layerResults .ag-pinned-right-cols-container {
   border: none !important;
   overflow: visible;
   border-radius: 50% !important;
+  background-color: transparent !important;
 }
 
 
@@ -74,6 +75,10 @@ body[dir='rtl'] #layerResults .ag-pinned-right-cols-container {
 #layerResults .ag-row.ag-row-selected .actionsContainer {
   border: none !important;
   background-color: var(--mdc-theme-gc-selection-background);
+}
+
+#layerResults .ag-row-hover {
+  background-color: rgb(44,65,89) !important;
 }
 
 #layerResults .ag-row.ag-full-width-row.ag-row-selected[row-id*="details"] {
