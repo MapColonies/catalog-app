@@ -58,7 +58,7 @@ const GENERAL_ACTIONS_GROUP: IActionGroup = {
     },
     {
       action: 'viewer',
-      frequent: true,
+      frequent: false,
       icon: '',
       class: 'mc-icon-Earth',
       titleTranslationId: 'action.viewer.tooltip',

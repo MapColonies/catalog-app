@@ -34,7 +34,7 @@ body[dir='rtl'] #gridActionsCellRenderer.actionsContainer .actionIcon {
   right: unset;
 }
 
-#gridActionsCellRenderer.actionsContainer button {
+#gridActionsCellRenderer.actionsContainer > button {
   background-color: rgb(44, 65, 89);
 }
 
