@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.3.4](https://github.com/MapColonies/catalog-app/compare/v4.3.3...v4.3.4) (2026-02-23)
+
+
+### Bug Fixes
+
+* simple viewer action not frequent ([#857](https://github.com/MapColonies/catalog-app/issues/857)) ([9865cd3](https://github.com/MapColonies/catalog-app/commit/9865cd3030054c66b9dcf95053b10b318af83607))
+
 ## [4.3.3](https://github.com/MapColonies/catalog-app/compare/v4.3.2...v4.3.3) (2026-02-22)
 
 
