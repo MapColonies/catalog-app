@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.3.5](https://github.com/MapColonies/catalog-app/compare/v4.3.4...v4.3.5) (2026-02-23)
+
+
+### Bug Fixes
+
+* pycsw fetches 100000 records ([#859](https://github.com/MapColonies/catalog-app/issues/859)) ([e1880da](https://github.com/MapColonies/catalog-app/commit/e1880da32692d7496e83a485fa10867565bd0b98))
+
 ## [4.3.4](https://github.com/MapColonies/catalog-app/compare/v4.3.3...v4.3.4) (2026-02-23)
 
 
