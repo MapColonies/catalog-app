@@ -3,12 +3,20 @@ import moment from 'moment';
 import { BASE_PATH } from '../../discrete-layer/components/layer-details/raster/state-machine/types';
 import CONFIG from '../config';
 
-export const getDateformatType = (withTime = false, fnsFormat = false, humanReadable = false): string => {
+export const getDateformatType = (
+  withTime = false,
+  fnsFormat = false,
+  humanReadable = false
+): string => {
   if (fnsFormat) {
     if (humanReadable) {
-      return withTime ? CONFIG.LOCALE.DATE_FNS_HUMAN_READABLE_DATE_TIME: CONFIG.LOCALE.DATE_FNS_HUMAN_READABLE_DATE; 
+      return withTime
+        ? CONFIG.LOCALE.DATE_FNS_HUMAN_READABLE_DATE_TIME
+        : CONFIG.LOCALE.DATE_FNS_HUMAN_READABLE_DATE;
     }
-    return withTime ? CONFIG.LOCALE.DATE_FNS_TIME_FORMAT : CONFIG.LOCALE.DATE_FNS_FORMAT;
+    return withTime
+      ? CONFIG.LOCALE.DATE_FNS_TIME_FORMAT
+      : CONFIG.LOCALE.DATE_FNS_FORMAT;
   }
   return withTime ? CONFIG.LOCALE.DATE_TIME_FORMAT : CONFIG.LOCALE.DATE_FORMAT;
 };
@@ -25,7 +33,10 @@ export const stringFormatter: FormatterFunc = (val): string => {
   return val !== undefined ? val.toString() : '';
 };
 
-export const dateFormatter: FormatterFunc = (date, withTime = false): string => {
+export const dateFormatter: FormatterFunc = (
+  date,
+  withTime = false
+): string => {
   // eslint-disable-next-line
   return date !== undefined && 'toISOString' in (moment(date) as moment.Moment)
     ? moment(date).format(getDateformatType(withTime))
@@ -33,9 +44,7 @@ export const dateFormatter: FormatterFunc = (date, withTime = false): string => 
 };
 
 export const relativeDateFormatter: FormatterFunc = (date): string => {
-  return date !== undefined
-    ? moment(date).fromNow()
-    : '-';
+  return date !== undefined ? moment(date).fromNow() : '-';
 };
 
 export const dateSerializer: FormatterFunc = (date): string => {
@@ -48,7 +57,7 @@ export const dateSerializer: FormatterFunc = (date): string => {
   }
 
   if (typeof date !== 'undefined') {
-    return (date).toISOString();
+    return date.toISOString();
   }
 
   return '-';
@@ -59,7 +68,10 @@ export const emphasizeByHTML: FormatterFunc = (value): string => {
 };
 
 const DEFAULT_DECIMALS = 2;
-export const formatBytes = (bytes: number, decimals = DEFAULT_DECIMALS): string => {
+export const formatBytes = (
+  bytes: number,
+  decimals = DEFAULT_DECIMALS
+): string => {
   const NONE = 0;
 
   if (!+bytes) return '0 Bytes';

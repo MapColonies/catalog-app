@@ -14,15 +14,20 @@ const AppTitle = (): JSX.Element => {
   const site = useMemo(() => currentSite(), []);
 
   useEffect(() => {
-    document.title = `${intl.formatMessage({ id: 'general.logo.text' })} - ${projectVersion}`;
+    document.title = `${intl.formatMessage({
+      id: 'general.logo.text',
+    })} - ${projectVersion}`;
   }, []);
 
-  const versionText = intl.formatMessage({id: "general.version.text"}, { projectVersion, appVersion });
+  const versionText = intl.formatMessage(
+    { id: 'general.version.text' },
+    { projectVersion, appVersion }
+  );
 
   return (
     <>
-      <Box className='appLogoContainer'>
-        <Box className='appTitleVersionContainer'>
+      <Box className="appLogoContainer">
+        <Box className="appTitleVersionContainer">
           <Typography tag="b">
             {intl.formatMessage({ id: 'general.logo.text' })}
           </Typography>

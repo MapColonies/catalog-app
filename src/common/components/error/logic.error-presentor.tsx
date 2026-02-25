@@ -12,17 +12,17 @@ interface ILogicErrorProps {
 }
 
 export const LogicError: React.FC<ILogicErrorProps> = ({ errors }) => {
-
   const intl = useIntl();
 
   const iconButtonErrorLevel = React.useMemo(() => {
-    return errors.some((error) => error.level === 'error') ? 'error' : 'warning';
+    return errors.some((error) => error.level === 'error')
+      ? 'error'
+      : 'warning';
   }, [errors]);
 
   return (
     <>
-      {
-        !isEmpty(errors) &&
+      {!isEmpty(errors) && (
         <AutoDirectionBox className="errorContainer">
           <IconButton
             className={`errorIcon mc-icon-Status-Warnings ${iconButtonErrorLevel}`}
@@ -32,20 +32,22 @@ export const LogicError: React.FC<ILogicErrorProps> = ({ errors }) => {
             }}
           />
           <ul className="errorsList">
-            {
-              errors.map((error, index) => (
-                <li
-                  key={index}
-                  dir="auto"
-                  className={error.level}
-                  dangerouslySetInnerHTML={{__html: intl.formatMessage({ id: error.code }, { value: error.message })}}
-                />
-              ))
-            }
+            {errors.map((error, index) => (
+              <li
+                key={index}
+                dir="auto"
+                className={error.level}
+                dangerouslySetInnerHTML={{
+                  __html: intl.formatMessage(
+                    { id: error.code },
+                    { value: error.message }
+                  ),
+                }}
+              />
+            ))}
           </ul>
         </AutoDirectionBox>
-      }
+      )}
     </>
   );
-
 };

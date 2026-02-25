@@ -17,7 +17,8 @@ if (!window._env_) {
       },
       ACTIVE_LAYER: 'ACTIVE_LAYER',
       ACTIVE_LAYER_PROPERTIES: {
-        urlPattern: 'arcgis/rest/services/Demographics/USA_Population_Density/MapServer/WMTS',
+        urlPattern:
+          'arcgis/rest/services/Demographics/USA_Population_Density/MapServer/WMTS',
         urlPatternParams: {
           service: 'WMTS',
           layers: 'USGSShadedReliefOnly',
@@ -53,7 +54,8 @@ if (!window._env_) {
       DEFAULT_USER: {
         role: 'USER',
       },
-      BASE_MAPS: '{ "maps": [ { "id": "1st", "title": "1st Map", "isForPreview": true, "thumbnail": "https://mt1.google.com/vt/lyrs=s&x=6&y=4&z=3", "baseRasterLayers": [ { "id": "GOOGLE_TERRAIN", "type": "XYZ_LAYER", "opacity": 1, "zIndex": 0, "options": { "url": "https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}", "layers": "", "credit": "GOOGLE" } }, { "id": "INFRARED_RASTER", "type": "WMS_LAYER", "opacity": 0.6, "zIndex": 1, "options": { "url": "https://mesonet.agron.iastate.edu/cgi-bin/wms/goes/conus_ir.cgi?", "layers": "goes_conus_ir", "credit": "Infrared data courtesy Iowa Environmental Mesonet", "parameters": { "transparent": "true", "format": "image/png" } } } ] }, { "id": "2nd", "title": "2nd Map", "thumbnail": "https://mt1.google.com/vt/lyrs=s&x=6&y=4&z=3", "baseRasterLayers": [ { "id": "RADAR_RASTER", "type": "WMS_LAYER", "opacity": 0.6, "zIndex": 1, "options": { "url": "https://mesonet.agron.iastate.edu/cgi-bin/wms/nexrad/n0r.cgi?", "layers": "nexrad-n0r", "credit": "Radar data courtesy Iowa Environmental Mesonet", "parameters": { "transparent": "true", "format": "image/png" } } }, { "id": "GOOGLE_TERRAIN", "type": "XYZ_LAYER", "opacity": 1, "zIndex": 0, "options": { "url": "https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}", "layers": "", "credit": "GOOGLE" } }, { "id": "VECTOR_TILES_GPS", "type": "XYZ_LAYER", "opacity": 1, "zIndex": 2, "options": { "url": "https://gps.tile.openstreetmap.org/lines/{z}/{x}/{y}.png", "layers": "", "credit": "openstreetmap" } } ] }, { "id": "3rd", "title": "3rd Map", "isCurrent": true, "thumbnail": "https://a.tile.thunderforest.com/cycle/17/78208/53265.png", "baseRasterLayers": [ { "id": "VECTOR_TILES", "type": "XYZ_LAYER", "opacity": 1, "zIndex": 0, "options": { "url": "https://{s}.tile.thunderforest.com/cycle/{z}/{x}/{y}.png?apikey=6170aad10dfd42a38d4d8c709a536f38", "layers": "", "credit": "thunderforest" } }, { "id": "VECTOR_TILES_GPS", "type": "XYZ_LAYER", "opacity": 1, "zIndex": 1, "options": { "url": "https://gps.tile.openstreetmap.org/lines/{z}/{x}/{y}.png", "layers": "", "credit": "openstreetmap" } } ] } ] }',
+      BASE_MAPS:
+        '{ "maps": [ { "id": "1st", "title": "1st Map", "isForPreview": true, "thumbnail": "https://mt1.google.com/vt/lyrs=s&x=6&y=4&z=3", "baseRasterLayers": [ { "id": "GOOGLE_TERRAIN", "type": "XYZ_LAYER", "opacity": 1, "zIndex": 0, "options": { "url": "https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}", "layers": "", "credit": "GOOGLE" } }, { "id": "INFRARED_RASTER", "type": "WMS_LAYER", "opacity": 0.6, "zIndex": 1, "options": { "url": "https://mesonet.agron.iastate.edu/cgi-bin/wms/goes/conus_ir.cgi?", "layers": "goes_conus_ir", "credit": "Infrared data courtesy Iowa Environmental Mesonet", "parameters": { "transparent": "true", "format": "image/png" } } } ] }, { "id": "2nd", "title": "2nd Map", "thumbnail": "https://mt1.google.com/vt/lyrs=s&x=6&y=4&z=3", "baseRasterLayers": [ { "id": "RADAR_RASTER", "type": "WMS_LAYER", "opacity": 0.6, "zIndex": 1, "options": { "url": "https://mesonet.agron.iastate.edu/cgi-bin/wms/nexrad/n0r.cgi?", "layers": "nexrad-n0r", "credit": "Radar data courtesy Iowa Environmental Mesonet", "parameters": { "transparent": "true", "format": "image/png" } } }, { "id": "GOOGLE_TERRAIN", "type": "XYZ_LAYER", "opacity": 1, "zIndex": 0, "options": { "url": "https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}", "layers": "", "credit": "GOOGLE" } }, { "id": "VECTOR_TILES_GPS", "type": "XYZ_LAYER", "opacity": 1, "zIndex": 2, "options": { "url": "https://gps.tile.openstreetmap.org/lines/{z}/{x}/{y}.png", "layers": "", "credit": "openstreetmap" } } ] }, { "id": "3rd", "title": "3rd Map", "isCurrent": true, "thumbnail": "https://a.tile.thunderforest.com/cycle/17/78208/53265.png", "baseRasterLayers": [ { "id": "VECTOR_TILES", "type": "XYZ_LAYER", "opacity": 1, "zIndex": 0, "options": { "url": "https://{s}.tile.thunderforest.com/cycle/{z}/{x}/{y}.png?apikey=6170aad10dfd42a38d4d8c709a536f38", "layers": "", "credit": "thunderforest" } }, { "id": "VECTOR_TILES_GPS", "type": "XYZ_LAYER", "opacity": 1, "zIndex": 1, "options": { "url": "https://gps.tile.openstreetmap.org/lines/{z}/{x}/{y}.png", "layers": "", "credit": "openstreetmap" } } ] } ] }',
       DEFAULT_TERRAIN_PROVIDER_URL: 'http://nginx-s3-gateway-URL',
       WEB_TOOLS_URL: 'http://mc-web-tools-URL',
       MODEL_VIEWER_ROUTE: 'simple-catalog-viewer',
@@ -63,15 +65,18 @@ if (!window._env_) {
         autocomplete: false,
       },
       NUMBER_OF_CHARACTERS_LIMIT: 18,
-      SERVED_ENTITY_TYPES: 'RECORD_ALL,RECORD_RASTER,RECORD_3D,RECORD_DEM,RECORD_VECTOR',
+      SERVED_ENTITY_TYPES:
+        'RECORD_ALL,RECORD_RASTER,RECORD_3D,RECORD_DEM,RECORD_VECTOR',
       ACCESS_TOKEN: {
         attributeName: 'token',
         injectionType: 'queryParam',
         tokenValue: 'TOKEN',
       },
-      RASTER_INGESTION_FILES_STRUCTURE: '{"data": {"allowedExt": [".gpkg"], "selectableExt": [".gpkg"], "relativeToAOIDirPath": "./data", "producerFileName": "*", "selectablePattern": "*"}, "product": {"allowedExt": [".shp", ".shx", ".dbf", ".prj", ".sbn", ".sbx", ".xml", ".cpg", ".qix"], "selectableExt": [".shp"], "relativeToAOIDirPath": "./shape", "producerFileName": "Product", "selectablePattern": "Product"}, "shapeMetadata": {"allowedExt": [".shp", ".shx", ".dbf", ".prj", ".sbn", ".sbx", ".xml", ".cpg", ".qix"], "selectableExt": [".shp"], "relativeToAOIDirPath": "./shape", "producerFileName": "ShapeMetadata", "selectablePattern": "ShapeMetadata"}}',
+      RASTER_INGESTION_FILES_STRUCTURE:
+        '{"data": {"allowedExt": [".gpkg"], "selectableExt": [".gpkg"], "relativeToAOIDirPath": "./data", "producerFileName": "*", "selectablePattern": "*"}, "product": {"allowedExt": [".shp", ".shx", ".dbf", ".prj", ".sbn", ".sbx", ".xml", ".cpg", ".qix"], "selectableExt": [".shp"], "relativeToAOIDirPath": "./shape", "producerFileName": "Product", "selectablePattern": "Product"}, "shapeMetadata": {"allowedExt": [".shp", ".shx", ".dbf", ".prj", ".sbn", ".sbx", ".xml", ".cpg", ".qix"], "selectableExt": [".shp"], "relativeToAOIDirPath": "./shape", "producerFileName": "ShapeMetadata", "selectablePattern": "ShapeMetadata"}}',
       WHATSNEW_URL: 'http://whatsnew-URL',
-      SITES_CONFIG: '{"masters": [{ "dns": "http://localhost:3000", "isAlias": false }], "slaves": [{ "dns": "http://localhost:8090", "isAlias": false }], "generics": [{ "dns": "https://catalog.mapcolonies.net", "isAlias": false }]}',
+      SITES_CONFIG:
+        '{"masters": [{ "dns": "http://localhost:3000", "isAlias": false }], "slaves": [{ "dns": "http://localhost:8090", "isAlias": false }], "generics": [{ "dns": "https://catalog.mapcolonies.net", "isAlias": false }]}',
       BFF_PATH: '/graphql',
       SELECTION_MODE_DEFAULT: '',
       SHOW_SELECTION_MODE_SWITCH: true,
@@ -88,7 +93,8 @@ if (!window._env_) {
         },
       },
       WFS: {
-        style: '{"color": "#01FF1F", "hover": "#24AEE9", "pointStroke": "#01FF1F"}',
+        style:
+          '{"color": "#01FF1F", "hover": "#24AEE9", "pointStroke": "#01FF1F"}',
         keyField: 'id',
         max: {
           pageSize: 300,
@@ -99,7 +105,7 @@ if (!window._env_) {
       GEOCODER: {
         url: 'http://geocoder-URL',
         callbackUrl: 'http://geocoder-callback-URL',
-      },  
+      },
       CHANGES_IN_SHAPE_FILES: {
         timeDifferenceGraceMinutes: 10,
         timeModifiedThresholdHours: 12,

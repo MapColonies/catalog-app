@@ -21,14 +21,25 @@ const TooltippedValue: React.FC<PropsWithChildren<TooltippedValueProps>> = ({
 }) => {
   const elementRef = useRef<HTMLElement>(null);
   const isEllipsisActive = useIsEllipsisActive(elementRef);
-  const typographyElement = useMemo(() => (
-    <Typography  dir="auto" {...restTypographyProps} ref={elementRef} className={className} tag={tag as React.ElementType<any>}>
-      {children}
-    </Typography>
-  ), [children]);
+  const typographyElement = useMemo(
+    () => (
+      <Typography
+        dir="auto"
+        {...restTypographyProps}
+        ref={elementRef}
+        className={className}
+        tag={tag as React.ElementType<any>}
+      >
+        {children}
+      </Typography>
+    ),
+    [children]
+  );
 
   return alwaysTooltip || (isEllipsisActive && !disableTooltip) ? (
-    <Tooltip content={customTooltipText || typographyElement}>{typographyElement}</Tooltip>
+    <Tooltip content={customTooltipText || typographyElement}>
+      {typographyElement}
+    </Tooltip>
   ) : (
     typographyElement
   );

@@ -36,8 +36,8 @@ body[dir='rtl'] .sidePanelContainer {
   height: calc(100% - 8px);
   padding-bottom: 8px;
   transition: left ease-in-out var(--collapse-expand-duration),
-              right ease-in-out var(--collapse-expand-duration),
-              width ease-in-out var(--collapse-expand-duration);
+    right ease-in-out var(--collapse-expand-duration),
+    width ease-in-out var(--collapse-expand-duration);
 }
 
 body[dir='rtl'] .mapAppContainer {
@@ -75,7 +75,7 @@ body[dir='rtl'] .mapAppContainer {
   padding-right: 16px;
 }
 
-body[dir='rtl'] .headerSystemAreaContainer{
+body[dir='rtl'] .headerSystemAreaContainer {
   padding-right: unset;
   padding-left: 16px;
 }
@@ -263,7 +263,7 @@ body[dir='rtl'] .tabHeaderContainer .filterByCatalogEntitySelect {
 }
 
 .cesium-viewer .bottomToolsContainer > div {
-  height: 28px;;
+  height: 28px;
 }
 
 .interactionsDisabled {
@@ -271,7 +271,7 @@ body[dir='rtl'] .tabHeaderContainer .filterByCatalogEntitySelect {
   overflow: hidden;
 }
 
-.interactionsDisabled::after{
+.interactionsDisabled::after {
   content: '';
   display: block;
   position: absolute;

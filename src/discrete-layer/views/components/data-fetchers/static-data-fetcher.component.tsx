@@ -7,24 +7,26 @@ import { WfsFeaturesFetcher } from './wfs-features-fetcher.component';
 import { ServicesAvailabilityFetcher } from './services-availability-fetcher-component';
 import { useStore } from '../../../models';
 
-
 export const StaticDataFetcher: React.FC = () => {
   const store = useStore();
 
-    // Init stores after some dependencies are set
-    useEffect(() => {
-      if (store.servicesAvailabilityStore.servicesAvailability) {
-        // Here we have the services availabilities initialized.
-        store.mapMenusManagerStore.initStore();
-      }
-  }, [store.mapMenusManagerStore.wfsFeatureTypes, store.servicesAvailabilityStore.servicesAvailability])
+  // Init stores after some dependencies are set
+  useEffect(() => {
+    if (store.servicesAvailabilityStore.servicesAvailability) {
+      // Here we have the services availabilities initialized.
+      store.mapMenusManagerStore.initStore();
+    }
+  }, [
+    store.mapMenusManagerStore.wfsFeatureTypes,
+    store.servicesAvailabilityStore.servicesAvailability,
+  ]);
 
   return (
     <>
       <EntityDescriptorsFetcher />
       <ServicesAvailabilityFetcher />
       <MCEnumsFetcher />
-      <LookupTablesFetcher/>
+      <LookupTablesFetcher />
       <WfsFeaturesFetcher />
       {/* <BaseMapsLegendsFetcher /> */}
     </>

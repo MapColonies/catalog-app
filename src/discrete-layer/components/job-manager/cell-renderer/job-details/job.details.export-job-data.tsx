@@ -16,16 +16,23 @@ interface JobDetailsExportJobDataProps extends ICellRendererParams {}
 
 const NONE = 0;
 
-export const JobDetailsExportJobData: React.FC<JobDetailsExportJobDataProps> = ({ data }) => {
+export const JobDetailsExportJobData: React.FC<
+  JobDetailsExportJobDataProps
+> = ({ data }) => {
   const intl = useIntl();
   const jobData = data as JobModelType;
-  
+
   const isExportJob = jobData.type?.toLowerCase().includes('export');
 
-  const jobDescription = jobData.description as string | undefined ?? '';
-  const exportLinks = get(jobData, `parameters.callbackParams.links`) as Record<string, string> | undefined;
+  const jobDescription = (jobData.description as string | undefined) ?? '';
+  const exportLinks = get(jobData, `parameters.callbackParams.links`) as
+    | Record<string, string>
+    | undefined;
 
-  const expirationTimeUTC: string = get(jobData, `parameters.cleanupData.cleanupExpirationTimeUTC`);
+  const expirationTimeUTC: string = get(
+    jobData,
+    `parameters.cleanupData.cleanupExpirationTimeUTC`
+  );
   let formattedExpirationTime = '';
   let hasExpired: boolean = false;
 
@@ -39,24 +46,34 @@ export const JobDetailsExportJobData: React.FC<JobDetailsExportJobDataProps> = (
   const jobStatus = jobData.status;
 
   // const exportLinkLabel = intl.formatMessage({id: 'system-status.export-details.link.label'});
-  const jobNoDescriptionText = intl.formatMessage({id: 'system-status.export-details.no-description.text'});
-  
-  const jobDescriptionText = intl.formatMessage({ id: 'system-status.export-details.description.label' } );
+  const jobNoDescriptionText = intl.formatMessage({
+    id: 'system-status.export-details.no-description.text',
+  });
+
+  const jobDescriptionText = intl.formatMessage({
+    id: 'system-status.export-details.description.label',
+  });
 
   if (!(isExportJob as boolean)) return null;
 
   return (
-    <Box id='exportJobData' className="jobDataContainer">
+    <Box id="exportJobData" className="jobDataContainer">
       <Box className="jobDescriptionContainer">
-        {
-          exportLinks && expirationTimeUTC && 
+        {exportLinks && expirationTimeUTC && (
           <>
-            <Typography tag="span" className={`${hasExpired ? 'expired' : 'valid'}`}>
-              { intl.formatMessage({id: 'system-status.export-details.expirationDate'}) + ': ' + formattedExpirationTime}
+            <Typography
+              tag="span"
+              className={`${hasExpired ? 'expired' : 'valid'}`}
+            >
+              {intl.formatMessage({
+                id: 'system-status.export-details.expirationDate',
+              }) +
+                ': ' +
+                formattedExpirationTime}
             </Typography>
-            { " | " }
+            {' | '}
           </>
-        }
+        )}
         <Typography tag="bdi" className="jobDescriptionLabel">
           {jobDescriptionText}
         </Typography>
@@ -72,9 +89,17 @@ export const JobDetailsExportJobData: React.FC<JobDetailsExportJobDataProps> = (
           {Object.entries(exportLinks).map(([linkType, exportLink]) => {
             const typeToPresent = linkType.replace('URI', '');
             return (
-              <Box className='linkContainer' key={`${jobData.id}_${linkType}`}>
-                <Hyperlink className='jobDataLink' url={exportLink} label={typeToPresent} />
-                <Copy value = {exportLink} iconStyle = {{ fontSize: `20px` }} key={exportLink}/>
+              <Box className="linkContainer" key={`${jobData.id}_${linkType}`}>
+                <Hyperlink
+                  className="jobDataLink"
+                  url={exportLink}
+                  label={typeToPresent}
+                />
+                <Copy
+                  value={exportLink}
+                  iconStyle={{ fontSize: `20px` }}
+                  key={exportLink}
+                />
               </Box>
             );
           })}

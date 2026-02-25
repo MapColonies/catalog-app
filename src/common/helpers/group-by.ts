@@ -2,7 +2,9 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 export const resolveProperty = (obj: any, property: string): any =>
-  property.split('.').reduce((result, prop) => (result ? result[prop] : undefined), obj);
+  property
+    .split('.')
+    .reduce((result, prop) => (result ? result[prop] : undefined), obj);
 
 export interface Group {
   key: any;
@@ -28,7 +30,10 @@ export const totalRowItem = (obj: any, prop: string) => {
 
 export const flattenGroup = (group: Group): any[] => {
   const items =
-    group.items.length && group.items[0] && group.items[0].key && group.items[0].items
+    group.items.length &&
+    group.items[0] &&
+    group.items[0].key &&
+    group.items[0].items
       ? flattenGroups(group.items)
       : group.items;
 
@@ -44,21 +49,24 @@ export const flattenGroup = (group: Group): any[] => {
   return group.sum && flattenedItems && flattenedItems.length
     ? [
         ...flattenedItems,
-        Object.getOwnPropertyNames(flattenedItems[0]).reduce((o, prop) => {
-          const val = resolveProperty(group.sum, prop);
-          o[prop] = val;
-          if (val !== undefined) {
-            o._sum[prop] = true;
-          }
-          return o;
-        }, { _sum: {} })
+        Object.getOwnPropertyNames(flattenedItems[0]).reduce(
+          (o, prop) => {
+            const val = resolveProperty(group.sum, prop);
+            o[prop] = val;
+            if (val !== undefined) {
+              o._sum[prop] = true;
+            }
+            return o;
+          },
+          { _sum: {} }
+        ),
       ]
     : flattenedItems;
 };
 export const flattenGroups = (groups: Group[]): any[] =>
   groups
     ? groups.reduce((array, group) => {
-        flattenGroup(group).forEach(item => array.push(item));
+        flattenGroup(group).forEach((item) => array.push(item));
         return array;
       }, [])
     : groups;
@@ -72,10 +80,12 @@ export const sumGroup = (group: Group, sum: string[]): Group => {
     sum: sum.reduce(
       (sumObj, sumProp) => ({
         ...sumObj,
-        [sumProp]: group.items.reduce((a, b) => resolveProperty(a, sumProp) + resolveProperty(b, sumProp))
+        [sumProp]: group.items.reduce(
+          (a, b) => resolveProperty(a, sumProp) + resolveProperty(b, sumProp)
+        ),
       }),
       {}
-    )
+    ),
   };
 };
 
@@ -85,10 +95,15 @@ export const groupBy = (array: any[], grouping: GroupBy): Group[] => {
   }
   const keys = grouping.keys;
   const groups: Group[] = array.reduce((results: Group[], item) => {
-    const group = results.find(g => keys.every(({ name, predicate }) => predicate(item[name]) === predicate(g.key[name])));
+    const group = results.find((g) =>
+      keys.every(
+        ({ name, predicate }) =>
+          predicate(item[name]) === predicate(g.key[name])
+      )
+    );
     const data = Object.getOwnPropertyNames(item).reduce((o, prop) => {
       // if (!keys.some(key => key === prop)) {
-        o[prop] = item[prop];
+      o[prop] = item[prop];
       // }
       return o;
     }, {});
@@ -100,13 +115,13 @@ export const groupBy = (array: any[], grouping: GroupBy): Group[] => {
           o[key.name] = item[key.name];
           return o;
         }, {}),
-        items: [data]
+        items: [data],
       });
     }
     return results;
   }, []);
   return grouping.thenby
-    ? groups.map(g => ({ ...g, items: groupBy(g.items, grouping.thenby) }))
+    ? groups.map((g) => ({ ...g, items: groupBy(g.items, grouping.thenby) }))
     : groups.reduce((arr, g) => {
         arr.push(sumGroup(g, grouping.sum));
         return arr;

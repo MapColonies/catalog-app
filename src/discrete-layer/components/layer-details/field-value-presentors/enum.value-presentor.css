@@ -13,7 +13,6 @@
 }
 .selectBoxContainer .enumOptions {
   width: 100%;
-
 }
 
 .enumOptions .mdc-select__dropdown-icon {
@@ -26,7 +25,8 @@ body[dir='rtl'] .enumOptions .mdc-select__dropdown-icon {
   left: 16px;
 }
 
-.enumOptions .mdc-menu.mdc-select__menu.mdc-menu-surface.mdc-menu-surface--open {
+.enumOptions
+  .mdc-menu.mdc-select__menu.mdc-menu-surface.mdc-menu-surface--open {
   max-height: 130px !important;
 }
 

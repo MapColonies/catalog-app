@@ -1,6 +1,6 @@
 // RASTER GENERAL CONFIGURATION
 
-export type RasterFileTypeConfig = "data" | "product" | "shapeMetadata";
+export type RasterFileTypeConfig = 'data' | 'product' | 'shapeMetadata';
 
 // FIELD selectablePattern can receive letters, and may optionally end with an '*' character,
 // which acts as a wildcard to match any sequence of characters following the prefix in the file name.
@@ -12,4 +12,7 @@ interface IRasterFileGroupConfig {
   selectablePattern: string;
 }
 
-export type IRasterIngestionFilesStructureConfig = Record<RasterFileTypeConfig, IRasterFileGroupConfig>;
+export type IRasterIngestionFilesStructureConfig = Record<
+  RasterFileTypeConfig,
+  IRasterFileGroupConfig
+>;

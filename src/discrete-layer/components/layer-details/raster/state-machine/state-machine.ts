@@ -1,7 +1,10 @@
 import { mergeWith } from 'lodash';
 import { assign, createMachine, fromCallback, sendParent } from 'xstate';
 import CONFIG from '../../../../../common/config';
-import { dateFormatter, relativeDateFormatter } from '../../../../../common/helpers/formatters';
+import {
+  dateFormatter,
+  relativeDateFormatter,
+} from '../../../../../common/helpers/formatters';
 import { localStore } from '../../../../../common/helpers/storage';
 import { Mode } from '../../../../../common/models/mode.enum';
 import {
@@ -10,12 +13,9 @@ import {
   filesErrorActions,
   filesSelectedActions,
   selectFileActions,
-  selectionModeActions
+  selectionModeActions,
 } from './action-handlers';
-import {
-  addError,
-  warnUnexpectedStateEvent
-} from './helpers';
+import { addError, warnUnexpectedStateEvent } from './helpers';
 import { SERVICES } from './services';
 import {
   DATA_LABEL,
@@ -23,7 +23,7 @@ import {
   PRODUCT_LABEL,
   SHAPEMETADATA_LABEL,
   STATE_TAGS,
-  WORKFLOW
+  WORKFLOW,
 } from './types';
 
 //#region --- FILES sub state machine ---
@@ -36,43 +36,67 @@ const filesMachine = createMachine({
       always: [
         {
           guard: (_: { context: IContext }) => {
-            console.log(`>>> Enter GUARD always of ${WORKFLOW.FILES.SELECTION_MODE}`);
+            console.log(
+              `>>> Enter GUARD always of ${WORKFLOW.FILES.SELECTION_MODE}`
+            );
             return _.context.selectionMode === 'manual';
           },
-          target: WORKFLOW.FILES.MANUAL.ROOT
+          target: WORKFLOW.FILES.MANUAL.ROOT,
         },
         {
-          target: WORKFLOW.FILES.AUTO.ROOT
-        }
-      ]
+          target: WORKFLOW.FILES.AUTO.ROOT,
+        },
+      ],
     },
     [WORKFLOW.FILES.AUTO.ROOT]: {
-      entry: (_: { context: IContext; event: any }) => console.log(`>>> ${WORKFLOW.FILES.AUTO.ROOT}`, _),
+      entry: (_: { context: IContext; event: any }) =>
+        console.log(`>>> ${WORKFLOW.FILES.AUTO.ROOT}`, _),
       initial: WORKFLOW.FILES.AUTO.IDLE,
       states: {
         [WORKFLOW.FILES.AUTO.IDLE]: {
-          entry: () => console.log(`>>> Enter ${WORKFLOW.FILES.AUTO.ROOT.toUpperCase()}.${WORKFLOW.FILES.AUTO.IDLE}`),
+          entry: () =>
+            console.log(
+              `>>> Enter ${WORKFLOW.FILES.AUTO.ROOT.toUpperCase()}.${
+                WORKFLOW.FILES.AUTO.IDLE
+              }`
+            ),
           on: {
             SELECT_FILES: {
               actions: [
                 ...selectFileActions('data', 'override', false),
-                ...cleanFilesErrorActions()
+                ...cleanFilesErrorActions(),
               ],
-              target: WORKFLOW.FILES.AUTO.SELECT_FILES
+              target: WORKFLOW.FILES.AUTO.SELECT_FILES,
             },
             MANUAL: {
               actions: selectionModeActions('manual' as SelectionMode, {
-                data: { label: DATA_LABEL, path: '', isExists: false, dateFormatterPredicate: dateFormatter },
-                product: { label: PRODUCT_LABEL, path: '', isExists: false, dateFormatterPredicate: relativeDateFormatter },
-                shapeMetadata: { label: SHAPEMETADATA_LABEL, path: '', isExists: false, dateFormatterPredicate: relativeDateFormatter }
+                data: {
+                  label: DATA_LABEL,
+                  path: '',
+                  isExists: false,
+                  dateFormatterPredicate: dateFormatter,
+                },
+                product: {
+                  label: PRODUCT_LABEL,
+                  path: '',
+                  isExists: false,
+                  dateFormatterPredicate: relativeDateFormatter,
+                },
+                shapeMetadata: {
+                  label: SHAPEMETADATA_LABEL,
+                  path: '',
+                  isExists: false,
+                  dateFormatterPredicate: relativeDateFormatter,
+                },
               }),
-              target: `#${WORKFLOW.FILES.ROOT}`
+              target: `#${WORKFLOW.FILES.ROOT}`,
             },
-            "*": { actions: warnUnexpectedStateEvent }
-          }
+            '*': { actions: warnUnexpectedStateEvent },
+          },
         },
         [WORKFLOW.FILES.AUTO.SELECT_FILES]: {
-          entry: () => console.log(`>>> Enter ${WORKFLOW.FILES.AUTO.SELECT_FILES}`),
+          entry: () =>
+            console.log(`>>> Enter ${WORKFLOW.FILES.AUTO.SELECT_FILES}`),
           tags: [STATE_TAGS.GENERAL_LOADING],
           invoke: {
             input: (_: { context: IContext; event: any }) => _,
@@ -89,96 +113,103 @@ const filesMachine = createMachine({
                         return srcValue;
                       }
                     }
-                  )
+                  ),
                 })),
                 sendParent((_: { context: IContext; event: any }) => ({
-                  type: "SET_FILES",
+                  type: 'SET_FILES',
                   files: {
-                    ..._.event.output
+                    ..._.event.output,
                   },
-                  addPolicy: "merge"
-                }))
+                  addPolicy: 'merge',
+                })),
               ],
-              target: WORKFLOW.FILES.AUTO.FETCH_PRODUCT
+              target: WORKFLOW.FILES.AUTO.FETCH_PRODUCT,
             },
             onError: {
               actions: filesErrorActions('data'),
-              target: WORKFLOW.FILES.AUTO.IDLE
-            }
-          }
+              target: WORKFLOW.FILES.AUTO.IDLE,
+            },
+          },
         },
         [WORKFLOW.FILES.AUTO.FETCH_PRODUCT]: {
-          entry: (_: { context: IContext; event: any }) => console.log(`>>> ${WORKFLOW.FILES.AUTO.FETCH_PRODUCT}`, _),
+          entry: (_: { context: IContext; event: any }) =>
+            console.log(`>>> ${WORKFLOW.FILES.AUTO.FETCH_PRODUCT}`, _),
           tags: [STATE_TAGS.GENERAL_LOADING],
           invoke: {
             input: (_: { context: IContext; event: any }) => _,
             src: SERVICES[WORKFLOW.FILES.ROOT].fetchProductService,
             onDone: {
               actions: fetchProductActions,
-              target: WORKFLOW.FILES.AUTO.CHECK_SHAPEMETADATA
+              target: WORKFLOW.FILES.AUTO.CHECK_SHAPEMETADATA,
             },
             onError: {
               actions: filesErrorActions('product'),
-              target: WORKFLOW.FILES.AUTO.IDLE
-            }
-          }
+              target: WORKFLOW.FILES.AUTO.IDLE,
+            },
+          },
         },
         [WORKFLOW.FILES.AUTO.CHECK_SHAPEMETADATA]: {
-          entry: (_: { context: IContext; event: any }) => console.log(`>>> ${WORKFLOW.FILES.AUTO.CHECK_SHAPEMETADATA}`, _),
+          entry: (_: { context: IContext; event: any }) =>
+            console.log(`>>> ${WORKFLOW.FILES.AUTO.CHECK_SHAPEMETADATA}`, _),
           invoke: {
             input: (_: { context: IContext; event: any }) => _,
             src: SERVICES[WORKFLOW.FILES.ROOT].checkShapeMetadataService,
             onDone: {
-              actions: [
-                sendParent({ type: "FILES_SELECTED" })
-              ],
-              target: WORKFLOW.FILES.AUTO.IDLE
+              actions: [sendParent({ type: 'FILES_SELECTED' })],
+              target: WORKFLOW.FILES.AUTO.IDLE,
             },
             onError: {
               actions: filesErrorActions('shapeMetadata'),
-              target: WORKFLOW.FILES.AUTO.IDLE
-            }
-          }
-        }
-      }
+              target: WORKFLOW.FILES.AUTO.IDLE,
+            },
+          },
+        },
+      },
     },
     [WORKFLOW.FILES.MANUAL.ROOT]: {
-      entry: (_: { context: IContext; event: any }) => console.log(`>>> ${WORKFLOW.FILES.MANUAL.ROOT}`, _),
+      entry: (_: { context: IContext; event: any }) =>
+        console.log(`>>> ${WORKFLOW.FILES.MANUAL.ROOT}`, _),
       initial: WORKFLOW.FILES.MANUAL.IDLE,
       states: {
         [WORKFLOW.FILES.MANUAL.IDLE]: {
-          entry: () => console.log(`>>> Enter ${WORKFLOW.FILES.MANUAL.ROOT.toLocaleUpperCase()}.${WORKFLOW.FILES.MANUAL.IDLE}`),
+          entry: () =>
+            console.log(
+              `>>> Enter ${WORKFLOW.FILES.MANUAL.ROOT.toLocaleUpperCase()}.${
+                WORKFLOW.FILES.MANUAL.IDLE
+              }`
+            ),
           on: {
             SELECT_DATA: {
               actions: [
                 ...selectFileActions('data'),
-                ...cleanFilesErrorActions()
+                ...cleanFilesErrorActions(),
               ],
-              target: WORKFLOW.FILES.MANUAL.SELECT_DATA
+              target: WORKFLOW.FILES.MANUAL.SELECT_DATA,
             },
             SELECT_PRODUCT: {
               actions: [
                 ...selectFileActions('product'),
-                ...cleanFilesErrorActions()
+                ...cleanFilesErrorActions(),
               ],
-              target: WORKFLOW.FILES.MANUAL.FETCH_PRODUCT
+              target: WORKFLOW.FILES.MANUAL.FETCH_PRODUCT,
             },
             SELECT_SHAPEMETADATA: {
               actions: [
                 ...selectFileActions('shapeMetadata'),
-                ...cleanFilesErrorActions()
+                ...cleanFilesErrorActions(),
               ],
-              target: WORKFLOW.FILES.MANUAL.CHECK_SHAPEMETADATA
+              target: WORKFLOW.FILES.MANUAL.CHECK_SHAPEMETADATA,
             },
             AUTO: {
               actions: selectionModeActions('auto' as SelectionMode),
-              target: `#${WORKFLOW.FILES.ROOT}`
+              target: `#${WORKFLOW.FILES.ROOT}`,
             },
-            "*": { actions: warnUnexpectedStateEvent }
-          }
+            '*': { actions: warnUnexpectedStateEvent },
+          },
         },
         [WORKFLOW.FILES.MANUAL.SELECT_DATA]: {
-          entry: () => console.log(`>>> Enter ${WORKFLOW.FILES.MANUAL.SELECT_DATA}`),
+          entry: () =>
+            console.log(`>>> Enter ${WORKFLOW.FILES.MANUAL.SELECT_DATA}`),
           tags: [STATE_TAGS.GENERAL_LOADING],
           invoke: {
             input: (_: { context: IContext; event: any }) => _,
@@ -190,66 +221,65 @@ const filesMachine = createMachine({
                     ..._.context.files,
                     data: {
                       ..._.context.files?.data,
-                      ..._.event.output
-                    }
-                  }
+                      ..._.event.output,
+                    },
+                  },
                 })),
                 sendParent((_: { context: IContext; event: any }) => ({
-                  type: "SET_FILES",
+                  type: 'SET_FILES',
                   files: {
                     data: {
-                      ..._.event.output
-                    }
+                      ..._.event.output,
+                    },
                   },
-                  addPolicy: "merge"
+                  addPolicy: 'merge',
                 })),
-                ...filesSelectedActions
+                ...filesSelectedActions,
               ],
-              target: WORKFLOW.FILES.MANUAL.IDLE
+              target: WORKFLOW.FILES.MANUAL.IDLE,
             },
             onError: {
               actions: filesErrorActions('data'),
-              target: WORKFLOW.FILES.MANUAL.IDLE
-            }
-          }
+              target: WORKFLOW.FILES.MANUAL.IDLE,
+            },
+          },
         },
         [WORKFLOW.FILES.MANUAL.FETCH_PRODUCT]: {
-          entry: (_: { context: IContext; event: any }) => console.log(`>>> ${WORKFLOW.FILES.MANUAL.FETCH_PRODUCT}`, _),
+          entry: (_: { context: IContext; event: any }) =>
+            console.log(`>>> ${WORKFLOW.FILES.MANUAL.FETCH_PRODUCT}`, _),
           tags: [STATE_TAGS.GENERAL_LOADING],
           invoke: {
             input: (_: { context: IContext; event: any }) => _,
             src: SERVICES[WORKFLOW.FILES.ROOT].fetchProductService,
             onDone: {
-              actions: [
-                ...fetchProductActions,
-                ...filesSelectedActions
-              ],
-              target: WORKFLOW.FILES.MANUAL.IDLE
+              actions: [...fetchProductActions, ...filesSelectedActions],
+              target: WORKFLOW.FILES.MANUAL.IDLE,
             },
             onError: {
               actions: filesErrorActions('product'),
-              target: WORKFLOW.FILES.MANUAL.IDLE
-            }
-          }
+              target: WORKFLOW.FILES.MANUAL.IDLE,
+            },
+          },
         },
         [WORKFLOW.FILES.MANUAL.CHECK_SHAPEMETADATA]: {
-          entry: (_: { context: IContext; event: any }) => console.log(`>>> ${WORKFLOW.FILES.MANUAL.CHECK_SHAPEMETADATA}`, _),
+          entry: (_: { context: IContext; event: any }) =>
+            console.log(`>>> ${WORKFLOW.FILES.MANUAL.CHECK_SHAPEMETADATA}`, _),
           invoke: {
             input: (_: { context: IContext; event: any }) => _,
             src: SERVICES[WORKFLOW.FILES.ROOT].checkShapeMetadataService,
             onDone: {
               actions: filesSelectedActions,
-              target: WORKFLOW.FILES.MANUAL.IDLE
+              target: WORKFLOW.FILES.MANUAL.IDLE,
             },
             onError: {
               actions: filesErrorActions('shapeMetadata'),
-              target: WORKFLOW.FILES.MANUAL.IDLE
-            }
-          }
-        }
-      }
-    }
-  }
+              target: WORKFLOW.FILES.MANUAL.IDLE,
+            },
+          },
+        },
+      },
+    },
+  },
 });
 //#endregion
 
@@ -259,55 +289,59 @@ export const workflowMachine = createMachine<IContext, Events>({
   id: WORKFLOW.ROOT,
   initial: WORKFLOW.IDLE,
   context: ({ input }) => ({
-    ...input as IContext,
-    errors: []
+    ...(input as IContext),
+    errors: [],
   }),
-  entry: () => console.log(`>>> Enter ${WORKFLOW.ROOT.toUpperCase()} state machine`),
+  entry: () =>
+    console.log(`>>> Enter ${WORKFLOW.ROOT.toUpperCase()} state machine`),
   states: {
     [WORKFLOW.IDLE]: {
-      entry: () => console.log(`>>> Enter ${WORKFLOW.ROOT.toUpperCase()}.${WORKFLOW.IDLE}`),
+      entry: () =>
+        console.log(
+          `>>> Enter ${WORKFLOW.ROOT.toUpperCase()}.${WORKFLOW.IDLE}`
+        ),
       id: WORKFLOW.IDLE,
       on: {
         START_NEW: {
           actions: assign((_: { context: IContext; event: any }) => ({
-            ..._.event
+            ..._.event,
           })),
-          target: WORKFLOW.FILES.ROOT
+          target: WORKFLOW.FILES.ROOT,
         },
         START_UPDATE: {
           actions: assign((_: { context: IContext; event: any }) => ({
-            ..._.event
+            ..._.event,
           })),
-          target: WORKFLOW.START_UPDATE
+          target: WORKFLOW.START_UPDATE,
         },
         RESELECT_FILES: {
-          target: WORKFLOW.FILES.ROOT
+          target: WORKFLOW.FILES.ROOT,
         },
         SUBMIT: {
           actions: assign((_: { context: IContext; event: any }) => ({
             formData: {
-              ..._.event.data
+              ..._.event.data,
             },
-            resolutionDegree: _.event.resolutionDegree
+            resolutionDegree: _.event.resolutionDegree,
           })),
-          target: WORKFLOW.JOB_SUBMISSION
+          target: WORKFLOW.JOB_SUBMISSION,
         },
         RESTORE: {
           actions: assign((_: { context: IContext; event: any }) => ({
             job: {
-              ..._.event.job
-            }
+              ..._.event.job,
+            },
           })),
-          target: WORKFLOW.RESTORE_JOB
+          target: WORKFLOW.RESTORE_JOB,
         },
         RETRY: {
-          target: WORKFLOW.RETRY_JOB
+          target: WORKFLOW.RETRY_JOB,
         },
         CLEAN_ERRORS: {
-          actions: assign({ errors: [] })
+          actions: assign({ errors: [] }),
         },
-        "*": { actions: warnUnexpectedStateEvent }
-      }
+        '*': { actions: warnUnexpectedStateEvent },
+      },
     },
     [WORKFLOW.START_UPDATE]: {
       entry: () => console.log(`>>> Enter ${WORKFLOW.START_UPDATE}`),
@@ -323,70 +357,77 @@ export const workflowMachine = createMachine<IContext, Events>({
             },
             actions: assign((_: { context: IContext; event: any }) => ({
               job: {
-                ..._.event.output
-              }
+                ..._.event.output,
+              },
             })),
-            target: WORKFLOW.RESTORE_JOB
+            target: WORKFLOW.RESTORE_JOB,
           },
           {
             actions: assign((_: { context: IContext; event: any }) => ({
               flowType: Mode.UPDATE,
-              selectionMode: CONFIG.SELECTION_MODE_DEFAULT === '' ? 'auto' : CONFIG.SELECTION_MODE_DEFAULT
+              selectionMode:
+                CONFIG.SELECTION_MODE_DEFAULT === ''
+                  ? 'auto'
+                  : CONFIG.SELECTION_MODE_DEFAULT,
             })),
-            target: WORKFLOW.FILES.ROOT
-          }
+            target: WORKFLOW.FILES.ROOT,
+          },
         ],
         onError: {
           actions: addError,
-          target: WORKFLOW.IDLE
-        }
-      }
+          target: WORKFLOW.IDLE,
+        },
+      },
     },
     [WORKFLOW.FILES.ROOT]: {
-      entry: () => console.log(`>>> Enter ${WORKFLOW.FILES.ROOT.toUpperCase()} sub state machine`),
+      entry: () =>
+        console.log(
+          `>>> Enter ${WORKFLOW.FILES.ROOT.toUpperCase()} sub state machine`
+        ),
       invoke: {
         id: WORKFLOW.FILES.ROOT, // <- needed to be able to target this state from the parent machine (child actor name)
         input: (_: { context: IContext; event: any }) => _.context,
-        src: filesMachine
+        src: filesMachine,
       },
       on: {
         SET_SELECTION_MODE: {
           actions: assign((_: { context: IContext; event: any }) => ({
-            selectionMode: _.event.selectionMode
-          }))
+            selectionMode: _.event.selectionMode,
+          })),
         },
         SET_FILES: {
           actions: assign((_: { context: IContext; event: any }) => {
-            const files = _.event.addPolicy === 'merge' ?
-              mergeWith(
-                {},
-                _.context.files,
-                _.event.files,
-                (objValue: any, srcValue: any, key: string) => {
-                  if (key === 'geoDetails') {
-                    return srcValue;
-                  }
-                }
-              ) :
-              { ..._.event.files };
+            const files =
+              _.event.addPolicy === 'merge'
+                ? mergeWith(
+                    {},
+                    _.context.files,
+                    _.event.files,
+                    (objValue: any, srcValue: any, key: string) => {
+                      if (key === 'geoDetails') {
+                        return srcValue;
+                      }
+                    }
+                  )
+                : { ..._.event.files };
 
             return {
-              files
+              files,
             };
-          })
+          }),
         },
         FILES_SELECTED: {
-          target: `#${WORKFLOW.ROOT}`
+          target: `#${WORKFLOW.ROOT}`,
         },
         FILES_ERROR: {
-          actions: addError
+          actions: addError,
         },
         CLEAN_FILES_ERRORS: {
-          actions: assign({ errors: [] })
+          actions: assign({ errors: [] }),
         },
         NOOP: { actions: () => {} },
-        "*": { actions: warnUnexpectedStateEvent }
-      }
+        '*': { actions: warnUnexpectedStateEvent },
+      },
     },
     [WORKFLOW.JOB_SUBMISSION]: {
       entry: () => console.log(`>>> Enter ${WORKFLOW.JOB_SUBMISSION}`),
@@ -397,16 +438,16 @@ export const workflowMachine = createMachine<IContext, Events>({
         onDone: {
           actions: assign((_: { context: IContext; event: any }) => ({
             job: {
-              ..._.event.output
-            }
+              ..._.event.output,
+            },
           })),
-          target: WORKFLOW.JOB_POLLING
+          target: WORKFLOW.JOB_POLLING,
         },
         onError: {
           actions: addError,
-          target: WORKFLOW.IDLE
-        }
-      }
+          target: WORKFLOW.IDLE,
+        },
+      },
     },
     [WORKFLOW.JOB_POLLING]: {
       entry: () => console.log(`>>> Enter ${WORKFLOW.JOB_POLLING}`),
@@ -433,17 +474,17 @@ export const workflowMachine = createMachine<IContext, Events>({
             actions: assign((_: { context: IContext; event: any }) => ({
               job: {
                 ..._.context.job,
-                ..._.event.output
-              }
+                ..._.event.output,
+              },
             })),
-            target: WORKFLOW.WAIT.ROOT
-          }
+            target: WORKFLOW.WAIT.ROOT,
+          },
         ],
         onError: {
           actions: addError,
-          target: WORKFLOW.IDLE
-        }
-      }
+          target: WORKFLOW.IDLE,
+        },
+      },
     },
     [WORKFLOW.WAIT.ROOT]: {
       id: WORKFLOW.WAIT,
@@ -451,7 +492,7 @@ export const workflowMachine = createMachine<IContext, Events>({
       entry: assign((_: { context: IContext; event: any }) => {
         console.log(`>>> Enter ${WORKFLOW.WAIT.ROOT}`);
         return {
-          remainingTime: CONFIG.JOB_MANAGER.POLLING_CYCLE_INTERVAL / 1000
+          remainingTime: CONFIG.JOB_MANAGER.POLLING_CYCLE_INTERVAL / 1000,
         };
       }),
       states: {
@@ -462,8 +503,8 @@ export const workflowMachine = createMachine<IContext, Events>({
                 sendBack({ type: 'TICK' });
               }, 1000);
               return () => clearInterval(interval);
-            })
-          }
+            }),
+          },
         },
         [WORKFLOW.WAIT.WATCHER]: {
           invoke: {
@@ -472,41 +513,55 @@ export const workflowMachine = createMachine<IContext, Events>({
               const { jobId, taskId } = input.context.job || {};
               const getTaskNotification = () => {
                 const lastTask = localStore.get('lastTask');
-                if (!lastTask) { return; }
+                if (!lastTask) {
+                  return;
+                }
                 const notification = JSON.parse(lastTask);
-                if (notification && jobId && taskId && notification.jobId === jobId && notification.taskId === taskId) {
+                if (
+                  notification &&
+                  jobId &&
+                  taskId &&
+                  notification.jobId === jobId &&
+                  notification.taskId === taskId
+                ) {
                   sendBack({ type: 'SYNC' });
                 }
               };
-              localStore.watchMethods(['setItem'], undefined, (_method, key) => {
-                if (key === 'MC-lastTask') {
-                  getTaskNotification();
+              localStore.watchMethods(
+                ['setItem'],
+                undefined,
+                (_method, key) => {
+                  if (key === 'MC-lastTask') {
+                    getTaskNotification();
+                  }
                 }
-              });
+              );
               return () => {
                 localStore.unWatchMethods();
               };
-            })
-          }
-        }
+            }),
+          },
+        },
       },
       on: {
         TICK: {
           actions: assign((_: { context: IContext; event: any }) => ({
-            remainingTime: _.context.remainingTime ? _.context.remainingTime - 1 : 0
-          }))
+            remainingTime: _.context.remainingTime
+              ? _.context.remainingTime - 1
+              : 0,
+          })),
         },
         SYNC: {
-          target: WORKFLOW.JOB_POLLING
+          target: WORKFLOW.JOB_POLLING,
         },
         STOP_POLLING: {
-          target: WORKFLOW.IDLE
+          target: WORKFLOW.IDLE,
         },
-        "*": { actions: warnUnexpectedStateEvent }
+        '*': { actions: warnUnexpectedStateEvent },
       },
       after: {
-        [CONFIG.JOB_MANAGER.POLLING_CYCLE_INTERVAL]: WORKFLOW.JOB_POLLING
-      }
+        [CONFIG.JOB_MANAGER.POLLING_CYCLE_INTERVAL]: WORKFLOW.JOB_POLLING,
+      },
     },
     [WORKFLOW.RESTORE_JOB]: {
       entry: () => console.log(`>>> Enter ${WORKFLOW.RESTORE_JOB}`),
@@ -516,15 +571,15 @@ export const workflowMachine = createMachine<IContext, Events>({
         src: SERVICES[WORKFLOW.ROOT].restoreJobService,
         onDone: {
           actions: assign((_: { context: IContext; event: any }) => ({
-            ..._.event.output
+            ..._.event.output,
           })),
-          target: WORKFLOW.JOB_POLLING
+          target: WORKFLOW.JOB_POLLING,
         },
         onError: {
           actions: addError,
-          target: WORKFLOW.IDLE
-        }
-      }
+          target: WORKFLOW.IDLE,
+        },
+      },
     },
     [WORKFLOW.RETRY_JOB]: {
       entry: () => console.log(`>>> Enter ${WORKFLOW.RETRY_JOB}`),
@@ -535,21 +590,21 @@ export const workflowMachine = createMachine<IContext, Events>({
         onDone: {
           actions: assign((_: { context: IContext; event: any }) => ({
             job: {
-              jobId: _.context.job?.jobId
-            }
+              jobId: _.context.job?.jobId,
+            },
           })),
-          target: WORKFLOW.JOB_POLLING
+          target: WORKFLOW.JOB_POLLING,
         },
         onError: {
           actions: addError,
-          target: WORKFLOW.IDLE
-        }
-      }
+          target: WORKFLOW.IDLE,
+        },
+      },
     },
     [WORKFLOW.DONE]: {
       entry: () => console.log(`>>> Enter ${WORKFLOW.DONE}`),
-      type: "final"
-    }
-  }
+      type: 'final',
+    },
+  },
 });
 //#endregion

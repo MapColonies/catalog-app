@@ -8,17 +8,21 @@ interface IFilterOnModelChange {
   onModelChange: (model: any | null, additionalEventAttributes?: any) => void;
 }
 
-export const JobDetailsStatusFilter: React.FC<IFilterOnModelChange> = ({ onModelChange }) => {
+export const JobDetailsStatusFilter: React.FC<IFilterOnModelChange> = ({
+  onModelChange,
+}) => {
   const intl = useIntl();
 
+  const getStatusTranslation = useCallback(
+    (status: Status): string => {
+      const statusText = intl.formatMessage({
+        id: `system-status.job.status_translation.${status as string}`,
+      });
 
-  const getStatusTranslation = useCallback((status: Status): string => {
-    const statusText = intl.formatMessage({
-      id: `system-status.job.status_translation.${status as string}`,
-    });
-
-    return statusText;
-  }, [intl]);
+      return statusText;
+    },
+    [intl]
+  );
 
   const getStatusOptions = useMemo((): JSX.Element => {
     const statuses: Record<string, string> = {};
@@ -38,7 +42,9 @@ export const JobDetailsStatusFilter: React.FC<IFilterOnModelChange> = ({ onModel
         placeholder={showAllStatusesText}
         options={statuses}
         onChange={(evt: React.ChangeEvent<HTMLSelectElement>): void => {
-          onModelChange(evt.currentTarget.value === '' ? null : evt.currentTarget.value)
+          onModelChange(
+            evt.currentTarget.value === '' ? null : evt.currentTarget.value
+          );
         }}
       />
     );

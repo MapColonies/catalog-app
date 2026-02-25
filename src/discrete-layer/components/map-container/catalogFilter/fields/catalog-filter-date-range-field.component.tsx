@@ -1,18 +1,33 @@
 import React from 'react';
 import { useIntl } from 'react-intl';
 import { Controller, RegisterOptions, useFormContext } from 'react-hook-form';
-import { lastDayOfYear, startOfDay, startOfYear, subDays, subYears } from 'date-fns';
+import {
+  lastDayOfYear,
+  startOfDay,
+  startOfYear,
+  subDays,
+  subYears,
+} from 'date-fns';
 import { isEmpty } from 'lodash';
-import { Box, DateRangePicker, isDateRange } from '@map-colonies/react-components';
+import {
+  Box,
+  DateRangePicker,
+  isDateRange,
+} from '@map-colonies/react-components';
 import { getDateformatType } from '../../../../../common/helpers/formatters';
-import { FieldConfigModelType, FilterFieldValidationModelType } from '../../../../models';
+import {
+  FieldConfigModelType,
+  FilterFieldValidationModelType,
+} from '../../../../models';
 import CatalogFilterFieldLabel from './catalog-filter-field-label.component';
 
 interface CatalogFilterDateRangeFieldProps {
   fieldDescriptor: FieldConfigModelType;
 }
 
-export const CatalogFilterDateRangeField: React.FC<CatalogFilterDateRangeFieldProps> = ({ fieldDescriptor }) => {
+export const CatalogFilterDateRangeField: React.FC<
+  CatalogFilterDateRangeFieldProps
+> = ({ fieldDescriptor }) => {
   const intl = useIntl();
   const formMethods = useFormContext();
   const fieldId = fieldDescriptor.fieldName ?? '';
@@ -22,16 +37,26 @@ export const CatalogFilterDateRangeField: React.FC<CatalogFilterDateRangeFieldPr
     pattern: fieldDescriptor?.isFilterable?.validation?.pattern
       ? {
           value: new RegExp(fieldDescriptor.isFilterable.validation.pattern),
-          message: intl.formatMessage({id: `catalog-filter.${fieldId}.validation-error`}),
+          message: intl.formatMessage({
+            id: `catalog-filter.${fieldId}.validation-error`,
+          }),
         }
       : undefined,
   };
 
   const shortcutsTranslations = {
-    SEVEN_DAYS: intl.formatMessage({id: 'catalog-filter.sevenDays.date-shortcuts'}),
-    THIRTY_DAYS: intl.formatMessage({id: 'catalog-filter.thirtyDays.date-shortcuts'}),
-    THIS_YEAR: intl.formatMessage({id: 'catalog-filter.thisYear.date-shortcuts'}),
-    LAST_YEAR: intl.formatMessage({id: 'catalog-filter.lastYear.date-shortcuts'}),
+    SEVEN_DAYS: intl.formatMessage({
+      id: 'catalog-filter.sevenDays.date-shortcuts',
+    }),
+    THIRTY_DAYS: intl.formatMessage({
+      id: 'catalog-filter.thirtyDays.date-shortcuts',
+    }),
+    THIS_YEAR: intl.formatMessage({
+      id: 'catalog-filter.thisYear.date-shortcuts',
+    }),
+    LAST_YEAR: intl.formatMessage({
+      id: 'catalog-filter.lastYear.date-shortcuts',
+    }),
   };
 
   return (
@@ -48,11 +73,19 @@ export const CatalogFilterDateRangeField: React.FC<CatalogFilterDateRangeFieldPr
         control={formMethods.control}
         name={fieldId}
         defaultValue={{}}
-        rules={{ ...(fieldValidation as RegisterOptions) , validate: (dateRangeValue) => {
-          if (!isEmpty(dateRangeValue) && (!dateRangeValue.startDate || !dateRangeValue.endDate)) {
-            return intl.formatMessage({id: "catalog-filter.dateRangeField.validation-error" });
-          }
-        }}}
+        rules={{
+          ...(fieldValidation as RegisterOptions),
+          validate: (dateRangeValue) => {
+            if (
+              !isEmpty(dateRangeValue) &&
+              (!dateRangeValue.startDate || !dateRangeValue.endDate)
+            ) {
+              return intl.formatMessage({
+                id: 'catalog-filter.dateRangeField.validation-error',
+              });
+            }
+          },
+        }}
         render={({ name, onBlur, onChange, value }) => {
           return (
             <DateRangePicker
@@ -105,11 +138,14 @@ export const CatalogFilterDateRangeField: React.FC<CatalogFilterDateRangeFieldPr
               onBlur={onBlur}
               onChange={(dateRangeObj) => {
                 if (isDateRange(dateRangeObj)) {
-                  const dateRangeVal = !dateRangeObj.startDate && !dateRangeObj.endDate ? {} : dateRangeObj;
+                  const dateRangeVal =
+                    !dateRangeObj.startDate && !dateRangeObj.endDate
+                      ? {}
+                      : dateRangeObj;
                   onChange(dateRangeVal);
-                  
+
                   // Revalidate range on change
-                  formMethods.trigger(fieldId)
+                  formMethods.trigger(fieldId);
                 }
               }}
             />
@@ -122,4 +158,4 @@ export const CatalogFilterDateRangeField: React.FC<CatalogFilterDateRangeFieldPr
       </span>
     </Box>
   );
-}
+};

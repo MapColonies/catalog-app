@@ -1,5 +1,8 @@
 import { get } from 'lodash';
-import { LayerMetadataMixedUnion, RecordStatus } from '../../discrete-layer/models';
+import {
+  LayerMetadataMixedUnion,
+  RecordStatus,
+} from '../../discrete-layer/models';
 import { DEFAULT_ID } from '../../discrete-layer/components/layer-details/entity.dialog';
 import CONFIG from '../config';
 import { isValidLayerMetadata } from './layer-url';
@@ -7,7 +10,8 @@ import { isValidLayerMetadata } from './layer-url';
 const STATUS = 'productStatus';
 const ID = 'id';
 const POLYGON_PARTS_SHOWN = 'polygonPartsShown';
-const POLYGON_PARTS_SHOWN_COLOR = CONFIG.CONTEXT_MENUS.MAP.POLYGON_PARTS_FEATURE_CONFIG.outlineColor;
+const POLYGON_PARTS_SHOWN_COLOR =
+  CONFIG.CONTEXT_MENUS.MAP.POLYGON_PARTS_FEATURE_CONFIG.outlineColor;
 const UNPUBLISHED_COLOR = 'var(--mdc-theme-gc-warning-high)';
 const ERROR_COLOR = 'var(--mdc-theme-gc-error-high)';
 
@@ -20,7 +24,10 @@ export const existPolygonParts = (data: Record<string, unknown>): boolean => {
 };
 
 export const isUnpublished = (data: Record<string, unknown>): boolean => {
-  return get(data, STATUS) === RecordStatus.UNPUBLISHED && get(data, ID) !== DEFAULT_ID;
+  return (
+    get(data, STATUS) === RecordStatus.UNPUBLISHED &&
+    get(data, ID) !== DEFAULT_ID
+  );
 };
 
 export const isPolygonPartsShown = (data: Record<string, unknown>): boolean => {
@@ -56,7 +63,9 @@ export const getIconStyle = (
     resStyle = { [colorProperty]: UNPUBLISHED_COLOR };
   }
   if (existPolygonParts(data) && isPolygonPartsShown(data)) {
-    const hasWFSLink = (data.links as Array<Record<string, unknown>>)?.some(link => link.protocol === 'WFS');
+    const hasWFSLink = (data.links as Array<Record<string, unknown>>)?.some(
+      (link) => link.protocol === 'WFS'
+    );
     if (hasWFSLink) {
       resStyle = { [colorProperty]: POLYGON_PARTS_SHOWN_COLOR };
     } else {
@@ -64,11 +73,13 @@ export const getIconStyle = (
     }
   }
   if (existPolygonParts(data) && !isPolygonPartsShown(data)) {
-    const hasWFSLink = (data.links as Array<Record<string, unknown>>)?.some(link => link.protocol === 'WFS');
+    const hasWFSLink = (data.links as Array<Record<string, unknown>>)?.some(
+      (link) => link.protocol === 'WFS'
+    );
     if (!hasWFSLink) {
       resStyle = {
         ...resStyle,
-        opacity: 0.5
+        opacity: 0.5,
       };
     }
   }

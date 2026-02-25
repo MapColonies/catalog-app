@@ -17,7 +17,8 @@ const useGetSelectionFieldForDomain = (): React.FC<ExportFieldProps> => {
   const { layerToExport } = exportStore;
 
   const getSelectionByDomain = useMemo(() => {
-    const layerRecordType = get(enums, layerToExport?.productType as string).parentDomain as RecordType;
+    const layerRecordType = get(enums, layerToExport?.productType as string)
+      .parentDomain as RecordType;
 
     switch (layerRecordType) {
       case RecordType.RECORD_RASTER:
@@ -25,11 +26,11 @@ const useGetSelectionFieldForDomain = (): React.FC<ExportFieldProps> => {
       case RecordType.RECORD_DEM:
         return DemSelectionField;
       default:
-          return ExportStringFieldComponent;
+        return ExportStringFieldComponent;
     }
-  }, [])
+  }, []);
 
- return getSelectionByDomain;
+  return getSelectionByDomain;
 };
 
 export default useGetSelectionFieldForDomain;

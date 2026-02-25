@@ -5,7 +5,7 @@
 #layerDetailsFormRaster .content {
   max-height: var(--content-height);
   overflow-y: auto;
-  padding:  0px 20px 0px 20px;
+  padding: 0px 20px 0px 20px;
   position: relative;
 }
 
@@ -59,12 +59,17 @@ body[dir='rtl'] #layerDetailsFormRaster .buttons {
   margin-top: 2px;
 }
 
-#layerDetailsFormRaster .enumOptions .mdc-menu.mdc-select__menu.mdc-menu-surface.mdc-menu-surface--open {
+#layerDetailsFormRaster
+  .enumOptions
+  .mdc-menu.mdc-select__menu.mdc-menu-surface.mdc-menu-surface--open {
   bottom: auto !important;
   top: 24px;
 }
 
-body[dir='rtl'] #layerDetailsFormRaster .enumOptions .mdc-select__dropdown-icon {
+body[dir='rtl']
+  #layerDetailsFormRaster
+  .enumOptions
+  .mdc-select__dropdown-icon {
   right: initial;
   left: initial;
 }
@@ -144,7 +149,7 @@ body[dir='rtl'] #layerDetailsFormRaster .enumOptions .mdc-select__dropdown-icon 
   color: var(--mdc-theme-text-icon-on-dark);
 }
 
-body[dir=rtl] #layerDetailsFormRaster .remainingTime {
+body[dir='rtl'] #layerDetailsFormRaster .remainingTime {
   right: unset;
   left: 4px;
 }

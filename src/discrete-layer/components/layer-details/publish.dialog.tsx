@@ -12,7 +12,7 @@ import {
   Icon,
   IconButton,
   Tooltip,
-  Typography
+  Typography,
 } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
 import { GraphQLError } from '../../../common/components/error/graphql.error-presentor';
@@ -32,101 +32,144 @@ interface ContinueDialogProps {
   onPublish: () => void;
 }
 
-export const PublishDialog: React.FC<ContinueDialogProps> = observer(({ layer, isOpen, onSetOpen, onPublish }) => {
-  const store = useStore();
-  const mutationQuery = useQuery();
-  const intl = useIntl();
+export const PublishDialog: React.FC<ContinueDialogProps> = observer(
+  ({ layer, isOpen, onSetOpen, onPublish }) => {
+    const store = useStore();
+    const mutationQuery = useQuery();
+    const intl = useIntl();
 
-  const closeDialog = useCallback(() => {
-    onSetOpen(false);
-  }, [onSetOpen]);
+    const closeDialog = useCallback(() => {
+      onSetOpen(false);
+    }, [onSetOpen]);
 
-  const publishMessage = useMemo((): string => {
-    return intl.formatMessage(
-    { id: 'publish-unpublish.dialog.publish.message' },
-    { action: emphasizeByHTML(`${intl.formatMessage({ id: 'publish-unpublish.dialog.publish.action' })}`) });
-  }, []);
+    const publishMessage = useMemo((): string => {
+      return intl.formatMessage(
+        { id: 'publish-unpublish.dialog.publish.message' },
+        {
+          action: emphasizeByHTML(
+            `${intl.formatMessage({
+              id: 'publish-unpublish.dialog.publish.action',
+            })}`
+          ),
+        }
+      );
+    }, []);
 
-  const unpublishMessage = useMemo((): string => {
-    return intl.formatMessage(
-    { id: 'publish-unpublish.dialog.unpublish.message' },
-    { action: emphasizeByHTML(`${intl.formatMessage({ id: 'publish-unpublish.dialog.unpublish.action' })}`) });
-  }, []);
+    const unpublishMessage = useMemo((): string => {
+      return intl.formatMessage(
+        { id: 'publish-unpublish.dialog.unpublish.message' },
+        {
+          action: emphasizeByHTML(
+            `${intl.formatMessage({
+              id: 'publish-unpublish.dialog.unpublish.action',
+            })}`
+          ),
+        }
+      );
+    }, []);
 
-  const dispatchAction = (action: Record<string, unknown>): void => {
-    store.actionDispatcherStore.dispatchAction(
-      {
+    const dispatchAction = (action: Record<string, unknown>): void => {
+      store.actionDispatcherStore.dispatchAction({
         action: action.action,
         data: action.data,
-      } as IDispatchAction
-    );
-  };
+      } as IDispatchAction);
+    };
 
-  useEffect(() => {
-    if (!mutationQuery.loading && ((mutationQuery.data as {updateStatus: string} | undefined)?.updateStatus === 'ok')) {
-      onSetOpen(false);
-      dispatchAction({ 
-        action: UserAction.SYSTEM_CALLBACK_PUBLISH,
-        data: {...layer, productStatus: isUnpublished(layer as any) ? RecordStatus.PUBLISHED : RecordStatus.UNPUBLISHED} 
-      });
-      onPublish();
-    }
-  }, [mutationQuery.data]);
+    useEffect(() => {
+      if (
+        !mutationQuery.loading &&
+        (mutationQuery.data as { updateStatus: string } | undefined)
+          ?.updateStatus === 'ok'
+      ) {
+        onSetOpen(false);
+        dispatchAction({
+          action: UserAction.SYSTEM_CALLBACK_PUBLISH,
+          data: {
+            ...layer,
+            productStatus: isUnpublished(layer as any)
+              ? RecordStatus.PUBLISHED
+              : RecordStatus.UNPUBLISHED,
+          },
+        });
+        onPublish();
+      }
+    }, [mutationQuery.data]);
 
-  const updateStatus = (): void => {
-    const productStatus = isUnpublished(layer as any) ? RecordStatus.PUBLISHED : RecordStatus.UNPUBLISHED;
-    mutationQuery.setQuery(
-      store.mutateUpdateStatus({
-        data: {
-          id: layer.id,
-          type: layer.type as RecordType,
-          partialRecordData: { productStatus },
-        },
-      })
-    );
-  };
-  
-  return (
-    <Box id="publishDialog">
-      <Dialog open={isOpen} preventOutsideDismiss={true}>
-        <DialogTitle>
-          <FormattedMessage id="general.dialog.exit.title"/>
-          <IconButton
-            className="closeIcon mc-icon-Close"
-            label="CLOSE"
-            onClick={ (): void => { closeDialog(); } }
-          />
-        </DialogTitle>
-        <DialogContent className="dialogBody">
-          <Tooltip content={intl.formatMessage({ id: 'general.warning.text' })}>
-            <Icon className="icon" icon={{ icon: 'info', size: 'xsmall' }}/>
-          </Tooltip>
-          <Typography tag="div" dangerouslySetInnerHTML={{__html: isUnpublished(layer as any) ? publishMessage : unpublishMessage}}></Typography>
-        </DialogContent>
-        <DialogActions>
-          <Box className="errors">
-            {/* eslint-disable-next-line */}
-            <GraphQLError error={mutationQuery.error ?? {}} />
-          </Box>
-          <Box>
-            <Button
-              raised
-              type="button"
-              disabled={mutationQuery.loading || mutationQuery.error !== undefined}
-              onClick={(): void => updateStatus()}
+    const updateStatus = (): void => {
+      const productStatus = isUnpublished(layer as any)
+        ? RecordStatus.PUBLISHED
+        : RecordStatus.UNPUBLISHED;
+      mutationQuery.setQuery(
+        store.mutateUpdateStatus({
+          data: {
+            id: layer.id,
+            type: layer.type as RecordType,
+            partialRecordData: { productStatus },
+          },
+        })
+      );
+    };
+
+    return (
+      <Box id="publishDialog">
+        <Dialog open={isOpen} preventOutsideDismiss={true}>
+          <DialogTitle>
+            <FormattedMessage id="general.dialog.exit.title" />
+            <IconButton
+              className="closeIcon mc-icon-Close"
+              label="CLOSE"
+              onClick={(): void => {
+                closeDialog();
+              }}
+            />
+          </DialogTitle>
+          <DialogContent className="dialogBody">
+            <Tooltip
+              content={intl.formatMessage({ id: 'general.warning.text' })}
             >
-              {
-                mutationQuery.loading ?
-                <CircularProgress className="loading"/> :
-                <FormattedMessage id="general.confirm-btn.text"/>
-              }
-            </Button>
-            <Button type="button" onClick={(): void => { closeDialog(); }}>
-              <FormattedMessage id="general.cancel-btn.text"/>
-            </Button>
-          </Box>
-        </DialogActions>
-      </Dialog>
-    </Box>
-  );
-});
+              <Icon className="icon" icon={{ icon: 'info', size: 'xsmall' }} />
+            </Tooltip>
+            <Typography
+              tag="div"
+              dangerouslySetInnerHTML={{
+                __html: isUnpublished(layer as any)
+                  ? publishMessage
+                  : unpublishMessage,
+              }}
+            ></Typography>
+          </DialogContent>
+          <DialogActions>
+            <Box className="errors">
+              {/* eslint-disable-next-line */}
+              <GraphQLError error={mutationQuery.error ?? {}} />
+            </Box>
+            <Box>
+              <Button
+                raised
+                type="button"
+                disabled={
+                  mutationQuery.loading || mutationQuery.error !== undefined
+                }
+                onClick={(): void => updateStatus()}
+              >
+                {mutationQuery.loading ? (
+                  <CircularProgress className="loading" />
+                ) : (
+                  <FormattedMessage id="general.confirm-btn.text" />
+                )}
+              </Button>
+              <Button
+                type="button"
+                onClick={(): void => {
+                  closeDialog();
+                }}
+              >
+                <FormattedMessage id="general.cancel-btn.text" />
+              </Button>
+            </Box>
+          </DialogActions>
+        </Dialog>
+      </Box>
+    );
+  }
+);

@@ -6,11 +6,12 @@ export interface IStorage {
   remove: (key: string) => void;
   clear: () => void;
   key: (index: number) => string | null;
-  watchMethods: ( methods: string[], 
-                  callbackBefore?: (method: string, key: string, ...args: any[]) => void,
-                  callbackAfter?: (method: string, key: string, ...args: any[]) => void
-                ) => void,
-  unWatchMethods: () => void,
+  watchMethods: (
+    methods: string[],
+    callbackBefore?: (method: string, key: string, ...args: any[]) => void,
+    callbackAfter?: (method: string, key: string, ...args: any[]) => void
+  ) => void;
+  unWatchMethods: () => void;
   length: number;
 }
 
@@ -93,11 +94,19 @@ function storageFactory(storage: Storage, prefix = ''): IStorage {
   }
 
   let originalMethods: Record<string, () => void> = {};
-  
-  function watchMethods (
+
+  function watchMethods(
     methods: string[] = [],
-    callbackBefore: (method: string, key: string, ...args: any[]) => void = function () {},
-    callbackAfter: (method: string, key: string, ...args: any[]) => void = function () {},
+    callbackBefore: (
+      method: string,
+      key: string,
+      ...args: any[]
+    ) => void = function () {},
+    callbackAfter: (
+      method: string,
+      key: string,
+      ...args: any[]
+    ) => void = function () {}
   ) {
     for (let method of methods) {
       const original = storage[method].bind(storage);
@@ -114,13 +123,12 @@ function storageFactory(storage: Storage, prefix = ''): IStorage {
     }
   }
 
-  function unWatchMethods () {
-    Object.keys(originalMethods).forEach(method => {
+  function unWatchMethods() {
+    Object.keys(originalMethods).forEach((method) => {
       storage[method] = originalMethods[method];
     });
-    originalMethods={};
+    originalMethods = {};
   }
-  
 
   return {
     get,

@@ -31,7 +31,10 @@ body[dir='rtl'] #layerDetailsFormRaster .ingestionSwitch {
   background-color: var(--mdc-theme-gc-selection-background);
 }
 
-#layerDetailsFormRaster .ingestionSwitch .MuiSwitch-colorSecondary.Mui-checked + .MuiSwitch-track {
+#layerDetailsFormRaster
+  .ingestionSwitch
+  .MuiSwitch-colorSecondary.Mui-checked
+  + .MuiSwitch-track {
   background-color: var(--mdc-theme-gc-selection-background);
   filter: brightness(2);
 }

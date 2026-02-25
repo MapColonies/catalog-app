@@ -14,7 +14,9 @@ import { useStore } from '../../models';
 import { applyFactor } from '../helpers/layersUtils';
 
 const DRAWING_MATERIAL_OPACITY = 0.5;
-const DRAWING_MATERIAL_COLOR = CesiumColor.CYAN.withAlpha(DRAWING_MATERIAL_OPACITY);
+const DRAWING_MATERIAL_COLOR = CesiumColor.CYAN.withAlpha(
+  DRAWING_MATERIAL_OPACITY
+);
 
 export interface IDrawingState {
   drawing: boolean;
@@ -25,7 +27,7 @@ const ExportDrawingHandler: React.FC = observer(() => {
   const store = useStore();
   const cesiumViewer = useCesiumMap();
   const { drawing, type } = store.exportStore.drawingState as IDrawingState;
-  
+
   useEffect(() => {
     return (): void => {
       store.exportStore.resetDrawingState();
@@ -35,8 +37,8 @@ const ExportDrawingHandler: React.FC = observer(() => {
   useEffect(() => {
     if (store.exportStore.hasExportPreviewed) {
       const selectedRoi = store.exportStore.geometrySelectionsCollection;
-      const features = [ ...selectedRoi.features ];
-      
+      const features = [...selectedRoi.features];
+
       // ***********************************************************************************************************
       // ***** Currentlty exported layer footprint not added to calculation of export preview, might be reconsidered
       // ***********************************************************************************************************

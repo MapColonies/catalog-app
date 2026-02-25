@@ -35,7 +35,9 @@ export const DEFAULT_ENUM_DESCRIPTOR: IEnumDescriptor = {
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const EnumsMapContext = createContext<IEnumsMapContext>({
   enumsMap: null,
-  setEnumsMap: (enums) => {return}
+  setEnumsMap: (enums) => {
+    return;
+  },
 });
 
 export default EnumsMapContext;

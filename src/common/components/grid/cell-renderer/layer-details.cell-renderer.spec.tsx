@@ -1,13 +1,19 @@
 import React from 'react';
 import { shallow } from 'enzyme';
-import { ICellRendererParams, Column, RowNode, GridApi, ColumnApi } from 'ag-grid-community';
+import {
+  ICellRendererParams,
+  Column,
+  RowNode,
+  GridApi,
+  ColumnApi,
+} from 'ag-grid-community';
 import timezoneMock from 'timezone-mock';
 // eslint-disable-next-line
 import '../../../../__mocks__/confEnvShim';
 import { LayerDetailsRenderer } from './layer-details.cell-renderer';
 
 /* eslint-disable */
-const mockDataBase:ICellRendererParams = {
+const mockDataBase: ICellRendererParams = {
   value: '',
   valueFormatted: null,
   getValue: () => {},
@@ -39,24 +45,20 @@ describe('AgGrid LayerDetailsRenderer component', () => {
 
   it('renders correctly', () => {
     const mockData = {
-      ...mockDataBase
+      ...mockDataBase,
     };
 
-    const wrapper = shallow(
-      <LayerDetailsRenderer {...mockData} />
-    );
+    const wrapper = shallow(<LayerDetailsRenderer {...mockData} />);
 
     expect(wrapper).toMatchSnapshot();
   });
 
   it('data fields presented as TOTAL_PARTS = NUM_SPAN_PER_FIELD * NUM_FIEDLS', () => {
     const mockData = {
-      ...mockDataBase
+      ...mockDataBase,
     };
 
-    const wrapper = shallow(
-      <LayerDetailsRenderer {...mockData} />
-    );
+    const wrapper = shallow(<LayerDetailsRenderer {...mockData} />);
 
     const spans = wrapper.find('span');
     expect(spans).toHaveLength(NUM_SPAN_PER_FIELD * NUM_FIEDLS);

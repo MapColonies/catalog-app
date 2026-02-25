@@ -9,7 +9,11 @@ interface CatalogFilterFieldLabelProps {
   required?: boolean;
 }
 
-const CatalogFilterFieldLabel: React.FC<CatalogFilterFieldLabelProps> = ({fieldName, labelTranslationId, required}) => {
+const CatalogFilterFieldLabel: React.FC<CatalogFilterFieldLabelProps> = ({
+  fieldName,
+  labelTranslationId,
+  required,
+}) => {
   const intl = useIntl();
 
   const fieldLabel = intl.formatMessage({
@@ -17,11 +21,19 @@ const CatalogFilterFieldLabel: React.FC<CatalogFilterFieldLabelProps> = ({fieldN
   });
 
   return (
-    <Box className='catalogFilterFieldLabelContainer'>
-      <Typography tag="span" className="catalogFilterFieldLabel" htmlFor={fieldName}>
+    <Box className="catalogFilterFieldLabelContainer">
+      <Typography
+        tag="span"
+        className="catalogFilterFieldLabel"
+        htmlFor={fieldName}
+      >
         {fieldLabel}
       </Typography>
-     { required as boolean && <Typography tag="span" className="requiredAsterisk">*</Typography> }
+      {(required as boolean) && (
+        <Typography tag="span" className="requiredAsterisk">
+          *
+        </Typography>
+      )}
     </Box>
   );
 };

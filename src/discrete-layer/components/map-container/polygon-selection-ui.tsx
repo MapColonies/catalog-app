@@ -1,7 +1,15 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
-import { Button, Drawer, DrawerContent, List, ListItem, ListItemGraphic, ListItemText } from '@map-colonies/react-core';
+import {
+  Button,
+  Drawer,
+  DrawerContent,
+  List,
+  ListItem,
+  ListItemGraphic,
+  ListItemText,
+} from '@map-colonies/react-core';
 import { Box, DrawType, IDrawingEvent } from '@map-colonies/react-components';
 import { BBoxDialog } from './bbox.dialog';
 
@@ -81,15 +89,20 @@ export const PolygonSelectionUi: React.FC<PolygonSelectionUiProps> = (
           onSetOpen={setOpen}
           onPolygonUpdate={onPolygonUpdate}
         />
-        {
-          menuOpen &&
-          <Box style={{
-            height:'210px', 
-            width: mapActionsWidth}}
+        {menuOpen && (
+          <Box
+            style={{
+              height: '210px',
+              width: mapActionsWidth,
+            }}
             className="drawerContainer"
           >
-            <Drawer dismissible style={{width:'100%'}} open={Boolean(anchorEl) && menuOpen}>
-              <DrawerContent >
+            <Drawer
+              dismissible
+              style={{ width: '100%' }}
+              open={Boolean(anchorEl) && menuOpen}
+            >
+              <DrawerContent>
                 <List>
                   <ListItem
                     onClick={(): void => {
@@ -131,15 +144,15 @@ export const PolygonSelectionUi: React.FC<PolygonSelectionUiProps> = (
                     }}
                   >
                     <ListItemGraphic icon="delete" />
-                      <ListItemText>
-                        <FormattedMessage id="polygon-selection.clear-menu_option.text" />
-                      </ListItemText>
-                    </ListItem>
+                    <ListItemText>
+                      <FormattedMessage id="polygon-selection.clear-menu_option.text" />
+                    </ListItemText>
+                  </ListItem>
                 </List>
               </DrawerContent>
             </Drawer>
           </Box>
-        }
+        )}
       </Box>
     );
   }

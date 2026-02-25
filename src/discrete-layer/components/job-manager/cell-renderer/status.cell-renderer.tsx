@@ -21,8 +21,8 @@ export const StatusRenderer: React.FC<ICellRendererParams> = (props) => {
   const status = jobData.status;
 
   const getProgress = (): string | null => {
-    if (jobData.taskCount as number === NO_DATA) {
-        return null;
+    if ((jobData.taskCount as number) === NO_DATA) {
+      return null;
     }
 
     const SUM_INIT = 0;
@@ -31,8 +31,7 @@ export const StatusRenderer: React.FC<ICellRendererParams> = (props) => {
       (sum: number, finalStatus: Status) => {
         const lowerCasedStatus = finalStatus.toLowerCase();
         const statusSum = get(jobData, `${lowerCasedStatus}Tasks`) as number;
-        const nextSum: number =
-          sum + (isNaN(statusSum) ? NO_DATA : statusSum);
+        const nextSum: number = sum + (isNaN(statusSum) ? NO_DATA : statusSum);
 
         return nextSum;
       },
@@ -49,11 +48,7 @@ export const StatusRenderer: React.FC<ICellRendererParams> = (props) => {
       id: `system-status.job.status_translation.${status as string}`,
     });
 
-    return (
-      <Box>
-        {`${statusText}  ${getProgress() ?? ''}`}
-      </Box>
-    );
+    return <Box>{`${statusText}  ${getProgress() ?? ''}`}</Box>;
   };
 
   type StatusCountType = number | null | undefined;
@@ -89,18 +84,26 @@ export const StatusRenderer: React.FC<ICellRendererParams> = (props) => {
     const { percentage } = jobData;
 
     return (
-        <Typography dir="auto" className={'progressPercentage'} tag={'p'}>
-          {typeof percentage !== 'undefined' && percentage !== null
-            ? `${percentage}%`
-            : ''}
-        </Typography>
+      <Typography dir="auto" className={'progressPercentage'} tag={'p'}>
+        {typeof percentage !== 'undefined' && percentage !== null
+          ? `${percentage}%`
+          : ''}
+      </Typography>
     );
   };
 
   const getProgressbarSections = (): JSX.Element | null => {
-    const { completedTasks, inProgressTasks, failedTasks, expiredTasks, status} = jobData;
+    const {
+      completedTasks,
+      inProgressTasks,
+      failedTasks,
+      expiredTasks,
+      status,
+    } = jobData;
 
-    const jobStatusFinal = FINAL_STATUSES.find(finalStatus => finalStatus === status);
+    const jobStatusFinal = FINAL_STATUSES.find(
+      (finalStatus) => finalStatus === status
+    );
 
     // If job status is a final status - we should return a full bar with its color.
     if (typeof jobStatusFinal !== 'undefined') {
@@ -125,15 +128,14 @@ export const StatusRenderer: React.FC<ICellRendererParams> = (props) => {
 
   return (
     <Box className="statusBarContainer">
-      <Box className="statusText">
-        {getProgressComponent()}
-      </Box>
+      <Box className="statusText">{getProgressComponent()}</Box>
       <Box
         className="statusBar"
         style={{
           width: `${STATUS_BAR_WIDTH}px`,
           height: `${STATUS_BAR_HEIGHT}px`,
-        }}>
+        }}
+      >
         {getPercentageView()}
         {getProgressbarSections()}
       </Box>

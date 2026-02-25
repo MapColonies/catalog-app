@@ -40,11 +40,11 @@ export type RasterErrorsSummary = {
     smallGeometries: {
       exceeded: boolean;
     };
-  }
+  };
 };
 // #endregion to be removed
 
 export type RasterErrorCount = {
   count?: number;
   exceeded?: boolean;
-}
+};

@@ -16,45 +16,53 @@ export const DEGREES_PER_METER = 0.00001;
 export const ZERO_MERIDIAN = 0;
 export const ANTI_MERIDIAN = 180;
 
-export type geoArgs = {name: string, value: any}[];
+export type geoArgs = { name: string; value: any }[];
 
 export type geoCustomChecks = {
-  validationFunc: ((value: string, args: geoArgs) => geoJSONValidation | undefined)[],
-  validationFuncArgs: geoArgs
+  validationFunc: ((
+    value: string,
+    args: geoArgs
+  ) => geoJSONValidation | undefined)[];
+  validationFuncArgs: geoArgs;
 };
 
 const checkPolygon = (coordinates: Position[][], meridian: number) => {
-    for (const ring of coordinates) {
-        for (let i = 0; i < ring.length - 1; i++) {
-            const start = ring[i];
-            const end = ring[i + 1];
+  for (const ring of coordinates) {
+    for (let i = 0; i < ring.length - 1; i++) {
+      const start = ring[i];
+      const end = ring[i + 1];
 
-            // Check if one point is on one side of the meridian and the other point is on the other side
-            if ((start[0] < meridian && end[0] > meridian) || (start[0] > meridian && end[0] < meridian)) {
-                return true;
-            }
-        }
+      // Check if one point is on one side of the meridian and the other point is on the other side
+      if (
+        (start[0] < meridian && end[0] > meridian) ||
+        (start[0] > meridian && end[0] < meridian)
+      ) {
+        return true;
+      }
     }
-    return false;
-}
+  }
+  return false;
+};
 
-export const crossesMeridian = (geometry: Polygon | MultiPolygon, meridian: number) => {
-    if (!geometry)
-      return true;
+export const crossesMeridian = (
+  geometry: Polygon | MultiPolygon,
+  meridian: number
+) => {
+  if (!geometry) return true;
 
-    const type = geometry.type;
+  const type = geometry.type;
 
-    if (type === 'Polygon') {
-        return checkPolygon(geometry.coordinates, meridian);
-    } else if (type === 'MultiPolygon') {
-        for (const polygon of geometry.coordinates) {
-            if (checkPolygon(polygon, meridian)) {
-                return true;
-            }
-        }
+  if (type === 'Polygon') {
+    return checkPolygon(geometry.coordinates, meridian);
+  } else if (type === 'MultiPolygon') {
+    for (const polygon of geometry.coordinates) {
+      if (checkPolygon(polygon, meridian)) {
+        return true;
+      }
     }
-    return false;
-}
+  }
+  return false;
+};
 
 /*
 ****** Current solution is using TURF MASK
@@ -71,104 +79,137 @@ There is 2 alternatives to get perimeter(outlined feature)
         const convexHullFromUnion: Feature = convex(unitedPolygon.geometry);
 */
 const QUANTIZATION_TOLERANCE = 1e6;
-const SIMPLIFY_TOLERANCE =  0.0001; // maximum allowed deviation(degrees) of simplified points from the original geometry
-// 0.0001 works good for geometries from ~200m(linear dimensions) 
-// but for a large geometries number of vertices might be relatively big and not so relevant for UI 
-export const getOutlinedFeature = (features: Feature<Polygon | MultiPolygon, Properties>[]) => {
-    const masked = mask({
-        type: 'FeatureCollection',
-        features: applyTopology(features, QUANTIZATION_TOLERANCE)
-    });
-    // Remove whole world geometry
-    masked.geometry.coordinates = masked.geometry.coordinates.slice(1);
-    
-    return simplify(
-        polygonToLine(masked), 
-        {tolerance: SIMPLIFY_TOLERANCE, highQuality: false}
-    );
-}
+const SIMPLIFY_TOLERANCE = 0.0001; // maximum allowed deviation(degrees) of simplified points from the original geometry
+// 0.0001 works good for geometries from ~200m(linear dimensions)
+// but for a large geometries number of vertices might be relatively big and not so relevant for UI
+export const getOutlinedFeature = (
+  features: Feature<Polygon | MultiPolygon, Properties>[]
+) => {
+  const masked = mask({
+    type: 'FeatureCollection',
+    features: applyTopology(features, QUANTIZATION_TOLERANCE),
+  });
+  // Remove whole world geometry
+  masked.geometry.coordinates = masked.geometry.coordinates.slice(1);
 
-export const applyTopology = (features: Feature<Polygon | MultiPolygon, Properties>[], quantization: number): Feature<Polygon | MultiPolygon, Properties>[]  => {
-    const polygons: Record<string,Geometry> = {};
-    features.forEach((feat, idx) => {
-        polygons[idx] = {
-            ...feat.geometry
-        } as unknown as Geometry;
-    });
+  return simplify(polygonToLine(masked), {
+    tolerance: SIMPLIFY_TOLERANCE,
+    highQuality: false,
+  });
+};
 
-    const pp_topology = topology(polygons, quantization );
-    const ret_features: Feature<Polygon | MultiPolygon, Properties>[] = [];
+export const applyTopology = (
+  features: Feature<Polygon | MultiPolygon, Properties>[],
+  quantization: number
+): Feature<Polygon | MultiPolygon, Properties>[] => {
+  const polygons: Record<string, Geometry> = {};
+  features.forEach((feat, idx) => {
+    polygons[idx] = {
+      ...feat.geometry,
+    } as unknown as Geometry;
+  });
 
-    Object.entries(polygons).forEach(([key, val]) => {
-      const topo_feat = feature(pp_topology, pp_topology.objects[key]);
-      ret_features.push(topo_feat as never);
-    });
+  const pp_topology = topology(polygons, quantization);
+  const ret_features: Feature<Polygon | MultiPolygon, Properties>[] = [];
 
-    return ret_features;
-}
+  Object.entries(polygons).forEach(([key, val]) => {
+    const topo_feat = feature(pp_topology, pp_topology.objects[key]);
+    ret_features.push(topo_feat as never);
+  });
 
-export const isGeometryPolygon =  (geometry: Geometry) => geometry ? geometry.type === 'Polygon' : true;
+  return ret_features;
+};
 
-export const polygonVertexDensityFactor = (polygon: Feature, tolerance: number): number => {
-    const vertices_org = explode(polygon as AllGeoJSON).features.map(f => f.geometry.coordinates);
-    const vertices_simpl = explode(turf.simplify(
-            polygon as AllGeoJSON, 
-            {tolerance, highQuality: false}
-        ))
-        .features.map(f => f.geometry.coordinates);
-    console.log("simple vs org vertices count:", vertices_org.length, "to:", vertices_simpl.length, `(${vertices_simpl.length/vertices_org.length})`);
+export const isGeometryPolygon = (geometry: Geometry) =>
+  geometry ? geometry.type === 'Polygon' : true;
 
-    return vertices_simpl.length/vertices_org.length;
-}
+export const polygonVertexDensityFactor = (
+  polygon: Feature,
+  tolerance: number
+): number => {
+  const vertices_org = explode(polygon as AllGeoJSON).features.map(
+    (f) => f.geometry.coordinates
+  );
+  const vertices_simpl = explode(
+    turf.simplify(polygon as AllGeoJSON, { tolerance, highQuality: false })
+  ).features.map((f) => f.geometry.coordinates);
+  console.log(
+    'simple vs org vertices count:',
+    vertices_org.length,
+    'to:',
+    vertices_simpl.length,
+    `(${vertices_simpl.length / vertices_org.length})`
+  );
 
-export const isPolygonContainsPolygon = (polygon: Feature, polygonToCheck: Feature): boolean => {
-    const polygonBBox = bbox(polygon);
-    const polygonBBoxPolygon = bboxPolygon(polygonBBox);
+  return vertices_simpl.length / vertices_org.length;
+};
 
-    const polygonToCheckBBox = bbox(polygonToCheck);
-    const polygonToCheckBBoxPolygon = bboxPolygon(polygonToCheckBBox);
-    return booleanContains(polygonBBoxPolygon, polygonToCheckBBoxPolygon);
+export const isPolygonContainsPolygon = (
+  polygon: Feature,
+  polygonToCheck: Feature
+): boolean => {
+  const polygonBBox = bbox(polygon);
+  const polygonBBoxPolygon = bboxPolygon(polygonBBox);
+
+  const polygonToCheckBBox = bbox(polygonToCheck);
+  const polygonToCheckBBoxPolygon = bboxPolygon(polygonToCheckBBox);
+  return booleanContains(polygonBBoxPolygon, polygonToCheckBBoxPolygon);
 };
 
 export const getFirstPoint = (geojson: Geometry): Position => {
-    // @ts-ignore
-    const { type, coordinates } = geojson;
-  
-    switch (type) {
-      case "Point":
-        return coordinates;
-  
-      case "LineString":
-      case "MultiPoint":
-        return coordinates[0];
-  
-      case "Polygon":
-      case "MultiLineString":
-        return coordinates[0][0];
-  
-      case "MultiPolygon":
-        return coordinates[0][0][0];
-  
-      default:
-        throw new Error("Unsupported GeoJSON geometry type");
-    }
-}
+  // @ts-ignore
+  const { type, coordinates } = geojson;
+
+  switch (type) {
+    case 'Point':
+      return coordinates;
+
+    case 'LineString':
+    case 'MultiPoint':
+      return coordinates[0];
+
+    case 'Polygon':
+    case 'MultiLineString':
+      return coordinates[0][0];
+
+    case 'MultiPolygon':
+      return coordinates[0][0][0];
+
+    default:
+      throw new Error('Unsupported GeoJSON geometry type');
+  }
+};
 
 export const explode = (geometry: AllGeoJSON) => {
-    return turf.explode(geometry)
-}
+  return turf.explode(geometry);
+};
 
 export const area = (geometry: AllGeoJSON) => {
-    return turf.area(geometry as unknown as  Feature<any> | FeatureCollection<any> | turf.helpers.Geometry);
-}
+  return turf.area(
+    geometry as unknown as
+      | Feature<any>
+      | FeatureCollection<any>
+      | turf.helpers.Geometry
+  );
+};
 
-export const isSmallArea = (area: number, pixelAreaThreshold: number, resolutionMeter: number): boolean => {
+export const isSmallArea = (
+  area: number,
+  pixelAreaThreshold: number,
+  resolutionMeter: number
+): boolean => {
   //IF($area > (sqrt(10) * to_real("resolution")) ^ 2 , 'Good', 'Small')
-  return (area > Math.pow((Math.sqrt(pixelAreaThreshold) * resolutionMeter), 2)) ? false : true;
-}
+  return area > Math.pow(Math.sqrt(pixelAreaThreshold) * resolutionMeter, 2)
+    ? false
+    : true;
+};
 
 // Function to detect small holes in Polygon and MultiPolygon
-export const countSmallHoles = (feature:  Feature<any>, threshold: number, resolution: number) => {
+export const countSmallHoles = (
+  feature: Feature<any>,
+  threshold: number,
+  resolution: number
+) => {
   let ret = 0;
   const featureGeometry = feature.geometry ?? feature;
   const type = featureGeometry.type;
@@ -183,13 +224,17 @@ export const countSmallHoles = (feature:  Feature<any>, threshold: number, resol
     console.log('Feature is not a Polygon or MultiPolygon.');
   }
 
-  if (ret > 0){
+  if (ret > 0) {
     console.log('Feature has holes', ret);
   }
   return ret;
-}
+};
 
-const countPolygonHoles = (coordinates: Position[][], threshold: number, resolution: number): number => {
+const countPolygonHoles = (
+  coordinates: Position[][],
+  threshold: number,
+  resolution: number
+): number => {
   let ret = 0;
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [outerRing, ...holes] = coordinates;
@@ -201,25 +246,30 @@ const countPolygonHoles = (coordinates: Position[][], threshold: number, resolut
     }
   });
   return ret;
-}
-
-export const getGapsByConvexHull = (polygonsData: {
-    [x: string]: PolygonPartRecordModelType;
-}) => {
-    const polygonsCoordinates = Object.values(polygonsData).map(
-        (poly: PolygonPartRecordModelType) => poly.footprint.coordinates);
-    const turfPolygons = polygonsCoordinates.map(
-        (coordinate) => turf.polygon(coordinate));
-    const polygonsCollection = turf.featureCollection(turfPolygons);
-    // @ts-ignore
-    const mergedPolygons = polygonsCollection.features.reduce((acc, curr) => {
-        return acc ? turf.union(acc, curr) : curr;
-    }, null);
-    const convexHull = turf.convex(polygonsCollection);
-    return convexHull? turf.difference(convexHull, mergedPolygons): null;
 };
 
-export const shrinkExtremeCoordinatesInOuterRing = (geometry: Geometry, factor = 0.99) => {
+export const getGapsByConvexHull = (polygonsData: {
+  [x: string]: PolygonPartRecordModelType;
+}) => {
+  const polygonsCoordinates = Object.values(polygonsData).map(
+    (poly: PolygonPartRecordModelType) => poly.footprint.coordinates
+  );
+  const turfPolygons = polygonsCoordinates.map((coordinate) =>
+    turf.polygon(coordinate)
+  );
+  const polygonsCollection = turf.featureCollection(turfPolygons);
+  // @ts-ignore
+  const mergedPolygons = polygonsCollection.features.reduce((acc, curr) => {
+    return acc ? turf.union(acc, curr) : curr;
+  }, null);
+  const convexHull = turf.convex(polygonsCollection);
+  return convexHull ? turf.difference(convexHull, mergedPolygons) : null;
+};
+
+export const shrinkExtremeCoordinatesInOuterRing = (
+  geometry: Geometry,
+  factor = 0.99
+) => {
   const LAT_THRESHOLD = 84.9;
   const LON_THRESHOLD = 179;
 
@@ -245,23 +295,26 @@ export const shrinkExtremeCoordinatesInOuterRing = (geometry: Geometry, factor =
     return processed;
   }
 
-  if (geometry.type === "Polygon") {
+  if (geometry.type === 'Polygon') {
     const [outer, ...holes] = geometry.coordinates;
     return {
-      type: "Polygon",
-      coordinates: [processRing(outer), ...holes]
+      type: 'Polygon',
+      coordinates: [processRing(outer), ...holes],
     } as Geometry;
   }
 
-  if (geometry.type === "MultiPolygon") {
+  if (geometry.type === 'MultiPolygon') {
     return {
-      type: "MultiPolygon",
-      coordinates: geometry.coordinates.map(polygon => {
+      type: 'MultiPolygon',
+      coordinates: geometry.coordinates.map((polygon) => {
         const [outer, ...holes] = polygon;
         return [processRing(outer), ...holes];
-      })
+      }),
     } as Geometry;
   }
 
-  throw new Error("[shrinkExtremeCoordinatesInOuterRing] Unsupported geometry type: " + geometry.type);
-}
+  throw new Error(
+    '[shrinkExtremeCoordinatesInOuterRing] Unsupported geometry type: ' +
+      geometry.type
+  );
+};

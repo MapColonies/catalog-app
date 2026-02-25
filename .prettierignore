@@ -1,5 +1,7 @@
 .vscode/settings.json
-schemas/*.json
+*.json
 helm
 confd
 public
+CHANGELOG.md
+src/discrete-layer/models

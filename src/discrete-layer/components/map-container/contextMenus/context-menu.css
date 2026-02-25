@@ -75,7 +75,10 @@ body[dir='rtl'] .imageryMenuIcon {
 }
 
 .imageryContextMenuTableField {
-  max-width: calc(var(--mdc-theme-gc-context-menu-width) - var(--order-width) - var(--scrollbar-width) - 24px);
+  max-width: calc(
+    var(--mdc-theme-gc-context-menu-width) - var(--order-width) -
+      var(--scrollbar-width) - 24px
+  );
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -93,7 +96,7 @@ body[dir='rtl'] .imageryMenuIcon {
   border-radius: 4px;
 }
 
-.menuSection{
+.menuSection {
   padding: 10px;
   width: 100%;
 }

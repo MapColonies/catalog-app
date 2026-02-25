@@ -66,7 +66,7 @@
 
 .dark-theme .mdc-menu .mdc-list {
   /* color: var(--mdc-theme-text-primary-on-background, rgba(0, 0, 0, 0.87)); */
-  color: var(--mdc-theme-text-primary-on-dark)
+  color: var(--mdc-theme-text-primary-on-dark);
 }
 
 .dark-theme .mdc-menu .mdc-list .mdc-list-item {
@@ -97,15 +97,18 @@
 }
 
 .dark-theme .mdc-select.mdc-select--disabled .mdc-select__selected-text {
-  color: unset; 
+  color: unset;
 }
 
-.dark-theme .mdc-select.mdc-select--outlined.mdc-select--no-label.mdc-select--disabled {
+.dark-theme
+  .mdc-select.mdc-select--outlined.mdc-select--no-label.mdc-select--disabled {
   background-color: var(--mdc-theme-text-disabled-on-light);
   opacity: 0.3;
 }
 
-.dark-theme .mdc-list.mdc-menu__items .mdc-list-item.mdc-ripple-upgraded--background-focused {
+.dark-theme
+  .mdc-list.mdc-menu__items
+  .mdc-list-item.mdc-ripple-upgraded--background-focused {
   color: var(--mdc-theme-primary);
 }
 
@@ -140,7 +143,7 @@
 }
 
 .dark-theme .ag-theme-alpine-dark .ag-row-hover:before {
-  background-color: unset
+  background-color: unset;
 }
 
 .dark-theme .ag-theme-alpine-dark .ag-cell-focus {
@@ -176,7 +179,7 @@
 .dark-theme .mdc-text-field--invalid .mdc-text-field__input {
   color: var(--mdc-theme-gc-error-high, red) !important;
 }
-  
+
 .dark-theme .mdc-text-field__input {
   color: var(--mdc-theme-text-primary-on-dark, #fff) !important;
 }
@@ -210,7 +213,8 @@
 
 /* DATE-TIME-PICKER CUSTOMIZATION */
 
-.MuiGrid-align-items-xs-flex-end.MuiGrid-justify-content-xs-center.MuiGrid-grid-xs-6, .MuiPickersCalendarHeader-switchHeader {
+.MuiGrid-align-items-xs-flex-end.MuiGrid-justify-content-xs-center.MuiGrid-grid-xs-6,
+.MuiPickersCalendarHeader-switchHeader {
   direction: ltr;
 }
 
@@ -354,7 +358,6 @@ body[dir='rtl'] .dark-theme .rst__virtualScrollOverride {
   opacity: 0.3;
 }
 
-
 /* Date Range Picker */
 
 .dark-theme .pickerContainer {
@@ -362,20 +365,30 @@ body[dir='rtl'] .dark-theme .rst__virtualScrollOverride {
 
   --date-picker-day-background: var(--mdc-theme-alternative-surface);
   --date-picker-day-font-color: var(--mdc-theme-text-primary-on-background);
-  --date-picker-day-selecting-range-background: var(--mdc-theme-gc-selection-background);
+  --date-picker-day-selecting-range-background: var(
+    --mdc-theme-gc-selection-background
+  );
   --date-picker-day-selecting-range-font-color: var(--mdc-theme-on-primary);
   --date-picker-day-hover-background: var(--mdc-theme-text-primary-on-dark);
   --date-picker-day-hover-font-color: var(--mdc-theme-text-primary-on-light);
-  --date-picker-selected-day-background: var(--mdc-theme-gc-selection-background);
-  --date-picker-selected-day-hover-background: var(--mdc-theme-text-primary-on-dark);
-  --date-picker-selected-day-hover-font-color: var(--mdc-theme-text-primary-on-light);
+  --date-picker-selected-day-background: var(
+    --mdc-theme-gc-selection-background
+  );
+  --date-picker-selected-day-hover-background: var(
+    --mdc-theme-text-primary-on-dark
+  );
+  --date-picker-selected-day-hover-font-color: var(
+    --mdc-theme-text-primary-on-light
+  );
   --date-picker-selected-day-font-color: var(--mdc-theme-on-primary);
 
   --date-picker-nav-icons-color: var(--mdc-theme-text-primary-on-background);
   --date-picker-header-background: var(--mdc-theme-gc-selection-background);
   --date-picker-header-color: var(--mdc-theme-text-primary-on-background);
 
-  --date-picker-shortcuts-hover-background: var(--mdc-theme-text-primary-on-dark);
+  --date-picker-shortcuts-hover-background: var(
+    --mdc-theme-text-primary-on-dark
+  );
   --date-picker-shortcuts-background: var(--mdc-theme-alternative-surface);
   --date-picker-shortcuts-font-color: var(--mdc-theme-text-primary-on-light);
 
@@ -383,9 +396,15 @@ body[dir='rtl'] .dark-theme .rst__virtualScrollOverride {
   --month-year-pickers-font-color: var(--mdc-theme-on-primary);
   --month-year-pickers-border-color: var(--mdc-theme-gc-selection-background);
 
-  --date-picker-scrollbar-track-background: var(--mdc-theme-text-primary-on-light);
-  --date-picker-scrollbar-thumb-background: var(--mdc-theme-alternative-surface);
-  --date-picker-scrollbar-thumb-hover-background: var(--mdc-theme-text-primary-on-dark);
+  --date-picker-scrollbar-track-background: var(
+    --mdc-theme-text-primary-on-light
+  );
+  --date-picker-scrollbar-thumb-background: var(
+    --mdc-theme-alternative-surface
+  );
+  --date-picker-scrollbar-thumb-hover-background: var(
+    --mdc-theme-text-primary-on-dark
+  );
 }
 
 /* LINEAR PROGRESS CUSTOMIZATION */
@@ -394,13 +413,13 @@ body[dir='rtl'] .dark-theme .rst__virtualScrollOverride {
 }
 
 /* COLLAPSABLE PANEL*/
-.dark-theme .rmwc-collapsible-list__children-inner{
-  border: 1px solid var(--mdc-theme-gc-selection-background); 
+.dark-theme .rmwc-collapsible-list__children-inner {
+  border: 1px solid var(--mdc-theme-gc-selection-background);
   margin-bottom: 2px;
 }
 
 /* SELLECT BUTTON FLAVOR*/
-.dark-theme .selectButtonFlavor .mdc-select__anchor{
+.dark-theme .selectButtonFlavor .mdc-select__anchor {
   height: 40px;
   width: 144px;
   background-color: transparent;
@@ -408,19 +427,21 @@ body[dir='rtl'] .dark-theme .rst__virtualScrollOverride {
   border: 1px solid var(--mdc-theme-primary);
 }
 
-.dark-theme .selectButtonFlavor .mdc-select__selected-text{
+.dark-theme .selectButtonFlavor .mdc-select__selected-text {
   color: var(--mdc-theme-primary) !important;
 }
 
-.dark-theme .selectButtonFlavor.mdc-select--disabled .mdc-select__selected-text{
+.dark-theme
+  .selectButtonFlavor.mdc-select--disabled
+  .mdc-select__selected-text {
   color: var(--mdc-theme-text-disabled-on-dark) !important;
 }
 
-.dark-theme .selectButtonFlavor.mdc-select--disabled .mdc-select__anchor{
+.dark-theme .selectButtonFlavor.mdc-select--disabled .mdc-select__anchor {
   border: solid 1px var(--mdc-theme-on-secondary);
   opacity: 0.4;
 }
 
-.dark-theme .selectButtonFlavor .mdc-list-item__ripple{
+.dark-theme .selectButtonFlavor .mdc-list-item__ripple {
   opacity: 0 !important;
 }

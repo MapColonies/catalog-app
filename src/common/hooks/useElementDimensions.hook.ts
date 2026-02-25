@@ -5,7 +5,9 @@ export interface IDimensions {
   height: number;
 }
 
-export const useElementDimensions = (element: React.MutableRefObject<HTMLElement | null>): IDimensions | undefined => {
+export const useElementDimensions = (
+  element: React.MutableRefObject<HTMLElement | null>
+): IDimensions | undefined => {
   const [dimensions, setDimensions] = useState<IDimensions>();
 
   useLayoutEffect(() => {

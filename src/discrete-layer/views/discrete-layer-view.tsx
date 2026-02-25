@@ -8,7 +8,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import bbox from '@turf/bbox';
 import bboxPolygon from '@turf/bbox-polygon';
 import { lineString } from '@turf/helpers';
-import { 
+import {
   Avatar,
   Icon,
   IconButton,
@@ -17,7 +17,7 @@ import {
   Select,
   Tooltip,
   Typography,
-  useTheme
+  useTheme,
 } from '@map-colonies/react-core';
 import {
   BboxCorner,
@@ -31,7 +31,7 @@ import {
   DrawType,
   IContextMenuData,
   IDrawing,
-  IDrawingEvent
+  IDrawingEvent,
 } from '@map-colonies/react-components';
 import { GeocoderOptions } from '@map-colonies/react-components/dist/cesium-map/geocoder/geocoder-panel';
 import { IMapLegend } from '@map-colonies/react-components/dist/cesium-map/legend';
@@ -76,7 +76,7 @@ import {
   JobModelType,
   LayerMetadataMixedUnion,
   LinkModelType,
-  RecordType
+  RecordType,
 } from '../models';
 import { IDispatchAction } from '../models/actionDispatcherStore';
 import { ILayerImage } from '../models/layerImage';
@@ -106,7 +106,9 @@ const START_IDX = 0;
 const DELTA = 0.00001;
 const DRAWING_MATERIAL_OPACITY = 0.5;
 const DRAWING_FINAL_MATERIAL_OPACITY = 0.8;
-const DRAWING_MATERIAL_COLOR = CesiumColor.YELLOW.withAlpha(DRAWING_MATERIAL_OPACITY);
+const DRAWING_MATERIAL_COLOR = CesiumColor.YELLOW.withAlpha(
+  DRAWING_MATERIAL_OPACITY
+);
 const mapMode2D = MapMode2D[CONFIG.MAP.MAPMODE2D as keyof typeof MapMode2D];
 
 const DRAWING_FINAL_MATERIAL = new CesiumPolylineDashMaterialProperty({
@@ -129,46 +131,73 @@ const getTimeStamp = (): string => new Date().getTime().toString();
 
 const DiscreteLayerView: React.FC = observer(() => {
   // eslint-disable-next-line
-  const { loading: searchLoading, error: searchError, data, query, setQuery } = useQuery();
+  const {
+    loading: searchLoading,
+    error: searchError,
+    data,
+    query,
+    setQuery,
+  } = useQuery();
   const store = useStore();
   const theme = useTheme();
   const intl = useIntl();
   const [isDrawing, setIsDrawing] = useState<boolean>(false);
-  const [jobToOpenRasterEntity, setJobToOpenRasterEntity] = useState<JobModelType | undefined>(undefined);
-  const [jobToOpenJobManager, setJobToOpenJobManager] = useState<Partial<Pick<JobModelType, 'id' | 'resourceId' | 'updated'>> | undefined>(undefined);
+  const [jobToOpenRasterEntity, setJobToOpenRasterEntity] = useState<
+    JobModelType | undefined
+  >(undefined);
+  const [jobToOpenJobManager, setJobToOpenJobManager] = useState<
+    Partial<Pick<JobModelType, 'id' | 'resourceId' | 'updated'>> | undefined
+  >(undefined);
   const [isRasterDialogOpen, setIsRasterDialogOpen] = useState<boolean>(false);
-  const [is3DIngestDialogOpen, setIs3DIngestDialogOpen] = useState<boolean>(false);
-  const [isDemIngestDialogOpen, setIsDemIngestDialogOpen] = useState<boolean>(false);
+  const [is3DIngestDialogOpen, setIs3DIngestDialogOpen] =
+    useState<boolean>(false);
+  const [isDemIngestDialogOpen, setIsDemIngestDialogOpen] =
+    useState<boolean>(false);
   const [isEntityDialogOpen, setIsEntityDialogOpen] = useState<boolean>(false);
-  const [isEntityDeleteDialogOpen, setIsEntityDeleteDialogOpen] = useState<boolean>(false);
-  const [isSystemsJobsDialogOpen, setIsSystemsJobsDialogOpen] = useState<boolean>(false);
-  const [isSystemCoreInfoDialogOpen, setIsSystemCoreInfoDialogOpen] = useState<boolean>(false);
-  const [isCreateEntityMenuOpen, setIsCreateEntityMenuOpen] = useState<boolean>(false);
+  const [isEntityDeleteDialogOpen, setIsEntityDeleteDialogOpen] =
+    useState<boolean>(false);
+  const [isSystemsJobsDialogOpen, setIsSystemsJobsDialogOpen] =
+    useState<boolean>(false);
+  const [isSystemCoreInfoDialogOpen, setIsSystemCoreInfoDialogOpen] =
+    useState<boolean>(false);
+  const [isCreateEntityMenuOpen, setIsCreateEntityMenuOpen] =
+    useState<boolean>(false);
   const [tabsPanelExpanded, setTabsPanelExpanded] = useState<boolean>(true);
-  const [detailsPanelExpanded, setDetailsPanelExpanded] = useState<boolean>(false);
+  const [detailsPanelExpanded, setDetailsPanelExpanded] =
+    useState<boolean>(false);
   const [activeTabView, setActiveTabView] = useState(TabViews.CATALOG);
   const [drawPrimitive, setDrawPrimitive] = useState<IDrawingObject>(noDrawing);
   const [catalogRefresh, setCatalogRefresh] = useState<number>(START_IDX);
-  const [isActiveLayersFilterEnabled, setIsActiveLayersFilterEnabled] = useState<boolean>(false);
+  const [isActiveLayersFilterEnabled, setIsActiveLayersFilterEnabled] =
+    useState<boolean>(false);
   const [catalogFilter, setCatalogFilter] = useState<boolean>(false);
   const [rect, setRect] = useState<CesiumRectangle | undefined>(undefined);
   const [poi, setPoi] = useState<IPOI | undefined>(undefined);
   const [isPoiSearchActive, setIsPoiSearchActive] = useState(false);
   const [corners, setCorners] = useState<BBoxCorners | undefined>(undefined);
-  const [userRole, setUserRole] = useState<UserRole>(store.userStore.user?.role ?? CONFIG.DEFAULT_USER.ROLE);
-  const [drawEntities, setDrawEntities] = useState<IDrawing[]>([{
-    coordinates: [],
-    name: '',
-    id: '',
-    type: DrawType.UNKNOWN,
-  }]);
+  const [userRole, setUserRole] = useState<UserRole>(
+    store.userStore.user?.role ?? CONFIG.DEFAULT_USER.ROLE
+  );
+  const [drawEntities, setDrawEntities] = useState<IDrawing[]>([
+    {
+      coordinates: [],
+      name: '',
+      id: '',
+      type: DrawType.UNKNOWN,
+    },
+  ]);
   const [searchResultsError, setSearchResultsError] = useState();
-  const [actionsMenuDimensions, setActionsMenuDimensions] = useState<MenuDimensions>();
-  const [whatsNewVisitedCount, setWhatsNewVisitedCount] = useState<number>(ZERO);
-  const [taskNotificationCount, setTaskNotificationCount] = useState<number>(ZERO);
+  const [actionsMenuDimensions, setActionsMenuDimensions] =
+    useState<MenuDimensions>();
+  const [whatsNewVisitedCount, setWhatsNewVisitedCount] =
+    useState<number>(ZERO);
+  const [taskNotificationCount, setTaskNotificationCount] =
+    useState<number>(ZERO);
 
   const isDrawingState = isDrawing || store.exportStore.drawingState?.drawing;
-  const disableOnDrawingClassName = isDrawingState ? 'interactionsDisabled' : '';
+  const disableOnDrawingClassName = isDrawingState
+    ? 'interactionsDisabled'
+    : '';
 
   useEffect(() => {
     const visitedCount = localStore.get('whatsNewVisitedCount');
@@ -207,57 +236,68 @@ const DiscreteLayerView: React.FC = observer(() => {
       store.discreteLayersStore.setTabviewData(TabViews.SEARCH_RESULTS, layers);
     }
   }, [data]);
-  
+
   useEffect(() => {
     // When search query changes, we need to refetch catalog capabilities as well
     let fullCatalogLayers: LayerMetadataMixedUnion[] | undefined;
-    
+
     // Tab data is set only when switching tabs
     if (activeTabView === TabViews.CATALOG) {
       fullCatalogLayers = store.discreteLayersStore.layersImages;
     } else {
-      fullCatalogLayers = store.discreteLayersStore.tabViews?.[TabViews.CATALOG].layersImages;
+      fullCatalogLayers =
+        store.discreteLayersStore.tabViews?.[TabViews.CATALOG].layersImages;
     }
 
     if (!isEmpty(data) && !isEmpty(fullCatalogLayers)) {
       const searchLayers = get(data, 'search', []) as ILayerImage[];
-      
+
       /**
        * There could be a case where the catalog includes outdated data (New layers has bee added).
        * Search results will always be updated each time new filter is applied.
        * As a workaround we add the delta layers to the capabilities search to update the capabilities state with the added layers.
        */
-      searchLayers.forEach(layer => {
-        const isNewLayer = !fullCatalogLayers?.some(catalogLayer => catalogLayer.id === layer.id);
+      searchLayers.forEach((layer) => {
+        const isNewLayer = !fullCatalogLayers?.some(
+          (catalogLayer) => catalogLayer.id === layer.id
+        );
         if (isNewLayer) {
           fullCatalogLayers?.push(layer);
         }
-      })
+      });
     }
-    
+
     void store.catalogTreeStore.capabilitiesFetch(fullCatalogLayers);
   }, [data]);
 
   useEffect(() => {
     setSearchResultsError(searchError);
   }, [searchError]);
-  
+
   useEffect(() => {
     /**
      * Instead of just set the width of the panel according to the state, we need to assign variable on the app container
      * because the map container will need to resize accordingly to fill up the space.
-     * */ 
-    const appContainer = document.querySelector('.app-container') as HTMLDivElement;
+     * */
+    const appContainer = document.querySelector(
+      '.app-container'
+    ) as HTMLDivElement;
     if (!tabsPanelExpanded) {
-      appContainer?.style.setProperty(SIDE_PANEL_WIDTH_VARIABLE, COLLAPSED_PANEL_WIDTH);
+      appContainer?.style.setProperty(
+        SIDE_PANEL_WIDTH_VARIABLE,
+        COLLAPSED_PANEL_WIDTH
+      );
     } else {
-      appContainer?.style.setProperty(SIDE_PANEL_WIDTH_VARIABLE, EXPANDED_PANEL_WIDTH);
+      appContainer?.style.setProperty(
+        SIDE_PANEL_WIDTH_VARIABLE,
+        EXPANDED_PANEL_WIDTH
+      );
     }
   }, [tabsPanelExpanded]);
 
   useEffect(() => {
     store.discreteLayersStore.resetTabView([TabViews.SEARCH_RESULTS]);
-    
+
     if (activeTabView === TabViews.SEARCH_RESULTS) {
       store.discreteLayersStore.clearLayersImages();
       store.discreteLayersStore.resetSelectedLayer();
@@ -269,42 +309,49 @@ const DiscreteLayerView: React.FC = observer(() => {
     }
   }, [store.discreteLayersStore.searchParams.geojson]);
 
-  const dispatchAction = (action: Record<string,unknown>): void => {
-    store.actionDispatcherStore.dispatchAction(
-      {
-        action: action.action,
-        data: action.data,
-      } as IDispatchAction
-    );
+  const dispatchAction = (action: Record<string, unknown>): void => {
+    store.actionDispatcherStore.dispatchAction({
+      action: action.action,
+      data: action.data,
+    } as IDispatchAction);
   };
-  
+
   /* eslint-disable */
-  const mapSettingsLocale = useMemo(() => ({
-    DIRECTION: intl.locale === 'he' ? 'rtl' : 'ltr',
-    METERS_UNIT: intl.formatMessage({ id: 'map.scale.units.meters' }),
-    KILOMETERS_UNIT: intl.formatMessage({ id: 'map.scale.units.kilometers' }),
-    ZOOM_LABEL: intl.formatMessage({ id: 'map.zoom.label' }),
-    DEBUG_PANEL_TITLE: intl.formatMessage({ id: 'debug-panel.title' }),
-    WFS_TITLE: intl.formatMessage({ id: 'debug-panel.wfs.title' }),
-    WFS_CACHE: intl.formatMessage({ id: 'debug-panel.wfs.cache' }),
-    WFS_EXTENT: intl.formatMessage({ id: 'debug-panel.wfs.extent' }),
-    NO_DATA_LAYERS: intl.formatMessage({ id: 'debug-panel.empty' }),
-    ACTIVE_LAYERS_TITLE: intl.formatMessage({ id: 'active-layers.title' }),
-    IMAGERY: intl.formatMessage({ id: 'active-layers.imagery' }),
-    DATA: intl.formatMessage({ id: 'active-layers.data' }),
-    FLY_TO: intl.formatMessage({ id: 'action.flyTo.tooltip' }),
-    REMOVE: intl.formatMessage({ id: 'active-layers.remove' }),
-    BASE_MAP_TITLE: intl.formatMessage({ id: 'map-settings.base-map.title' }),
-    TERRAIN_TITLE: intl.formatMessage({ id: 'record-type.record_quantized_mesh.label' }),
-    SHOW_FEATURE_ON_MAP: intl.formatMessage({ id: 'geocoder-panel.show-feature-on-map' }),
-    IN_MAP_EXTENT: intl.formatMessage({ id: 'geocoder-panel.in-map-extent' }),
-    SEARCH_PLACEHOLDER: intl.formatMessage({ id: 'general.search.placeholder' }),
-    NO_RESULTS: intl.formatMessage({ id: 'results.nodata' }),
-  }), [intl]);
+  const mapSettingsLocale = useMemo(
+    () => ({
+      DIRECTION: intl.locale === 'he' ? 'rtl' : 'ltr',
+      METERS_UNIT: intl.formatMessage({ id: 'map.scale.units.meters' }),
+      KILOMETERS_UNIT: intl.formatMessage({ id: 'map.scale.units.kilometers' }),
+      ZOOM_LABEL: intl.formatMessage({ id: 'map.zoom.label' }),
+      DEBUG_PANEL_TITLE: intl.formatMessage({ id: 'debug-panel.title' }),
+      WFS_TITLE: intl.formatMessage({ id: 'debug-panel.wfs.title' }),
+      WFS_CACHE: intl.formatMessage({ id: 'debug-panel.wfs.cache' }),
+      WFS_EXTENT: intl.formatMessage({ id: 'debug-panel.wfs.extent' }),
+      NO_DATA_LAYERS: intl.formatMessage({ id: 'debug-panel.empty' }),
+      ACTIVE_LAYERS_TITLE: intl.formatMessage({ id: 'active-layers.title' }),
+      IMAGERY: intl.formatMessage({ id: 'active-layers.imagery' }),
+      DATA: intl.formatMessage({ id: 'active-layers.data' }),
+      FLY_TO: intl.formatMessage({ id: 'action.flyTo.tooltip' }),
+      REMOVE: intl.formatMessage({ id: 'active-layers.remove' }),
+      BASE_MAP_TITLE: intl.formatMessage({ id: 'map-settings.base-map.title' }),
+      TERRAIN_TITLE: intl.formatMessage({
+        id: 'record-type.record_quantized_mesh.label',
+      }),
+      SHOW_FEATURE_ON_MAP: intl.formatMessage({
+        id: 'geocoder-panel.show-feature-on-map',
+      }),
+      IN_MAP_EXTENT: intl.formatMessage({ id: 'geocoder-panel.in-map-extent' }),
+      SEARCH_PLACEHOLDER: intl.formatMessage({
+        id: 'general.search.placeholder',
+      }),
+      NO_RESULTS: intl.formatMessage({ id: 'results.nodata' }),
+    }),
+    [intl]
+  );
   /* eslint-enable */
 
   const memoizedLayers = useMemo(() => {
-    return(
+    return (
       <>
         <MapActionResolver />
         <SelectedLayersContainer />
@@ -318,8 +365,8 @@ const DiscreteLayerView: React.FC = observer(() => {
   const LayersResultsStyle = useMemo(() => {
     return {
       height: 'calc(100% - 50px)',
-      width: 'calc(100% - 8px)'
-    }
+      width: 'calc(100% - 8px)',
+    };
   }, []);
 
   const handleTabViewChange = (targetViewIdx: TabViews): void => {
@@ -334,17 +381,23 @@ const DiscreteLayerView: React.FC = observer(() => {
   };
 
   const buildFilters = (): FilterField[] => {
-    const coordinates = (store.discreteLayersStore.searchParams.geojson as Polygon)?.coordinates[0];
-   
-    const boundingBoxFilter = coordinates ? [{
-      field: 'mc:boundingBox',
-      bbox: {
-        llon: coordinates[0][0],
-        llat: coordinates[0][1],
-        ulon: coordinates[2][0],
-        ulat: coordinates[2][1],
-      },
-    }] : [];
+    const coordinates = (
+      store.discreteLayersStore.searchParams.geojson as Polygon
+    )?.coordinates[0];
+
+    const boundingBoxFilter = coordinates
+      ? [
+          {
+            field: 'mc:boundingBox',
+            bbox: {
+              llon: coordinates[0][0],
+              llat: coordinates[0][1],
+              ulon: coordinates[2][0],
+              ulat: coordinates[2][1],
+            },
+          },
+        ]
+      : [];
 
     return [
       ...boundingBoxFilter,
@@ -352,7 +405,7 @@ const DiscreteLayerView: React.FC = observer(() => {
         field: 'mc:type',
         eq: store.discreteLayersStore.searchParams.recordType,
       },
-      ...store.discreteLayersStore.searchParams.catalogFilters
+      ...store.discreteLayersStore.searchParams.catalogFilters,
     ];
   };
 
@@ -364,30 +417,39 @@ const DiscreteLayerView: React.FC = observer(() => {
   useEffect(() => {
     if (activeTabView === TabViews.SEARCH_RESULTS) {
       void store.discreteLayersStore.clearLayersImages();
-  
+
       // TODO: build query params: FILTERS and SORTS
       const filters = buildFilters();
-      setQuery(store.querySearch({
-        opts: {
-          filter: filters
-        },
-        end: CONFIG.RUNNING_MODE.END_RECORD,
-        start: CONFIG.RUNNING_MODE.START_RECORD,
-      }));
+      setQuery(
+        store.querySearch({
+          opts: {
+            filter: filters,
+          },
+          end: CONFIG.RUNNING_MODE.END_RECORD,
+          start: CONFIG.RUNNING_MODE.START_RECORD,
+        })
+      );
     }
-  }, [store.discreteLayersStore.searchParams.geojson, store.discreteLayersStore.searchParams.catalogFilters]);
+  }, [
+    store.discreteLayersStore.searchParams.geojson,
+    store.discreteLayersStore.searchParams.catalogFilters,
+  ]);
 
   useEffect(() => {
-    const hasFiltersEnabled = store.discreteLayersStore.searchParams.catalogFilters.length > START_IDX || store.discreteLayersStore.searchParams.geojson;
+    const hasFiltersEnabled =
+      store.discreteLayersStore.searchParams.catalogFilters.length >
+        START_IDX || store.discreteLayersStore.searchParams.geojson;
     if (hasFiltersEnabled) {
       const filters = buildFilters();
-      setQuery(store.querySearch({
-        opts: {
-          filter: filters
-        },
-        end: CONFIG.RUNNING_MODE.END_RECORD,
-        start: CONFIG.RUNNING_MODE.START_RECORD,
-      }));
+      setQuery(
+        store.querySearch({
+          opts: {
+            filter: filters,
+          },
+          end: CONFIG.RUNNING_MODE.END_RECORD,
+          start: CONFIG.RUNNING_MODE.START_RECORD,
+        })
+      );
     }
   }, [store.discreteLayersStore.searchParams.recordType]);
 
@@ -405,7 +467,11 @@ const DiscreteLayerView: React.FC = observer(() => {
   };
 
   const handleCatalogFiltersReset = (): void => {
-    if (store.discreteLayersStore.searchParams.catalogFilters.length === START_IDX) { return; }
+    if (
+      store.discreteLayersStore.searchParams.catalogFilters.length === START_IDX
+    ) {
+      return;
+    }
 
     store.discreteLayersStore.searchParams.resetCatalogFilters();
 
@@ -416,10 +482,10 @@ const DiscreteLayerView: React.FC = observer(() => {
       store.discreteLayersStore.resetSelectedLayer();
       store.discreteLayersStore.resetPolygonParts();
     }
-    
+
     // Geographic filters are being cleaned via the "Trashcan" (handlePolygonReset function).
     // If any of the geographical filters is enabled, then we want to stay at the search results tab.
-    
+
     if (typeof store.discreteLayersStore.searchParams.geojson === 'undefined') {
       handleTabViewChange(TabViews.CATALOG);
       setSearchResultsError(undefined);
@@ -427,20 +493,23 @@ const DiscreteLayerView: React.FC = observer(() => {
   };
 
   const handlePolygonReset = (): void => {
-      store.discreteLayersStore.searchParams.resetLocation();
-      setDrawEntities([]);
-      setPoi(undefined);
-      setCorners(undefined);
-      setSearchResultsError(undefined);
+    store.discreteLayersStore.searchParams.resetLocation();
+    setDrawEntities([]);
+    setPoi(undefined);
+    setCorners(undefined);
+    setSearchResultsError(undefined);
 
     if (activeTabView !== TabViews.CATALOG) {
       // Catalog filters are being cleaned from inside the catalog filters panel.
       // If there's any filter enabled, then we want to stay at the search results tab.
-      if (store.discreteLayersStore.searchParams.catalogFilters?.length === START_IDX) {
+      if (
+        store.discreteLayersStore.searchParams.catalogFilters?.length ===
+        START_IDX
+      ) {
         handleTabViewChange(TabViews.CATALOG);
       }
     }
-    
+
     store.mapMenusManagerStore.resetMapMenusFeatures();
   };
 
@@ -469,11 +538,11 @@ const DiscreteLayerView: React.FC = observer(() => {
     [RecordType.RECORD_DEM]: {
       [Mode.NEW]: setIsDemIngestDialogOpen,
       [Mode.VIEW]: setIsEntityDialogOpen,
-    }
+    },
   };
 
   const handleEntityDialogOpen = (recordType: RecordType, open: boolean) => {
-    const mode = store.discreteLayersStore.selectedLayerOperationMode;    
+    const mode = store.discreteLayersStore.selectedLayerOperationMode;
     const setDialogOpen = get(dialogMap, `${recordType}.${mode}`);
 
     if (setDialogOpen) {
@@ -489,7 +558,7 @@ const DiscreteLayerView: React.FC = observer(() => {
         handleTabViewChange(TabViews.SEARCH_RESULTS);
         handlePolygonSelected((drawing.geojson as Feature).geometry as Polygon);
         setIsDrawing(false);
-        
+
         setDrawEntities([
           {
             coordinates: drawing.primitive,
@@ -504,53 +573,62 @@ const DiscreteLayerView: React.FC = observer(() => {
       },
     };
   };
-  
+
   const setDrawType = (drawType: DrawType): void => {
     setIsDrawing(true);
     setDrawPrimitive(createDrawPrimitive(drawType));
   };
 
   const onPoiSelection = (lon: number, lat: number): void => {
-    onPolygonSelection({
-      primitive: undefined,
-      type: DrawType.BOX,
-      geojson: {
-        type : 'FeatureCollection',
-        features: [
-          { 
-            type : 'Feature',
-            properties : {  
-              type : BboxCorner.TOP_RIGHT,
-            }, 
-            geometry : { 
-              type : 'Point',
-              coordinates : [ lon + DELTA, lat + DELTA ] 
-            }
-          },
-          { 
-            type : 'Feature',
-            properties : {  
-              type : BboxCorner.BOTTOM_LEFT
-            }, 
-            geometry : { 
-              type : 'Point',
-              coordinates : [ lon - DELTA, lat - DELTA ]  
-            }
-          }
-        ]
-      }
-    }, true);
-    setPoi({lon, lat});
+    onPolygonSelection(
+      {
+        primitive: undefined,
+        type: DrawType.BOX,
+        geojson: {
+          type: 'FeatureCollection',
+          features: [
+            {
+              type: 'Feature',
+              properties: {
+                type: BboxCorner.TOP_RIGHT,
+              },
+              geometry: {
+                type: 'Point',
+                coordinates: [lon + DELTA, lat + DELTA],
+              },
+            },
+            {
+              type: 'Feature',
+              properties: {
+                type: BboxCorner.BOTTOM_LEFT,
+              },
+              geometry: {
+                type: 'Point',
+                coordinates: [lon - DELTA, lat - DELTA],
+              },
+            },
+          ],
+        },
+      },
+      true
+    );
+    setPoi({ lon, lat });
   };
 
   const onPolygonSelection = (polygon: IDrawingEvent, isPoi = false): void => {
     const timeStamp = getTimeStamp();
-    const bottomLeftPoint = find((polygon.geojson as FeatureCollection<Point>).features, (feat: Feature<Point>)=>{
-      return feat.properties?.type === BboxCorner.BOTTOM_LEFT;
-    }) as Feature<Point>;
-    const rightTopPoint = find((polygon.geojson as FeatureCollection<Point>).features, (feat: Feature<Point>)=>{
-      return feat.properties?.type === BboxCorner.TOP_RIGHT;
-    }) as Feature<Point>;
+    const bottomLeftPoint = find(
+      (polygon.geojson as FeatureCollection<Point>).features,
+      (feat: Feature<Point>) => {
+        return feat.properties?.type === BboxCorner.BOTTOM_LEFT;
+      }
+    ) as Feature<Point>;
+    const rightTopPoint = find(
+      (polygon.geojson as FeatureCollection<Point>).features,
+      (feat: Feature<Point>) => {
+        return feat.properties?.type === BboxCorner.TOP_RIGHT;
+      }
+    ) as Feature<Point>;
     setCorners({
       topRightLat: rightTopPoint.geometry.coordinates[1],
       topRightLon: rightTopPoint.geometry.coordinates[0],
@@ -560,7 +638,7 @@ const DiscreteLayerView: React.FC = observer(() => {
     const line = lineString([
       [
         bottomLeftPoint.geometry.coordinates[0],
-        bottomLeftPoint.geometry.coordinates[1]
+        bottomLeftPoint.geometry.coordinates[1],
       ],
       [
         rightTopPoint.geometry.coordinates[0],
@@ -568,10 +646,10 @@ const DiscreteLayerView: React.FC = observer(() => {
       ],
     ]);
     const boxPolygon = bboxPolygon(bbox(line));
-    
+
     handleTabViewChange(TabViews.SEARCH_RESULTS);
 
-    handlePolygonSelected((boxPolygon as Feature).geometry as Polygon); 
+    handlePolygonSelected((boxPolygon as Feature).geometry as Polygon);
 
     setDrawEntities([
       {
@@ -590,7 +668,7 @@ const DiscreteLayerView: React.FC = observer(() => {
     setRect(new CesiumRectangle());
     dispatchAction({
       action: UserAction.SYSTEM_CALLBACK_FLYTO,
-      data: { selectedLayer: store.discreteLayersStore.selectedLayer }
+      data: { selectedLayer: store.discreteLayersStore.selectedLayer },
     });
   }, []);
 
@@ -612,59 +690,97 @@ const DiscreteLayerView: React.FC = observer(() => {
     {
       idx: TabViews.EXPORT_LAYER,
       title: 'tab-views.export-layer',
-      iconClassName: intl.locale === 'en' ? 'mc-icon-Export' : 'mc-icon-Export-Left',
-    }
+      iconClassName:
+        intl.locale === 'en' ? 'mc-icon-Export' : 'mc-icon-Export-Left',
+    },
   ];
 
   const permissions = useMemo(() => {
     return {
-      isSystemJobsAllowed: store.userStore.isActionAllowed(UserAction.SYSTEM_ACTION_JOBS),
-      isSystemCoreInfoAllowed: store.userStore.isActionAllowed(UserAction.SYSTEM_ACTION_COREINFO),
-      isWebToolsAllowed: store.userStore.isActionAllowed(UserAction.SYSTEM_ACTION_TOOLS),
-      isSystemFilterEnabled: store.userStore.isActionAllowed(UserAction.SYSTEM_ACTION_FILTER),
-      isSystemSidebarCollapseEnabled: store.userStore.isActionAllowed(UserAction.SYSTEM_ACTION_SIDEBARCOLLAPSEEXPAND),
-      isLayerRasterRecordIngestAllowed: store.userStore.isActionAllowed(UserAction.ENTITY_ACTION_LAYERRASTERRECORD_CREATE),
-      isLayer3DRecordIngestAllowed: store.userStore.isActionAllowed(UserAction.ENTITY_ACTION_LAYER3DRECORD_CREATE),
-      isLayerDemRecordIngestAllowed: store.userStore.isActionAllowed(UserAction.ENTITY_ACTION_LAYERDEMRECORD_CREATE),
-      isSwitchUserRoleAllowed: store.userStore.isActionAllowed(UserAction.FEATURE_SWITCH_USER_ROLE),
-      isDeleteAllowed: store.userStore.isActionAllowed(`entity_action.${store.discreteLayersStore.selectedLayer?.__typename}.delete`),
-    }
+      isSystemJobsAllowed: store.userStore.isActionAllowed(
+        UserAction.SYSTEM_ACTION_JOBS
+      ),
+      isSystemCoreInfoAllowed: store.userStore.isActionAllowed(
+        UserAction.SYSTEM_ACTION_COREINFO
+      ),
+      isWebToolsAllowed: store.userStore.isActionAllowed(
+        UserAction.SYSTEM_ACTION_TOOLS
+      ),
+      isSystemFilterEnabled: store.userStore.isActionAllowed(
+        UserAction.SYSTEM_ACTION_FILTER
+      ),
+      isSystemSidebarCollapseEnabled: store.userStore.isActionAllowed(
+        UserAction.SYSTEM_ACTION_SIDEBARCOLLAPSEEXPAND
+      ),
+      isLayerRasterRecordIngestAllowed: store.userStore.isActionAllowed(
+        UserAction.ENTITY_ACTION_LAYERRASTERRECORD_CREATE
+      ),
+      isLayer3DRecordIngestAllowed: store.userStore.isActionAllowed(
+        UserAction.ENTITY_ACTION_LAYER3DRECORD_CREATE
+      ),
+      isLayerDemRecordIngestAllowed: store.userStore.isActionAllowed(
+        UserAction.ENTITY_ACTION_LAYERDEMRECORD_CREATE
+      ),
+      isSwitchUserRoleAllowed: store.userStore.isActionAllowed(
+        UserAction.FEATURE_SWITCH_USER_ROLE
+      ),
+      isDeleteAllowed: store.userStore.isActionAllowed(
+        `entity_action.${store.discreteLayersStore.selectedLayer?.__typename}.delete`
+      ),
+    };
   }, [store.userStore.user, store.discreteLayersStore.selectedLayer]);
 
   const recordTypeOptions = useMemo(() => {
     return CONFIG.SERVED_ENTITY_TYPES.map((entity) => {
       const value = entity as keyof typeof RecordType;
       return {
-        label: intl.formatMessage({id: `record-type.${RecordType[value].toLowerCase()}.label`}),
-        value: RecordType[value]
+        label: intl.formatMessage({
+          id: `record-type.${RecordType[value].toLowerCase()}.label`,
+        }),
+        value: RecordType[value],
       };
     });
   }, []);
 
   const PanelExpanderButton: React.FC = () => {
     const isRtl = intl.locale === 'he';
-    const iconClassExpand = isRtl ? 'mc-icon-Arrows-Left' : 'mc-icon-Arrows-Right';
-    const iconClassCollapse = isRtl ? 'mc-icon-Arrows-Right' : 'mc-icon-Arrows-Left';
-    const className = `${tabsPanelExpanded ? iconClassCollapse : iconClassExpand}`;
+    const iconClassExpand = isRtl
+      ? 'mc-icon-Arrows-Left'
+      : 'mc-icon-Arrows-Right';
+    const iconClassCollapse = isRtl
+      ? 'mc-icon-Arrows-Right'
+      : 'mc-icon-Arrows-Left';
+    const className = `${
+      tabsPanelExpanded ? iconClassCollapse : iconClassExpand
+    }`;
 
     return (
-      <Tooltip content={intl.formatMessage({ id: `${!tabsPanelExpanded ? 'action.expand.tooltip' : 'action.collapse.tooltip'}` })}>
-        <IconButton 
+      <Tooltip
+        content={intl.formatMessage({
+          id: `${
+            !tabsPanelExpanded
+              ? 'action.expand.tooltip'
+              : 'action.collapse.tooltip'
+          }`,
+        })}
+      >
+        <IconButton
           className={className}
           label="PANEL EXPANDER"
           disabled={!(permissions.isSystemSidebarCollapseEnabled as boolean)}
-          onClick={ (): void => {setTabsPanelExpanded(!tabsPanelExpanded);}}
+          onClick={(): void => {
+            setTabsPanelExpanded(!tabsPanelExpanded);
+          }}
         />
       </Tooltip>
     );
   };
 
   const getActiveTabHeader = (tabIdx: number, site: string): JSX.Element => {
-
     if (!tabsPanelExpanded) {
       return (
         <div className="tabHeaderContainer">
-           <PanelExpanderButton />
+          <PanelExpanderButton />
         </div>
       );
     }
@@ -673,63 +789,90 @@ const DiscreteLayerView: React.FC = observer(() => {
       return tab.idx === tabIdx;
     });
 
-
     return (
       <div className="tabHeaderContainer">
-        <div className="tabTitleContainer" style={{backgroundColor: theme.custom?.GC_TAB_ACTIVE_BACKGROUND as string}}>
-          <div className="tabTitle" style={{
-            backgroundColor: theme.custom?.GC_ALTERNATIVE_SURFACE as string,
-            borderBottomColor: theme.custom?.GC_TAB_ACTIVE_BACKGROUND as string
-          }}>
-            <IconButton 
+        <div
+          className="tabTitleContainer"
+          style={{
+            backgroundColor: theme.custom?.GC_TAB_ACTIVE_BACKGROUND as string,
+          }}
+        >
+          <div
+            className="tabTitle"
+            style={{
+              backgroundColor: theme.custom?.GC_ALTERNATIVE_SURFACE as string,
+              borderBottomColor: theme.custom
+                ?.GC_TAB_ACTIVE_BACKGROUND as string,
+            }}
+          >
+            <IconButton
               className={`operationIcon ${tabView?.iconClassName as string}`}
               label="TAB ICON"
             />
-            <div className='tab-title'>
+            <div className="tab-title">
               <Typography use="headline6" tag="span">
                 <FormattedMessage id={tabView?.title}></FormattedMessage>
               </Typography>
-              <Typography use="headline6" tag="span" className={`current-client-site-${site}`}>
-                {site!=='generic' && intl.formatMessage({ id: `tab-views.catalog.site.${site}` })}
+              <Typography
+                use="headline6"
+                tag="span"
+                className={`current-client-site-${site}`}
+              >
+                {site !== 'generic' &&
+                  intl.formatMessage({ id: `tab-views.catalog.site.${site}` })}
               </Typography>
             </div>
           </div>
         </div>
 
-        <div className="tabOperationsContainer" style={{backgroundColor: theme.custom?.GC_ALTERNATIVE_SURFACE as string}}>
-          <div className="tabOperations" style={{
-            backgroundColor: theme.custom?.GC_TAB_ACTIVE_BACKGROUND as string,
-            borderTopColor: theme.custom?.GC_TAB_ACTIVE_BACKGROUND as string
-          }}>
-            {
-              tabIdx === TabViews.CATALOG && 
+        <div
+          className="tabOperationsContainer"
+          style={{
+            backgroundColor: theme.custom?.GC_ALTERNATIVE_SURFACE as string,
+          }}
+        >
+          <div
+            className="tabOperations"
+            style={{
+              backgroundColor: theme.custom?.GC_TAB_ACTIVE_BACKGROUND as string,
+              borderTopColor: theme.custom?.GC_TAB_ACTIVE_BACKGROUND as string,
+            }}
+          >
+            {tabIdx === TabViews.CATALOG && (
               <Box className="filterByCatalogEntitySelect">
                 <Select
                   enhanced
                   defaultValue={recordTypeOptions[0].value}
                   options={recordTypeOptions}
                   value={store.discreteLayersStore.searchParams.recordType}
-                  onChange={
-                    (evt: React.ChangeEvent<HTMLSelectElement>): void => {
-                      store.discreteLayersStore.searchParams.setRecordType(get(evt,'currentTarget.value'));
-                      setCatalogFilter(false);
-                      setIsActiveLayersFilterEnabled(false);
-                      setCatalogRefresh(catalogRefresh + 1);
-                    }
-                  }
+                  onChange={(
+                    evt: React.ChangeEvent<HTMLSelectElement>
+                  ): void => {
+                    store.discreteLayersStore.searchParams.setRecordType(
+                      get(evt, 'currentTarget.value')
+                    );
+                    setCatalogFilter(false);
+                    setIsActiveLayersFilterEnabled(false);
+                    setCatalogRefresh(catalogRefresh + 1);
+                  }}
                 />
               </Box>
-            }
-            {
-              tabIdx === TabViews.CATALOG &&
-              <Tooltip content={intl.formatMessage({ id: catalogFilter ? 'action.show-all.tooltip' : 'action.filter-nonactive.tooltip' })}>
+            )}
+            {tabIdx === TabViews.CATALOG && (
+              <Tooltip
+                content={intl.formatMessage({
+                  id: catalogFilter
+                    ? 'action.show-all.tooltip'
+                    : 'action.filter-nonactive.tooltip',
+                })}
+              >
                 <Icon
                   className="operationIcon"
                   disabled={!isActiveLayersFilterEnabled}
                   label="ACTIVE"
                   onClick={(): void => {
                     if (isActiveLayersFilterEnabled) {
-                      setCatalogFilter(prev => !prev);
+                      setCatalogFilter((prev) => !prev);
                     }
                   }}
                   icon={
@@ -743,10 +886,11 @@ const DiscreteLayerView: React.FC = observer(() => {
                   }
                 />
               </Tooltip>
-            }
-            {
-              tabIdx === TabViews.CATALOG && 
-              <Tooltip content={intl.formatMessage({ id: 'action.refresh.tooltip' })}>
+            )}
+            {tabIdx === TabViews.CATALOG && (
+              <Tooltip
+                content={intl.formatMessage({ id: 'action.refresh.tooltip' })}
+              >
                 <IconButton
                   className="operationIcon mc-icon-Refresh"
                   onClick={(): void => {
@@ -756,66 +900,91 @@ const DiscreteLayerView: React.FC = observer(() => {
                   }}
                 />
               </Tooltip>
-            }
-            {
-              tabIdx === TabViews.CATALOG && 
-              (permissions.isLayerRasterRecordIngestAllowed as boolean || permissions.isLayer3DRecordIngestAllowed || permissions.isLayerDemRecordIngestAllowed) && 
-              <MenuSurfaceAnchor id="newContainer">
-                <MenuSurface open={isCreateEntityMenuOpen} onClose={(): void => setIsCreateEntityMenuOpen(false)}>
-                  {
-                    CONFIG.SERVED_ENTITY_TYPES.includes('RECORD_RASTER') &&
-                    permissions.isLayerRasterRecordIngestAllowed &&
-                    <Tooltip content={intl.formatMessage({ id: 'tab-views.catalog.actions.ingest_raster' })}>
-                      <IconButton
-                        className="operationIcon mc-icon-Map-Orthophoto"
-                        label="NEW RASTER"
-                        onClick={(): void => {
-                          setIsCreateEntityMenuOpen(false);
-                          dispatchAction({
-                            action: UserAction.ENTITY_ACTION_LAYERRASTERRECORD_CREATE
-                          });
-                        }}
-                      />
-                    </Tooltip>
-                  }
-                  {
-                    CONFIG.SERVED_ENTITY_TYPES.includes('RECORD_3D') &&
-                    permissions.isLayer3DRecordIngestAllowed &&
-                    <Tooltip content={intl.formatMessage({ id: 'tab-views.catalog.actions.ingest_3d' })}>
-                      <IconButton
-                        className="operationIcon mc-icon-Map-3D"
-                        label="NEW 3D"
-                        onClick={(): void => {
-                          setIsCreateEntityMenuOpen(false);
-                          dispatchAction({
-                            action: UserAction.ENTITY_ACTION_LAYER3DRECORD_CREATE
-                          });
-                        }}
-                      />
-                    </Tooltip>
-                  }
-                  {
-                    CONFIG.SERVED_ENTITY_TYPES.includes('RECORD_DEM') &&
-                    permissions.isLayerDemRecordIngestAllowed &&
-                    <Tooltip content={intl.formatMessage({ id: 'tab-views.catalog.actions.ingest_dem' })}>
-                      <IconButton
-                        className="operationIcon mc-icon-Map-DTM"
-                        label="NEW DEM"
-                        onClick={(): void => {
-                          setIsCreateEntityMenuOpen(false);
-                          dispatchAction({
-                            action: UserAction.ENTITY_ACTION_LAYERDEMRECORD_CREATE
-                          });
-                        }}
-                      />
-                    </Tooltip>
-                  }
-                </MenuSurface>
-                <Tooltip content={intl.formatMessage({ id: 'action.operations.tooltip' })}>
-                  <IconButton className="operationIcon mc-icon-Plus" onClick={(): void => setIsCreateEntityMenuOpen(!isCreateEntityMenuOpen)}/>
-                </Tooltip>
-              </MenuSurfaceAnchor>
-            }
+            )}
+            {tabIdx === TabViews.CATALOG &&
+              ((permissions.isLayerRasterRecordIngestAllowed as boolean) ||
+                permissions.isLayer3DRecordIngestAllowed ||
+                permissions.isLayerDemRecordIngestAllowed) && (
+                <MenuSurfaceAnchor id="newContainer">
+                  <MenuSurface
+                    open={isCreateEntityMenuOpen}
+                    onClose={(): void => setIsCreateEntityMenuOpen(false)}
+                  >
+                    {CONFIG.SERVED_ENTITY_TYPES.includes('RECORD_RASTER') &&
+                      permissions.isLayerRasterRecordIngestAllowed && (
+                        <Tooltip
+                          content={intl.formatMessage({
+                            id: 'tab-views.catalog.actions.ingest_raster',
+                          })}
+                        >
+                          <IconButton
+                            className="operationIcon mc-icon-Map-Orthophoto"
+                            label="NEW RASTER"
+                            onClick={(): void => {
+                              setIsCreateEntityMenuOpen(false);
+                              dispatchAction({
+                                action:
+                                  UserAction.ENTITY_ACTION_LAYERRASTERRECORD_CREATE,
+                              });
+                            }}
+                          />
+                        </Tooltip>
+                      )}
+                    {CONFIG.SERVED_ENTITY_TYPES.includes('RECORD_3D') &&
+                      permissions.isLayer3DRecordIngestAllowed && (
+                        <Tooltip
+                          content={intl.formatMessage({
+                            id: 'tab-views.catalog.actions.ingest_3d',
+                          })}
+                        >
+                          <IconButton
+                            className="operationIcon mc-icon-Map-3D"
+                            label="NEW 3D"
+                            onClick={(): void => {
+                              setIsCreateEntityMenuOpen(false);
+                              dispatchAction({
+                                action:
+                                  UserAction.ENTITY_ACTION_LAYER3DRECORD_CREATE,
+                              });
+                            }}
+                          />
+                        </Tooltip>
+                      )}
+                    {CONFIG.SERVED_ENTITY_TYPES.includes('RECORD_DEM') &&
+                      permissions.isLayerDemRecordIngestAllowed && (
+                        <Tooltip
+                          content={intl.formatMessage({
+                            id: 'tab-views.catalog.actions.ingest_dem',
+                          })}
+                        >
+                          <IconButton
+                            className="operationIcon mc-icon-Map-DTM"
+                            label="NEW DEM"
+                            onClick={(): void => {
+                              setIsCreateEntityMenuOpen(false);
+                              dispatchAction({
+                                action:
+                                  UserAction.ENTITY_ACTION_LAYERDEMRECORD_CREATE,
+                              });
+                            }}
+                          />
+                        </Tooltip>
+                      )}
+                  </MenuSurface>
+                  <Tooltip
+                    content={intl.formatMessage({
+                      id: 'action.operations.tooltip',
+                    })}
+                  >
+                    <IconButton
+                      className="operationIcon mc-icon-Plus"
+                      onClick={(): void =>
+                        setIsCreateEntityMenuOpen(!isCreateEntityMenuOpen)
+                      }
+                    />
+                  </Tooltip>
+                </MenuSurfaceAnchor>
+              )}
             {/*<Tooltip content={intl.formatMessage({ id: 'action.delete.tooltip' })}>
               <IconButton 
                 className="operationIcon mc-icon-Delete"
@@ -837,48 +1006,69 @@ const DiscreteLayerView: React.FC = observer(() => {
     );
   };
 
-  const mapLegendsExtractor = useCallback((layers: (ILayerImage & { meta: unknown })[]): IMapLegend[] => {
-    const legendDocProtocol = LinkType.LEGEND_DOC;
-    const legendImgProtocol = LinkType.LEGEND_IMG;
-    const legendObjProtocol = LinkType.LEGEND;
-    const legendsProtocols = [legendDocProtocol, legendImgProtocol, legendObjProtocol];
+  const mapLegendsExtractor = useCallback(
+    (layers: (ILayerImage & { meta: unknown })[]): IMapLegend[] => {
+      const legendDocProtocol = LinkType.LEGEND_DOC;
+      const legendImgProtocol = LinkType.LEGEND_IMG;
+      const legendObjProtocol = LinkType.LEGEND;
+      const legendsProtocols = [
+        legendDocProtocol,
+        legendImgProtocol,
+        legendObjProtocol,
+      ];
 
-    return layers.reduce((legendsList, cesiumLayer): IMapLegend[] => {
-      if (typeof get(cesiumLayer.meta, 'layerRecord.links') !== 'undefined') {
-        const cesiumLayerLinks = get(cesiumLayer,'meta.layerRecord.links') as LinkModelType[];
+      return layers.reduce((legendsList, cesiumLayer): IMapLegend[] => {
+        if (typeof get(cesiumLayer.meta, 'layerRecord.links') !== 'undefined') {
+          const cesiumLayerLinks = get(
+            cesiumLayer,
+            'meta.layerRecord.links'
+          ) as LinkModelType[];
 
-        const layerLegendLinks = cesiumLayerLinks.reduce((legendsByProtocol, link) => {
-          const isLegendLink = legendsProtocols.includes(link.protocol as LinkType);
+          const layerLegendLinks = cesiumLayerLinks.reduce(
+            (legendsByProtocol, link) => {
+              const isLegendLink = legendsProtocols.includes(
+                link.protocol as LinkType
+              );
 
-          if (isLegendLink) {
-            return { ...legendsByProtocol, [link.protocol as LinkType]: link };
+              if (isLegendLink) {
+                return {
+                  ...legendsByProtocol,
+                  [link.protocol as LinkType]: link,
+                };
+              }
+              return legendsByProtocol;
+            },
+            {} as Record<LinkType, LinkModelType>
+          );
+
+          const layerLegend: IMapLegend = {
+            layer: get(cesiumLayer, 'meta.layerRecord.productName') as string,
+            legend: get(cesiumLayer, 'layerLegendsLinks.LEGEND') as Record<
+              string,
+              unknown
+            >[],
+            legendDoc: get(layerLegendLinks, 'LEGEND_DOC.url') as string,
+            legendImg: get(layerLegendLinks, 'LEGEND_IMG.url') as string,
+          };
+
+          const { legendDoc, legendImg } = layerLegend;
+
+          const shouldAddLegend =
+            typeof legendDoc !== 'undefined' ||
+            typeof legendImg !== 'undefined';
+
+          if (!shouldAddLegend) {
+            return legendsList;
           }
-          return legendsByProtocol;
-        }, {} as Record<LinkType, LinkModelType>)
-        
-        const layerLegend: IMapLegend = {
-          layer: get(cesiumLayer, 'meta.layerRecord.productName') as string,
-          legend: get(cesiumLayer, 'layerLegendsLinks.LEGEND') as Record<string, unknown>[],
-          legendDoc: get(layerLegendLinks,'LEGEND_DOC.url') as string,
-          legendImg: get(layerLegendLinks,'LEGEND_IMG.url') as string,
-        };
-        
-        const {legendDoc, legendImg} = layerLegend;
 
-        const shouldAddLegend = typeof legendDoc !== 'undefined' || typeof legendImg !== 'undefined';
-
-        if (!shouldAddLegend) {
-          return legendsList;
+          return [...legendsList, layerLegend];
         }
 
-        return [...legendsList, layerLegend];
-      }
-
-      return legendsList;
-    
-    }, [] as IMapLegend[]);
-
-  }, []);
+        return legendsList;
+      }, [] as IMapLegend[]);
+    },
+    []
+  );
 
   useEffect(() => {
     if (typeof store.userStore.user?.role !== 'undefined') {
@@ -913,138 +1103,170 @@ const DiscreteLayerView: React.FC = observer(() => {
 
   const site = useMemo(() => currentSite(), []);
 
-  const triggerCallbackFunc = (data: Feature, options: GeocoderOptions, i: number) => {
+  const triggerCallbackFunc = (
+    data: Feature,
+    options: GeocoderOptions,
+    i: number
+  ) => {
     const requestId = data.properties?.headers['request_id'];
 
     if (!requestId) {
-      console.warn('GEOCODING[FEEDBACK]: Missing request_id in response header. Ensure the "Access-Control-Expose-Headers" header includes "request_id".');
+      console.warn(
+        'GEOCODING[FEEDBACK]: Missing request_id in response header. Ensure the "Access-Control-Expose-Headers" header includes "request_id".'
+      );
     }
 
-    if (!CONFIG.GEOCODER.CALLBACK_URL) { return; }
+    if (!CONFIG.GEOCODER.CALLBACK_URL) {
+      return;
+    }
 
-    const CATALOG_APP_USER_ID = CONFIG.CATALOG_APP_USER_ID.replace('{CURRENT_USER}', store.userStore?.user?.role as string);
+    const CATALOG_APP_USER_ID = CONFIG.CATALOG_APP_USER_ID.replace(
+      '{CURRENT_USER}',
+      store.userStore?.user?.role as string
+    );
 
     const body = {
       request_id: requestId,
       chosen_result_id: i,
-      user_id: CATALOG_APP_USER_ID
-    }
+      user_id: CATALOG_APP_USER_ID,
+    };
 
     const url = `${CONFIG.GEOCODER.CALLBACK_URL}?token=${CONFIG.ACCESS_TOKEN.TOKEN_VALUE}`;
 
     fetch(url, {
       method: 'POST',
-      body: JSON.stringify(body)
+      body: JSON.stringify(body),
     });
   };
 
-  const GEOCODER_OPTIONS = useMemo(() => ([
-    {
-      baseUrl: CONFIG.GEOCODER.URL,
-      endPoint: '/search/location/query',
-      method: 'GET',
-      params: {
-        dynamic: {
-          queryText: 'query',
-          geoContext: {
-            name: 'geo_context',
-            relatedParams: [["geo_context_mode", 'filter']]
-          }
+  const GEOCODER_OPTIONS = useMemo(
+    () =>
+      [
+        {
+          baseUrl: CONFIG.GEOCODER.URL,
+          endPoint: '/search/location/query',
+          method: 'GET',
+          params: {
+            dynamic: {
+              queryText: 'query',
+              geoContext: {
+                name: 'geo_context',
+                relatedParams: [['geo_context_mode', 'filter']],
+              },
+            },
+            static: [
+              ['limit', CONFIG.GEOCODER.RESULTS_LIMIT],
+              ['disable_fuzziness', false],
+              ['token', CONFIG.ACCESS_TOKEN.TOKEN_VALUE],
+            ],
+          },
+          title: intl.formatMessage({ id: 'geocoder-panel.title.location' }),
+          callbackFunc: (data, options, i) => {
+            triggerCallbackFunc(data, options, i);
+          },
         },
-        static: [
-          ["limit", CONFIG.GEOCODER.RESULTS_LIMIT],
-          ["disable_fuzziness", false],
-          ["token", CONFIG.ACCESS_TOKEN.TOKEN_VALUE]
-        ],
-      },
-      title: intl.formatMessage({ id: 'geocoder-panel.title.location' }),
-      callbackFunc: (data, options, i) => { triggerCallbackFunc(data, options, i) }
-    },
-    {
-      baseUrl: CONFIG.GEOCODER.URL,
-      endPoint: '/search/control/tiles',
-      method: 'GET',
-      params: {
-        dynamic: {
-          queryText: 'tile',
-          geoContext: {
-            name: 'geo_context',
-            relatedParams: [['geo_context_mode', 'filter']],
-          }
+        {
+          baseUrl: CONFIG.GEOCODER.URL,
+          endPoint: '/search/control/tiles',
+          method: 'GET',
+          params: {
+            dynamic: {
+              queryText: 'tile',
+              geoContext: {
+                name: 'geo_context',
+                relatedParams: [['geo_context_mode', 'filter']],
+              },
+            },
+            static: [
+              ['limit', CONFIG.GEOCODER.RESULTS_LIMIT],
+              ['disable_fuzziness', false],
+              ['token', CONFIG.ACCESS_TOKEN.TOKEN_VALUE],
+            ],
+          },
+          title: intl.formatMessage({ id: 'geocoder-panel.title.tiles' }),
+          callbackFunc: (data, options, i) => {
+            triggerCallbackFunc(data, options, i);
+          },
         },
-        static: [
-          ["limit", CONFIG.GEOCODER.RESULTS_LIMIT],
-          ["disable_fuzziness", false],
-          ["token", CONFIG.ACCESS_TOKEN.TOKEN_VALUE]
-        ],
-      },
-      title: intl.formatMessage({ id: 'geocoder-panel.title.tiles' }),
-      callbackFunc: (data, options, i) => { triggerCallbackFunc(data, options, i) }
-    },
-    {
-      baseUrl: CONFIG.GEOCODER.URL,
-      endPoint: '/search/control/items',
-      method: 'GET',
-      params: {
-        dynamic: {
-          queryText: 'command_name',
-          geoContext: {
-            name: 'geo_context',
-            relatedParams: [['geo_context_mode', 'filter']],
-          }
+        {
+          baseUrl: CONFIG.GEOCODER.URL,
+          endPoint: '/search/control/items',
+          method: 'GET',
+          params: {
+            dynamic: {
+              queryText: 'command_name',
+              geoContext: {
+                name: 'geo_context',
+                relatedParams: [['geo_context_mode', 'filter']],
+              },
+            },
+            static: [
+              ['limit', CONFIG.GEOCODER.RESULTS_LIMIT],
+              ['disable_fuzziness', false],
+              ['token', CONFIG.ACCESS_TOKEN.TOKEN_VALUE],
+            ],
+          },
+          title: intl.formatMessage({ id: 'geocoder-panel.title.control' }),
+          callbackFunc: (data, options, i) => {
+            triggerCallbackFunc(data, options, i);
+          },
         },
-        static: [
-          ["limit", CONFIG.GEOCODER.RESULTS_LIMIT],
-          ["disable_fuzziness", false],
-          ["token", CONFIG.ACCESS_TOKEN.TOKEN_VALUE]
-        ],
-      },
-      title: intl.formatMessage({ id: 'geocoder-panel.title.control' }),
-      callbackFunc: (data, options, i) => { triggerCallbackFunc(data, options, i) }
-    },
-    {
-      baseUrl: CONFIG.GEOCODER.URL,
-      endPoint: '/search/control/routes',
-      method: 'GET',
-      params: {
-        dynamic: {
-          queryText: 'command_name',
-          geoContext: {
-            name: 'geo_context',
-            relatedParams: [['geo_context_mode', 'filter']],
-          }
+        {
+          baseUrl: CONFIG.GEOCODER.URL,
+          endPoint: '/search/control/routes',
+          method: 'GET',
+          params: {
+            dynamic: {
+              queryText: 'command_name',
+              geoContext: {
+                name: 'geo_context',
+                relatedParams: [['geo_context_mode', 'filter']],
+              },
+            },
+            static: [['token', CONFIG.ACCESS_TOKEN.TOKEN_VALUE]],
+            // "geo_context": { "bbox": [-180, -90, 180, 90] },
+          },
+          title: intl.formatMessage({ id: 'geocoder-panel.title.routes' }),
+          callbackFunc: (data, options, i) => {
+            triggerCallbackFunc(data, options, i);
+          },
         },
-        static: [
-          ["token", CONFIG.ACCESS_TOKEN.TOKEN_VALUE]
-        ],
-        // "geo_context": { "bbox": [-180, -90, 180, 90] },
-      },
-      title: intl.formatMessage({ id: 'geocoder-panel.title.routes' }),
-      callbackFunc: (data, options, i) => { triggerCallbackFunc(data, options, i) }
-    },
-  ]) satisfies GeocoderOptions[], [intl]);
+      ] satisfies GeocoderOptions[],
+    [intl]
+  );
 
   return (
     <>
       <Box className={`headerContainer ${disableOnDrawingClassName}`}>
         <Box className="headerViewsSwitcher">
           <Box>
-           <AppTitle />
+            <AppTitle />
           </Box>
           <TabViewsSwitcher
-            handleTabViewChange = {handleTabViewChange}
-            activeTabView = {activeTabView}
-            disabled={isDrawing || store.exportStore.drawingState?.drawing || store.catalogTreeStore.isLoading || searchLoading}
+            handleTabViewChange={handleTabViewChange}
+            activeTabView={activeTabView}
+            disabled={
+              isDrawing ||
+              store.exportStore.drawingState?.drawing ||
+              store.catalogTreeStore.isLoading ||
+              searchLoading
+            }
           />
         </Box>
         <Box className="headerSearchOptionsContainer">
           <PolygonSelectionUi
-            onCancelDraw={(): void=>{ console.log('****** onCancelDraw ****** called')}}
+            onCancelDraw={(): void => {
+              console.log('****** onCancelDraw ****** called');
+            }}
             onReset={handlePolygonReset}
             onStartDraw={setDrawType}
             onFiltersApply={handleCatalogFiltersApply}
             onFiltersReset={handleCatalogFiltersReset}
-            isSelectionEnabled={Array.isArray(drawEntities[START_IDX]?.coordinates) ? drawEntities[START_IDX]?.coordinates.length > START_IDX : !!drawEntities[START_IDX]?.coordinates}
+            isSelectionEnabled={
+              Array.isArray(drawEntities[START_IDX]?.coordinates)
+                ? drawEntities[START_IDX]?.coordinates.length > START_IDX
+                : !!drawEntities[START_IDX]?.coordinates
+            }
             onPolygonUpdate={onPolygonSelection}
             onPoiUpdate={onPoiSelection}
             poi={poi}
@@ -1053,44 +1275,56 @@ const DiscreteLayerView: React.FC = observer(() => {
           />
         </Box>
         <Box className="headerSystemAreaContainer">
-          <Tooltip content={intl.formatMessage({ id: 'general.whats-new.tooltip' })}>
+          <Tooltip
+            content={intl.formatMessage({ id: 'general.whats-new.tooltip' })}
+          >
             <Box className="position">
-              {
-                whatsNewVisitedCount === ZERO &&
+              {whatsNewVisitedCount === ZERO && (
                 <Box className="badge badge_primary"></Box>
-              }
+              )}
               <IconButton
-                  className="operationIcon mc-icon-Help"
-                  style={{fontSize: '38px'}}
-                  label="Whats new?"
-                  onClick={(): void => { 
-                    const val = whatsNewVisitedCount + 1;
-                    localStore.set('whatsNewVisitedCount', val + '');
-                    setWhatsNewVisitedCount(val);
-                    window.open(CONFIG.WHATSNEW_URL, '_blank');
-                  }}
-                />
+                className="operationIcon mc-icon-Help"
+                style={{ fontSize: '38px' }}
+                label="Whats new?"
+                onClick={(): void => {
+                  const val = whatsNewVisitedCount + 1;
+                  localStore.set('whatsNewVisitedCount', val + '');
+                  setWhatsNewVisitedCount(val);
+                  window.open(CONFIG.WHATSNEW_URL, '_blank');
+                }}
+              />
             </Box>
           </Tooltip>
-          <Tooltip content={intl.formatMessage({ id: 'general.login-user.tooltip' }, { user: store.userStore.user?.role })}>
-            <Avatar className="avatar" name={store.userStore.user?.role} size="large" />
+          <Tooltip
+            content={intl.formatMessage(
+              { id: 'general.login-user.tooltip' },
+              { user: store.userStore.user?.role }
+            )}
+          >
+            <Avatar
+              className="avatar"
+              name={store.userStore.user?.role}
+              size="large"
+            />
           </Tooltip>
-          {
-            permissions.isSwitchUserRoleAllowed &&
+          {permissions.isSwitchUserRoleAllowed && (
             <Box className="headerUserModeSwitchContainer">
-              <UserModeSwitch userRole={userRole} setUserRole={store.userStore.changeUserRole}/>
+              <UserModeSwitch
+                userRole={userRole}
+                setUserRole={store.userStore.changeUserRole}
+              />
             </Box>
-          }
-          {
-            permissions.isSystemJobsAllowed &&
-            <Tooltip content={intl.formatMessage({ id: 'action.system-jobs.tooltip' })}>
+          )}
+          {permissions.isSystemJobsAllowed && (
+            <Tooltip
+              content={intl.formatMessage({ id: 'action.system-jobs.tooltip' })}
+            >
               <Box className="systemJobsIconWrapper">
-                {
-                  taskNotificationCount > 0 &&
+                {taskNotificationCount > 0 && (
                   <AutoDirectionBox className="notificationBadge">
                     {taskNotificationCount < 10 ? taskNotificationCount : '9+'}
                   </AutoDirectionBox>
-                }
+                )}
                 <IconButton
                   className="operationIcon mc-icon-Job-Management"
                   label="SYSTEM JOBS"
@@ -1098,10 +1332,16 @@ const DiscreteLayerView: React.FC = observer(() => {
                     const lastTask = localStore.get('lastTask');
                     if (lastTask) {
                       const notification = JSON.parse(lastTask);
-                      setJobToOpenJobManager({ id: notification.jobId, resourceId: notification.productId, updated: notification.updated });
+                      setJobToOpenJobManager({
+                        id: notification.jobId,
+                        resourceId: notification.productId,
+                        updated: notification.updated,
+                      });
                       localStore.remove('lastTask');
                     }
-                    const taskNotificationCount = localStore.get('taskNotificationCount');
+                    const taskNotificationCount = localStore.get(
+                      'taskNotificationCount'
+                    );
                     if (taskNotificationCount) {
                       localStore.remove('taskNotificationCount');
                     }
@@ -1111,10 +1351,13 @@ const DiscreteLayerView: React.FC = observer(() => {
                 />
               </Box>
             </Tooltip>
-          }
-          {
-            permissions.isSystemCoreInfoAllowed &&
-            <Tooltip content={intl.formatMessage({ id: 'action.system-core-info.tooltip' })}>
+          )}
+          {permissions.isSystemCoreInfoAllowed && (
+            <Tooltip
+              content={intl.formatMessage({
+                id: 'action.system-core-info.tooltip',
+              })}
+            >
               <IconButton
                 className="operationIcon mc-icon-System-Info"
                 label="SYSTEM CORE INFO"
@@ -1123,44 +1366,56 @@ const DiscreteLayerView: React.FC = observer(() => {
                 }}
               />
             </Tooltip>
-          }
-          {
-            permissions.isWebToolsAllowed &&
-            CONFIG.WEB_TOOLS_URL &&
-            <Tooltip content={intl.formatMessage({ id: 'action.web-tools.tooltip' })}>
+          )}
+          {permissions.isWebToolsAllowed && CONFIG.WEB_TOOLS_URL && (
+            <Tooltip
+              content={intl.formatMessage({ id: 'action.web-tools.tooltip' })}
+            >
               <IconButton
                 className="operationIcon mc-icon-Tools"
                 label="WEB TOOLS"
-                onClick={ (): void => { window.open(CONFIG.WEB_TOOLS_URL); } }
+                onClick={(): void => {
+                  window.open(CONFIG.WEB_TOOLS_URL);
+                }}
               />
             </Tooltip>
-          }
+          )}
         </Box>
       </Box>
       <Box className="mainViewContainer">
-        <Box className={`sidePanelParentContainer ${disableOnDrawingClassName}`}>
-          {
-            !tabsPanelExpanded ? (
-              <Box
-                className="sidePanelContainer"
-                style={{ backgroundColor: theme.custom?.GC_ALTERNATIVE_SURFACE as string }}
-              >
-                {getActiveTabHeader(activeTabView, site)}
-              </Box>
-            ) : null
-          }
-          <Box 
+        <Box
+          className={`sidePanelParentContainer ${disableOnDrawingClassName}`}
+        >
+          {!tabsPanelExpanded ? (
+            <Box
+              className="sidePanelContainer"
+              style={{
+                backgroundColor: theme.custom?.GC_ALTERNATIVE_SURFACE as string,
+              }}
+            >
+              {getActiveTabHeader(activeTabView, site)}
+            </Box>
+          ) : null}
+          <Box
             className="sidePanelContainer"
             style={{
               backgroundColor: theme.custom?.GC_ALTERNATIVE_SURFACE as string,
-              height: activeTabView !== TabViews.EXPORT_LAYER ? (detailsPanelExpanded ? '50%' : '75%') : '100%',
+              height:
+                activeTabView !== TabViews.EXPORT_LAYER
+                  ? detailsPanelExpanded
+                    ? '50%'
+                    : '75%'
+                  : '100%',
               display: tabsPanelExpanded ? 'block' : 'none',
             }}
           >
-            <Box className="tabContentContainer" style={{display: activeTabView === TabViews.CATALOG ? 'block' : 'none'}}>
-              {
-                getActiveTabHeader(activeTabView, site)
-              }
+            <Box
+              className="tabContentContainer"
+              style={{
+                display: activeTabView === TabViews.CATALOG ? 'block' : 'none',
+              }}
+            >
+              {getActiveTabHeader(activeTabView, site)}
               <Box className="panelContent" style={{ overflow: 'hidden' }}>
                 <CatalogTreeComponent
                   refresh={catalogRefresh}
@@ -1168,62 +1423,60 @@ const DiscreteLayerView: React.FC = observer(() => {
                 />
               </Box>
             </Box>
-            {
-              activeTabView === TabViews.SEARCH_RESULTS &&
+            {activeTabView === TabViews.SEARCH_RESULTS && (
               <Box className="tabContentContainer">
-                {
-                  getActiveTabHeader(activeTabView, site)
-                }
+                {getActiveTabHeader(activeTabView, site)}
                 <LayersResults
                   searchLoading={searchLoading}
-                  searchError={searchResultsError} 
+                  searchError={searchResultsError}
                   style={LayersResultsStyle}
                 />
               </Box>
-            }
-            {
-              activeTabView === TabViews.EXPORT_LAYER &&
+            )}
+            {activeTabView === TabViews.EXPORT_LAYER && (
               <Box className="tabContentContainer">
-                {
-                  getActiveTabHeader(activeTabView, site)
-                }
+                {getActiveTabHeader(activeTabView, site)}
                 <ExportLayerComponent
                   handleTabViewChange={handleTabViewChange}
                   handleFlyTo={onFlyTo}
                   style={{
                     height: 'calc(100% - 50px)',
                     width: 'calc(100% - 8px)',
-                    display: 'flex'
+                    display: 'flex',
                   }}
                 />
               </Box>
-            }
+            )}
           </Box>
-          {
-            activeTabView !== TabViews.EXPORT_LAYER && 
-            <Box className="sidePanelContainer sideDetailsPanel" style={{
-              backgroundColor: theme.custom?.GC_ALTERNATIVE_SURFACE as string,
-              height: detailsPanelExpanded ? '50%' : '25%',
-              display: tabsPanelExpanded ? 'block' : 'none',
-            }}>
+          {activeTabView !== TabViews.EXPORT_LAYER && (
+            <Box
+              className="sidePanelContainer sideDetailsPanel"
+              style={{
+                backgroundColor: theme.custom?.GC_ALTERNATIVE_SURFACE as string,
+                height: detailsPanelExpanded ? '50%' : '25%',
+                display: tabsPanelExpanded ? 'block' : 'none',
+              }}
+            >
               <DetailsPanel
                 activeTabView={activeTabView}
-                detailsPanelExpanded = {detailsPanelExpanded}
-                setDetailsPanelExpanded = {setDetailsPanelExpanded}
+                detailsPanelExpanded={detailsPanelExpanded}
+                setDetailsPanelExpanded={setDetailsPanelExpanded}
               />
             </Box>
-          }
+          )}
         </Box>
         <Box className="mapAppContainer">
-          <ActionsMenuDimensionsContext.Provider value={{actionsMenuDimensions, setActionsMenuDimensions}}>
+          <ActionsMenuDimensionsContext.Provider
+            value={{ actionsMenuDimensions, setActionsMenuDimensions }}
+          >
             <CesiumMap
               mapMode2D={mapMode2D}
-              projection={CONFIG.MAP.PROJECTION}  
+              projection={CONFIG.MAP.PROJECTION}
               center={CONFIG.MAP.CENTER}
               zoom={CONFIG.MAP.ZOOM}
               sceneMode={CesiumSceneMode.SCENE2D}
               imageryProvider={false}
-              locale = {mapSettingsLocale}
+              locale={mapSettingsLocale}
               baseMaps={store.discreteLayersStore.baseMaps}
               useOptimizedTileRequests={CONFIG.MAP.USE_OPTIMIZED_TILE_REQUESTS}
               layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
@@ -1235,54 +1488,77 @@ const DiscreteLayerView: React.FC = observer(() => {
                 title: intl.formatMessage({ id: 'map-legends.sidebar-title' }),
                 emptyText: intl.formatMessage({ id: 'map-legends.empty-text' }),
                 actionsTexts: {
-                  docText: intl.formatMessage({ id: 'map-legends.actions.doc' }),
-                  imgText: intl.formatMessage({ id: 'map-legends.actions.img' }),
-                }
+                  docText: intl.formatMessage({
+                    id: 'map-legends.actions.doc',
+                  }),
+                  imgText: intl.formatMessage({
+                    id: 'map-legends.actions.img',
+                  }),
+                },
               }}
               showDebuggerTool={CONFIG.MAP.SHOW_DEBUGGER_TOOL}
               showActiveLayersTool={CONFIG.MAP.SHOW_ACTIVE_LAYERS_TOOL}
-              {...(CONFIG.MAP.SHOW_GEOCODER_TOOL ? { geocoderPanel: GEOCODER_OPTIONS } : {})}
+              {...(CONFIG.MAP.SHOW_GEOCODER_TOOL
+                ? { geocoderPanel: GEOCODER_OPTIONS }
+                : {})}
             >
-                {
-                  activeTabView !== TabViews.EXPORT_LAYER &&
-                  <CesiumDrawingsDataSource
-                    drawings={activeTabView === TabViews.SEARCH_RESULTS ? drawEntities : []}
-                    drawingMaterial={DRAWING_MATERIAL_COLOR}
-                    drawState={{
-                      drawing: isDrawing,
-                      type: drawPrimitive.type,
-                      handler: drawPrimitive.handler,
-                    }}
-                    hollow={true}
-                    outlineWidth={5}
-                    material={ (DRAWING_FINAL_MATERIAL as unknown) as CesiumColor }
-                  />
-                }
-
-                { memoizedLayers }
-
-                { activeTabView === TabViews.EXPORT_LAYER && <ExportDrawingHandler /> }
-
-                <ActionResolver
-                  handleOpenEntityDialog = {handleEntityDialogOpen}
-                  handleFlyTo = {onFlyTo}
-                  handleTabViewChange = {handleTabViewChange}
-                  activeTabView = {activeTabView}
-                  handleOpenJobDialog = {(open, jobData) => {
-                    const { id, resourceId, updated } = jobData;
-                    setJobToOpenJobManager({ id, resourceId, updated });
-                    setIsSystemsJobsDialogOpen(open);
+              {activeTabView !== TabViews.EXPORT_LAYER && (
+                <CesiumDrawingsDataSource
+                  drawings={
+                    activeTabView === TabViews.SEARCH_RESULTS
+                      ? drawEntities
+                      : []
+                  }
+                  drawingMaterial={DRAWING_MATERIAL_COLOR}
+                  drawState={{
+                    drawing: isDrawing,
+                    type: drawPrimitive.type,
+                    handler: drawPrimitive.handler,
                   }}
+                  hollow={true}
+                  outlineWidth={5}
+                  material={DRAWING_FINAL_MATERIAL as unknown as CesiumColor}
                 />
+              )}
 
-                <Terrain/>
-                <ExtentUpdater/>
-                <WfsFeature />
-                <DemHeightsFeatureComponent />
-                <PolygonPartsFeature />
-                { poi && activeTabView === TabViews.SEARCH_RESULTS && <PoiEntity longitude={poi.lon} latitude={poi.lat}/> }
-                { rect && <FlyTo setRect={setRect} layer={store.discreteLayersStore.selectedLayer as LayerMetadataMixedUnion}/> }
-                { activeTabView === TabViews.EXPORT_LAYER && <ExportPolygonsRenderer /> }
+              {memoizedLayers}
+
+              {activeTabView === TabViews.EXPORT_LAYER && (
+                <ExportDrawingHandler />
+              )}
+
+              <ActionResolver
+                handleOpenEntityDialog={handleEntityDialogOpen}
+                handleFlyTo={onFlyTo}
+                handleTabViewChange={handleTabViewChange}
+                activeTabView={activeTabView}
+                handleOpenJobDialog={(open, jobData) => {
+                  const { id, resourceId, updated } = jobData;
+                  setJobToOpenJobManager({ id, resourceId, updated });
+                  setIsSystemsJobsDialogOpen(open);
+                }}
+              />
+
+              <Terrain />
+              <ExtentUpdater />
+              <WfsFeature />
+              <DemHeightsFeatureComponent />
+              <PolygonPartsFeature />
+              {poi && activeTabView === TabViews.SEARCH_RESULTS && (
+                <PoiEntity longitude={poi.lon} latitude={poi.lat} />
+              )}
+              {rect && (
+                <FlyTo
+                  setRect={setRect}
+                  layer={
+                    store.discreteLayersStore
+                      .selectedLayer as LayerMetadataMixedUnion
+                  }
+                />
+              )}
+              {activeTabView === TabViews.EXPORT_LAYER && (
+                <ExportPolygonsRenderer />
+              )}
             </CesiumMap>
           </ActionsMenuDimensionsContext.Provider>
           {/* <BrowserCompatibilityChecker />  Should talk about if we need it or not anymore. */}
@@ -1290,8 +1566,7 @@ const DiscreteLayerView: React.FC = observer(() => {
         </Box>
 
         {/* <Filters isFiltersOpened={isFilter} filtersView={activeTabView}/> */}
-        {
-          isRasterDialogOpen &&
+        {isRasterDialogOpen && (
           <EntityRasterDialog
             isOpen={isRasterDialogOpen}
             onSetOpen={(open) => {
@@ -1301,9 +1576,8 @@ const DiscreteLayerView: React.FC = observer(() => {
             job={jobToOpenRasterEntity}
             setJob={setJobToOpenRasterEntity}
           />
-        }
-        {
-          is3DIngestDialogOpen &&
+        )}
+        {is3DIngestDialogOpen && (
           <EntityDialog
             isOpen={is3DIngestDialogOpen}
             onSetOpen={(open) => {
@@ -1312,9 +1586,8 @@ const DiscreteLayerView: React.FC = observer(() => {
             }}
             recordType={RecordType.RECORD_3D}
           />
-        }
-        {
-          isDemIngestDialogOpen &&
+        )}
+        {isDemIngestDialogOpen && (
           <EntityDialog
             isOpen={isDemIngestDialogOpen}
             onSetOpen={(open) => {
@@ -1323,9 +1596,8 @@ const DiscreteLayerView: React.FC = observer(() => {
             }}
             recordType={RecordType.RECORD_DEM}
           />
-        }
-        {
-          isEntityDialogOpen && 
+        )}
+        {isEntityDialogOpen && (
           <EntityDialog
             isOpen={isEntityDialogOpen}
             onSetOpen={(open) => {
@@ -1334,22 +1606,20 @@ const DiscreteLayerView: React.FC = observer(() => {
             }}
             layerRecord={store.discreteLayersStore.selectedLayer}
           />
-        }
-        {
-          permissions.isDeleteAllowed &&
+        )}
+        {permissions.isDeleteAllowed &&
           store.discreteLayersStore.selectedLayer &&
-          isEntityDeleteDialogOpen &&
-          <EntityDeleteDialog
-            isOpen={isEntityDeleteDialogOpen}
-            onSetOpen={(open) => {
-              setIsEntityDeleteDialogOpen(open);
-              onCloseDialog();
-            }}
-            layerRecord={store.discreteLayersStore.selectedLayer}
-          />
-        }
-        {
-          isSystemsJobsDialogOpen &&
+          isEntityDeleteDialogOpen && (
+            <EntityDeleteDialog
+              isOpen={isEntityDeleteDialogOpen}
+              onSetOpen={(open) => {
+                setIsEntityDeleteDialogOpen(open);
+                onCloseDialog();
+              }}
+              layerRecord={store.discreteLayersStore.selectedLayer}
+            />
+          )}
+        {isSystemsJobsDialogOpen && (
           <JobsDialog
             isOpen={isSystemsJobsDialogOpen}
             onSetOpen={setIsSystemsJobsDialogOpen}
@@ -1357,14 +1627,13 @@ const DiscreteLayerView: React.FC = observer(() => {
             focusOnJob={jobToOpenJobManager}
             setFocusOnJob={setJobToOpenJobManager}
           />
-        }
-        {
-          isSystemCoreInfoDialogOpen &&
+        )}
+        {isSystemCoreInfoDialogOpen && (
           <SystemCoreInfoDialog
             isOpen={isSystemCoreInfoDialogOpen}
             onSetOpen={setIsSystemCoreInfoDialogOpen}
           />
-        }
+        )}
       </Box>
     </>
   );

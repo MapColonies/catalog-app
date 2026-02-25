@@ -18,38 +18,50 @@ const ExportGeneralFieldComponent: React.FC<ExportFieldProps> = ({
   selectionIdx,
   fieldName,
   fieldValue,
-  fieldInfo: {placeholderValue, helperTextValue, rhfValidation, validationAgainstField, rows, maxLength},
+  fieldInfo: {
+    placeholderValue,
+    helperTextValue,
+    rhfValidation,
+    validationAgainstField,
+    rows,
+    maxLength,
+  },
   type,
   isLoading,
 }) => {
   const store = useStore();
   const formMethods = useFormContext();
-  
+
   const getFormFieldId = (name: string): string => {
-    return `${selectionIdx}_${name}_${selectionId}`
-  }
+    return `${selectionIdx}_${name}_${selectionId}`;
+  };
 
   const fieldId = getFormFieldId(fieldName);
-  
-  const placeholderVal = useMemo(() =>
-    typeof placeholderValue !== 'undefined'
-      ? typeof placeholderValue === 'string'
-        ? placeholderValue
-        : placeholderValue()
-      : '',
+
+  const placeholderVal = useMemo(
+    () =>
+      typeof placeholderValue !== 'undefined'
+        ? typeof placeholderValue === 'string'
+          ? placeholderValue
+          : placeholderValue()
+        : '',
     [placeholderValue]
   );
 
-  const handleOnChange = useCallback((e: React.ChangeEvent<HTMLInputElement>): void => {
-    const newFieldVal = rhfValidation?.valueAsNumber as boolean ? e.target.valueAsNumber : e.target.value;
+  const handleOnChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>): void => {
+      const newFieldVal = (rhfValidation?.valueAsNumber as boolean)
+        ? e.target.valueAsNumber
+        : e.target.value;
 
-    store.exportStore.setSelectionProperty(
-      selectionId,
-      fieldName,
-      newFieldVal
-    );
-    
-  }, [store.exportStore.setSelectionProperty, selectionId, fieldName])
+      store.exportStore.setSelectionProperty(
+        selectionId,
+        fieldName,
+        newFieldVal
+      );
+    },
+    [store.exportStore.setSelectionProperty, selectionId, fieldName]
+  );
 
   const [innerValue, handleFieldChange] = useDebounceField(
     { handleChange: handleOnChange } as EntityFormikHandlers,
@@ -61,28 +73,34 @@ const ExportGeneralFieldComponent: React.FC<ExportFieldProps> = ({
     const registerValidation = {
       ...(rhfValidation ?? {}),
       validate: {
-        ...((rhfValidation?.validate) ?? {}),
-        validationAgainstField: (value: unknown): string | boolean |undefined => {
+        ...(rhfValidation?.validate ?? {}),
+        validationAgainstField: (
+          value: unknown
+        ): string | boolean | undefined => {
           if (typeof validationAgainstField !== 'undefined') {
-            return validationAgainstField.validate(value, formMethods.watch(getFormFieldId(validationAgainstField.watch)));
+            return validationAgainstField.validate(
+              value,
+              formMethods.watch(getFormFieldId(validationAgainstField.watch))
+            );
           }
-        }
+        },
       },
     };
-    
-    formMethods.register(fieldId, {...registerValidation});
-    
+
+    formMethods.register(fieldId, { ...registerValidation });
+
     // Mitigate errors on init
-    formMethods.setValue(fieldId, fieldValue, { shouldValidate: fieldValue.length > NONE });
+    formMethods.setValue(fieldId, fieldValue, {
+      shouldValidate: fieldValue.length > NONE,
+    });
 
     // Revalidate fields
     void formMethods.trigger();
-    
+
     return (): void => {
       formMethods.unregister(fieldId);
-    }
+    };
   }, [fieldId]);
-
 
   return (
     <Box className="exportSelectionField" key={selectionId}>
@@ -112,7 +130,11 @@ const ExportGeneralFieldComponent: React.FC<ExportFieldProps> = ({
         invalid={!isEmpty(formMethods.errors[fieldId])}
       />
 
-      <ExportFieldHelperText key={`${fieldId}_helper`} helperText={helperTextValue} fieldValue={fieldValue} />
+      <ExportFieldHelperText
+        key={`${fieldId}_helper`}
+        helperText={helperTextValue}
+        fieldValue={fieldValue}
+      />
     </Box>
   );
 };

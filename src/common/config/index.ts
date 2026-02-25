@@ -1,6 +1,12 @@
-import { CesiumGeographicTilingScheme, Proj } from '@map-colonies/react-components';
+import {
+  CesiumGeographicTilingScheme,
+  Proj,
+} from '@map-colonies/react-components';
 import { IRasterLayer } from '@map-colonies/react-components/dist/cesium-map/layers-manager';
-import { IBaseMaps, IBaseMap } from '@map-colonies/react-components/dist/cesium-map/map';
+import {
+  IBaseMaps,
+  IBaseMap,
+} from '@map-colonies/react-components/dist/cesium-map/map';
 import { LinkType } from '../models/link-type.enum';
 import { IRasterIngestionFilesStructureConfig } from '../models/raster-ingestion-files-structure';
 
@@ -22,28 +28,33 @@ const MAP = (window as any)._env_.MAP;
 const JOB_MANAGER = (window as any)._env_.JOB_MANAGER;
 const DEFAULT_USER = (window as any)._env_.DEFAULT_USER;
 const BASE_MAPS = JSON.parse((window as any)._env_.BASE_MAPS);
-const DEFAULT_TERRAIN_PROVIDER_URL = (window as any)._env_.DEFAULT_TERRAIN_PROVIDER_URL;
+const DEFAULT_TERRAIN_PROVIDER_URL = (window as any)._env_
+  .DEFAULT_TERRAIN_PROVIDER_URL;
 const WEB_TOOLS_URL = (window as any)._env_.WEB_TOOLS_URL;
 const MODEL_VIEWER_ROUTE = (window as any)._env_.MODEL_VIEWER_ROUTE;
 const MODEL_VIEWER_TOKEN_VALUE = (window as any)._env_.MODEL_VIEWER_TOKEN_VALUE;
 const RUNNING_MODE = (window as any)._env_.RUNNING_MODE;
-const NUMBER_OF_CHARACTERS_LIMIT = (window as any)._env_.NUMBER_OF_CHARACTERS_LIMIT;
+const NUMBER_OF_CHARACTERS_LIMIT = (window as any)._env_
+  .NUMBER_OF_CHARACTERS_LIMIT;
 const SERVED_ENTITY_TYPES = (window as any)._env_.SERVED_ENTITY_TYPES;
 const ACCESS_TOKEN = (window as any)._env_.ACCESS_TOKEN;
-const RASTER_INGESTION_FILES_STRUCTURE = JSON.parse((window as any)._env_.RASTER_INGESTION_FILES_STRUCTURE);
+const RASTER_INGESTION_FILES_STRUCTURE = JSON.parse(
+  (window as any)._env_.RASTER_INGESTION_FILES_STRUCTURE
+);
 const PROJECT_VERSION = (window as any)._env_.PROJECT_VERSION;
 const WHATSNEW_URL = (window as any)._env_.WHATSNEW_URL;
 const SITES_CONFIG = JSON.parse((window as any)._env_.SITES_CONFIG);
 const BFF_PATH = (window as any)._env_.BFF_PATH;
 const SELECTION_MODE_DEFAULT = (window as any)._env_.SELECTION_MODE_DEFAULT;
-const SHOW_SELECTION_MODE_SWITCH = (window as any)._env_.SHOW_SELECTION_MODE_SWITCH;
+const SHOW_SELECTION_MODE_SWITCH = (window as any)._env_
+  .SHOW_SELECTION_MODE_SWITCH;
 const POLYGON_PARTS = {
   ...(window as any)._env_.POLYGON_PARTS,
   highResolutionColor: '#01FF1F',
   mediumResolutionColor: '#fbff01',
   lowResolutionColor: '#ff3401',
   hoverColor: '#24AEE9',
-  billBoardStrokeColor: '#FFFF00'
+  billBoardStrokeColor: '#FFFF00',
 };
 const WFS = (window as any)._env_.WFS;
 const GEOCODER = (window as any)._env_.GEOCODER;
@@ -54,19 +65,28 @@ function enrichBaseMaps(baseMaps: IBaseMaps): IBaseMaps {
     maps: baseMaps.maps.map((baseMap: IBaseMap) => {
       return {
         ...baseMap,
-        thumbnail: baseMap.thumbnail && ACCESS_TOKEN.injectionType?.toLowerCase() === 'queryparam' ? `${baseMap.thumbnail}?${ACCESS_TOKEN.attributeName}=${ACCESS_TOKEN.tokenValue}` : baseMap.thumbnail,
-        baseRasterLayers: (baseMap.baseRasterLayers as IRasterLayer[]).map((rasterLayer) => {
-          return {
-            ...rasterLayer,
-            options: {
-              ...rasterLayer.options,
-              tilingScheme: (rasterLayer.type === LinkType.WMTS_LAYER) ? new CesiumGeographicTilingScheme() : undefined
-            }
-          };
-        })
-      }
-    })
-  }
+        thumbnail:
+          baseMap.thumbnail &&
+          ACCESS_TOKEN.injectionType?.toLowerCase() === 'queryparam'
+            ? `${baseMap.thumbnail}?${ACCESS_TOKEN.attributeName}=${ACCESS_TOKEN.tokenValue}`
+            : baseMap.thumbnail,
+        baseRasterLayers: (baseMap.baseRasterLayers as IRasterLayer[]).map(
+          (rasterLayer) => {
+            return {
+              ...rasterLayer,
+              options: {
+                ...rasterLayer.options,
+                tilingScheme:
+                  rasterLayer.type === LinkType.WMTS_LAYER
+                    ? new CesiumGeographicTilingScheme()
+                    : undefined,
+              },
+            };
+          }
+        ),
+      };
+    }),
+  };
 }
 
 const systemJobsPriorityOptions =
@@ -119,8 +139,8 @@ const APP_CONFIG = {
     DATE_TIME_FORMAT: `${DATE_FORMAT} HH:mm`,
     DATE_FNS_FORMAT: DATE_FNS_FORMAT,
     DATE_FNS_TIME_FORMAT: `${DATE_FNS_FORMAT} hh:mm`,
-    DATE_FNS_HUMAN_READABLE_DATE: "PPPP",
-    DATE_FNS_HUMAN_READABLE_DATE_TIME: "PPPPp",
+    DATE_FNS_HUMAN_READABLE_DATE: 'PPPP',
+    DATE_FNS_HUMAN_READABLE_DATE_TIME: 'PPPPp',
   },
   I18N: {
     DEFAULT_LANGUAGE: LANGUAGE,
@@ -254,10 +274,13 @@ const APP_CONFIG = {
     RESULTS_LIMIT: 6,
   },
   RASTER_INGESTION: {
-    FILES_STRUCTURE: RASTER_INGESTION_FILES_STRUCTURE as IRasterIngestionFilesStructureConfig,
+    FILES_STRUCTURE:
+      RASTER_INGESTION_FILES_STRUCTURE as IRasterIngestionFilesStructureConfig,
     CHANGES_IN_SHAPE_FILES: {
-      TIME_DIFFERENCE_GRACE_MINUTES: CHANGES_IN_SHAPE_FILES.timeDifferenceGraceMinutes,
-      TIME_MODIFIED_THRESHOLD_HOURS: CHANGES_IN_SHAPE_FILES.timeModifiedThresholdHours,
+      TIME_DIFFERENCE_GRACE_MINUTES:
+        CHANGES_IN_SHAPE_FILES.timeDifferenceGraceMinutes,
+      TIME_MODIFIED_THRESHOLD_HOURS:
+        CHANGES_IN_SHAPE_FILES.timeModifiedThresholdHours,
     },
   },
 };

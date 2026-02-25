@@ -23,7 +23,7 @@
 }
 
 /* Priority is binded to status field... */
-.ag-cell-value[col-id="status"] {
+.ag-cell-value[col-id='status'] {
   overflow: visible;
 }
 

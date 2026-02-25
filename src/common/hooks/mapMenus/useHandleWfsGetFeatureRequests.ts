@@ -7,7 +7,9 @@ import {
 } from '../../../discrete-layer/models';
 import { WfsGetFeatureParams } from '../../../discrete-layer/models/RootStore.base';
 
-type HandlerGetFeatureOptions = WfsGetFeatureParams & { onDataResolved?: (data?: GetFeatureModelType) => void };
+type HandlerGetFeatureOptions = WfsGetFeatureParams & {
+  onDataResolved?: (data?: GetFeatureModelType) => void;
+};
 
 const useHandleWfsGetFeatureRequests = (): {
   data: { getFeature: GetFeatureModelType } | undefined;
@@ -16,7 +18,8 @@ const useHandleWfsGetFeatureRequests = (): {
   setGetFeatureOptions: (options: HandlerGetFeatureOptions) => void;
 } => {
   const store = useStore();
-  const [getFeatureOptions, setGetFeatureOptions] = useState<HandlerGetFeatureOptions>();
+  const [getFeatureOptions, setGetFeatureOptions] =
+    useState<HandlerGetFeatureOptions>();
 
   const { data, loading, setQuery } = useQuery<{
     getFeature: GetFeatureModelType;
@@ -24,11 +27,14 @@ const useHandleWfsGetFeatureRequests = (): {
 
   useEffect(() => {
     if (getFeatureOptions) {
-      
-      const featureConfig = store.mapMenusManagerStore.getFeatureConfig(getFeatureOptions.typeName);
+      const featureConfig = store.mapMenusManagerStore.getFeatureConfig(
+        getFeatureOptions.typeName
+      );
       const dWithin = featureConfig.dWithin;
-  
-        setQuery(store.queryGetFeature({ data: { ...getFeatureOptions, dWithin } }));
+
+      setQuery(
+        store.queryGetFeature({ data: { ...getFeatureOptions, dWithin } })
+      );
     }
   }, [getFeatureOptions]);
 
@@ -43,7 +49,7 @@ const useHandleWfsGetFeatureRequests = (): {
       store.mapMenusManagerStore.setCurrentWfsFeatureInfo(featureInfo);
 
       getFeatureOptions.onDataResolved?.(featureInfo);
-    } 
+    }
 
     //TODO: Handle Errors, how should we deal with them?
   }, [data, loading]);

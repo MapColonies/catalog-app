@@ -9,8 +9,12 @@ interface IFootprintCellRendererParams {
   data: ILayerImage;
 }
 
-export const FootprintRenderer: React.FC<IFootprintCellRendererParams> = (props) => {
-  const [checked, setChecked] = useState<boolean>(props.data.footprintShown as boolean);
+export const FootprintRenderer: React.FC<IFootprintCellRendererParams> = (
+  props
+) => {
+  const [checked, setChecked] = useState<boolean>(
+    props.data.footprintShown as boolean
+  );
 
   useEffect(() => {
     setChecked(props.data.footprintShown as boolean);
@@ -20,13 +24,11 @@ export const FootprintRenderer: React.FC<IFootprintCellRendererParams> = (props)
     <Checkbox
       className="footprintIcon"
       checked={checked}
-      onClick={
-        (evt: React.MouseEvent<HTMLInputElement>): void => {
-          evt.stopPropagation();
-          setChecked(evt.currentTarget.checked);
-          props.onClick(props.data, evt.currentTarget.checked);
-        }
-      }
+      onClick={(evt: React.MouseEvent<HTMLInputElement>): void => {
+        evt.stopPropagation();
+        setChecked(evt.currentTarget.checked);
+        props.onClick(props.data, evt.currentTarget.checked);
+      }}
     />
   );
 };

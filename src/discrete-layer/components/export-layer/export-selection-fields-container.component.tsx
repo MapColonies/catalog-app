@@ -9,7 +9,11 @@ import { useStore } from '../../models';
 import './export-layer.component.css';
 import { get, isEmpty } from 'lodash';
 import useGetSelectionFieldForDomain from './hooks/useGetSelectionFieldForDomain';
-import { GENERAL_FIELDS_ID, GENERAL_FIELDS_IDX, SELECTION_ERROR_CLASSNAME } from './constants';
+import {
+  GENERAL_FIELDS_ID,
+  GENERAL_FIELDS_IDX,
+  SELECTION_ERROR_CLASSNAME,
+} from './constants';
 import ExportSelectionComponent from './export-selection.component';
 import { usePrevious } from '../../../common/hooks/previous.hook';
 
@@ -19,21 +23,19 @@ const scrollToElement = (elem?: Element | null): void => {
       behavior: 'smooth',
     });
   }, NONE);
-}
+};
 
 const NONE = 0;
 
 const ExportSelectionFieldsContainer: React.FC = observer(() => {
   const store = useStore();
   const selectionsContainerRef = useRef<HTMLDivElement | null>(null);
-  const exportGeometrySelections = store.exportStore.geometrySelectionsCollection;
+  const exportGeometrySelections =
+    store.exportStore.geometrySelectionsCollection;
   const selectionServerError = store.exportStore.serverErroredSelectionId;
 
-  const {
-    externalFields,
-    internalFields,
-    propsForDomain,
-  } = useAddFeatureWithProps();
+  const { externalFields, internalFields, propsForDomain } =
+    useAddFeatureWithProps();
 
   const SelectionFieldPerDomainRenderer = useGetSelectionFieldForDomain();
 
@@ -45,7 +47,7 @@ const ExportSelectionFieldsContainer: React.FC = observer(() => {
     return featuresWithProps.map((feature, selectionIdx) => {
       return (
         <ExportSelectionComponent
-          key={get(feature,'properties.id') as string}
+          key={get(feature, 'properties.id') as string}
           feature={feature}
           selectionIdx={selectionIdx}
           internalFields={internalFields}
@@ -63,8 +65,10 @@ const ExportSelectionFieldsContainer: React.FC = observer(() => {
 
   useLayoutEffect(() => {
     if (typeof selectionServerError !== 'undefined') {
-      const erroredSelection = selectionsContainerRef.current?.querySelector(`.${SELECTION_ERROR_CLASSNAME}`);
-      
+      const erroredSelection = selectionsContainerRef.current?.querySelector(
+        `.${SELECTION_ERROR_CLASSNAME}`
+      );
+
       if (!isEmpty(erroredSelection)) {
         scrollToElement(erroredSelection);
       }
@@ -75,8 +79,9 @@ const ExportSelectionFieldsContainer: React.FC = observer(() => {
     const generalExportFields = Object.entries(
       externalFields as Record<AvailableProperties, unknown>
     ).map(([key]) => {
-      const formFieldValue = Object.entries(store.exportStore.formData)
-      .reduce<string>((storedValue, [fieldName, value]): string => {
+      const formFieldValue = Object.entries(
+        store.exportStore.formData
+      ).reduce<string>((storedValue, [fieldName, value]): string => {
         if (fieldName.includes(key)) {
           return value as string;
         }
@@ -101,9 +106,7 @@ const ExportSelectionFieldsContainer: React.FC = observer(() => {
     <>
       {propsForDomain && externalFields && internalFields && (
         <div ref={selectionsContainerRef} className="exportSelectionsContainer">
-          <Box className="externalFields">
-            {externalExportFields}
-          </Box>
+          <Box className="externalFields">{externalExportFields}</Box>
           {renderExportSelectionsFields}
         </div>
       )}

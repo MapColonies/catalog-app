@@ -7,21 +7,22 @@ import './footprint.header-renderer.css';
 
 interface IFootprintCellRendererParams extends ICellRendererParams {
   isChecked: boolean;
-  onClick:  (value: boolean, gridApi: GridApi) => void;
+  onClick: (value: boolean, gridApi: GridApi) => void;
 }
 
-export const HeaderFootprintRenderer: React.FC<IFootprintCellRendererParams> = (props) => {
+export const HeaderFootprintRenderer: React.FC<IFootprintCellRendererParams> = (
+  props
+) => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
   const [checked, setChecked] = useState<boolean>(props.isChecked);
   return (
-    <Checkbox 
+    <Checkbox
       checked={checked}
-      onClick={
-        (evt: React.MouseEvent<HTMLInputElement>): void => {
-          setChecked(evt.currentTarget.checked);
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-          props.onClick(evt.currentTarget.checked, props.api);
-        }}
+      onClick={(evt: React.MouseEvent<HTMLInputElement>): void => {
+        setChecked(evt.currentTarget.checked);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        props.onClick(evt.currentTarget.checked, props.api);
+      }}
     />
- );
+  );
 };

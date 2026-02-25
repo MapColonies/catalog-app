@@ -20,7 +20,7 @@ body[dir='rtl'] #jobsDialog .mdc-dialog__surface {
   gap: 32px;
 }
 
-#jobsDialog .jobsBody .drpContainer > div:nth-child(-n+2) {
+#jobsDialog .jobsBody .drpContainer > div:nth-child(-n + 2) {
   width: 160px;
 }
 
@@ -138,14 +138,17 @@ body[dir='rtl'] .jobsBody .ag-pinned-right-cols-container {
 
 /* Show action buttons only for row that is being hovered. For rows which are not being hovered, hide them by setting their width and padding to 0.*/
 #jobsDialog .ag-pinned-right-cols-container .ag-row:not(.ag-row-hover),
-#jobsDialog .ag-pinned-right-cols-container .ag-row:not(.ag-row-hover) .ag-cell {
+#jobsDialog
+  .ag-pinned-right-cols-container
+  .ag-row:not(.ag-row-hover)
+  .ag-cell {
   width: 0 !important;
   padding: 0 !important;
   border: none;
 }
 
 #jobsDialog .ag-pinned-right-cols-container .ag-row.ag-row-hover {
-  background-color: rgb(44,65,89);
+  background-color: rgb(44, 65, 89);
   border-width: 0px !important;
 }
 
@@ -157,7 +160,7 @@ body[dir='rtl'] .jobsBody .ag-pinned-right-cols-container {
   background-color: var(--mdc-theme-gc-selection-background);
 }
 
-#jobsDialog .ag-row.ag-full-width-row.ag-row-selected[row-id*="details"] {
+#jobsDialog .ag-row.ag-full-width-row.ag-row-selected[row-id*='details'] {
   background: unset;
   overflow: visible;
 }
@@ -196,7 +199,7 @@ body[dir='rtl'] .jobsBody .ag-pinned-right-cols-container {
   left: 536px;
 }
 
-/* Not sure why I did it, it causes some problems with disappearing elements */ 
+/* Not sure why I did it, it causes some problems with disappearing elements */
 
 /* .jobsBody [aria-hidden="true"]:not(.ag-paging-row-summary-panel,.ag-paging-description) {
   display: none;

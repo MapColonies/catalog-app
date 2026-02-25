@@ -7,11 +7,17 @@ interface StatusValuePresentorProps {
   value?: string;
 }
 
-export const StatusValuePresentorComponent: React.FC<StatusValuePresentorProps> = ({
-  value,
-}) => {
+export const StatusValuePresentorComponent: React.FC<
+  StatusValuePresentorProps
+> = ({ value }) => {
   return (
-    <TooltippedValue className={value && isUnpublishedValue(value) ? 'detailsFieldValue warning' : 'detailsFieldValue'}>
+    <TooltippedValue
+      className={
+        value && isUnpublishedValue(value)
+          ? 'detailsFieldValue warning'
+          : 'detailsFieldValue'
+      }
+    >
       {value}
     </TooltippedValue>
   );

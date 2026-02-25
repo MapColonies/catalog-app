@@ -18,5 +18,5 @@ body[dir='rtl'] .footprintIcon {
 }
 
 body[dir='rtl'] .toolbarButton .mdc-checkbox .mdc-checkbox__background {
-  left: unset; 
+  left: unset;
 }

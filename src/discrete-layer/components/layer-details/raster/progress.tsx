@@ -18,25 +18,28 @@ interface ProgressProps {
   isValid: boolean;
 }
 
-export const Progress: React.FC<ProgressProps> = ({ titleId, show, percentage, status, reason, isFailed, isValid }) => {
-  const getClass = (isFailed: boolean, isValid: boolean): string => (
-    isFailed
-      ? 'error'
-      : !isValid
-        ? 'warning'
-        : 'success'
-  );
+export const Progress: React.FC<ProgressProps> = ({
+  titleId,
+  show,
+  percentage,
+  status,
+  reason,
+  isFailed,
+  isValid,
+}) => {
+  const getClass = (isFailed: boolean, isValid: boolean): string =>
+    isFailed ? 'error' : !isValid ? 'warning' : 'success';
 
   const getStyles = (isFailed: boolean, isValid: boolean) => {
     const color = isFailed
       ? 'var(--mdc-theme-gc-error-high)'
       : !isValid
-        ? 'var(--mdc-theme-gc-warning-high)'
-        : 'var(--mdc-theme-gc-success)';
+      ? 'var(--mdc-theme-gc-warning-high)'
+      : 'var(--mdc-theme-gc-success)';
     return {
       textColor: color || 'var(--mdc-theme-gc-success)',
       pathColor: color || 'var(--mdc-theme-gc-success)',
-      trailColor: 'var(--mdc-theme-gc-selection-background)'
+      trailColor: 'var(--mdc-theme-gc-selection-background)',
     };
   };
 
@@ -47,52 +50,44 @@ export const Progress: React.FC<ProgressProps> = ({ titleId, show, percentage, s
       </Box>
       <Box className="center">
         <Box className="progressBar">
-          {
-            show ? (
-              <CircularProgressBar
-                value={percentage ?? 0}
-                strokeWidth={6}
-                styles={getStyles(isFailed, isValid)}
-              >
-                {
-                  (isFailed || !isValid) &&
-                  <IconButton
-                    className={`icon mc-icon-Status-Warnings ${getClass(isFailed, isValid)}`}
-                    onClick={(e): void => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                    }}
-                  />
-                }
-                {
-                  !(isFailed || !isValid) && status === Status.Completed &&
-                  <IconButton
-                    className={`icon mc-icon-Ok ${getClass(isFailed, isValid)}`}
-                    onClick={(e): void => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                    }}
-                  />
-                }
-                {
-                  !(isFailed || !isValid) && status !== Status.Completed &&
-                  <Box className="spacer" />
-                }
-                <Box className={`text bold ${getClass(isFailed, isValid)}`}>
-                  <StatusText status={status} reason={reason} />
-                </Box>
-                <Box className={`percentage bold`}>
-                  {`${percentage ?? 0}%`}
-                </Box>
-              </CircularProgressBar>
-            ) : (
-              <Skeleton 
-                circle 
-                width={150}
-                height={150}
-              />
-            )
-          }
+          {show ? (
+            <CircularProgressBar
+              value={percentage ?? 0}
+              strokeWidth={6}
+              styles={getStyles(isFailed, isValid)}
+            >
+              {(isFailed || !isValid) && (
+                <IconButton
+                  className={`icon mc-icon-Status-Warnings ${getClass(
+                    isFailed,
+                    isValid
+                  )}`}
+                  onClick={(e): void => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}
+                />
+              )}
+              {!(isFailed || !isValid) && status === Status.Completed && (
+                <IconButton
+                  className={`icon mc-icon-Ok ${getClass(isFailed, isValid)}`}
+                  onClick={(e): void => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}
+                />
+              )}
+              {!(isFailed || !isValid) && status !== Status.Completed && (
+                <Box className="spacer" />
+              )}
+              <Box className={`text bold ${getClass(isFailed, isValid)}`}>
+                <StatusText status={status} reason={reason} />
+              </Box>
+              <Box className={`percentage bold`}>{`${percentage ?? 0}%`}</Box>
+            </CircularProgressBar>
+          ) : (
+            <Skeleton circle width={150} height={150} />
+          )}
         </Box>
       </Box>
     </Box>

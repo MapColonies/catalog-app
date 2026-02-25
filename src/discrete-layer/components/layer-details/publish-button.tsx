@@ -12,12 +12,18 @@ interface PublishButtonProps {
 
 export const PublishButton: React.FC<PublishButtonProps> = ({
   layer,
-  className = ''
+  className = '',
 }) => {
   const intl = useIntl();
-  const [unpublished, setUnpublished] = useState<boolean>(isUnpublished(layer as any));
-  const [icon, setIcon] = useState<string>(unpublished ? 'mc-icon-Publish' : 'mc-icon-Unpublish');
-  const [tooltip, setTooltip] = useState<string>(unpublished ? 'action.publish.tooltip' : 'action.unpublish.tooltip');
+  const [unpublished, setUnpublished] = useState<boolean>(
+    isUnpublished(layer as any)
+  );
+  const [icon, setIcon] = useState<string>(
+    unpublished ? 'mc-icon-Publish' : 'mc-icon-Unpublish'
+  );
+  const [tooltip, setTooltip] = useState<string>(
+    unpublished ? 'action.publish.tooltip' : 'action.unpublish.tooltip'
+  );
   const [isDialogOpen, setDialogOpen] = useState<boolean>(false);
 
   useEffect(() => {
@@ -26,14 +32,14 @@ export const PublishButton: React.FC<PublishButtonProps> = ({
 
   useEffect(() => {
     setIcon(unpublished ? 'mc-icon-Publish' : 'mc-icon-Unpublish');
-    setTooltip(unpublished ? 'action.publish.tooltip' : 'action.unpublish.tooltip');
+    setTooltip(
+      unpublished ? 'action.publish.tooltip' : 'action.unpublish.tooltip'
+    );
   }, [unpublished]);
 
   return (
     <>
-      <Tooltip
-        content={intl.formatMessage({ id: tooltip })}
-      >
+      <Tooltip content={intl.formatMessage({ id: tooltip })}>
         <IconButton
           className={`${className} ${icon}`}
           label="PUBLISH AND UNPUBLISH"
@@ -42,8 +48,7 @@ export const PublishButton: React.FC<PublishButtonProps> = ({
           }}
         />
       </Tooltip>
-      {
-        isDialogOpen &&
+      {isDialogOpen && (
         <PublishDialog
           layer={layer}
           isOpen={isDialogOpen}
@@ -52,7 +57,7 @@ export const PublishButton: React.FC<PublishButtonProps> = ({
             setUnpublished(!unpublished);
           }}
         />
-      }
+      )}
     </>
   );
 };

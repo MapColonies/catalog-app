@@ -1,76 +1,76 @@
 .catalogFilterPanelContainer {
-    --filter-panel-open-height: 400px;
-    position: absolute;
-    top: 80%;
-    left: 0;
-    width: 100%;
-    height: 0px;
-    display: none;
-    background-color: var(--mdc-theme-background);
-    border-radius: 0 0 20px 20px;
-    z-index: 0;
+  --filter-panel-open-height: 400px;
+  position: absolute;
+  top: 80%;
+  left: 0;
+  width: 100%;
+  height: 0px;
+  display: none;
+  background-color: var(--mdc-theme-background);
+  border-radius: 0 0 20px 20px;
+  z-index: 0;
 }
 
 .catalogFilterPanelContainer.open {
-    display: block;
-    animation: slideToBottom 500ms forwards;
-    display: flex;
-    gap: 20px;
-    justify-content: space-between;
-    flex-direction: column;
-    padding: 20px;
+  display: block;
+  animation: slideToBottom 500ms forwards;
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+  flex-direction: column;
+  padding: 20px;
 }
 .catalogFilterFieldError {
-    color: var(--mdc-theme-gc-error-high);
+  color: var(--mdc-theme-gc-error-high);
 }
 
 .catalogFilterPanelContainer.open .catalogFilterFieldContainer {
-    height: 4rem;
+  height: 4rem;
 }
 
 .catalogFiltersForm {
-    width: 100%;
-    align-self: center;
+  width: 100%;
+  align-self: center;
 }
 
 .catalogFilterFormContainer {
-    display: flex;
-    overflow-y: auto;
-    flex: 1;
-    width: 100%;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  overflow-y: auto;
+  flex: 1;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
 }
 
 .catalogFiltersForm .shortcutsContainer .shortcut {
-    min-width: 7em;
+  min-width: 7em;
 }
 
-.catalogFilterFormContainer .catalogFilterFieldContainer, 
+.catalogFilterFormContainer .catalogFilterFieldContainer,
 .catalogFilterFieldContainer .catalogFilterDateRangeWrapper {
-    width: 100%;
+  width: 100%;
 }
 
 .catalogFiltersButtonsContainer {
-    display: flex;
-    width: 100%;
-    gap: 10px;
+  display: flex;
+  width: 100%;
+  gap: 10px;
 }
 
 .catalogFiltersSubmitBtn {
-    flex: 4;
+  flex: 4;
 }
 
 .catalogFiltersClearBtn {
-    flex: 1;
+  flex: 1;
 }
 
 @keyframes slideToBottom {
-    from {
-        height: 0px;
-    }
+  from {
+    height: 0px;
+  }
 
-    to {
-        height: var(--filter-panel-open-height);
-    }
+  to {
+    height: var(--filter-panel-open-height);
+  }
 }

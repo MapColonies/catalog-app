@@ -1,24 +1,32 @@
-.mdc-checkbox .mdc-checkbox__native-control:checked ~ .mdc-checkbox__background::before,
-.mdc-checkbox .mdc-checkbox__native-control:indeterminate ~ .mdc-checkbox__background::before {
+.mdc-checkbox
+  .mdc-checkbox__native-control:checked
+  ~ .mdc-checkbox__background::before,
+.mdc-checkbox
+  .mdc-checkbox__native-control:indeterminate
+  ~ .mdc-checkbox__background::before {
   background-color: #2979ff;
   /* @alternate */
   background-color: var(--mdc-theme-primary, #2979ff);
 }
-.mdc-checkbox.mdc-checkbox--selected .mdc-checkbox__ripple::before, .mdc-checkbox.mdc-checkbox--selected .mdc-checkbox__ripple::after {
+.mdc-checkbox.mdc-checkbox--selected .mdc-checkbox__ripple::before,
+.mdc-checkbox.mdc-checkbox--selected .mdc-checkbox__ripple::after {
   background-color: #2979ff;
   /* @alternate */
   background-color: var(--mdc-theme-primary, #2979ff);
 }
 
-.mdc-checkbox.mdc-ripple-upgraded--background-focused.mdc-checkbox--selected .mdc-checkbox__ripple::before,
-.mdc-checkbox.mdc-ripple-upgraded--background-focused.mdc-checkbox--selected .mdc-checkbox__ripple::after {
+.mdc-checkbox.mdc-ripple-upgraded--background-focused.mdc-checkbox--selected
+  .mdc-checkbox__ripple::before,
+.mdc-checkbox.mdc-ripple-upgraded--background-focused.mdc-checkbox--selected
+  .mdc-checkbox__ripple::after {
   background-color: #2979ff;
   /* @alternate */
   background-color: var(--mdc-theme-primary, #2979ff);
 }
 
 .mdc-checkbox__native-control:enabled:checked ~ .mdc-checkbox__background,
-.mdc-checkbox__native-control:enabled:indeterminate ~ .mdc-checkbox__background {
+.mdc-checkbox__native-control:enabled:indeterminate
+  ~ .mdc-checkbox__background {
   border-color: #2979ff;
   /* @alternate */
   border-color: var(--mdc-theme-primary, #2979ff);
@@ -35,14 +43,16 @@
   bottom: 40px;
   left: 8px;
 }
-.mdc-snackbar__label, [dir=rtl] .mdc-snackbar__label {
+.mdc-snackbar__label,
+[dir='rtl'] .mdc-snackbar__label {
   padding: 0;
 }
-.mdc-snackbar__surface, [dir=rtl] .mdc-snackbar__surface {
+.mdc-snackbar__surface,
+[dir='rtl'] .mdc-snackbar__surface {
   padding: 0;
 }
 .mdc-snackbar__action:not(:disabled) {
-    color: var(--mdc-theme-primary, #2979ff);;
+  color: var(--mdc-theme-primary, #2979ff);
 }
 
 .app-container {
@@ -81,7 +91,7 @@ button.cesium-infoBox-close:hover {
   left: unset;
 }
 
-[dir=rtl] .cesium-infoBox {
+[dir='rtl'] .cesium-infoBox {
   right: unset;
   left: 88px;
 }
@@ -92,7 +102,7 @@ button.cesium-infoBox-close:hover {
   justify-content: space-evenly;
 }
 
-[dir=rtl] .cesium-infoBox-title {
+[dir='rtl'] .cesium-infoBox-title {
   direction: ltr;
 }
 
@@ -123,7 +133,7 @@ button.cesium-infoBox-close:hover {
 }
 
 .appVersionContainer-slave {
-  color:  var(--mdc-theme-gc-site-slave);
+  color: var(--mdc-theme-gc-site-slave);
 }
 
 title.rtl {
@@ -150,10 +160,12 @@ body[dir='ltr'] .react-datepicker__close-icon {
 
 @keyframes glow {
   from {
-    text-shadow: 0 0 10px #fff, 0 0 12px #fff, 0 0 14px #e60073, 0 0 18px #e60073, 0 0 20px #e60073;
+    text-shadow: 0 0 10px #fff, 0 0 12px #fff, 0 0 14px #e60073,
+      0 0 18px #e60073, 0 0 20px #e60073;
   }
   to {
-    text-shadow: 0 0 12px #fff, 0 0 14px #ff4da6, 0 0 16px #ff4da6, 0 0 18px #ff4da6, 0 0 20px #ff4da6, 0 0 22px #ff4da6;
+    text-shadow: 0 0 12px #fff, 0 0 14px #ff4da6, 0 0 16px #ff4da6,
+      0 0 18px #ff4da6, 0 0 20px #ff4da6, 0 0 22px #ff4da6;
   }
 }
 
@@ -164,8 +176,8 @@ input::-webkit-inner-spin-button {
 }
 
 input:-webkit-autofill,
-input:-webkit-autofill:hover, 
-input:-webkit-autofill:focus, 
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
   -webkit-box-shadow: 0 0 0 30px var(--mdc-theme-alternative-surface) inset !important;
 }
@@ -202,7 +214,11 @@ input:disabled {
   }
 }
 
-.mdc-checkbox .mdc-checkbox__native-control:enabled:not(:checked):not(:indeterminate):not([data-indeterminate=true]) ~ .mdc-checkbox__background {
+.mdc-checkbox
+  .mdc-checkbox__native-control:enabled:not(:checked):not(:indeterminate):not(
+    [data-indeterminate='true']
+  )
+  ~ .mdc-checkbox__background {
   border: 1px solid var(--mdc-theme-on-surface);
 }
 

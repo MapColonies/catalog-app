@@ -6,21 +6,24 @@ import { GridRowNode } from '..';
 import './footprint.cell-renderer.css';
 
 interface IFootprintCellRendererParams extends ICellRendererParams {
-  onClick:  (id: string, value: boolean, node: GridRowNode) => void;
+  onClick: (id: string, value: boolean, node: GridRowNode) => void;
 }
 
-export const FootprintRenderer: React.FC<IFootprintCellRendererParams> = (props) => {
+export const FootprintRenderer: React.FC<IFootprintCellRendererParams> = (
+  props
+) => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-  const [checked, setChecked] = useState<boolean>(props.data.footprintShown as boolean);
+  const [checked, setChecked] = useState<boolean>(
+    props.data.footprintShown as boolean
+  );
   return (
-    <Checkbox 
+    <Checkbox
       checked={checked}
-      onChange={
-        (evt: React.MouseEvent<HTMLInputElement>): void => {
-          setChecked(evt.currentTarget.checked);
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-          props.onClick(props.data.id, evt.currentTarget.checked, props.node);
-        }}
+      onChange={(evt: React.MouseEvent<HTMLInputElement>): void => {
+        setChecked(evt.currentTarget.checked);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        props.onClick(props.data.id, evt.currentTarget.checked, props.node);
+      }}
     />
- );
+  );
 };

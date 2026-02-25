@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { getValidationMessage, ValidationMessage } from '../../discrete-layer/components/layer-details/utils';
+import {
+  getValidationMessage,
+  ValidationMessage,
+} from '../../discrete-layer/components/layer-details/utils';
 import { SYNC_QUERY_NAME } from '../../syncHttpClientGql';
 import { sessionStore } from '../helpers/storage';
 
@@ -30,8 +33,14 @@ const useSessionStoreWatcherForm = () => {
         case key.includes(SYNC_QUERY_NAME.VALIDATE_SOURCE): {
           switch (method) {
             case 'setItem': {
-              const data = sessionStore.getObject(SYNC_QUERY_NAME.VALIDATE_SOURCE);
-              if (data && !data.isValid && !sessionStore.getObject(SYNC_QUERY_NAME.GET_PRODUCT)) {
+              const data = sessionStore.getObject(
+                SYNC_QUERY_NAME.VALIDATE_SOURCE
+              );
+              if (
+                data &&
+                !data.isValid &&
+                !sessionStore.getObject(SYNC_QUERY_NAME.GET_PRODUCT)
+              ) {
                 setValidationWarn(getValidationMessage(data, intl));
               }
               break;
@@ -48,7 +57,11 @@ const useSessionStoreWatcherForm = () => {
       }
     };
 
-    sessionStore.watchMethods(['setItem', 'removeItem'], () => {}, callbackAfter);
+    sessionStore.watchMethods(
+      ['setItem', 'removeItem'],
+      () => {},
+      callbackAfter
+    );
 
     return () => {
       sessionStore.unWatchMethods();

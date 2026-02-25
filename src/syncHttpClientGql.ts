@@ -7,8 +7,8 @@ export const enum SYNC_QUERY_NAME {
   RASTER_UPDATE_GEOPKG = 'startRasterUpdateGeopkg',
   VALIDATE_SOURCE = 'validateSource',
   GET_DIRECTORY = 'getDirectory',
-  GET_PRODUCT = 'getProduct'
-};
+  GET_PRODUCT = 'getProduct',
+}
 
 export type SYNC_QUERY = {
   queryName: SYNC_QUERY_NAME;
@@ -154,9 +154,15 @@ const syncSlaves = (isRawRequest: boolean, masterResponse: any, query: string, v
 };*/
 
 export const syncHttpClientGql = () => {
-  const clientGql = createHttpClient(`${CONFIG.SERVICE_PROTOCOL}${CONFIG.SERVICE_NAME}/graphql`);
+  const clientGql = createHttpClient(
+    `${CONFIG.SERVICE_PROTOCOL}${CONFIG.SERVICE_NAME}/graphql`
+  );
 
-  const syncRequest = async (isRawRequest: boolean, query: string, variables: any) => {
+  const syncRequest = async (
+    isRawRequest: boolean,
+    query: string,
+    variables: any
+  ) => {
     try {
       // const relevantQuery = currentQuery(query);
       const masterResponse: any = isRawRequest

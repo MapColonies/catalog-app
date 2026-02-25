@@ -1,19 +1,27 @@
 import { get } from 'lodash';
 import { useContext } from 'react';
-import lookupTablesContext, { ILookupOption } from '../contexts/lookupTables.context';
+import lookupTablesContext, {
+  ILookupOption,
+} from '../contexts/lookupTables.context';
 
 export interface IZoomLevelData {
-  resolutionDeg:number;
-  resolutionMeter:number
+  resolutionDeg: number;
+  resolutionMeter: number;
 }
-export const useZoomLevels = (): Record<string,IZoomLevelData> => {
-  const zoomlevelresolutions = {} as Record<string,IZoomLevelData>;
+export const useZoomLevels = (): Record<string, IZoomLevelData> => {
+  const zoomlevelresolutions = {} as Record<string, IZoomLevelData>;
   const { lookupTablesData } = useContext(lookupTablesContext);
-  const lookupOptions = get(lookupTablesData?.dictionary, 'zoomlevelresolutions') as ILookupOption[] ?? []; 
+  const lookupOptions =
+    (get(
+      lookupTablesData?.dictionary,
+      'zoomlevelresolutions'
+    ) as ILookupOption[]) ?? [];
 
   lookupOptions?.forEach((option) => {
-    zoomlevelresolutions[option.value] = {...option.properties} as unknown as IZoomLevelData;
+    zoomlevelresolutions[option.value] = {
+      ...option.properties,
+    } as unknown as IZoomLevelData;
   });
-  
+
   return zoomlevelresolutions;
-}
+};
