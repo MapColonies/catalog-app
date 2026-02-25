@@ -5,8 +5,10 @@ import { EntityDescriptorModelType } from '../../../models';
 
 export const EntityDescriptorsFetcher: React.FC = observer(() => {
   const store = useStore();
-  const descriptorsQuery = useQuery((store) => store.queryEntityDescriptors({},
-    ` type
+  const descriptorsQuery = useQuery((store) =>
+    store.queryEntityDescriptors(
+      {},
+      ` type
     categories {
       category
       categoryTitle
@@ -107,16 +109,21 @@ export const EntityDescriptorsFetcher: React.FC = observer(() => {
         default
       }
       __typename
-    }`));
-  
+    }`
+    )
+  );
+
   useEffect(() => {
     if (!descriptorsQuery.loading && descriptorsQuery.data) {
-      const descriptors = descriptorsQuery.data?.entityDescriptors as EntityDescriptorModelType[];
+      const descriptors = descriptorsQuery.data
+        ?.entityDescriptors as EntityDescriptorModelType[];
       store.discreteLayersStore.setEntityDescriptors([...descriptors]);
     }
-  }, [descriptorsQuery.data, descriptorsQuery.loading, store.discreteLayersStore]);
-  
-  return (
-    <></>
-  );
+  }, [
+    descriptorsQuery.data,
+    descriptorsQuery.loading,
+    store.discreteLayersStore,
+  ]);
+
+  return <></>;
 });

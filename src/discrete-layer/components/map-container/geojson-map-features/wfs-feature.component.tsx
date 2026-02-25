@@ -13,12 +13,12 @@ export const WfsFeature: React.FC = observer(() => {
   const store = useStore();
   const intl = useIntl();
   const wfsFeature = store.mapMenusManagerStore.currentWfsFeatureInfo;
-  
+
   if (!wfsFeature) return null;
-  
+
   // If there are no features, use array with an empty object instead so that `GeojsonFeatureWithInfoBox` component will render no data found message
   const wfsFeatures = wfsFeature.features?.length ? wfsFeature.features : [{}];
-  
+
   return (
     <>
       {wfsFeatures?.map((feature) => {
@@ -40,8 +40,17 @@ export const WfsFeature: React.FC = observer(() => {
                   id: wfsFeature.config.translationId ?? wfsFeature.typeName,
                 })
               )}
-            markerIconPath={wfsFeature.config.markerIcon ? `assets/img/app/${wfsFeature.config.markerIcon}.png` : undefined}
-            markerPosition={{ longitude: Number(wfsFeature.pointCoordinates[LONGITUDE_POSITION]), latitude: Number(wfsFeature.pointCoordinates[LATITUDE_POSITION]) }}
+            markerIconPath={
+              wfsFeature.config.markerIcon
+                ? `assets/img/app/${wfsFeature.config.markerIcon}.png`
+                : undefined
+            }
+            markerPosition={{
+              longitude: Number(
+                wfsFeature.pointCoordinates[LONGITUDE_POSITION]
+              ),
+              latitude: Number(wfsFeature.pointCoordinates[LATITUDE_POSITION]),
+            }}
             shouldFocusOnCreation={wfsFeatures.length === 1}
             shouldVisualize={wfsFeature.config.isVisualized}
           />

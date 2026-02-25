@@ -1,85 +1,84 @@
 .actionsMenuItem {
-    display: flex;
-    width: 100%;
-    align-items: center;
+  display: flex;
+  width: 100%;
+  align-items: center;
 }
 
 .actionsMenuItem.mdc-button:disabled {
-    background-color: transparent;
+  background-color: transparent;
 }
 
-.actionsMenuItemLoading { 
-    position: absolute;
-    right: 10px;
+.actionsMenuItemLoading {
+  position: absolute;
+  right: 10px;
 }
 
 body[dir='rtl'] .actionsMenuItemLoading {
-    right: unset;
-    left: 10px;
+  right: unset;
+  left: 10px;
 }
 
 .contextMenuFooter {
-    background-color: var(--mdc-theme-gc-selection-background);
+  background-color: var(--mdc-theme-gc-selection-background);
 }
 
 .contextMenuFooter .heightContainer {
-    display: flex;
-    gap: 10px;
-    padding: 0px 20px;  
-    align-items: center;
-    height: 2rem;
+  display: flex;
+  gap: 10px;
+  padding: 0px 20px;
+  align-items: center;
+  height: 2rem;
 }
 
 .coordinatesContainer {
-    display: flex;
-    gap: 10px;
-    padding: 10px;
+  display: flex;
+  gap: 10px;
+  padding: 10px;
 }
 
 .contextMenuFooter .activeLayersMessageContainer {
-    text-align: left;
-    padding: 5px 20px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+  text-align: left;
+  padding: 5px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 body[dir='rtl'] .contextMenuFooter .coordinatesContainer {
-    text-align: right;
+  text-align: right;
 }
 
 .featureIcon {
-    margin-right: 10px;
+  margin-right: 10px;
 }
 
 .featureIcon,
 .menuIcon {
-    font-size: 20px;
-    padding: 0;
-    pointer-events: none;
+  font-size: 20px;
+  padding: 0;
+  pointer-events: none;
 }
 
-@keyframes scaleAndRotate{
-    from {
-        transform: scale(1) rotate(0deg);
-    }
-    to {
-        transform: scale(1.3) rotate(360deg);
-        color: white;
-    }
+@keyframes scaleAndRotate {
+  from {
+    transform: scale(1) rotate(0deg);
+  }
+  to {
+    transform: scale(1.3) rotate(360deg);
+    color: white;
+  }
 }
 
 .menuIcon.loading {
-    animation: scaleAndRotate 1.2s alternate infinite;
+  animation: scaleAndRotate 1.2s alternate infinite;
 }
 
-
 body[dir='rtl'] .featureIcon {
-    margin-right: unset;
-    margin-left: 10px;
+  margin-right: unset;
+  margin-left: 10px;
 }
 
 .actionsContextMenuItemLabel {
-    overflow: 'hidden';
-    text-overflow: 'ellipsis';
+  overflow: 'hidden';
+  text-overflow: 'ellipsis';
 }

@@ -12,7 +12,7 @@
   gap: 12px;
 }
 
-#exportJobData.jobDataContainer .exportJobLinkContainer>a:hover {
+#exportJobData.jobDataContainer .exportJobLinkContainer > a:hover {
   filter: brightness(150%);
 }
 

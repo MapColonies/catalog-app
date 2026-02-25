@@ -1,6 +1,6 @@
 .detailsTitle {
   color: var(--mdc-theme-text-primary-on-dark);
-  white-Space: nowrap;
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   margin-right: auto;
@@ -42,10 +42,10 @@ body[dir='rtl'] .detailsContent {
   padding: 0;
 }
 
-.detailsPanelProductView .categoryFieldsTitle{
+.detailsPanelProductView .categoryFieldsTitle {
   font-size: 1.2em;
 }
 
-.categoryFieldsParentContainer.detailsPanelProductView{
+.categoryFieldsParentContainer.detailsPanelProductView {
   margin-top: 4px;
 }

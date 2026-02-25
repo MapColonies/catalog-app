@@ -26,8 +26,7 @@ export const BaseMapsLegendsFetcher: React.FC = observer(() => {
           },
           {
             protocol: LinkType.LEGEND_IMG,
-            url:
-              'https://c8.alamy.com/comp/F5HF5D/map-icon-legend-symbol-sign-toolkit-element-F5HF5D.jpg',
+            url: 'https://c8.alamy.com/comp/F5HF5D/map-icon-legend-symbol-sign-toolkit-element-F5HF5D.jpg',
           },
         ],
       ],
@@ -40,8 +39,7 @@ export const BaseMapsLegendsFetcher: React.FC = observer(() => {
           },
           {
             protocol: LinkType.LEGEND_IMG,
-            url:
-              'https://i.pinimg.com/564x/55/cf/a1/55cfa147dfef99d231ec95ab8cd3652d--outdoor-code-cub-scouts-brownie-hiking-badge.jpg',
+            url: 'https://i.pinimg.com/564x/55/cf/a1/55cfa147dfef99d231ec95ab8cd3652d--outdoor-code-cub-scouts-brownie-hiking-badge.jpg',
           },
         ],
       ],
@@ -56,8 +54,7 @@ export const BaseMapsLegendsFetcher: React.FC = observer(() => {
           },
           {
             protocol: LinkType.LEGEND_IMG,
-            url:
-              'https://i.pinimg.com/564x/55/cf/a1/55cfa147dfef99d231ec95ab8cd3652d--outdoor-code-cub-scouts-brownie-hiking-badge.jpg',
+            url: 'https://i.pinimg.com/564x/55/cf/a1/55cfa147dfef99d231ec95ab8cd3652d--outdoor-code-cub-scouts-brownie-hiking-badge.jpg',
           },
         ],
       ],
@@ -71,8 +68,7 @@ export const BaseMapsLegendsFetcher: React.FC = observer(() => {
           },
           {
             protocol: LinkType.LEGEND_IMG,
-            url:
-              'https://c8.alamy.com/comp/F5HF5D/map-icon-legend-symbol-sign-toolkit-element-F5HF5D.jpg',
+            url: 'https://c8.alamy.com/comp/F5HF5D/map-icon-legend-symbol-sign-toolkit-element-F5HF5D.jpg',
           },
         ],
       ],
@@ -106,8 +102,12 @@ export const BaseMapsLegendsFetcher: React.FC = observer(() => {
                 const layerFromCatalog = await GET_MOCK_LAYER_WITH_LINKS(
                   rasterLayer.id
                 );
-                const legendsLinks = ((layerFromCatalog.links as unknown) as LinkModelType[]).filter(
-                  (link) => [LEGEND_PDF_PROTOCOL, LEGEND_IMG_PROTOCOL].includes(link.protocol as LinkType)
+                const legendsLinks = (
+                  layerFromCatalog.links as unknown as LinkModelType[]
+                ).filter((link) =>
+                  [LEGEND_PDF_PROTOCOL, LEGEND_IMG_PROTOCOL].includes(
+                    link.protocol as LinkType
+                  )
                 );
 
                 return {

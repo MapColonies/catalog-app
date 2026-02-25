@@ -16,7 +16,7 @@ export interface IAction {
   titleTranslationId: string;
   views: TabViews[];
   dependentField?: DependentField;
-};
+}
 
 export interface IActionGroup {
   id: number;
@@ -39,8 +39,14 @@ export enum EntityActionsTypes {
   EXPORT_ACTIONS = 'exportActions',
 }
 
-export const isDependentFieldWithValue = (dependentField?: DependentField): dependentField is DependentFieldWithValue => {
-  return typeof dependentField !== 'undefined' && typeof dependentField !== 'string' && 'expectedValue' in dependentField;
+export const isDependentFieldWithValue = (
+  dependentField?: DependentField
+): dependentField is DependentFieldWithValue => {
+  return (
+    typeof dependentField !== 'undefined' &&
+    typeof dependentField !== 'string' &&
+    'expectedValue' in dependentField
+  );
 };
 
 const GENERAL_ACTIONS_GROUP: IActionGroup = {
@@ -54,7 +60,7 @@ const GENERAL_ACTIONS_GROUP: IActionGroup = {
       icon: '',
       class: 'mc-icon-Fly-to',
       titleTranslationId: 'action.flyTo.tooltip',
-      views: [TabViews.CATALOG, TabViews.SEARCH_RESULTS]
+      views: [TabViews.CATALOG, TabViews.SEARCH_RESULTS],
     },
     {
       action: 'viewer',
@@ -62,8 +68,12 @@ const GENERAL_ACTIONS_GROUP: IActionGroup = {
       icon: '',
       class: 'mc-icon-Earth',
       titleTranslationId: 'action.viewer.tooltip',
-      dependentField: {field: 'productStatus', expectedValue: RecordStatus.BEING_DELETED, operator: 'notEquals'},
-      views: [TabViews.CATALOG, TabViews.SEARCH_RESULTS]
+      dependentField: {
+        field: 'productStatus',
+        expectedValue: RecordStatus.BEING_DELETED,
+        operator: 'notEquals',
+      },
+      views: [TabViews.CATALOG, TabViews.SEARCH_RESULTS],
     },
     {
       action: 'export',
@@ -71,8 +81,8 @@ const GENERAL_ACTIONS_GROUP: IActionGroup = {
       icon: '',
       class: 'mc-icon-Export',
       titleTranslationId: 'action.export.tooltip',
-      dependentField: {field: 'layerURLMissing', expectedValue: false},
-      views: [TabViews.CATALOG, TabViews.SEARCH_RESULTS]
+      dependentField: { field: 'layerURLMissing', expectedValue: false },
+      views: [TabViews.CATALOG, TabViews.SEARCH_RESULTS],
     },
   ],
 };
@@ -93,8 +103,8 @@ const ACTIONS_CONFIG: IEntityActions[] = [
             icon: '',
             class: 'mc-icon-Edit1',
             titleTranslationId: 'action.edit.tooltip',
-            dependentField: {field: 'layerURLMissing', expectedValue: false},
-            views: [TabViews.CATALOG, TabViews.SEARCH_RESULTS]
+            dependentField: { field: 'layerURLMissing', expectedValue: false },
+            views: [TabViews.CATALOG, TabViews.SEARCH_RESULTS],
           },
           {
             action: 'update',
@@ -102,12 +112,12 @@ const ACTIONS_CONFIG: IEntityActions[] = [
             icon: '',
             class: 'mc-icon-Update',
             titleTranslationId: 'action.update.tooltip',
-            dependentField: {field: 'layerURLMissing', expectedValue: false},
-            views: [TabViews.CATALOG, TabViews.SEARCH_RESULTS]
+            dependentField: { field: 'layerURLMissing', expectedValue: false },
+            views: [TabViews.CATALOG, TabViews.SEARCH_RESULTS],
           },
         ],
-      }
-    ]
+      },
+    ],
   },
   {
     entity: 'Layer3DRecord',
@@ -124,8 +134,12 @@ const ACTIONS_CONFIG: IEntityActions[] = [
             icon: '',
             class: 'mc-icon-Edit1',
             titleTranslationId: 'action.edit.tooltip',
-            dependentField: {field: 'productStatus', expectedValue: RecordStatus.BEING_DELETED, operator: 'notEquals'},
-            views: [TabViews.CATALOG, TabViews.SEARCH_RESULTS]
+            dependentField: {
+              field: 'productStatus',
+              expectedValue: RecordStatus.BEING_DELETED,
+              operator: 'notEquals',
+            },
+            views: [TabViews.CATALOG, TabViews.SEARCH_RESULTS],
           },
           {
             action: 'delete',
@@ -133,12 +147,16 @@ const ACTIONS_CONFIG: IEntityActions[] = [
             icon: '',
             class: 'mc-icon-Delete',
             titleTranslationId: 'action.delete.tooltip',
-            dependentField: {field: 'productStatus', expectedValue: RecordStatus.BEING_DELETED, operator: 'notEquals'},
-            views: [TabViews.CATALOG, TabViews.SEARCH_RESULTS]
+            dependentField: {
+              field: 'productStatus',
+              expectedValue: RecordStatus.BEING_DELETED,
+              operator: 'notEquals',
+            },
+            views: [TabViews.CATALOG, TabViews.SEARCH_RESULTS],
           },
         ],
       },
-    ]
+    ],
   },
   {
     entity: 'VectorBestRecord',
@@ -155,11 +173,11 @@ const ACTIONS_CONFIG: IEntityActions[] = [
             icon: '',
             class: 'mc-icon-Edit1',
             titleTranslationId: 'action.edit.tooltip',
-            views: [TabViews.CATALOG, TabViews.SEARCH_RESULTS]
+            views: [TabViews.CATALOG, TabViews.SEARCH_RESULTS],
           },
         ],
-      }
-    ]
+      },
+    ],
   },
   {
     entity: 'QuantizedMeshBestRecord',
@@ -176,11 +194,11 @@ const ACTIONS_CONFIG: IEntityActions[] = [
             icon: '',
             class: 'mc-icon-Edit1',
             titleTranslationId: 'action.edit.tooltip',
-            views: [TabViews.CATALOG, TabViews.SEARCH_RESULTS]
+            views: [TabViews.CATALOG, TabViews.SEARCH_RESULTS],
           },
         ],
-      }
-    ]
+      },
+    ],
   },
   {
     entity: 'LayerDemRecord',
@@ -197,7 +215,7 @@ const ACTIONS_CONFIG: IEntityActions[] = [
             icon: '',
             class: 'mc-icon-Edit1',
             titleTranslationId: 'action.edit.tooltip',
-            views: [TabViews.CATALOG, TabViews.SEARCH_RESULTS]
+            views: [TabViews.CATALOG, TabViews.SEARCH_RESULTS],
           },
           // {
           //   action: 'delete',
@@ -208,8 +226,8 @@ const ACTIONS_CONFIG: IEntityActions[] = [
           //   views: [TabViews.CATALOG, TabViews.SEARCH_RESULTS]
           // },
         ],
-      }
-    ]
+      },
+    ],
   },
   {
     entity: 'Job',
@@ -262,10 +280,9 @@ const ACTIONS_CONFIG: IEntityActions[] = [
             views: [],
           },
         ],
-      }
-    ]
-    
-  }
+      },
+    ],
+  },
 ];
 
 export default ACTIONS_CONFIG;

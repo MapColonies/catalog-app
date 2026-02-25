@@ -1,4 +1,3 @@
-
 import { TabViews } from '../../discrete-layer/views/tab-views';
 import { IAction, IActionGroup } from './entity.actions';
 
@@ -33,15 +32,15 @@ export enum ContextActionsGroupTemplates {
 
 export enum ActionSpreadPreference {
   FLAT = 'flat',
-  MENU = 'menu'
+  MENU = 'menu',
 }
 
-export type SeparatorPosition = "BEFORE" | "AFTER";
+export type SeparatorPosition = 'BEFORE' | 'AFTER';
 
 export interface IContextAction extends IAction {
   templateId?: ContextActionsTemplates;
   separator?: SeparatorPosition;
-};
+}
 
 export interface IContextActionGroup extends Omit<IActionGroup, 'group'> {
   order: number;
@@ -62,11 +61,12 @@ export interface IContextActions {
   groups: IContextActionGroup[];
 }
 
-
 // A "type guard" helper function used to infer if action is a group or a single action.
-export const isActionGroup = (action: IContextAction | IContextActionGroup): action is IContextActionGroup => {
+export const isActionGroup = (
+  action: IContextAction | IContextActionGroup
+): action is IContextActionGroup => {
   return (action as IContextActionGroup).actions !== undefined;
-}
+};
 
 const DEFAULT_MINIMUM_ITEMS_IN_MENU = 2;
 
@@ -79,14 +79,14 @@ const defaultContextActionProps: IAction = {
   views: [TabViews.CATALOG, TabViews.SEARCH_RESULTS],
 };
 
-const defaultContextActionGroupProps: Omit<IContextActionGroup, "order"> = {
+const defaultContextActionGroupProps: Omit<IContextActionGroup, 'order'> = {
   id: 0,
   actionsSpreadPreference: ActionSpreadPreference.MENU,
   minimumItemsInMenu: DEFAULT_MINIMUM_ITEMS_IN_MENU,
   actions: [],
   titleTranslationId: '',
-  type: ''
-}
+  type: '',
+};
 
 const CONTEXT_ACTIONS_CONFIG: IContextActions[] = [
   {
@@ -107,7 +107,7 @@ const CONTEXT_ACTIONS_CONFIG: IContextActions[] = [
             ...defaultContextActionProps,
             templateId: ContextActionsTemplates.WFS_QUERY_FEATURES,
             action: ContextActions.QUERY_WFS_FEATURE,
-          }
+          },
         ],
       },
       {
@@ -149,7 +149,7 @@ const CONTEXT_ACTIONS_CONFIG: IContextActions[] = [
                 ...defaultContextActionProps,
                 titleTranslationId: 'map-context-menu.polygon-parts.title',
                 action: ContextActions.QUERY_POLYGON_PARTS,
-                separator: 'AFTER'
+                separator: 'AFTER',
               },
               {
                 ...defaultContextActionProps,

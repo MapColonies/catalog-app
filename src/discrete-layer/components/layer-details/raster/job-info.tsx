@@ -7,7 +7,11 @@ import { AutoDirectionBox } from '../../../../common/components/auto-direction-b
 import { Status } from '../../../models';
 import { JobErrorsSummary } from '../../job-errors-summary/job-errors-summary';
 import { Progress } from './progress';
-import { isJobValid, isStatusFailed, isTaskValid } from './state-machine/helpers';
+import {
+  isJobValid,
+  isStatusFailed,
+  isTaskValid,
+} from './state-machine/helpers';
 import { IJob } from './state-machine/types';
 
 import './job-info.css';
@@ -50,31 +54,36 @@ export const JobInfo: React.FC<JobInfoProps> = ({ job }) => {
           <Box className="title underline bold">
             <FormattedMessage id="ingestion.job.report" />
           </Box>
-          {
-            job.taskId ? (
-              job.validationReport?.errorsSummary?.errorsCount ? (
-                <Box className="reportList bold">
-                  {JobErrorsSummary(theme, job.validationReport.errorsSummary, "countWrapper", job.taskStatus === Status.Failed ? theme.custom?.GC_ERROR_HIGH : '')}
-                </Box>
-              ) : (
-                <Box className="reportError">
-                  {
-                    job.taskReason
-                    ? <Typography className="error" tag="span">
-                        <AutoDirectionBox>{job.taskReason}</AutoDirectionBox>
-                      </Typography>
-                    : <Box className="reportInProgress">
-                        <FormattedMessage id="ingestion.job.report-in-progress" />
-                      </Box>
-                  }
-                </Box>
-              )
+          {job.taskId ? (
+            job.validationReport?.errorsSummary?.errorsCount ? (
+              <Box className="reportList bold">
+                {JobErrorsSummary(
+                  theme,
+                  job.validationReport.errorsSummary,
+                  'countWrapper',
+                  job.taskStatus === Status.Failed
+                    ? theme.custom?.GC_ERROR_HIGH
+                    : ''
+                )}
+              </Box>
             ) : (
-              <Box className="reportLoading">
-                <Skeleton width="99%" count={8} />
+              <Box className="reportError">
+                {job.taskReason ? (
+                  <Typography className="error" tag="span">
+                    <AutoDirectionBox>{job.taskReason}</AutoDirectionBox>
+                  </Typography>
+                ) : (
+                  <Box className="reportInProgress">
+                    <FormattedMessage id="ingestion.job.report-in-progress" />
+                  </Box>
+                )}
               </Box>
             )
-          }
+          ) : (
+            <Box className="reportLoading">
+              <Skeleton width="99%" count={8} />
+            </Box>
+          )}
         </Box>
       </Box>
     </>

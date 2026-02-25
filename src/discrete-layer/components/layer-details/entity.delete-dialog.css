@@ -56,7 +56,11 @@ body[dir='rtl'] #entityDeleteDialog .closeIcon {
     height: var(--modal-height);
   }
 
-  #entityDeleteDialog .mdc-dialog .mdc-dialog__surface .mdc-dialog .mdc-dialog__surface {
+  #entityDeleteDialog
+    .mdc-dialog
+    .mdc-dialog__surface
+    .mdc-dialog
+    .mdc-dialog__surface {
     max-width: var(--modal-width);
     height: var(--chonky-modal-height);
   }

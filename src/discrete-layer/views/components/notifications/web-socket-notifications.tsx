@@ -5,23 +5,21 @@ import { localStore } from '../../../../common/helpers/storage';
 import { CallBack } from '../../../../common/models/job-errors-summary.raster';
 
 const WebSocketNotifications: React.FC = () => {
-
   useEffect(() => {
     const initWebSocket = () => {
       const wsClient = createClient({
         url: `${CONFIG.WS_PROTOCOL}${CONFIG.SERVICE_NAME}/graphql-ws`,
         keepAlive: 300000,
-        connectionParams: {
-        },
+        connectionParams: {},
         on: {
           connected: () => {
-            console.log("WebSocket connected");
+            console.log('WebSocket connected');
           },
           error: (error) => {
-            console.error("WebSocket error:", error);
+            console.error('WebSocket error:', error);
           },
           closed: () => {
-            console.log("WebSocket disconnected");
+            console.log('WebSocket disconnected');
           },
         },
       });
@@ -29,7 +27,7 @@ const WebSocketNotifications: React.FC = () => {
     };
 
     const wsClient = initWebSocket();
-    
+
     const subscribeToTask = () => {
       return wsClient.subscribe(
         {
@@ -51,9 +49,16 @@ const WebSocketNotifications: React.FC = () => {
           }`,
         },
         {
-          next: (res: { data: { taskUpdateDetails: CallBack<unknown>}, errors: Record<string, unknown>[]}) => {
-            console.log('WebSocket notification received for', `job:${res.data.taskUpdateDetails.jobId} task:${res.data.taskUpdateDetails.taskId}`);
-            const newCount = parseInt(localStore.get('taskNotificationCount') || '0', 10) + 1;
+          next: (res: {
+            data: { taskUpdateDetails: CallBack<unknown> };
+            errors: Record<string, unknown>[];
+          }) => {
+            console.log(
+              'WebSocket notification received for',
+              `job:${res.data.taskUpdateDetails.jobId} task:${res.data.taskUpdateDetails.taskId}`
+            );
+            const newCount =
+              parseInt(localStore.get('taskNotificationCount') || '0', 10) + 1;
             localStore.set('taskNotificationCount', newCount.toString());
             localStore.setObject('lastTask', res.data.taskUpdateDetails);
           },
@@ -66,7 +71,7 @@ const WebSocketNotifications: React.FC = () => {
         }
       );
     };
-    
+
     subscribeToTask();
 
     return () => {

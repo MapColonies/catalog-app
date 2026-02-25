@@ -5,8 +5,13 @@ interface UnknownValuePresentorProps {
   value?: string;
 }
 
-export const UnknownValuePresentorComponent: React.FC<UnknownValuePresentorProps> = ({ value }) => {
+export const UnknownValuePresentorComponent: React.FC<
+  UnknownValuePresentorProps
+> = ({ value }) => {
   return (
-    <TooltippedValue className="detailsFieldValue"> *UNKNOWN TYPE - {value}*</TooltippedValue>
+    <TooltippedValue className="detailsFieldValue">
+      {' '}
+      *UNKNOWN TYPE - {value}*
+    </TooltippedValue>
   );
-}
+};

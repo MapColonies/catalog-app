@@ -1,40 +1,39 @@
-
 .gpuInsufficientError * {
-    padding: 0;
-    margin: 0;
-    box-sizing: border-box;    
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
 }
 
 .gpuInsufficientError {
-    display: flex;
-    flex-direction: column;
-    position: absolute;
-    top: 20px;
-    left: 50%;
-    align-items: center;
-    justify-content: center;
-    width: 70%;
-    min-height: 3rem;
-    background: var(--mdc-theme-gc-error-high);
-    z-index: 0;
-    transform: translateX(-50%);
-    white-space: pre-line;
-    gap: 12px;
-    padding: 12px 0;
-    text-align: center;
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  align-items: center;
+  justify-content: center;
+  width: 70%;
+  min-height: 3rem;
+  background: var(--mdc-theme-gc-error-high);
+  z-index: 0;
+  transform: translateX(-50%);
+  white-space: pre-line;
+  gap: 12px;
+  padding: 12px 0;
+  text-align: center;
 }
 
 .closeIconContainer {
-    position: absolute;
-    top: 12px;
-    right: 12px;
+  position: absolute;
+  top: 12px;
+  right: 12px;
 }
 
 .closeIcon {
-    color: var(--mdc-theme-text-secondary-on-background) !important;
-    scale: 1.5;
+  color: var(--mdc-theme-text-secondary-on-background) !important;
+  scale: 1.5;
 }
 
 .closeIcon:hover {
-    color: white !important;
+  color: white !important;
 }

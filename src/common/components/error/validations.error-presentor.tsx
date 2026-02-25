@@ -13,31 +13,33 @@ interface IValidationsError {
   errors: Record<string, string[]>;
 }
 
-export const ValidationsError: React.FC<IValidationsError> = ({ errors })=> {
+export const ValidationsError: React.FC<IValidationsError> = ({ errors }) => {
   return (
     <>
-      {
-        Object.keys(errors).length > NONE &&
+      {Object.keys(errors).length > NONE && (
         <AutoDirectionBox className="errorContainer">
-          <IconButton className="errorIcon mc-icon-Status-Warnings" 
+          <IconButton
+            className="errorIcon mc-icon-Status-Warnings"
             onClick={(e): void => {
               e.preventDefault();
               e.stopPropagation();
             }}
           />
           <ul className="errorsList">
-            {
-              Object.keys(errors).map((key: string) => {
-                return errors[key].map((errorMessage: string, index: number) => {
-                  return (
-                    <li dir="auto" key={`${key}${index}`} dangerouslySetInnerHTML={{__html: errorMessage}}></li>
-                  );
-                })
-              })
-            }
+            {Object.keys(errors).map((key: string) => {
+              return errors[key].map((errorMessage: string, index: number) => {
+                return (
+                  <li
+                    dir="auto"
+                    key={`${key}${index}`}
+                    dangerouslySetInnerHTML={{ __html: errorMessage }}
+                  ></li>
+                );
+              });
+            })}
           </ul>
         </AutoDirectionBox>
-      }
+      )}
     </>
   );
 };

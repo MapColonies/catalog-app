@@ -1,5 +1,12 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import React, { useEffect, useCallback, useState, useLayoutEffect, useRef, useMemo } from 'react';
+import React, {
+  useEffect,
+  useCallback,
+  useState,
+  useLayoutEffect,
+  useRef,
+  useMemo,
+} from 'react';
 import { useIntl } from 'react-intl';
 import { observer } from 'mobx-react';
 import { FormikValues } from 'formik';
@@ -27,11 +34,14 @@ import {
   RecordStatus,
   ValidationValueType,
   LayerDemRecordModel,
-  LayerRasterRecordModelType
+  LayerRasterRecordModelType,
 } from '../../models';
 import { IDispatchAction } from '../../models/actionDispatcherStore';
 import { ILayerImage } from '../../models/layerImage';
-import { Layer3DRecordInput, LayerDemRecordInput } from '../../models/RootStore.base';
+import {
+  Layer3DRecordInput,
+  LayerDemRecordInput,
+} from '../../models/RootStore.base';
 import { UserAction } from '../../models/userStore';
 import {
   FieldConfigModelKeys,
@@ -49,7 +59,7 @@ import {
   getFlatEntityDescriptors,
   getPartialRecord,
   getValidationType,
-  getYupFieldConfig
+  getYupFieldConfig,
 } from './utils';
 import suite from './validate';
 
@@ -67,18 +77,25 @@ interface EntityDialogProps {
   layerRecord?: ILayerImage | null;
 }
 
-const setDefaultValues = (record: Record<string, unknown>, descriptors: EntityDescriptorModelType[]): void => {
+const setDefaultValues = (
+  record: Record<string, unknown>,
+  descriptors: EntityDescriptorModelType[]
+): void => {
   getFlatEntityDescriptors(
     record['__typename'] as LayerRecordTypes,
     descriptors
-  ).filter(
-    field => field.default
-  ).forEach(
-    descriptor => record[descriptor.fieldName as string] = descriptor.default
-  );
+  )
+    .filter((field) => field.default)
+    .forEach(
+      (descriptor) =>
+        (record[descriptor.fieldName as string] = descriptor.default)
+    );
 };
 
-export const buildRecord = (recordType: RecordType, descriptors: EntityDescriptorModelType[]): ILayerImage => {
+export const buildRecord = (
+  recordType: RecordType,
+  descriptors: EntityDescriptorModelType[]
+): ILayerImage => {
   const record = {} as Record<string, unknown>;
   switch (recordType) {
     case RecordType.RECORD_DEM:
@@ -86,7 +103,9 @@ export const buildRecord = (recordType: RecordType, descriptors: EntityDescripto
         record[key as string] = undefined;
       });
       record.productType = ProductType.DTM;
-      record['__typename'] = LayerDemRecordModel.properties['__typename'].name.replaceAll('"','');
+      record['__typename'] = LayerDemRecordModel.properties[
+        '__typename'
+      ].name.replaceAll('"', '');
       break;
     case RecordType.RECORD_3D:
       Layer3DRecordModelKeys.forEach((key) => {
@@ -94,7 +113,9 @@ export const buildRecord = (recordType: RecordType, descriptors: EntityDescripto
       });
       record.productType = ProductType.PHOTO_REALISTIC_3D;
       record.productStatus = RecordStatus.UNPUBLISHED;
-      record['__typename'] = Layer3DRecordModel.properties['__typename'].name.replaceAll('"','');
+      record['__typename'] = Layer3DRecordModel.properties[
+        '__typename'
+      ].name.replaceAll('"', '');
       break;
     // case RecordType.RECORD_RASTER:
     //   LayerRasterRecordModelKeys.forEach((key) => {
@@ -136,7 +157,6 @@ const getLabel = (recordType: RecordType): string => {
 
 export const EntityDialog: React.FC<EntityDialogProps> = observer(
   (props: EntityDialogProps) => {
-
     const store = useStore();
     const intl = useIntl();
     const mutationQuery = useQuery();
@@ -151,22 +171,29 @@ export const EntityDialog: React.FC<EntityDialogProps> = observer(
       return store.discreteLayersStore.selectedLayerOperationMode;
     }, []);
 
-    const { isOpen, onSetOpen } = props;   
-    const [recordType] = useState<RecordType>(props.recordType ?? (props.layerRecord?.type as RecordType));
+    const { isOpen, onSetOpen } = props;
+    const [recordType] = useState<RecordType>(
+      props.recordType ?? (props.layerRecord?.type as RecordType)
+    );
     const [mode] = useState<Mode>(decideMode());
     const [layerRecord] = useState<LayerMetadataMixedUnion>(
       props.layerRecord && mode !== Mode.UPDATE
         ? cloneDeep(props.layerRecord)
-        : buildRecord(recordType, store.discreteLayersStore.entityDescriptors as EntityDescriptorModelType[])
+        : buildRecord(
+            recordType,
+            store.discreteLayersStore
+              .entityDescriptors as EntityDescriptorModelType[]
+          )
     );
-    const [vestValidationResults, setVestValidationResults] = useState<
-      DraftResult
-    >({} as DraftResult);
+    const [vestValidationResults, setVestValidationResults] =
+      useState<DraftResult>({} as DraftResult);
     const [descriptors, setDescriptors] = useState<unknown[]>([]);
     const [schema, setSchema] = useState<Record<string, Yup.AnySchema>>({});
     const [inputValues, setInputValues] = useState<FormikValues>({});
     const [isAllInfoReady, setIsAllInfoReady] = useState<boolean>(false);
-    const queryGetProduct = useQuery<{getProduct: LayerMetadataMixedUnion | null}>();
+    const queryGetProduct = useQuery<{
+      getProduct: LayerMetadataMixedUnion | null;
+    }>();
 
     const dialogTitleParam = recordType;
     const dialogTitleParamTranslation = intl.formatMessage({
@@ -177,24 +204,20 @@ export const EntityDialog: React.FC<EntityDialogProps> = observer(
       { value: dialogTitleParamTranslation }
     );
 
-    const dispatchAction = (action: Record<string,unknown>): void => {
-      store.actionDispatcherStore.dispatchAction(
-        {
-          action: action.action,
-          data: action.data,
-        } as IDispatchAction
-      );
+    const dispatchAction = (action: Record<string, unknown>): void => {
+      store.actionDispatcherStore.dispatchAction({
+        action: action.action,
+        data: action.data,
+      } as IDispatchAction);
     };
 
-    const metadataPayloadKeys = useMemo(
-      () => {
-        return getFlatEntityDescriptors(
-          'Layer3DRecord',
-          store.discreteLayersStore.entityDescriptors as EntityDescriptorModelType[]
-        )
-        .map(descriptor => descriptor.fieldName);
-      },
-      [store.discreteLayersStore.entityDescriptors]);
+    const metadataPayloadKeys = useMemo(() => {
+      return getFlatEntityDescriptors(
+        'Layer3DRecord',
+        store.discreteLayersStore
+          .entityDescriptors as EntityDescriptorModelType[]
+      ).map((descriptor) => descriptor.fieldName);
+    }, [store.discreteLayersStore.entityDescriptors]);
 
     const handleIngestQueries = (): void => {
       // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -218,7 +241,10 @@ export const EntityDialog: React.FC<EntityDialogProps> = observer(
               data: {
                 directory: directory as string,
                 fileNames: [fileNames as string],
-                metadata: cleanUpEntityPayload(metadata, metadataPayloadKeys as string[]) as unknown as Layer3DRecordInput,
+                metadata: cleanUpEntityPayload(
+                  metadata,
+                  metadataPayloadKeys as string[]
+                ) as unknown as Layer3DRecordInput,
                 type: RecordType.RECORD_3D,
               },
             })
@@ -235,25 +261,36 @@ export const EntityDialog: React.FC<EntityDialogProps> = observer(
           data: {
             id: inputValues.id as string,
             type: inputValues.type as RecordType,
-            partialRecordData: getPartialRecord(inputValues as Record<string, unknown> as Partial<ILayerImage>, descriptors as FieldConfigModelType[], IS_EDITABLE),
+            partialRecordData: getPartialRecord(
+              inputValues as Record<string, unknown> as Partial<ILayerImage>,
+              descriptors as FieldConfigModelType[],
+              IS_EDITABLE
+            ),
           },
         })
       );
     };
 
-    const handleUpdateQueries = (): void => {
-      
-    };
+    const handleUpdateQueries = (): void => {};
 
     const checkHasQueriesSucceeded = (): boolean => {
       const SUCCESS_RESPONSE_VAL = 'ok';
 
-      const mutationServices = ['updateMetadata', 'start3DIngestion', 'startRasterIngestion', 'startRasterUpdateGeopkg'];
-      const hasAnyQuerySucceeded = Object.entries(mutationQuery.data ?? {})
-      .some(([key, val]) => mutationServices.includes(key) && val === SUCCESS_RESPONSE_VAL);
-      
+      const mutationServices = [
+        'updateMetadata',
+        'start3DIngestion',
+        'startRasterIngestion',
+        'startRasterUpdateGeopkg',
+      ];
+      const hasAnyQuerySucceeded = Object.entries(
+        mutationQuery.data ?? {}
+      ).some(
+        ([key, val]) =>
+          mutationServices.includes(key) && val === SUCCESS_RESPONSE_VAL
+      );
+
       return hasAnyQuerySucceeded;
-    }
+    };
 
     useEffect(() => {
       if (!isEmpty(descriptors) && !isEmpty(layerRecord)) {
@@ -265,66 +302,84 @@ export const EntityDialog: React.FC<EntityDialogProps> = observer(
       const CONTENT_HEIGHT_VAR_NAME = '--content-height';
       /* eslint-disable */
       if (dialogContainerRef.current !== null) {
-        const baseContentHeight = getComputedStyle(dialogContainerRef.current).getPropertyValue('--base-content-height');
-        const currentIngestionFieldsHeight = getComputedStyle(dialogContainerRef.current).getPropertyValue('--ingestion-fields-height');
-        const currentUpdateHeaderHeight = getComputedStyle(dialogContainerRef.current).getPropertyValue('--update-layer-header-height');
-  
-        switch(mode) {
+        const baseContentHeight = getComputedStyle(
+          dialogContainerRef.current
+        ).getPropertyValue('--base-content-height');
+        const currentIngestionFieldsHeight = getComputedStyle(
+          dialogContainerRef.current
+        ).getPropertyValue('--ingestion-fields-height');
+        const currentUpdateHeaderHeight = getComputedStyle(
+          dialogContainerRef.current
+        ).getPropertyValue('--update-layer-header-height');
+
+        switch (mode) {
           case Mode.NEW:
-            dialogContainerRef.current.style.setProperty(CONTENT_HEIGHT_VAR_NAME, `calc(${baseContentHeight} - ${currentIngestionFieldsHeight})`);
+            dialogContainerRef.current.style.setProperty(
+              CONTENT_HEIGHT_VAR_NAME,
+              `calc(${baseContentHeight} - ${currentIngestionFieldsHeight})`
+            );
             break;
           case Mode.UPDATE:
-            dialogContainerRef.current.style.setProperty(CONTENT_HEIGHT_VAR_NAME, `calc(${baseContentHeight} - ${currentUpdateHeaderHeight} - ${currentIngestionFieldsHeight})`);        
+            dialogContainerRef.current.style.setProperty(
+              CONTENT_HEIGHT_VAR_NAME,
+              `calc(${baseContentHeight} - ${currentUpdateHeaderHeight} - ${currentIngestionFieldsHeight})`
+            );
             break;
           default:
-            dialogContainerRef.current.style.setProperty(CONTENT_HEIGHT_VAR_NAME, baseContentHeight);
+            dialogContainerRef.current.style.setProperty(
+              CONTENT_HEIGHT_VAR_NAME,
+              baseContentHeight
+            );
             break;
         }
       }
     }, [mode, dialogContainerRef.current]);
 
-    const ingestionFields =
-      [
-        {
-          ...buildFieldInfo(),
-          fieldName: 'directory',
-          label: 'field-names.ingestion.directory',
-          isRequired: true,
-          isAutoGenerated: false,
-          infoMsgCode: ['info-general-tooltip.required'],
-        },
-        {
-          ...buildFieldInfo(),
-          fieldName: 'fileNames',
-          label: getLabel(recordType),
-          isRequired: true,
-          isAutoGenerated: false,
-          infoMsgCode: ['info-general-tooltip.required'],
-        },
-      ];
+    const ingestionFields = [
+      {
+        ...buildFieldInfo(),
+        fieldName: 'directory',
+        label: 'field-names.ingestion.directory',
+        isRequired: true,
+        isAutoGenerated: false,
+        infoMsgCode: ['info-general-tooltip.required'],
+      },
+      {
+        ...buildFieldInfo(),
+        fieldName: 'fileNames',
+        label: getLabel(recordType),
+        isRequired: true,
+        isAutoGenerated: false,
+        infoMsgCode: ['info-general-tooltip.required'],
+      },
+    ];
 
     useEffect(() => {
       const descriptors = getFlatEntityDescriptors(
         layerRecord.__typename,
-        store.discreteLayersStore.entityDescriptors as EntityDescriptorModelType[]
+        store.discreteLayersStore
+          .entityDescriptors as EntityDescriptorModelType[]
       );
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const yupSchema: Record<string, any> = {};
-      [
-        ...ingestionFields,
-        ...descriptors
-      ].forEach((field) => {
+      [...ingestionFields, ...descriptors].forEach((field) => {
         const fieldName: string = field.fieldName as string;
         switch (mode) {
           case Mode.NEW:
           case Mode.UPDATE:
-            if ((field.isRequired as boolean) && field.isAutoGenerated !== true) {
+            if (
+              (field.isRequired as boolean) &&
+              field.isAutoGenerated !== true
+            ) {
               yupSchema[fieldName] = getYupFieldConfig(field, intl);
             }
             break;
           case Mode.EDIT:
-            if ((field.isRequired as boolean) && field.isManuallyEditable === true) {
+            if (
+              (field.isRequired as boolean) &&
+              field.isManuallyEditable === true
+            ) {
               yupSchema[fieldName] = getYupFieldConfig(field, intl);
             }
             break;
@@ -378,14 +433,16 @@ export const EntityDialog: React.FC<EntityDialogProps> = observer(
       );
       setDescriptors(desc as any[]);
 
-      if ([Mode.EDIT].includes(mode) && recordType === RecordType.RECORD_RASTER) {
+      if (
+        [Mode.EDIT].includes(mode) &&
+        recordType === RecordType.RECORD_RASTER
+      ) {
         queryGetProduct.setQuery(
-          store.queryGetProduct(
-            {
-              productType: layerRecord?.productType as ProductType,
-              productId: (layerRecord as LayerRasterRecordModelType).productId as string
-            }
-          )
+          store.queryGetProduct({
+            productType: layerRecord?.productType as ProductType,
+            productId: (layerRecord as LayerRasterRecordModelType)
+              .productId as string,
+          })
         );
       }
     }, []);
@@ -396,16 +453,16 @@ export const EntityDialog: React.FC<EntityDialogProps> = observer(
 
     useEffect(() => {
       if (vestValidationResults.errorCount === NONE) {
-        switch(mode) {
+        switch (mode) {
           case Mode.NEW:
             handleIngestQueries();
-          break;
+            break;
           case Mode.EDIT:
             handleEditQueries();
-          break;
+            break;
           case Mode.UPDATE:
             handleUpdateQueries();
-          break;
+            break;
         }
       }
     }, [vestValidationResults]);
@@ -421,13 +478,19 @@ export const EntityDialog: React.FC<EntityDialogProps> = observer(
 
       if (!mutationQuery.loading && hasAnyQuerySucceeded) {
         closeDialog();
-        
-        dispatchAction({ 
+
+        dispatchAction({
           action: UserAction.SYSTEM_CALLBACK_EDIT,
-          data: inputValues as ILayerImage 
+          data: inputValues as ILayerImage,
         });
       }
-    }, [mutationQuery.data, mutationQuery.loading, closeDialog, store.discreteLayersStore, inputValues]);
+    }, [
+      mutationQuery.data,
+      mutationQuery.loading,
+      closeDialog,
+      store.discreteLayersStore,
+      inputValues,
+    ]);
 
     const UpdateLayerHeader = (): JSX.Element => {
       return (
@@ -451,7 +514,13 @@ export const EntityDialog: React.FC<EntityDialogProps> = observer(
     return (
       <div id="entityDialog" ref={dialogContainerRef}>
         <Dialog open={isOpen} preventOutsideDismiss={true}>
-          <DialogTitle style={mode !== Mode.NEW ? getTextStyle(layerRecord as any, 'backgroundColor') : undefined}>
+          <DialogTitle
+            style={
+              mode !== Mode.NEW
+                ? getTextStyle(layerRecord as any, 'backgroundColor')
+                : undefined
+            }
+          >
             {dialogTitle}
             <IconButton
               className="closeIcon mc-icon-Close"
@@ -485,7 +554,7 @@ export const EntityDialog: React.FC<EntityDialogProps> = observer(
                     values
                   );
                   // eslint-disable-next-line
-                  setVestValidationResults(get(vestSuite, "get")()) ;
+                  setVestValidationResults(get(vestSuite, 'get')());
                 }}
                 vestValidationResults={vestValidationResults}
                 // eslint-disable-next-line

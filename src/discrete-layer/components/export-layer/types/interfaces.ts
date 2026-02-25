@@ -1,4 +1,7 @@
-import { AvailableProperties, ExportFieldOptions } from '../hooks/useAddFeatureWithProps';
+import {
+  AvailableProperties,
+  ExportFieldOptions,
+} from '../hooks/useAddFeatureWithProps';
 
 export interface ExportFieldProps {
   selectionId: string;
@@ -9,4 +12,3 @@ export interface ExportFieldProps {
   isLoading?: boolean;
   type?: 'text' | 'number';
 }
-  

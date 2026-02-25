@@ -52,7 +52,10 @@ interface FilePickerDialogProps {
 }
 
 const getSuffixFromFolderChain = (folderChain: FileData[]): string => {
-  return BASE_PATH_SUFFIX + folderChain.map((file) => normalizePath(file.name)).join('/');
+  return (
+    BASE_PATH_SUFFIX +
+    folderChain.map((file) => normalizePath(file.name)).join('/')
+  );
 };
 
 export const FilePickerDialog: React.FC<FilePickerDialogProps> = observer(
@@ -63,7 +66,7 @@ export const FilePickerDialog: React.FC<FilePickerDialogProps> = observer(
     onFilesSelection,
     selection: currentSelection,
     fetchMetaData = true,
-    rasterIngestionFilesTypeConfig = undefined
+    rasterIngestionFilesTypeConfig = undefined,
   }) => {
     const filePickerRef = useRef<FilePickerComponentHandle>(null);
     const [files, setFiles] = useState<FileData[]>([]);
@@ -71,17 +74,27 @@ export const FilePickerDialog: React.FC<FilePickerDialogProps> = observer(
     const [path, setPath] = useState<string>(
       getSuffixFromFolderChain(currentSelection.folderChain)
     );
-    const [graphQLError, setGraphQLError] = useState<Record<string, unknown> | null>(null);
+    const [graphQLError, setGraphQLError] = useState<Record<
+      string,
+      unknown
+    > | null>(null);
     const [selection, setSelection] = useState<Selection>(currentSelection);
     const store = useStore();
     const queryDirectory = useCallback(
-      () => useQuery<{ getDirectory: FileModelType[] }>(), [])();
+      () => useQuery<{ getDirectory: FileModelType[] }>(),
+      []
+    )();
     const queryMetadata = useCallback(
-      () => useQuery<{ getFile: LayerMetadataMixedUnion }>(), [])();
+      () => useQuery<{ getFile: LayerMetadataMixedUnion }>(),
+      []
+    )();
     const intl = useIntl();
 
     useEffect(() => {
-      if (files.length === EMPTY || files.some((f: FileData | null) => f !== null)) {
+      if (
+        files.length === EMPTY ||
+        files.some((f: FileData | null) => f !== null)
+      ) {
         setFiles(new Array(NUMBER_OF_TEMPLATE_FILES).fill(null));
       }
       queryDirectory.setQuery(
@@ -89,7 +102,7 @@ export const FilePickerDialog: React.FC<FilePickerDialogProps> = observer(
           data: {
             path,
             type: recordType,
-            rasterIngestionFilesTypeConfig
+            rasterIngestionFilesTypeConfig,
           },
         })
       );
@@ -106,10 +119,12 @@ export const FilePickerDialog: React.FC<FilePickerDialogProps> = observer(
 
     useEffect(() => {
       if (queryDirectory.data) {
-        const dirContent = cloneDeep(queryDirectory.data.getDirectory) as FileData[];
-        
+        const dirContent = cloneDeep(
+          queryDirectory.data.getDirectory
+        ) as FileData[];
+
         const shouldAutoSelectMountDir =
-          AUTO_SELECT_SINGLE_MOUNT as boolean &&
+          (AUTO_SELECT_SINGLE_MOUNT as boolean) &&
           path === BASE_PATH_SUFFIX &&
           dirContent.length === 1 &&
           (dirContent[0].isDir as boolean);
@@ -117,7 +132,7 @@ export const FilePickerDialog: React.FC<FilePickerDialogProps> = observer(
         if (shouldAutoSelectMountDir) {
           void filePickerRef.current?.requestFileAction(
             FilePickerActions.OpenFiles,
-            {targetFile: dirContent[0], files:[dirContent[0]]}
+            { targetFile: dirContent[0], files: [dirContent[0]] }
           );
         } else {
           setFiles(dirContent);
@@ -161,7 +176,7 @@ export const FilePickerDialog: React.FC<FilePickerDialogProps> = observer(
 
     useEffect(() => {
       /* eslint-disable */
-      if (!isEmpty(get(queryMetadata, "error"))) {
+      if (!isEmpty(get(queryMetadata, 'error'))) {
         const metadataError = [
           {
             message: intl.formatMessage({
@@ -176,7 +191,7 @@ export const FilePickerDialog: React.FC<FilePickerDialogProps> = observer(
         queryError.response.errors = metadataError;
 
         const prevSelection = filePickerRef.current?.getFileSelection();
-        
+
         setSelection({
           ...prevSelection,
           metadata: {
@@ -185,7 +200,7 @@ export const FilePickerDialog: React.FC<FilePickerDialogProps> = observer(
           },
         } as Selection);
       }
-    /* eslint-enable */
+      /* eslint-enable */
     }, [queryMetadata.error]);
 
     const closeDialog = useCallback(() => {

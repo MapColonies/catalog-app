@@ -8,12 +8,17 @@ interface UseStaticHTMLProps<T> {
   props: T;
 }
 
-function useStaticHTML<T>({ FunctionalComp, props }: UseStaticHTMLProps<T>): string {
+function useStaticHTML<T>({
+  FunctionalComp,
+  props,
+}: UseStaticHTMLProps<T>): string {
   const [html, setHTML] = useState<string>('');
 
   useEffect(() => {
     // @ts-ignore
-    const htmlString = renderToStaticMarkup(React.createElement(FunctionalComp, {...props}));
+    const htmlString = renderToStaticMarkup(
+      React.createElement(FunctionalComp, { ...props })
+    );
     setHTML(htmlString);
   }, [FunctionalComp, props]);
 

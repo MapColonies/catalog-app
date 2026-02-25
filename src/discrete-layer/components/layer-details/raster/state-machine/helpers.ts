@@ -22,7 +22,7 @@ import {
   SHAPES_DIR,
   SHAPES_RELATIVE_TO_DATA_DIR,
   STATE_TAGS,
-  WORKFLOW
+  WORKFLOW,
 } from './types';
 
 export const normalizeError = (err: any) => {
@@ -33,65 +33,87 @@ export const normalizeError = (err: any) => {
   return { ...res };
 };
 
-export const addError = assign((_: { context: IContext; event: any }) => { 
+export const addError = assign((_: { context: IContext; event: any }) => {
   return {
-    errors: _.event.error.addPolicy === "merge" ?
-      [ ..._.context.errors, normalizeError(_.event.error)] :
-      [normalizeError(_.event.error)]
+    errors:
+      _.event.error.addPolicy === 'merge'
+        ? [..._.context.errors, normalizeError(_.event.error)]
+        : [normalizeError(_.event.error)],
   };
 });
 
 export const warnUnexpectedStateEvent = (_: any) => {
-  console.warn(`[StateMachine] Unexpected event '${_.event.type}' in state '${_.self._snapshot.value}'`);
+  console.warn(
+    `[StateMachine] Unexpected event '${_.event.type}' in state '${_.self._snapshot.value}'`
+  );
 };
 
 export const getFeatureAndMarker = (
   geometry: Geometry,
   featureFeatureType: FeatureType,
   markerFeatureType: FeatureType
-): { feature: Feature<Geometry, GeoJsonProperties>, marker: Feature<Geometry, GeoJsonProperties> } => {
+): {
+  feature: Feature<Geometry, GeoJsonProperties>;
+  marker: Feature<Geometry, GeoJsonProperties>;
+} => {
   const feature: Feature<Geometry, GeoJsonProperties> = {
-    type: "Feature",
+    type: 'Feature',
     properties: {
-      featureType: featureFeatureType
+      featureType: featureFeatureType,
     },
-    geometry
+    geometry,
   };
   const marker: Feature<Geometry, GeoJsonProperties> = {
-    type: "Feature",
+    type: 'Feature',
     properties: {
-      featureType: markerFeatureType
+      featureType: markerFeatureType,
     },
     geometry: {
       coordinates: getFirstPoint(geometry),
-      type: "Point"
+      type: 'Point',
     },
   };
   return {
     feature,
-    marker
+    marker,
   };
 };
 
 export const getPath = (baseDir: string, filePath: string): string => {
-  const resolvedPath = path.resolve(baseDir, filePath.startsWith(BASE_PATH) ? filePath.substring(1) : filePath);
-  return resolvedPath.startsWith(BASE_PATH) ? resolvedPath.substring(1) : resolvedPath;
+  const resolvedPath = path.resolve(
+    baseDir,
+    filePath.startsWith(BASE_PATH) ? filePath.substring(1) : filePath
+  );
+  return resolvedPath.startsWith(BASE_PATH)
+    ? resolvedPath.substring(1)
+    : resolvedPath;
 };
 
 export const getPathWithSlash = (path: string): string => {
   return path.startsWith(BASE_PATH) ? path : BASE_PATH + path;
 };
 
-export const getFile = (files: FileData[], gpkgPath: string, fileName: string, label: string, dateFormatterPredicate: (modDate: Date | string) => string) => {
+export const getFile = (
+  files: FileData[],
+  gpkgPath: string,
+  fileName: string,
+  label: string,
+  dateFormatterPredicate: (modDate: Date | string) => string
+) => {
   const baseDirectory = path.dirname(gpkgPath);
-  const resolvedPath = getPath(baseDirectory, path.join(SHAPES_RELATIVE_TO_DATA_DIR, SHAPES_DIR, fileName));
-  const matchingFiles = files?.filter((file: FileData) => file.name === fileName);
+  const resolvedPath = getPath(
+    baseDirectory,
+    path.join(SHAPES_RELATIVE_TO_DATA_DIR, SHAPES_DIR, fileName)
+  );
+  const matchingFiles = files?.filter(
+    (file: FileData) => file.name === fileName
+  );
   if (!matchingFiles || matchingFiles.length === 0) {
     return {
       label,
       path: resolvedPath,
       isExists: false,
-      dateFormatterPredicate
+      dateFormatterPredicate,
     };
   }
   return matchingFiles.map((file: FileData) => ({
@@ -99,7 +121,7 @@ export const getFile = (files: FileData[], gpkgPath: string, fileName: string, l
     path: resolvedPath,
     details: { ...file },
     isExists: true,
-    dateFormatterPredicate
+    dateFormatterPredicate,
   }))[FIRST];
 };
 
@@ -117,11 +139,14 @@ export const buildError = (
     code,
     message,
     addPolicy,
-    response
+    response,
   };
 };
 
-export const hasTagDeep = (state: SnapshotFrom<typeof workflowMachine>, tag = STATE_TAGS.GENERAL_LOADING): boolean => {
+export const hasTagDeep = (
+  state: SnapshotFrom<typeof workflowMachine>,
+  tag = STATE_TAGS.GENERAL_LOADING
+): boolean => {
   if (state && typeof state.hasTag === 'function' && state.hasTag(tag)) {
     return true;
   }
@@ -142,20 +167,36 @@ const isFileExistsAndValid = (file: IFiles[keyof IFiles]) => {
 
 export const isFilesSelected = (context: IContext): boolean => {
   const files = context.files || {};
-  return isFileExistsAndValid(files.data) &&
+  return (
+    isFileExistsAndValid(files.data) &&
     isFileExistsAndValid(files.product) &&
-    isFileExistsAndValid(files.shapeMetadata);
+    isFileExistsAndValid(files.shapeMetadata)
+  );
 };
 
 export const validateShapeFiles = (files: IFiles): IStateError[] => {
-  const productDetails = files.product?.details;  
+  const productDetails = files.product?.details;
   const shapeMetadataDetails = files.shapeMetadata?.details;
   if (productDetails && shapeMetadataDetails) {
     const modDateProduct = moment(productDetails.modDate);
     const modDateShapeMetadata = moment(shapeMetadataDetails.modDate);
-    const differenceInMinutes = modDateProduct.diff(modDateShapeMetadata, 'minutes');
-    if (Math.abs(differenceInMinutes) > CONFIG.RASTER_INGESTION.CHANGES_IN_SHAPE_FILES.TIME_DIFFERENCE_GRACE_MINUTES) {
-      return [ buildError('ingestion.warning.modDateMismatch', CONFIG.RASTER_INGESTION.CHANGES_IN_SHAPE_FILES.TIME_DIFFERENCE_GRACE_MINUTES.toString(), 'logic', 'warning') ];
+    const differenceInMinutes = modDateProduct.diff(
+      modDateShapeMetadata,
+      'minutes'
+    );
+    if (
+      Math.abs(differenceInMinutes) >
+      CONFIG.RASTER_INGESTION.CHANGES_IN_SHAPE_FILES
+        .TIME_DIFFERENCE_GRACE_MINUTES
+    ) {
+      return [
+        buildError(
+          'ingestion.warning.modDateMismatch',
+          CONFIG.RASTER_INGESTION.CHANGES_IN_SHAPE_FILES.TIME_DIFFERENCE_GRACE_MINUTES.toString(),
+          'logic',
+          'warning'
+        ),
+      ];
     }
   }
   return [];
@@ -175,7 +216,7 @@ export const handleShapeFilesValidation = (files: IFiles): IStateError[] => {
     if (files.shapeMetadata) {
       files.shapeMetadata.isModDateDiffExceeded = true;
     }
-    errors = [ ...shapeFilesValidation ];
+    errors = [...shapeFilesValidation];
   }
   return errors;
 };
@@ -197,9 +238,11 @@ export const isGoToJobEnabled = (context: IContext): boolean => {
 };
 
 export const isRetryEnabled = (context: IContext): boolean => {
-  return !!(context.job && context.job.jobId) &&
+  return (
+    !!(context.job && context.job.jobId) &&
     context.selectionMode === 'restore' &&
-    !!get(context, 'job.details.availableActions.isResumable');
+    !!get(context, 'job.details.availableActions.isResumable')
+  );
 };
 
 export const isUIDisabled = (isLoading: boolean, state: any): boolean => {
@@ -207,17 +250,27 @@ export const isUIDisabled = (isLoading: boolean, state: any): boolean => {
 };
 
 export const hasError = (errors: IStateError[]): boolean => {
-  return errors.length > 0 &&
-    (errors.some(error => error.level === 'error') ||
-    errors.some(error => !error.level));
+  return (
+    errors.length > 0 &&
+    (errors.some((error) => error.level === 'error') ||
+      errors.some((error) => !error.level))
+  );
 };
 
 export const isStatusFailed = (status: Status | undefined): boolean => {
-  return status !== null && typeof status !== 'undefined' && [Status.Failed, Status.Aborted].includes(status as Status);
+  return (
+    status !== null &&
+    typeof status !== 'undefined' &&
+    [Status.Failed, Status.Aborted].includes(status as Status)
+  );
 };
 
 export const isJobValid = (status: Status | undefined): boolean => {
-  return status !== null && typeof status !== 'undefined' && ![Status.Suspended, Status.Expired].includes(status as Status);
+  return (
+    status !== null &&
+    typeof status !== 'undefined' &&
+    ![Status.Suspended, Status.Expired].includes(status as Status)
+  );
 };
 
 export const isTaskValid = (job: IJob | undefined): boolean => {
@@ -227,14 +280,18 @@ export const isTaskValid = (job: IJob | undefined): boolean => {
   return (
     taskPercentage === 0 ||
     (validationReport?.isValid === true &&
-    Object.values(errorsSummary?.errorsCount || {}).every(value => typeof value !== 'number' || value === 0) &&
-    errorsSummary?.thresholds?.smallHoles?.exceeded === false &&
-    errorsSummary?.thresholds?.smallGeometries?.exceeded === false)
+      Object.values(errorsSummary?.errorsCount || {}).every(
+        (value) => typeof value !== 'number' || value === 0
+      ) &&
+      errorsSummary?.thresholds?.smallHoles?.exceeded === false &&
+      errorsSummary?.thresholds?.smallGeometries?.exceeded === false)
   );
 };
 
 export const isModified = (modDate: Date | string) => {
   return modDate
-    ? moment().diff(moment(modDate), 'hours') <= CONFIG.RASTER_INGESTION.CHANGES_IN_SHAPE_FILES.TIME_MODIFIED_THRESHOLD_HOURS
+    ? moment().diff(moment(modDate), 'hours') <=
+        CONFIG.RASTER_INGESTION.CHANGES_IN_SHAPE_FILES
+          .TIME_MODIFIED_THRESHOLD_HOURS
     : false;
 };

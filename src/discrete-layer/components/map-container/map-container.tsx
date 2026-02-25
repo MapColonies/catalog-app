@@ -12,12 +12,12 @@ import {
   DrawerHeader,
   DrawerSubtitle,
   DrawerTitle,
-  useTheme
+  useTheme,
 } from '@map-colonies/react-core';
-import { 
-  DrawType, 
+import {
+  DrawType,
   BboxCorner,
-  CesiumMap, 
+  CesiumMap,
   CesiumDrawingsDataSource,
   CesiumColor,
   CesiumSceneMode,
@@ -25,7 +25,7 @@ import {
   IDrawing,
   Box,
   DateTimeRangePickerFormControl,
-  SupportedLocales
+  SupportedLocales,
 } from '@map-colonies/react-components';
 import CONFIG from '../../../common/config';
 import { DrawerOpener } from '../drawer-opener/drawer-opener';
@@ -48,7 +48,9 @@ const noDrawing: IDrawingObject = {
   handler: (drawing: IDrawingEvent) => {},
 };
 const DRAWING_MATERIAL_OPACITY = 0.5;
-const DRAWING_MATERIAL_COLOR = CesiumColor.YELLOW.withAlpha(DRAWING_MATERIAL_OPACITY);
+const DRAWING_MATERIAL_COLOR = CesiumColor.YELLOW.withAlpha(
+  DRAWING_MATERIAL_OPACITY
+);
 const mapActionsWidth = '400px';
 
 export interface MapContainerProps {
@@ -72,7 +74,9 @@ export const MapContainer: React.FC<MapContainerProps> = (props) => {
   ]);
   const theme = useTheme();
   const intl = useIntl();
-  const [center] = useState<[number, number]>(CONFIG.MAP.CENTER as [number, number]);
+  const [center] = useState<[number, number]>(
+    CONFIG.MAP.CENTER as [number, number]
+  );
   const createDrawPrimitive = (type: DrawType): IDrawingObject => {
     return {
       type: type,
@@ -80,8 +84,10 @@ export const MapContainer: React.FC<MapContainerProps> = (props) => {
         const timeStamp = getTimeStamp();
 
         setIsDrawing(false);
-        
-        props.handlePolygonSelected((drawing.geojson as Feature).geometry as Polygon);
+
+        props.handlePolygonSelected(
+          (drawing.geojson as Feature).geometry as Polygon
+        );
 
         setDrawEntities([
           {
@@ -98,24 +104,30 @@ export const MapContainer: React.FC<MapContainerProps> = (props) => {
       },
     };
   };
-  
+
   const setDrawType = (drawType: DrawType): void => {
     setIsDrawing(true);
     setDrawPrimitive(createDrawPrimitive(drawType));
   };
- 
+
   const onPolygonSelection = (polygon: IDrawingEvent): void => {
     const timeStamp = getTimeStamp();
-    const bottomLeftPoint = find((polygon.geojson as FeatureCollection<Point>).features, (feat: Feature<Point>)=>{
-      return feat.properties?.type === BboxCorner.BOTTOM_LEFT;
-    }) as Feature<Point>;
-    const rightTopPoint = find((polygon.geojson as FeatureCollection<Point>).features, (feat: Feature<Point>)=>{
-      return feat.properties?.type === BboxCorner.TOP_RIGHT;
-    }) as Feature<Point>;
+    const bottomLeftPoint = find(
+      (polygon.geojson as FeatureCollection<Point>).features,
+      (feat: Feature<Point>) => {
+        return feat.properties?.type === BboxCorner.BOTTOM_LEFT;
+      }
+    ) as Feature<Point>;
+    const rightTopPoint = find(
+      (polygon.geojson as FeatureCollection<Point>).features,
+      (feat: Feature<Point>) => {
+        return feat.properties?.type === BboxCorner.TOP_RIGHT;
+      }
+    ) as Feature<Point>;
     const line = lineString([
       [
         bottomLeftPoint.geometry.coordinates[0],
-        bottomLeftPoint.geometry.coordinates[1]
+        bottomLeftPoint.geometry.coordinates[1],
       ],
       [
         rightTopPoint.geometry.coordinates[0],
@@ -134,7 +146,7 @@ export const MapContainer: React.FC<MapContainerProps> = (props) => {
       },
     ]);
 
-    props.handlePolygonSelected((boxPolygon as Feature).geometry as Polygon); 
+    props.handlePolygonSelected((boxPolygon as Feature).geometry as Polygon);
   };
 
   const onReset = (): void => {
@@ -149,7 +161,13 @@ export const MapContainer: React.FC<MapContainerProps> = (props) => {
 
   return (
     <div className="map">
-      <div className="filtersPosition" style={{backgroundColor: theme.primary as string, width: mapActionsWidth}}>
+      <div
+        className="filtersPosition"
+        style={{
+          backgroundColor: theme.primary as string,
+          width: mapActionsWidth,
+        }}
+      >
         <div className="filtersContainer">
           <PolygonSelectionUi
             onCancelDraw={onCancelDraw}
@@ -157,7 +175,7 @@ export const MapContainer: React.FC<MapContainerProps> = (props) => {
             onStartDraw={setDrawType}
             isSelectionEnabled={isDrawing}
             onPolygonUpdate={onPolygonSelection}
-            mapActionsWidth = {mapActionsWidth}
+            mapActionsWidth={mapActionsWidth}
             handleOtherDrawers={(): void => setFiltersOpen(false)}
           />
           <div className="filtersMargin">
@@ -170,7 +188,10 @@ export const MapContainer: React.FC<MapContainerProps> = (props) => {
               <FormattedMessage id="filters.title" />
             </Button>
             {filtersOpen && (
-              <Box className="drawerPosition" style={{  height: '300px', width: mapActionsWidth}}>
+              <Box
+                className="drawerPosition"
+                style={{ height: '300px', width: mapActionsWidth }}
+              >
                 <Drawer dismissible open={filtersOpen}>
                   <DrawerHeader>
                     <DrawerTitle>
@@ -180,58 +201,68 @@ export const MapContainer: React.FC<MapContainerProps> = (props) => {
                       <FormattedMessage id="filters.sub-title" />
                     </DrawerSubtitle>
                   </DrawerHeader>
-                  <DrawerContent style={{padding: '0px 16px'}}>
-                    <DateTimeRangePickerFormControl 
-                      width={'100%'} 
-                      renderAsButton={false} 
+                  <DrawerContent style={{ padding: '0px 16px' }}>
+                    <DateTimeRangePickerFormControl
+                      width={'100%'}
+                      renderAsButton={false}
                       onChange={(dateRange): void => {
-                        console.log('DateTimeRangePickerFormControl--->',dateRange.from, dateRange.to);
+                        console.log(
+                          'DateTimeRangePickerFormControl--->',
+                          dateRange.from,
+                          dateRange.to
+                        );
                       }}
                       local={{
-                        setText: intl.formatMessage({ id: 'filters.date-picker.set-btn.text' }),
-                        startPlaceHolderText: intl.formatMessage({ id: 'filters.date-picker.start-time.label' }),
-                        endPlaceHolderText: intl.formatMessage({ id: 'filters.date-picker.end-time.label' }),
-                        calendarLocale: SupportedLocales[CONFIG.I18N.DEFAULT_LANGUAGE.toUpperCase() as keyof typeof SupportedLocales]
+                        setText: intl.formatMessage({
+                          id: 'filters.date-picker.set-btn.text',
+                        }),
+                        startPlaceHolderText: intl.formatMessage({
+                          id: 'filters.date-picker.start-time.label',
+                        }),
+                        endPlaceHolderText: intl.formatMessage({
+                          id: 'filters.date-picker.end-time.label',
+                        }),
+                        calendarLocale:
+                          SupportedLocales[
+                            CONFIG.I18N.DEFAULT_LANGUAGE.toUpperCase() as keyof typeof SupportedLocales
+                          ],
                       }}
                     />
                   </DrawerContent>
                 </Drawer>
-              </Box>)
-            }
+              </Box>
+            )}
 
-            {
-              resultsOpen &&
-              <Box className="drawerPosition" style={{  height: '600px', width: mapActionsWidth, zIndex: -1}}>
+            {resultsOpen && (
+              <Box
+                className="drawerPosition"
+                style={{ height: '600px', width: mapActionsWidth, zIndex: -1 }}
+              >
                 <Drawer dismissible open={resultsOpen}>
                   <DrawerHeader>
                     <DrawerTitle>RESULTS</DrawerTitle>
                     <DrawerSubtitle>Subtitle</DrawerSubtitle>
                   </DrawerHeader>
-                  <DrawerContent>
-                  </DrawerContent>
+                  <DrawerContent></DrawerContent>
                 </Drawer>
               </Box>
-            }
+            )}
 
-            <DrawerOpener
-              isOpen={resultsOpen}
-              onClick={setResultsOpen}
-            />
-
+            <DrawerOpener isOpen={resultsOpen} onClick={setResultsOpen} />
           </div>
         </div>
       </div>
-      <CesiumMap 
-        projection={CONFIG.MAP.PROJECTION}  
+      <CesiumMap
+        projection={CONFIG.MAP.PROJECTION}
         center={center}
         zoom={CONFIG.MAP.ZOOM}
         sceneMode={CesiumSceneMode.SCENE2D}
         imageryProvider={false}
       >
         {props.mapContent}
-        <SelectedLayersContainer/>
-        <HighlightedLayer/>
-        <LayersFootprints/>
+        <SelectedLayersContainer />
+        <HighlightedLayer />
+        <LayersFootprints />
         <CesiumDrawingsDataSource
           drawings={drawEntities}
           drawingMaterial={DRAWING_MATERIAL_COLOR}

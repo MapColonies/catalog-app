@@ -29,7 +29,12 @@ const ExportEnumSelectionField: React.FC<ExportEnumSelectionFieldProps> = ({
   selectionIdx,
   fieldName,
   fieldValue,
-  fieldInfo: { placeholderValue, helperTextValue, rhfValidation, validationAgainstField },
+  fieldInfo: {
+    placeholderValue,
+    helperTextValue,
+    rhfValidation,
+    validationAgainstField,
+  },
   type,
 }) => {
   const intl = useIntl();
@@ -39,49 +44,60 @@ const ExportEnumSelectionField: React.FC<ExportEnumSelectionFieldProps> = ({
   const [innerValue, setInnerValue] = useState(fieldValue);
   const enums = enumsMap as IEnumsMapType;
   const locale = CONFIG.I18N.DEFAULT_LANGUAGE;
-  
+
   const getFormFieldId = (name: string): string => {
-    return `${selectionIdx}_${name}_${selectionId}`
-  }
+    return `${selectionIdx}_${name}_${selectionId}`;
+  };
 
   const fieldId = getFormFieldId(fieldName);
-  
+
   useEffect(() => {
     const registerValidation = {
       ...(rhfValidation ?? {}),
       validate: {
-        ...((rhfValidation?.validate) ?? {}),
-        validationAgainstField: (value: unknown): string | boolean |undefined => {
+        ...(rhfValidation?.validate ?? {}),
+        validationAgainstField: (
+          value: unknown
+        ): string | boolean | undefined => {
           if (typeof validationAgainstField !== 'undefined') {
-            return validationAgainstField.validate(value, formMethods.watch(getFormFieldId(validationAgainstField.watch)));
+            return validationAgainstField.validate(
+              value,
+              formMethods.watch(getFormFieldId(validationAgainstField.watch))
+            );
           }
-        }
+        },
       },
     };
-    
-    formMethods.register(fieldId, {...registerValidation});
-    
+
+    formMethods.register(fieldId, { ...registerValidation });
+
     // Mitigate errors on init
-    formMethods.setValue(fieldId, fieldValue, { shouldValidate: fieldValue.length > NONE });
+    formMethods.setValue(fieldId, fieldValue, {
+      shouldValidate: fieldValue.length > NONE,
+    });
 
     // Revalidate fields
     void formMethods.trigger();
-    
+
     return (): void => {
       formMethods.unregister(fieldId);
-    }
+    };
   }, [fieldId]);
 
   return (
     <Box className="exportSelectionField enumSelectContainer">
-      <ExportFieldLabel required={!isEmpty(rhfValidation?.required)} fieldId={fieldId} fieldName={fieldName} />
+      <ExportFieldLabel
+        required={!isEmpty(rhfValidation?.required)}
+        fieldId={fieldId}
+        fieldName={fieldName}
+      />
       <Select
         value={innerValue}
         id={fieldId}
         name={fieldId}
         onChange={(e: React.FormEvent<HTMLSelectElement>): void => {
           const newFieldVal = e.currentTarget.value;
-          
+
           store.exportStore.setSelectionProperty(
             selectionId,
             fieldName,
@@ -107,9 +123,12 @@ const ExportEnumSelectionField: React.FC<ExportEnumSelectionFieldProps> = ({
               translation = get(dictionary[item], locale) as string;
             } else {
               // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-              const { translationKey, internal } = enums[item] ?? DEFAULT_ENUM_DESCRIPTOR;
+              const { translationKey, internal } =
+                enums[item] ?? DEFAULT_ENUM_DESCRIPTOR;
               icon = enums[item].icon;
-              translation = !isEmpty(translationKey) ? intl.formatMessage({ id: translationKey }) : '';
+              translation = !isEmpty(translationKey)
+                ? intl.formatMessage({ id: translationKey })
+                : '';
               if (internal) {
                 return null;
               }
@@ -124,7 +143,11 @@ const ExportEnumSelectionField: React.FC<ExportEnumSelectionFieldProps> = ({
         })}
       </Select>
 
-      <ExportFieldHelperText key={`${fieldId}_helper`} helperText={helperTextValue} fieldValue={fieldValue} />
+      <ExportFieldHelperText
+        key={`${fieldId}_helper`}
+        helperText={helperTextValue}
+        fieldValue={fieldValue}
+      />
     </Box>
   );
 };

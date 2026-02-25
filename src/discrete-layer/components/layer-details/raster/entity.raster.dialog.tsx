@@ -1,5 +1,12 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import React, { useEffect, useCallback, useState, useLayoutEffect, useRef, useMemo } from 'react';
+import React, {
+  useEffect,
+  useCallback,
+  useState,
+  useLayoutEffect,
+  useRef,
+  useMemo,
+} from 'react';
 import { useIntl } from 'react-intl';
 import { FormikValues } from 'formik';
 import { cloneDeep, get, isEmpty } from 'lodash';
@@ -12,7 +19,7 @@ import {
   DialogTitle,
   Icon,
   IconButton,
-  Typography
+  Typography,
 } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
 import CONFIG from '../../../../common/config';
@@ -32,13 +39,13 @@ import {
   Status,
   useStore,
   ValidationConfigModelType,
-  ValidationValueType
+  ValidationValueType,
 } from '../../../models';
 import { ILayerImage } from '../../../models/layerImage';
 import { LayerRasterRecordInput } from '../../../models/RootStore.base';
 import {
   LayerRasterRecordModelKeys,
-  LayerRecordTypes
+  LayerRecordTypes,
 } from '../entity-types-keys';
 import { LayersDetailsComponent } from '../layer-details';
 import { FieldInfoName } from '../layer-details.field-info';
@@ -51,12 +58,15 @@ import {
   getYupFieldConfig,
   getBasicType,
   isEnumType,
-  jobType2Mode
+  jobType2Mode,
 } from '../utils';
 import suite from '../validate';
 import EntityRasterForm from './layer-details-form.raster';
 import { Events } from './state-machine/types';
-import { RasterWorkflowProvider, RasterWorkflowContext } from './state-machine/context';
+import {
+  RasterWorkflowProvider,
+  RasterWorkflowContext,
+} from './state-machine/context';
 import { getUIIngestionFieldDescriptors } from './utils';
 
 import './entity.raster.dialog.css';
@@ -79,28 +89,35 @@ interface EntityRasterInnerProps extends EntityRasterDialogProps {
   recordType?: RecordType;
 }
 
-const setDefaultValues = (record: Record<string, unknown>, descriptors: EntityDescriptorModelType[]): void => {
+const setDefaultValues = (
+  record: Record<string, unknown>,
+  descriptors: EntityDescriptorModelType[]
+): void => {
   getFlatEntityDescriptors(
-    record.__typename as LayerRecordTypes ?? 'LayerRasterRecord',
+    (record.__typename as LayerRecordTypes) ?? 'LayerRasterRecord',
     descriptors
   ).forEach((field) => {
-      const fieldName = field.fieldName as string;
-      const fieldNameType = getBasicType(field.fieldName as FieldInfoName, DEFAULT_TYPE_NAME);
-      if ((field.lookupTable || isEnumType(fieldNameType))) {
-        if (field.isMultiSelection) {
-          record[fieldName] = [];
-        } else {
-          record[fieldName] = '';
-        }
-      }
-      if (field.default) {
-        record[fieldName] = field.default;
+    const fieldName = field.fieldName as string;
+    const fieldNameType = getBasicType(
+      field.fieldName as FieldInfoName,
+      DEFAULT_TYPE_NAME
+    );
+    if (field.lookupTable || isEnumType(fieldNameType)) {
+      if (field.isMultiSelection) {
+        record[fieldName] = [];
+      } else {
+        record[fieldName] = '';
       }
     }
-  )
+    if (field.default) {
+      record[fieldName] = field.default;
+    }
+  });
 };
 
-export const buildRasterRecord = (descriptors: EntityDescriptorModelType[]): ILayerImage => {
+export const buildRasterRecord = (
+  descriptors: EntityDescriptorModelType[]
+): ILayerImage => {
   const record = {} as Record<string, unknown>;
   LayerRasterRecordModelKeys.forEach((key) => {
     record[key as string] = undefined;
@@ -108,72 +125,85 @@ export const buildRasterRecord = (descriptors: EntityDescriptorModelType[]): ILa
   setDefaultValues(record, descriptors);
   record.productType = ProductType.ORTHOPHOTO;
   record.productStatus = RecordStatus.UNPUBLISHED;
-  record['__typename'] = LayerRasterRecordModel.properties['__typename'].name.replaceAll('"','');
+  record['__typename'] = LayerRasterRecordModel.properties[
+    '__typename'
+  ].name.replaceAll('"', '');
   record.id = DEFAULT_ID;
   record.type = RecordType.RECORD_RASTER;
   return record as unknown as ILayerImage;
 };
 
-export const EntityRasterDialog: React.FC<EntityRasterDialogProps> = observer((props: EntityRasterDialogProps) => {
+export const EntityRasterDialog: React.FC<EntityRasterDialogProps> = observer(
+  (props: EntityRasterDialogProps) => {
+    const store = useStore();
 
-  const store = useStore();
+    const { job } = props;
 
-  const { job } = props;
-
-  const isUpdateMode = (jobRecord: JobModelType | undefined): boolean => {
-    if (jobRecord) {
-      const type = jobRecord.type || RasterIngestionJobType.NEW;
-      return jobType2Mode[type] === Mode.UPDATE;
-    }
-
-    return store.discreteLayersStore.selectedLayerOperationMode === Mode.UPDATE;
-  };
-
-  const isRestoreMode = (jobRecord: JobModelType | undefined): boolean => {
-    return !isEmpty(jobRecord?.resourceId) && !isEmpty(jobRecord?.productType);
-  }
-
-  const getRecordLayer = (jobRecord: JobModelType | undefined): ILayerImage => {
-    const { selectedLayer, entityDescriptors, findRasterLayer } = store.discreteLayersStore;
-    const descriptors = entityDescriptors as EntityDescriptorModelType[];
-
-    // 1. START_NEW mode - always return empty base layer
-    if (!isUpdateMode(jobRecord)) { 
-      return buildRasterRecord(descriptors);
-    }
-
-    // 2. RESTORE mode - try to get the matching layer
-    if (isRestoreMode(jobRecord)) {
-      const layerRecord = findRasterLayer(jobRecord?.resourceId as string, jobRecord?.productType as string);
-
-      if (layerRecord) {
-        return cloneDeep(layerRecord);
+    const isUpdateMode = (jobRecord: JobModelType | undefined): boolean => {
+      if (jobRecord) {
+        const type = jobRecord.type || RasterIngestionJobType.NEW;
+        return jobType2Mode[type] === Mode.UPDATE;
       }
-    }
 
-    // 3. START_UPDATE mode - return the currently selected layer
-    if (selectedLayer && !isRestoreMode(jobRecord)) {
-      return selectedLayer;
-    }
+      return (
+        store.discreteLayersStore.selectedLayerOperationMode === Mode.UPDATE
+      );
+    };
 
-    // 4. Fallback (should rarely happen) - return record for START_NEW mode
-    return buildRasterRecord(descriptors);
-  };
+    const isRestoreMode = (jobRecord: JobModelType | undefined): boolean => {
+      return (
+        !isEmpty(jobRecord?.resourceId) && !isEmpty(jobRecord?.productType)
+      );
+    };
 
-  return (
-    <RasterWorkflowProvider>
-      <EntityRasterDialogInner
-        {...props}
-        layerRecord={getRecordLayer(job)}
-        mode={isUpdateMode(job) ? Mode.UPDATE : Mode.NEW}
-        recordType={RecordType.RECORD_RASTER}
-      />
-    </RasterWorkflowProvider>
-  );
-});
+    const getRecordLayer = (
+      jobRecord: JobModelType | undefined
+    ): ILayerImage => {
+      const { selectedLayer, entityDescriptors, findRasterLayer } =
+        store.discreteLayersStore;
+      const descriptors = entityDescriptors as EntityDescriptorModelType[];
 
-const EntityRasterDialogInner: React.FC<EntityRasterInnerProps> = observer((props: EntityRasterInnerProps) => {
+      // 1. START_NEW mode - always return empty base layer
+      if (!isUpdateMode(jobRecord)) {
+        return buildRasterRecord(descriptors);
+      }
 
+      // 2. RESTORE mode - try to get the matching layer
+      if (isRestoreMode(jobRecord)) {
+        const layerRecord = findRasterLayer(
+          jobRecord?.resourceId as string,
+          jobRecord?.productType as string
+        );
+
+        if (layerRecord) {
+          return cloneDeep(layerRecord);
+        }
+      }
+
+      // 3. START_UPDATE mode - return the currently selected layer
+      if (selectedLayer && !isRestoreMode(jobRecord)) {
+        return selectedLayer;
+      }
+
+      // 4. Fallback (should rarely happen) - return record for START_NEW mode
+      return buildRasterRecord(descriptors);
+    };
+
+    return (
+      <RasterWorkflowProvider>
+        <EntityRasterDialogInner
+          {...props}
+          layerRecord={getRecordLayer(job)}
+          mode={isUpdateMode(job) ? Mode.UPDATE : Mode.NEW}
+          recordType={RecordType.RECORD_RASTER}
+        />
+      </RasterWorkflowProvider>
+    );
+  }
+);
+
+const EntityRasterDialogInner: React.FC<EntityRasterInnerProps> = observer(
+  (props: EntityRasterInnerProps) => {
     //#region STATE MACHINE
     const actorRef = RasterWorkflowContext.useActorRef();
 
@@ -188,18 +218,21 @@ const EntityRasterDialogInner: React.FC<EntityRasterInnerProps> = observer((prop
       if (job) {
         actorRef.send({
           type: 'RESTORE',
-          job: { jobId: job.id }
+          job: { jobId: job.id },
         } satisfies Events);
       } else if (mode === Mode.UPDATE) {
         actorRef.send({
           type: 'START_UPDATE',
-          updatedLayer: layerRecord as LayerRasterRecordModelType
+          updatedLayer: layerRecord as LayerRasterRecordModelType,
         } satisfies Events);
       } else {
         actorRef.send({
           type: 'START_NEW',
           flowType: Mode.NEW,
-          selectionMode: CONFIG.SELECTION_MODE_DEFAULT === '' ? 'auto' : CONFIG.SELECTION_MODE_DEFAULT
+          selectionMode:
+            CONFIG.SELECTION_MODE_DEFAULT === ''
+              ? 'auto'
+              : CONFIG.SELECTION_MODE_DEFAULT,
         } satisfies Events);
       }
     }, [mode, layerRecord, actorRef]);
@@ -209,22 +242,26 @@ const EntityRasterDialogInner: React.FC<EntityRasterInnerProps> = observer((prop
     const intl = useIntl();
     const dialogContainerRef = useRef<HTMLDivElement>(null);
 
-    const [recordType] = useState<RecordType>(props.recordType ?? (layerRecord.type as RecordType));
-    const [vestValidationResults, setVestValidationResults] = useState<DraftResult>({} as DraftResult);
+    const [recordType] = useState<RecordType>(
+      props.recordType ?? (layerRecord.type as RecordType)
+    );
+    const [vestValidationResults, setVestValidationResults] =
+      useState<DraftResult>({} as DraftResult);
     const [descriptors, setDescriptors] = useState<unknown[]>([]);
     const [schema, setSchema] = useState<Record<string, Yup.AnySchema>>({});
     const [inputValues, setInputValues] = useState<FormikValues>({});
     const [isAllInfoReady, setIsAllInfoReady] = useState<boolean>(false);
 
-    const entityDescriptors = store.discreteLayersStore.entityDescriptors as EntityDescriptorModelType[];
+    const entityDescriptors = store.discreteLayersStore
+      .entityDescriptors as EntityDescriptorModelType[];
 
     const metadataPayloadKeys = useMemo(() => {
-      return getFlatEntityDescriptors(
-        layerRecord.__typename,
-        entityDescriptors
-      )
-      .filter(descriptor => descriptor.isCreateEssential || descriptor.fieldName === 'id')
-      .map(descriptor => descriptor.fieldName);
+      return getFlatEntityDescriptors(layerRecord.__typename, entityDescriptors)
+        .filter(
+          (descriptor) =>
+            descriptor.isCreateEssential || descriptor.fieldName === 'id'
+        )
+        .map((descriptor) => descriptor.fieldName);
     }, [entityDescriptors]);
 
     const dialogTitleParam = recordType;
@@ -232,61 +269,70 @@ const EntityRasterDialogInner: React.FC<EntityRasterInnerProps> = observer((prop
       id: `record-type.${(dialogTitleParam as string).toLowerCase()}.label`,
     });
     const dialogTitle = intl.formatMessage(
-      { id: `general.title.${(mode).toLowerCase()}` },
+      { id: `general.title.${mode.toLowerCase()}` },
       { value: dialogTitleParamTranslation }
     );
 
-    const addDescriptorValidations = (desciptors: FieldConfigModelType[]): FieldConfigModelType[] => {
-      return desciptors.map(
-        (field: FieldConfigModelType) => {
-          return {
-            ...field,
-            validation: field.validation?.map(
-              (val: ValidationConfigModelType) => {
-                const firstParam = intl.formatMessage({ id: field.label });
-                const paramType = getValidationType(val) ?? '';
-                // @ts-ignore
-                // eslint-disable-next-line
-                const paramValue: string = val[paramType] ?? '';
-                let secondParam = '';
-                if (paramType !== '' && paramValue !== '') {
-                  if (val.valueType === ValidationValueType.FIELD) {
-                    const fieldLabel = field.label as string;
-                    const fieldLabelPrefix = fieldLabel.substring(
-                      START,
-                      fieldLabel.lastIndexOf('.')
-                    );
-                    secondParam = intl.formatMessage({
-                      id: `${fieldLabelPrefix}.${paramValue}`,
-                    });
-                  } else {
-                    secondParam = paramValue;
-                  }
+    const addDescriptorValidations = (
+      desciptors: FieldConfigModelType[]
+    ): FieldConfigModelType[] => {
+      return desciptors.map((field: FieldConfigModelType) => {
+        return {
+          ...field,
+          validation: field.validation?.map(
+            (val: ValidationConfigModelType) => {
+              const firstParam = intl.formatMessage({ id: field.label });
+              const paramType = getValidationType(val) ?? '';
+              // @ts-ignore
+              // eslint-disable-next-line
+              const paramValue: string = val[paramType] ?? '';
+              let secondParam = '';
+              if (paramType !== '' && paramValue !== '') {
+                if (val.valueType === ValidationValueType.FIELD) {
+                  const fieldLabel = field.label as string;
+                  const fieldLabelPrefix = fieldLabel.substring(
+                    START,
+                    fieldLabel.lastIndexOf('.')
+                  );
+                  secondParam = intl.formatMessage({
+                    id: `${fieldLabelPrefix}.${paramValue}`,
+                  });
+                } else {
+                  secondParam = paramValue;
                 }
-                const finalMsg = intl.formatMessage(
-                  { id: val.errorMsgCode },
-                  {
-                    fieldName: emphasizeByHTML(`${firstParam}`),
-                    value: emphasizeByHTML(`${secondParam}`),
-                  }
-                );
-                return (secondParam !== '$NOW') ? {
-                  ...val,
-                  errorMsgTranslation: finalMsg,
-                } : undefined;
               }
-            ),
-          };
-        }
-      );
+              const finalMsg = intl.formatMessage(
+                { id: val.errorMsgCode },
+                {
+                  fieldName: emphasizeByHTML(`${firstParam}`),
+                  value: emphasizeByHTML(`${secondParam}`),
+                }
+              );
+              return secondParam !== '$NOW'
+                ? {
+                    ...val,
+                    errorMsgTranslation: finalMsg,
+                  }
+                : undefined;
+            }
+          ),
+        };
+      });
     };
 
     useEffect(() => {
       if (vestValidationResults.errorCount === NONE) {
         const { __typename, ...metadata } = inputValues;
-        const data = cleanUpEntityPayload(metadata, metadataPayloadKeys as string[]) as unknown as LayerRasterRecordInput;
+        const data = cleanUpEntityPayload(
+          metadata,
+          metadataPayloadKeys as string[]
+        ) as unknown as LayerRasterRecordInput;
         const resolutionDegree = metadata.resolutionDegree as number;
-        actorRef.send({ type: 'SUBMIT', data, resolutionDegree } satisfies Events);
+        actorRef.send({
+          type: 'SUBMIT',
+          data,
+          resolutionDegree,
+        } satisfies Events);
       }
     }, [vestValidationResults]);
 
@@ -300,19 +346,34 @@ const EntityRasterDialogInner: React.FC<EntityRasterInnerProps> = observer((prop
       const CONTENT_HEIGHT_VAR_NAME = '--content-height';
       /* eslint-disable */
       if (dialogContainerRef.current !== null) {
-        const baseContentHeight = getComputedStyle(dialogContainerRef.current).getPropertyValue('--base-content-height');
-        const currentIngestionFieldsHeight = getComputedStyle(dialogContainerRef.current).getPropertyValue('--ingestion-fields-height');
-        const currentUpdateHeaderHeight = getComputedStyle(dialogContainerRef.current).getPropertyValue('--update-layer-header-height');
-  
-        switch(mode) {
+        const baseContentHeight = getComputedStyle(
+          dialogContainerRef.current
+        ).getPropertyValue('--base-content-height');
+        const currentIngestionFieldsHeight = getComputedStyle(
+          dialogContainerRef.current
+        ).getPropertyValue('--ingestion-fields-height');
+        const currentUpdateHeaderHeight = getComputedStyle(
+          dialogContainerRef.current
+        ).getPropertyValue('--update-layer-header-height');
+
+        switch (mode) {
           case Mode.NEW:
-            dialogContainerRef.current.style.setProperty(CONTENT_HEIGHT_VAR_NAME, `calc(${baseContentHeight} - ${currentIngestionFieldsHeight})`);
+            dialogContainerRef.current.style.setProperty(
+              CONTENT_HEIGHT_VAR_NAME,
+              `calc(${baseContentHeight} - ${currentIngestionFieldsHeight})`
+            );
             break;
           case Mode.UPDATE:
-            dialogContainerRef.current.style.setProperty(CONTENT_HEIGHT_VAR_NAME, `calc(${baseContentHeight} - ${currentUpdateHeaderHeight} - ${currentIngestionFieldsHeight})`);        
+            dialogContainerRef.current.style.setProperty(
+              CONTENT_HEIGHT_VAR_NAME,
+              `calc(${baseContentHeight} - ${currentUpdateHeaderHeight} - ${currentIngestionFieldsHeight})`
+            );
             break;
           default:
-            dialogContainerRef.current.style.setProperty(CONTENT_HEIGHT_VAR_NAME, baseContentHeight);
+            dialogContainerRef.current.style.setProperty(
+              CONTENT_HEIGHT_VAR_NAME,
+              baseContentHeight
+            );
             break;
         }
       }
@@ -328,16 +389,19 @@ const EntityRasterDialogInner: React.FC<EntityRasterInnerProps> = observer((prop
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const yupSchema: Record<string, any> = {};
-      [
-        ...uiIngestionFieldDescriptors,
-        ...descriptors
-      ].forEach((field) => {
+      [...uiIngestionFieldDescriptors, ...descriptors].forEach((field) => {
         const fieldName: string = field.fieldName as string;
         switch (mode) {
           case Mode.NEW:
           case Mode.UPDATE:
-            if ((field.isRequired as boolean) && field.isAutoGenerated !== true) {
-              yupSchema[fieldName] = getYupFieldConfig((field as FieldConfigModelType), intl);
+            if (
+              (field.isRequired as boolean) &&
+              field.isAutoGenerated !== true
+            ) {
+              yupSchema[fieldName] = getYupFieldConfig(
+                field as FieldConfigModelType,
+                intl
+              );
             }
             break;
           default:
@@ -347,7 +411,7 @@ const EntityRasterDialogInner: React.FC<EntityRasterInnerProps> = observer((prop
 
       setSchema(yupSchema);
 
-      const desc = addDescriptorValidations([ ...descriptors ]);
+      const desc = addDescriptorValidations([...descriptors]);
 
       setDescriptors(desc as any[]);
     }, []);
@@ -373,23 +437,38 @@ const EntityRasterDialogInner: React.FC<EntityRasterInnerProps> = observer((prop
               mode={Mode.VIEW}
             />
           </Box>
-          {
-            state.context.selectionMode === 'restore' &&
+          {state.context.selectionMode === 'restore' &&
             state.context.flowType === Mode.UPDATE &&
-            ![Status.Completed, Status.Aborted].includes(state.context.job?.details?.status as Status) &&
-            <Box className='lockedIcon'>
-              <Icon icon={{ icon: 'lock', size: 'xlarge' }} />
-              <Typography tag="span">{intl.formatMessage({ id: 'general.title.locked' })}</Typography>
-            </Box>
-          }
+            ![Status.Completed, Status.Aborted].includes(
+              state.context.job?.details?.status as Status
+            ) && (
+              <Box className="lockedIcon">
+                <Icon icon={{ icon: 'lock', size: 'xlarge' }} />
+                <Typography tag="span">
+                  {intl.formatMessage({ id: 'general.title.locked' })}
+                </Typography>
+              </Box>
+            )}
         </Box>
       );
-    }, [entityDescriptors,layerRecord, state.context.selectionMode, state.context.flowType, state.context.job?.details?.status]);
+    }, [
+      entityDescriptors,
+      layerRecord,
+      state.context.selectionMode,
+      state.context.flowType,
+      state.context.job?.details?.status,
+    ]);
 
     return (
       <div id="entityRasterDialog" ref={dialogContainerRef}>
         <Dialog open={isOpen} preventOutsideDismiss={true}>
-          <DialogTitle style={mode !== Mode.NEW ? getTextStyle(layerRecord as any, 'backgroundColor') : undefined}>
+          <DialogTitle
+            style={
+              mode !== Mode.NEW
+                ? getTextStyle(layerRecord as any, 'backgroundColor')
+                : undefined
+            }
+          >
             {dialogTitle}
             <IconButton
               className="closeIcon mc-icon-Close"
@@ -400,12 +479,8 @@ const EntityRasterDialogInner: React.FC<EntityRasterInnerProps> = observer((prop
             />
           </DialogTitle>
           <DialogContent className="dialogBody">
-            {
-              mode === Mode.UPDATE &&
-              UpdateLayerHeader
-            }
-            {
-              isAllInfoReady && (
+            {mode === Mode.UPDATE && UpdateLayerHeader}
+            {isAllInfoReady && (
               <EntityRasterForm
                 mode={mode}
                 entityDescriptors={entityDescriptors}
@@ -423,11 +498,13 @@ const EntityRasterDialogInner: React.FC<EntityRasterInnerProps> = observer((prop
                     values
                   );
                   // eslint-disable-next-line
-                  setVestValidationResults(get(vestSuite, "get")()) ;
+                  setVestValidationResults(get(vestSuite, 'get')());
                 }}
                 vestValidationResults={vestValidationResults}
                 closeDialog={closeDialog}
-                customErrorReset={store.discreteLayersStore.clearCustomValidationError}
+                customErrorReset={
+                  store.discreteLayersStore.clearCustomValidationError
+                }
                 customError={store.discreteLayersStore.customValidationError}
               />
             )}

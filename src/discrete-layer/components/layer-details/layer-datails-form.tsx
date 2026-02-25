@@ -48,7 +48,7 @@ export interface FormValues {
 export interface StatusError {
   errors: {
     [fieldName: string]: string[];
-  }
+  };
 }
 
 interface LayerDetailsFormCustomProps {
@@ -64,9 +64,17 @@ interface LayerDetailsFormCustomProps {
 }
 
 export interface EntityFormikHandlers extends FormikHandlers {
-  setFieldValue: (field: string, value: unknown, shouldValidate?: boolean) => void;
+  setFieldValue: (
+    field: string,
+    value: unknown,
+    shouldValidate?: boolean
+  ) => void;
   setFieldError: (field: string, message: string) => void;
-  setFieldTouched: (field: string, isTouched?: boolean | undefined, shouldValidate?: boolean | undefined) => void;
+  setFieldTouched: (
+    field: string,
+    isTouched?: boolean | undefined,
+    shouldValidate?: boolean | undefined
+  ) => void;
   setStatus: (status?: StatusError | Record<string, unknown>) => void;
   status: StatusError | Record<string, unknown>;
 }
@@ -107,32 +115,35 @@ const InnerForm = (
   const intl = useIntl();
   const [graphQLError, setGraphQLError] = useState<unknown>(mutationQueryError);
   const [isSelectedFiles, setIsSelectedFiles] = useState<boolean>(false);
-  const [firstPhaseErrors, setFirstPhaseErrors] = useState<Record<string, string[]>>({});
+  const [firstPhaseErrors, setFirstPhaseErrors] = useState<
+    Record<string, string[]>
+  >({});
   const [showCurtain, setShowCurtain] = useState<boolean>(true);
   // const validationWarn = useSessionStoreWatcherForm();
 
-  const getStatusErrors = useCallback((): StatusError | Record<string, unknown> => {
+  const getStatusErrors = useCallback(():
+    | StatusError
+    | Record<string, unknown> => {
     return {
-      ...get(status, 'errors') as Record<string, string[]>
-    }
+      ...(get(status, 'errors') as Record<string, string[]>),
+    };
   }, [status]);
 
-  const getYupErrors = useCallback(
-    (): Record<string, string[]> => {
-      const validationResults: Record<string, string[]> = {};
-      Object.entries(errors).forEach(([key, value]) => {
-        if (getFieldMeta(key).touched) {
-          validationResults[key] = [value];
-        }
-      });
-      return validationResults;
-    },
-    [errors, getFieldMeta],
-  );
+  const getYupErrors = useCallback((): Record<string, string[]> => {
+    const validationResults: Record<string, string[]> = {};
+    Object.entries(errors).forEach(([key, value]) => {
+      if (getFieldMeta(key).touched) {
+        validationResults[key] = [value];
+      }
+    });
+    return validationResults;
+  }, [errors, getFieldMeta]);
 
   useEffect(() => {
-    setShowCurtain((mode === Mode.NEW || mode === Mode.UPDATE) && !isSelectedFiles);
-  }, [mode, isSelectedFiles])
+    setShowCurtain(
+      (mode === Mode.NEW || mode === Mode.UPDATE) && !isSelectedFiles
+    );
+  }, [mode, isSelectedFiles]);
 
   useEffect(() => {
     setGraphQLError(mutationQueryError);
@@ -141,8 +152,8 @@ const InnerForm = (
   useEffect(() => {
     setFirstPhaseErrors({
       ...getYupErrors(),
-      ...getStatusErrors() as { [fieldName: string]: string[]; },
-    })
+      ...(getStatusErrors() as { [fieldName: string]: string[] }),
+    });
   }, [errors, getYupErrors, getStatusErrors]);
 
   const entityFormikHandlers: EntityFormikHandlers = useMemo(
@@ -185,28 +196,40 @@ const InnerForm = (
       status,
     ]
   );
-  
+
   const reloadFormMetadata = (
     ingestionFields: FormValues,
     metadata: MetadataFile
   ): void => {
     setIsSelectedFiles(!!ingestionFields.fileNames);
 
-    delete ((metadata.recordModel as unknown) as Record<string, unknown>)['__typename'];
-    
+    delete (metadata.recordModel as unknown as Record<string, unknown>)[
+      '__typename'
+    ];
+
     // Check update related fields in metadata obj
-    const updateFields = extractDescriptorRelatedFieldNames('updateRules', getFlatEntityDescriptors(layerRecord.__typename, entityDescriptors));
+    const updateFields = extractDescriptorRelatedFieldNames(
+      'updateRules',
+      getFlatEntityDescriptors(layerRecord.__typename, entityDescriptors)
+    );
 
     for (const [key, val] of Object.entries(metadata.recordModel)) {
-      if (val === null || (updateFields.includes(key) && mode === Mode.UPDATE)) {
-        delete ((metadata.recordModel as unknown) as Record<string, unknown>)[key];
+      if (
+        val === null ||
+        (updateFields.includes(key) && mode === Mode.UPDATE)
+      ) {
+        delete (metadata.recordModel as unknown as Record<string, unknown>)[
+          key
+        ];
       }
     }
 
     resetForm();
     setValues({
       ...values,
-      ...transformEntityToFormFields((isEmpty(metadata.recordModel) ? layerRecord : metadata.recordModel)),
+      ...transformEntityToFormFields(
+        isEmpty(metadata.recordModel) ? layerRecord : metadata.recordModel
+      ),
       ...ingestionFields,
     });
 
@@ -221,8 +244,7 @@ const InnerForm = (
         className="form"
         noValidate
       >
-        {
-          (mode === Mode.NEW || mode === Mode.UPDATE) &&
+        {(mode === Mode.NEW || mode === Mode.UPDATE) && (
           <IngestionFields
             formik={entityFormikHandlers}
             reloadFormMetadata={reloadFormMetadata}
@@ -233,7 +255,7 @@ const InnerForm = (
             isError={showCurtain}
             onErrorCallback={setShowCurtain}
           />
-        }
+        )}
         <Box
           className={[
             mode === Mode.NEW ? 'content section' : 'content',
@@ -251,41 +273,39 @@ const InnerForm = (
         </Box>
         <Box className="footer">
           <Box className="messages">
-            {
-              Object.keys(firstPhaseErrors).length > NONE &&
-              JSON.stringify(firstPhaseErrors) !== '{}' &&
-              <ValidationsError errors={firstPhaseErrors} />
-            }
-            {
-              (Object.keys(errors).length === NONE || JSON.stringify(errors) === '{}') &&
-              vestValidationResults.errorCount > NONE &&
-              <ValidationsError errors={vestValidationResults.getErrors()} />
-            }
-            {
-              graphQLError !== undefined &&
+            {Object.keys(firstPhaseErrors).length > NONE &&
+              JSON.stringify(firstPhaseErrors) !== '{}' && (
+                <ValidationsError errors={firstPhaseErrors} />
+              )}
+            {(Object.keys(errors).length === NONE ||
+              JSON.stringify(errors) === '{}') &&
+              vestValidationResults.errorCount > NONE && (
+                <ValidationsError errors={vestValidationResults.getErrors()} />
+              )}
+            {graphQLError !== undefined &&
               graphQLError !== null &&
               graphQLError &&
               JSON.stringify(graphQLError) !== '{}' &&
-              Object.keys(graphQLError).length > NONE &&
-              <GraphQLError error={graphQLError} />
-            }
+              Object.keys(graphQLError).length > NONE && (
+                <GraphQLError error={graphQLError} />
+              )}
           </Box>
           <Box className="buttons">
-            { mode !== Mode.VIEW &&
-            <Button
-              raised
-              type="submit"
-              disabled={
-                mutationQueryLoading ||
-                !dirty ||
-                Object.keys(errors).length > NONE ||
-                (Object.keys(getStatusErrors()).length > NONE) ||
-                !isEmpty(graphQLError)
-              }
-            >
-              <FormattedMessage id="general.ok-btn.text" />
-            </Button>
-            }
+            {mode !== Mode.VIEW && (
+              <Button
+                raised
+                type="submit"
+                disabled={
+                  mutationQueryLoading ||
+                  !dirty ||
+                  Object.keys(errors).length > NONE ||
+                  Object.keys(getStatusErrors()).length > NONE ||
+                  !isEmpty(graphQLError)
+                }
+              >
+                <FormattedMessage id="general.ok-btn.text" />
+              </Button>
+            )}
             <Button
               type="button"
               onClick={(): void => {
@@ -324,7 +344,7 @@ export default withFormik<LayerDetailsFormProps, FormValues>({
     return {
       directory: '',
       fileNames: '',
-      ...transformEntityToFormFields(props.layerRecord)
+      ...transformEntityToFormFields(props.layerRecord),
     };
   },
 
@@ -339,7 +359,10 @@ export default withFormik<LayerDetailsFormProps, FormValues>({
     values,
     formikBag: FormikBag<LayerDetailsFormProps, FormValues>
   ) => {
-    const entityForSubmit = prepareEntityForSubmit(values as unknown as Record<string, unknown>, formikBag.props.layerRecord);
+    const entityForSubmit = prepareEntityForSubmit(
+      values as unknown as Record<string, unknown>,
+      formikBag.props.layerRecord
+    );
 
     formikBag.props.onSubmit(entityForSubmit);
   },

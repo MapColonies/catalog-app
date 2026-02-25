@@ -1,4 +1,4 @@
-import React,{useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import { Typography } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
 import { Copy } from '../../../../../common/components/copy/copy';
@@ -11,8 +11,14 @@ interface FailReasonAreaProps {
   key?: string;
 }
 
-export const FailReasonArea: React.FC<FailReasonAreaProps> = ({ failReason, show, key = '' }) => {
-  const [containerClass, setContainerClass] = useState('failReasonAreaContainer');
+export const FailReasonArea: React.FC<FailReasonAreaProps> = ({
+  failReason,
+  show,
+  key = '',
+}) => {
+  const [containerClass, setContainerClass] = useState(
+    'failReasonAreaContainer'
+  );
 
   useEffect(() => {
     setContainerClass(`failReasonAreaContainer ${show ? 'show' : ''}`);
@@ -24,7 +30,7 @@ export const FailReasonArea: React.FC<FailReasonAreaProps> = ({ failReason, show
         <Typography className="failReasonText" tag="p">
           {failReason}
         </Typography>
-        <Copy value={failReason}/>
+        <Copy value={failReason} />
       </Box>
     </td>
   );

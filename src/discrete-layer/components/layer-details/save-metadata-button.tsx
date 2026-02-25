@@ -6,7 +6,9 @@ import { IDispatchAction } from '../../models/actionDispatcherStore';
 import { ILayerImage } from '../../models/layerImage';
 import { getBasicType, getFlatEntityDescriptors } from './utils';
 import { FieldInfoName } from './layer-details.field-info';
-import EnumsMapContext, { IEnumsMapType } from '../../../common/contexts/enumsMap.context';
+import EnumsMapContext, {
+  IEnumsMapType,
+} from '../../../common/contexts/enumsMap.context';
 
 interface SaveMetadataProps {
   metadata: ILayerImage;
@@ -15,7 +17,7 @@ interface SaveMetadataProps {
 
 export const SaveMetadataButton: React.FC<SaveMetadataProps> = ({
   metadata,
-  className = ''
+  className = '',
 }) => {
   const intl = useIntl();
   const store = useStore();
@@ -24,7 +26,11 @@ export const SaveMetadataButton: React.FC<SaveMetadataProps> = ({
   // Sorting out non-relevant properties from metadata
   const getfFilteredMetadataToDownload = useCallback(() => {
     // Generate enum types
-    const enumBasicTypes = new Set(Object.values(enumsMap as IEnumsMapType).map(enumVal => enumVal.enumName));
+    const enumBasicTypes = new Set(
+      Object.values(enumsMap as IEnumsMapType).map(
+        (enumVal) => enumVal.enumName
+      )
+    );
 
     const descriptors = getFlatEntityDescriptors(
       metadata.__typename,
@@ -34,8 +40,11 @@ export const SaveMetadataButton: React.FC<SaveMetadataProps> = ({
     // Map Enum values
     const mappedEnumsMetadata = Object.fromEntries(
       Object.entries(metadata).map(([key, val]) => {
-        const basicType = getBasicType(key as FieldInfoName, metadata.__typename);
-        
+        const basicType = getBasicType(
+          key as FieldInfoName,
+          metadata.__typename
+        );
+
         if (enumBasicTypes.has(basicType)) {
           return [key, enumsMap?.[val as string]?.realValue];
         }
@@ -43,7 +52,6 @@ export const SaveMetadataButton: React.FC<SaveMetadataProps> = ({
         return [key, val];
       })
     );
-
 
     const pureMetadata = Object.fromEntries(
       Object.entries(mappedEnumsMetadata).filter(([key]) => {
@@ -59,15 +67,15 @@ export const SaveMetadataButton: React.FC<SaveMetadataProps> = ({
     return pureMetadata;
   }, [metadata]);
 
-  const filteredMetadataToDownload = useMemo(getfFilteredMetadataToDownload, [metadata]);
+  const filteredMetadataToDownload = useMemo(getfFilteredMetadataToDownload, [
+    metadata,
+  ]);
 
   const dispatchAction = (action: Record<string, unknown>): void => {
-    store.actionDispatcherStore.dispatchAction(
-      {
-        action: action.action,
-        data: action.data,
-      } as IDispatchAction
-    );
+    store.actionDispatcherStore.dispatchAction({
+      action: action.action,
+      data: action.data,
+    } as IDispatchAction);
   };
 
   const metadataExporter = useMemo((): JSX.Element => {
@@ -79,7 +87,10 @@ export const SaveMetadataButton: React.FC<SaveMetadataProps> = ({
           className={`mc-icon-Download ${className}`}
           label="SAVE METADATA"
           onClick={(): void =>
-             dispatchAction({ action: `${metadata.__typename}.saveMetadata`, data: filteredMetadataToDownload })
+            dispatchAction({
+              action: `${metadata.__typename}.saveMetadata`,
+              data: filteredMetadataToDownload,
+            })
           }
         />
       </Tooltip>

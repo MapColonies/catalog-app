@@ -26,15 +26,14 @@
 }
 
 .counterField {
-    display:flex;
-    align-items: center;
-    justify-content: center;
-
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .countLabel {
-    color: var(--mdc-theme-text-icon-on-dark);
-    margin: 0;
+  color: var(--mdc-theme-text-icon-on-dark);
+  margin: 0;
 }
 
 .countValue {
@@ -48,7 +47,7 @@
   align-items: center;
   font-weight: bold;
   font-size: 1.2em;
-  background:var(--ag-selected-details-row-background);
+  background: var(--ag-selected-details-row-background);
 }
 
 .failReasonText {
@@ -56,20 +55,20 @@
   text-overflow: ellipsis;
   overflow: hidden;
   color: var(--mdc-theme-gc-error-high);
-  margin:0;
+  margin: 0;
 }
 
-.detailsField{
-    max-width: 35ch;
-    margin: 2px 12px;
-    display:flex;
-    align-items: center;
-    justify-content: center;
+.detailsField {
+  max-width: 35ch;
+  margin: 2px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .detailLabel {
-    color: var(--mdc-theme-text-icon-on-dark);
-    margin:0;
+  color: var(--mdc-theme-text-icon-on-dark);
+  margin: 0;
 }
 
 .detailValue {

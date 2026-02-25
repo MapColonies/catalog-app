@@ -14,7 +14,7 @@ function isDescendant(older, younger) {
     !!older.children &&
     typeof older.children !== 'function' &&
     older.children.some(
-      child => child === younger || isDescendant(child, younger)
+      (child) => child === younger || isDescendant(child, younger)
     )
   );
 }
@@ -54,13 +54,14 @@ class FileThemeNodeContentRenderer extends Component {
       ...otherProps
     } = this.props;
     const nodeTitle = title || node.title;
-    const tooltipText = typeof nodeTitle === 'function'
-    ? nodeTitle({
-        node,
-        path,
-        treeIndex,
-      })
-    : nodeTitle;
+    const tooltipText =
+      typeof nodeTitle === 'function'
+        ? nodeTitle({
+            node,
+            path,
+            treeIndex,
+          })
+        : nodeTitle;
 
     const styles = {
       lineBlock: 'lineBlock',
@@ -87,7 +88,7 @@ class FileThemeNodeContentRenderer extends Component {
 
     const isDraggedDescendant = draggedNode && isDescendant(draggedNode, node);
     const isLandingPadActive = !didDrop && isDragging;
-    const isSecondLevelLeaf = node.isGroup === undefined && path.length ===2;
+    const isSecondLevelLeaf = node.isGroup === undefined && path.length === 2;
 
     // Construct the scaffold representing the structure of the tree
     const scaffold = [];
@@ -144,8 +145,16 @@ class FileThemeNodeContentRenderer extends Component {
                 node.expanded ? styles.collapseButton : styles.expandButton
               }
               style={{
-                left: rowDirection === 'ltr' ? (lowerSiblingCounts.length - 0.4) * scaffoldBlockPxWidth : 'unset',
-                right: rowDirection === 'rtl' ? (parentNode === null ? -1 * (lowerSiblingCounts.length) * scaffoldBlockPxWidth : 'unset') : 'unset',
+                left:
+                  rowDirection === 'ltr'
+                    ? (lowerSiblingCounts.length - 0.4) * scaffoldBlockPxWidth
+                    : 'unset',
+                right:
+                  rowDirection === 'rtl'
+                    ? parentNode === null
+                      ? -1 * lowerSiblingCounts.length * scaffoldBlockPxWidth
+                      : 'unset'
+                    : 'unset',
               }}
               onClick={() =>
                 toggleChildrenVisibility({
@@ -165,9 +174,12 @@ class FileThemeNodeContentRenderer extends Component {
           }
           style={{
             position: 'absolute',
-            left: rowDirection === 'ltr' && !isSecondLevelLeaf ?  scaffoldBlockPxWidth : 'unset',
+            left:
+              rowDirection === 'ltr' && !isSecondLevelLeaf
+                ? scaffoldBlockPxWidth
+                : 'unset',
             right: rowDirection === 'rtl' ? scaffoldBlockPxWidth * 2 : 'unset',
-            width: 'calc(100% - var(--rst-expander-size))'
+            width: 'calc(100% - var(--rst-expander-size))',
           }}
         >
           {/* Set the row preview to be used during drag and drop */}
@@ -208,19 +220,16 @@ class FileThemeNodeContentRenderer extends Component {
                     ))}
                   </div>
 
-                    <TooltippedValue
-                      dir=''
-                      className={styles.rowLabel} 
-                      tag={"div"} 
-                      customTooltipText={tooltipText}
-                    >
-                      <span className={styles.rowTitle}>
-                       {tooltipText}
-                      </span>
-                    </TooltippedValue>                  
-                  
-                  {
-                    !node.children && 
+                  <TooltippedValue
+                    dir=""
+                    className={styles.rowLabel}
+                    tag={'div'}
+                    customTooltipText={tooltipText}
+                  >
+                    <span className={styles.rowTitle}>{tooltipText}</span>
+                  </TooltippedValue>
+
+                  {!node.children && (
                     <div className={styles.rowToolbar}>
                       {buttons.map((btn, index) => (
                         <div
@@ -231,15 +240,20 @@ class FileThemeNodeContentRenderer extends Component {
                         </div>
                       ))}
                     </div>
-                  }
+                  )}
 
-                  {
-                    node.children &&
+                  {node.children && (
                     <div className="descendantCount">
-                      ( {getDescendantCount({node, ignoreCollapsed: false }) - (parentNode !== null ? 0 : (getDepth(node) > 1) ? node.children.length : 0)} )
+                      ({' '}
+                      {getDescendantCount({ node, ignoreCollapsed: false }) -
+                        (parentNode !== null
+                          ? 0
+                          : getDepth(node) > 1
+                          ? node.children.length
+                          : 0)}{' '}
+                      )
                     </div>
-                  }
-
+                  )}
                 </div>
               </div>
             </div>

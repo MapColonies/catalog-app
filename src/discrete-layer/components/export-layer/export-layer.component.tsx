@@ -21,26 +21,33 @@ interface ExportLayerComponentProps {
   handleTabViewChange: (tabView: TabViews) => void;
 }
 
-export const ExportLayerComponent: React.FC<ExportLayerComponentProps> = observer(
-  ({ style, handleFlyTo, handleTabViewChange }) => {    
+export const ExportLayerComponent: React.FC<ExportLayerComponentProps> =
+  observer(({ style, handleFlyTo, handleTabViewChange }) => {
     const store = useStore();
     const formMethods = useForm({
       mode: 'onBlur',
-      reValidateMode: 'onBlur'
+      reValidateMode: 'onBlur',
     });
 
     const layerToExport = store.exportStore.layerToExport;
     const finalJobId = store.exportStore.finalJobId;
-    
+
     useGeneralExportBehavior(() => {
       if (isEmpty(store.exportStore.geometrySelectionsCollection.features)) {
-        if (!isPolygonContainedInLayer(store.discreteLayersStore.mapViewerExtentPolygon as Feature, layerToExport as LayerMetadataMixedUnion)){
+        if (
+          !isPolygonContainedInLayer(
+            store.discreteLayersStore.mapViewerExtentPolygon as Feature,
+            layerToExport as LayerMetadataMixedUnion
+          )
+        ) {
           handleFlyTo();
         }
       }
     });
 
-    const {formState: { isSubmitted }} = formMethods;
+    const {
+      formState: { isSubmitted },
+    } = formMethods;
 
     useEffect(() => {
       return (): void => {
@@ -50,19 +57,24 @@ export const ExportLayerComponent: React.FC<ExportLayerComponentProps> = observe
         } else {
           store.exportStore.resetFormData();
         }
-      }
+      };
     }, [isSubmitted]);
 
     const endExportSession = useCallback(() => {
       store.actionDispatcherStore.dispatchAction({
         action: ExportActions.END_EXPORT_SESSION,
-        data: {}
+        data: {},
       });
     }, []);
 
     const tabContentByMode = (): JSX.Element => {
       if (!isEmpty(finalJobId)) {
-        return <ExportLayerFinalStage onClose={endExportSession} jobId={finalJobId as string}/>;
+        return (
+          <ExportLayerFinalStage
+            onClose={endExportSession}
+            jobId={finalJobId as string}
+          />
+        );
       }
 
       return (
@@ -90,5 +102,4 @@ export const ExportLayerComponent: React.FC<ExportLayerComponentProps> = observe
         )}
       </Box>
     );
-  }
-);
+  });

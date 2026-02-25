@@ -1,10 +1,20 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useIntl } from 'react-intl';
-import { ColDef, RowDataUpdatedEvent, ValueGetterParams } from 'ag-grid-community';
+import {
+  ColDef,
+  RowDataUpdatedEvent,
+  ValueGetterParams,
+} from 'ag-grid-community';
 import { observer } from 'mobx-react-lite';
 import { isEmpty } from 'lodash';
 import { Box } from '@map-colonies/react-components';
-import { 
+import {
   GridComponent,
   GridComponentOptions,
   GridValueFormatterParams,
@@ -13,7 +23,7 @@ import {
   GridRowNode,
   GridReadyEvent,
   GridApi,
-  GridRowClickedEvent
+  GridRowClickedEvent,
 } from '../../../common/components/grid';
 import { ActionsRenderer } from '../../../common/components/grid/cell-renderer/actions.cell-renderer';
 import { FootprintRenderer } from '../../../common/components/grid/cell-renderer/footprint.cell-renderer';
@@ -57,7 +67,11 @@ export const LayersResults: React.FC<LayersResultsProps> = observer((props) => {
   // const cacheRef = useRef({} as ILayerImage[]);
   const selectedLayersRef = useRef(INITIAL_ORDER);
 
-  const updateRow = (id: string, newData: Partial<ILayerImage>, gridApi: GridApi): void => {
+  const updateRow = (
+    id: string,
+    newData: Partial<ILayerImage>,
+    gridApi: GridApi
+  ): void => {
     const rowNode = gridApi.getRowNode(id);
     if (rowNode) {
       rowNode.setData({ ...rowNode.data, ...newData });
@@ -95,24 +109,36 @@ export const LayersResults: React.FC<LayersResultsProps> = observer((props) => {
 
   const entityPermittedActions = useMemo(() => {
     const entityActions: Record<string, unknown> = {};
-    [ 'LayerRasterRecord', 'Layer3DRecord', 'LayerDemRecord', 'VectorBestRecord', 'QuantizedMeshBestRecord' ].forEach( entityName => {
-      const allGroupsActions = store.actionDispatcherStore.getEntityActionGroups(entityName);
+    [
+      'LayerRasterRecord',
+      'Layer3DRecord',
+      'LayerDemRecord',
+      'VectorBestRecord',
+      'QuantizedMeshBestRecord',
+    ].forEach((entityName) => {
+      const allGroupsActions =
+        store.actionDispatcherStore.getEntityActionGroups(entityName);
       const permittedGroupsActions = allGroupsActions.map((actionGroup) => {
         return {
           titleTranslationId: actionGroup.titleTranslationId,
-          group:
-            actionGroup.group.filter(action => {
+          group: actionGroup.group
+            .filter((action) => {
               // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-              return store.userStore.isActionAllowed(`entity_action.${entityName}.${action.action}`) === false ? false : true && 
-                     action.views.includes(TabViews.SEARCH_RESULTS);
+              return store.userStore.isActionAllowed(
+                `entity_action.${entityName}.${action.action}`
+              ) === false
+                ? false
+                : true && action.views.includes(TabViews.SEARCH_RESULTS);
             })
             .map((action) => {
               return {
                 ...action,
-                titleTranslationId: intl.formatMessage({ id: action.titleTranslationId }),
+                titleTranslationId: intl.formatMessage({
+                  id: action.titleTranslationId,
+                }),
               };
             }),
-        }
+        };
       });
       entityActions[entityName] = permittedGroupsActions;
     });
@@ -122,7 +148,7 @@ export const LayersResults: React.FC<LayersResultsProps> = observer((props) => {
   const dispatchAction = (action: Record<string, unknown>): void => {
     store.actionDispatcherStore.dispatchAction({
       action: action.action,
-      data: action.data
+      data: action.data,
     } as IDispatchAction);
   };
 
@@ -132,7 +158,7 @@ export const LayersResults: React.FC<LayersResultsProps> = observer((props) => {
   //     dispatchAction(undefined)
   //   };
   // }, []);
-  
+
   const colDef = [
     {
       width: 20,
@@ -142,7 +168,7 @@ export const LayersResults: React.FC<LayersResultsProps> = observer((props) => {
       cellRendererParams: {
         onClick: (id: string, value: boolean, node: GridRowNode): void => {
           store.discreteLayersStore.showFootprint(id, value);
-        }
+        },
       },
       headerName: '',
     },
@@ -156,18 +182,22 @@ export const LayersResults: React.FC<LayersResultsProps> = observer((props) => {
             selectedLayersRef.current++;
           } else {
             const orders: number[] = [];
-            (node as any).beans.gridApi.forEachNode((item: GridRowNode)=> {
-              const rowData = item.data as {[key: string]: string | boolean | number};
+            (node as any).beans.gridApi.forEachNode((item: GridRowNode) => {
+              const rowData = item.data as {
+                [key: string]: string | boolean | number;
+              };
               if (rowData.layerImageShown === true && rowData.id !== id) {
                 orders.push(rowData.order as number);
               }
             });
-            selectedLayersRef.current = (orders.length) ? getMax(orders) : selectedLayersRef.current-1;
+            selectedLayersRef.current = orders.length
+              ? getMax(orders)
+              : selectedLayersRef.current - 1;
           }
           const order = value ? selectedLayersRef.current : null;
           store.discreteLayersStore.showLayer(id, value, order);
-        }
-      }
+        },
+      },
     },
     {
       headerName: '',
@@ -178,21 +208,36 @@ export const LayersResults: React.FC<LayersResultsProps> = observer((props) => {
         style: {
           display: 'flex',
           justifyContent: 'center',
-          paddingTop: '8px'
+          paddingTop: '8px',
         },
-        onClick: (data: ILayerImage, value: boolean, gridApi: GridApi): void => {
-          const activePPLayer = store.discreteLayersStore.layersImages?.find(layer => isPolygonPartsShown(layer as unknown as Record<string, unknown>)) as LayerRasterRecordModelType;
+        onClick: (
+          data: ILayerImage,
+          value: boolean,
+          gridApi: GridApi
+        ): void => {
+          const activePPLayer = store.discreteLayersStore.layersImages?.find(
+            (layer) =>
+              isPolygonPartsShown(layer as unknown as Record<string, unknown>)
+          ) as LayerRasterRecordModelType;
           store.discreteLayersStore.showPolygonParts(data.id, value);
           if (activePPLayer) {
-            updateRow(activePPLayer.id, {...activePPLayer, polygonPartsShown: false}, gridApi);
+            updateRow(
+              activePPLayer.id,
+              { ...activePPLayer, polygonPartsShown: false },
+              gridApi
+            );
           }
-          updateRow(data.id, {...data, polygonPartsShown: value} as LayerRasterRecordModelType, gridApi);
+          updateRow(
+            data.id,
+            { ...data, polygonPartsShown: value } as LayerRasterRecordModelType,
+            gridApi
+          );
           dispatchAction({
             action: UserAction.SYSTEM_CALLBACK_SHOWPOLYGONPARTS,
-            data: { selectedLayer: {...data, polygonPartsShown: value } }
+            data: { selectedLayer: { ...data, polygonPartsShown: value } },
           });
-        }
-      }
+        },
+      },
     },
     {
       headerName: intl.formatMessage({
@@ -204,7 +249,10 @@ export const LayersResults: React.FC<LayersResultsProps> = observer((props) => {
       cellRenderer: 'styledByDataRenderer',
       tooltipField: 'productName',
       tooltipComponent: 'customTooltip',
-      tooltipComponentParams: { color: '#ececec', infoTooltipMap: store.discreteLayersStore.entityTooltipFields }
+      tooltipComponentParams: {
+        color: '#ececec',
+        infoTooltipMap: store.discreteLayersStore.entityTooltipFields,
+      },
     },
     {
       headerName: intl.formatMessage({
@@ -215,9 +263,12 @@ export const LayersResults: React.FC<LayersResultsProps> = observer((props) => {
       field: 'ingestionDate',
       valueGetter: (params: ValueGetterParams): string => {
         const { data } = params;
-        return data.ingestionDate !== undefined && data.ingestionDate !== null ? data.ingestionDate : data.insertDate;
+        return data.ingestionDate !== undefined && data.ingestionDate !== null
+          ? data.ingestionDate
+          : data.insertDate;
       },
-      valueFormatter: (params: GridValueFormatterParams): string => dateFormatter(params.value)
+      valueFormatter: (params: GridValueFormatterParams): string =>
+        dateFormatter(params.value),
     },
     {
       headerName: intl.formatMessage({
@@ -225,7 +276,7 @@ export const LayersResults: React.FC<LayersResultsProps> = observer((props) => {
       }),
       width: 50,
       field: 'order',
-      hide: true
+      hide: true,
     },
     {
       pinned: 'right',
@@ -236,14 +287,14 @@ export const LayersResults: React.FC<LayersResultsProps> = observer((props) => {
         actions: entityPermittedActions,
         actionHandler: dispatchAction,
       },
-    }
+    },
   ];
 
   const gridOptions: GridComponentOptions = {
     enableRtl: CONFIG.I18N.DEFAULT_LANGUAGE.toUpperCase() === 'HE',
     pagination: PAGINATION,
     paginationPageSize: PAGE_SIZE,
-    paginationPageSizeSelector: false,//[PAGE_SIZE, 20, 50, 100],
+    paginationPageSizeSelector: false, //[PAGE_SIZE, 20, 50, 100],
     defaultColDef: {
       suppressMovable: true, // All columns cannot be dragged
       resizable: false, // All columns cannot be resized by default
@@ -270,7 +321,7 @@ export const LayersResults: React.FC<LayersResultsProps> = observer((props) => {
     rowSelection: {
       mode: 'singleRow',
       checkboxes: false,
-      enableClickSelection: true, 
+      enableClickSelection: true,
     },
     suppressCellFocus: true,
     onCellMouseOver(event: GridCellMouseOverEvent) {
@@ -285,51 +336,64 @@ export const LayersResults: React.FC<LayersResultsProps> = observer((props) => {
     onGridReady(params: GridReadyEvent) {
       setGridApi(params.api);
       params.api.forEachNode((node) => {
-        if ((node.data as ILayerImage).id === store.discreteLayersStore.selectedLayer?.id) {
-          params.api.setNodesSelected({nodes: [node], newValue: true});
+        if (
+          (node.data as ILayerImage).id ===
+          store.discreteLayersStore.selectedLayer?.id
+        ) {
+          params.api.setNodesSelected({ nodes: [node], newValue: true });
         }
       });
     },
     onRowDataUpdated(event: RowDataUpdatedEvent) {
-      const rowToUpdate: GridRowNode | undefined | null = event.api.getRowNode(store.discreteLayersStore.selectedLayer?.id as string);
-      
+      const rowToUpdate: GridRowNode | undefined | null = event.api.getRowNode(
+        store.discreteLayersStore.selectedLayer?.id as string
+      );
+
       // Find the pinned column to update as well
-      const pinnedColId = (event.api.getColumnDefs()?.find(colDef => (colDef as ColDef).pinned) as ColDef).colId as string;
+      const pinnedColId = (
+        event.api
+          .getColumnDefs()
+          ?.find((colDef) => (colDef as ColDef).pinned) as ColDef
+      ).colId as string;
 
       event.api.refreshCells({
         force: true,
         suppressFlash: true,
-        columns:['productName', '__typename', 'updateDate', pinnedColId], 
+        columns: ['productName', '__typename', 'updateDate', pinnedColId],
         //@ts-ignore
-        rowNodes: !isEmpty(rowToUpdate) ? [rowToUpdate] : undefined
+        rowNodes: !isEmpty(rowToUpdate) ? [rowToUpdate] : undefined,
       });
     },
   };
 
   useEffect(() => {
     if (store.discreteLayersStore.layersImages) {
-      setlayersImages([...store.discreteLayersStore.layersImages.map(item => ({ ...item }))]);
+      setlayersImages([
+        ...store.discreteLayersStore.layersImages.map((item) => ({ ...item })),
+      ]);
     }
   }, [store.discreteLayersStore.layersImages]);
 
-
   return (
     <Box id="layerResults">
-      {
-        props.searchError ?
-          <Error
-            className="errorMessage"
-            message={props.searchError.response?.errors[0].message}
-            details={props.searchError.response?.errors[0].extensions?.exception?.config?.url}
-          /> :
-          <GridComponent
-            gridOptions={gridOptions}
-            rowData={layersImages}
-            // rowData={getRowData()}
-            style={props.style}
-            isLoading={props.searchLoading}
-          />
-      }
+      {props.searchError ? (
+        <Error
+          className="errorMessage"
+          message={props.searchError.response?.errors[0].message}
+          details={
+            props.searchError.response?.errors[0].extensions?.exception?.config
+              ?.url
+          }
+        />
+      ) : (
+        <GridComponent
+          gridOptions={gridOptions}
+          rowData={layersImages}
+          // rowData={getRowData()}
+          style={props.style}
+          isLoading={props.searchLoading}
+        />
+      )}
     </Box>
   );
 });

@@ -45,7 +45,9 @@ body[dir='rtl'] #gridActionsCellRenderer.actionsContainer .actionIcon {
   right: 0;
 }
 
-body[dir='rtl'] #gridActionsCellRenderer.actionsContainer > button:not(#allActionsIcon) {
+body[dir='rtl']
+  #gridActionsCellRenderer.actionsContainer
+  > button:not(#allActionsIcon) {
   right: unset;
   left: -20px;
 }
@@ -61,7 +63,9 @@ body[dir='rtl'] #gridActionsCellRenderer.actionsContainer > button:not(#allActio
   /* position: fixed; */
 }
 
-body[dir='rtl'] #gridActionsMenuContainer .mdc-menu-surface.mdc-menu-surface--open {
+body[dir='rtl']
+  #gridActionsMenuContainer
+  .mdc-menu-surface.mdc-menu-surface--open {
   right: -160px !important;
   left: unset;
 }

@@ -18,7 +18,7 @@
 #layerDetailsFormRaster .content {
   max-height: var(--content-height);
   overflow-y: auto;
-  padding:  0px 20px 0px 20px;
+  padding: 0px 20px 0px 20px;
   position: relative;
 }
 
@@ -70,18 +70,22 @@ body[dir='rtl'] #layerDetailsFormRaster .buttons {
   margin-top: inherit;
 }
 
-#layerDetailsFormRaster .rmwc-collapsible-list__handle .mdc-list-item{
+#layerDetailsFormRaster .rmwc-collapsible-list__handle .mdc-list-item {
   border: 1px solid var(--mdc-theme-gc-selection-background);
   margin-top: 2px;
 }
 
-
-#layerDetailsFormRaster .enumOptions .mdc-menu.mdc-select__menu.mdc-menu-surface.mdc-menu-surface--open {
+#layerDetailsFormRaster
+  .enumOptions
+  .mdc-menu.mdc-select__menu.mdc-menu-surface.mdc-menu-surface--open {
   bottom: auto !important;
   top: 24px;
 }
 
-body[dir='rtl'] #layerDetailsFormRaster .enumOptions .mdc-select__dropdown-icon {
+body[dir='rtl']
+  #layerDetailsFormRaster
+  .enumOptions
+  .mdc-select__dropdown-icon {
   right: initial;
   left: initial;
 }
@@ -110,7 +114,7 @@ body[dir='rtl'] #layerDetailsFormRaster .enumOptions .mdc-select__dropdown-icon 
   border-bottom: 1px dashed var(--mdc-theme-gc-selection-background);
 }
 
-#layerDetailsFormRaster .ReactVirtualized__Grid.ReactVirtualized__List{
+#layerDetailsFormRaster .ReactVirtualized__Grid.ReactVirtualized__List {
   direction: inherit !important;
 }
 
@@ -145,12 +149,14 @@ body[dir='rtl'] #layerDetailsFormRaster .enumOptions .mdc-select__dropdown-icon 
   color: var(--mdc-theme-text-icon-on-dark);
 }
 
-#layerDetailsFormRaster .addPolygonPart{
+#layerDetailsFormRaster .addPolygonPart {
   display: flex;
   justify-content: center;
 }
 
-#layerDetailsFormRaster .polygonPartsContainer .mdc-button--outlined:not(:disabled) {
+#layerDetailsFormRaster
+  .polygonPartsContainer
+  .mdc-button--outlined:not(:disabled) {
   border-color: unset;
 }
 
@@ -168,7 +174,7 @@ body[dir='rtl'] #layerDetailsFormRaster .enumOptions .mdc-select__dropdown-icon 
 
 #layerDetailsFormRaster .loadingOnTop {
   position: absolute;
-  top:6px;
+  top: 6px;
   left: 20px;
 }
 
@@ -181,6 +187,6 @@ body[dir='rtl'] #layerDetailsFormRaster .enumOptions .mdc-select__dropdown-icon 
   align-items: center;
 }
 
-body[dir='rtl'] #layerDetailsFormRaster .deletePolygonPart { 
+body[dir='rtl'] #layerDetailsFormRaster .deletePolygonPart {
   left: -550px;
 }

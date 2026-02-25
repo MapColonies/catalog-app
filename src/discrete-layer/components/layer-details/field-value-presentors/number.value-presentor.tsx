@@ -12,8 +12,8 @@ interface NumberValuePresentorProps {
   fieldNamePrefix?: string;
 }
 
-export const NumberValuePresentorComponent: React.FC<NumberValuePresentorProps> = (props) => {
-  return (
-    <FormInputTextFieldComponent {...props} type="number"/>
-  );
-}
+export const NumberValuePresentorComponent: React.FC<
+  NumberValuePresentorProps
+> = (props) => {
+  return <FormInputTextFieldComponent {...props} type="number" />;
+};

@@ -19,7 +19,11 @@ export const FieldLabelComponent: React.FC<FieldLabelProps> = ({
   showTooltip,
 }) => {
   return (
-    <Box className={customClassName !== undefined ? customClassName : 'detailsFieldLabel'}>
+    <Box
+      className={
+        customClassName !== undefined ? customClassName : 'detailsFieldLabel'
+      }
+    >
       <TooltippedValue disableTooltip={showTooltip}>
         <FormattedMessage id={value} />
       </TooltippedValue>

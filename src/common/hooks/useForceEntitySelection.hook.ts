@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 
-export const useForceEntitySelection = (dependencies: React.DependencyList): { entitySelected: boolean } => {
+export const useForceEntitySelection = (
+  dependencies: React.DependencyList
+): { entitySelected: boolean } => {
   const RESELECTION_TIMEOUT = 0;
   const [entitySelected, setEntitySelected] = useState(true);
 
@@ -13,4 +15,4 @@ export const useForceEntitySelection = (dependencies: React.DependencyList): { e
   }, dependencies);
 
   return { entitySelected };
-}
+};

@@ -1,9 +1,9 @@
-.ag-theme-alpine-dark .ag-header-cell[col-id="footprintShown"]{
+.ag-theme-alpine-dark .ag-header-cell[col-id='footprintShown'] {
   padding-left: 0px;
   padding-right: 18px;
 }
 
-body[dir='rtl'] .ag-theme-alpine-dark .ag-header-cell[col-id="footprintShown"]{
+body[dir='rtl'] .ag-theme-alpine-dark .ag-header-cell[col-id='footprintShown'] {
   padding-right: 0px;
   padding-left: 18px;
 }
@@ -55,17 +55,19 @@ body[dir='rtl'] #layerResults .ag-pinned-right-cols-container {
   background-color: transparent !important;
 }
 
-
 /* Show action buttons only for row that is being hovered. For rows which are not being hovered, hide them by setting their width and padding to 0.*/
 #layerResults .ag-pinned-right-cols-container .ag-row:not(.ag-row-hover),
-#layerResults .ag-pinned-right-cols-container .ag-row:not(.ag-row-hover) .ag-cell {
+#layerResults
+  .ag-pinned-right-cols-container
+  .ag-row:not(.ag-row-hover)
+  .ag-cell {
   width: 0 !important;
   padding: 0 !important;
   border: none;
 }
 
 #layerResults .ag-pinned-right-cols-container .ag-row.ag-row-hover {
-  background-color: rgb(44,65,89);
+  background-color: rgb(44, 65, 89);
   border-width: 0px !important;
 }
 
@@ -78,21 +80,21 @@ body[dir='rtl'] #layerResults .ag-pinned-right-cols-container {
 }
 
 #layerResults .ag-row-hover {
-  background-color: rgb(44,65,89) !important;
+  background-color: rgb(44, 65, 89) !important;
 }
 
-#layerResults .ag-row.ag-full-width-row.ag-row-selected[row-id*="details"] {
+#layerResults .ag-row.ag-full-width-row.ag-row-selected[row-id*='details'] {
   background: unset;
   overflow: visible;
 }
 
-#layerResults .ag-row .ag-cell[col-id="footprintShown"] {
+#layerResults .ag-row .ag-cell[col-id='footprintShown'] {
   padding: unset;
 }
 
 #layerResults .actionsContainer {
-  right:0 !important;
-  position:relative;
+  right: 0 !important;
+  position: relative;
   overflow: visible !important;
   width: 0px !important;
   height: 0px !important;

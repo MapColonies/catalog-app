@@ -2,7 +2,11 @@ import { createRoot } from 'react-dom/client';
 import Axios, { Method } from 'axios';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
-import { IPartialAxiosRequestConfig, StoreProvider, rootStore } from './discrete-layer/models/RootStore';
+import {
+  IPartialAxiosRequestConfig,
+  StoreProvider,
+  rootStore,
+} from './discrete-layer/models/RootStore';
 import { SearchResponse } from './discrete-layer/models/discreteLayersStore';
 import CONFIG from './common/config';
 import { syncHttpClientGql } from './syncHttpClientGql';

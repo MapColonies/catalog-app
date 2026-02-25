@@ -13,7 +13,12 @@ import {
   Button,
   IconButton,
 } from '@map-colonies/react-core';
-import { BboxCorner, Box, DrawType, IDrawingEvent } from '@map-colonies/react-components';
+import {
+  BboxCorner,
+  Box,
+  DrawType,
+  IDrawingEvent,
+} from '@map-colonies/react-components';
 import CONFIG from '../../../common/config';
 import { ValidationsError } from '../../../common/components/error/validations.error-presentor';
 import { FieldLabelComponent } from '../../../common/components/form/field-label';
@@ -83,31 +88,33 @@ interface BBoxDialogProps {
   corners?: BBoxCorners;
 }
 
-export const BBoxDialog: React.FC<BBoxDialogProps> = (
-  {
-    isOpen,
-    onSetOpen,
-    onPolygonUpdate,
-    corners: currentCorners
-  }
-) => {
+export const BBoxDialog: React.FC<BBoxDialogProps> = ({
+  isOpen,
+  onSetOpen,
+  onPolygonUpdate,
+  corners: currentCorners,
+}) => {
   const intl = useIntl();
-  const [corners] = useState<BBoxCorners>(currentCorners ?? {
-    topRightLat: 0,
-    topRightLon: 0,
-    bottomLeftLat: 0,
-    bottomLeftLon: 0,
-  });
+  const [corners] = useState<BBoxCorners>(
+    currentCorners ?? {
+      topRightLat: 0,
+      topRightLon: 0,
+      bottomLeftLat: 0,
+      bottomLeftLon: 0,
+    }
+  );
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const yupSchema: Record<string, any> = {};
-  Object.keys(corners).forEach(fieldName => {
+  Object.keys(corners).forEach((fieldName) => {
     const fieldLabel = `custom-bbox.dialog-field.${fieldName}.label`;
-    yupSchema[fieldName] = Yup
-    .number()
-    .required(
+    yupSchema[fieldName] = Yup.number().required(
       intl.formatMessage(
         { id: 'validation-general.number' },
-        { fieldName: emphasizeByHTML(`${intl.formatMessage({ id: fieldLabel })}`) }
+        {
+          fieldName: emphasizeByHTML(
+            `${intl.formatMessage({ id: fieldLabel })}`
+          ),
+        }
       )
     );
   });
@@ -115,44 +122,48 @@ export const BBoxDialog: React.FC<BBoxDialogProps> = (
   const formik = useFormik({
     initialValues: corners,
     validationSchema: Yup.object({
-      ...yupSchema
+      ...yupSchema,
     }),
     onSubmit: (values) => {
       const errors = validate(values, intl);
-      if (errors.latDistance === undefined && errors.lonDistance === undefined && errors.invalid === undefined) {
+      if (
+        errors.latDistance === undefined &&
+        errors.lonDistance === undefined &&
+        errors.invalid === undefined
+      ) {
         try {
           onPolygonUpdate({
             primitive: undefined,
             type: DrawType.BOX,
             geojson: {
-              type : 'FeatureCollection',
+              type: 'FeatureCollection',
               features: [
-                { 
-                  type : 'Feature', 
-                  properties : {  
-                    type : BboxCorner.TOP_RIGHT,
-                  }, 
-                  geometry : { 
-                    type : 'Point', 
-                    coordinates : [ values.topRightLon, values.topRightLat ] 
-                  }
+                {
+                  type: 'Feature',
+                  properties: {
+                    type: BboxCorner.TOP_RIGHT,
+                  },
+                  geometry: {
+                    type: 'Point',
+                    coordinates: [values.topRightLon, values.topRightLat],
+                  },
                 },
-                { 
-                  type : 'Feature', 
-                  properties : {  
-                    type : BboxCorner.BOTTOM_LEFT
-                  }, 
-                  geometry : { 
-                    type : 'Point', 
-                    coordinates : [ values.bottomLeftLon, values.bottomLeftLat ]  
-                  }
-                }
-              ]
-            }
+                {
+                  type: 'Feature',
+                  properties: {
+                    type: BboxCorner.BOTTOM_LEFT,
+                  },
+                  geometry: {
+                    type: 'Point',
+                    coordinates: [values.bottomLeftLon, values.bottomLeftLat],
+                  },
+                },
+              ],
+            },
           });
           closeDialog();
           setFormErrors({});
-        } catch(e) {
+        } catch (e) {
           console.error(e);
         }
       } else {
@@ -167,10 +178,12 @@ export const BBoxDialog: React.FC<BBoxDialogProps> = (
     onSetOpen(false);
   }, [onSetOpen]);
 
-  const getValidationErrors = (errors: Record<string, unknown>): Record<string, string[]> => {
+  const getValidationErrors = (
+    errors: Record<string, unknown>
+  ): Record<string, string[]> => {
     const validationResults: Record<string, string[]> = {};
     Object.entries(errors).forEach(([key, value]) => {
-      validationResults[key] = [ value as string ];
+      validationResults[key] = [value as string];
     });
     return validationResults;
   };
@@ -183,15 +196,21 @@ export const BBoxDialog: React.FC<BBoxDialogProps> = (
           <IconButton
             className="closeIcon mc-icon-Close"
             label="CLOSE"
-            onClick={(): void => { closeDialog(); }}
+            onClick={(): void => {
+              closeDialog();
+            }}
           />
         </DialogTitle>
         <DialogContent>
           <form onSubmit={formik.handleSubmit} className="bboxForm" noValidate>
             <Box className="bboxRow">
-              <BBoxCorner corner={Corner.TOP_RIGHT} className="bboxField"/>
+              <BBoxCorner corner={Corner.TOP_RIGHT} className="bboxField" />
               <Box className="bboxField">
-                <FieldLabelComponent value='custom-bbox.dialog-field.topRightLon.label' isRequired={true} showTooltip={false}></FieldLabelComponent>
+                <FieldLabelComponent
+                  value="custom-bbox.dialog-field.topRightLon.label"
+                  isRequired={true}
+                  showTooltip={false}
+                ></FieldLabelComponent>
                 <TextField
                   name="topRightLon"
                   type="number"
@@ -201,7 +220,11 @@ export const BBoxDialog: React.FC<BBoxDialogProps> = (
                 />
               </Box>
               <Box className="bboxField">
-                <FieldLabelComponent value='custom-bbox.dialog-field.topRightLat.label' isRequired={true} showTooltip={false}></FieldLabelComponent>
+                <FieldLabelComponent
+                  value="custom-bbox.dialog-field.topRightLat.label"
+                  isRequired={true}
+                  showTooltip={false}
+                ></FieldLabelComponent>
                 <TextField
                   name="topRightLat"
                   type="number"
@@ -212,9 +235,13 @@ export const BBoxDialog: React.FC<BBoxDialogProps> = (
               </Box>
             </Box>
             <Box className="bboxRow">
-              <BBoxCorner corner={Corner.BOTTOM_LEFT} className="bboxField"/>
+              <BBoxCorner corner={Corner.BOTTOM_LEFT} className="bboxField" />
               <Box className="bboxField">
-                <FieldLabelComponent value='custom-bbox.dialog-field.bottomLeftLon.label' isRequired={true} showTooltip={false}></FieldLabelComponent>
+                <FieldLabelComponent
+                  value="custom-bbox.dialog-field.bottomLeftLon.label"
+                  isRequired={true}
+                  showTooltip={false}
+                ></FieldLabelComponent>
                 <TextField
                   name="bottomLeftLon"
                   type="number"
@@ -224,7 +251,11 @@ export const BBoxDialog: React.FC<BBoxDialogProps> = (
                 />
               </Box>
               <Box className="bboxField">
-                <FieldLabelComponent value='custom-bbox.dialog-field.bottomLeftLat.label' isRequired={true} showTooltip={false}></FieldLabelComponent>
+                <FieldLabelComponent
+                  value="custom-bbox.dialog-field.bottomLeftLat.label"
+                  isRequired={true}
+                  showTooltip={false}
+                ></FieldLabelComponent>
                 <TextField
                   name="bottomLeftLat"
                   type="number"
@@ -236,22 +267,34 @@ export const BBoxDialog: React.FC<BBoxDialogProps> = (
             </Box>
             <Box className="footer">
               <Box className="messages">
-                {
-                  !isEmpty(formik.errors) && 
-                  <ValidationsError errors={getValidationErrors(formik.errors)}/>
-                }
-                {
-                  isEmpty(formik.errors) &&
-                  !isEmpty(formErrors) &&
-                  <ValidationsError errors={getValidationErrors(formErrors as Record<string, unknown>)}/>
-                }
+                {!isEmpty(formik.errors) && (
+                  <ValidationsError
+                    errors={getValidationErrors(formik.errors)}
+                  />
+                )}
+                {isEmpty(formik.errors) && !isEmpty(formErrors) && (
+                  <ValidationsError
+                    errors={getValidationErrors(
+                      formErrors as Record<string, unknown>
+                    )}
+                  />
+                )}
               </Box>
               <Box className="buttons">
-                <Button raised type="submit" disabled={Object.keys(formik.errors).length > NONE}>
-                  <FormattedMessage id="general.ok-btn.text"/>
+                <Button
+                  raised
+                  type="submit"
+                  disabled={Object.keys(formik.errors).length > NONE}
+                >
+                  <FormattedMessage id="general.ok-btn.text" />
                 </Button>
-                <Button type="button" onClick={(): void => { closeDialog(); }}>
-                  <FormattedMessage id="general.cancel-btn.text"/>
+                <Button
+                  type="button"
+                  onClick={(): void => {
+                    closeDialog();
+                  }}
+                >
+                  <FormattedMessage id="general.cancel-btn.text" />
                 </Button>
               </Box>
             </Box>

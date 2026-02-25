@@ -4,7 +4,11 @@ import { workflowMachine } from './state-machine';
 
 export const RasterWorkflowContext = createActorContext(workflowMachine);
 
-export function RasterWorkflowProvider({ children }: { children: React.ReactNode }) {
+export function RasterWorkflowProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const store = useStore();
 
   return (

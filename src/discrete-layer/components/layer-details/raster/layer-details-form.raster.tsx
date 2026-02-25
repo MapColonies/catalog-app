@@ -6,7 +6,7 @@ import {
   FormikErrors,
   Form,
   FormikHandlers,
-  FormikBag
+  FormikBag,
 } from 'formik';
 import { Feature, GeoJsonProperties, Geometry } from 'geojson';
 import { get } from 'lodash';
@@ -25,13 +25,13 @@ import {
   EntityDescriptorModelType,
   LayerMetadataMixedUnion,
   RecordType,
-  useStore
+  useStore,
 } from '../../../models';
 import { LayersDetailsComponent } from '../layer-details';
 import {
   filterModeDescriptors,
   prepareEntityForSubmit,
-  transformEntityToFormFields
+  transformEntityToFormFields,
 } from '../utils';
 import { Curtain } from './curtain/curtain.component';
 import { IngestionFields } from './ingestion-fields.raster';
@@ -48,7 +48,7 @@ import {
   isGoToJobEnabled,
   isJobSubmitted,
   isRetryEnabled,
-  isUIDisabled
+  isUIDisabled,
 } from './state-machine/helpers';
 import { Events } from './state-machine/types';
 import { getUIIngestionFieldDescriptors } from './utils';
@@ -72,19 +72,27 @@ interface LayerDetailsFormCustomProps {
   vestValidationResults: DraftResult;
   closeDialog: () => void;
   customErrorReset: () => void;
-  customError?: Record<string,string[]> | undefined;
+  customError?: Record<string, string[]> | undefined;
 }
 
 export interface StatusError {
   errors: {
     [fieldName: string]: string[];
-  }
+  };
 }
 
 export interface EntityFormikHandlers extends FormikHandlers {
-  setFieldValue: (field: string, value: unknown, shouldValidate?: boolean) => void;
+  setFieldValue: (
+    field: string,
+    value: unknown,
+    shouldValidate?: boolean
+  ) => void;
   setFieldError: (field: string, message: string) => void;
-  setFieldTouched: (field: string, isTouched?: boolean | undefined, shouldValidate?: boolean | undefined) => void;
+  setFieldTouched: (
+    field: string,
+    isTouched?: boolean | undefined,
+    shouldValidate?: boolean | undefined
+  ) => void;
   setStatus: (status?: StatusError | Record<string, unknown>) => void;
   status: StatusError | Record<string, unknown>;
 }
@@ -120,7 +128,9 @@ export const InnerRasterForm = (
   } = props;
 
   const status = props.status as StatusError | Record<string, unknown>;
-  const [firstPhaseErrors, setFirstPhaseErrors] = useState<Record<string, string[]>>({});
+  const [firstPhaseErrors, setFirstPhaseErrors] = useState<
+    Record<string, string[]>
+  >({});
   const [isSubmittedForm, setIsSubmittedForm] = useState(false);
   const [ingestionFieldsCurtain, setIngestionFieldsCurtain] = useState(false);
 
@@ -148,17 +158,19 @@ export const InnerRasterForm = (
       resetForm();
       setValues({
         ...values,
-        ...state.context.formData
+        ...state.context.formData,
       });
     }
   }, [state.context?.formData]);
   //#endregion
 
-  const getStatusErrors = useCallback((): StatusError | Record<string, unknown> => {
+  const getStatusErrors = useCallback(():
+    | StatusError
+    | Record<string, unknown> => {
     return {
-      ...get(status, 'errors') as Record<string, string[]>,
-      ...customError
-    }
+      ...(get(status, 'errors') as Record<string, string[]>),
+      ...customError,
+    };
   }, [status, customError]);
 
   const getYupErrors = useCallback((): Record<string, string[]> => {
@@ -199,15 +211,17 @@ export const InnerRasterForm = (
   }, [entityDescriptors, mode]);
 
   const uiIngestionFieldDescriptors = useMemo(() => {
-    return [{ 
-      type: UiDescriptorsTypeName,
-      categories :[
-        {
-          category: 'DUMMY',
-          fields: getUIIngestionFieldDescriptors()
-        }
-      ]
-    }];
+    return [
+      {
+        type: UiDescriptorsTypeName,
+        categories: [
+          {
+            category: 'DUMMY',
+            fields: getUIIngestionFieldDescriptors(),
+          },
+        ],
+      },
+    ];
   }, [entityDescriptors, mode]);
 
   const entityFormikHandlers: EntityFormikHandlers = useMemo(
@@ -258,14 +272,14 @@ export const InnerRasterForm = (
 
   useEffect(() => {
     if (dirty) {
-      actorRef.send({ type: "CLEAN_ERRORS" } satisfies Events);
+      actorRef.send({ type: 'CLEAN_ERRORS' } satisfies Events);
     }
   }, [dirty]);
 
   return (
     <Box id="layerDetailsFormRaster">
       <Form
-        onSubmit = {(e) => {
+        onSubmit={(e) => {
           e.preventDefault();
           handleSubmit(e);
           setIsSubmittedForm(true);
@@ -275,56 +289,76 @@ export const InnerRasterForm = (
         className="form"
         noValidate
       >
-        {
-          (mode === Mode.NEW || mode === Mode.UPDATE) &&
-          <IngestionFields recordType={recordType} curtain={ingestionFieldsCurtain} />
-        }
+        {(mode === Mode.NEW || mode === Mode.UPDATE) && (
+          <IngestionFields
+            recordType={recordType}
+            curtain={ingestionFieldsCurtain}
+          />
+        )}
         <Box className="content section">
           <Box className="previewAndJobContainer">
             <Box className="jobData section">
-              <Box className="remainingTime">
-                {state.context.remainingTime}
-              </Box>
+              <Box className="remainingTime">{state.context.remainingTime}</Box>
               <JobInfo job={state.context.job} />
             </Box>
             <GeoFeaturesPresentorComponent
               layerRecord={layerRecord}
               mode={mode}
-              geoFeatures={
-                [
-                  state.context.files?.data?.geoDetails?.feature as Feature<Geometry, GeoJsonProperties>,
-                  state.context.files?.data?.geoDetails?.marker as Feature<Geometry, GeoJsonProperties>,
-                  state.context.files?.product?.geoDetails?.feature as Feature<Geometry, GeoJsonProperties>,
-                  state.context.files?.product?.geoDetails?.marker as Feature<Geometry, GeoJsonProperties>
-                ]
-              } 
+              geoFeatures={[
+                state.context.files?.data?.geoDetails?.feature as Feature<
+                  Geometry,
+                  GeoJsonProperties
+                >,
+                state.context.files?.data?.geoDetails?.marker as Feature<
+                  Geometry,
+                  GeoJsonProperties
+                >,
+                state.context.files?.product?.geoDetails?.feature as Feature<
+                  Geometry,
+                  GeoJsonProperties
+                >,
+                state.context.files?.product?.geoDetails?.marker as Feature<
+                  Geometry,
+                  GeoJsonProperties
+                >,
+              ]}
               // selectedFeatureKey={selectedFeature}
               // @ts-ignore
-              selectionStyle={[PPMapStyles.get(FeatureType.SELECTED_FILL), PPMapStyles.get(FeatureType.SELECTED_MARKER)]}
-              style={{width: '520px', position: 'relative', direction: 'ltr'}}
-              fitOptions={{padding:[10,20,10,20]}}
-              ingestionResolutionMeter={getFieldMeta('resolutionMeter').value as number}
+              selectionStyle={[
+                PPMapStyles.get(FeatureType.SELECTED_FILL),
+                PPMapStyles.get(FeatureType.SELECTED_MARKER),
+              ]}
+              style={{ width: '520px', position: 'relative', direction: 'ltr' }}
+              fitOptions={{ padding: [10, 20, 10, 20] }}
+              ingestionResolutionMeter={
+                getFieldMeta('resolutionMeter').value as number
+              }
             />
           </Box>
           <Box className="curtainContainer">
             <LayersDetailsComponent
-              entityDescriptors={uiIngestionFieldDescriptors as EntityDescriptorModelType[]}
-              layerRecord={{__typename: UiDescriptorsTypeName}}
+              entityDescriptors={
+                uiIngestionFieldDescriptors as EntityDescriptorModelType[]
+              }
+              layerRecord={{ __typename: UiDescriptorsTypeName }}
               mode={mode}
               formik={entityFormikHandlers}
               enableMapPreview={false}
-              showFiedlsCategory={false}/>
+              showFiedlsCategory={false}
+            />
             <LayersDetailsComponent
               entityDescriptors={ingestionFieldDescriptors}
               layerRecord={layerRecord}
               mode={mode}
               formik={entityFormikHandlers}
               enableMapPreview={false}
-              showFiedlsCategory={false}/>
-            {
-              (isLoading || !isFilesSelected(state.context) || isJobSubmitted(state.context)) &&
-              <Curtain showProgress={isLoading}/>
-            }
+              showFiedlsCategory={false}
+            />
+            {(isLoading ||
+              !isFilesSelected(state.context) ||
+              isJobSubmitted(state.context)) && (
+              <Curtain showProgress={isLoading} />
+            )}
           </Box>
         </Box>
         <Box className="footer">
@@ -335,39 +369,38 @@ export const InnerRasterForm = (
               JSON.stringify(topLevelFieldsErrors) !== '{}' &&
               <ValidationsError errors={topLevelFieldsErrors} />
             } */}
-            {
-              Object.keys(firstPhaseErrors).length > NONE &&
-              JSON.stringify(firstPhaseErrors) !== '{}' &&
-              <ValidationsError errors={firstPhaseErrors} />
-            }
-            {
-              (Object.keys(errors).length === NONE || JSON.stringify(errors) === '{}') &&
-              vestValidationResults.errorCount > NONE &&
-              <ValidationsError errors={vestValidationResults.getErrors()} />
-            }
+            {Object.keys(firstPhaseErrors).length > NONE &&
+              JSON.stringify(firstPhaseErrors) !== '{}' && (
+                <ValidationsError errors={firstPhaseErrors} />
+              )}
+            {(Object.keys(errors).length === NONE ||
+              JSON.stringify(errors) === '{}') &&
+              vestValidationResults.errorCount > NONE && (
+                <ValidationsError errors={vestValidationResults.getErrors()} />
+              )}
           </Box>
           <Box className="buttons">
-            {
-              isGoToJobEnabled(state.context) &&
+            {isGoToJobEnabled(state.context) && (
               <Button
                 raised
                 type="button"
-                className={!isRetryEnabled(state.context) ? 'blink-for-attention' : ''}
+                className={
+                  !isRetryEnabled(state.context) ? 'blink-for-attention' : ''
+                }
                 onClick={(e): void => {
                   e.preventDefault();
                   e.stopPropagation();
                   store.actionDispatcherStore.dispatchAction({
                     action: UserAction.SYSTEM_CALLBACK_OPEN_JOB_MANAGER,
-                    data: { job: state.context.job?.details }
-                  })
+                    data: { job: state.context.job?.details },
+                  });
                   closeDialog();
                 }}
               >
                 <FormattedMessage id="general.go-to-job-manager-btn.text" />
               </Button>
-            }
-            {
-              !hasActiveJob(state.context) &&
+            )}
+            {!hasActiveJob(state.context) && (
               <Button
                 raised
                 type="submit"
@@ -375,21 +408,20 @@ export const InnerRasterForm = (
                   isUIDisabled(isLoading, state) ||
                   !dirty ||
                   Object.keys(errors).length > NONE ||
-                  (Object.keys(getStatusErrors()).length > NONE) ||
+                  Object.keys(getStatusErrors()).length > NONE ||
                   hasError(state.context.errors)
                 }
               >
                 <FormattedMessage id="general.ok-btn.text" />
               </Button>
-            }
-            {
-              isRetryEnabled(state.context) &&
+            )}
+            {isRetryEnabled(state.context) && (
               <Button
                 raised
                 type="button"
                 disabled={
                   Object.keys(errors).length > NONE ||
-                  (Object.keys(getStatusErrors()).length > NONE) ||
+                  Object.keys(getStatusErrors()).length > NONE ||
                   hasError(state.context.errors)
                 }
                 onClick={(e): void => {
@@ -401,7 +433,7 @@ export const InnerRasterForm = (
               >
                 <FormattedMessage id="general.retry-btn.text" />
               </Button>
-            }
+            )}
             <Button
               type="button"
               onClick={(): void => {
@@ -431,7 +463,7 @@ interface LayerDetailsFormProps {
   vestValidationResults: DraftResult;
   closeDialog: () => void;
   customErrorReset: () => void;
-  customError?: Record<string,string[]> | undefined;
+  customError?: Record<string, string[]> | undefined;
 }
 
 export default withFormik<LayerDetailsFormProps, FormValues>({
@@ -440,7 +472,7 @@ export default withFormik<LayerDetailsFormProps, FormValues>({
       resolutionDegree: undefined,
       resolutionMeter: undefined,
       resolutionDegreeMaxValue: undefined,
-      ...transformEntityToFormFields(props.layerRecord)
+      ...transformEntityToFormFields(props.layerRecord),
     };
   },
 
@@ -455,7 +487,10 @@ export default withFormik<LayerDetailsFormProps, FormValues>({
     values,
     formikBag: FormikBag<LayerDetailsFormProps, FormValues>
   ) => {
-    const entityForSubmit = prepareEntityForSubmit(values as unknown as Record<string, unknown>, formikBag.props.layerRecord);
+    const entityForSubmit = prepareEntityForSubmit(
+      values as unknown as Record<string, unknown>,
+      formikBag.props.layerRecord
+    );
     formikBag.props.onSubmit(entityForSubmit);
   },
 })(InnerRasterForm);

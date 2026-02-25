@@ -166,5 +166,4 @@ describe('BBoxDialog component', () => {
   //   expect(wrapper.find('#errorContainer')).toBeDefined();
   // });
   /* eslint-enable */
-
 });

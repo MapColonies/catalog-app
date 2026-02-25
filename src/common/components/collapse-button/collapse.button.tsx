@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Icon } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
 
-
 const BASE_ICON_ANGLE = 0;
 const UPSIDE_DOWN_ANGLE = 180;
 

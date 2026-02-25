@@ -102,10 +102,10 @@ export const BBoxCorner: React.FC<BBoxCornerProps> = ({
   className,
 }) => {
   const classes = useStyle();
-  const bboxCorner = useMemo(() => getCornerClass(classes, corner), [
-    classes,
-    corner,
-  ]);
+  const bboxCorner = useMemo(
+    () => getCornerClass(classes, corner),
+    [classes, corner]
+  );
   return (
     <div className={`${classes.bbox} ${bboxCorner} ${className ?? ''}`}></div>
   );

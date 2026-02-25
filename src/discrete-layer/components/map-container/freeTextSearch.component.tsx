@@ -15,77 +15,87 @@ export const PYCSW_ANY_TEXT_FIELD = 'csw:AnyText';
 const FREE_TEXT_SEARCH_DEBOUNCE = 1000;
 const INITIAL_VALUE = '';
 
-interface FreeTextSearchProps { 
+interface FreeTextSearchProps {
   onFiltersApply: (filters: FilterField[]) => void;
   onFiltersReset: () => void;
   isCatalogFiltersEnabled: boolean;
 }
 
-export const FreeTextSearch: React.FC<FreeTextSearchProps> = observer(({ onFiltersApply, onFiltersReset, isCatalogFiltersEnabled }) => {
-  const intl = useIntl();
-  const store = useStore();
-  const isSystemFreeTextSearchEnabled = store.userStore.isActionAllowed(UserAction.SYSTEM_ACTION_FREETEXTSEARCH);
+export const FreeTextSearch: React.FC<FreeTextSearchProps> = observer(
+  ({ onFiltersApply, onFiltersReset, isCatalogFiltersEnabled }) => {
+    const intl = useIntl();
+    const store = useStore();
+    const isSystemFreeTextSearchEnabled = store.userStore.isActionAllowed(
+      UserAction.SYSTEM_ACTION_FREETEXTSEARCH
+    );
 
-  const catalogFilters = store.discreteLayersStore.searchParams.catalogFilters;
-  const [value, setValue] = useState(INITIAL_VALUE);
+    const catalogFilters =
+      store.discreteLayersStore.searchParams.catalogFilters;
+    const [value, setValue] = useState(INITIAL_VALUE);
 
-  const getFreeTextFilter = (text: string): FilterField => ({
-    field: PYCSW_ANY_TEXT_FIELD,
-    like: text
-  });
+    const getFreeTextFilter = (text: string): FilterField => ({
+      field: PYCSW_ANY_TEXT_FIELD,
+      like: text,
+    });
 
-  useEffect(() => {
-    if (isCatalogFiltersEnabled) {
-      setValue(INITIAL_VALUE);
-    }
-  }, [isCatalogFiltersEnabled]);
-
-  useEffect(() => {
-    if (catalogFilters.length === 0) {
-      if (value.trim().length > 0) {
-        const freeTextFilter = getFreeTextFilter(value);
-        onFiltersApply([freeTextFilter]);
+    useEffect(() => {
+      if (isCatalogFiltersEnabled) {
+        setValue(INITIAL_VALUE);
       }
-    }
-  }, [catalogFilters]);
+    }, [isCatalogFiltersEnabled]);
 
-  useEffect(() => {
-    setValue(INITIAL_VALUE);
-  }, [store.userStore.user?.role]);
+    useEffect(() => {
+      if (catalogFilters.length === 0) {
+        if (value.trim().length > 0) {
+          const freeTextFilter = getFreeTextFilter(value);
+          onFiltersApply([freeTextFilter]);
+        }
+      }
+    }, [catalogFilters]);
 
-  const handleFreeTextChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    const fieldValue = e.target.value;
-    setValue(fieldValue);
+    useEffect(() => {
+      setValue(INITIAL_VALUE);
+    }, [store.userStore.user?.role]);
 
-    if (fieldValue.trim().length === 0) {
-      onFiltersReset();
-      return;      
-    }
+    const handleFreeTextChange = useCallback(
+      (e: ChangeEvent<HTMLInputElement>) => {
+        const fieldValue = e.target.value;
+        setValue(fieldValue);
 
-    const freeTextFilter = getFreeTextFilter(fieldValue);
-    store.discreteLayersStore.searchParams.resetCatalogFilters();
-    onFiltersApply([freeTextFilter]);
-  }, [onFiltersReset, onFiltersApply]);
+        if (fieldValue.trim().length === 0) {
+          onFiltersReset();
+          return;
+        }
 
-  const [innerValue, handleFieldChange] = useDebounceField(
-    { handleChange: handleFreeTextChange } as EntityFormikHandlers,
-    value,
-    FREE_TEXT_SEARCH_DEBOUNCE
-  );
+        const freeTextFilter = getFreeTextFilter(fieldValue);
+        store.discreteLayersStore.searchParams.resetCatalogFilters();
+        onFiltersApply([freeTextFilter]);
+      },
+      [onFiltersReset, onFiltersApply]
+    );
 
-  return (
-    <Box className="freeTextSearchContainer">
-      <TextField
-        disabled={!isSystemFreeTextSearchEnabled}
-        style={{ padding: '0 6px' }}
-        onChange={(e: ChangeEvent<HTMLInputElement>): void => {
-          handleFieldChange(e);
-        }}
-        placeholder={intl.formatMessage({ id: "catalog-filter.freeText.placeholder" })}
-        value={innerValue}
-        type="text"
-        autoComplete={'off'}
-      />
-    </Box>
-  );
-});
+    const [innerValue, handleFieldChange] = useDebounceField(
+      { handleChange: handleFreeTextChange } as EntityFormikHandlers,
+      value,
+      FREE_TEXT_SEARCH_DEBOUNCE
+    );
+
+    return (
+      <Box className="freeTextSearchContainer">
+        <TextField
+          disabled={!isSystemFreeTextSearchEnabled}
+          style={{ padding: '0 6px' }}
+          onChange={(e: ChangeEvent<HTMLInputElement>): void => {
+            handleFieldChange(e);
+          }}
+          placeholder={intl.formatMessage({
+            id: 'catalog-filter.freeText.placeholder',
+          })}
+          value={innerValue}
+          type="text"
+          autoComplete={'off'}
+        />
+      </Box>
+    );
+  }
+);

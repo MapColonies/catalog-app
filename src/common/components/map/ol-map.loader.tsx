@@ -1,16 +1,14 @@
-
 import { useEffect } from 'react';
 import { useMap } from '@map-colonies/react-components';
 import { MapEvent } from 'ol';
 
 import './ol-map.loader.css';
 
-interface MapLoadingIndicatorProps {
-}
+interface MapLoadingIndicatorProps {}
 
 export const MapLoadingIndicator: React.FC<MapLoadingIndicatorProps> = () => {
   const mapOl = useMap();
-    
+
   useEffect(() => {
     const handleLoadStartEvent = (e: MapEvent): void => {
       mapOl.getTargetElement().classList.add('olSpinner');
@@ -30,7 +28,7 @@ export const MapLoadingIndicator: React.FC<MapLoadingIndicatorProps> = () => {
         console.log('OL loading events remove listener failed', e);
       }
     };
-  },[]);
-  
+  }, []);
+
   return <></>;
-}
+};

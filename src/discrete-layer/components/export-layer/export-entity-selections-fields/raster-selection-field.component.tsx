@@ -17,23 +17,26 @@ const RasterSelectionField: React.FC<ExportFieldProps> = (props) => {
 
   switch (fieldName) {
     case 'minResolutionDeg': {
-      const currentRes = (get(
-        exportStore.geometrySelectionsCollection.features[selectionIdx - 1],
-        `properties.minResolutionDeg`
-      ) as number | undefined)?.toString();
+      const currentRes = (
+        get(
+          exportStore.geometrySelectionsCollection.features[selectionIdx - 1],
+          `properties.minResolutionDeg`
+        ) as number | undefined
+      )?.toString();
 
-      const maxResFromLayer = (get(
-        exportStore.layerToExport,
-        `maxResolutionDeg`
-      ) as number | undefined)?.toString();
+      const maxResFromLayer = (
+        get(exportStore.layerToExport, `maxResolutionDeg`) as number | undefined
+      )?.toString();
 
       const getValidResolutions = (): string[] => {
         return Object.values(ZOOM_LEVELS_TABLE)
-        .map((res) => res.toString())
-        .filter((res) => {
-         return typeof maxResFromLayer !== 'undefined' ? +res >= +maxResFromLayer : res;
-        })
-      }
+          .map((res) => res.toString())
+          .filter((res) => {
+            return typeof maxResFromLayer !== 'undefined'
+              ? +res >= +maxResFromLayer
+              : res;
+          });
+      };
 
       const options = getValidResolutions();
 
@@ -46,52 +49,75 @@ const RasterSelectionField: React.FC<ExportFieldProps> = (props) => {
               const [integers, decimals] = value.split('.');
               const substrStart = 0;
               const numberOfDecimals = 8;
-              const resString = `${integers}.${decimals.substring(substrStart, numberOfDecimals)}`;
-              const zoomLevel = degreesPerPixelToZoomLevel(Number.parseFloat(value));
-              return `${resString.padEnd(MAX_PADDING_LENGTH + (MAX_VALUE_LENGTH - resString.length),' ')}${zoomLevel}`;
+              const resString = `${integers}.${decimals.substring(
+                substrStart,
+                numberOfDecimals
+              )}`;
+              const zoomLevel = degreesPerPixelToZoomLevel(
+                Number.parseFloat(value)
+              );
+              return `${resString.padEnd(
+                MAX_PADDING_LENGTH + (MAX_VALUE_LENGTH - resString.length),
+                ' '
+              )}${zoomLevel}`;
             }}
-            {...props} />
+            {...props}
+          />
         </>
-      )
+      );
     }
     case 'maxResolutionDeg': {
-      const currentRes = (get(
-        exportStore.layerToExport,
-        fieldInfo.defaultsFromEntityField as LayerMetadataMixedUnionKeys
-      ) as number).toString();
+      const currentRes = (
+        get(
+          exportStore.layerToExport,
+          fieldInfo.defaultsFromEntityField as LayerMetadataMixedUnionKeys
+        ) as number
+      ).toString();
 
-      const resFromEntityProps = (get(
-        exportStore.geometrySelectionsCollection.features[selectionIdx - 1],
-        `properties.maxResolutionDeg`
-      ) as number | undefined)?.toString();
+      const resFromEntityProps = (
+        get(
+          exportStore.geometrySelectionsCollection.features[selectionIdx - 1],
+          `properties.maxResolutionDeg`
+        ) as number | undefined
+      )?.toString();
 
       const getValidResolutions = (): string[] => {
         return Object.values(ZOOM_LEVELS_TABLE)
-        .map((res) => res.toString())
-        .filter((res) => {
-          const resolutionPrecision = currentRes.split('.')[1].length;
-          const samePrecisionResFromTable = Number(res).toFixed(
-            resolutionPrecision
-          );
-    
-          return Number(currentRes) <= Number(samePrecisionResFromTable);
-        })
-      }
+          .map((res) => res.toString())
+          .filter((res) => {
+            const resolutionPrecision = currentRes.split('.')[1].length;
+            const samePrecisionResFromTable =
+              Number(res).toFixed(resolutionPrecision);
+
+            return Number(currentRes) <= Number(samePrecisionResFromTable);
+          });
+      };
 
       return (
         <>
-          <ExportOptionsField 
-            options={Array.from(new Set([currentRes, ...getValidResolutions()]))}
+          <ExportOptionsField
+            options={Array.from(
+              new Set([currentRes, ...getValidResolutions()])
+            )}
             defaultValue={resFromEntityProps ?? currentRes}
             valueToPresentPredicate={(value: string): string => {
               const [integers, decimals] = value.split('.');
               const substrStart = 0;
               const numberOfDecimals = 8;
-              const resString = `${integers}.${decimals.substring(substrStart, numberOfDecimals)}`;
-              const zoomLevel = degreesPerPixelToZoomLevel(Number.parseFloat(value));
-              return `${resString.padEnd(MAX_PADDING_LENGTH + (MAX_VALUE_LENGTH - resString.length),' ')}${zoomLevel}`;
+              const resString = `${integers}.${decimals.substring(
+                substrStart,
+                numberOfDecimals
+              )}`;
+              const zoomLevel = degreesPerPixelToZoomLevel(
+                Number.parseFloat(value)
+              );
+              return `${resString.padEnd(
+                MAX_PADDING_LENGTH + (MAX_VALUE_LENGTH - resString.length),
+                ' '
+              )}${zoomLevel}`;
             }}
-            {...props} />
+            {...props}
+          />
         </>
       );
     }

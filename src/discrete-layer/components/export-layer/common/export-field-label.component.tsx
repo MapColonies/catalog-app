@@ -9,7 +9,11 @@ interface ExportFieldLabelProps {
   required?: boolean;
 }
 
-const ExportFieldLabel: React.FC<ExportFieldLabelProps> = ({fieldName, fieldId, required}) => {
+const ExportFieldLabel: React.FC<ExportFieldLabelProps> = ({
+  fieldName,
+  fieldId,
+  required,
+}) => {
   const intl = useIntl();
 
   const fieldLabel = intl.formatMessage({
@@ -17,11 +21,15 @@ const ExportFieldLabel: React.FC<ExportFieldLabelProps> = ({fieldName, fieldId, 
   });
 
   return (
-    <Box className='exportFieldLabelContainer'>
+    <Box className="exportFieldLabelContainer">
       <Typography tag="span" className="exportFieldLabel" htmlFor={fieldId}>
         {fieldLabel}
       </Typography>
-     { required as boolean && <Typography tag="span" className="requiredAsterisk">*</Typography> }
+      {(required as boolean) && (
+        <Typography tag="span" className="requiredAsterisk">
+          *
+        </Typography>
+      )}
     </Box>
   );
 };

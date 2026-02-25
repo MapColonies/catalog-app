@@ -1,20 +1,31 @@
 import { get } from 'lodash';
 import React from 'react';
-import { default as RLSkeleton, SkeletonProps as RLSkeletonProps } from 'react-loading-skeleton';
+import {
+  default as RLSkeleton,
+  SkeletonProps as RLSkeletonProps,
+} from 'react-loading-skeleton';
 import { useTheme } from '@map-colonies/react-core';
 import CONFIG from '../../../common/config';
 
 import 'react-loading-skeleton/dist/skeleton.css';
 
-const direction = CONFIG.I18N.DEFAULT_LANGUAGE.toUpperCase() === 'HE' ? 'rtl' : 'ltr';
+const direction =
+  CONFIG.I18N.DEFAULT_LANGUAGE.toUpperCase() === 'HE' ? 'rtl' : 'ltr';
 
-interface SkeletonProps extends RLSkeletonProps { }
+interface SkeletonProps extends RLSkeletonProps {}
 
 export const Skeleton: React.FC<SkeletonProps> = ({ ...rest }) => {
-
   const theme = useTheme();
-  const GC_SKELETON_BASE = get(theme, 'custom.GC_SKELETON_BASE', 'rgba(235, 235, 235, 0.1)') as string;
-  const GC_SKELETON_HIGHLIGHT = get(theme, 'custom.GC_SKELETON_HIGHLIGHT', 'rgba(175, 191, 218, 0.4)') as string;
+  const GC_SKELETON_BASE = get(
+    theme,
+    'custom.GC_SKELETON_BASE',
+    'rgba(235, 235, 235, 0.1)'
+  ) as string;
+  const GC_SKELETON_HIGHLIGHT = get(
+    theme,
+    'custom.GC_SKELETON_HIGHLIGHT',
+    'rgba(175, 191, 218, 0.4)'
+  ) as string;
 
   return (
     <RLSkeleton
@@ -31,5 +42,4 @@ export const Skeleton: React.FC<SkeletonProps> = ({ ...rest }) => {
       {...rest}
     />
   );
-
 };

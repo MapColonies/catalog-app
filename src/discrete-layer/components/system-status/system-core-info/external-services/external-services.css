@@ -1,5 +1,5 @@
 .listsContainer {
-  width:80%;
+  width: 80%;
 }
 
 .externalService {
@@ -33,20 +33,39 @@
   content: ': ';
 }
 
-.tabContent .flex-column-center .rmwc-collapsible-list--open .rmwc-collapsible-list__handle {
+.tabContent
+  .flex-column-center
+  .rmwc-collapsible-list--open
+  .rmwc-collapsible-list__handle {
   background-color: var(--mdc-theme-gc-selection-background);
   font-weight: bold;
 }
 
-#systemCoreInfoBody .tabContent .flex-column-center .rmwc-collapsible-list .rmwc-collapsible-list__handle {
+#systemCoreInfoBody
+  .tabContent
+  .flex-column-center
+  .rmwc-collapsible-list
+  .rmwc-collapsible-list__handle {
   border-bottom: 2px solid var(--mdc-theme-gc-selection-background);
 }
 
-body[dir='rtl'] #systemCoreInfoBody .tabContent .flex-column-center .rmwc-collapsible-list .rmwc-collapsible-list__handle {
+body[dir='rtl']
+  #systemCoreInfoBody
+  .tabContent
+  .flex-column-center
+  .rmwc-collapsible-list
+  .rmwc-collapsible-list__handle {
   direction: ltr;
 }
 
-body[dir='rtl'] #systemCoreInfoBody .tabContent .flex-column-center .rmwc-collapsible-list .rmwc-collapsible-list__handle .mdc-list-item .mdc-list-item__meta {
+body[dir='rtl']
+  #systemCoreInfoBody
+  .tabContent
+  .flex-column-center
+  .rmwc-collapsible-list
+  .rmwc-collapsible-list__handle
+  .mdc-list-item
+  .mdc-list-item__meta {
   margin: unset !important;
   margin-left: auto !important;
 }

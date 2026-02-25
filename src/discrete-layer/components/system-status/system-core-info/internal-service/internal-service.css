@@ -1,25 +1,23 @@
-
-
 #systemCoreInfoBody .statusIndicator {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
 }
 
 .internalService {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 80%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 80%;
 }
 
 body[dir='rtl'] #systemCoreInfoBody .internalService {
-    flex-direction: row-reverse;
+  flex-direction: row-reverse;
 }
 
 .internalService .serviceName {
-    text-align: left;
-    flex: 3;
-    margin-left: 1.5rem;
-    font-weight: bold;
+  text-align: left;
+  flex: 3;
+  margin-left: 1.5rem;
+  font-weight: bold;
 }

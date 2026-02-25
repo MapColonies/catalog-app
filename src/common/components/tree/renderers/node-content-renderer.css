@@ -14,7 +14,10 @@
 }
 .rowSelected {
   border-radius: 100px;
-  background-color: var(--rst-selected-background-color, rgba(33, 150, 243, 0.3));
+  background-color: var(
+    --rst-selected-background-color,
+    rgba(33, 150, 243, 0.3)
+  );
 }
 .rowWrapperDragDisabled {
   cursor: default;
@@ -29,15 +32,18 @@
   box-sizing: border-box;
 }
 /** * The outline of where the element will go if dropped, displayed while dragging */
-.rowLandingPad, .rowCancelPad {
+.rowLandingPad,
+.rowCancelPad {
   border: none;
   box-shadow: none;
   outline: none;
 }
-.rowLandingPad *, .rowCancelPad * {
+.rowLandingPad *,
+.rowCancelPad * {
   opacity: 0 !important;
 }
-.rowLandingPad::before, .rowCancelPad::before {
+.rowLandingPad::before,
+.rowCancelPad::before {
   background-color: lightblue;
   border: 2px dotted black;
   content: '';
@@ -60,7 +66,10 @@
 .rowSearchFocus {
   box-shadow: inset 0 -7px 7px -3px #fc6421;
 }
-.rowContents, .rowLabel, .rowToolbar, .toolbarButton {
+.rowContents,
+.rowLabel,
+.rowToolbar,
+.toolbarButton {
   display: inline-block;
   vertical-align: middle;
 }
@@ -92,7 +101,8 @@ body[dir='rtl'] .rowLabel {
   text-align: end;
   flex-grow: 1;
 }
-.collapseButton, .expandButton {
+.collapseButton,
+.expandButton {
   appearance: none;
   border: none;
   background: transparent;
@@ -105,7 +115,8 @@ body[dir='rtl'] .rowLabel {
   transform: translate3d(-50%, -50%, 0);
   cursor: pointer;
 }
-.collapseButton::after, .expandButton::after {
+.collapseButton::after,
+.expandButton::after {
   content: '';
   position: absolute;
   transform-origin: 7px 4px;
@@ -115,19 +126,26 @@ body[dir='rtl'] .rowLabel {
   border-right-width: 7px;
   border-top-color: gray;
 }
-.collapseButton:hover::after, .expandButton:hover::after {
+.collapseButton:hover::after,
+.expandButton:hover::after {
   /* border-top-color: black; */
 }
-.collapseButton:focus, .expandButton:focus {
+.collapseButton:focus,
+.expandButton:focus {
   outline: none;
 }
-.collapseButton:focus::after, .expandButton:focus::after {
-  filter: drop-shadow(0 0 1px #83bef9) drop-shadow(0 0 1px #83bef9) drop-shadow(0 0 1px #83bef9);
+.collapseButton:focus::after,
+.expandButton:focus::after {
+  filter: drop-shadow(0 0 1px #83bef9) drop-shadow(0 0 1px #83bef9)
+    drop-shadow(0 0 1px #83bef9);
 }
 .expandButton::after {
   transform: translate3d(-50%, -20%, 0) rotateZ(-90deg);
 }
-.rst__rtl .ReactVirtualized__Grid .ReactVirtualized__Grid__innerScrollContainer .expandButton::after {
+.rst__rtl
+  .ReactVirtualized__Grid
+  .ReactVirtualized__Grid__innerScrollContainer
+  .expandButton::after {
   transform: translate3d(-50%, -20%, 0) rotateZ(90deg);
 }
 /** * Line for under a node with children */
@@ -136,7 +154,8 @@ body[dir='rtl'] .rowLabel {
   display: inline-block;
 }
 /* ========================================================================== Scaffold Line-overlaid blocks used for showing the tree structure ========================================================================== */
-.lineBlock, .absoluteLineBlock {
+.lineBlock,
+.absoluteLineBlock {
   height: 100%;
   position: relative;
   display: inline-block;
@@ -165,19 +184,19 @@ body[dir='rtl'] .rowLabel {
   0% {
     transform: translate(0, 0);
     opacity: 0;
- }
+  }
   30% {
     transform: translate(0, 300%);
     opacity: 1;
- }
+  }
   70% {
     transform: translate(0, 700%);
     opacity: 1;
- }
+  }
   100% {
     transform: translate(0, 1000%);
     opacity: 0;
- }
+  }
 }
 .highlightLineVertical::after {
   content: '';
@@ -196,8 +215,10 @@ body[dir='rtl'] .rowLabel {
   z-index: 3;
   content: '';
   position: absolute;
-  border-top: solid var(--rst-highlight-line-size) var(--rst-hover-background-color);
-  border-left: solid var(--rst-highlight-line-size) var(--rst-hover-background-color);
+  border-top: solid var(--rst-highlight-line-size)
+    var(--rst-hover-background-color);
+  border-left: solid var(--rst-highlight-line-size)
+    var(--rst-hover-background-color);
   box-sizing: border-box;
   height: calc(50% + var(--rst-highlight-line-size) / 2);
   top: 50%;
@@ -212,8 +233,10 @@ body[dir='rtl'] .rowLabel {
 .highlightBottomLeftCorner::before {
   content: '';
   position: absolute;
-  border-bottom: solid var(--rst-highlight-line-size) var(--rst-hover-background-color);
-  border-left: solid var(--rst-highlight-line-size) var(--rst-hover-background-color);
+  border-bottom: solid var(--rst-highlight-line-size)
+    var(--rst-hover-background-color);
+  border-left: solid var(--rst-highlight-line-size)
+    var(--rst-hover-background-color);
   box-sizing: border-box;
   height: calc(100% + var(--rst-highlight-line-size) / 2);
   top: 0;

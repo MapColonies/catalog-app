@@ -1,5 +1,8 @@
 import React from 'react';
-import { FieldConfigModelType, FilterFieldValidationModelType } from '../../../../models';
+import {
+  FieldConfigModelType,
+  FilterFieldValidationModelType,
+} from '../../../../models';
 import { Controller, RegisterOptions, useFormContext } from 'react-hook-form';
 import { TextField } from '@map-colonies/react-core';
 import CatalogFilterFieldLabel from './catalog-filter-field-label.component';
@@ -12,7 +15,9 @@ interface CatalogFilterGeneralFieldProps {
   placeholder?: string;
 }
 
-export const CatalogFilterGeneralField: React.FC<CatalogFilterGeneralFieldProps> = ({ fieldDescriptor, placeholder }) => {
+export const CatalogFilterGeneralField: React.FC<
+  CatalogFilterGeneralFieldProps
+> = ({ fieldDescriptor, placeholder }) => {
   const intl = useIntl();
   const formMethods = useFormContext();
   const fieldId = fieldDescriptor.fieldName ?? '';
@@ -22,7 +27,9 @@ export const CatalogFilterGeneralField: React.FC<CatalogFilterGeneralFieldProps>
     pattern: fieldDescriptor?.isFilterable?.validation?.pattern
       ? {
           value: new RegExp(fieldDescriptor.isFilterable.validation.pattern),
-          message: intl.formatMessage({id: `catalog-filter.${fieldId}.validation-error`}),
+          message: intl.formatMessage({
+            id: `catalog-filter.${fieldId}.validation-error`,
+          }),
         }
       : undefined,
   };
@@ -40,7 +47,7 @@ export const CatalogFilterGeneralField: React.FC<CatalogFilterGeneralFieldProps>
         name={fieldId}
         control={formMethods.control}
         defaultValue=""
-        rules={{...fieldValidation as RegisterOptions}}
+        rules={{ ...(fieldValidation as RegisterOptions) }}
         render={(field) => {
           return (
             <TextField
@@ -55,10 +62,10 @@ export const CatalogFilterGeneralField: React.FC<CatalogFilterGeneralFieldProps>
           );
         }}
       />
-      
+
       <span className="catalogFilterFieldError">
         {formMethods.errors[fieldId]?.message ?? undefined}
       </span>
     </Box>
   );
-}
+};

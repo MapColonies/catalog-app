@@ -20,29 +20,31 @@ export const Copy = (props: IProps) => {
 
   return (
     <>
-      <CopyToClipboard text={props.value} onCopy={(): void => setIsCopied(true)}>
+      <CopyToClipboard
+        text={props.value}
+        onCopy={(): void => setIsCopied(true)}
+      >
         <Box className="iconWrapper">
-          {
+          {props.copyToClipboardChildren ? (
             props.copyToClipboardChildren
-            ? props.copyToClipboardChildren
-            : <IconButton
-                type="button"
-                className={"mc-icon-Copy"}
-                onChange={(): void => {
-                  setIsCopied(true);
-                }}
-                label={isCopied ? 'Success' : 'Copy'}
-              />
-          }
-          {
-            isCopied &&
+          ) : (
+            <IconButton
+              type="button"
+              className={'mc-icon-Copy'}
+              onChange={(): void => {
+                setIsCopied(true);
+              }}
+              label={isCopied ? 'Success' : 'Copy'}
+            />
+          )}
+          {isCopied && (
             <IconButton
               className="mc-icon-Ok copyIndication"
-              style={{ color: "var(--mdc-theme-gc-success)" }}
+              style={{ color: 'var(--mdc-theme-gc-success)' }}
             />
-          }
+          )}
         </Box>
       </CopyToClipboard>
     </>
-  )
+  );
 };

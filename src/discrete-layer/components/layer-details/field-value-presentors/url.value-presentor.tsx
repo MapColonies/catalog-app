@@ -17,8 +17,10 @@ interface UrlValuePresentorProps {
   linkInfo?: ILink;
 }
 
-export const UrlValuePresentorComponent: React.FC<UrlValuePresentorProps> = ({ value, linkInfo }) => {
-
+export const UrlValuePresentorComponent: React.FC<UrlValuePresentorProps> = ({
+  value,
+  linkInfo,
+}) => {
   // Render COPY action for unknown link types also.
   return (
     <>
@@ -33,15 +35,13 @@ export const UrlValuePresentorComponent: React.FC<UrlValuePresentorProps> = ({ v
         )}
       </TooltippedValue>
 
-      {
-        !linkInfo || linkInfo.linkAction === COPY ? (
-          <Box className="detailsUrlFieldUrlCopy">
-            <Copy value={value}/>
-          </Box>
-        ) : (
-          <Box className="detailsUrlFieldUrlCopy"></Box>
-        )
-      }
+      {!linkInfo || linkInfo.linkAction === COPY ? (
+        <Box className="detailsUrlFieldUrlCopy">
+          <Copy value={value} />
+        </Box>
+      ) : (
+        <Box className="detailsUrlFieldUrlCopy"></Box>
+      )}
     </>
   );
-}
+};

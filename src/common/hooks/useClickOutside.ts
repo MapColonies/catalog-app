@@ -14,12 +14,18 @@ function isDescendant(parent: Node, child: Node) {
     highestParentAvailableTag = node?.nodeName ?? '';
     node = node.parentNode;
   }
-  
-  if (node === null && highestParentAvailableTag !== '#document') { return true; }
+
+  if (node === null && highestParentAvailableTag !== '#document') {
+    return true;
+  }
   return false;
 }
 
-export const useClickOutside = <T extends HTMLElement>(ref:  React.RefObject<T>, onClickOutside: (e: MouseEvent) => void, shouldHandle = true) => {
+export const useClickOutside = <T extends HTMLElement>(
+  ref: React.RefObject<T>,
+  onClickOutside: (e: MouseEvent) => void,
+  shouldHandle = true
+) => {
   const clickHandler = useCallback((e: MouseEvent) => {
     if (ref.current) {
       if (!isDescendant(ref.current, e.target as Node)) {
@@ -31,7 +37,7 @@ export const useClickOutside = <T extends HTMLElement>(ref:  React.RefObject<T>,
   useEffect(() => {
     return () => {
       document.removeEventListener('click', clickHandler);
-    }
+    };
   }, []);
 
   useEffect(() => {
@@ -42,6 +48,5 @@ export const useClickOutside = <T extends HTMLElement>(ref:  React.RefObject<T>,
         document.addEventListener('click', clickHandler);
       }, LISTENER_DELAY);
     }
-
   }, [shouldHandle]);
-}
+};

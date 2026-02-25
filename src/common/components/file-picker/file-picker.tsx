@@ -104,8 +104,9 @@ export const FilePickerComponent = React.forwardRef<
           }
         } else if (data.id === FilePickerActions.ChangeSelection.id) {
           setSelection((currentSelection) => {
-            const selectedIds = fpRef.current?.getFileSelection() as Set<string>;
-  
+            const selectedIds =
+              fpRef.current?.getFileSelection() as Set<string>;
+
             if (!isMultiSelection && selectedIds.size > 1) {
               fpRef.current?.setFileSelection(
                 new Set(currentSelection.files.map((file) => file.id))

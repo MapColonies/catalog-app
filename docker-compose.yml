@@ -1,9 +1,7 @@
 version: '3'
 
 services:
-
-  catalog-app-service: 
-
+  catalog-app-service:
     image: catalog-app
 
     build: .
