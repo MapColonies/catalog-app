@@ -32,7 +32,6 @@ jobs:
       - name: Build and Push Helm Chart
         uses: MapColonies/shared-workflows/actions/build-and-push-helm@build-and-push-helm-v1.0.1
         with:
-
           context: ./helm
           domain: app
           registry: ${{ secrets.ACR_URL }}
