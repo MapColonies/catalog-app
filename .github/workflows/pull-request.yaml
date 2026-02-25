@@ -7,6 +7,10 @@ jobs:
     name: Run Helm lint Check
     runs-on: ubuntu-latest
     steps:
+      - name: Check out TS Project Git repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: helm-lint
         uses: MapColonies/shared-workflows/actions/helm-lint@helm-lint-v1
 
