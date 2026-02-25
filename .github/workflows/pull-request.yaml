@@ -9,7 +9,7 @@ jobs:
 
     strategy: &node-strategy
       matrix:
-        node: [ 24.x ]
+        node: [ 18.x ]
 
     steps:
       - name: Run TS Project linters
