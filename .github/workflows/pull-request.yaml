@@ -3,69 +3,58 @@ name: pull_request
 on: [ pull_request ]
 
 jobs:
-  eslint:
-    name: Run TS Project eslint
-    runs-on: ubuntu-latest
-
-    strategy: &node-strategy
-      matrix:
-        node: [ 18.x ]
-
-    steps:
-      - name: Run TS Project linters
-        uses: MapColonies/shared-workflows/actions/eslint@eslint-v1.0.1
-        with:
-          node_version: ${{ matrix.node }}
-
   helm-lint:
     name: Run Helm lint Check
     runs-on: ubuntu-latest
-
     steps:
-      - name: Check out TS Project Git repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Helm Lint Checks
+      - name: helm-lint
         uses: MapColonies/shared-workflows/actions/helm-lint@helm-lint-v1
 
-  tests:
-    name: Run Tests
+  build_and_test:
     runs-on: ubuntu-latest
-
-    strategy: *node-strategy
-
+    permissions:
+      checks: write
+      contents: write
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        node-version: [16.13.x]
     steps:
-      - name: Check out TS Project Git repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - name: checkout
+        uses: actions/checkout@v5
+      - uses: actions/cache@v4
         with:
-          node-version: ${{ matrix.node }}
-          cache: 'yarn'
-
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-
-      - name: Run tests
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install yarn
+        run: |
+          curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+          echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends yarn
+      - name: Install dependecies
+        run: yarn
+      - name: Lint
+        uses: wearerequired/lint-action@v2
+        with:
+          tsc: true
+          eslint: true
+          eslint_extensions: js,jsx,ts,tsx
+          prettier: true
+          prettier_dir: src
+      - name: Test
         run: yarn test
-
-      - name: Upload test reports
-        uses: actions/upload-artifact@v4
-        with:
-          name: Test Reporters ${{ matrix.node }}
-          path: ./reports/**
 
   build_docker_image:
     name: Build Docker Image
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
-
+        uses: actions/checkout@v5
       - name: Build Docker image
         uses: docker/build-push-action@v6
         with:
