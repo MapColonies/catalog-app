@@ -8,16 +8,16 @@
   padding: 8px;
 }
 
-.jobDetailsContainer { 
-  overflow-y: auto; 
+.jobDetailsContainer {
+  overflow-y: auto;
   height: 230px;
   width: 1300px;
   margin: 0px 35px;
-  background:var(--ag-selected-details-row-background);
+  background: var(--ag-selected-details-row-background);
   padding-left: 20px;
 }
 
-body[dir="rtl"] .jobDetailsContainer {
+body[dir='rtl'] .jobDetailsContainer {
   padding-left: unset;
 }
 
@@ -31,7 +31,7 @@ body[dir="rtl"] .jobDetailsContainer {
   padding: 8px;
 }
 
-.jobDetailsContainer .loadingContainer{
+.jobDetailsContainer .loadingContainer {
   grid-column: 1 / -1;
   height: 10em;
   justify-self: center;

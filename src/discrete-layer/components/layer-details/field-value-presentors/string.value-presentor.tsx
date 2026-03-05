@@ -13,7 +13,5 @@ interface StringValuePresentorProps {
 }
 
 export const StringValuePresentorComponent: React.FC<StringValuePresentorProps> = (props) => {
-  return (
-    <FormInputTextFieldComponent {...props} type="text"/>
-  );
-}
+  return <FormInputTextFieldComponent {...props} type="text" />;
+};

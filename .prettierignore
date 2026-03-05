@@ -1,2 +1,9 @@
 .vscode/settings.json
-schemas/*.json
+schemas
+confd
+helm
+public
+CHANGELOG.md
+src/discrete-layer/models
+src/common/hooks/useGetGpuTier/benchmarks
+*.json

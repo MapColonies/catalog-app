@@ -3,7 +3,13 @@ import { get } from 'lodash';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Box } from '@map-colonies/react-components';
-import { CircularProgress, IconButton, Tooltip, Typography, useTheme } from '@map-colonies/react-core';
+import {
+  CircularProgress,
+  IconButton,
+  Tooltip,
+  Typography,
+  useTheme,
+} from '@map-colonies/react-core';
 import { AutoDirectionBox } from '../../../../../common/components/auto-direction-box/auto-direction-box.component';
 import { DETAILS_ROW_ID_SUFFIX } from '../../../../../common/components/grid';
 import { Hyperlink } from '../../../../../common/components/hyperlink/hyperlink';
@@ -12,12 +18,15 @@ import { RasterErrorsSummary } from '../../../../../common/models/job-errors-sum
 import { RasterIngestionJobType } from '../../../../../common/models/raster-job';
 import { JobModelType, Status, TaskModelType, useStore } from '../../../../models';
 import useZoomLevelsTable from '../../../export-layer/hooks/useZoomLevelsTable';
-import { getRasterErrorCount, JobErrorsSummary } from '../../../job-errors-summary/job-errors-summary';
+import {
+  getRasterErrorCount,
+  JobErrorsSummary,
+} from '../../../job-errors-summary/job-errors-summary';
 
 import './info-area.css';
 import './job-details.raster-job-data.css';
 
-interface JobDetailsRasterJobDataProps extends ICellRendererParams { }
+interface JobDetailsRasterJobDataProps extends ICellRendererParams {}
 
 const MAX_ERRORS_SHOWN = 99;
 
@@ -53,8 +62,8 @@ export const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = (
       const result = await store.queryFindTasks({
         params: {
           jobId: jobData.id.replace(DETAILS_ROW_ID_SUFFIX, ''),
-          type: 'validation'
-        }
+          type: 'validation',
+        },
       });
       if (!result?.findTasks[0]) {
         return undefined;
@@ -67,7 +76,7 @@ export const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = (
           setErrorsCount(calculateErrorsCount(errorsCount));
         }
       }
-    } catch { }
+    } catch {}
   }, [store, jobData]);
 
   const computeZoomLevel = useCallback(() => {
@@ -77,7 +86,7 @@ export const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = (
     }
     const index = Object.values(ZOOM_LEVELS_TABLE)
       .map((value) => value.toString())
-      .findIndex(value => value === ingestionResolution);
+      .findIndex((value) => value === ingestionResolution);
     if (index >= 0) {
       setZoomLevel(index);
     }
@@ -95,9 +104,10 @@ export const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = (
 
   const zoomLabel = zoomLevel !== undefined ? `(${zoomLevel})` : '';
 
-  const rasterInfo = (jobData.parameters && hasGpkgPath())
-    ? `${getGpkgFilesPath()} ${zoomLabel}`
-    : intl.formatMessage({ id: 'general.deprecated-job.text' });
+  const rasterInfo =
+    jobData.parameters && hasGpkgPath()
+      ? `${getGpkgFilesPath()} ${zoomLabel}`
+      : intl.formatMessage({ id: 'general.deprecated-job.text' });
 
   const hasErrors = errorsCount > 0;
   const isTaskFailed = task?.status === Status.Failed;
@@ -123,18 +133,12 @@ export const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = (
     <Box id="rasterJobData" className="jobDataContainer">
       <Box className="content">
         <AutoDirectionBox>
-          {
-            !isLoading
-              ? rasterInfo
-              : <CircularProgress size="xsmall"></CircularProgress>
-          }
+          {!isLoading ? rasterInfo : <CircularProgress size="xsmall"></CircularProgress>}
         </AutoDirectionBox>
       </Box>
-      {
-        !isLoading &&
+      {!isLoading && (
         <Box className="errorsContainerPosition" key={`${jobData.id}`}>
-          {
-            !isTaskFailed && hasErrors &&
+          {!isTaskFailed && hasErrors && (
             <Box className="errorsSummaryContainer">
               <IconButton
                 className="mc-icon-Status-Warnings error statusIcon"
@@ -143,49 +147,55 @@ export const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = (
                   e.stopPropagation();
                 }}
               />
-              <Tooltip content={
-                <Box>
-                  {JobErrorsSummary(theme, task?.parameters?.errorsSummary, "reportItem")}
-                </Box>
-              }>
-                <Hyperlink 
+              <Tooltip
+                content={
+                  <Box>
+                    {JobErrorsSummary(theme, task?.parameters?.errorsSummary, 'reportItem')}
+                  </Box>
+                }
+              >
+                <Hyperlink
                   className="error"
                   url={task?.parameters?.report?.url ?? ''}
-                  label={`${errorsCount > MAX_ERRORS_SHOWN ? `+${MAX_ERRORS_SHOWN}` : errorsCount} ${errorsMessage}`} 
-                >
-                </Hyperlink>
+                  label={`${
+                    errorsCount > MAX_ERRORS_SHOWN ? `+${MAX_ERRORS_SHOWN}` : errorsCount
+                  } ${errorsMessage}`}
+                ></Hyperlink>
               </Tooltip>
-              <Hyperlink 
-                  className="error"
-                  url={task?.parameters?.report?.url ?? ''}
-                  label={`${errorsCount > MAX_ERRORS_SHOWN ? `+${MAX_ERRORS_SHOWN}` : errorsCount} ${errorsMessage}`} 
-                >
-                  <IconButton
-                    className="mc-icon-Download downloadIcon error statusIcon"
-                  />
-                </Hyperlink>
+              <Hyperlink
+                className="error"
+                url={task?.parameters?.report?.url ?? ''}
+                label={`${
+                  errorsCount > MAX_ERRORS_SHOWN ? `+${MAX_ERRORS_SHOWN}` : errorsCount
+                } ${errorsMessage}`}
+              >
+                <IconButton className="mc-icon-Download downloadIcon error statusIcon" />
+              </Hyperlink>
             </Box>
-          }
-          {
-            !isTaskFailed && !hasErrors && hasGpkgPath() && task &&
-            <Box className="success">
-              {intl.formatMessage({ id: 'general.no-errors.text' })}
-            </Box>
-          }
-          {
-            isTaskFailed &&
-            <Tooltip content={
-              <Box>
-                {JobErrorsSummary(theme, task?.parameters?.errorsSummary, "reportItem", theme.custom?.GC_ERROR_HIGH)}
-              </Box>
-            }>
+          )}
+          {!isTaskFailed && !hasErrors && hasGpkgPath() && task && (
+            <Box className="success">{intl.formatMessage({ id: 'general.no-errors.text' })}</Box>
+          )}
+          {isTaskFailed && (
+            <Tooltip
+              content={
+                <Box>
+                  {JobErrorsSummary(
+                    theme,
+                    task?.parameters?.errorsSummary,
+                    'reportItem',
+                    theme.custom?.GC_ERROR_HIGH
+                  )}
+                </Box>
+              }
+            >
               <Typography className="error" tag="span">
                 {intl.formatMessage({ id: 'ingestion.error.failed-task-report' })}
               </Typography>
             </Tooltip>
-          }
+          )}
         </Box>
-      }
+      )}
     </Box>
   );
 };

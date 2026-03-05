@@ -30,7 +30,7 @@ const UserModeSwitch: React.FC<UserModeSwitchProps> = observer(({ userRole, setU
   const [password, setPassword] = useState('');
   const [isPasswordValid, setIsPasswordValid] = useState(true);
   const store = useStore();
-  const { data, loading, setQuery } = useQuery<{login: UserLoginModelType}>();
+  const { data, loading, setQuery } = useQuery<{ login: UserLoginModelType }>();
 
   const resetDialogState = useCallback((): void => {
     setPassword('');
@@ -55,14 +55,16 @@ const UserModeSwitch: React.FC<UserModeSwitchProps> = observer(({ userRole, setU
   }, []);
 
   const validatePassword = useCallback((): void => {
-    setQuery(store.queryLogin({
-      data:{
-        userName:'NOT_USED',
-        userPassword: password
-      }
-    }));
+    setQuery(
+      store.queryLogin({
+        data: {
+          userName: 'NOT_USED',
+          userPassword: password,
+        },
+      })
+    );
   }, [password]);
-  
+
   useEffect(() => {
     if (!loading && data) {
       setIsPasswordValid(data.login.isValid as boolean);
@@ -70,7 +72,7 @@ const UserModeSwitch: React.FC<UserModeSwitchProps> = observer(({ userRole, setU
         setUserRole(UserRole.ADMIN);
         closeDialog();
       }
-    } 
+    }
   }, [data, loading]);
 
   const renderInputErrorMsg = useCallback((): JSX.Element => {
@@ -100,7 +102,7 @@ const UserModeSwitch: React.FC<UserModeSwitchProps> = observer(({ userRole, setU
               setPassword(e.currentTarget.value.trim());
             }}
             onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>): void => {
-              const SUBMIT_KEY = 'Enter'
+              const SUBMIT_KEY = 'Enter';
               if (password && e.key === SUBMIT_KEY) {
                 validatePassword();
               }
@@ -125,18 +127,11 @@ const UserModeSwitch: React.FC<UserModeSwitchProps> = observer(({ userRole, setU
         <FormattedMessage id="user-role.switch.admin.text" />
       </Typography>
 
-      <Dialog
-        className="userModeSwitchDialog"
-        open={isDialogOpen}
-        preventOutsideDismiss={true}
-      >
+      <Dialog className="userModeSwitchDialog" open={isDialogOpen} preventOutsideDismiss={true}>
         <DialogTitle>
           <FormattedMessage id="user-role.dialog.title.text" />
 
-          <IconButton
-            className="closeIcon mc-icon-Close"
-            onClick={closeDialog}
-          />
+          <IconButton className="closeIcon mc-icon-Close" onClick={closeDialog} />
         </DialogTitle>
 
         <DialogContent className="userModeSwitchDialogContent">

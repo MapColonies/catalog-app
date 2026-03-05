@@ -5,9 +5,7 @@ import messages_he from './he.json';
 import AG_GRID_LOCALE_EN from './grid.en';
 import AG_GRID_LOCALE_HE from './grid.he';
 const MESSAGES: {
-  [key: string]:
-    | Record<string, string>
-    | Record<string, MessageFormatElement[]>;
+  [key: string]: Record<string, string> | Record<string, MessageFormatElement[]>;
 } = {
   he: messages_he,
   en: messages_en,

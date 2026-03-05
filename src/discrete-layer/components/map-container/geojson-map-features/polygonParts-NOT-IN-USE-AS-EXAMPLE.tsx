@@ -1,4 +1,4 @@
-export {}
+export {};
 // import React, { useEffect, useState } from 'react';
 // import { useIntl } from 'react-intl';
 // import { Feature, GeoJsonProperties, Geometry, LineString, MultiPolygon, Polygon } from 'geojson';

@@ -30,11 +30,7 @@ jest.mock('react-intl', () => {
   /* eslint-enable */
 });
 
-const updateField = (
-  wrapper: ShallowWrapper,
-  fieldName: string,
-  value: number
-) => {
+const updateField = (wrapper: ShallowWrapper, fieldName: string, value: number) => {
   const fieldWrapper = wrapper.find(TextField).find({ name: fieldName });
 
   act(() => {
@@ -74,11 +70,7 @@ describe('BBoxDialog component', () => {
 
   it('renders correctly', () => {
     const wrapper = shallow(
-      <BBoxDialog
-        isOpen={false}
-        onSetOpen={setOpenFn}
-        onPolygonUpdate={polygonUpdate}
-      />
+      <BBoxDialog isOpen={false} onSetOpen={setOpenFn} onPolygonUpdate={polygonUpdate} />
     );
 
     expect(wrapper).toMatchSnapshot();
@@ -93,11 +85,7 @@ describe('BBoxDialog component', () => {
     };
 
     const wrapper = shallow(
-      <BBoxDialog
-        isOpen={false}
-        onSetOpen={setOpenFn}
-        onPolygonUpdate={polygonUpdate}
-      />
+      <BBoxDialog isOpen={false} onSetOpen={setOpenFn} onPolygonUpdate={polygonUpdate} />
     );
 
     for (const field in fields) {
@@ -115,11 +103,7 @@ describe('BBoxDialog component', () => {
 
   it('Cancel button triggers dialog closing', () => {
     const wrapper = shallow(
-      <BBoxDialog
-        isOpen={false}
-        onSetOpen={setOpenFn}
-        onPolygonUpdate={polygonUpdate}
-      />
+      <BBoxDialog isOpen={false} onSetOpen={setOpenFn} onPolygonUpdate={polygonUpdate} />
     );
 
     getButtonById(wrapper, 'general.cancel-btn.text').simulate('click');
@@ -129,11 +113,7 @@ describe('BBoxDialog component', () => {
 
   it('Submitting the form triggers onPolygonUpdate', async () => {
     const wrapper = shallow(
-      <BBoxDialog
-        isOpen={false}
-        onSetOpen={setOpenFn}
-        onPolygonUpdate={polygonUpdate}
-      />
+      <BBoxDialog isOpen={false} onSetOpen={setOpenFn} onPolygonUpdate={polygonUpdate} />
     );
 
     act(() => {
@@ -166,5 +146,4 @@ describe('BBoxDialog component', () => {
   //   expect(wrapper.find('#errorContainer')).toBeDefined();
   // });
   /* eslint-enable */
-
 });

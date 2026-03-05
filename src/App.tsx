@@ -1,4 +1,4 @@
-import React, { useState, useLayoutEffect,useEffect } from 'react';
+import React, { useState, useLayoutEffect, useEffect } from 'react';
 import { IntlProvider } from 'react-intl';
 import Moment from 'moment';
 import 'moment/locale/he'; // TODO: improve dynamic moment locales loading
@@ -38,7 +38,6 @@ import './App.css';
 import './App.dark-theme.css';
 import './App.light-theme.css';
 
-
 import { queue } from './discrete-layer/components/snackbar/notification-queue';
 import { SnackContainer } from './discrete-layer/components/snackbar/snack-container';
 import DiscreteLayerView from './discrete-layer/views/discrete-layer-view';
@@ -53,13 +52,13 @@ import WebSocketNotifications from './discrete-layer/views/components/notificati
 import { PasswordAutofillDisabler } from './discrete-layer/views/components/password-autofill-disabler.component';
 
 const App: React.FC = () => {
-  /*const prefersDarkMode = */useMediaQuery('(prefers-color-scheme: dark)');
+  /*const prefersDarkMode = */ useMediaQuery('(prefers-color-scheme: dark)');
   // eslint-disable-next-line
   const [lang, setLang] = useState(CONFIG.I18N.DEFAULT_LANGUAGE);
   const [enumsMap, setEnumsMap] = useState<IEnumsMapType | null>(null);
 
   // const theme = Themes.lightTheme; //TODO: when dark theme will be tuned use this --> prefersDarkMode ? Themes.darkTheme : Themes.lightTheme;
-  const customThemeProps: Record<string,string> = {};
+  const customThemeProps: Record<string, string> = {};
   for (const prop in CustomTheme.darkTheme) {
     customThemeProps[camelize(prop)] = (CustomTheme.darkTheme as Record<string, string>)[prop];
   }
@@ -70,8 +69,8 @@ const App: React.FC = () => {
     alternativeSurface: '#2D3748',
     ...customThemeProps,
     custom: {
-      ...CustomTheme.darkTheme
-    }
+      ...CustomTheme.darkTheme,
+    },
   };
 
   const [lookupTablesData, setLookupTablesData] = useState<ILookupTableData>({});
@@ -87,7 +86,11 @@ const App: React.FC = () => {
   return (
     <>
       <WebSocketNotifications />
-      <IntlProvider onError={() => null} locale={lang} messages={MESSAGES[lang] as Record<string, string>}>
+      <IntlProvider
+        onError={() => null}
+        locale={lang}
+        messages={MESSAGES[lang] as Record<string, string>}
+      >
         <RMWCProvider
           typography={{
             body1: 'span',
@@ -98,7 +101,10 @@ const App: React.FC = () => {
             ),
           }}
         >
-          <RMWCThemeProvider className={`app-container ${theme.type}-theme`} options={theme as IOptions}>
+          <RMWCThemeProvider
+            className={`app-container ${theme.type}-theme`}
+            options={theme as IOptions}
+          >
             <PasswordAutofillDisabler />
             <CssBaseline />
             <LookupTablesContext.Provider value={{ lookupTablesData, setLookupTablesData }}>

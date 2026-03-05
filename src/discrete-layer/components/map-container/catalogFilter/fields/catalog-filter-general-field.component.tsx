@@ -12,7 +12,10 @@ interface CatalogFilterGeneralFieldProps {
   placeholder?: string;
 }
 
-export const CatalogFilterGeneralField: React.FC<CatalogFilterGeneralFieldProps> = ({ fieldDescriptor, placeholder }) => {
+export const CatalogFilterGeneralField: React.FC<CatalogFilterGeneralFieldProps> = ({
+  fieldDescriptor,
+  placeholder,
+}) => {
   const intl = useIntl();
   const formMethods = useFormContext();
   const fieldId = fieldDescriptor.fieldName ?? '';
@@ -22,16 +25,13 @@ export const CatalogFilterGeneralField: React.FC<CatalogFilterGeneralFieldProps>
     pattern: fieldDescriptor?.isFilterable?.validation?.pattern
       ? {
           value: new RegExp(fieldDescriptor.isFilterable.validation.pattern),
-          message: intl.formatMessage({id: `catalog-filter.${fieldId}.validation-error`}),
+          message: intl.formatMessage({ id: `catalog-filter.${fieldId}.validation-error` }),
         }
       : undefined,
   };
 
   return (
-    <Box
-      className={'catalogFilterFieldContainer'}
-      key={fieldId + '_fieldContainer'}
-    >
+    <Box className={'catalogFilterFieldContainer'} key={fieldId + '_fieldContainer'}>
       <CatalogFilterFieldLabel
         fieldName={fieldId}
         labelTranslationId={fieldDescriptor.label ?? ''}
@@ -40,7 +40,7 @@ export const CatalogFilterGeneralField: React.FC<CatalogFilterGeneralFieldProps>
         name={fieldId}
         control={formMethods.control}
         defaultValue=""
-        rules={{...fieldValidation as RegisterOptions}}
+        rules={{ ...(fieldValidation as RegisterOptions) }}
         render={(field) => {
           return (
             <TextField
@@ -55,10 +55,10 @@ export const CatalogFilterGeneralField: React.FC<CatalogFilterGeneralFieldProps>
           );
         }}
       />
-      
+
       <span className="catalogFilterFieldError">
         {formMethods.errors[fieldId]?.message ?? undefined}
       </span>
     </Box>
   );
-}
+};

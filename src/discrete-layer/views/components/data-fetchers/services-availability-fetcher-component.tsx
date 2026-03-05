@@ -6,12 +6,14 @@ import { useQuery, useStore } from '../../../models/RootStore';
 export const ServicesAvailabilityFetcher: React.FC = observer(() => {
   const store = useStore();
   const servicesAvailabilityQuery = useQuery((store) => store.queryServicesAvailability());
-  
+
   useEffect(() => {
-    if (!servicesAvailabilityQuery.loading && servicesAvailabilityQuery.data) {  
-         store.servicesAvailabilityStore.setServicesAvailabilities(servicesAvailabilityQuery.data.servicesAvailability);
+    if (!servicesAvailabilityQuery.loading && servicesAvailabilityQuery.data) {
+      store.servicesAvailabilityStore.setServicesAvailabilities(
+        servicesAvailabilityQuery.data.servicesAvailability
+      );
     }
   }, [servicesAvailabilityQuery.data, servicesAvailabilityQuery.loading]);
-  
+
   return null;
 });

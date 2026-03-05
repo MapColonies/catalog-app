@@ -27,13 +27,9 @@ describe('BBoxCorner component', () => {
 
   it('render DIV with marked corner and defined css className', () => {
     const className = 'test';
-    const wrapper = shallow(
-      <BBoxCorner corner={corner} className={className} />
-    );
+    const wrapper = shallow(<BBoxCorner corner={corner} className={className} />);
 
-    const labelContainer = wrapper.find(
-      `div.bboxLeftBottomCorner.${className}`
-    );
+    const labelContainer = wrapper.find(`div.bboxLeftBottomCorner.${className}`);
     expect(labelContainer).toBeTruthy();
   });
 });

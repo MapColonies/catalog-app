@@ -19,7 +19,7 @@ import {
   useMap,
   useVectorSource,
   VectorLayer,
-  VectorSource
+  VectorSource,
 } from '@map-colonies/react-components';
 import { Checkbox } from '@map-colonies/react-core';
 import { Mode } from '../../../../common/models/mode.enum';
@@ -34,8 +34,8 @@ import './pp-map.css';
 interface GeoFeaturesPresentorProps {
   mode: Mode;
   geoFeatures?: Feature[];
-  style?: CSSProperties | undefined,
-  fitOptions?: FitOptions | undefined,
+  style?: CSSProperties | undefined;
+  fitOptions?: FitOptions | undefined;
   selectedFeatureKey?: string;
   selectionStyle?: Style;
   showExistingPolygonParts?: boolean;
@@ -53,7 +53,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   fitOptions,
   selectedFeatureKey,
   selectionStyle,
-  layerRecord
+  layerRecord,
 }) => {
   const store = useStore();
   const intl = useIntl();
@@ -61,19 +61,21 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   const [showExistingPolygonParts, setShowExistingPolygonParts] = useState<boolean>(false);
 
   useEffect(() => {
-    const definedElements = geoFeatures?.filter(feat => feat !== undefined);
-    if(definedElements?.length === 0){
+    const definedElements = geoFeatures?.filter((feat) => feat !== undefined);
+    if (definedElements?.length === 0) {
       renderCount.current = 0;
     }
     if (definedElements && definedElements?.length >= MIN_FEATURES_NUMBER) {
       renderCount.current += 1;
     }
   });
- 
+
   const previewBaseMap = useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-array-constructor
     const olBaseMap = new Array();
-    let baseMap = store.discreteLayersStore.baseMaps?.maps.find((map: IBaseMap) => map.isForPreview);
+    let baseMap = store.discreteLayersStore.baseMaps?.maps.find(
+      (map: IBaseMap) => map.isForPreview
+    );
     if (!baseMap) {
       baseMap = store.discreteLayersStore.baseMaps?.maps.find((map: IBaseMap) => map.isCurrent);
     }
@@ -90,10 +92,12 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
           });
           olBaseMap.push(
             <TileLayer key={layer.id} options={{ opacity: layer.opacity }}>
-              <TileWMTS options={{
-                ...wmtsOptions,
-                crossOrigin: 'anonymous'
-              }} />
+              <TileWMTS
+                options={{
+                  ...wmtsOptions,
+                  crossOrigin: 'anonymous',
+                }}
+              />
             </TileLayer>
           );
         }
@@ -103,31 +107,33 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
           });
           olBaseMap.push(
             <TileLayer key={layer.id} options={{ opacity: layer.opacity }}>
-              <TileXYZ options={{
-                ...xyzOptions,
-                crossOrigin: 'anonymous'
-              }} />
+              <TileXYZ
+                options={{
+                  ...xyzOptions,
+                  crossOrigin: 'anonymous',
+                }}
+              />
             </TileLayer>
-          )
+          );
         }
-      })
+      });
     }
     return olBaseMap;
   }, []);
-  
+
   const LegendsArray = useMemo(() => {
     const res: LegendItem[] = [];
-    PPMapStyles.forEach((value, key)=>{
+    PPMapStyles.forEach((value, key) => {
       if (!key.includes('MARKER')) {
         res.push({
-          title: intl.formatMessage({id: `polygon-parts.map-preview-legend.${key}`}) as string,
-          style: value as Style
+          title: intl.formatMessage({ id: `polygon-parts.map-preview-legend.${key}` }) as string,
+          style: value as Style,
         });
       }
     });
     return res;
   }, []);
-  
+
   const GeoFeaturesInnerComponent: React.FC = () => {
     const source = useVectorSource();
     const map = useMap();
@@ -135,42 +141,40 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
     if (renderCount.current < RENDERS_TILL_FULL_FEATURES_SET) {
       source.once('change', () => {
         if (source.getState() === 'ready') {
-          setTimeout(() => { 
-            map.getView().fit(source.getExtent(), fitOptions)
-          },0);
+          setTimeout(() => {
+            map.getView().fit(source.getExtent(), fitOptions);
+          }, 0);
         }
       });
     }
 
     return (
       <>
-        {
-          geoFeatures?.map((feat, idx) => {
-            let featureStyle = PPMapStyles.get(feat?.properties?.featureType);
+        {geoFeatures?.map((feat, idx) => {
+          let featureStyle = PPMapStyles.get(feat?.properties?.featureType);
 
-            if ( selectedFeatureKey && feat?.properties?.key === selectedFeatureKey) {
-              featureStyle = selectionStyle;
-            }
+          if (selectedFeatureKey && feat?.properties?.key === selectedFeatureKey) {
+            featureStyle = selectionStyle;
+          }
 
-            return (feat && !isEmpty(feat.geometry)) ?
-              <GeoJSONFeature 
-                geometry={{...feat.geometry}} 
-                fit={false}
-                key={feat.id ?? idx}
-                featureStyle={featureStyle}
-              /> : null
-          })
-        }
+          return feat && !isEmpty(feat.geometry) ? (
+            <GeoJSONFeature
+              geometry={{ ...feat.geometry }}
+              fit={false}
+              key={feat.id ?? idx}
+              featureStyle={featureStyle}
+            />
+          ) : null;
+        })}
       </>
     );
   };
-    
+
   return (
-    <Box style={{...style}}>
+    <Box style={{ ...style }}>
       <Map>
-        <MapLoadingIndicator/>
-        {
-          mode === Mode.UPDATE &&
+        <MapLoadingIndicator />
+        {mode === Mode.UPDATE && (
           <Box className="checkbox">
             <Checkbox
               className="flexCheckItem showOnMapContainer"
@@ -181,17 +185,18 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
               }}
             />
           </Box>
-        }
+        )}
         {previewBaseMap}
         <VectorLayer>
           <VectorSource>
-            <GeoFeaturesInnerComponent/>
+            <GeoFeaturesInnerComponent />
           </VectorSource>
         </VectorLayer>
-        {
-          showExistingPolygonParts && <PolygonPartsExtentVectorLayer layerRecord={layerRecord}/>
-        }
-        <Legend legendItems={LegendsArray} title={intl.formatMessage({id: 'polygon-parts.map-preview-legend.title'})}/>
+        {showExistingPolygonParts && <PolygonPartsExtentVectorLayer layerRecord={layerRecord} />}
+        <Legend
+          legendItems={LegendsArray}
+          title={intl.formatMessage({ id: 'polygon-parts.map-preview-legend.title' })}
+        />
       </Map>
     </Box>
   );

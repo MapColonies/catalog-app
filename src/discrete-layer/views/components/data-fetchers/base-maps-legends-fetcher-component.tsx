@@ -13,9 +13,7 @@ export const BaseMapsLegendsFetcher: React.FC = observer(() => {
   const store = useStore();
 
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  const GET_MOCK_LAYER_WITH_LINKS = async (
-    layerId: string
-  ): Promise<ILayerImage> => {
+  const GET_MOCK_LAYER_WITH_LINKS = async (layerId: string): Promise<ILayerImage> => {
     const MOCK_LINKS_PER_ID = new Map<string, unknown[]>([
       [
         'GOOGLE_TERRAIN',
@@ -26,8 +24,7 @@ export const BaseMapsLegendsFetcher: React.FC = observer(() => {
           },
           {
             protocol: LinkType.LEGEND_IMG,
-            url:
-              'https://c8.alamy.com/comp/F5HF5D/map-icon-legend-symbol-sign-toolkit-element-F5HF5D.jpg',
+            url: 'https://c8.alamy.com/comp/F5HF5D/map-icon-legend-symbol-sign-toolkit-element-F5HF5D.jpg',
           },
         ],
       ],
@@ -40,8 +37,7 @@ export const BaseMapsLegendsFetcher: React.FC = observer(() => {
           },
           {
             protocol: LinkType.LEGEND_IMG,
-            url:
-              'https://i.pinimg.com/564x/55/cf/a1/55cfa147dfef99d231ec95ab8cd3652d--outdoor-code-cub-scouts-brownie-hiking-badge.jpg',
+            url: 'https://i.pinimg.com/564x/55/cf/a1/55cfa147dfef99d231ec95ab8cd3652d--outdoor-code-cub-scouts-brownie-hiking-badge.jpg',
           },
         ],
       ],
@@ -56,8 +52,7 @@ export const BaseMapsLegendsFetcher: React.FC = observer(() => {
           },
           {
             protocol: LinkType.LEGEND_IMG,
-            url:
-              'https://i.pinimg.com/564x/55/cf/a1/55cfa147dfef99d231ec95ab8cd3652d--outdoor-code-cub-scouts-brownie-hiking-badge.jpg',
+            url: 'https://i.pinimg.com/564x/55/cf/a1/55cfa147dfef99d231ec95ab8cd3652d--outdoor-code-cub-scouts-brownie-hiking-badge.jpg',
           },
         ],
       ],
@@ -71,8 +66,7 @@ export const BaseMapsLegendsFetcher: React.FC = observer(() => {
           },
           {
             protocol: LinkType.LEGEND_IMG,
-            url:
-              'https://c8.alamy.com/comp/F5HF5D/map-icon-legend-symbol-sign-toolkit-element-F5HF5D.jpg',
+            url: 'https://c8.alamy.com/comp/F5HF5D/map-icon-legend-symbol-sign-toolkit-element-F5HF5D.jpg',
           },
         ],
       ],
@@ -91,52 +85,44 @@ export const BaseMapsLegendsFetcher: React.FC = observer(() => {
     });
   };
 
-  const getLegendsWithBasemaps = useCallback(
-    async (baseMaps: IBaseMaps): Promise<IBaseMaps> => {
-      const LEGEND_PDF_PROTOCOL = LinkType.LEGEND_DOC;
-      const LEGEND_IMG_PROTOCOL = LinkType.LEGEND_IMG;
+  const getLegendsWithBasemaps = useCallback(async (baseMaps: IBaseMaps): Promise<IBaseMaps> => {
+    const LEGEND_PDF_PROTOCOL = LinkType.LEGEND_DOC;
+    const LEGEND_IMG_PROTOCOL = LinkType.LEGEND_IMG;
 
-      const baseMapsWithLegends = await Promise.all(
-        baseMaps.maps.map(async (baseMap) => {
-          return {
-            ...baseMap,
-            baseRasterLayers: await Promise.all(
-              baseMap.baseRasterLayers.map(async (rasterLayer) => {
-                // Here we'll make the call to get the legends from the links in DB.
-                const layerFromCatalog = await GET_MOCK_LAYER_WITH_LINKS(
-                  rasterLayer.id
-                );
-                const legendsLinks = ((layerFromCatalog.links as unknown) as LinkModelType[]).filter(
-                  (link) => [LEGEND_PDF_PROTOCOL, LEGEND_IMG_PROTOCOL].includes(link.protocol as LinkType)
-                );
+    const baseMapsWithLegends = await Promise.all(
+      baseMaps.maps.map(async (baseMap) => {
+        return {
+          ...baseMap,
+          baseRasterLayers: await Promise.all(
+            baseMap.baseRasterLayers.map(async (rasterLayer) => {
+              // Here we'll make the call to get the legends from the links in DB.
+              const layerFromCatalog = await GET_MOCK_LAYER_WITH_LINKS(rasterLayer.id);
+              const legendsLinks = (layerFromCatalog.links as unknown as LinkModelType[]).filter(
+                (link) =>
+                  [LEGEND_PDF_PROTOCOL, LEGEND_IMG_PROTOCOL].includes(link.protocol as LinkType)
+              );
 
-                return {
-                  ...rasterLayer,
-                  options: {
-                    ...rasterLayer.options,
-                    legends: [
-                      {
-                        layer: rasterLayer.id,
-                        legendDoc: legendsLinks.find(
-                          (link) => link.protocol === LEGEND_PDF_PROTOCOL
-                        ),
-                        legendImg: legendsLinks.find(
-                          (link) => link.protocol === LEGEND_IMG_PROTOCOL
-                        ),
-                      },
-                    ] as IMapLegend[],
-                  },
-                };
-              })
-            ),
-          };
-        })
-      );
+              return {
+                ...rasterLayer,
+                options: {
+                  ...rasterLayer.options,
+                  legends: [
+                    {
+                      layer: rasterLayer.id,
+                      legendDoc: legendsLinks.find((link) => link.protocol === LEGEND_PDF_PROTOCOL),
+                      legendImg: legendsLinks.find((link) => link.protocol === LEGEND_IMG_PROTOCOL),
+                    },
+                  ] as IMapLegend[],
+                },
+              };
+            })
+          ),
+        };
+      })
+    );
 
-      return { maps: [...baseMapsWithLegends] };
-    },
-    []
-  );
+    return { maps: [...baseMapsWithLegends] };
+  }, []);
 
   useEffect(() => {
     void (async (): Promise<void> => {

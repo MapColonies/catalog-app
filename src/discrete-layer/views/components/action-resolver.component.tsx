@@ -11,9 +11,13 @@ import {
   LayerDemRecordModelKeys,
   Layer3DRecordModelKeys,
   QuantizedMeshBestRecordModelKeys,
-  VectorBestRecordModelKeys
+  VectorBestRecordModelKeys,
 } from '../../components/layer-details/entity-types-keys';
-import { cleanUpEntity, downloadJSONToClient, importShapeFileFromClient } from '../../components/layer-details/utils'
+import {
+  cleanUpEntity,
+  downloadJSONToClient,
+  importShapeFileFromClient,
+} from '../../components/layer-details/utils';
 import { IDispatchAction } from '../../models/actionDispatcherStore';
 import { getLayerFootprint, ILayerImage } from '../../models/layerImage';
 import { LayerRasterRecordModelType } from '../../models/LayerRasterRecordModel';
@@ -44,7 +48,13 @@ interface ActionResolverProps {
 }
 
 export const ActionResolver: React.FC<ActionResolverProps> = observer((props) => {
-  const { handleOpenEntityDialog, handleFlyTo, handleTabViewChange, handleOpenJobDialog, activeTabView } = props;
+  const {
+    handleOpenEntityDialog,
+    handleFlyTo,
+    handleTabViewChange,
+    handleOpenJobDialog,
+    activeTabView,
+  } = props;
 
   const store = useStore();
   const ENUMS = useEnums();
@@ -52,12 +62,12 @@ export const ActionResolver: React.FC<ActionResolverProps> = observer((props) =>
 
   const selectedLayersRef = useRef(initialOrder);
 
-  const {internalFields: exportDomainInternalFields} = useAddFeatureWithProps(false);
-  
+  const { internalFields: exportDomainInternalFields } = useAddFeatureWithProps(false);
+
   const { setGetFeatureOptions } = useHandleWfsGetFeatureRequests();
   const { setDemHeightsOptions } = useHandleDemHeightsRequests();
   const { setGetPolygonPartsFeatureOptions } = useHandleWfsPolygonPartsRequests(); //<-from context menu
-  
+
   const baseUpdateEntity = useCallback(
     (updatedValue: ILayerImage) => {
       store.discreteLayersStore.updateLayer(updatedValue);
@@ -100,7 +110,7 @@ export const ActionResolver: React.FC<ActionResolverProps> = observer((props) =>
     (isShown: boolean, selectedLayer: ILayerImage) => {
       if (!isEmpty(selectedLayer)) {
         store.discreteLayersStore.showFootprint(selectedLayer.id, isShown);
-        
+
         const shouldUpdateTreeNode = activeTabView === TabViews.CATALOG;
 
         if (shouldUpdateTreeNode) {
@@ -111,11 +121,7 @@ export const ActionResolver: React.FC<ActionResolverProps> = observer((props) =>
         }
       }
     },
-    [
-      store.discreteLayersStore.showFootprint,
-      store.catalogTreeStore.updateNodeById,
-      activeTabView
-    ]
+    [store.discreteLayersStore.showFootprint, store.catalogTreeStore.updateNodeById, activeTabView]
   );
 
   const baseLayerImageShow = useCallback(
@@ -123,7 +129,10 @@ export const ActionResolver: React.FC<ActionResolverProps> = observer((props) =>
       if (!isEmpty(selectedLayer)) {
         if (isShown) {
           selectedLayersRef.current++;
-          if (selectedLayer.type === RecordType.RECORD_3D && mapViewer.scene.mode !== CesiumSceneMode.SCENE3D) {
+          if (
+            selectedLayer.type === RecordType.RECORD_3D &&
+            mapViewer.scene.mode !== CesiumSceneMode.SCENE3D
+          ) {
             mapViewer.scene.morphTo3D(1);
           }
         } else {
@@ -151,33 +160,34 @@ export const ActionResolver: React.FC<ActionResolverProps> = observer((props) =>
         }
       }
     },
-    [
-      store.discreteLayersStore.showLayer,
-      store.catalogTreeStore.updateNodeById,
-      activeTabView
-    ]
+    [store.discreteLayersStore.showLayer, store.catalogTreeStore.updateNodeById, activeTabView]
   );
 
   const basePolygonPartsShow = useCallback(
     (isShown: boolean, selectedLayer: ILayerImage) => {
       if (!isEmpty(selectedLayer) && activeTabView === TabViews.CATALOG) {
-        const activePPLayer = store.discreteLayersStore.layersImages?.find(layer => isPolygonPartsShown(layer as unknown as Record<string, unknown>)) as LayerRasterRecordModelType;
+        const activePPLayer = store.discreteLayersStore.layersImages?.find((layer) =>
+          isPolygonPartsShown(layer as unknown as Record<string, unknown>)
+        ) as LayerRasterRecordModelType;
         store.discreteLayersStore.showPolygonParts(selectedLayer.id, isShown);
         if (activePPLayer) {
-          store.catalogTreeStore.updateNodeById(activePPLayer.id, {...activePPLayer, polygonPartsShown: false});
+          store.catalogTreeStore.updateNodeById(activePPLayer.id, {
+            ...activePPLayer,
+            polygonPartsShown: false,
+          });
         }
-        store.catalogTreeStore.updateNodeById(selectedLayer.id, {...selectedLayer});
+        store.catalogTreeStore.updateNodeById(selectedLayer.id, { ...selectedLayer });
       }
     },
     [
       store.discreteLayersStore.showPolygonParts,
       store.catalogTreeStore.updateNodeById,
-      activeTabView
+      activeTabView,
     ]
   );
 
   const basePPUpdateErrorShow = useCallback(
-    (ppResolutionsUpdateError: Record<string,string[]>) => {
+    (ppResolutionsUpdateError: Record<string, string[]>) => {
       store.discreteLayersStore.setCustomValidationError(ppResolutionsUpdateError);
     },
     []
@@ -202,80 +212,111 @@ export const ActionResolver: React.FC<ActionResolverProps> = observer((props) =>
           handleOpenEntityDialog(RecordType.RECORD_DEM, true);
           break;
         case 'LayerRasterRecord.edit':
-          // @ts-ignore
-          store.discreteLayersStore.selectLayer(cleanUpEntity(data, LayerRasterRecordModelKeys) as LayerMetadataMixedUnion);
+          store.discreteLayersStore.selectLayer(
+            // @ts-ignore
+            cleanUpEntity(data, LayerRasterRecordModelKeys) as LayerMetadataMixedUnion
+          );
           store.discreteLayersStore.setSelectedLayerOperationMode(Mode.EDIT);
           handleOpenEntityDialog(RecordType.RECORD_RASTER, true);
           break;
         case 'Layer3DRecord.edit':
-          // @ts-ignore
-          store.discreteLayersStore.selectLayer(cleanUpEntity(data, Layer3DRecordModelKeys) as LayerMetadataMixedUnion);
+          store.discreteLayersStore.selectLayer(
+            // @ts-ignore
+            cleanUpEntity(data, Layer3DRecordModelKeys) as LayerMetadataMixedUnion
+          );
           store.discreteLayersStore.setSelectedLayerOperationMode(Mode.EDIT);
           handleOpenEntityDialog(RecordType.RECORD_3D, true);
           break;
         case 'LayerDemRecord.edit':
-          // @ts-ignore
-          store.discreteLayersStore.selectLayer(cleanUpEntity(data, LayerDemRecordModelKeys) as LayerMetadataMixedUnion);
+          store.discreteLayersStore.selectLayer(
+            // @ts-ignore
+            cleanUpEntity(data, LayerDemRecordModelKeys) as LayerMetadataMixedUnion
+          );
           store.discreteLayersStore.setSelectedLayerOperationMode(Mode.EDIT);
           handleOpenEntityDialog(RecordType.RECORD_DEM, true);
           break;
         case 'VectorBestRecord.edit':
-          // @ts-ignore
-          store.discreteLayersStore.selectLayer(cleanUpEntity(data, VectorBestRecordModelKeys) as LayerMetadataMixedUnion);
+          store.discreteLayersStore.selectLayer(
+            // @ts-ignore
+            cleanUpEntity(data, VectorBestRecordModelKeys) as LayerMetadataMixedUnion
+          );
           store.discreteLayersStore.setSelectedLayerOperationMode(Mode.EDIT);
           handleOpenEntityDialog(RecordType.RECORD_VECTOR, true);
           break;
         case 'QuantizedMeshBestRecord.edit':
-          // @ts-ignore
-          store.discreteLayersStore.selectLayer(cleanUpEntity(data, QuantizedMeshBestRecordModelKeys) as LayerMetadataMixedUnion);
+          store.discreteLayersStore.selectLayer(
+            // @ts-ignore
+            cleanUpEntity(data, QuantizedMeshBestRecordModelKeys) as LayerMetadataMixedUnion
+          );
           store.discreteLayersStore.setSelectedLayerOperationMode(Mode.EDIT);
           handleOpenEntityDialog(RecordType.RECORD_DEM, true);
           break;
         case UserAction.ENTITY_ACTION_SELECTED_ENTITY_EDIT:
           store.discreteLayersStore.setSelectedLayerOperationMode(Mode.EDIT);
           handleOpenEntityDialog(store.discreteLayersStore.selectedLayer?.type as RecordType, true);
-          break;          
+          break;
         case UserAction.ENTITY_ACTION_SELECTED_ENTITY_VIEW:
           store.discreteLayersStore.setSelectedLayerOperationMode(Mode.VIEW);
           handleOpenEntityDialog(store.discreteLayersStore.selectedLayer?.type as RecordType, true);
-          break;          
+          break;
         case 'LayerRasterRecord.flyTo':
-          // @ts-ignore
-          store.discreteLayersStore.selectLayer(cleanUpEntity(data, LayerRasterRecordModelKeys) as LayerMetadataMixedUnion);
+          store.discreteLayersStore.selectLayer(
+            // @ts-ignore
+            cleanUpEntity(data, LayerRasterRecordModelKeys) as LayerMetadataMixedUnion
+          );
           handleFlyTo();
           break;
         case 'Layer3DRecord.flyTo':
-          // @ts-ignore
-          store.discreteLayersStore.selectLayer(cleanUpEntity(data, Layer3DRecordModelKeys) as LayerMetadataMixedUnion);
+          store.discreteLayersStore.selectLayer(
+            // @ts-ignore
+            cleanUpEntity(data, Layer3DRecordModelKeys) as LayerMetadataMixedUnion
+          );
           handleFlyTo();
           break;
         case 'LayerDemRecord.flyTo':
-          // @ts-ignore
-          store.discreteLayersStore.selectLayer(cleanUpEntity(data, LayerDemRecordModelKeys) as LayerMetadataMixedUnion);
+          store.discreteLayersStore.selectLayer(
+            // @ts-ignore
+            cleanUpEntity(data, LayerDemRecordModelKeys) as LayerMetadataMixedUnion
+          );
           handleFlyTo();
           break;
         case 'VectorBestRecord.flyTo':
-          // @ts-ignore
-          store.discreteLayersStore.selectLayer(cleanUpEntity(data, VectorBestRecordModelKeys) as LayerMetadataMixedUnion);
+          store.discreteLayersStore.selectLayer(
+            // @ts-ignore
+            cleanUpEntity(data, VectorBestRecordModelKeys) as LayerMetadataMixedUnion
+          );
           handleFlyTo();
           break;
         case 'QuantizedMeshBestRecord.flyTo':
-          // @ts-ignore
-          store.discreteLayersStore.selectLayer(cleanUpEntity(data, QuantizedMeshBestRecordModelKeys) as LayerMetadataMixedUnion);
+          store.discreteLayersStore.selectLayer(
+            // @ts-ignore
+            cleanUpEntity(data, QuantizedMeshBestRecordModelKeys) as LayerMetadataMixedUnion
+          );
           handleFlyTo();
           break;
         case 'LayerRasterRecord.update':
-          // @ts-ignore
-          store.discreteLayersStore.selectLayer(cleanUpEntity(data, LayerRasterRecordModelKeys) as LayerMetadataMixedUnion, true);
+          store.discreteLayersStore.selectLayer(
+            // @ts-ignore
+            cleanUpEntity(data, LayerRasterRecordModelKeys) as LayerMetadataMixedUnion,
+            // @ts-ignore
+            true
+          );
           store.discreteLayersStore.setSelectedLayerOperationMode(Mode.UPDATE);
           handleOpenEntityDialog(RecordType.RECORD_RASTER, true);
           break;
         case 'Layer3DRecord.viewer':
-          window.open(`${CONFIG.WEB_TOOLS_URL}/${CONFIG.MODEL_VIEWER_ROUTE}?model_ids=${data.productId}&token=${CONFIG.MODEL_VIEWER_TOKEN_VALUE}`);
+          window.open(
+            `${CONFIG.WEB_TOOLS_URL}/${CONFIG.MODEL_VIEWER_ROUTE}?model_ids=${data.productId}&token=${CONFIG.MODEL_VIEWER_TOKEN_VALUE}`
+          );
           break;
         case 'Layer3DRecord.delete':
-          // @ts-ignore
-          store.discreteLayersStore.selectLayer(cleanUpEntity(data, Layer3DRecordModelKeys) as LayerMetadataMixedUnion, false, true);
+          store.discreteLayersStore.selectLayer(
+            // @ts-ignore
+            cleanUpEntity(data, Layer3DRecordModelKeys) as LayerMetadataMixedUnion,
+            // @ts-ignore
+            false,
+            true
+          );
           store.discreteLayersStore.setSelectedLayerOperationMode(Mode.DELETE);
           handleOpenEntityDialog(RecordType.RECORD_3D, true);
           break;
@@ -296,21 +337,30 @@ export const ActionResolver: React.FC<ActionResolverProps> = observer((props) =>
           break;
         case 'LayerRasterRecord.export': {
           // @ts-ignore
-          const selectedLayerToExport = cleanUpEntity(data, LayerRasterRecordModelKeys) as LayerMetadataMixedUnion;
+          const selectedLayerToExport = cleanUpEntity(
+            data,
+            LayerRasterRecordModelKeys
+          ) as LayerMetadataMixedUnion;
           store.exportStore.reset();
           store.exportStore.setLayerToExport(selectedLayerToExport);
           break;
         }
         case 'Layer3DRecord.export': {
           // @ts-ignore
-          const selectedLayerToExport = cleanUpEntity(data, Layer3DRecordModelKeys) as LayerMetadataMixedUnion;
+          const selectedLayerToExport = cleanUpEntity(
+            data,
+            Layer3DRecordModelKeys
+          ) as LayerMetadataMixedUnion;
           store.exportStore.reset();
           store.exportStore.setLayerToExport(selectedLayerToExport);
           break;
         }
         case 'LayerDemRecord.export': {
           // @ts-ignore
-          const selectedLayerToExport = cleanUpEntity(data, LayerDemRecordModelKeys) as LayerMetadataMixedUnion;
+          const selectedLayerToExport = cleanUpEntity(
+            data,
+            LayerDemRecordModelKeys
+          ) as LayerMetadataMixedUnion;
           store.exportStore.reset();
           store.exportStore.setLayerToExport(selectedLayerToExport);
           break;
@@ -320,68 +370,66 @@ export const ActionResolver: React.FC<ActionResolverProps> = observer((props) =>
         case 'QuantizedMeshBestRecord.export':
           break;
         case ContextActions.QUERY_WFS_FEATURE: {
-          const coordinates = data.coordinates as { longitude: number, latitude: number };
+          const coordinates = data.coordinates as { longitude: number; latitude: number };
           const typeName = data.feature as string;
-          const closeMenu = (data.handleClose as (() => void | undefined));
+          const closeMenu = data.handleClose as () => void | undefined;
 
           setGetFeatureOptions({
-            pointCoordinates: [
-              coordinates.longitude.toString(),
-              coordinates.latitude.toString(),
-            ],
+            pointCoordinates: [coordinates.longitude.toString(), coordinates.latitude.toString()],
             typeName,
             count: 1,
             onDataResolved: closeMenu,
           });
-          
+
           break;
         }
         case ContextActions.QUERY_POLYGON_PARTS: {
-          const coordinates = data.coordinates as { longitude: number, latitude: number };
-          const closeMenu = (data.handleClose as (() => void | undefined));
+          const coordinates = data.coordinates as { longitude: number; latitude: number };
+          const closeMenu = data.handleClose as () => void | undefined;
 
           setGetPolygonPartsFeatureOptions({
             feature: {
               type: 'Feature',
               properties: {},
               geometry: {
-                coordinates: [
-                  coordinates.longitude.toString(),
-                  coordinates.latitude.toString()
-                ],
-                type: 'Point'
-              }
+                coordinates: [coordinates.longitude.toString(), coordinates.latitude.toString()],
+                type: 'Point',
+              },
             },
             typeName: getWFSFeatureTypeName(data?.layerRecord as LayerRasterRecordModelType, ENUMS),
             shouldFlyToFeatures: true,
             onDataResolved: closeMenu,
-            dWithin: 0
+            dWithin: 0,
           });
-          
+
           break;
         }
         case ContextActions.QUERY_DEM_HEIGHT: {
-          const coordinates = data.coordinates as { longitude: number, latitude: number };
-          const closeMenu = (data.handleClose as (() => void | undefined));
+          const coordinates = data.coordinates as { longitude: number; latitude: number };
+          const closeMenu = data.handleClose as () => void | undefined;
 
           setDemHeightsOptions({
             positions: [coordinates],
             onDataResolved: closeMenu,
           });
-          
+
           break;
         }
         case ExportActions.DRAW_FOOTPRINT: {
-          const {layerToExport} = store.exportStore;
-          store.exportStore.setTempRawSelection(getLayerFootprint(layerToExport as LayerMetadataMixedUnion, false) as Feature);
+          const { layerToExport } = store.exportStore;
+          store.exportStore.setTempRawSelection(
+            getLayerFootprint(layerToExport as LayerMetadataMixedUnion, false) as Feature
+          );
           break;
         }
         case ExportActions.TOGGLE_FULL_LAYER_EXPORT: {
-          const {layerToExport} = store.exportStore;
+          const { layerToExport } = store.exportStore;
 
           if (data.is3DInit as boolean) {
             store.exportStore.resetFeatureSelections();
-            store.exportStore.setTempRawSelection(getLayerFootprint(layerToExport as LayerMetadataMixedUnion, false) as Feature);
+            store.exportStore.setTempRawSelection(
+              getLayerFootprint(layerToExport as LayerMetadataMixedUnion, false) as Feature
+            );
             store.exportStore.setIsFullyLayerExportEnabled(true);
 
             break;
@@ -390,7 +438,9 @@ export const ActionResolver: React.FC<ActionResolverProps> = observer((props) =>
           if (!store.exportStore.isFullLayerExportEnabled) {
             // Clean any previous selections
             store.exportStore.resetFeatureSelections();
-            store.exportStore.setTempRawSelection(getLayerFootprint(layerToExport as LayerMetadataMixedUnion, false) as Feature);
+            store.exportStore.setTempRawSelection(
+              getLayerFootprint(layerToExport as LayerMetadataMixedUnion, false) as Feature
+            );
           } else {
             store.exportStore.resetFeatureSelections();
           }
@@ -401,14 +451,14 @@ export const ActionResolver: React.FC<ActionResolverProps> = observer((props) =>
         case ExportActions.DRAW_RECTANGLE:
           store.exportStore.setDrawingState({
             drawing: true,
-            type: DrawType.BOX
-          })
+            type: DrawType.BOX,
+          });
           break;
         case ExportActions.DRAW_POLYGON:
           store.exportStore.setDrawingState({
             drawing: true,
-            type: DrawType.POLYGON
-          })
+            type: DrawType.POLYGON,
+          });
           break;
         case ExportActions.DRAW_BY_COORDINATES:
           store.exportStore.setIsBBoxDialogOpen(true);
@@ -419,7 +469,7 @@ export const ActionResolver: React.FC<ActionResolverProps> = observer((props) =>
           store.exportStore.resetHasExportPreviewed();
           store.exportStore.resetDrawingState();
           break;
-        case ExportActions.IMPORT_FROM_SHAPE_FILE: 
+        case ExportActions.IMPORT_FROM_SHAPE_FILE:
           importShapeFileFromClient((evt, fileType) => {
             void store.exportStore.handleUploadedFile(evt, fileType, exportDomainInternalFields);
           }, true);
@@ -440,16 +490,30 @@ export const ActionResolver: React.FC<ActionResolverProps> = observer((props) =>
         }
         case UserAction.SYSTEM_CALLBACK_PUBLISH: {
           const inputValues = data as unknown as ILayerImage;
-          
-          baseUpdateEntityField(inputValues, 'productStatus' as keyof ILayerImage, get(inputValues, 'productStatus'));
-          
+
+          baseUpdateEntityField(
+            inputValues,
+            'productStatus' as keyof ILayerImage,
+            get(inputValues, 'productStatus')
+          );
+
           const node = store.catalogTreeStore.findNodeById(inputValues.id);
 
           if (node) {
-            if (existStatus(inputValues as unknown as Record<string, unknown>) && isUnpublished(inputValues as unknown as Record<string, unknown>)) {
-              store.catalogTreeStore.addNodeToParent(node.node, "tab-views.catalog.top-categories.unpublished", true);
-            } else  {
-              const unpublishedNode = store.catalogTreeStore.findNodeByTitle("tab-views.catalog.top-categories.unpublished", true) as NodeData;
+            if (
+              existStatus(inputValues as unknown as Record<string, unknown>) &&
+              isUnpublished(inputValues as unknown as Record<string, unknown>)
+            ) {
+              store.catalogTreeStore.addNodeToParent(
+                node.node,
+                'tab-views.catalog.top-categories.unpublished',
+                true
+              );
+            } else {
+              const unpublishedNode = store.catalogTreeStore.findNodeByTitle(
+                'tab-views.catalog.top-categories.unpublished',
+                true
+              ) as NodeData;
               store.catalogTreeStore.removeChildFromParent(inputValues.id, unpublishedNode);
             }
           }
@@ -457,7 +521,11 @@ export const ActionResolver: React.FC<ActionResolverProps> = observer((props) =>
         }
         case UserAction.SYSTEM_CALLBACK_DELETE: {
           const selectedLayer = data as unknown as ILayerImage;
-          baseUpdateEntityField(selectedLayer, 'productStatus' as keyof ILayerImage, get(selectedLayer, 'productStatus'));
+          baseUpdateEntityField(
+            selectedLayer,
+            'productStatus' as keyof ILayerImage,
+            get(selectedLayer, 'productStatus')
+          );
           break;
         }
         case UserAction.SYSTEM_CALLBACK_FLYTO: {
@@ -488,7 +556,7 @@ export const ActionResolver: React.FC<ActionResolverProps> = observer((props) =>
           break;
         }
         case UserAction.SYSTEM_CALLBACK_SHOW_PPERROR_ON_UPDATE: {
-          basePPUpdateErrorShow(data as Record<string,string[]>);
+          basePPUpdateErrorShow(data as Record<string, string[]>);
           break;
         }
         case UserAction.SYSTEM_CALLBACK_OPEN_JOB_MANAGER: {
@@ -501,8 +569,5 @@ export const ActionResolver: React.FC<ActionResolverProps> = observer((props) =>
     }
   }, [store.actionDispatcherStore.action, store.discreteLayersStore]);
 
-  return (
-    <></>
-  );
-
+  return <></>;
 });

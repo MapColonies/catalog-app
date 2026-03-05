@@ -12,32 +12,37 @@ interface BestInEditDialogProps {
 }
 
 export const BestInEditDialog: React.FC<BestInEditDialogProps> = ({ isOpen, onSetOpen }) => {
-  const closeDialog = useCallback(
-    () => {
-      onSetOpen(false);
-    },
-    [onSetOpen]
-  );
+  const closeDialog = useCallback(() => {
+    onSetOpen(false);
+  }, [onSetOpen]);
 
   return (
     <Box id="bestInEditDialog">
       <Dialog open={isOpen} preventOutsideDismiss={true}>
         <DialogTitle>
-          <FormattedMessage id="general.dialog.best-in-edit.title"/>
+          <FormattedMessage id="general.dialog.best-in-edit.title" />
           <IconButton
             className="closeIcon mc-icon-Close"
             label="CLOSE"
-            onClick={ (): void => { closeDialog(); } }
+            onClick={(): void => {
+              closeDialog();
+            }}
           />
         </DialogTitle>
         <DialogContent className="dialogBody">
           <Box>
-            <FormattedMessage id="general.dialog.best-in-edit.message"/>
+            <FormattedMessage id="general.dialog.best-in-edit.message" />
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button raised type="button" onClick={(): void => { closeDialog(); }}>
-            <FormattedMessage id="general.ok-btn.text"/>
+          <Button
+            raised
+            type="button"
+            onClick={(): void => {
+              closeDialog();
+            }}
+          >
+            <FormattedMessage id="general.ok-btn.text" />
           </Button>
         </DialogActions>
       </Dialog>

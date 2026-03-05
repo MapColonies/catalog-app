@@ -1,11 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Feature, GeoJsonProperties, Geometry } from 'geojson';
 import { cloneDeep } from 'lodash';
-import {
-  GetFeatureModelType,
-  useQuery,
-  useStore,
-} from '../../discrete-layer/models';
+import { GetFeatureModelType, useQuery, useStore } from '../../discrete-layer/models';
 import { WfsPolygonPartsGetFeatureParams } from '../../discrete-layer/models/RootStore.base';
 import CONFIG from '../config';
 
@@ -18,17 +14,20 @@ const useWfsPolygonPartsRequests = (): {
   setQueryPolygonPartsFeatureOptions: (options: GetFeatureOptions) => void;
 } => {
   const store = useStore();
-  const [queryPolygonPartsFeatureOptions, setQueryPolygonPartsFeatureOptions] = useState<GetFeatureOptions>();
+  const [queryPolygonPartsFeatureOptions, setQueryPolygonPartsFeatureOptions] =
+    useState<GetFeatureOptions>();
 
   const { data, loading, setQuery } = useQuery<{ getPolygonPartsFeature: GetFeatureModelType }>();
 
   useEffect(() => {
     if (queryPolygonPartsFeatureOptions) {
-      setQuery(store.queryGetPolygonPartsFeature({
-        data: {
-          ...queryPolygonPartsFeatureOptions
-        }
-      }));
+      setQuery(
+        store.queryGetPolygonPartsFeature({
+          data: {
+            ...queryPolygonPartsFeatureOptions,
+          },
+        })
+      );
     }
   }, [queryPolygonPartsFeatureOptions]);
 
@@ -39,19 +38,23 @@ const useWfsPolygonPartsRequests = (): {
         feature: queryPolygonPartsFeatureOptions.feature,
       };
       if (queryPolygonPartsFeatureOptions.startIndex === 0) {
-        store.discreteLayersStore.setPolygonPartsInfo(featureInfo.features as Feature<Geometry, GeoJsonProperties>[]);
+        store.discreteLayersStore.setPolygonPartsInfo(
+          featureInfo.features as Feature<Geometry, GeoJsonProperties>[]
+        );
       } else {
-        store.discreteLayersStore.addPolygonPartsInfo(featureInfo.features as Feature<Geometry, GeoJsonProperties>[]);
+        store.discreteLayersStore.addPolygonPartsInfo(
+          featureInfo.features as Feature<Geometry, GeoJsonProperties>[]
+        );
       }
       if (data.getPolygonPartsFeature.numberReturned !== 0) {
         const startIndex = queryPolygonPartsFeatureOptions.startIndex as number;
         const nextPage = startIndex / CONFIG.POLYGON_PARTS.MAX.WFS_FEATURES + 1;
         setQueryPolygonPartsFeatureOptions({
           ...queryPolygonPartsFeatureOptions,
-          startIndex: nextPage * CONFIG.POLYGON_PARTS.MAX.WFS_FEATURES
+          startIndex: nextPage * CONFIG.POLYGON_PARTS.MAX.WFS_FEATURES,
         });
       }
-    } 
+    }
   }, [data, loading]);
 
   return { data, loading, queryPolygonPartsFeatureOptions, setQueryPolygonPartsFeatureOptions };

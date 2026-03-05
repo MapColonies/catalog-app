@@ -21,7 +21,6 @@ import './actions.context-menu.css';
 
 interface IActionsContextMenuProps extends IContextMenuData {}
 
-
 export const COORDS_DISPLAY_PRECISION = 1;
 const FIRST = 0;
 
@@ -33,51 +32,51 @@ export const ActionsContextMenu: React.FC<IActionsContextMenuProps> = observer((
   const heightsAtCoordinates = useHeightFromTerrain({ position: [{ ...coordinates }] });
   const menuProperties = useGetMenuProperties(MapMenusIds.ActionsMenu, props);
 
-  const {actionsMenuDimensions, setActionsMenuDimensions } = useContext(ActionsMenuDimensionsContext);
+  const { actionsMenuDimensions, setActionsMenuDimensions } = useContext(
+    ActionsMenuDimensionsContext
+  );
   const actionsContextMenuDimensions = useGetMenuDimensions(menuProperties, 35);
 
   useEffect(() => {
     const areSameDimensions = _.isEqual(actionsMenuDimensions, actionsContextMenuDimensions);
-    
+
     if (actionsContextMenuDimensions && !areSameDimensions) {
-      setActionsMenuDimensions(actionsContextMenuDimensions)
+      setActionsMenuDimensions(actionsContextMenuDimensions);
     }
-  }, [actionsContextMenuDimensions])
+  }, [actionsContextMenuDimensions]);
 
   useEffect(() => {
-    menuTitleIconRef.current?.classList.remove('loading')
-  }, [props.contextEvt])
-
+    menuTitleIconRef.current?.classList.remove('loading');
+  }, [props.contextEvt]);
 
   const dispatchAction = useCallback((action: IDispatchAction): void => {
     store.actionDispatcherStore.dispatchAction({
       action: action.action,
-      data: {...action.data, coordinates, handleClose},
+      data: { ...action.data, coordinates, handleClose },
     } as IDispatchAction);
   }, []);
 
-
   const MenuItemRenderer: ContextMenuItemRenderer = ({ item }) => {
-
-    const actionToDispatch = useMemo(() => ({
-      action: item.action.action,
-      data: { ...item.payloadData },
-    }), [item]);
+    const actionToDispatch = useMemo(
+      () => ({
+        action: item.action.action,
+        data: { ...item.payloadData },
+      }),
+      [item]
+    );
 
     return (
       <Box
         className="actionsMenuItem"
         onClick={(): void => {
           dispatchAction(actionToDispatch);
-          
-          menuTitleIconRef.current?.classList.add('loading')
+
+          menuTitleIconRef.current?.classList.add('loading');
         }}
       >
-        {typeof item.icon !== 'undefined' && (
-          <Icon className={`featureIcon ${item.icon}`} />
-        )}
-        
-        <TooltippedValue disableTooltip className={"actionsContextMenuItemLabel"}>
+        {typeof item.icon !== 'undefined' && <Icon className={`featureIcon ${item.icon}`} />}
+
+        <TooltippedValue disableTooltip className={'actionsContextMenuItemLabel'}>
           {intl.formatMessage({ id: item.title })}
         </TooltippedValue>
       </Box>
@@ -85,22 +84,27 @@ export const ActionsContextMenu: React.FC<IActionsContextMenuProps> = observer((
   };
 
   const getHeightText = (): string => {
-    const coordinateHeight = (heightsAtCoordinates.newPositions?.[FIRST] as CesiumCartographic).height;
+    const coordinateHeight = (heightsAtCoordinates.newPositions?.[FIRST] as CesiumCartographic)
+      .height;
 
     if (typeof coordinateHeight !== 'undefined' && !isNaN(coordinateHeight)) {
-      return `${coordinateHeight.toFixed(COORDS_DISPLAY_PRECISION)} ${intl.formatMessage({ id: 'actions.meter.sign' })}`;
+      return `${coordinateHeight.toFixed(COORDS_DISPLAY_PRECISION)} ${intl.formatMessage({
+        id: 'actions.meter.sign',
+      })}`;
     }
 
     return `N/A`;
-  }
+  };
 
   const getActiveLayersText = (): string | undefined => {
     const MAX_ACTIVE_LAYERS_TO_PRESENT = CONFIG.CONTEXT_MENUS.MAP.MAX_ACTIVE_LAYERS_TO_PRESENT;
-    const activeLayersInPosition = (menuProperties?.dynamicMenuData?.ACTIVE_LAYERS_IN_POSITION as unknown[] | undefined);
-    
+    const activeLayersInPosition = menuProperties?.dynamicMenuData?.ACTIVE_LAYERS_IN_POSITION as
+      | unknown[]
+      | undefined;
+
     if (activeLayersInPosition) {
       if (activeLayersInPosition.length <= MAX_ACTIVE_LAYERS_TO_PRESENT) return;
-      
+
       const title = intl.formatMessage(
         { id: 'map-context-menu.title' },
         {
@@ -113,40 +117,41 @@ export const ActionsContextMenu: React.FC<IActionsContextMenuProps> = observer((
     }
 
     return;
-  }
+  };
 
   const activeLayersText = useMemo(getActiveLayersText, [menuProperties?.dynamicMenuData]);
 
   return (
-        <ContextMenu
-          menuItems={menuProperties?.itemsList}
-          ItemRenderer={MenuItemRenderer}
-          menuTitleComponent={
-            <Box className="coordinatesContainer">
-              <Icon ref={menuTitleIconRef} className={`menuIcon mc-icon-Location-Full`} />
-              {getCoordinatesDisplayText(coordinates.latitude, coordinates.longitude)}
-            </Box>
-          }
-          dispatchAction={dispatchAction}
-          {...props}
-        >
-          <Box className="contextMenuFooter">
-            <Box className="heightContainer"> 
-              <Icon className='menuIcon mc-icon-Height-DTM' />
-              <Typography tag="p">
-                {heightsAtCoordinates.isLoadingData ? <CircularProgress /> : getHeightText()}
-              </Typography>
-            </Box>
-            {activeLayersText && <Box className="activeLayersMessageContainer">
-              <TypeIcon
-                typeName={"ORTHOPHOTO"}
-                className={"menuIcon"}
-                style={{color: 'inherit', display: "flex", alignItems: 'center'}}
-              />
-              {activeLayersText}
-            </Box>
-            }
+    <ContextMenu
+      menuItems={menuProperties?.itemsList}
+      ItemRenderer={MenuItemRenderer}
+      menuTitleComponent={
+        <Box className="coordinatesContainer">
+          <Icon ref={menuTitleIconRef} className={`menuIcon mc-icon-Location-Full`} />
+          {getCoordinatesDisplayText(coordinates.latitude, coordinates.longitude)}
+        </Box>
+      }
+      dispatchAction={dispatchAction}
+      {...props}
+    >
+      <Box className="contextMenuFooter">
+        <Box className="heightContainer">
+          <Icon className="menuIcon mc-icon-Height-DTM" />
+          <Typography tag="p">
+            {heightsAtCoordinates.isLoadingData ? <CircularProgress /> : getHeightText()}
+          </Typography>
+        </Box>
+        {activeLayersText && (
+          <Box className="activeLayersMessageContainer">
+            <TypeIcon
+              typeName={'ORTHOPHOTO'}
+              className={'menuIcon'}
+              style={{ color: 'inherit', display: 'flex', alignItems: 'center' }}
+            />
+            {activeLayersText}
           </Box>
-        </ContextMenu>
+        )}
+      </Box>
+    </ContextMenu>
   );
 });

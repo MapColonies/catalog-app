@@ -5,7 +5,7 @@ import { Typography } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
 import CONFIG from '../../config';
 
-import './browser-compatibility-checker.css'
+import './browser-compatibility-checker.css';
 
 const uaParserObj = new UAParser();
 const FIRST_ELEM = 0;
@@ -34,14 +34,13 @@ export const BrowserCompatibilityChecker: React.FC = () => {
 
   return (
     <>
-      {
-        (!isEngineChromium || !isBrowserVersionSupported) &&
+      {(!isEngineChromium || !isBrowserVersionSupported) && (
         <Box className="compatibilityError">
           <Typography tag="h4">
             {isEngineChromium ? browserTooOldErr : browserNotSupportedErr}
           </Typography>
         </Box>
-      }
+      )}
     </>
   );
 };

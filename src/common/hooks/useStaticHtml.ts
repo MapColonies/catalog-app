@@ -13,7 +13,7 @@ function useStaticHTML<T>({ FunctionalComp, props }: UseStaticHTMLProps<T>): str
 
   useEffect(() => {
     // @ts-ignore
-    const htmlString = renderToStaticMarkup(React.createElement(FunctionalComp, {...props}));
+    const htmlString = renderToStaticMarkup(React.createElement(FunctionalComp, { ...props }));
     setHTML(htmlString);
   }, [FunctionalComp, props]);
 

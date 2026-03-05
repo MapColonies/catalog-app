@@ -267,7 +267,7 @@
   "ingestion.job.validationTaskProgress": "Validation progress",
   "ingestion.job.report": "Validation results",
   "ingestion.job.report-in-progress": "Report in progress",
-  
+
   "validationReport.geometryValidity": "Invalid geometry",
   "validationReport.vertices": "Polygons with too many vertices",
   "validationReport.metadata": "Invalid metadata",
@@ -770,7 +770,7 @@
   "Units.dms": "DMS",
   "Units.arc_seconds": "ARC_SECONDS",
   "Units.unknown": "UNKNOWN",
-  
+
   "UndulationModel.msl_egm96": "MSL_EGM96",
   "UndulationModel.msl_egm2008": "MSL_EGM2008",
   "UndulationModel.msl_dma10": "MSL_DMA10",
@@ -812,7 +812,7 @@
   "lookupTable.hotAreas.sderot": "Sderot",
   "lookupTable.hotAreas.syria": "Syria",
   "lookupTable.hotAreas.telAviv": "Tel Aviv",
-  
+
   "Transparency.transparent": "Transparent",
   "Transparency.opaque": "Opaque",
 
@@ -839,10 +839,10 @@
   "export-layer.exportSuccessContainer.jobId.title": "Job ID",
   "export-layer.export.button": "Export Layer",
   "export-layer.preview.button": "Evaluate Export",
-  "export-layer.selection-index.text":"Selection",
-  "export-layer.generalFields.text":"General Fields",
-  "export-layer.fileError.text":"Imported File",
-  "export-layer.serviceError.text":"Service Error",
+  "export-layer.selection-index.text": "Selection",
+  "export-layer.generalFields.text": "General Fields",
+  "export-layer.fileError.text": "Imported File",
+  "export-layer.serviceError.text": "Service Error",
   "export-layer.generalError.text": "General Error",
   "export-layer.description.field": "Description",
   "export-layer.zoomLevel.field": "Zoom Level",

@@ -6,10 +6,6 @@ interface TypeValuePresentorProps {
   value?: string;
 }
 
-export const TypeValuePresentorComponent: React.FC<TypeValuePresentorProps> = ({
-  value,
-}) => {
-  return (
-    <TooltippedValue className="detailsFieldValue">{value}</TooltippedValue>
-  );
+export const TypeValuePresentorComponent: React.FC<TypeValuePresentorProps> = ({ value }) => {
+  return <TooltippedValue className="detailsFieldValue">{value}</TooltippedValue>;
 };

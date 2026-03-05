@@ -8,17 +8,22 @@ import {
   MenuItem,
   MenuItemsGroup,
   MenuItemsList,
-  isMenuItemGroup
+  isMenuItemGroup,
 } from '../../../discrete-layer/models/mapMenusManagerStore';
 import { useStore } from '../../../discrete-layer/models';
 import { IDispatchAction } from '../../../discrete-layer/models/actionDispatcherStore';
 import { DEFAULT_LAYER_HUE_FACTOR } from '../../../discrete-layer/views/components/map-action-resolver.component';
-import { ContextActionGroupProps, ContextActions, ContextActionsGroupTemplates, ContextActionsTemplates } from '../../actions/context.actions';
+import {
+  ContextActionGroupProps,
+  ContextActions,
+  ContextActionsGroupTemplates,
+  ContextActionsTemplates,
+} from '../../actions/context.actions';
 import CONFIG from '../../config';
 
 export const useHandleMapMenuTemplates = (
   menuProperties?: IMapMenuProperties,
-  contextProps?: IContextMenuData,
+  contextProps?: IContextMenuData
 ): IMapMenuProperties | undefined => {
   /**
    *  The hook should be able to generate the menu properties passed as an argument,
@@ -40,26 +45,29 @@ export const useHandleMapMenuTemplates = (
 
   // This object holds the data that used to generate menu items from templates.
 
-  const dynamicMenuData: DynamicMenuData = useMemo(() => ({
-    [ContextActionsGroupTemplates.ACTIVE_LAYERS_IN_POSITION]: activeLayersInPosition,
-    [ContextActionsTemplates.WFS_QUERY_FEATURES]: wfsFeatureTypesList
-  }), [activeLayersInPosition, wfsFeatureTypesList])
-
+  const dynamicMenuData: DynamicMenuData = useMemo(
+    () => ({
+      [ContextActionsGroupTemplates.ACTIVE_LAYERS_IN_POSITION]: activeLayersInPosition,
+      [ContextActionsTemplates.WFS_QUERY_FEATURES]: wfsFeatureTypesList,
+    }),
+    [activeLayersInPosition, wfsFeatureTypesList]
+  );
 
   const handleActionTemplates = (actionTemplateMenuItem: MenuItem): MenuItemsList => {
     switch (actionTemplateMenuItem.templateId) {
       case ContextActionsTemplates.WFS_QUERY_FEATURES: {
-        const wfsFeatureTypesList = dynamicMenuData[ContextActionsTemplates.WFS_QUERY_FEATURES] as string[];
+        const wfsFeatureTypesList = dynamicMenuData[
+          ContextActionsTemplates.WFS_QUERY_FEATURES
+        ] as string[];
         const wfsQueryMenuItems: MenuItem[] = wfsFeatureTypesList.map((feature) => {
-          const featureConfig =
-            store.mapMenusManagerStore.getFeatureConfig(feature);
+          const featureConfig = store.mapMenusManagerStore.getFeatureConfig(feature);
           const featureTitle = featureConfig.translationId ?? feature;
 
           return {
             title: featureTitle,
             icon: featureConfig.icon,
             action: { ...actionTemplateMenuItem.action },
-            payloadData: { feature }
+            payloadData: { feature },
           };
         });
         return wfsQueryMenuItems;
@@ -67,14 +75,16 @@ export const useHandleMapMenuTemplates = (
       default:
         return [actionTemplateMenuItem];
     }
-  }
+  };
 
   const handleGroupTemplates = (groupTemplateMenuItem: MenuItemsGroup): MenuItemsList => {
     const generatedGroups: MenuItemsList = [];
 
     switch (groupTemplateMenuItem.templateId) {
       case ContextActionsGroupTemplates.ACTIVE_LAYERS_IN_POSITION: {
-        const activeLayersInPosition = dynamicMenuData[ContextActionsGroupTemplates.ACTIVE_LAYERS_IN_POSITION] as Record<string, unknown>[];
+        const activeLayersInPosition = dynamicMenuData[
+          ContextActionsGroupTemplates.ACTIVE_LAYERS_IN_POSITION
+        ] as Record<string, unknown>[];
         const templateProps = groupTemplateMenuItem.groupProps;
         const MAX_ACTIVE_LAYERS_TO_PRESENT = CONFIG.CONTEXT_MENUS.MAP.MAX_ACTIVE_LAYERS_TO_PRESENT;
         const slicedActiveLayers = activeLayersInPosition.slice(0, MAX_ACTIVE_LAYERS_TO_PRESENT);
@@ -82,7 +92,7 @@ export const useHandleMapMenuTemplates = (
         // Some pinkish color
         const HOVERED_LAYER_HUE_FACTOR = 30;
 
-        slicedActiveLayers.forEach(activeLayer => {
+        slicedActiveLayers.forEach((activeLayer) => {
           const groupProp: ContextActionGroupProps = {
             ...templateProps,
             id: templateProps.id + 1,
@@ -90,22 +100,27 @@ export const useHandleMapMenuTemplates = (
             titleTranslationId: activeLayer.meta?.layerRecord?.productName as string,
           };
 
-
           const mouseEnterAction: IDispatchAction = {
             action: ContextActions.HIGHLIGHT_ACTIVE_LAYER,
-            data: { ...activeLayer.meta as Record<string, unknown>, hue: HOVERED_LAYER_HUE_FACTOR }
+            data: {
+              ...(activeLayer.meta as Record<string, unknown>),
+              hue: HOVERED_LAYER_HUE_FACTOR,
+            },
           };
 
           const mouseLeaveAction: IDispatchAction = {
             action: ContextActions.HIGHLIGHT_ACTIVE_LAYER,
-            data: { ...activeLayer.meta as Record<string, unknown>, hue: DEFAULT_LAYER_HUE_FACTOR }
+            data: {
+              ...(activeLayer.meta as Record<string, unknown>),
+              hue: DEFAULT_LAYER_HUE_FACTOR,
+            },
           };
 
           const generatedGroup: MenuItemsGroup = {
             ...groupTemplateMenuItem,
             groupProps: groupProp,
             title: groupProp.titleTranslationId,
-            items: groupTemplateMenuItem.items.map(item => {
+            items: groupTemplateMenuItem.items.map((item) => {
               if (!isMenuItemGroup(item)) {
                 return { ...item, payloadData: activeLayer.meta as Record<string, unknown> };
               }
@@ -113,7 +128,7 @@ export const useHandleMapMenuTemplates = (
               return item;
             }),
             mouseEnterAction,
-            mouseLeaveAction
+            mouseLeaveAction,
           };
 
           generatedGroups.push(generatedGroup);
@@ -126,17 +141,23 @@ export const useHandleMapMenuTemplates = (
         // Check if group holds WFS actions by presence at least one such item
         const wfsFeature = groupTemplateMenuItem.items.find((item) => {
           const menuItem = item as MenuItem;
-          return menuItem.action ? menuItem.action.action === ContextActions.QUERY_WFS_FEATURE : false;
+          return menuItem.action
+            ? menuItem.action.action === ContextActions.QUERY_WFS_FEATURE
+            : false;
         });
         if (wfsFeature) {
-          tempGroup.groupProps.titleTranslationId = intl.formatMessage({
-            id: tempGroup.groupProps.titleTranslationId,
-          }, { extraInfo: `(${groupTemplateMenuItem.items.length}/${store.mapMenusManagerStore.total})` });
+          tempGroup.groupProps.titleTranslationId = intl.formatMessage(
+            {
+              id: tempGroup.groupProps.titleTranslationId,
+            },
+            {
+              extraInfo: `(${groupTemplateMenuItem.items.length}/${store.mapMenusManagerStore.total})`,
+            }
+          );
         }
         return [tempGroup];
     }
-
-  }
+  };
 
   // Iterate through the menu (and sub-menu) properties and handle the templates logic based on the templateId.
   // Returns the menu after the processing.
@@ -145,7 +166,6 @@ export const useHandleMapMenuTemplates = (
     const itemsList = items ?? menuProperties?.itemsList;
 
     itemsList?.forEach((item) => {
-
       if (!isMenuItemGroup(item)) {
         // Handle action templates
         const generatedActions: MenuItemsList = handleActionTemplates(item);
@@ -155,14 +175,12 @@ export const useHandleMapMenuTemplates = (
         // Handle group templates
         const generatedGroups: MenuItemsList = handleGroupTemplates({
           ...item,
-          items: getGeneratedMenu(item.items).itemsList
+          items: getGeneratedMenu(item.items).itemsList,
         });
 
         menuItems.push(...generatedGroups);
         return;
-
       }
-
     });
 
     return { ...menuProperties, itemsList: menuItems };

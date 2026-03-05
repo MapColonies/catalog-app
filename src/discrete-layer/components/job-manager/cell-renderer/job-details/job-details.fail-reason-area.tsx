@@ -1,4 +1,4 @@
-import React,{useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import { Typography } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
 import { Copy } from '../../../../../common/components/copy/copy';
@@ -24,7 +24,7 @@ export const FailReasonArea: React.FC<FailReasonAreaProps> = ({ failReason, show
         <Typography className="failReasonText" tag="p">
           {failReason}
         </Typography>
-        <Copy value={failReason}/>
+        <Copy value={failReason} />
       </Box>
     </td>
   );

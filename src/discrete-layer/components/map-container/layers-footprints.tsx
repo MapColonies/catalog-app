@@ -6,8 +6,8 @@ import React, { useEffect, useState, useRef } from 'react';
 import { observer } from 'mobx-react-lite';
 import { isObject, get } from 'lodash';
 import { Feature, FeatureCollection } from 'geojson';
-import { 
-  CesiumGeojsonLayer, 
+import {
+  CesiumGeojsonLayer,
   CesiumColor,
   CesiumVerticalOrigin,
   CesiumLabelStyle,
@@ -16,8 +16,7 @@ import {
   // CesiumBoundingSphere,
   // CesiumEllipsoid,
   CesiumConstantPositionProperty,
-  CesiumConstantProperty
-
+  CesiumConstantProperty,
 } from '@map-colonies/react-components';
 import CONFIG from '../../../common/config';
 import { usePrevious } from '../../../common/hooks/previous.hook';
@@ -62,39 +61,43 @@ export const LayersFootprints: React.FC = observer(() => {
   const [layersFootprints, setlayersFootprints] = useState<FeatureCollection>();
 
   const prevLayersFootprints = usePrevious<FeatureCollection | undefined>(layersFootprints);
-  const cacheRef = useRef({type: 'FeatureCollection', features: []} as FeatureCollection | undefined);
-  const cacheColorsRef = useRef({} as Record<string,CesiumColor>);
+  const cacheRef = useRef({ type: 'FeatureCollection', features: [] } as
+    | FeatureCollection
+    | undefined);
+  const cacheColorsRef = useRef({} as Record<string, CesiumColor>);
 
   useEffect(() => {
     if (discreteLayersStore.layersImages) {
       const footprintsCollection: FeatureCollection = {
         type: 'FeatureCollection',
-        features: []
-      }
+        features: [],
+      };
       const footprintsFeaturesArray = discreteLayersStore.layersImages
-      .filter((layer) => layer.footprintShown )
-      .map((layer) => {
-        return getLayerFootprint(layer, false);
-      });
+        .filter((layer) => layer.footprintShown)
+        .map((layer) => {
+          return getLayerFootprint(layer, false);
+        });
       footprintsCollection.features.push(...footprintsFeaturesArray);
       setlayersFootprints(footprintsCollection);
     }
   }, [discreteLayersStore.layersImages]);
 
-  const isSameFeatureCollection = (source: FeatureCollection | undefined, target: FeatureCollection | undefined): boolean => {
+  const isSameFeatureCollection = (
+    source: FeatureCollection | undefined,
+    target: FeatureCollection | undefined
+  ): boolean => {
     let res = false;
-    if (source && target &&
-        source.features.length === target.features.length) {
-          let matchesRes = true;
-          source.features.forEach((srcFeat: Feature) => {
-            const match = target.features.find((targetFeat: Feature) => {
-              return get(targetFeat,'properties.id') === get(srcFeat, 'properties.id');
-            });
-            matchesRes = matchesRes && isObject(match);
-          });
-          res = matchesRes;
+    if (source && target && source.features.length === target.features.length) {
+      let matchesRes = true;
+      source.features.forEach((srcFeat: Feature) => {
+        const match = target.features.find((targetFeat: Feature) => {
+          return get(targetFeat, 'properties.id') === get(srcFeat, 'properties.id');
+        });
+        matchesRes = matchesRes && isObject(match);
+      });
+      res = matchesRes;
     }
-    
+
     return res;
   };
 
@@ -124,12 +127,11 @@ export const LayersFootprints: React.FC = observer(() => {
       clampToGround={true}
       data={getFootprints()}
       onLoad={(geoJsonDataSouce): void => {
-        
         geoJsonDataSouce.entities.values.forEach((item) => {
           let positions = null;
-          let bckColor = null; 
+          let bckColor = null;
           if (item.polyline) {
-            const color = getColor(get(item,'properties.id'),  { alpha: 1 });
+            const color = getColor(get(item, 'properties.id'), { alpha: 1 });
             (item.polyline.width as CesiumConstantProperty).setValue(FOOTPRINT_BORDER_WIDTH);
             // typings issue in CESIUM for reference https://github.com/CesiumGS/cesium/issues/8898
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -140,18 +142,18 @@ export const LayersFootprints: React.FC = observer(() => {
             bckColor = color;
           }
           if (item.polygon) {
-            const color = getColor(get(item,'properties.id'), { blue: 1, alpha: 1});
+            const color = getColor(get(item, 'properties.id'), { blue: 1, alpha: 1 });
 
             item.polygon.outlineColor = color;
-            item.polygon.material = CesiumColor.fromAlpha(color, 0.10);
+            item.polygon.material = CesiumColor.fromAlpha(color, 0.1);
             positions = item.polygon.hierarchy.getValue().positions;
             bckColor = color;
           }
 
           item.position = getLabelPosition(positions);
-          
+
           const label = {
-            text: item.properties.id.getValue().toString().substring(0,4),
+            text: item.properties.id.getValue().toString().substring(0, 4),
             font: '12px Roboto, Helvetica, Arial, sans-serif',
             fillColor: CesiumColor.WHITE,
             // outlineColor: CesiumColor.WHITE,
@@ -160,7 +162,7 @@ export const LayersFootprints: React.FC = observer(() => {
             style: CesiumLabelStyle.FILL,
             verticalOrigin: CesiumVerticalOrigin.BOTTOM,
             pixelOffset: new CesiumCartesian2(0, 8),
-            backgroundColor:  bckColor,
+            backgroundColor: bckColor,
             showBackground: true,
             disableDepthTestDistance: Number.POSITIVE_INFINITY,
           };

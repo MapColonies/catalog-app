@@ -13,7 +13,6 @@ import { IPosition } from '../../../../common/hooks/useHeightFromTerrain';
 import { crossesMeridian, ZERO_MERIDIAN } from '../../../../common/utils/geo.tools';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
 
-
 export const PolygonPartsFeature: React.FC = observer(() => {
   const store = useStore();
   const intl = useIntl();
@@ -25,7 +24,7 @@ export const PolygonPartsFeature: React.FC = observer(() => {
 
   const [markerPosition, setMarkerPosition] = useState<IPosition>();
 
-  const enrichWFSData = (geoJsonFeature : Feature) => {
+  const enrichWFSData = (geoJsonFeature: Feature) => {
     const resolutionDegree = geoJsonFeature?.properties?.['resolutionDegree'];
     if (isNaN(resolutionDegree)) {
       return;
@@ -39,9 +38,9 @@ export const PolygonPartsFeature: React.FC = observer(() => {
   };
 
   useEffect(() => {
-      if (lastMenuPosition) {
-        setMarkerPosition(lastMenuPosition);
-      }
+    if (lastMenuPosition) {
+      setMarkerPosition(lastMenuPosition);
+    }
   }, [polygonPartsFeature]);
 
   useEffect(() => {
@@ -50,11 +49,11 @@ export const PolygonPartsFeature: React.FC = observer(() => {
       const ppPolygon = bboxPolygon(store.mapMenusManagerStore.multiplePolygonPartsBBox);
       const isCrossesMeridian = crossesMeridian(ppPolygon.geometry as Polygon, ZERO_MERIDIAN);
 
-      if (!isCrossesMeridian){
+      if (!isCrossesMeridian) {
         const polygonPartsFeaturesRect = CesiumRectangle.fromDegrees(
           ...store.mapMenusManagerStore.multiplePolygonPartsBBox
         ) as CesiumRectangle;
-  
+
         cesiumViewer.camera.flyTo({ destination: polygonPartsFeaturesRect });
       }
     }
@@ -63,14 +62,20 @@ export const PolygonPartsFeature: React.FC = observer(() => {
   if (!polygonPartsFeature) return null;
 
   // If there are no features, use array with an empty object instead so that `GeojsonFeatureWithInfoBox` component will render no data found message
-  const polygonPartsFeatures = polygonPartsFeature.features?.length ? polygonPartsFeature.features : [{}];
+  const polygonPartsFeatures = polygonPartsFeature.features?.length
+    ? polygonPartsFeature.features
+    : [{}];
 
   return (
     <>
       {polygonPartsFeatures?.map((feature) => {
         const geoJsonFeature = feature as Feature;
-        const polygonPartsFeatureConfig: IFeatureConfig = CONFIG.CONTEXT_MENUS.MAP.POLYGON_PARTS_FEATURE_CONFIG;
-        const isCrossesMeridian = crossesMeridian(geoJsonFeature.geometry as Polygon | MultiPolygon, ZERO_MERIDIAN);
+        const polygonPartsFeatureConfig: IFeatureConfig =
+          CONFIG.CONTEXT_MENUS.MAP.POLYGON_PARTS_FEATURE_CONFIG;
+        const isCrossesMeridian = crossesMeridian(
+          geoJsonFeature.geometry as Polygon | MultiPolygon,
+          ZERO_MERIDIAN
+        );
 
         enrichWFSData(geoJsonFeature);
 

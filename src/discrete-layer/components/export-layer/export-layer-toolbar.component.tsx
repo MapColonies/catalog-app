@@ -1,7 +1,15 @@
 import React, { useMemo, useState } from 'react';
 import { Box } from '@map-colonies/react-components';
 import { observer } from 'mobx-react-lite';
-import { Checkbox, IconButton, Menu, MenuItem, MenuSurfaceAnchor, Tooltip, Typography } from '@map-colonies/react-core';
+import {
+  Checkbox,
+  IconButton,
+  Menu,
+  MenuItem,
+  MenuSurfaceAnchor,
+  Tooltip,
+  Typography,
+} from '@map-colonies/react-core';
 import { useIntl } from 'react-intl';
 import { FeatureCollection, lineString } from '@turf/helpers';
 import { Feature, Point } from 'geojson';
@@ -12,7 +20,6 @@ import { IDispatchAction } from '../../models/actionDispatcherStore';
 import { useStore } from '../../models';
 import { BBoxDialog } from '../map-container/bbox.dialog';
 import useDomainExportActionsConfig, { ExportAction } from './hooks/useDomainExportActionsConfig';
-
 
 interface ExportLayerToolbarProps {
   disableAll?: boolean;
@@ -47,36 +54,31 @@ const MenuActionPresentor: React.FC<ActionPresentorBaseProps> = ({
             // @ts-ignore
             onMouseOver={(evt: MouseEvent): void => evt.stopPropagation()}
           >
-            {Array.from(action.menuActionOptions.items).map(
-              ([actionKey, value], i) => {
-                return (
-                  <MenuItem 
-                    key={`action_${actionKey}_${i}`}
-                    onClick={(): void => {
-                      const actionToDispatch = {
-                        ...action.menuActionOptions?.dispatchOnItemClick,
-                        data: value as Feature,
-                      };
+            {Array.from(action.menuActionOptions.items).map(([actionKey, value], i) => {
+              return (
+                <MenuItem
+                  key={`action_${actionKey}_${i}`}
+                  onClick={(): void => {
+                    const actionToDispatch = {
+                      ...action.menuActionOptions?.dispatchOnItemClick,
+                      data: value as Feature,
+                    };
 
-                      dispatchAction(actionToDispatch);
-                    }}>
-                    <Box className="exportActionMenuItem">
-                      <Typography tag="p">{actionKey}</Typography>
-                    </Box>
-                  </MenuItem>
-                );
-              }
-            )}
+                    dispatchAction(actionToDispatch);
+                  }}
+                >
+                  <Box className="exportActionMenuItem">
+                    <Typography tag="p">{actionKey}</Typography>
+                  </Box>
+                </MenuItem>
+              );
+            })}
           </Menu>
           <Tooltip content={intl.formatMessage({ id: action.titleTranslationId })}>
             <IconButton
-              className={`exportAction ${action.disabled ? 'disabled' : ''} ${
-                action.class
-              }`}
+              className={`exportAction ${action.disabled ? 'disabled' : ''} ${action.class}`}
               id="exportMenuActionIcon"
-              onClick={(): void =>
-                setIsActionMenuOpen((isMenuOpen) => !isMenuOpen)
-              }
+              onClick={(): void => setIsActionMenuOpen((isMenuOpen) => !isMenuOpen)}
               disabled={action.disabled}
             />
           </Tooltip>
@@ -90,7 +92,7 @@ const ToggleActionPresentor: React.FC<ActionPresentorBaseProps> = ({
   action,
   listKey,
   data = {},
-  dispatchAction
+  dispatchAction,
 }) => {
   const intl = useIntl();
   const store = useStore();
@@ -119,11 +121,11 @@ const ToggleActionPresentor: React.FC<ActionPresentorBaseProps> = ({
 const ActionPresentor: React.FC<ActionPresentorBaseProps> = (props) => {
   const { action, listKey, data, dispatchAction } = props;
   const intl = useIntl();
-  
-    const getActionPresentorByProps = useMemo(() => {
-      if (action === 'SEPARATOR') {
-        return <Box className="exportActionSeparator"></Box>;
-      }
+
+  const getActionPresentorByProps = useMemo(() => {
+    if (action === 'SEPARATOR') {
+      return <Box className="exportActionSeparator"></Box>;
+    }
 
     const shouldRenderToggle = typeof action.toggleExportStoreFieldOptions !== 'undefined';
     const shouldRenderMenu = typeof action.menuActionOptions !== 'undefined';
@@ -140,28 +142,21 @@ const ActionPresentor: React.FC<ActionPresentorBaseProps> = (props) => {
       default:
         presentor = (
           <IconButton
-            className={`exportAction ${action.disabled ? 'disabled' : ''} ${
-              action.class
-            }`}
+            className={`exportAction ${action.disabled ? 'disabled' : ''} ${action.class}`}
             key={listKey}
             label={action.action}
             disabled={action.disabled}
-            onClick={(): void =>
-              dispatchAction({ action: action.action, data })
-            }
+            onClick={(): void => dispatchAction({ action: action.action, data })}
           />
         );
-        
+
         break;
     }
 
-      return (
-        <Tooltip content={intl.formatMessage({ id: action.titleTranslationId })}>
-          {presentor}
-        </Tooltip>
-      );
-    }, [action]);
-
+    return (
+      <Tooltip content={intl.formatMessage({ id: action.titleTranslationId })}>{presentor}</Tooltip>
+    );
+  }, [action]);
 
   return getActionPresentorByProps;
 };
@@ -186,17 +181,28 @@ const ExportLayerToolbar: React.FC<ExportLayerToolbarProps> = observer(({ disabl
             ? action
             : {
                 ...action,
-                disabled: disableAll as boolean || action.disabled,
+                disabled: (disableAll as boolean) || action.disabled,
               };
 
-        return <ActionPresentor key={`action_${i}`} dispatchAction={dispatchAction} action={actionToDisplay} listKey={i.toString()} />;
+        return (
+          <ActionPresentor
+            key={`action_${i}`}
+            dispatchAction={dispatchAction}
+            action={actionToDisplay}
+            listKey={i.toString()}
+          />
+        );
       })}
 
       <BBoxDialog
         isOpen={exportStore.isBBoxDialogOpen as boolean}
         onSetOpen={exportStore.setIsBBoxDialogOpen}
         onPolygonUpdate={(selection): void => {
-          const lineStr = lineString((selection.geojson as FeatureCollection).features.map(feature => (feature.geometry as Point).coordinates));
+          const lineStr = lineString(
+            (selection.geojson as FeatureCollection).features.map(
+              (feature) => (feature.geometry as Point).coordinates
+            )
+          );
           const lineStrBBox = bbox(lineStr);
           const selectionPolygon = bboxPolygon(lineStrBBox);
           exportStore.setTempRawSelection(selectionPolygon);
