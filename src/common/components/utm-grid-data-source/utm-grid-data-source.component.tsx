@@ -11,7 +11,6 @@ import center from '@turf/center';
 import { points } from '@turf/helpers';
 import React from 'react';
 
-
 const SELECTION_POLYGON_OUTLINE_COLOR = '#8a3e00';
 const SELECTION_POLYGON_LINE_WIDTH = 2;
 
@@ -25,7 +24,7 @@ const UTMGridDataSource: React.FC = () => {
         // TODO: Change the data source path.
         data={'./assets/data/utmzone.geojson'}
         onLoad={(geoJsonDataSource): void => {
-          geoJsonDataSource.entities.values.forEach(item => {
+          geoJsonDataSource.entities.values.forEach((item) => {
             let centerInDegrees;
 
             if (item.polyline) {
@@ -38,20 +37,22 @@ const UTMGridDataSource: React.FC = () => {
               centerInDegrees = center(
                 points(
                   // @ts-ignore
-                  ((item.polyline.positions.getValue() as Record<string, unknown>).map((pos) => {
+                  (item.polyline.positions.getValue() as Record<string, unknown>).map((pos) => {
                     const cartographicPos = CesiumCartographic.fromCartesian(pos);
                     return [
                       CesiumMath.toDegrees(cartographicPos.latitude),
                       CesiumMath.toDegrees(cartographicPos.longitude),
                     ];
-                  }))
+                  })
                 )
               ).geometry.coordinates;
             }
 
             if (item.polygon) {
               // @ts-ignore
-              (item.polygon.outlineColor as CesiumConstantProperty).setValue(CesiumColor.fromCssColorString(SELECTION_POLYGON_OUTLINE_COLOR));
+              (item.polygon.outlineColor as CesiumConstantProperty).setValue(
+                CesiumColor.fromCssColorString(SELECTION_POLYGON_OUTLINE_COLOR)
+              );
               (item.polygon.outlineWidth as CesiumConstantProperty).setValue(
                 SELECTION_POLYGON_LINE_WIDTH
               );
@@ -62,15 +63,16 @@ const UTMGridDataSource: React.FC = () => {
               centerInDegrees = center(
                 points(
                   // @ts-ignore
-                  ((item.polygon.hierarchy.getValue() as Record<string, unknown>)
-                    .positions as CesiumCartesian3[]).map((pos) => {
-                      const cartographicPos = CesiumCartographic.fromCartesian(pos);
-                      return [
-                        CesiumMath.toDegrees(cartographicPos.latitude),
-                        CesiumMath.toDegrees(cartographicPos.longitude),
-                      ];
-                    }
-                  )
+                  (
+                    (item.polygon.hierarchy.getValue() as Record<string, unknown>)
+                      .positions as CesiumCartesian3[]
+                  ).map((pos) => {
+                    const cartographicPos = CesiumCartographic.fromCartesian(pos);
+                    return [
+                      CesiumMath.toDegrees(cartographicPos.latitude),
+                      CesiumMath.toDegrees(cartographicPos.longitude),
+                    ];
+                  })
                 )
               ).geometry.coordinates;
             }

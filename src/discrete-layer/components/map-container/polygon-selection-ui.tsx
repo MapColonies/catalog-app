@@ -1,7 +1,15 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
-import { Button, Drawer, DrawerContent, List, ListItem, ListItemGraphic, ListItemText } from '@map-colonies/react-core';
+import {
+  Button,
+  Drawer,
+  DrawerContent,
+  List,
+  ListItem,
+  ListItemGraphic,
+  ListItemText,
+} from '@map-colonies/react-core';
 import { Box, DrawType, IDrawingEvent } from '@map-colonies/react-components';
 import { BBoxDialog } from './bbox.dialog';
 
@@ -29,9 +37,7 @@ export interface PolygonSelectionUiProps {
   handleOtherDrawers?: () => void;
 }
 
-export const PolygonSelectionUi: React.FC<PolygonSelectionUiProps> = (
-  props
-) => {
+export const PolygonSelectionUi: React.FC<PolygonSelectionUiProps> = (props) => {
   const classes = useStyle();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [menuOpen, setMenuOpen] = React.useState(false);
@@ -76,20 +82,17 @@ export const PolygonSelectionUi: React.FC<PolygonSelectionUiProps> = (
         >
           <FormattedMessage id="polygon-selection.draw-btn.text" />
         </Button>
-        <BBoxDialog
-          isOpen={open}
-          onSetOpen={setOpen}
-          onPolygonUpdate={onPolygonUpdate}
-        />
-        {
-          menuOpen &&
-          <Box style={{
-            height:'210px', 
-            width: mapActionsWidth}}
+        <BBoxDialog isOpen={open} onSetOpen={setOpen} onPolygonUpdate={onPolygonUpdate} />
+        {menuOpen && (
+          <Box
+            style={{
+              height: '210px',
+              width: mapActionsWidth,
+            }}
             className="drawerContainer"
           >
-            <Drawer dismissible style={{width:'100%'}} open={Boolean(anchorEl) && menuOpen}>
-              <DrawerContent >
+            <Drawer dismissible style={{ width: '100%' }} open={Boolean(anchorEl) && menuOpen}>
+              <DrawerContent>
                 <List>
                   <ListItem
                     onClick={(): void => {
@@ -131,15 +134,15 @@ export const PolygonSelectionUi: React.FC<PolygonSelectionUiProps> = (
                     }}
                   >
                     <ListItemGraphic icon="delete" />
-                      <ListItemText>
-                        <FormattedMessage id="polygon-selection.clear-menu_option.text" />
-                      </ListItemText>
-                    </ListItem>
+                    <ListItemText>
+                      <FormattedMessage id="polygon-selection.clear-menu_option.text" />
+                    </ListItemText>
+                  </ListItem>
                 </List>
               </DrawerContent>
             </Drawer>
           </Box>
-        }
+        )}
       </Box>
     );
   }

@@ -5,7 +5,7 @@
   width: 124px; /*36+36+36+16*/
   justify-content: flex-end;
   padding-left: 16px;
-  background-color: rgb(44,65,89);
+  background-color: rgb(44, 65, 89);
   /* 
   ColorRes = Color * alpha + Background * (1 - alpha); 
     Color = rgba(33, 150, 243, 0.1)
@@ -27,7 +27,7 @@ body[dir='rtl'] .actionsContainer {
   left: unset;
 }
 
-body[dir='rtl'] .actionsContainer .actionIcon{
+body[dir='rtl'] .actionsContainer .actionIcon {
   left: unset;
   right: unset;
 }
@@ -62,6 +62,6 @@ body[dir='rtl'] #actionsMenuContainer .mdc-menu-surface.mdc-menu-surface--open {
 }
 
 body[dir='rtl'] .actionMenuItemTitle {
- padding-left: unset;
- padding-right: 8px;
+  padding-left: unset;
+  padding-right: 8px;
 }

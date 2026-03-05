@@ -8,7 +8,7 @@ import {
   CesiumWMTSLayer,
   CesiumXYZLayer,
   ICesiumImageryLayer,
-  useCesiumMap
+  useCesiumMap,
 } from '@map-colonies/react-components';
 import CONFIG from '../../../common/config';
 import { usePrevious } from '../../../common/hooks/previous.hook';
@@ -21,7 +21,7 @@ import {
   generateLayerRectangle,
   getTokenResource,
   getWMTSOptions,
-  getLinksArrWithTokens
+  getLinksArrWithTokens,
 } from '../helpers/layersUtils';
 
 interface CacheMap {
@@ -36,11 +36,13 @@ export const SelectedLayersContainer: React.FC = observer(() => {
   const prevLayersImages = usePrevious<ILayerImage[]>(layersImages);
   const cacheRef = useRef({} as CacheMap);
   const mapViewer = useCesiumMap();
-  
+
   useEffect(() => {
     if (store.discreteLayersStore.layersImages) {
       // @ts-ignore
-      setlayersImages(store.discreteLayersStore.layersImages.slice().sort((curr, next) => curr.order - next.order));
+      setlayersImages(
+        store.discreteLayersStore.layersImages.slice().sort((curr, next) => curr.order - next.order)
+      );
       if (isEmpty(store.discreteLayersStore.layersImages)) {
         cacheRef.current = {};
       }
@@ -53,7 +55,7 @@ export const SelectedLayersContainer: React.FC = observer(() => {
     }
   }, [store.discreteLayersStore.previewedLayers]);
 
-  const generateLayerComponent = (layer: ILayerImage): JSX.Element | undefined  => {
+  const generateLayerComponent = (layer: ILayerImage): JSX.Element | undefined => {
     const layerLink = getLayerLink(layer);
 
     switch (layerLink.protocol) {
@@ -64,14 +66,19 @@ export const SelectedLayersContainer: React.FC = observer(() => {
             meta={{
               id: layer.id,
               searchLayerPredicate: ((cesiumLayer, idx) => {
-                const correctLinkByProtocol = (layer.links as LinkModelType[]).find(link => link.protocol === layerLink.protocol);
+                const correctLinkByProtocol = (layer.links as LinkModelType[]).find(
+                  (link) => link.protocol === layerLink.protocol
+                );
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                return correctLinkByProtocol?.url === (cesiumLayer as any)._imageryProvider._resource._url
+                return (
+                  correctLinkByProtocol?.url ===
+                  (cesiumLayer as any)._imageryProvider._resource._url
+                );
               }) as SearchLayerPredicate,
               layerRecord: {
                 ...layer,
-                links: getLinksArrWithTokens([...layer.links as LinkModelType[]])
-              } as ILayerImage
+                links: getLinksArrWithTokens([...(layer.links as LinkModelType[])]),
+              } as ILayerImage,
             }}
             rectangle={generateLayerRectangle(layer as LayerRasterRecordModelType)}
             options={{ url: getTokenResource(layerLink.url as string) }}
@@ -82,19 +89,30 @@ export const SelectedLayersContainer: React.FC = observer(() => {
         return (
           <Cesium3DTileset
             maximumScreenSpaceError={CONFIG.THREE_D_LAYER.MAXIMUM_SCREEN_SPACE_ERROR}
-            cullRequestsWhileMovingMultiplier={CONFIG.THREE_D_LAYER.CULL_REQUESTS_WHILE_MOVING_MULTIPLIER}
+            cullRequestsWhileMovingMultiplier={
+              CONFIG.THREE_D_LAYER.CULL_REQUESTS_WHILE_MOVING_MULTIPLIER
+            }
             preloadFlightDestinations
             preferLeaves
             skipLevelOfDetail
             key={layer.id}
-            url={getTokenResource(layerLink.url as string, (layer as Layer3DRecordModelType).productVersion as string)}
+            url={getTokenResource(
+              layerLink.url as string,
+              (layer as Layer3DRecordModelType).productVersion as string
+            )}
           />
         );
       case LinkType.WMTS_LAYER:
       case LinkType.WMTS: {
-        const capability = store.discreteLayersStore.capabilities?.find(item => layerLink.name === item.id);
+        const capability = store.discreteLayersStore.capabilities?.find(
+          (item) => layerLink.name === item.id
+        );
         const optionsWMTS = {
-          ...getWMTSOptions(layer as LayerRasterRecordModelType, layerLink.url as string, capability)
+          ...getWMTSOptions(
+            layer as LayerRasterRecordModelType,
+            layerLink.url as string,
+            capability
+          ),
         };
         return (
           <CesiumWMTSLayer
@@ -103,15 +121,19 @@ export const SelectedLayersContainer: React.FC = observer(() => {
               id: layer.id,
               searchLayerPredicate: ((cesiumLayer, idx) => {
                 const linkUrl = (optionsWMTS.url as Record<string, any>)._url as string;
-                const cesiumLayerLinkUrl = get(cesiumLayer, '_imageryProvider._resource._url') as string;
+                const cesiumLayerLinkUrl = get(
+                  cesiumLayer,
+                  '_imageryProvider._resource._url'
+                ) as string;
                 const isBaseLayer = get(cesiumLayer, 'meta.parentBasetMapId') as string;
-                const isLayerFound = (linkUrl.split('?')[0] === cesiumLayerLinkUrl.split('?')[0]) && !isBaseLayer;
+                const isLayerFound =
+                  linkUrl.split('?')[0] === cesiumLayerLinkUrl.split('?')[0] && !isBaseLayer;
                 return isLayerFound;
               }) as SearchLayerPredicate,
               layerRecord: {
                 ...layer,
-                links: getLinksArrWithTokens([...layer.links as LinkModelType[]])
-              } as ILayerImage
+                links: getLinksArrWithTokens([...(layer.links as LinkModelType[])]),
+              } as ILayerImage,
             }}
             rectangle={generateLayerRectangle(layer as LayerRasterRecordModelType)}
             options={optionsWMTS}
@@ -126,7 +148,7 @@ export const SelectedLayersContainer: React.FC = observer(() => {
           pageSize: CONFIG.WFS.MAX.PAGE_SIZE,
           zoomLevel: CONFIG.WFS.MAX.ZOOM_LEVEL,
           maxCacheSize: CONFIG.WFS.MAX.CACHE_SIZE,
-          keyField: CONFIG.WFS.KEY_FIELD
+          keyField: CONFIG.WFS.KEY_FIELD,
         };
         return (
           <CesiumWFSLayer
@@ -140,7 +162,7 @@ export const SelectedLayersContainer: React.FC = observer(() => {
         return undefined;
     }
   };
-  
+
   const getLayer = (layer: ILayerImage): JSX.Element | null | undefined => {
     const cache = cacheRef.current;
     if (layer.layerImageShown === true) {
@@ -155,7 +177,9 @@ export const SelectedLayersContainer: React.FC = observer(() => {
         }
       }
     } else {
-      const prevLayer = (prevLayersImages as []).find((item: ILayerImage) => item.id === layer.id) as ILayerImage | undefined;
+      const prevLayer = (prevLayersImages as []).find(
+        (item: ILayerImage) => item.id === layer.id
+      ) as ILayerImage | undefined;
       if (prevLayer?.layerImageShown === true) {
         delete cache[layer.id];
         return null;
@@ -165,11 +189,9 @@ export const SelectedLayersContainer: React.FC = observer(() => {
 
   return (
     <>
-      {
-        layersImages.map((layer) => {
-          return getLayer(layer);
-        })
-      }
+      {layersImages.map((layer) => {
+        return getLayer(layer);
+      })}
     </>
   );
 });

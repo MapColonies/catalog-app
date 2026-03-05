@@ -30,7 +30,9 @@ const RUNNING_MODE = (window as any)._env_.RUNNING_MODE;
 const NUMBER_OF_CHARACTERS_LIMIT = (window as any)._env_.NUMBER_OF_CHARACTERS_LIMIT;
 const SERVED_ENTITY_TYPES = (window as any)._env_.SERVED_ENTITY_TYPES;
 const ACCESS_TOKEN = (window as any)._env_.ACCESS_TOKEN;
-const RASTER_INGESTION_FILES_STRUCTURE = JSON.parse((window as any)._env_.RASTER_INGESTION_FILES_STRUCTURE);
+const RASTER_INGESTION_FILES_STRUCTURE = JSON.parse(
+  (window as any)._env_.RASTER_INGESTION_FILES_STRUCTURE
+);
 const PROJECT_VERSION = (window as any)._env_.PROJECT_VERSION;
 const WHATSNEW_URL = (window as any)._env_.WHATSNEW_URL;
 const SITES_CONFIG = JSON.parse((window as any)._env_.SITES_CONFIG);
@@ -43,7 +45,7 @@ const POLYGON_PARTS = {
   mediumResolutionColor: '#fbff01',
   lowResolutionColor: '#ff3401',
   hoverColor: '#24AEE9',
-  billBoardStrokeColor: '#FFFF00'
+  billBoardStrokeColor: '#FFFF00',
 };
 const WFS = (window as any)._env_.WFS;
 const GEOCODER = (window as any)._env_.GEOCODER;
@@ -54,19 +56,25 @@ function enrichBaseMaps(baseMaps: IBaseMaps): IBaseMaps {
     maps: baseMaps.maps.map((baseMap: IBaseMap) => {
       return {
         ...baseMap,
-        thumbnail: baseMap.thumbnail && ACCESS_TOKEN.injectionType?.toLowerCase() === 'queryparam' ? `${baseMap.thumbnail}?${ACCESS_TOKEN.attributeName}=${ACCESS_TOKEN.tokenValue}` : baseMap.thumbnail,
+        thumbnail:
+          baseMap.thumbnail && ACCESS_TOKEN.injectionType?.toLowerCase() === 'queryparam'
+            ? `${baseMap.thumbnail}?${ACCESS_TOKEN.attributeName}=${ACCESS_TOKEN.tokenValue}`
+            : baseMap.thumbnail,
         baseRasterLayers: (baseMap.baseRasterLayers as IRasterLayer[]).map((rasterLayer) => {
           return {
             ...rasterLayer,
             options: {
               ...rasterLayer.options,
-              tilingScheme: (rasterLayer.type === LinkType.WMTS_LAYER) ? new CesiumGeographicTilingScheme() : undefined
-            }
+              tilingScheme:
+                rasterLayer.type === LinkType.WMTS_LAYER
+                  ? new CesiumGeographicTilingScheme()
+                  : undefined,
+            },
           };
-        })
-      }
-    })
-  }
+        }),
+      };
+    }),
+  };
 }
 
 const systemJobsPriorityOptions =
@@ -119,8 +127,8 @@ const APP_CONFIG = {
     DATE_TIME_FORMAT: `${DATE_FORMAT} HH:mm`,
     DATE_FNS_FORMAT: DATE_FNS_FORMAT,
     DATE_FNS_TIME_FORMAT: `${DATE_FNS_FORMAT} hh:mm`,
-    DATE_FNS_HUMAN_READABLE_DATE: "PPPP",
-    DATE_FNS_HUMAN_READABLE_DATE_TIME: "PPPPp",
+    DATE_FNS_HUMAN_READABLE_DATE: 'PPPP',
+    DATE_FNS_HUMAN_READABLE_DATE_TIME: 'PPPPp',
   },
   I18N: {
     DEFAULT_LANGUAGE: LANGUAGE,
@@ -152,8 +160,7 @@ const APP_CONFIG = {
     CULL_REQUESTS_WHILE_MOVING_MULTIPLIER: 120,
   },
   WMTS_LAYER: {
-    ATTRIBUTIONS:
-      'Tiles © <a href="http://basemap.nationalmap.gov">basemap</a>',
+    ATTRIBUTIONS: 'Tiles © <a href="http://basemap.nationalmap.gov">basemap</a>',
     URL: `${MAP_SERVER}/${ACTIVE_LAYER_PROPERTIES.urlPattern}`,
     LAYER: `${PUBLISH_POINT}`,
     STYLE: `${ACTIVE_LAYER_PROPERTIES.urlPatternParams.style}`,

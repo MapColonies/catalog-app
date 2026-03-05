@@ -14,15 +14,17 @@ import './polygon-selection-ui.css';
 export const Divider: React.FC = () => {
   const theme = useTheme();
   return (
-    <Box style={{
-      width:'1px',
-      borderWidth:'0 0 0 1px',
-      borderColor: theme.textIconOnDark as string,
-      borderStyle: 'solid',
-      height: '70%',
-    }}/>
+    <Box
+      style={{
+        width: '1px',
+        borderWidth: '0 0 0 1px',
+        borderColor: theme.textIconOnDark as string,
+        borderStyle: 'solid',
+        height: '70%',
+      }}
+    />
   );
-}
+};
 
 export interface PolygonSelectionUiProps {
   isSelectionEnabled: boolean;
@@ -43,7 +45,7 @@ enum PolygonSelectionsLabels {
   POLYGON = 'POLYGON',
   BBOX = 'BBOX',
   POI = 'POI',
-  FILTER = 'FILTER'
+  FILTER = 'FILTER',
 }
 
 export const PolygonSelectionUi: React.FC<PolygonSelectionUiProps> = (props) => {
@@ -68,7 +70,9 @@ export const PolygonSelectionUi: React.FC<PolygonSelectionUiProps> = (props) => 
   const [open, setOpen] = useState(false);
   const [openPoiDialog, setOpenPoiDialog] = useState(false);
   const [activeSelection, setActiveSelection] = useState<PolygonSelectionsLabels | ''>('');
-  const [lastDrawingSelectionType, setLastDrawingSelectionType] = useState<PolygonSelectionsLabels | ''>('');
+  const [lastDrawingSelectionType, setLastDrawingSelectionType] = useState<
+    PolygonSelectionsLabels | ''
+  >('');
   const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false);
   const [isCatalogFiltersEnabled, setIsCatalogFiltersEnabled] = useState(false);
 
@@ -80,7 +84,7 @@ export const PolygonSelectionUi: React.FC<PolygonSelectionUiProps> = (props) => 
     setIsFilterPanelOpen(false);
     setActiveSelection('');
     setLastDrawingSelectionType('');
-  }, [store.userStore.user?.role])
+  }, [store.userStore.user?.role]);
 
   useEffect(() => {
     if (poi) {
@@ -91,11 +95,11 @@ export const PolygonSelectionUi: React.FC<PolygonSelectionUiProps> = (props) => 
       setActiveSelection(lastDrawingSelectionType);
       setLastDrawingSelectionType('');
     }
-  }, [isSelectionEnabled, poi, corners])
+  }, [isSelectionEnabled, poi, corners]);
 
   const getActiveClass = (className: string, selectionLabel: PolygonSelectionsLabels) => {
-    return `${className} ${activeSelection === selectionLabel ? 'active': ''}`;
-  }
+    return `${className} ${activeSelection === selectionLabel ? 'active' : ''}`;
+  };
 
   return (
     <>
@@ -107,7 +111,7 @@ export const PolygonSelectionUi: React.FC<PolygonSelectionUiProps> = (props) => 
           pointerEvents: (disabled as boolean) ? 'none' : 'unset',
         }}
       >
-         <Tooltip content={intl.formatMessage({ id: 'action.clear.tooltip' })}>
+        <Tooltip content={intl.formatMessage({ id: 'action.clear.tooltip' })}>
           <IconButton
             className="mc-icon-Delete"
             label="CLEAR"
@@ -120,10 +124,7 @@ export const PolygonSelectionUi: React.FC<PolygonSelectionUiProps> = (props) => 
         <Divider />
         <Tooltip content={intl.formatMessage({ id: 'action.point.tooltip' })}>
           <IconButton
-            className={getActiveClass(
-              'mc-icon-POI',
-              PolygonSelectionsLabels.POI
-            )}
+            className={getActiveClass('mc-icon-POI', PolygonSelectionsLabels.POI)}
             label={PolygonSelectionsLabels.POI}
             onClick={(): void => {
               setOpenPoiDialog(true);
@@ -132,10 +133,7 @@ export const PolygonSelectionUi: React.FC<PolygonSelectionUiProps> = (props) => 
         </Tooltip>
         <Tooltip content={intl.formatMessage({ id: 'action.box.tooltip' })}>
           <IconButton
-            className={getActiveClass(
-              'mc-icon-Rectangle',
-              PolygonSelectionsLabels.BOX
-            )}
+            className={getActiveClass('mc-icon-Rectangle', PolygonSelectionsLabels.BOX)}
             label={PolygonSelectionsLabels.BOX}
             onClick={(): void => {
               setLastDrawingSelectionType(PolygonSelectionsLabels.BOX);
@@ -145,10 +143,7 @@ export const PolygonSelectionUi: React.FC<PolygonSelectionUiProps> = (props) => 
         </Tooltip>
         <Tooltip content={intl.formatMessage({ id: 'action.polygon.tooltip' })}>
           <IconButton
-            className={getActiveClass(
-              'mc-icon-Polygon',
-              PolygonSelectionsLabels.POLYGON
-            )}
+            className={getActiveClass('mc-icon-Polygon', PolygonSelectionsLabels.POLYGON)}
             label={PolygonSelectionsLabels.POLYGON}
             onClick={(): void => {
               setLastDrawingSelectionType(PolygonSelectionsLabels.POLYGON);
@@ -158,10 +153,7 @@ export const PolygonSelectionUi: React.FC<PolygonSelectionUiProps> = (props) => 
         </Tooltip>
         <Tooltip content={intl.formatMessage({ id: 'action.bbox-corners.tooltip' })}>
           <IconButton
-            className={getActiveClass(
-              'mc-icon-Coordinates',
-              PolygonSelectionsLabels.BBOX
-            )}
+            className={getActiveClass('mc-icon-Coordinates', PolygonSelectionsLabels.BBOX)}
             label={PolygonSelectionsLabels.BBOX}
             onClick={(): void => {
               setOpen(true);
@@ -171,9 +163,7 @@ export const PolygonSelectionUi: React.FC<PolygonSelectionUiProps> = (props) => 
         <Divider />
         <Tooltip content={intl.formatMessage({ id: 'action.filter.tooltip' })}>
           <IconButton
-            className={`mc-icon-Filter ${
-              isCatalogFiltersEnabled ? 'active' : ''
-            }`}
+            className={`mc-icon-Filter ${isCatalogFiltersEnabled ? 'active' : ''}`}
             label={PolygonSelectionsLabels.FILTER}
             onClick={() => {
               setIsFilterPanelOpen((currFilterOpen) => !currFilterOpen);
@@ -189,24 +179,22 @@ export const PolygonSelectionUi: React.FC<PolygonSelectionUiProps> = (props) => 
             onFiltersApply(filters);
           }}
         />
-        {
-          open &&
+        {open && (
           <BBoxDialog
             isOpen={open}
             onSetOpen={setOpen}
             onPolygonUpdate={onPolygonUpdate}
             corners={corners}
           />
-        }
-        {
-          openPoiDialog &&
+        )}
+        {openPoiDialog && (
           <PoiDialog
             isOpen={openPoiDialog}
             onSetOpen={setOpenPoiDialog}
             onPoiUpdate={onPoiUpdate}
             poi={poi}
           />
-        }
+        )}
         <CatalogFilterPanel
           onFiltersReset={() => {
             setIsCatalogFiltersEnabled(false);

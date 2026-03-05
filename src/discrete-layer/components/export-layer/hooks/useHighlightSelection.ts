@@ -8,26 +8,30 @@ import { useStore } from '../../../models';
 const HIGHLIGHT_BUFFER_METERS = 2;
 
 interface IHighlightSelectionUtils {
-    onSelectionMouseOver: (selectionId: string) => void;
-    onSelectionMouseOut: () => void;
+  onSelectionMouseOver: (selectionId: string) => void;
+  onSelectionMouseOut: () => void;
 }
 
 const useHighlightSelection = (): IHighlightSelectionUtils => {
-    const { exportStore } = useStore();
+  const { exportStore } = useStore();
 
-    const onSelectionMouseOver = useCallback((selectionId: string) => {
-        const hoveredSelection = exportStore.getFeatureById(selectionId);
-        const bufferedSelection = buffer(hoveredSelection as Feature<Polygon>, HIGHLIGHT_BUFFER_METERS, {units: 'meters'});
-        const selectionLine = polygonToLine(bufferedSelection as Feature<Polygon>);
-        
-        exportStore.setHighlightedFeature(selectionLine as Feature);
-    }, []);
+  const onSelectionMouseOver = useCallback((selectionId: string) => {
+    const hoveredSelection = exportStore.getFeatureById(selectionId);
+    const bufferedSelection = buffer(
+      hoveredSelection as Feature<Polygon>,
+      HIGHLIGHT_BUFFER_METERS,
+      { units: 'meters' }
+    );
+    const selectionLine = polygonToLine(bufferedSelection as Feature<Polygon>);
 
-    const onSelectionMouseOut = useCallback(() => {
-        exportStore.resetHighlightedFeature();
-    }, []);
+    exportStore.setHighlightedFeature(selectionLine as Feature);
+  }, []);
 
-    return { onSelectionMouseOver, onSelectionMouseOut };
-}
+  const onSelectionMouseOut = useCallback(() => {
+    exportStore.resetHighlightedFeature();
+  }, []);
+
+  return { onSelectionMouseOver, onSelectionMouseOut };
+};
 
 export default useHighlightSelection;

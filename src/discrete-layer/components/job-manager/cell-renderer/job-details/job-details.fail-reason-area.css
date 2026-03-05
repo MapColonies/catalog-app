@@ -1,21 +1,20 @@
 .failReasonAreaContainer {
   line-height: 0px;
   padding: 0 10px;
-  height:0;
-  display:none;
+  height: 0;
+  display: none;
 }
 
-.failReasonAreaContainer.show{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    opacity: 1;
-    padding: 10px;
-    line-height: 20px;
-    height: 1em;
-    transition: all 0.1s ease-in;
+.failReasonAreaContainer.show {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 1;
+  padding: 10px;
+  line-height: 20px;
+  height: 1em;
+  transition: all 0.1s ease-in;
 }
-  
 
 .failReasonText {
   max-width: 50ch;

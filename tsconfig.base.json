@@ -3,11 +3,7 @@
     "paths": {
       "react": ["./node_modules/@types/react"]
     },
-    "types": [
-      "node",
-      "jest",
-      "webpack-env"
-    ]
+    "types": ["node", "jest", "webpack-env"]
   },
   "exclude": [
     "src/**/*.spec.tsx",

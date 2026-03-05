@@ -1,7 +1,8 @@
 const fs = require('fs');
-const url = require('url');
 const path = require('path');
-const exec = require('child_process').exec;
+const { execFile } = require('child_process');
+const http = require('http');
+const https = require('https');
 
 let confdUrl =
   'https://github.com/kelseyhightower/confd/releases/download/v0.15.0/confd-0.15.0-windows-amd64.exe';
@@ -41,16 +42,20 @@ const devIndexConfigPath = path.join(confdDevBasePath, 'conf.d/index.toml');
 
 const download = (uri, filename) => {
   console.log(`Downloading ${filename} from ${uri}`);
-  const protocol = url.parse(uri).protocol.slice(0, -1);
+
+  const urlObj = new URL(uri);
+  const client = urlObj.protocol === 'https:' ? https : http;
 
   return new Promise((resolve, reject) => {
-    const onError = e => {
-      fs.unlink(filename);
+    const onError = (e) => {
+      if (fs.existsSync(filename)) {
+        fs.unlinkSync(filename);
+      }
       reject(e);
     };
 
-    require(protocol)
-      .get(uri, function(response) {
+    client
+      .get(uri, (response) => {
         if (response.statusCode >= 200 && response.statusCode < 300) {
           const fileStream = fs.createWriteStream(filename, { mode: 0o755 });
           fileStream.on('error', onError);
@@ -59,7 +64,9 @@ const download = (uri, filename) => {
         } else if (response.headers.location) {
           resolve(download(response.headers.location, filename));
         } else {
-          reject(new Error(response.statusCode + ' ' + response.statusMessage));
+          reject(
+            new Error(`${response.statusCode} ${response.statusMessage}`)
+          );
         }
       })
       .on('error', onError);
@@ -70,11 +77,11 @@ const downloadIfNotExists = (uri, filename) => {
   console.log(`Checking if ${filename} exists`);
   return new Promise(resolve => {
     if (fs.existsSync(filename)) {
-      console.log(`${filename} exists, proceeding to the next stage`);
+      console.log(`File ${filename} exists, proceeding to the next stage`);
       resolve();
       return;
     }
-    console.log(`${filename} does not exist`);
+    console.log(`File ${filename} does not exist`);
     resolve(download(uri, filename));
   });
 };
@@ -91,7 +98,7 @@ const createDirIfNotExists = dir => {
   }
 };
 
-const createDevConfdConfigFile = (env, isInDocker) => {
+const createDevConfdConfigFile = async (env, isInDocker) => {
   createDirIfNotExists(confdDevBasePath);
   createDirIfNotExists(path.join(confdDevBasePath, 'conf.d'));
   createDirIfNotExists(path.join(confdDevBasePath, 'templates'));
@@ -99,45 +106,44 @@ const createDevConfdConfigFile = (env, isInDocker) => {
   if (!env) {
     env = 'default';
   }
-  console.log('Get toml and tmpl files');
-  copyFile(confdTmplPath, devTmplPath);
-  copyFile(confdConfigPath, devConfigPath, data => {
+  console.log('Creating a development toml and tmpl files');
+  const tmplCopy = copyFile(confdTmplPath, devTmplPath);
+  const tomlCopy = copyFile(confdConfigPath, devConfigPath, data => {
     const target = 'dest = "' + path.join(confdBasePath, '..', 'html') + '/'; 
     return !isInDocker ? data : data.replace('dest = "public/', target);
   });
-  copyFile(indexTmplPath, devIndexTmplPath);
-  copyFile(indexConfigPath, devIndexConfigPath, data => {
+  const indexTmplCopy = copyFile(indexTmplPath, devIndexTmplPath);
+  const indexTomlCopy = copyFile(indexConfigPath, devIndexConfigPath, data => {
     const target = 'dest = "' + path.join(confdBasePath, '..', 'html') + '/'; 
     return !isInDocker ? data : data.replace('dest = "public/', target);
   });
+
+  return Promise.all([tmplCopy, tomlCopy, indexTmplCopy, indexTomlCopy]);
 };
 
 const replacePlaceHolders = () => {
   return copyFile(indexTmplPath, indexTmplPath, (content) => {
     console.log('**** Replace PLACEHOLDERS by CONFD syntax ****');
     return content
-          .replace(/{PUBLIC_URL_PLACEHOLDER}/g, '{{ getv "/configuration/public/url" "." }}')
-          .replace(/{APP_VERSION_PLACEHOLDER}/g, '{{ getv "/configuration/image/tag" "vUnknown" }}');
+      .replace(/{PUBLIC_URL_PLACEHOLDER}/g, '{{ getv "/configuration/public/url" "." }}')
+      .replace(/{APP_VERSION_PLACEHOLDER}/g, '{{ getv "/configuration/image/tag" "{APP_VERSION_PLACEHOLDER}" }}');
   });
 };
 
 const runConfd = () => {
   console.log('Running confd');
-  exec(
-    `${confdPath} -backend env -onetime -confdir ${confdDevBasePath}`,
+  execFile(
+    `${confdPath}`,
+    ['-backend', 'env', '-onetime', '-confdir', confdDevBasePath],
     (error, stdout, stderr) => {
       console.log(stdout);
       console.error(stderr);
       if (error !== null) {
-        throw new Error(`exec error: ${error}`);
+        throw new Error(`execFile error: ${error}`);
       }
     }
   );
 };
-
-// const createTargetDir = () => {
-//   createDirIfNotExists('config');
-// };
 
 const help = () => {
   console.log('usage: "node <path to this script> [options]\n');
@@ -154,7 +160,7 @@ const help = () => {
 };
 
 const main = () => {
-  if (process.argv.indexOf('--help') != -1) {
+  if (process.argv.indexOf('--help') !== -1) {
     help();
   }
   const envIdx = process.argv.indexOf('--environment');
@@ -164,7 +170,6 @@ const main = () => {
       replacePlaceHolders();
       createDevConfdConfigFile(env, isInDocker);
     })
-    // .then(createTargetDir())
     .then(() => runConfd())
     .catch(err => {
       console.error('Failed to generate the configuration');

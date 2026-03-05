@@ -15,10 +15,10 @@ import { getCatalogFilters } from './utils';
 import './catalog-filter-panel.css';
 
 interface CatalogFilterPanelProps {
-    isOpen: boolean;
-    closePanel: () => void;
-    onFiltersSubmit: (filters: FilterField[]) => void;
-    onFiltersReset: () => void;
+  isOpen: boolean;
+  closePanel: () => void;
+  onFiltersSubmit: (filters: FilterField[]) => void;
+  onFiltersReset: () => void;
 }
 /**
  * Use react-hook-forms with validations.
@@ -35,24 +35,25 @@ export const CatalogFilterPanel: React.FC<CatalogFilterPanelProps> = observer(
 
     const catalogFilterPanelContainerRef = useRef<HTMLDivElement>(null);
 
-    useClickOutside(catalogFilterPanelContainerRef, closePanel, isOpen)
+    useClickOutside(catalogFilterPanelContainerRef, closePanel, isOpen);
 
     const selectedProductType = store.discreteLayersStore.searchParams.recordType;
     const filterableFields = useGetFilterableFields(selectedProductType as RecordType);
 
     const defaultFormValues = useMemo(() => {
-      return filterableFields?.reduce((defaultValues, field) => {
-        return ({...defaultValues, [field.fieldName as string]: ''})
-      }, {}) ?? {}
-    }, [filterableFields])
+      return (
+        filterableFields?.reduce((defaultValues, field) => {
+          return { ...defaultValues, [field.fieldName as string]: '' };
+        }, {}) ?? {}
+      );
+    }, [filterableFields]);
 
-    
     const formMethods = useForm({
       mode: 'onBlur',
       reValidateMode: 'onBlur',
-      defaultValues: defaultFormValues
+      defaultValues: defaultFormValues,
     });
-    
+
     const handleFormReset = () => {
       formMethods.reset(defaultFormValues);
       onFiltersReset();
@@ -60,7 +61,7 @@ export const CatalogFilterPanel: React.FC<CatalogFilterPanelProps> = observer(
 
     useEffect(() => {
       handleFormReset();
-    }, [store.userStore.user?.role])
+    }, [store.userStore.user?.role]);
 
     const handleSubmit = () => {
       const filterFormValues = formMethods.getValues();
@@ -70,14 +71,23 @@ export const CatalogFilterPanel: React.FC<CatalogFilterPanelProps> = observer(
     };
 
     const watchAllFields = formMethods.watch();
-    const isFormEmpty = useMemo(() => Object.values(watchAllFields).every(value => isEmpty(value)), [watchAllFields]);
+    const isFormEmpty = useMemo(
+      () => Object.values(watchAllFields).every((value) => isEmpty(value)),
+      [watchAllFields]
+    );
 
     // If there is errors or if all field values are empty, then submit should be disabled
-    const isSubmitFiltersDisabled = useMemo(() => !formMethods.formState.isValid || isFormEmpty, [watchAllFields]);
+    const isSubmitFiltersDisabled = useMemo(
+      () => !formMethods.formState.isValid || isFormEmpty,
+      [watchAllFields]
+    );
 
     return (
       <FormProvider {...formMethods}>
-        <div ref={catalogFilterPanelContainerRef} className={`catalogFilterPanelContainer ${isOpen ? 'open' : 'close'}`}>
+        <div
+          ref={catalogFilterPanelContainerRef}
+          className={`catalogFilterPanelContainer ${isOpen ? 'open' : 'close'}`}
+        >
           <Box className="catalogFilterFormContainer">
             {filterableFields?.length && (
               <form className="catalogFiltersForm" id={'catalogFiltersForm'}>
@@ -94,7 +104,7 @@ export const CatalogFilterPanel: React.FC<CatalogFilterPanelProps> = observer(
               onClick={formMethods.handleSubmit(handleSubmit)}
               disabled={isSubmitFiltersDisabled}
             >
-              {intl.formatMessage({id: 'catalog-filter.filterButton.text'})}
+              {intl.formatMessage({ id: 'catalog-filter.filterButton.text' })}
             </Button>
             <Button
               className="catalogFiltersClearBtn"
@@ -102,7 +112,7 @@ export const CatalogFilterPanel: React.FC<CatalogFilterPanelProps> = observer(
               form="catalogFiltersForm"
               onClick={handleFormReset}
             >
-              {intl.formatMessage({id: 'catalog-filter.clearFilterButton.text'})}
+              {intl.formatMessage({ id: 'catalog-filter.clearFilterButton.text' })}
             </Button>
           </Box>
         </div>

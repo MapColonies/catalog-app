@@ -11,7 +11,7 @@ import {
 } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
 import { JobModelType, Status } from '../../../models';
-import { FINAL_STATUSES } from '../../job-manager/job.types'
+import { FINAL_STATUSES } from '../../job-manager/job.types';
 
 import './priority.cell-renderer.css';
 
@@ -28,9 +28,7 @@ interface IPriorityCellRendererParams extends ICellRendererParams {
   readOnly?: (jobData: JobModelType) => boolean;
 }
 
-export const PriorityRenderer: React.FC<IPriorityCellRendererParams> = (
-  props
-) => {
+export const PriorityRenderer: React.FC<IPriorityCellRendererParams> = (props) => {
   const jobData: JobModelType = props.data as JobModelType;
   const { optionsData } = props;
   const [value, setValue] = useState((get(jobData, 'priority') as number).toString());
@@ -38,8 +36,8 @@ export const PriorityRenderer: React.FC<IPriorityCellRendererParams> = (
   const [disabled, setDisabled] = useState(false);
 
   useEffect(() => {
-    const shouldBeDisabled = loading || FINAL_STATUSES.includes(jobData.status as Status)
-    setDisabled(shouldBeDisabled)
+    const shouldBeDisabled = loading || FINAL_STATUSES.includes(jobData.status as Status);
+    setDisabled(shouldBeDisabled);
   }, [loading, jobData.status]);
 
   interface IconObj {
@@ -53,7 +51,11 @@ export const PriorityRenderer: React.FC<IPriorityCellRendererParams> = (
       (option: PriorityOption) => option.value === val
     ) as PriorityOption;
 
-    return { icon: selectedOption.icon, color: selectedOption.iconcolor, label: selectedOption.label };
+    return {
+      icon: selectedOption.icon,
+      color: selectedOption.iconcolor,
+      label: selectedOption.label,
+    };
   }, []);
 
   const [icon, setIcon] = useState(getIconObjForVal(value));
@@ -83,7 +85,9 @@ export const PriorityRenderer: React.FC<IPriorityCellRendererParams> = (
             label="IMPORT"
           />
 
-          <Typography className="priorityReadonlyLabel" tag="p">{icon.label}</Typography>
+          <Typography className="priorityReadonlyLabel" tag="p">
+            {icon.label}
+          </Typography>
         </Box>
       );
     }
@@ -105,16 +109,15 @@ export const PriorityRenderer: React.FC<IPriorityCellRendererParams> = (
         }}
       />
     );
-  }
+  };
 
   return (
     <Box className="priorityCellContainer">
-      {
-        loading &&
+      {loading && (
         <Box className="loadingContainer">
           <CircularProgress />
         </Box>
-      }
+      )}
       {renderPriorityPresentor()}
     </Box>
   );

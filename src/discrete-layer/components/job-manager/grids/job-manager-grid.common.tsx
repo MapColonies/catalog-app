@@ -5,7 +5,7 @@ import CONFIG from '../../../../common/config';
 import {
   GridComponent,
   GridComponentOptions,
-  GridReadyEvent
+  GridReadyEvent,
 } from '../../../../common/components/grid';
 import EnumsMapContext from '../../../../common/contexts/enumsMap.context';
 import { IActionGroup } from '../../../../common/actions/entity.actions';
@@ -35,10 +35,12 @@ export interface ICommonJobManagerGridProps {
   gridStyleOverride?: React.CSSProperties;
   onGridReadyCB?: (params: GridReadyEvent) => void;
   customColDef?: (ColDef | ColGroupDef)[];
-  omitColDefsByRenderer?: { renderers: string[], preserveColWidth?: boolean };
+  omitColDefsByRenderer?: { renderers: string[]; preserveColWidth?: boolean };
   areJobsLoading?: boolean;
   focusOnJob?: Partial<Pick<JobModelType, 'id' | 'resourceId' | 'updated'>>;
-  setFocusOnJob?: (job: Partial<Pick<JobModelType, 'id' | 'resourceId' | 'updated'>> | undefined) => void;
+  setFocusOnJob?: (
+    job: Partial<Pick<JobModelType, 'id' | 'resourceId' | 'updated'>> | undefined
+  ) => void;
   handleFocusError?: (error: IError | undefined) => void;
 }
 
@@ -54,7 +56,9 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
     customColDef,
     gridOptionsOverride = {},
     gridStyleOverride = {},
-    onGridReadyCB = (params): void => { return },
+    onGridReadyCB = (params): void => {
+      return;
+    },
     rowDataChangeCB = (): void => {
       return;
     },
@@ -62,7 +66,7 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
     areJobsLoading,
     focusOnJob,
     setFocusOnJob,
-    handleFocusError
+    handleFocusError,
   } = props;
 
   const store = useStore();
@@ -89,9 +93,7 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
     onGridReadyCB(params);
 
     params.api.applyColumnState({
-      state: [
-        {colId: 'updated', sort: 'desc'}
-      ],
+      state: [{ colId: 'updated', sort: 'desc' }],
     });
     params.api.sizeColumnsToFit();
   };
@@ -113,7 +115,8 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
     });
   }, [intl]);
 
-  const primitiveValueFormatter = (params:Record<string,unknown>):string => params.value as string || '';
+  const primitiveValueFormatter = (params: Record<string, unknown>): string =>
+    (params.value as string) || '';
   const defaultColDef = useMemo(
     () => [
       {
@@ -171,10 +174,7 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
         cellRenderer: 'priorityRenderer',
         cellRendererParams: {
           optionsData: getPriorityOptions,
-          onChange: (
-            evt: React.FormEvent<HTMLInputElement>,
-            jobData: JobModelType
-          ): void => {
+          onChange: (evt: React.FormEvent<HTMLInputElement>, jobData: JobModelType): void => {
             const { id, productType } = jobData;
             const chosenPriority: string | number = evt.currentTarget.value;
             const updateTaskDomain = getProductDomain(
@@ -192,7 +192,7 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
           },
           readOnly: (jobData: JobModelType): boolean => {
             return jobData.domain !== Domain.RASTER;
-          } 
+          },
         },
       },
       {
@@ -208,8 +208,7 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
         valueFormatter: primitiveValueFormatter,
         sortable: true,
         // @ts-ignore
-        comparator: (valueA, valueB, nodeA, nodeB, isInverted): number =>
-          valueA - valueB,
+        comparator: (valueA, valueB, nodeA, nodeB, isInverted): number => valueA - valueB,
       },
       {
         headerName: intl.formatMessage({
@@ -224,8 +223,7 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
         valueFormatter: primitiveValueFormatter,
         sortable: true,
         // @ts-ignore
-        comparator: (valueA, valueB, nodeA, nodeB, isInverted): number =>
-          valueA - valueB,
+        comparator: (valueA, valueB, nodeA, nodeB, isInverted): number => valueA - valueB,
       },
       // {
       //   headerName: intl.formatMessage({
@@ -283,7 +281,7 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
         filter: {
           component: JobDetailsStatusFilter,
           doesFilterPass: (params: any) => {
-              return params.model === params.handlerParams.getValue(params.node);
+            return params.model === params.handlerParams.getValue(params.node);
           },
         },
       },
@@ -309,16 +307,18 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
       const renderersList = omitColDefsByRenderer.renderers;
 
       if (!(omitColDefsByRenderer.preserveColWidth ?? false)) {
-        colDef = defaultColDef.filter(colDef => !renderersList.includes(colDef.cellRenderer as string)) as ColDef[]; 
+        colDef = defaultColDef.filter(
+          (colDef) => !renderersList.includes(colDef.cellRenderer as string)
+        ) as ColDef[];
       } else {
-        colDef = defaultColDef.map(colDef => {
+        colDef = defaultColDef.map((colDef) => {
           if (renderersList.includes(colDef.cellRenderer as string)) {
-            return ({
+            return {
               ...colDef,
               cellRenderer: 'placeholderRenderer',
               headerName: '',
               pinned: undefined,
-            })
+            };
           }
           return colDef;
         }) as ColDef[];
@@ -335,63 +335,62 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
   };
 
   const baseGridOption: GridComponentOptions = {
-      enableRtl: CONFIG.I18N.DEFAULT_LANGUAGE.toUpperCase() === 'HE',
-      enableFilterHandlers: true,
-      suppressRowTransform: true,
-      pagination: pagination,
-      paginationPageSize: pageSize,
-      paginationPageSizeSelector: false,//[pageSize, 20, 50, 100],
-      getRowId: (params: GetRowIdParams): string => {
-        return (params.data as JobModelType).id;
+    enableRtl: CONFIG.I18N.DEFAULT_LANGUAGE.toUpperCase() === 'HE',
+    enableFilterHandlers: true,
+    suppressRowTransform: true,
+    pagination: pagination,
+    paginationPageSize: pageSize,
+    paginationPageSizeSelector: false, //[pageSize, 20, 50, 100],
+    getRowId: (params: GetRowIdParams): string => {
+      return (params.data as JobModelType).id;
+    },
+    detailsRowCellRenderer: 'detailsRenderer',
+    detailsRowHeight: 230,
+    detailsRowExpanderPosition: 'start',
+    overlayNoRowsTemplate: intl.formatMessage({
+      id: 'results.nodata',
+    }),
+    loadingOverlayComponent: 'customLoadingOverlay',
+    components: {
+      jobDetailsStatusFilter: useCallback(JobDetailsStatusFilter, []),
+      detailsRenderer: useCallback(JobDetailsRenderer, []),
+      statusRenderer: useCallback(StatusRenderer, []),
+      actionsRenderer: useCallback(ActionsRenderer, []),
+      priorityRenderer: useCallback(PriorityRenderer, []),
+      productTypeRenderer: useCallback(JobProductTypeRenderer, []),
+      dateCellRenderer: useCallback(DateCellRenderer, []),
+      tooltippedCellRenderer: useCallback(TooltippedCellRenderer, []),
+      placeholderRenderer: useCallback(PlaceholderCellRenderer, []),
+      customLoadingOverlay: useCallback(Loading, []),
+    },
+    tooltipShowDelay: 0,
+    tooltipMouseTrack: false,
+    rowSelection: {
+      mode: 'singleRow',
+      checkboxes: false,
+      enableClickSelection: true,
+    },
+    suppressCellFocus: true,
+    singleClickEdit: true,
+    suppressMenuHide: true, // Used to show filter icon at all times (not only when hovering the header).
+    defaultColDef: {
+      unSortIcon: true,
+    },
+    onGridReady,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    context: {
+      detailsRowCellRendererPresencePredicate: (rowData: any) => {
+        const jobData = rowData as JobModelType;
+        return jobData.domain === Domain.RASTER;
       },
-      detailsRowCellRenderer: 'detailsRenderer',
-      detailsRowHeight: 230,
-      detailsRowExpanderPosition: 'start',
-      overlayNoRowsTemplate: intl.formatMessage({
-        id: 'results.nodata',
-      }),
-      loadingOverlayComponent: 'customLoadingOverlay',
-      components: {
-        jobDetailsStatusFilter: useCallback(JobDetailsStatusFilter, []),
-        detailsRenderer: useCallback(JobDetailsRenderer, []),
-        statusRenderer: useCallback(StatusRenderer, []),
-        actionsRenderer: useCallback(ActionsRenderer, []),
-        priorityRenderer: useCallback(PriorityRenderer, []),
-        productTypeRenderer: useCallback(JobProductTypeRenderer, []),
-        dateCellRenderer: useCallback(DateCellRenderer, []),
-        tooltippedCellRenderer: useCallback(TooltippedCellRenderer, []),
-        placeholderRenderer: useCallback(PlaceholderCellRenderer, []),
-        customLoadingOverlay: useCallback(Loading, [])
-      },
-      tooltipShowDelay: 0,
-      tooltipMouseTrack: false,
-      rowSelection: {
-        mode: 'singleRow',
-        checkboxes: false,
-        enableClickSelection: true, 
-      },
-      suppressCellFocus: true,
-      singleClickEdit: true,
-      suppressMenuHide: true, // Used to show filter icon at all times (not only when hovering the header).
-      defaultColDef: {
-        unSortIcon: true,  
-      },
-      onGridReady,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      context:{
-        detailsRowCellRendererPresencePredicate: (rowData: any) => {
-          const jobData = rowData as JobModelType;
-          return jobData.domain === Domain.RASTER;
-        }
-      }
-    };
+    },
+  };
 
   const gridOptions = useMemo(() => {
     const combinedOptions = { ...baseGridOption, ...gridOptionsOverride };
     const colDefs = customColDef ?? getColDef(combinedOptions);
-    return ({ ...combinedOptions, columnDefs: colDefs })
+    return { ...combinedOptions, columnDefs: colDefs };
   }, []);
-
 
   const defaultGridStyle: React.CSSProperties = {
     height: '100%',

@@ -23,7 +23,7 @@ const ExportPolygonsRenderer: React.FC = observer(() => {
   const store = useStore();
   const exportGeometrySelections = store.exportStore.geometrySelectionsCollection;
   const getEntityLabel = useGetEntityLabelForDomain();
-  
+
   return (
     <>
       <CesiumGeojsonLayer
@@ -33,17 +33,23 @@ const ExportPolygonsRenderer: React.FC = observer(() => {
           geoJsonDataSource.entities.values.forEach((item, i) => {
             if (item.polygon) {
               // @ts-ignore
-              (item.polygon.outlineColor as CesiumConstantProperty).setValue(CesiumColor.fromCssColorString(SELECTION_POLYGON_OUTLINE_COLOR));
-              (item.polygon.outlineWidth as CesiumConstantProperty).setValue(SELECTION_POLYGON_LINE_WIDTH);
-              
+              (item.polygon.outlineColor as CesiumConstantProperty).setValue(
+                CesiumColor.fromCssColorString(SELECTION_POLYGON_OUTLINE_COLOR)
+              );
+              (item.polygon.outlineWidth as CesiumConstantProperty).setValue(
+                SELECTION_POLYGON_LINE_WIDTH
+              );
+
               // @ts-ignore
               item.polygon.material = CesiumColor.CYAN.withAlpha(SELECTION_POLYGON_OPACITY);
 
               const centerInDegrees = center(
                 points(
                   // @ts-ignore
-                  ((item.polygon.hierarchy.getValue() as Record<string, unknown>)
-                    .positions as CesiumCartesian3[]).map((pos) => {
+                  (
+                    (item.polygon.hierarchy.getValue() as Record<string, unknown>)
+                      .positions as CesiumCartesian3[]
+                  ).map((pos) => {
                     const cartographicPos = CesiumCartographic.fromCartesian(pos);
                     return [
                       CesiumMath.toDegrees(cartographicPos.latitude),
@@ -64,7 +70,7 @@ const ExportPolygonsRenderer: React.FC = observer(() => {
                 outlineColor: CesiumColor.BLACK,
                 outlineWidth: 2,
                 showBackground: true,
-                disableDepthTestDistance: Number.POSITIVE_INFINITY
+                disableDepthTestDistance: Number.POSITIVE_INFINITY,
               };
 
               // @ts-ignore

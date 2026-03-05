@@ -18,19 +18,19 @@ interface Services {
 export const InternalService: React.FC<InternalServiceProps> = ({
   service: { image, services, status },
 }: InternalServiceProps) => {
-
   const theme = useTheme();
 
-  
-  const svcList = (services as
-    | Services[]
-    | undefined)?.map((service) => {
+  const svcList = (services as Services[] | undefined)?.map((service) => {
     return (
       <Box className="internalService">
         <Box
           className="statusIndicator"
           style={{
-            backgroundColor: `${(status as boolean) ? theme.custom?.GC_SUCCESS as string : theme.custom?.GC_ERROR_HIGH as string}`,
+            backgroundColor: `${
+              (status as boolean)
+                ? (theme.custom?.GC_SUCCESS as string)
+                : (theme.custom?.GC_ERROR_HIGH as string)
+            }`,
           }}
         />
         <Typography className="serviceName" tag="p">

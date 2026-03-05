@@ -12,7 +12,9 @@ interface ILayerImageCellRendererParams {
 }
 
 export const LayerImageRenderer: React.FC<ILayerImageCellRendererParams> = (props) => {
-  const [layerImageShown, setLayerImageShown] = useState<boolean>(props.data.layerImageShown as boolean);
+  const [layerImageShown, setLayerImageShown] = useState<boolean>(
+    props.data.layerImageShown as boolean
+  );
 
   useEffect(() => {
     setLayerImageShown(props.data.layerImageShown as boolean);
@@ -26,19 +28,23 @@ export const LayerImageRenderer: React.FC<ILayerImageCellRendererParams> = (prop
 
   return (
     <Box>
-      <IconButton 
-        className={layerImageShown ? 'mc-icon-Show imageChecked' : !isValidLayerMetadata(props.data) ? 'mc-icon-Hide iconNotAllowed' : 'mc-icon-Hide'}
-        label="LAYER IMAGE SHOWN ICON"
-        onClick={
-          (evt: React.MouseEvent<HTMLButtonElement>): void => {
-            if (isValidLayerMetadata(props.data)) {
-              const val = !layerImageShown;
-              evt.stopPropagation();
-              setLayerImageShown(val);
-              props.onClick(props.data, val);
-            }
-          }
+      <IconButton
+        className={
+          layerImageShown
+            ? 'mc-icon-Show imageChecked'
+            : !isValidLayerMetadata(props.data)
+            ? 'mc-icon-Hide iconNotAllowed'
+            : 'mc-icon-Hide'
         }
+        label="LAYER IMAGE SHOWN ICON"
+        onClick={(evt: React.MouseEvent<HTMLButtonElement>): void => {
+          if (isValidLayerMetadata(props.data)) {
+            const val = !layerImageShown;
+            evt.stopPropagation();
+            setLayerImageShown(val);
+            props.onClick(props.data, val);
+          }
+        }}
       />
     </Box>
   );

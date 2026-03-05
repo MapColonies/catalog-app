@@ -1,8 +1,6 @@
 import { get } from 'lodash';
 import React, { useContext, useMemo } from 'react';
-import EnumsMapContext, {
-  IEnumsMapType,
-} from '../../../../common/contexts/enumsMap.context';
+import EnumsMapContext, { IEnumsMapType } from '../../../../common/contexts/enumsMap.context';
 import { RecordType, useStore } from '../../../models';
 import ExportStringFieldComponent from '../common/fields/export-general-field.component';
 import DemSelectionField from '../export-entity-selections-fields/dem-selection-field.component';
@@ -17,7 +15,8 @@ const useGetSelectionFieldForDomain = (): React.FC<ExportFieldProps> => {
   const { layerToExport } = exportStore;
 
   const getSelectionByDomain = useMemo(() => {
-    const layerRecordType = get(enums, layerToExport?.productType as string).parentDomain as RecordType;
+    const layerRecordType = get(enums, layerToExport?.productType as string)
+      .parentDomain as RecordType;
 
     switch (layerRecordType) {
       case RecordType.RECORD_RASTER:
@@ -25,11 +24,11 @@ const useGetSelectionFieldForDomain = (): React.FC<ExportFieldProps> => {
       case RecordType.RECORD_DEM:
         return DemSelectionField;
       default:
-          return ExportStringFieldComponent;
+        return ExportStringFieldComponent;
     }
-  }, [])
+  }, []);
 
- return getSelectionByDomain;
+  return getSelectionByDomain;
 };
 
 export default useGetSelectionFieldForDomain;

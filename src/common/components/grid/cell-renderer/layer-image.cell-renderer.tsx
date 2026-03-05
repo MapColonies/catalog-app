@@ -13,7 +13,9 @@ interface ILayerImageCellRendererParams extends ICellRendererParams {
 
 export const LayerImageRenderer: React.FC<ILayerImageCellRendererParams> = (props) => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-  const [layerImageShown, setLayerImageShown] = useState<boolean>(props.data.layerImageShown as boolean);
+  const [layerImageShown, setLayerImageShown] = useState<boolean>(
+    props.data.layerImageShown as boolean
+  );
 
   useEffect(() => {
     if (layerImageShown && isBeingDeleted(props.data)) {
@@ -24,17 +26,21 @@ export const LayerImageRenderer: React.FC<ILayerImageCellRendererParams> = (prop
   return (
     <Box style={{ display: 'flex', justifyContent: 'center', paddingTop: '8px' }}>
       <IconButton
-        className={layerImageShown ? 'mc-icon-Show imageChecked' : !isValidLayerMetadata(props.data) ? 'mc-icon-Hide iconNotAllowed' : 'mc-icon-Hide'}
-        label="LAYER IMAGE SHOWN ICON"
-        onClick={
-          (): void => {
-            if (isValidLayerMetadata(props.data)) {
-              setLayerImageShown(!layerImageShown);
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-              props.onClick(props.data.id, !layerImageShown, props.node);
-            }
-          }
+        className={
+          layerImageShown
+            ? 'mc-icon-Show imageChecked'
+            : !isValidLayerMetadata(props.data)
+            ? 'mc-icon-Hide iconNotAllowed'
+            : 'mc-icon-Hide'
         }
+        label="LAYER IMAGE SHOWN ICON"
+        onClick={(): void => {
+          if (isValidLayerMetadata(props.data)) {
+            setLayerImageShown(!layerImageShown);
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            props.onClick(props.data.id, !layerImageShown, props.node);
+          }
+        }}
       />
     </Box>
   );

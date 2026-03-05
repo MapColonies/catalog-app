@@ -4,7 +4,12 @@ import moment from 'moment';
 import vest, { test, enforce } from 'vest';
 import { IEnforceRules } from 'vest/enforce';
 import { ValidationTypeName } from '../../../common/models/validation.enum';
-import { DateGranularityType, FieldConfigModelType, ValidationConfigModelType, ValidationValueType } from '../../models';
+import {
+  DateGranularityType,
+  FieldConfigModelType,
+  ValidationConfigModelType,
+  ValidationValueType,
+} from '../../models';
 import { FieldInfoName } from './layer-details.field-info';
 import { getBasicType, getValidationType } from './utils';
 
@@ -39,7 +44,7 @@ enforce.extend({
         JSON.parse(val);
       }
       return true;
-    } catch(e) {
+    } catch (e) {
       return false;
     }
   },
@@ -50,12 +55,19 @@ enforce.extend({
 
     const isEmptyVal = typeof val === 'undefined' || val === null || val === '';
     return !isEmptyVal;
-  }
+  },
 });
 
-const suite = (fieldDescriptor: FieldConfigModelType[], data: Record<string, unknown> = {}): unknown => {
-
-  const greaterThanOrEquals = (basicType: string, value1: unknown, value2: unknown, validateTime = false): IEnforceRules => {
+const suite = (
+  fieldDescriptor: FieldConfigModelType[],
+  data: Record<string, unknown> = {}
+): unknown => {
+  const greaterThanOrEquals = (
+    basicType: string,
+    value1: unknown,
+    value2: unknown,
+    validateTime = false
+  ): IEnforceRules => {
     switch (basicType) {
       case 'momentDateType':
         return enforce(value1).afterOrSame(value2, validateTime);
@@ -67,7 +79,12 @@ const suite = (fieldDescriptor: FieldConfigModelType[], data: Record<string, unk
     }
   };
 
-  const lessThanOrEquals = (basicType: string, value1: unknown, value2: unknown, validateTime = false): IEnforceRules => {
+  const lessThanOrEquals = (
+    basicType: string,
+    value1: unknown,
+    value2: unknown,
+    validateTime = false
+  ): IEnforceRules => {
     switch (basicType) {
       case 'momentDateType':
         return enforce(value1).beforeOrSame(value2, validateTime);
@@ -79,7 +96,10 @@ const suite = (fieldDescriptor: FieldConfigModelType[], data: Record<string, unk
     }
   };
 
-  const getValueToCompare = (validation: ValidationConfigModelType, data: Record<string, unknown>): number | undefined => {
+  const getValueToCompare = (
+    validation: ValidationConfigModelType,
+    data: Record<string, unknown>
+  ): number | undefined => {
     const value = getValidationType(validation) ?? '';
     // @ts-ignore
     const param = validation[value] as string | number;
@@ -93,7 +113,6 @@ const suite = (fieldDescriptor: FieldConfigModelType[], data: Record<string, unk
   };
 
   const validate = vest.create((data: Record<string, unknown>): void => {
-
     fieldDescriptor.forEach((field: FieldConfigModelType): void => {
       let value2Compare;
       const fieldName = field.fieldName as string;
@@ -117,13 +136,23 @@ const suite = (fieldDescriptor: FieldConfigModelType[], data: Record<string, unk
                   case ValidationTypeName.min:
                     value2Compare = getValueToCompare(validation, data);
                     if (value2Compare !== undefined) {
-                      greaterThanOrEquals(basicType, data[fieldName], value2Compare, shouldValidateTime);
+                      greaterThanOrEquals(
+                        basicType,
+                        data[fieldName],
+                        value2Compare,
+                        shouldValidateTime
+                      );
                     }
                     break;
                   case ValidationTypeName.max:
                     value2Compare = getValueToCompare(validation, data);
                     if (value2Compare !== undefined) {
-                      lessThanOrEquals(basicType, data[fieldName], value2Compare, shouldValidateTime);
+                      lessThanOrEquals(
+                        basicType,
+                        data[fieldName],
+                        value2Compare,
+                        shouldValidateTime
+                      );
                     }
                     break;
                   case ValidationTypeName.minLength:
@@ -142,14 +171,12 @@ const suite = (fieldDescriptor: FieldConfigModelType[], data: Record<string, unk
           /* eslint-enable */
         }
       });
-      
     });
   });
 
   validate(data);
 
   return validate;
-  
 };
 
 // eslint-disable-next-line

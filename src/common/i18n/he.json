@@ -172,7 +172,7 @@
   "publish-unpublish.dialog.publish.action": "פרסום",
   "publish-unpublish.dialog.unpublish.message": "הפעולה תוביל ל{action} המוצר ולהסתרתו <br/>ועלולה להשפיע על מערכות הצורכות את המוצר",
   "publish-unpublish.dialog.unpublish.action": "ביטול פרסום",
-  
+
   "delete.dialog.message": "הפעולה תוביל ל{action} המוצר וכל חומריו ועלולה להשפיע על מערכות הצורכות את המוצר",
   "delete.dialog.action": "מחיקת",
   "delete.dialog.checkbox": "אישור מחיקה",
@@ -770,7 +770,7 @@
   "Units.dms": "DMS",
   "Units.arc_seconds": "ARC_SECONDS",
   "Units.unknown": "UNKNOWN",
-  
+
   "UndulationModel.msl_egm96": "MSL_EGM96",
   "UndulationModel.msl_egm2008": "MSL_EGM2008",
   "UndulationModel.msl_dma10": "MSL_DMA10",
@@ -812,7 +812,7 @@
   "lookupTable.hotAreas.sderot": "שדרות",
   "lookupTable.hotAreas.syria": "סוריה",
   "lookupTable.hotAreas.telAviv": "תל אביב",
-  
+
   "Transparency.transparent": "Transparent",
   "Transparency.opaque": "Opaque",
 
@@ -839,10 +839,10 @@
   "export-layer.exportSuccessContainer.jobId.title": "מזהה משימה",
   "export-layer.export.button": "ייצא שכבה",
   "export-layer.preview.button": "שערך ייצוא",
-  "export-layer.selection-index.text":"בחירה",
-  "export-layer.generalFields.text":"שדות כלליים",
-  "export-layer.fileError.text":"בחירה מקובץ",
-  "export-layer.serviceError.text":"שגיאה מהשרת",
+  "export-layer.selection-index.text": "בחירה",
+  "export-layer.generalFields.text": "שדות כלליים",
+  "export-layer.fileError.text": "בחירה מקובץ",
+  "export-layer.serviceError.text": "שגיאה מהשרת",
   "export-layer.generalError.text": "שגיאה כללית",
   "export-layer.description.field": "תיאור",
   "export-layer.zoomLevel.field": "רמת זום",

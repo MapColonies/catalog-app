@@ -9,54 +9,56 @@ export const fetchProductActions = [
       ..._.context.files,
       product: {
         ..._.context.files?.product,
-        ..._.event.output
-      }
-    }
+        ..._.event.output,
+      },
+    },
   })),
   sendParent((_: { context: IContext; event: any }) => ({
-    type: "SET_FILES",
+    type: 'SET_FILES',
     files: {
       product: {
-        ..._.event.output
-      }
+        ..._.event.output,
+      },
     },
-    addPolicy: "merge"
-  }))
+    addPolicy: 'merge',
+  })),
 ];
 
 export const selectionModeActions = (selectionMode: SelectionMode, files: IFiles = {}) => [
   assign({ selectionMode, files }),
-  sendParent({ type: "SET_SELECTION_MODE", selectionMode }),
-  sendParent({ type: "SET_FILES", files, addPolicy: "override" }),
-  sendParent({ type: "CLEAN_FILES_ERRORS" })
+  sendParent({ type: 'SET_SELECTION_MODE', selectionMode }),
+  sendParent({ type: 'SET_FILES', files, addPolicy: 'override' }),
+  sendParent({ type: 'CLEAN_FILES_ERRORS' }),
 ];
 
-export const selectFileActions = (fileType: RasterFileTypeConfig, parentAddPolicy: AddPolicy = 'merge', preserveCurrent: boolean = true) => [
+export const selectFileActions = (
+  fileType: RasterFileTypeConfig,
+  parentAddPolicy: AddPolicy = 'merge',
+  preserveCurrent: boolean = true
+) => [
   assign((_: { context: IContext; event: any }) => ({
     files: {
       ...(preserveCurrent ? _.context.files : {}),
       [fileType]: {
-        ..._.event.file
-      }
-    }
+        ..._.event.file,
+      },
+    },
   })),
   sendParent((_: { context: IContext; event: any }) => ({
-    type: "SET_FILES",
+    type: 'SET_FILES',
     files: {
       [fileType]: {
-        ..._.event.file
-      }
+        ..._.event.file,
+      },
     },
-    addPolicy: parentAddPolicy
-  }))
+    addPolicy: parentAddPolicy,
+  })),
 ];
 
 export const filesSelectedActions = [
   sendParent((_: { context: IContext; event: any }) => {
-    return isFilesSelected(_.context)
-      ? {type: "FILES_SELECTED"}
-      : {type: "NOOP"};
-  })
+    return isFilesSelected(_.context) ? { type: 'FILES_SELECTED' } : { type: 'NOOP' };
+  }),
 ];
 
 export const updateFileErrorAction = (targetFile?: keyof IFiles) => {
@@ -74,7 +76,7 @@ export const updateFileErrorAction = (targetFile?: keyof IFiles) => {
       return {
         ...file,
         isDisabled,
-        hasError
+        hasError,
       };
     };
 
@@ -83,12 +85,12 @@ export const updateFileErrorAction = (targetFile?: keyof IFiles) => {
     const shapeMetadataVal = updateFile(files.shapeMetadata, 'shapeMetadata');
 
     return {
-      type: "SET_FILES",
+      type: 'SET_FILES',
       files: {
         ...files,
-        ...(dataVal ? {data: dataVal} : {}),
-        ...(productVal ? {product: productVal} : {}),
-        ...(shapeMetadataVal ? {shapeMetadata: shapeMetadataVal} : {})
+        ...(dataVal ? { data: dataVal } : {}),
+        ...(productVal ? { product: productVal } : {}),
+        ...(shapeMetadataVal ? { shapeMetadata: shapeMetadataVal } : {}),
       },
     };
   });
@@ -96,14 +98,14 @@ export const updateFileErrorAction = (targetFile?: keyof IFiles) => {
 
 export const filesErrorActions = (targetFile?: keyof IFiles) => [
   sendParent((_: { context: IContext; event: any }) => ({
-    type: "FILES_ERROR",
-    error: normalizeError(_.event.error)
+    type: 'FILES_ERROR',
+    error: normalizeError(_.event.error),
   })),
-  updateFileErrorAction(targetFile)
+  updateFileErrorAction(targetFile),
 ];
 
 export const cleanFilesErrorActions = () => [
   assign({ errors: [] }),
   sendParent({ type: 'CLEAN_FILES_ERRORS' }),
-  updateFileErrorAction()
+  updateFileErrorAction(),
 ];

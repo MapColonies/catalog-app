@@ -5,7 +5,7 @@ import { Box } from '@map-colonies/react-components';
 import { Copy } from '../../../../../common/components/copy/copy';
 import { AutoDirectionBox } from '../../../../../common/components/auto-direction-box/auto-direction-box.component';
 import TooltippedValue from '../../../../../common/components/form/tooltipped.value';
-import {DETAILS_ROW_ID_SUFFIX} from '../../../../../common/components/grid';
+import { DETAILS_ROW_ID_SUFFIX } from '../../../../../common/components/grid';
 import { JobModelType, Status } from '../../../../models';
 
 import './job-details.header.css';
@@ -65,31 +65,30 @@ export const JobDetailsHeader: React.FC<JobDetailsHeaderProps> = ({
     taskCountRow: {
       completed: {
         label: getStatusTranslation(Status.Completed),
-        value: (completedTasks as unknown) as string,
+        value: completedTasks as unknown as string,
       },
       failed: {
         label: getStatusTranslation(Status.Failed),
-        value: (failedTasks as unknown) as string,
+        value: failedTasks as unknown as string,
       },
       inProgress: {
         label: getStatusTranslation(Status.InProgress),
-        value: (inProgressTasks as unknown) as string,
+        value: inProgressTasks as unknown as string,
       },
       pending: {
         label: getStatusTranslation(Status.Pending),
-        value: (pendingTasks as unknown) as string,
+        value: pendingTasks as unknown as string,
       },
       // suspended: {
       expired: {
         label: getStatusTranslation(Status.Suspended),
-        value: (expiredTasks as unknown) as string,
+        value: expiredTasks as unknown as string,
       },
     },
     failReason: {
       reason: status === Status.Failed ? reason : null,
     },
   };
-
 
   const generateDetailsRow = (): JSX.Element => {
     return (
@@ -103,7 +102,7 @@ export const JobDetailsHeader: React.FC<JobDetailsHeaderProps> = ({
               <TooltippedValue tag="p" className="detailValue">
                 {value}
               </TooltippedValue>
-              <Copy value = {value} iconStyle = {{ fontSize: `20px` }}/>
+              <Copy value={value} iconStyle={{ fontSize: `20px` }} />
             </Box>
           );
         })}
@@ -116,7 +115,7 @@ export const JobDetailsHeader: React.FC<JobDetailsHeaderProps> = ({
 
     return (
       <>
-        {Object.values(dataToPresent.taskCountRow).map(({ label, value },index) => {
+        {Object.values(dataToPresent.taskCountRow).map(({ label, value }, index) => {
           return (
             <Box className="counterField" key={`${label}${index}`}>
               <Typography tag="p" className="countLabel">
@@ -137,10 +136,8 @@ export const JobDetailsHeader: React.FC<JobDetailsHeaderProps> = ({
     if (!failReason) return null;
     return (
       <>
-        <AutoDirectionBox className="failReasonText">
-          {failReason}
-        </AutoDirectionBox>
-        <Copy value = {failReason} iconStyle = {{ fontSize: `20px` }}/>
+        <AutoDirectionBox className="failReasonText">{failReason}</AutoDirectionBox>
+        <Copy value={failReason} iconStyle={{ fontSize: `20px` }} />
       </>
     );
   };

@@ -79,10 +79,7 @@ const useStyle = makeStyles((theme: Theme) =>
   })
 );
 
-const getCornerClass = (
-  classes: Record<string, string>,
-  cornerToIndicate: Corner
-): string => {
+const getCornerClass = (classes: Record<string, string>, cornerToIndicate: Corner): string => {
   switch (cornerToIndicate) {
     case Corner.TOP_RIGHT:
       return classes.bboxRightTopCorner;
@@ -97,16 +94,8 @@ const getCornerClass = (
   }
 };
 
-export const BBoxCorner: React.FC<BBoxCornerProps> = ({
-  corner,
-  className,
-}) => {
+export const BBoxCorner: React.FC<BBoxCornerProps> = ({ corner, className }) => {
   const classes = useStyle();
-  const bboxCorner = useMemo(() => getCornerClass(classes, corner), [
-    classes,
-    corner,
-  ]);
-  return (
-    <div className={`${classes.bbox} ${bboxCorner} ${className ?? ''}`}></div>
-  );
+  const bboxCorner = useMemo(() => getCornerClass(classes, corner), [classes, corner]);
+  return <div className={`${classes.bbox} ${bboxCorner} ${className ?? ''}`}></div>;
 };

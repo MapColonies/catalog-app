@@ -34,27 +34,27 @@ interface JobsDialogProps {
   onSetOpen: (open: boolean) => void;
   setRestoreFromJob: (job: JobModelType) => void;
   focusOnJob?: Partial<Pick<JobModelType, 'id' | 'resourceId' | 'updated'>>;
-  setFocusOnJob?: (job: Partial<Pick<JobModelType, 'id' | 'resourceId' | 'updated'>> | undefined) => void;
+  setFocusOnJob?: (
+    job: Partial<Pick<JobModelType, 'id' | 'resourceId' | 'updated'>> | undefined
+  ) => void;
 }
 
 export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialogProps) => {
   const store = useStore();
   const intl = useIntl();
   const { isOpen, onSetOpen, setRestoreFromJob, focusOnJob, setFocusOnJob } = props;
-  const [ updateTaskPayload, setUpdateTaskPayload ] = useState<Record<string, unknown>>({});
-  const [ gridRowData, setGridRowData ] = useState<JobModelType[] | undefined>(undefined);
-  const [ gridApi, setGridApi ] = useState<GridApi>();
-  const [ pollingCycle, setPollingCycle ] = useState(START_CYCLE_ITERATION);
-  const [ fromDate, setFromDate ] = useState<Date | undefined>(
+  const [updateTaskPayload, setUpdateTaskPayload] = useState<Record<string, unknown>>({});
+  const [gridRowData, setGridRowData] = useState<JobModelType[] | undefined>(undefined);
+  const [gridApi, setGridApi] = useState<GridApi>();
+  const [pollingCycle, setPollingCycle] = useState(START_CYCLE_ITERATION);
+  const [fromDate, setFromDate] = useState<Date | undefined>(
     moment().subtract(CONFIG.JOB_MANAGER.FILTER_DAYS_TIME_SLOT, 'days').startOf('day').toDate()
   );
-  const [ tillDate, setTillDate ] = useState<Date | undefined>(
-    moment().endOf('day').toDate()
-  );
-  const [ focusError, setFocusError ] = useState<IError | undefined>(undefined);
-  const [ dateRangeError, setDateRangeError ] = useState<IError | undefined>(undefined);
-  const [ errorMessages, setErrorMessages ] = useState<IError[]>([]);
-  const [ timeLeft, actions ] = useCountDown(POLLING_CYCLE_INTERVAL, COUNTDOWN_REFRESH_RATE);
+  const [tillDate, setTillDate] = useState<Date | undefined>(moment().endOf('day').toDate());
+  const [focusError, setFocusError] = useState<IError | undefined>(undefined);
+  const [dateRangeError, setDateRangeError] = useState<IError | undefined>(undefined);
+  const [errorMessages, setErrorMessages] = useState<IError[]>([]);
+  const [timeLeft, actions] = useCountDown(POLLING_CYCLE_INTERVAL, COUNTDOWN_REFRESH_RATE);
 
   // start the timer during the first render
   useEffect(() => {
@@ -62,32 +62,32 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
   }, []);
 
   // eslint-disable-next-line
-  const { setQuery, loading, error, data, query } = useQuery((store) =>
-    store.queryJobs({
-      params: {
-        fromDate,
-        tillDate
-      }
-    }),
+  const { setQuery, loading, error, data, query } = useQuery(
+    (store) =>
+      store.queryJobs({
+        params: {
+          fromDate,
+          tillDate,
+        },
+      }),
     {
-      fetchPolicy: 'no-cache'
+      fetchPolicy: 'no-cache',
     }
   );
 
   //@ts-ignore
-  const { setQuery: setQueryForOneJob, data: jobData, loading: loadingJobData } = useQuery<Record<any, any>>((store) =>
-    undefined,
-    {
-      fetchPolicy: 'no-cache'
-    }
-  );
+  const {
+    setQuery: setQueryForOneJob,
+    data: jobData,
+    loading: loadingJobData,
+  } = useQuery<Record<any, any>>((store) => undefined, {
+    fetchPolicy: 'no-cache',
+  });
 
   const mutationQuery = useQuery();
 
   const getJobActions = useMemo(() => {
-    let actions: IActionGroup[] = store.actionDispatcherStore.getEntityActionGroups(
-      JOB_ENTITY
-    );
+    let actions: IActionGroup[] = store.actionDispatcherStore.getEntityActionGroups(JOB_ENTITY);
 
     actions = actions.map((action) => {
       const groupsWithTranslation = action.group.map((action) => {
@@ -107,19 +107,15 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
   }, []);
 
   useEffect(() => {
-    if (
-      typeof fromDate !== 'undefined' &&
-      typeof tillDate !== 'undefined'
-    ) {
+    if (typeof fromDate !== 'undefined' && typeof tillDate !== 'undefined') {
       (actions as IActions).start(POLLING_CYCLE_INTERVAL);
-      setQuery(
-        (store) =>
-          store.queryJobs({
-            params: {
-              fromDate,
-              tillDate,
-            },
-          })
+      setQuery((store) =>
+        store.queryJobs({
+          params: {
+            fromDate,
+            tillDate,
+          },
+        })
       );
     }
   }, [fromDate, tillDate, setQuery]);
@@ -140,7 +136,8 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
             fromDate,
             tillDate,
           },
-        }));
+        })
+      );
     }
   }, [mutationQuery.data]);
 
@@ -148,14 +145,14 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
     if (updateTaskPayload.id !== undefined) {
       // @ts-ignore
       // eslint-disable-next-line @typescript-eslint/no-empty-function
-      mutationQuery.setQuery(store.mutateUpdateJob(updateTaskPayload, () => { }));
+      mutationQuery.setQuery(store.mutateUpdateJob(updateTaskPayload, () => {}));
     }
   }, [updateTaskPayload]);
 
   useEffect(() => {
     const pollingInterval = setInterval(() => {
-      setErrorMessages(prev => upsertOrRemoveError(prev, undefined, 'error.server-error'));
-      setPollingCycle(prevCycle => prevCycle + 1);
+      setErrorMessages((prev) => upsertOrRemoveError(prev, undefined, 'error.server-error'));
+      setPollingCycle((prevCycle) => prevCycle + 1);
       (actions as IActions).start(POLLING_CYCLE_INTERVAL);
       setQuery((store) =>
         store.queryJobs({
@@ -174,7 +171,10 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
 
   useEffect(() => {
     if (!loadingJobData && jobData) {
-      downloadJSONToClient(jobData.job, `${encodeURI(jobData.job.resourceId as string)}_job_details.json`);
+      downloadJSONToClient(
+        jobData.job,
+        `${encodeURI(jobData.job.resourceId as string)}_job_details.json`
+      );
     }
   }, [jobData, loadingJobData]);
 
@@ -184,10 +184,10 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
     newErrorCode?: string
   ): IError[] => {
     if (newError) {
-      const filtered = prevErrors.filter(e => e.code !== newError.code);
+      const filtered = prevErrors.filter((e) => e.code !== newError.code);
       return [...filtered, newError];
     } else {
-      return prevErrors.filter(e => e.code !== newErrorCode);
+      return prevErrors.filter((e) => e.code !== newErrorCode);
     }
   };
 
@@ -196,25 +196,23 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
     if (!isEmpty(mutationQuery.error)) {
       gridApi?.refreshCells({
         suppressFlash: true,
-        force: true
+        force: true,
       });
       const NONE = 0;
       const serverError = mutationQuery.error.response.errors[0];
       const status = serverError.serverResponse?.status ?? NONE;
-      let message = serverError.serverResponse?.data.message ?
-        serverError.serverResponse.data.message :
-        serverError.serverResponse?.statusText ?
-          serverError.serverResponse?.statusText :
-          serverError.message.substring(+serverError.message.indexOf('; ') + 1);
+      let message = serverError.serverResponse?.data.message
+        ? serverError.serverResponse.data.message
+        : serverError.serverResponse?.statusText
+        ? serverError.serverResponse?.statusText
+        : serverError.message.substring(+serverError.message.indexOf('; ') + 1);
       newError = {
         code: 'error.server-error',
-        message: `${(status > NONE) ? status + ' ' : ''}${message}`,
-        level: "error"
+        message: `${status > NONE ? status + ' ' : ''}${message}`,
+        level: 'error',
       };
     }
-    setErrorMessages(prev =>
-      upsertOrRemoveError(prev, newError, 'error.server-error')
-    );
+    setErrorMessages((prev) => upsertOrRemoveError(prev, newError, 'error.server-error'));
   }, [mutationQuery.error]);
 
   useEffect(() => {
@@ -223,16 +221,14 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
       newError = {
         code: focusError.code,
         message: `${focusOnJob.resourceId} <bdi>(${dateFormatter(focusOnJob.updated, true)})</bdi>`,
-        level: focusError.level
+        level: focusError.level,
       };
     }
-    setErrorMessages(prev =>
-      upsertOrRemoveError(prev, newError, 'warning.row-not-found')
-    );
+    setErrorMessages((prev) => upsertOrRemoveError(prev, newError, 'warning.row-not-found'));
   }, [focusError]);
 
   useEffect(() => {
-    setErrorMessages(prev =>
+    setErrorMessages((prev) =>
       upsertOrRemoveError(prev, dateRangeError, 'warning.exceeded-date-range')
     );
   }, [dateRangeError]);
@@ -243,10 +239,10 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
   }, [onSetOpen]);
 
   const dispatchAction = (action: Record<string, unknown> | undefined): void => {
-    const actionToDispatch = (action ? { action: action.action, data: action.data } : action) as IDispatchAction;
-    store.actionDispatcherStore.dispatchAction(
-      actionToDispatch
-    );
+    const actionToDispatch = (
+      action ? { action: action.action, data: action.data } : action
+    ) as IDispatchAction;
+    store.actionDispatcherStore.dispatchAction(actionToDispatch);
   };
 
   // Job actions handler
@@ -257,27 +253,31 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
       switch (action) {
         case 'Job.retry':
           mutationQuery.setQuery(
-            store.mutateJobRetry({'jobRetryParams': {
-              id: data.id as string,
-              domain: data.domain as string,
-              type: data.type as string,
-            }})
+            store.mutateJobRetry({
+              jobRetryParams: {
+                id: data.id as string,
+                domain: data.domain as string,
+                type: data.type as string,
+              },
+            })
           );
           break;
         case 'Job.abort': {
           mutationQuery.setQuery(
-            store.mutateJobAbort({'jobAbortParams': {
-              id: data.id as string,
-              domain: data.domain as string,
-              type: data.type as string,
-            }})
+            store.mutateJobAbort({
+              jobAbortParams: {
+                id: data.id as string,
+                domain: data.domain as string,
+                type: data.type as string,
+              },
+            })
           );
           break;
         }
         case 'Job.download_details':
           setQueryForOneJob((store) =>
             store.queryJob({
-              id: data.id as string
+              id: data.id as string,
             })
           );
           break;
@@ -295,7 +295,7 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
 
   useEffect(() => {
     return (): void => {
-      dispatchAction(undefined)
+      dispatchAction(undefined);
     };
   }, []);
 
@@ -307,10 +307,10 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
           getJobActions={getJobActions}
           rowData={gridRowData as JobModelType[]}
           onGridReadyCB={(params): void => {
-            setGridApi(params.api)
+            setGridApi(params.api);
           }}
           updateJobCB={setUpdateTaskPayload}
-          rowDataChangeCB={(): void => { }}
+          rowDataChangeCB={(): void => {}}
           areJobsLoading={loading}
           focusOnJob={focusOnJob}
           setFocusOnJob={setFocusOnJob}
@@ -329,8 +329,8 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
           controlsLayout="row"
           dateFormat="dd/MM/yyyy"
           showTime={false}
-          onChange={(dateRange: { from?: Date; to?: Date; }): void => {
-            setErrorMessages(prev => upsertOrRemoveError(prev, undefined, 'error.server-error'));
+          onChange={(dateRange: { from?: Date; to?: Date }): void => {
+            setErrorMessages((prev) => upsertOrRemoveError(prev, undefined, 'error.server-error'));
             const from = dateRange.from;
             const to = dateRange.to;
             const diff = moment(to).diff(moment(from), 'days');
@@ -338,7 +338,7 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
               setDateRangeError({
                 code: 'warning.exceeded-date-range',
                 message: CONFIG.JOB_MANAGER.MAX_DATE_RANGE_DAYS,
-                level: 'warning'
+                level: 'warning',
               });
             } else {
               setDateRangeError(undefined);
@@ -358,9 +358,10 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
             endPlaceHolderText: intl.formatMessage({
               id: 'filters.date-picker.end-time.label',
             }),
-            calendarLocale: SupportedLocales[
-              CONFIG.I18N.DEFAULT_LANGUAGE.toUpperCase() as keyof typeof SupportedLocales
-            ],
+            calendarLocale:
+              SupportedLocales[
+                CONFIG.I18N.DEFAULT_LANGUAGE.toUpperCase() as keyof typeof SupportedLocales
+              ],
           }}
         />
       </Box>
@@ -375,7 +376,9 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
           <Box
             className="refreshContainer"
             onClick={(): void => {
-              setErrorMessages(prev => upsertOrRemoveError(prev, undefined, 'error.server-error'));
+              setErrorMessages((prev) =>
+                upsertOrRemoveError(prev, undefined, 'error.server-error')
+              );
               (actions as IActions).start(POLLING_CYCLE_INTERVAL);
               setQuery((store) =>
                 store.queryJobs({
@@ -388,9 +391,7 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
             }}
           >
             <IconButton className="refreshIcon mc-icon-Refresh" />
-            <Box className="refreshSecs">
-              {`${(timeLeft as number) / MILLISECONDS_IN_SEC}`}
-            </Box>
+            <Box className="refreshSecs">{`${(timeLeft as number) / MILLISECONDS_IN_SEC}`}</Box>
           </Box>
           <IconButton
             className="closeIcon mc-icon-Close"
@@ -401,18 +402,15 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
         </DialogTitle>
         <DialogContent className="jobsBody">
           {renderDateTimeRangePicker()}
-          {
-            !error &&
+          {!error &&
             typeof fromDate !== 'undefined' &&
             typeof tillDate !== 'undefined' &&
-            renderGridList()
-          }
-          {
-            error &&
+            renderGridList()}
+          {error && (
             <Box className="jobsDataError">
               <GraphQLError error={error} />
             </Box>
-          }
+          )}
           <Box className="footer">
             <Box className="buttons">
               <Button
@@ -426,10 +424,7 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
               </Button>
             </Box>
             <Box className="messages">
-              {
-                errorMessages.length > 0 &&
-                <LogicError errors={errorMessages} />
-              }
+              {errorMessages.length > 0 && <LogicError errors={errorMessages} />}
             </Box>
           </Box>
         </DialogContent>

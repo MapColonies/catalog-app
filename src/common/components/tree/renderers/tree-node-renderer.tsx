@@ -37,7 +37,7 @@ class FileThemeTreeNodeRenderer extends Component {
 
     return connectDropTarget(
       <div {...otherProps} className={styles.node}>
-        {Children.map(children, child =>
+        {Children.map(children, (child) =>
           cloneElement(child, {
             isOver,
             canDrop,
@@ -83,9 +83,7 @@ FileThemeTreeNodeRenderer.propTypes = {
   // used in dndManager
   getPrevRow: PropTypes.func.isRequired,
   node: PropTypes.shape({}).isRequired,
-  path: PropTypes.arrayOf(
-    PropTypes.oneOfType([PropTypes.string, PropTypes.number])
-  ).isRequired,
+  path: PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.string, PropTypes.number])).isRequired,
   rowDirection: PropTypes.string.isRequired,
 };
 
