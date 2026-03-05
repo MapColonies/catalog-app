@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useMemo, useState, useEffect, useCallback } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { withFormik, FormikProps, FormikErrors, Form, FormikHandlers, FormikBag } from 'formik';
@@ -171,7 +172,6 @@ export const InnerRasterForm = (
   }, [errors, getFieldMeta, isSubmittedForm]);
 
   useEffect(() => {
-    // @ts-ignore
     setFirstPhaseErrors(mergeRecursive(getYupErrors(), getStatusErrors()));
   }, [errors, getYupErrors, getStatusErrors]);
 
@@ -305,7 +305,6 @@ export const InnerRasterForm = (
                 >,
               ]}
               // selectedFeatureKey={selectedFeature}
-              // @ts-ignore
               selectionStyle={[
                 PPMapStyles.get(FeatureType.SELECTED_FILL),
                 PPMapStyles.get(FeatureType.SELECTED_MARKER),

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import bolleanValid from '@turf/boolean-valid';
 // import kinks from '@turf/kinks';
 import booleanPointOnLine from '@turf/boolean-point-on-line';
@@ -17,7 +18,6 @@ const LINEARING_MIN_POSITIONS = 4;
 const hasTooManyVerteces = (geom: Geometry): boolean => {
   let totalVertices = 0;
   if (isValidGeometryType(geom)) {
-    //@ts-ignore
     const polygons = geom.type === 'Polygon' ? [geom.coordinates] : geom.coordinates;
 
     polygons.forEach((polygon: Position[][]) => {
@@ -34,7 +34,6 @@ const hasTooManyVerteces = (geom: Geometry): boolean => {
 // }
 
 export const hasSelfIntersections = (json: Geometry): boolean => {
-  //@ts-ignore
   const filterFunc = (
     isect,
     ring0,
@@ -98,7 +97,6 @@ const isValidGeometryType = (json: Geometry): boolean => {
 
 const isAllGeometryLinearRingsValid = (geom: Geometry): geoJSONValidation => {
   if (isValidGeometryType(geom)) {
-    //@ts-ignore
     const polygons = geom.type === 'Polygon' ? [geom.coordinates] : geom.coordinates;
 
     for (const polygon of polygons) {

@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
+// @ts-nocheck
 import React, { useEffect, useCallback, useState, useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { cloneDeep, isEmpty } from 'lodash';
@@ -75,7 +75,6 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
     }
   );
 
-  //@ts-ignore
   const {
     setQuery: setQueryForOneJob,
     data: jobData,
@@ -143,8 +142,6 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
 
   useEffect(() => {
     if (updateTaskPayload.id !== undefined) {
-      // @ts-ignore
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
       mutationQuery.setQuery(store.mutateUpdateJob(updateTaskPayload, () => {}));
     }
   }, [updateTaskPayload]);

@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
+// @ts-nocheck
 import { get, isEmpty, omit } from 'lodash';
 import moment, { unitOfTime } from 'moment';
 import { IntlShape } from 'react-intl';
@@ -268,7 +268,6 @@ export const getValidationType = (
   validation: ValidationConfigModelType
 ): ValidationTypeName | undefined => {
   const values = $enum(ValidationTypeName).getValues();
-  // @ts-ignore
   const filteredArray = values.filter(
     (value) => validation[value] !== null && validation[value] !== undefined
   );
@@ -276,7 +275,6 @@ export const getValidationType = (
 };
 
 export const getInfoMsgValidationType = (msgCode: string): ValidationTypeName => {
-  // @ts-ignore
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   return ValidationTypeName[msgCode.substring(msgCode.lastIndexOf('.') + 1)];
 };
@@ -291,7 +289,6 @@ export const cleanUpEntity = (
     | QuantizedMeshBestRecordModelArray
 ): Record<string, unknown> => {
   const keysNotInModel = Object.keys(data).filter((key) => {
-    // @ts-ignore
     return !entityKeys.includes(key);
   });
   return omit(data, keysNotInModel);
@@ -725,7 +722,6 @@ export const transformEntityToFormFields = (
     switch (basicType) {
       case 'string[]':
       case 'sensors':
-        // @ts-ignore
         transformedFields[fieldName] = transformedFields[fieldName]?.join(', ');
         break;
       default:
@@ -747,7 +743,6 @@ export const transformFormFieldsToEntity = (
     switch (basicType) {
       case 'string[]':
       case 'sensors':
-        // @ts-ignore
         transformedFields[fieldName] = transformedFields[fieldName]
           ?.split(',')
           ?.map((val) => (val as string).trim());

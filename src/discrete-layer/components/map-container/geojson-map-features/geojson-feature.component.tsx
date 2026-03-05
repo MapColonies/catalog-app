@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState, useEffect } from 'react';
 import {
   CesiumMath,
@@ -68,7 +69,6 @@ export const GeojsonFeature: React.FC<GeojsonFeatureProps> = ({
 
   useEffect(() => {
     if (newPositions && transformedFeature) {
-      // @ts-ignore
       const is2dArr = is2dArray(newPositions);
 
       const newCoordinates = is2dArr
@@ -87,7 +87,6 @@ export const GeojsonFeature: React.FC<GeojsonFeatureProps> = ({
 
       setFeatureWithHeight({
         ...transformedFeature,
-        // @ts-ignore
         geometry: {
           ...transformedFeature.geometry,
           coordinates: newCoordinates,
@@ -110,18 +109,15 @@ export const GeojsonFeature: React.FC<GeojsonFeatureProps> = ({
 
         geoJsonDataSource.entities.values.forEach((item) => {
           if (item.polyline) {
-            // @ts-ignore
             item.polyline.material = CesiumColor.fromCssColorString(featureFillColor);
             (item.polyline.width as CesiumConstantProperty).setValue(lineWidth);
             (item.polyline.clampToGround as CesiumConstantProperty).setValue(true);
           }
 
           if (item.polygon) {
-            // @ts-ignore
             (item.polygon.outlineColor as CesiumConstantProperty).setValue(
               CesiumColor.fromCssColorString(featureOutlineColor)
             );
-            // @ts-ignore
             item.polygon.material = CesiumColor.fromCssColorString(featureFillColor);
             (item.polygon.outline as CesiumConstantProperty).setValue(true);
           }

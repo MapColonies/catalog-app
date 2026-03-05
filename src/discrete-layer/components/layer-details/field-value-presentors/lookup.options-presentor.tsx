@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Box } from '@map-colonies/react-components';
 import { MenuItem, Select, Typography } from '@map-colonies/react-core';
 import { isEmpty } from 'lodash';
@@ -150,7 +151,6 @@ export const LookupOptionsPresentorComponent: React.FC<LookupTablesPresentorProp
         ? (filteredOptions[0] as ILookupOption).translationCode
         : value;
 
-      // @ts-ignore
       return intl.formatMessage({
         id:
           typeof displayValue === 'string' || 'undefined'

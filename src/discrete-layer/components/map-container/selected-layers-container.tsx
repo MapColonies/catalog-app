@@ -39,8 +39,8 @@ export const SelectedLayersContainer: React.FC = observer(() => {
 
   useEffect(() => {
     if (store.discreteLayersStore.layersImages) {
-      // @ts-ignore
       setlayersImages(
+        // @ts-ignore
         store.discreteLayersStore.layersImages.slice().sort((curr, next) => curr.order - next.order)
       );
       if (isEmpty(store.discreteLayersStore.layersImages)) {

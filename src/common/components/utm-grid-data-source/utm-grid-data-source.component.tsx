@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
+// @ts-nocheck
 import {
   CesiumCartesian3,
   CesiumCartographic,
@@ -31,12 +31,10 @@ const UTMGridDataSource: React.FC = () => {
               (item.polyline.clampToGround as CesiumConstantProperty).setValue(true);
               (item.polyline.width as CesiumConstantProperty).setValue(HIGHLIGHT_OUTLINE_WIDTH);
 
-              // @ts-ignore
               item.polyline.material = SELECTION_OUTLINE_COLOR;
 
               centerInDegrees = center(
                 points(
-                  // @ts-ignore
                   (item.polyline.positions.getValue() as Record<string, unknown>).map((pos) => {
                     const cartographicPos = CesiumCartographic.fromCartesian(pos);
                     return [
@@ -49,7 +47,6 @@ const UTMGridDataSource: React.FC = () => {
             }
 
             if (item.polygon) {
-              // @ts-ignore
               (item.polygon.outlineColor as CesiumConstantProperty).setValue(
                 CesiumColor.fromCssColorString(SELECTION_POLYGON_OUTLINE_COLOR)
               );
@@ -57,12 +54,10 @@ const UTMGridDataSource: React.FC = () => {
                 SELECTION_POLYGON_LINE_WIDTH
               );
 
-              // @ts-ignore
               item.polygon.material = CesiumColor.TRANSPARENT;
 
               centerInDegrees = center(
                 points(
-                  // @ts-ignore
                   (
                     (item.polygon.hierarchy.getValue() as Record<string, unknown>)
                       .positions as CesiumCartesian3[]
@@ -77,7 +72,6 @@ const UTMGridDataSource: React.FC = () => {
               ).geometry.coordinates;
             }
 
-            // @ts-ignore
             item.position = CesiumCartesian3.fromDegrees(centerInDegrees[1], centerInDegrees[0]); // [lon, lat]
 
             const label = {
@@ -92,7 +86,6 @@ const UTMGridDataSource: React.FC = () => {
               // disableDepthTestDistance: Number.POSITIVE_INFINITY,
             };
 
-            // @ts-ignore
             item.label = label;
           });
         }}

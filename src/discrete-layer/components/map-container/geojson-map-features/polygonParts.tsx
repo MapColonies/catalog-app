@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import React, { useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Feature, Polygon, BBox, Point } from 'geojson';
@@ -540,9 +541,9 @@ export const PolygonParts: React.FC = observer(() => {
 
     const labelsCollectionName = `labels_${dataSource.name}`;
     const deselectLabelEntities = (entity: CesiumCesiumEntity) => {
-      // @ts-ignore
       if (
         !isEmpty(entity?.entityCollection) &&
+        // @ts-ignore
         entity.entityCollection.owner.name === labelsCollectionName
       ) {
         mapViewer.selectedEntity = undefined;
