@@ -5,4 +5,5 @@ helm
 public
 CHANGELOG.md
 src/discrete-layer/models
+src/common/hooks/useGetGpuTier/benchmarks
 *.json
