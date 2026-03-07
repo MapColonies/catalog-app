@@ -50,6 +50,7 @@ jobs:
           eslint_extensions: js,jsx,ts,tsx
           prettier: true
           prettier_dir: src
+          prettier_ignore: .prettierignore
       - name: Test
         run: yarn test
 
