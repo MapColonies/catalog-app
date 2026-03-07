@@ -19,10 +19,6 @@ jobs:
     permissions:
       checks: write
       contents: write
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-        node-version: [16.x]
     steps:
       - name: checkout
         uses: actions/checkout@v5
@@ -30,10 +26,10 @@ jobs:
         with:
           path: '**/node_modules'
           key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Use Node.js 16
         uses: actions/setup-node@v5
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 16
       - name: Install yarn
         run: |
           curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
