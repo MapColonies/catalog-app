@@ -42,17 +42,12 @@ jobs:
           sudo apt-get install --no-install-recommends yarn
       - name: Install dependecies
         run: yarn
-      - name: Lint
-        uses: wearerequired/lint-action@v2
-        with:
-          tsc: true
-          eslint: true
-          eslint_extensions: js,jsx,ts,tsx
-          prettier: true
-          prettier_dir: src
-          prettier_exclude: |
-            src/discrete-layer/models/**
-            src/common/hooks/useGetGpuTier/benchmarks/**
+      - name: TypeScript check
+        run: yarn tsc --noEmit
+      - name: ESLint
+        run: yarn eslint "src/**/*.{js,jsx,ts,tsx}"
+      - name: Prettier
+        run: yarn prettier --check .
       - name: Test
         run: yarn test
 
