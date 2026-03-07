@@ -7,11 +7,11 @@ confd/**
 helm/**
 public/**
 
-# generated or special files
+# generated files
+src/discrete-layer/models/**/*
+
+# benchmark data (must never be formatted)
+src/common/hooks/useGetGpuTier/benchmarks/**/*
+
+# generated changelog
 CHANGELOG.md
-
-# generated TypeScript models
-src/discrete-layer/models/**
-
-# benchmark json files (must not be formatted)
-src/common/hooks/useGetGpuTier/benchmarks/**/*.json
