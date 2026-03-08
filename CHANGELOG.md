@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.4.0](https://github.com/MapColonies/catalog-app/compare/v4.3.5...v4.4.0) (2026-03-08)
+
+
+### Features
+
+* upgrade to node 24 ([#863](https://github.com/MapColonies/catalog-app/issues/863)) ([dc258fb](https://github.com/MapColonies/catalog-app/commit/dc258fb17d5659fe72b2ee4edb20a16f2f63aff2))
+
 ## [4.3.5](https://github.com/MapColonies/catalog-app/compare/v4.3.4...v4.3.5) (2026-02-23)
 
 
