@@ -1,11 +1,7 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Box } from '@map-colonies/react-components';
-import {
-  CollapsibleList,
-  SimpleListItem,
-  Typography,
-} from '@map-colonies/react-core';
+import { CollapsibleList, SimpleListItem, Typography } from '@map-colonies/react-core';
 import { Copy } from '../../../../../common/components/copy/copy';
 import { CategorizedServices } from '../system-core-info.dialog';
 
@@ -15,37 +11,30 @@ interface ExternalServicesProps {
   services: CategorizedServices;
 }
 
-export const ExternalServices: React.FC<ExternalServicesProps> = ({ services }: ExternalServicesProps) => {
+export const ExternalServices: React.FC<ExternalServicesProps> = ({
+  services,
+}: ExternalServicesProps) => {
   return (
     <Box className="listsContainer">
-      {
-        Object.entries(services).map(([category, services]) => {
-          return (
-            <CollapsibleList
-              handle={
-                <SimpleListItem
-                  text={category}
-                  metaIcon="chevron_right"
-                />
-              }
-            >
-              {(services ?? []).map(({ url, display }) => {
-                return (
-                  <Box className="externalService">
-                    <Typography className="displayName" tag="p">
-                      <FormattedMessage id={display} />
-                    </Typography>
-                    <Typography className="urlText" tag="p">
-                      {`${url as string}`}
-                    </Typography>
-                    <Copy value={url as string}/>
-                  </Box>
-                );
-              })}
-            </CollapsibleList>
-          );
-        })
-      }
+      {Object.entries(services).map(([category, services]) => {
+        return (
+          <CollapsibleList handle={<SimpleListItem text={category} metaIcon="chevron_right" />}>
+            {(services ?? []).map(({ url, display }) => {
+              return (
+                <Box className="externalService">
+                  <Typography className="displayName" tag="p">
+                    <FormattedMessage id={display} />
+                  </Typography>
+                  <Typography className="urlText" tag="p">
+                    {`${url as string}`}
+                  </Typography>
+                  <Copy value={url as string} />
+                </Box>
+              );
+            })}
+          </CollapsibleList>
+        );
+      })}
     </Box>
   );
 };

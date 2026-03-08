@@ -21,10 +21,10 @@ export const Terrain: React.FC<TerrainProps> = () => {
 
   mapViewer.scene.globe.depthTestAgainstTerrain = true;
   mapViewer.scene.globe.baseColor = CesiumColor.WHITESMOKE;
-  
+
   useEffect(() => {
-    function isTerrainTileError (e: Record<string, unknown>): boolean {
-      return e.level as number > NONE;
+    function isTerrainTileError(e: Record<string, unknown>): boolean {
+      return (e.level as number) > NONE;
     }
 
     function handleTerrainError(e: unknown): void {
@@ -35,7 +35,7 @@ export const Terrain: React.FC<TerrainProps> = () => {
           body: (
             <Error
               className="errorNotification"
-              message={intl.formatMessage({ id: "terrain-provider.access.error" })}
+              message={intl.formatMessage({ id: 'terrain-provider.access.error' })}
               details={CONFIG.DEFAULT_TERRAIN_PROVIDER_URL as string}
             />
           ),
@@ -43,7 +43,7 @@ export const Terrain: React.FC<TerrainProps> = () => {
 
         // Remove the error listener after failing once
         mapViewer.terrainProvider.errorEvent.removeEventListener(handleTerrainError);
-  
+
         mapViewer.terrainProvider = new CesiumEllipsoidTerrainProvider({});
       } else {
         console.error('Terrain provider error: Tile problem. ', e);

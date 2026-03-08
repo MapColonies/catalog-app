@@ -10,13 +10,11 @@ interface IProductTypeCellRendererParams extends ICellRendererParams {
 }
 
 export const JobProductTypeRenderer: React.FC<IProductTypeCellRendererParams> = (props) => {
-
   const data = props.data as JobModelType;
 
   return (
     <Box className="productTypeIconContainer" style={{ width: props.colDef?.width }}>
-      <TypeIcon typeName={data.productType as string} style={props.style}/>
+      <TypeIcon typeName={data.productType as string} style={props.style} />
     </Box>
   );
-  
 };

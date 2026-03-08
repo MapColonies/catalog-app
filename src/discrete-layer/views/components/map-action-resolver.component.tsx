@@ -14,7 +14,6 @@ export const MapActionResolver: React.FC = observer(() => {
   const [highlightedLayer, setHighlightedLayer] = useState<ICesiumImageryLayer>();
   const prevHighlightedLayer = useRef<ICesiumImageryLayer>();
 
-
   // Preserve last highlighted layer to reset it when new highlighted layer is set.
   useEffect(() => {
     if (highlightedLayer) {
@@ -30,8 +29,7 @@ export const MapActionResolver: React.FC = observer(() => {
   useEffect(() => {
     if (typeof store.actionDispatcherStore?.action === 'undefined') return;
 
-    const { action, data } = store.actionDispatcherStore
-      .action as IDispatchAction;
+    const { action, data } = store.actionDispatcherStore.action as IDispatchAction;
 
     /**
      * In theory, only context actions are supposed to be catch here.
@@ -42,28 +40,28 @@ export const MapActionResolver: React.FC = observer(() => {
     switch (action) {
       case ContextActions.MOVE_LAYER_UP: {
         mapViewer.layersManager?.raise(data?.id as string, 1);
-        
+
         setHighlightedLayer(undefined);
         closeContextMenu();
         break;
       }
       case ContextActions.MOVE_LAYER_DOWN: {
         mapViewer.layersManager?.lower(data?.id as string, 1);
-        
+
         setHighlightedLayer(undefined);
         closeContextMenu();
         break;
       }
       case ContextActions.MOVE_LAYER_TO_TOP: {
         mapViewer.layersManager?.raiseToTop(data?.id as string);
-        
+
         setHighlightedLayer(undefined);
         closeContextMenu();
         break;
       }
       case ContextActions.MOVE_LAYER_TO_BOTTOM: {
         mapViewer.layersManager?.lowerToBottom(data?.id as string);
-        
+
         setHighlightedLayer(undefined);
         closeContextMenu();
         break;
@@ -72,17 +70,17 @@ export const MapActionResolver: React.FC = observer(() => {
         const foundLayer = mapViewer.layersManager?.get(data?.id as string);
 
         if (foundLayer) {
-          if (data?.hue as number > DEFAULT_LAYER_HUE_FACTOR) {
+          if ((data?.hue as number) > DEFAULT_LAYER_HUE_FACTOR) {
             if (highlightedLayer) {
               highlightedLayer.hue = DEFAULT_LAYER_HUE_FACTOR;
             }
             setHighlightedLayer(foundLayer);
-          } else if (data?.hue as number === DEFAULT_LAYER_HUE_FACTOR) {
+          } else if ((data?.hue as number) === DEFAULT_LAYER_HUE_FACTOR) {
             setHighlightedLayer(undefined);
           }
           foundLayer.hue = data?.hue as number;
         }
-        
+
         break;
       }
       case ContextActions.QUERY_POLYGON_PARTS: {
@@ -92,11 +90,7 @@ export const MapActionResolver: React.FC = observer(() => {
       default:
         break;
     }
-    
-  }, [
-    store.actionDispatcherStore.action,
-    store.discreteLayersStore,
-  ]);
+  }, [store.actionDispatcherStore.action, store.discreteLayersStore]);
 
   return <></>;
 });

@@ -3,10 +3,16 @@ import moment from 'moment';
 import { BASE_PATH } from '../../discrete-layer/components/layer-details/raster/state-machine/types';
 import CONFIG from '../config';
 
-export const getDateformatType = (withTime = false, fnsFormat = false, humanReadable = false): string => {
+export const getDateformatType = (
+  withTime = false,
+  fnsFormat = false,
+  humanReadable = false
+): string => {
   if (fnsFormat) {
     if (humanReadable) {
-      return withTime ? CONFIG.LOCALE.DATE_FNS_HUMAN_READABLE_DATE_TIME: CONFIG.LOCALE.DATE_FNS_HUMAN_READABLE_DATE; 
+      return withTime
+        ? CONFIG.LOCALE.DATE_FNS_HUMAN_READABLE_DATE_TIME
+        : CONFIG.LOCALE.DATE_FNS_HUMAN_READABLE_DATE;
     }
     return withTime ? CONFIG.LOCALE.DATE_FNS_TIME_FORMAT : CONFIG.LOCALE.DATE_FNS_FORMAT;
   }
@@ -14,10 +20,7 @@ export const getDateformatType = (withTime = false, fnsFormat = false, humanRead
 };
 
 export interface FormatterFunc {
-  (
-    source: string | Date | moment.Moment | undefined,
-    option?: boolean | undefined
-  ): string;
+  (source: string | Date | moment.Moment | undefined, option?: boolean | undefined): string;
 }
 
 export const stringFormatter: FormatterFunc = (val): string => {
@@ -33,9 +36,7 @@ export const dateFormatter: FormatterFunc = (date, withTime = false): string => 
 };
 
 export const relativeDateFormatter: FormatterFunc = (date): string => {
-  return date !== undefined
-    ? moment(date).fromNow()
-    : '-';
+  return date !== undefined ? moment(date).fromNow() : '-';
 };
 
 export const dateSerializer: FormatterFunc = (date): string => {
@@ -48,7 +49,7 @@ export const dateSerializer: FormatterFunc = (date): string => {
   }
 
   if (typeof date !== 'undefined') {
-    return (date).toISOString();
+    return date.toISOString();
   }
 
   return '-';

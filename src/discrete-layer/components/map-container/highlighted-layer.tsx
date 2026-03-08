@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { FeatureCollection } from 'geojson';
-import { CesiumGeojsonLayer, CesiumColor, CesiumConstantProperty } from '@map-colonies/react-components';
+import {
+  CesiumGeojsonLayer,
+  CesiumColor,
+  CesiumConstantProperty,
+} from '@map-colonies/react-components';
 import { useStore } from '../../models/RootStore';
 import { getLayerFootprint } from '../../models/layerImage';
 
@@ -14,7 +18,7 @@ export const HighlightedLayer: React.FC = observer(() => {
   useEffect(() => {
     let footprintsCollection: FeatureCollection = {
       type: 'FeatureCollection',
-      features: []
+      features: [],
     };
     const layer = discreteLayersStore.highlightedLayer;
     if (layer) {
@@ -33,7 +37,7 @@ export const HighlightedLayer: React.FC = observer(() => {
       clampToGround={true}
       data={layersFootprints}
       onLoad={(geoJsonDataSouce): void => {
-        geoJsonDataSouce.entities.values.forEach(item => {
+        geoJsonDataSouce.entities.values.forEach((item) => {
           if (item.polyline) {
             (item.polyline.width as CesiumConstantProperty).setValue(FOOTPRINT_BORDER_WIDTH);
             // typings issue in CESIUM for reference https://github.com/CesiumGS/cesium/issues/8898
@@ -46,7 +50,7 @@ export const HighlightedLayer: React.FC = observer(() => {
             // typings issue in CESIUM for reference https://github.com/CesiumGS/cesium/issues/8898
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
-            item.polygon.material = CesiumColor.fromRandom({alpha: 0.4});
+            item.polygon.material = CesiumColor.fromRandom({ alpha: 0.4 });
           }
         });
       }}

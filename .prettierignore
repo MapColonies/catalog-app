@@ -1,2 +1,17 @@
-.vscode/settings.json
-schemas/*.json
+# VSCode
+.vscode/
+
+# folders
+schemas/**
+confd/**
+helm/**
+public/**
+
+# generated files
+src/discrete-layer/models/**/*
+
+# benchmark data (must never be formatted)
+src/common/hooks/useGetGpuTier/benchmarks/**/*
+
+# generated changelog
+CHANGELOG.md

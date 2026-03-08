@@ -15,7 +15,13 @@ interface ITypeIconProps {
   onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
-export const TypeIcon: React.FC<ITypeIconProps> = ({ typeName, thumbnailUrl, style, className, onClick }) => {
+export const TypeIcon: React.FC<ITypeIconProps> = ({
+  typeName,
+  thumbnailUrl,
+  style,
+  className,
+  onClick,
+}) => {
   const intl = useIntl();
   const { enumsMap } = useContext(EnumsMapContext);
   const { icon, translationKey } = enumsMap?.[typeName] ?? DEFAULT_ENUM_DESCRIPTOR;

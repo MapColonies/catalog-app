@@ -87,14 +87,12 @@ describe('Polygon Selection component', () => {
 
     openMenuButton.simulate('click', { currentTarget: {} });
 
-    const item = wrapper
-      .findWhere((n) => {
-        return (
-          n.type() === ListItemText &&
-          n.prop('children').props['id'] ===
-            'polygon-selection.box-menu_option.text'
-        );
-      });
+    const item = wrapper.findWhere((n) => {
+      return (
+        n.type() === ListItemText &&
+        n.prop('children').props['id'] === 'polygon-selection.box-menu_option.text'
+      );
+    });
     item.parent().simulate('click');
 
     expect(startDraw).toHaveBeenCalledWith(DrawType.BOX);
@@ -116,14 +114,12 @@ describe('Polygon Selection component', () => {
     const openMenuButton = wrapper.find(Button);
     openMenuButton.simulate('click', { currentTarget: {} });
 
-    const item = wrapper
-      .findWhere((n) => {
-        return (
-          n.type() === ListItemText &&
-          n.prop('children').props['id'] ===
-            'polygon-selection.box_coorinate-menu_option.text'
-        );
-      });
+    const item = wrapper.findWhere((n) => {
+      return (
+        n.type() === ListItemText &&
+        n.prop('children').props['id'] === 'polygon-selection.box_coorinate-menu_option.text'
+      );
+    });
     item.parent().simulate('click');
 
     expect(wrapper.find(BBoxDialog).prop('isOpen')).toBe(true);
@@ -144,14 +140,12 @@ describe('Polygon Selection component', () => {
     const openMenuButton = wrapper.find(Button);
     openMenuButton.simulate('click', { currentTarget: {} });
 
-    const item = wrapper
-      .findWhere((n) => {
-        return (
-          n.type() === ListItemText &&
-          n.prop('children').props['id'] ===
-            'polygon-selection.clear-menu_option.text'
-        );
-      });
+    const item = wrapper.findWhere((n) => {
+      return (
+        n.type() === ListItemText &&
+        n.prop('children').props['id'] === 'polygon-selection.clear-menu_option.text'
+      );
+    });
     item.parent().simulate('click');
 
     expect(resetDraw).toHaveBeenCalledTimes(1);

@@ -1,45 +1,45 @@
 .loadFromShapeBtn .mdc-button--outlined:not(:disabled) {
-    border-color: currentColor;
-    padding: 10px;
-    margin: 10px 0;
+  border-color: currentColor;
+  padding: 10px;
+  margin: 10px 0;
 }
 
 .jsonInput {
-    direction: ltr;
+  direction: ltr;
 }
 
 .jsonValueAlign {
-    text-align: left !important;
+  text-align: left !important;
 }
 
 .withMapPreview {
-    height: 150px !important;
+  height: 150px !important;
 }
 
 .detailsFieldValue .ol-attribution {
-    display: none;
+  display: none;
 }
 
 .detailsFieldValue .map {
-    border: solid var(--mdc-theme-gc-selection-background) 1px;
+  border: solid var(--mdc-theme-gc-selection-background) 1px;
 }
 
 .warningContainer {
-    display: flex;
-    color: var(--mdc-theme-gc-warning-high);
-    align-items: center;
-    margin: 0 8px 0 8px;
+  display: flex;
+  color: var(--mdc-theme-gc-warning-high);
+  align-items: center;
+  margin: 0 8px 0 8px;
 }
 
 .detailsFieldNoMargin {
-    margin: 0 !important;
+  margin: 0 !important;
 }
 
 .jsonDetailsFieldValueContainer {
-    display: flex;
-    gap: 10px;
+  display: flex;
+  gap: 10px;
 }
 
 .jsonDetailsFieldTextValueContainer {
-    display: flex;
+  display: flex;
 }

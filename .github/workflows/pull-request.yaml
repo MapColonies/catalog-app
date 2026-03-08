@@ -1,0 +1,59 @@
+name: pull_request
+
+on: [pull_request]
+
+jobs:
+  helm-lint:
+    name: Run Helm lint Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out TS Project Git repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: helm-lint
+        uses: MapColonies/shared-workflows/actions/helm-lint@helm-lint-v1
+
+  build_and_test:
+    runs-on: ubuntu-latest
+    permissions:
+      checks: write
+      contents: write
+    steps:
+      - name: checkout
+        uses: actions/checkout@v5
+      - uses: actions/cache@v4
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+      - name: Use Node.js 16
+        uses: actions/setup-node@v5
+        with:
+          node-version: 16
+      - name: Install yarn
+        run: |
+          curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+          echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends yarn
+      - name: Install dependecies
+        run: yarn
+      - name: TypeScript check
+        run: yarn tsc --noEmit
+      - name: ESLint
+        run: yarn eslint "src/**/*.{js,jsx,ts,tsx}"
+      - name: Prettier
+        run: yarn prettier --check .
+      - name: Test
+        run: yarn test
+
+  build_docker_image:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+      - name: Build Docker image
+        uses: docker/build-push-action@v6
+        with:
+          push: false

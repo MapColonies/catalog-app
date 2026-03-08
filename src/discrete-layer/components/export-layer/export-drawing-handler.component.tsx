@@ -25,7 +25,7 @@ const ExportDrawingHandler: React.FC = observer(() => {
   const store = useStore();
   const cesiumViewer = useCesiumMap();
   const { drawing, type } = store.exportStore.drawingState as IDrawingState;
-  
+
   useEffect(() => {
     return (): void => {
       store.exportStore.resetDrawingState();
@@ -35,8 +35,8 @@ const ExportDrawingHandler: React.FC = observer(() => {
   useEffect(() => {
     if (store.exportStore.hasExportPreviewed) {
       const selectedRoi = store.exportStore.geometrySelectionsCollection;
-      const features = [ ...selectedRoi.features ];
-      
+      const features = [...selectedRoi.features];
+
       // ***********************************************************************************************************
       // ***** Currentlty exported layer footprint not added to calculation of export preview, might be reconsidered
       // ***********************************************************************************************************

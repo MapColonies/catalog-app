@@ -17,15 +17,16 @@ const AppTitle = (): JSX.Element => {
     document.title = `${intl.formatMessage({ id: 'general.logo.text' })} - ${projectVersion}`;
   }, []);
 
-  const versionText = intl.formatMessage({id: "general.version.text"}, { projectVersion, appVersion });
+  const versionText = intl.formatMessage(
+    { id: 'general.version.text' },
+    { projectVersion, appVersion }
+  );
 
   return (
     <>
-      <Box className='appLogoContainer'>
-        <Box className='appTitleVersionContainer'>
-          <Typography tag="b">
-            {intl.formatMessage({ id: 'general.logo.text' })}
-          </Typography>
+      <Box className="appLogoContainer">
+        <Box className="appTitleVersionContainer">
+          <Typography tag="b">{intl.formatMessage({ id: 'general.logo.text' })}</Typography>
           <Tooltip
             content={`${intl.formatMessage({
               id: 'general.version.tooltip',

@@ -20,9 +20,9 @@ export const PPMapStyles = new Map<FeatureType, Style | undefined>([
     new Style({
       stroke: new Stroke({
         width: 4,
-        color: "#000000"
-      })
-    })
+        color: '#000000',
+      }),
+    }),
   ],
   [
     FeatureType.PP_PERIMETER_MARKER,
@@ -30,18 +30,18 @@ export const PPMapStyles = new Map<FeatureType, Style | undefined>([
       image: new Icon({
         scale: 0.2,
         anchor: [0.5, 1],
-        src: 'assets/img/map-marker.gif'
-      })
-    })
+        src: 'assets/img/map-marker.gif',
+      }),
+    }),
   ],
   [
     FeatureType.SOURCE_EXTENT,
     new Style({
       stroke: new Stroke({
         width: 4,
-        color: "#7F00FF"
-      })
-    })
+        color: '#7F00FF',
+      }),
+    }),
   ],
   [
     FeatureType.SOURCE_EXTENT_MARKER,
@@ -49,31 +49,36 @@ export const PPMapStyles = new Map<FeatureType, Style | undefined>([
       image: new Icon({
         scale: 0.2,
         anchor: [0.5, 1],
-        src: 'assets/img/map-marker.gif'
-      })
-    })
+        src: 'assets/img/map-marker.gif',
+      }),
+    }),
   ],
   [
     FeatureType.EXISTING_PP,
     new Style({
       stroke: new Stroke({
         width: 2,
-        color: CONFIG.CONTEXT_MENUS.MAP.POLYGON_PARTS_FEATURE_CONFIG.outlineColor
+        color: CONFIG.CONTEXT_MENUS.MAP.POLYGON_PARTS_FEATURE_CONFIG.outlineColor,
       }),
       fill: new Fill({
-        color: CONFIG.CONTEXT_MENUS.MAP.POLYGON_PARTS_FEATURE_CONFIG.color
-      })
-    })
-  ]
+        color: CONFIG.CONTEXT_MENUS.MAP.POLYGON_PARTS_FEATURE_CONFIG.color,
+      }),
+    }),
+  ],
 ]);
 
-export const getWFSFeatureTypeName = (layerRecord: LayerRasterRecordModelType | null, enums: IEnumsMapType) => {
+export const getWFSFeatureTypeName = (
+  layerRecord: LayerRasterRecordModelType | null,
+  enums: IEnumsMapType
+) => {
   // Naming convention of polygon parts feature typeName
   // polygonParts:{productId}-{productType}
-  return layerRecord ?
-    `${CONFIG.POLYGON_PARTS.FEATURE_TYPE_PREFIX}${layerRecord.productId}-${enums[layerRecord.productType as string].realValue}` :
-    'SHOULD_BE_CALCULATED_FROM_UPDATED_LAYER';
-}
+  return layerRecord
+    ? `${CONFIG.POLYGON_PARTS.FEATURE_TYPE_PREFIX}${layerRecord.productId}-${
+        enums[layerRecord.productType as string].realValue
+      }`
+    : 'SHOULD_BE_CALCULATED_FROM_UPDATED_LAYER';
+};
 
 // Inspired by https://openlayers.org/en/latest/examples/vector-labels.html
 const stringDivider = (str: string, width: number, spaceReplacer: string): string => {
@@ -96,15 +101,21 @@ const stringDivider = (str: string, width: number, spaceReplacer: string): strin
   return str;
 };
 
-export const getText = (feature: Feature, resolution: number, featureConfig: Record<string, string>, ZOOM_LEVELS_TABLE: Record<string, number>, defaultText?: string) => {
+export const getText = (
+  feature: Feature,
+  resolution: number,
+  featureConfig: Record<string, string>,
+  ZOOM_LEVELS_TABLE: Record<string, number>,
+  defaultText?: string
+) => {
   const type = get(feature.properties, 'text') ?? featureConfig.text;
   const maxResolution = parseInt(featureConfig.maxreso);
 
   let featureResolution = get(feature.properties, 'resolutionDegree');
-  
+
   let zoomLevel = Object.values(ZOOM_LEVELS_TABLE)
     .map((res) => res.toString())
-    .findIndex(val => val === get(feature.properties, 'resolutionDegree')?.toString());
+    .findIndex((val) => val === get(feature.properties, 'resolutionDegree')?.toString());
 
   if (typeof featureResolution == 'string' && featureResolution?.includes('(')) {
     featureResolution = featureResolution.split(/[()]/)[1];
@@ -114,7 +125,7 @@ export const getText = (feature: Feature, resolution: number, featureConfig: Rec
   const updatedInVersion = get(feature.properties, 'productVersion');
 
   let text = defaultText ?? '';
-  
+
   if (zoomLevel > -1) {
     text = `${ingestionDateUTC}\n\nv${updatedInVersion} (${zoomLevel})`;
   }
@@ -125,10 +136,7 @@ export const getText = (feature: Feature, resolution: number, featureConfig: Rec
     text = '';
   } else if (type === 'shorten') {
     text = text.substring(12);
-  } else if (
-    type === 'wrap' &&
-    (!featureConfig.placement || featureConfig.placement !== 'line')
-  ) {
+  } else if (type === 'wrap' && (!featureConfig.placement || featureConfig.placement !== 'line')) {
     text = stringDivider(text, 16, '\n');
   }
 
@@ -161,7 +169,13 @@ export const FEATURE_LABEL_CONFIG = {
   },
 };
 
-export const createTextStyle = (feature: Feature, resolution: number, featureConfig: Record<string, string>, ZOOM_LEVELS_TABLE: Record<string, number>, defaultText?: string) => {
+export const createTextStyle = (
+  feature: Feature,
+  resolution: number,
+  featureConfig: Record<string, string>,
+  ZOOM_LEVELS_TABLE: Record<string, number>,
+  defaultText?: string
+) => {
   const align = featureConfig.align;
   const baseline = featureConfig.baseline;
   const size = featureConfig.size;

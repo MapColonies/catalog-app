@@ -25,16 +25,20 @@ export const ProductTypeRenderer: React.FC<IProductTypeCellRendererParams> = (pr
   const computedStyle = useMemo(() => {
     return {
       ...(props.style ?? {}),
-      ...(getIconStyle(data as any, 'color') ?? {})
+      ...(getIconStyle(data as any, 'color') ?? {}),
     };
   }, [props.style, data]);
 
   return (
     <TypeIcon
       typeName={data.productType as string}
-      thumbnailUrl={data.links ? getLinkUrlWithToken(data.links as LinkModelType[], LinkType.THUMBNAIL_S) : undefined}
+      thumbnailUrl={
+        data.links
+          ? getLinkUrlWithToken(data.links as LinkModelType[], LinkType.THUMBNAIL_S)
+          : undefined
+      }
       style={computedStyle}
-      onClick={data.__typename === "LayerRasterRecord" ? handleClick : undefined}
+      onClick={data.__typename === 'LayerRasterRecord' ? handleClick : undefined}
     />
   );
 };

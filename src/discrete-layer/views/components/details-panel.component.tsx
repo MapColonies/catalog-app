@@ -24,91 +24,89 @@ interface DetailsPanelComponentProps {
 }
 
 export const DetailsPanel: React.FC<DetailsPanelComponentProps> = observer((props) => {
-  const {
-    detailsPanelExpanded,
-    setDetailsPanelExpanded,
-    activeTabView
-  } = props;
+  const { detailsPanelExpanded, setDetailsPanelExpanded, activeTabView } = props;
 
   const store = useStore();
   const intl = useIntl();
   const layerToPresent = store.discreteLayersStore.selectedLayer;
-  
+
   const permissions = useMemo(() => {
     return {
-      isEditAllowed: layerToPresent && store.userStore.isActionAllowed(`entity_action.${layerToPresent.__typename}.edit`),
-      isPublishAllowed: layerToPresent && store.userStore.isActionAllowed(`entity_action.${layerToPresent.__typename}.publish`),
-      isSaveMetadataAllowed: layerToPresent && store.userStore.isActionAllowed(`entity_action.${layerToPresent.__typename}.saveMetadata`),
-    }
+      isEditAllowed:
+        layerToPresent &&
+        store.userStore.isActionAllowed(`entity_action.${layerToPresent.__typename}.edit`),
+      isPublishAllowed:
+        layerToPresent &&
+        store.userStore.isActionAllowed(`entity_action.${layerToPresent.__typename}.publish`),
+      isSaveMetadataAllowed:
+        layerToPresent &&
+        store.userStore.isActionAllowed(`entity_action.${layerToPresent.__typename}.saveMetadata`),
+    };
   }, [store.userStore.user, layerToPresent]);
 
   const dispatchAction = (action: Record<string, unknown>): void => {
-    store.actionDispatcherStore.dispatchAction(
-      {
-        action: action.action,
-        data: action.data,
-      } as IDispatchAction
-    );
+    store.actionDispatcherStore.dispatchAction({
+      action: action.action,
+      data: action.data,
+    } as IDispatchAction);
   };
 
   return (
     <>
       <Box style={{ display: 'flex', paddingTop: '8px' }}>
-        <Typography dir="auto" use="headline6" tag="div" className="detailsTitle" style={getTextStyle(layerToPresent as any ?? {}, 'color')}>
+        <Typography
+          dir="auto"
+          use="headline6"
+          tag="div"
+          className="detailsTitle"
+          style={getTextStyle((layerToPresent as any) ?? {}, 'color')}
+        >
           {layerToPresent?.productName}
         </Typography>
-        {
-          permissions.isPublishAllowed === true && !isBeingDeleted(layerToPresent as LayerMetadataMixedUnion) &&
+        {permissions.isPublishAllowed === true &&
+          !isBeingDeleted(layerToPresent as LayerMetadataMixedUnion) &&
           layerToPresent &&
-          existStatus(layerToPresent as any) &&
-          <PublishButton layer={layerToPresent} className="operationIcon"/>
-        }
-        {
-          permissions.isEditAllowed === true && !isBeingDeleted(layerToPresent as LayerMetadataMixedUnion) &&
-          <Tooltip content={intl.formatMessage({ id: 'action.edit.tooltip' })}>
-            <IconButton
-              className="operationIcon mc-icon-Edit1"
-              label="EDIT"
-              onClick={(): void => {
-                dispatchAction({
-                  action: UserAction.ENTITY_ACTION_SELECTED_ENTITY_EDIT
-                });
-              }}
-            />
-          </Tooltip>
-        }
-        {
-          permissions.isEditAllowed === false && 
+          existStatus(layerToPresent as any) && (
+            <PublishButton layer={layerToPresent} className="operationIcon" />
+          )}
+        {permissions.isEditAllowed === true &&
+          !isBeingDeleted(layerToPresent as LayerMetadataMixedUnion) && (
+            <Tooltip content={intl.formatMessage({ id: 'action.edit.tooltip' })}>
+              <IconButton
+                className="operationIcon mc-icon-Edit1"
+                label="EDIT"
+                onClick={(): void => {
+                  dispatchAction({
+                    action: UserAction.ENTITY_ACTION_SELECTED_ENTITY_EDIT,
+                  });
+                }}
+              />
+            </Tooltip>
+          )}
+        {permissions.isEditAllowed === false && (
           <Tooltip content={intl.formatMessage({ id: 'action.view.tooltip' })}>
             <IconButton
               className="mc-icon-Info"
               label="VIEW"
               onClick={(): void => {
                 dispatchAction({
-                  action: UserAction.ENTITY_ACTION_SELECTED_ENTITY_VIEW
+                  action: UserAction.ENTITY_ACTION_SELECTED_ENTITY_VIEW,
                 });
               }}
             />
           </Tooltip>
-        }
-        {
-          permissions.isSaveMetadataAllowed === true && layerToPresent &&
-          <SaveMetadataButton metadata={layerToPresent} className="operationIcon"/>
-        }
+        )}
+        {permissions.isSaveMetadataAllowed === true && layerToPresent && (
+          <SaveMetadataButton metadata={layerToPresent} className="operationIcon" />
+        )}
         <Tooltip
           content={intl.formatMessage({
-            id: `${
-              !detailsPanelExpanded
-                ? 'action.expand.tooltip'
-                : 'action.collapse.tooltip'
-            }`,
+            id: `${!detailsPanelExpanded ? 'action.expand.tooltip' : 'action.collapse.tooltip'}`,
           })}
         >
           <IconButton
             className={`operationIcon ${
-              !detailsPanelExpanded
-                ? 'mc-icon-Expand-Panel'
-                : 'mc-icon-Collapce-Panel'
+              !detailsPanelExpanded ? 'mc-icon-Expand-Panel' : 'mc-icon-Collapce-Panel'
             }`}
             label="DETAILS EXPANDER"
             onClick={(): void => {
@@ -121,7 +119,9 @@ export const DetailsPanel: React.FC<DetailsPanelComponentProps> = observer((prop
         <LayersDetailsComponent
           isSearchTab={activeTabView === TabViews.SEARCH_RESULTS}
           className="detailsPanelProductView"
-          entityDescriptors={store.discreteLayersStore.entityDescriptors as EntityDescriptorModelType[]}
+          entityDescriptors={
+            store.discreteLayersStore.entityDescriptors as EntityDescriptorModelType[]
+          }
           layerRecord={layerToPresent}
           isBrief={!detailsPanelExpanded}
           mode={Mode.VIEW}
@@ -130,4 +130,4 @@ export const DetailsPanel: React.FC<DetailsPanelComponentProps> = observer((prop
       </Box>
     </>
   );
-})
+});

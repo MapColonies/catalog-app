@@ -28,62 +28,57 @@ interface ExportSelectionComponentProps {
 
 const NONE = 0;
 
-const ExportSelectionComponent: React.FC<ExportSelectionComponentProps> = observer(({
-  feature,
-  selectionIdx,
-  internalFields,
-  propsForDomain,
-}) => {
-  const intl = useIntl();
-  const store = useStore();
-  const SelectionFieldPerDomainRenderer = useGetSelectionFieldForDomain();
-  const { onSelectionMouseOver, onSelectionMouseOut } = useHighlightSelection();
-  const featProps = feature.properties as Record<string, unknown>;
-  const selectionId = featProps.id;
-  const prevFeature = usePrevious(feature);
-  const [newFeature, setNewFeature] = useState(feature);
-  const isSelectionServerError = store.exportStore.serverErroredSelectionId === feature.properties?.id as string;
+const ExportSelectionComponent: React.FC<ExportSelectionComponentProps> = observer(
+  ({ feature, selectionIdx, internalFields, propsForDomain }) => {
+    const intl = useIntl();
+    const store = useStore();
+    const SelectionFieldPerDomainRenderer = useGetSelectionFieldForDomain();
+    const { onSelectionMouseOver, onSelectionMouseOut } = useHighlightSelection();
+    const featProps = feature.properties as Record<string, unknown>;
+    const selectionId = featProps.id;
+    const prevFeature = usePrevious(feature);
+    const [newFeature, setNewFeature] = useState(feature);
+    const isSelectionServerError =
+      store.exportStore.serverErroredSelectionId === (feature.properties?.id as string);
 
-  const {data: estimatedSizeRes, error, loading, setSelection} = useEstimatedSize(feature);
+    const { data: estimatedSizeRes, error, loading, setSelection } = useEstimatedSize(feature);
 
-  useEffect(() => {
-    const prevFeatureProps = prevFeature?.properties;
-    const newFeatureProps = feature.properties;
+    useEffect(() => {
+      const prevFeatureProps = prevFeature?.properties;
+      const newFeatureProps = feature.properties;
 
-    if (prevFeatureProps) {
+      if (prevFeatureProps) {
         if (!isEqual(prevFeatureProps, newFeatureProps)) {
-            setNewFeature(feature);
+          setNewFeature(feature);
         }
-    } else {
+      } else {
         setNewFeature(feature);
-    }
-  },[feature]);
+      }
+    }, [feature]);
 
-  useEffect(() => {
-    // Estimate size.
-    setSelection(newFeature);
-    
-  }, [newFeature]);
+    useEffect(() => {
+      // Estimate size.
+      setSelection(newFeature);
+    }, [newFeature]);
 
-  const estimatedSizeText = useMemo(() => {
-    const NOT_AVAILABLE_TEXT = 'N/A';
-    const estimatedSizeValue = typeof estimatedSizeRes === 'number' ? formatBytes(estimatedSizeRes) : NOT_AVAILABLE_TEXT;
+    const estimatedSizeText = useMemo(() => {
+      const NOT_AVAILABLE_TEXT = 'N/A';
+      const estimatedSizeValue =
+        typeof estimatedSizeRes === 'number' ? formatBytes(estimatedSizeRes) : NOT_AVAILABLE_TEXT;
 
-    const estimatedSizeLabel = intl.formatMessage({ id: 'export-layer.sizeEstimation.label' });
+      const estimatedSizeLabel = intl.formatMessage({ id: 'export-layer.sizeEstimation.label' });
 
-    return (
-      <Box className="estimatedSizeContainer">
-        <Typography tag="bdi">
-          {estimatedSizeLabel}
+      return (
+        <Box className="estimatedSizeContainer">
           <Typography tag="bdi">
-            {loading ? '' : estimatedSizeValue}
+            {estimatedSizeLabel}
+            <Typography tag="bdi">{loading ? '' : estimatedSizeValue}</Typography>
           </Typography>
-        </Typography>   
-      </Box>
-    );
-  }, [estimatedSizeRes, error, loading]);
-  
-  const selection = useMemo(() => {
+        </Box>
+      );
+    }, [estimatedSizeRes, error, loading]);
+
+    const selection = useMemo(() => {
       const selectionFields = Object.entries(featProps)
         .filter(([key]) => key in (internalFields ?? {}))
         .map(([key, val]) => {
@@ -98,23 +93,21 @@ const ExportSelectionComponent: React.FC<ExportSelectionComponentProps> = observ
             />
           );
         });
-    
+
       const hasPropsSign = selectionFields.length > NONE ? ':' : '.';
       const selectionTextId = isEmpty(featProps.label)
         ? 'export-layer.selection-index.text'
         : (featProps.label as string);
-    
+
       const customOrGeneralSelectionText = intl.formatMessage({
         id: selectionTextId,
       });
       const selectionTitle = `${selectionIdx + 1}. ${customOrGeneralSelectionText}${hasPropsSign}`;
-    
+
       return (
         <Box
           className={`selectionContainer ${
-            store.exportStore.isFullLayerExportEnabled || loading
-              ? 'backdrop'
-              : ''
+            store.exportStore.isFullLayerExportEnabled || loading ? 'backdrop' : ''
           } ${isSelectionServerError ? SELECTION_ERROR_CLASSNAME : ''}`}
           onMouseEnter={(): void => {
             onSelectionMouseOver(feature.properties?.id as string);
@@ -133,9 +126,7 @@ const ExportSelectionComponent: React.FC<ExportSelectionComponentProps> = observ
                 className="removeSelectionBtn mc-icon-Close"
                 onClick={(): void => {
                   store.exportStore.resetHighlightedFeature();
-                  store.exportStore.removeFeatureById(
-                    feature.properties?.id as string
-                  );
+                  store.exportStore.removeFeatureById(feature.properties?.id as string);
                 }}
               />
               <Typography tag="bdi" className="selectionIndex">
@@ -147,9 +138,10 @@ const ExportSelectionComponent: React.FC<ExportSelectionComponentProps> = observ
           </Box>
         </Box>
       );
-  }, [newFeature, estimatedSizeRes, error, loading, selectionIdx, isSelectionServerError]);
+    }, [newFeature, estimatedSizeRes, error, loading, selectionIdx, isSelectionServerError]);
 
-  return selection;
-});
+    return selection;
+  }
+);
 
 export default ExportSelectionComponent;

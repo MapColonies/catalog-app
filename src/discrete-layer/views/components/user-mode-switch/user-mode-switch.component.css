@@ -76,9 +76,7 @@ body[dir='rtl'] .userModeSwitchDialog .closeIcon {
   height: var(--invalid_msg_height);
 }
 
-.passwordInputContainer
-  .mdc-text-field:not(.mdc-text-field--disabled)
-  .mdc-floating-label {
+.passwordInputContainer .mdc-text-field:not(.mdc-text-field--disabled) .mdc-floating-label {
   color: var(--mdc-theme-text-icon-on-background);
 }
 

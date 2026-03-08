@@ -10,8 +10,14 @@ import { Copy } from '../../../../../common/components/copy/copy';
 import { AutoDirectionBox } from '../../../../../common/components/auto-direction-box/auto-direction-box.component';
 import { DETAILS_ROW_ID_SUFFIX } from '../../../../../common/components/grid';
 import { Loading } from '../../../../../common/components/tree/statuses/loading';
-import { relativeDateFormatter, dateFormatter, } from '../../../../../common/helpers/formatters';
-import { JobModelType, ProductType, Status, TasksGroupModelType, useStore } from '../../../../models';
+import { relativeDateFormatter, dateFormatter } from '../../../../../common/helpers/formatters';
+import {
+  JobModelType,
+  ProductType,
+  Status,
+  TasksGroupModelType,
+  useStore,
+} from '../../../../models';
 import { useQuery } from '../../../../models/RootStore';
 import { JobDetailsHeader } from './job-details.header';
 import { JobDetailsExportJobData } from './job.details.export-job-data';
@@ -55,7 +61,7 @@ const taskFields: ITaskField[] = [
 
 interface StatusPresentorParams {
   task: Record<string, unknown>;
-  reactKey?: string
+  reactKey?: string;
 }
 
 const StatusPresentor: React.FC<StatusPresentorParams> = ({ task, reactKey = '' }) => {
@@ -84,7 +90,7 @@ const StatusPresentor: React.FC<StatusPresentorParams> = ({ task, reactKey = '' 
         >
           {(task.percentage as Number).toString() + '%'}
         </Typography>
-      )
+      );
     }
   };
 
@@ -114,7 +120,7 @@ const StatusPresentor: React.FC<StatusPresentorParams> = ({ task, reactKey = '' 
             </>
           </Tooltip>
         </AutoDirectionBox>
-        <Copy value = {task.reason as string} iconStyle = {{ fontSize: `20px` }}/>
+        <Copy value={task.reason as string} iconStyle={{ fontSize: `20px` }} />
       </Box>
     );
   }
@@ -134,23 +140,22 @@ const getValuePresentor = (
 ): JSX.Element => {
   switch (field.valueType) {
     case 'date': {
-      const dateAndTimeTooltipContent: string = dateFormatter(
-        task[field.name] as Moment,
-        true
-      );
+      const dateAndTimeTooltipContent: string = dateFormatter(task[field.name] as Moment, true);
 
       return (
         <Tooltip content={dateAndTimeTooltipContent} key={`DATE_${idx}`}>
-          <Box className="gridCell">
-            {relativeDateFormatter(task[field.name] as Moment)}
-          </Box>
+          <Box className="gridCell">{relativeDateFormatter(task[field.name] as Moment)}</Box>
         </Tooltip>
       );
     }
     case 'Status':
       return <StatusPresentor key={`STATUS_${idx}`} task={task} />;
     default:
-      return <Box key={`gridCdellDefault_${idx}`} className="gridCell">{task[field.name] as string} </Box>;
+      return (
+        <Box key={`gridCdellDefault_${idx}`} className="gridCell">
+          {task[field.name] as string}{' '}
+        </Box>
+      );
   }
 };
 
@@ -159,7 +164,7 @@ interface TasksRendererParams {
   productType: ProductType;
 }
 
-const TasksRenderer: React.FC<TasksRendererParams> = observer(({ jobId, productType}) => {
+const TasksRenderer: React.FC<TasksRendererParams> = observer(({ jobId, productType }) => {
   const [tasksData, setTasksData] = useState<TasksGroupModelType[]>([]);
 
   const { loading, data } = useQuery(
@@ -189,42 +194,35 @@ const TasksRenderer: React.FC<TasksRendererParams> = observer(({ jobId, productT
 
   return (
     <>
-      {
-        tasksData.map((task) => {
-          return taskFields.map((field, idx) => {
-            return getValuePresentor(
-              (task as unknown) as Record<string, unknown>,
-              field,
-              idx
-            );
-          });
-        })
-      }
+      {tasksData.map((task) => {
+        return taskFields.map((field, idx) => {
+          return getValuePresentor(task as unknown as Record<string, unknown>, field, idx);
+        });
+      })}
     </>
   );
 });
 
 export const JobDetailsRenderer: React.FC<ICellRendererParams> = observer((props) => {
   const store = useStore();
-  
+
   const [propsWithJobParams, setPropsWithJobParams] = useState(props);
   const jobId = (props.data as JobModelType).id.replace(DETAILS_ROW_ID_SUFFIX, '');
 
-  const { data } = useQuery(
-    (store) =>
-      store.queryJob({
-        id: jobId,
-      })
+  const { data } = useQuery((store) =>
+    store.queryJob({
+      id: jobId,
+    })
   );
 
   useEffect(() => {
     if (!data?.job) return;
 
-    setPropsWithJobParams(prev => ({
+    setPropsWithJobParams((prev) => ({
       ...prev,
       data: {
         ...props.data,
-        parameters: data.job?.parameters
+        parameters: data.job?.parameters,
       },
     }));
   }, [data]);
@@ -233,7 +231,7 @@ export const JobDetailsRenderer: React.FC<ICellRendererParams> = observer((props
 
   return (
     <Box key={`${jobId}_${store.jobsStore.reloadDataCounter}`} className="jobDetailsContainer">
-      <JobDetailsHeader job={props.data as JobModelType} /> 
+      <JobDetailsHeader job={props.data as JobModelType} />
       <JobDetailsExportJobData {...propsWithJobParams} />
       <JobDetailsRasterJobData {...propsWithJobParams} />
       <Box className="gridContainer">
@@ -247,7 +245,10 @@ export const JobDetailsRenderer: React.FC<ICellRendererParams> = observer((props
             <FormattedMessage id={field.label} />
           </Typography>
         ))}
-        <TasksRenderer productType={(props.data as JobModelType).productType as ProductType} jobId={jobId} />
+        <TasksRenderer
+          productType={(props.data as JobModelType).productType as ProductType}
+          jobId={jobId}
+        />
       </Box>
     </Box>
   );

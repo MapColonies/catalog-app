@@ -30,18 +30,17 @@ interface IServerErrorResponse {
 }
 
 export const GraphQLError: React.FC<IGpaphQLError> = ({ error }) => {
-
   const intl = useIntl();
 
   const formatMessage = (serverError: IServerError): string => {
     const status = serverError.serverResponse?.status ?? NONE;
-    const message = serverError.serverResponse?.data.message ?
-      serverError.serverResponse.data.message :
-      serverError.serverResponse?.statusText ?? '';
+    const message = serverError.serverResponse?.data.message
+      ? serverError.serverResponse.data.message
+      : serverError.serverResponse?.statusText ?? '';
     if (status && status >= USER_ERROR_RESPONSE_CODE && status < SERVER_ERROR_RESPONSE_CODE) {
       const translatedError = intl.formatMessage({ id: `general.http-${status}.error` });
       return `${translatedError}<br/>${message}`;
-    }  else if (message) {
+    } else if (message) {
       return message;
     } else {
       return serverError.message.substring(+serverError.message.indexOf('; ') + 1);
@@ -50,8 +49,7 @@ export const GraphQLError: React.FC<IGpaphQLError> = ({ error }) => {
 
   return (
     <>
-      {
-        !isEmpty(error?.response) &&
+      {!isEmpty(error?.response) && (
         <AutoDirectionBox className="errorContainer">
           <IconButton
             className="errorIcon mc-icon-Status-Warnings error"
@@ -61,26 +59,29 @@ export const GraphQLError: React.FC<IGpaphQLError> = ({ error }) => {
             }}
           />
           <ul className="errorsList">
-            {
-              error.response.errors?.map((error: IServerError, index: number) => {
-                return (
-                  <li dir="auto" key={index} dangerouslySetInnerHTML={{__html: formatMessage(error)}}></li>
-                );
-              })
-            }
-            {
-              error.response.status >= USER_ERROR_RESPONSE_CODE &&
-              error.response.status < SERVER_ERROR_RESPONSE_CODE &&
-              <li dir="auto" key={error.response.status as number}><FormattedMessage id={`general.http-${error.response.status}.error`}/></li>
-            }
-            {
-              error.response.status >= SERVER_ERROR_RESPONSE_CODE &&
-              <li dir="auto" key={error.response.status as number}><FormattedMessage id="general.server.error"/></li>
-            }
+            {error.response.errors?.map((error: IServerError, index: number) => {
+              return (
+                <li
+                  dir="auto"
+                  key={index}
+                  dangerouslySetInnerHTML={{ __html: formatMessage(error) }}
+                ></li>
+              );
+            })}
+            {error.response.status >= USER_ERROR_RESPONSE_CODE &&
+              error.response.status < SERVER_ERROR_RESPONSE_CODE && (
+                <li dir="auto" key={error.response.status as number}>
+                  <FormattedMessage id={`general.http-${error.response.status}.error`} />
+                </li>
+              )}
+            {error.response.status >= SERVER_ERROR_RESPONSE_CODE && (
+              <li dir="auto" key={error.response.status as number}>
+                <FormattedMessage id="general.server.error" />
+              </li>
+            )}
           </ul>
         </AutoDirectionBox>
-      }
+      )}
     </>
   );
-
 };

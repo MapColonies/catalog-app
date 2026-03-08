@@ -27,16 +27,16 @@ body[dir='rtl'] .filtersPosition {
   gap: 8px;
 }
 
-.drawerPosition{
-  overflow: hidden; 
+.drawerPosition {
+  overflow: hidden;
   position: absolute;
   top: 60px;
   left: 0px;
 }
 
-.drawerPosition .mdc-drawer{
+.drawerPosition .mdc-drawer {
   width: 100%;
-} 
+}
 body[dir='rtl'] .drawerPosition {
   right: 0px;
   left: unset;

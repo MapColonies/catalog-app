@@ -28,28 +28,33 @@ const ExportOptionsField: React.FC<ExportOptionsFieldProps> = ({
 }) => {
   const store = useStore();
   const formMethods = useFormContext();
-  const [innerValue, setInnerValue] = useState(isEmpty(fieldValue) ? defaultValue ?? '' : fieldValue);
+  const [innerValue, setInnerValue] = useState(
+    isEmpty(fieldValue) ? defaultValue ?? '' : fieldValue
+  );
 
   const getFormFieldId = (name: string): string => {
-    return `${selectionIdx}_${name}_${selectionId}`
-  }
+    return `${selectionIdx}_${name}_${selectionId}`;
+  };
   const fieldId = getFormFieldId(fieldName);
 
   useEffect(() => {
     const registerValidation = {
       ...(rhfValidation ?? {}),
       validate: {
-        ...((rhfValidation?.validate) ?? {}),
-        validationAgainstField: (value: unknown): string | boolean |undefined => {
+        ...(rhfValidation?.validate ?? {}),
+        validationAgainstField: (value: unknown): string | boolean | undefined => {
           if (typeof validationAgainstField !== 'undefined') {
-            return validationAgainstField.validate(value, formMethods.watch(getFormFieldId(validationAgainstField.watch)));
+            return validationAgainstField.validate(
+              value,
+              formMethods.watch(getFormFieldId(validationAgainstField.watch))
+            );
           }
-        }
+        },
       },
     };
-    
-    formMethods.register(fieldId, {...registerValidation});
-    
+
+    formMethods.register(fieldId, { ...registerValidation });
+
     // Mitigate errors on init
     formMethods.setValue(fieldId, innerValue, { shouldValidate: innerValue.length > NONE });
 
@@ -58,25 +63,27 @@ const ExportOptionsField: React.FC<ExportOptionsFieldProps> = ({
 
     return (): void => {
       formMethods.unregister(fieldId);
-    }
+    };
   }, [fieldId]);
 
   return (
     <Box className="exportSelectionField selectOptionsContainer">
-      <ExportFieldLabel required={!isEmpty(rhfValidation?.required)} fieldId={fieldId} fieldName={fieldName} />
+      <ExportFieldLabel
+        required={!isEmpty(rhfValidation?.required)}
+        fieldId={fieldId}
+        fieldName={fieldName}
+      />
       <Select
         value={innerValue}
         defaultValue={defaultValue}
         id={fieldId}
         name={fieldId}
         onChange={(e: React.FormEvent<HTMLSelectElement>): void => {
-          const newFieldVal = rhfValidation?.valueAsNumber as boolean ? Number(e.currentTarget.value) : e.currentTarget.value;
+          const newFieldVal = (rhfValidation?.valueAsNumber as boolean)
+            ? Number(e.currentTarget.value)
+            : e.currentTarget.value;
 
-          store.exportStore.setSelectionProperty(
-            selectionId,
-            fieldName,
-            newFieldVal
-          );
+          store.exportStore.setSelectionProperty(selectionId, fieldName, newFieldVal);
 
           formMethods.setValue(fieldId, newFieldVal, { shouldValidate: true });
           setInnerValue(e.currentTarget.value);
@@ -98,7 +105,11 @@ const ExportOptionsField: React.FC<ExportOptionsFieldProps> = ({
         })}
       </Select>
 
-      <ExportFieldHelperText key={`${fieldId}_helper`} helperText={helperTextValue} fieldValue={fieldValue} />
+      <ExportFieldHelperText
+        key={`${fieldId}_helper`}
+        helperText={helperTextValue}
+        fieldValue={fieldValue}
+      />
     </Box>
   );
 };

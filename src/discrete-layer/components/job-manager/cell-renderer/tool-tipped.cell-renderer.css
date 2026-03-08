@@ -1,11 +1,11 @@
 #jobsDialog .tooltippedCell {
-    line-height: 1;
+  line-height: 1;
 }
 
 #jobsDialog .tooltippedCell > * {
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-    text-align: center;
-    padding-bottom: 1px;  
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  text-align: center;
+  padding-bottom: 1px;
 }

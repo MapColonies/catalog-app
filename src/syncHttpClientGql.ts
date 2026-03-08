@@ -7,8 +7,8 @@ export const enum SYNC_QUERY_NAME {
   RASTER_UPDATE_GEOPKG = 'startRasterUpdateGeopkg',
   VALIDATE_SOURCE = 'validateSource',
   GET_DIRECTORY = 'getDirectory',
-  GET_PRODUCT = 'getProduct'
-};
+  GET_PRODUCT = 'getProduct',
+}
 
 export type SYNC_QUERY = {
   queryName: SYNC_QUERY_NAME;

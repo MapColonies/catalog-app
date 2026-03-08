@@ -220,4 +220,4 @@ export enum Country {
   TUR = 'TUR',
   TKM = 'TKM',
   YEM = 'YEM',
-};
+}

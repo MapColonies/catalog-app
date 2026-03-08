@@ -10,7 +10,9 @@ import { ExportFieldProps } from '../types/interfaces';
 
 const DemSelectionField: React.FC<ExportFieldProps> = (props) => {
   const { fieldName, selectionIdx } = props;
-  const {exportStore: { layerToExport, geometrySelectionsCollection }} = useStore();
+  const {
+    exportStore: { layerToExport, geometrySelectionsCollection },
+  } = useStore();
   const { enumsMap } = useContext(EnumsMapContext);
   const enums = enumsMap as IEnumsMapType;
 
@@ -26,59 +28,63 @@ const DemSelectionField: React.FC<ExportFieldProps> = (props) => {
       const PROJECTION_OPTIONS = [DEMExportProjection.WGS84, DEMExportProjection.UTM];
       const DEFAULT_PROJECTION = DEMExportProjection.WGS84;
 
-      const valueFromEntityProps = (get(
-        geometrySelectionsCollection.features[selectionIdx - 1],
-        `properties.projection`
-      ) as number | undefined)?.toString();
+      const valueFromEntityProps = (
+        get(geometrySelectionsCollection.features[selectionIdx - 1], `properties.projection`) as
+          | number
+          | undefined
+      )?.toString();
 
       return (
         <>
-           <ExportOptionsField
-              options={PROJECTION_OPTIONS}
-              defaultValue={valueFromEntityProps ?? DEFAULT_PROJECTION}
-              {...props}
-            />
+          <ExportOptionsField
+            options={PROJECTION_OPTIONS}
+            defaultValue={valueFromEntityProps ?? DEFAULT_PROJECTION}
+            {...props}
+          />
         </>
-      )
+      );
     }
     case 'resampleMethod': {
-      const options = getEnumRealValues(enums, "ResamplingMethod");
+      const options = getEnumRealValues(enums, 'ResamplingMethod');
       const defaultResamplingMethod = 'near';
 
-      const valueFromEntityProps = (get(
-        geometrySelectionsCollection.features[selectionIdx - 1],
-        `properties.resampleMethod`
-      ) as number | undefined)?.toString();
+      const valueFromEntityProps = (
+        get(
+          geometrySelectionsCollection.features[selectionIdx - 1],
+          `properties.resampleMethod`
+        ) as number | undefined
+      )?.toString();
 
       return (
         <>
-           <ExportOptionsField
-              options={options}
-              defaultValue={valueFromEntityProps ?? defaultResamplingMethod}
-              {...props}
-            />
+          <ExportOptionsField
+            options={options}
+            defaultValue={valueFromEntityProps ?? defaultResamplingMethod}
+            {...props}
+          />
         </>
-      )
+      );
     }
     case 'dataType': {
-      const options = getEnumRealValues(enums, "DEMDataType");
+      const options = getEnumRealValues(enums, 'DEMDataType');
       const defaultValueFromLayer = get(layerToExport, 'dataType') as string;
       const defaultValue = get(enums, defaultValueFromLayer).realValue;
 
-      const valueFromEntityProps = (get(
-        geometrySelectionsCollection.features[selectionIdx - 1],
-        `properties.dataType`
-      ) as number | undefined)?.toString();
-      
+      const valueFromEntityProps = (
+        get(geometrySelectionsCollection.features[selectionIdx - 1], `properties.dataType`) as
+          | number
+          | undefined
+      )?.toString();
+
       return (
         <>
-            <ExportOptionsField
-              options={options}
-              defaultValue={valueFromEntityProps ?? defaultValue}
-              {...props}
-            />
+          <ExportOptionsField
+            options={options}
+            defaultValue={valueFromEntityProps ?? defaultValue}
+            {...props}
+          />
         </>
-      )
+      );
     }
     case 'description': {
       return (

@@ -1,3 +1,4 @@
+/* eslint-disable */
 var body = document.querySelector('body');
 var uaParserObj = new UAParser();
 var FIRST_ELEM = 0;

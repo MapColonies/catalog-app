@@ -1,8 +1,8 @@
 .categoryFieldsParentContainer {
   /* This value is default. the real value comes from 'NUMBER_OF_CHARACTERS_LIMIT' in config, */
   /* and set in layer-details.tsx                                                             */
-  
-  --field-label-max-length: 18ch
+
+  --field-label-max-length: 18ch;
 }
 
 .categoryFieldsParentContainer {
