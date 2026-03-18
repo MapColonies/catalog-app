@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.4.1](https://github.com/MapColonies/catalog-app/compare/v4.4.0...v4.4.1) (2026-03-18)
+
+
+### Bug Fixes
+
+* nginx worker_processes from auto to 4 for faster startup ([#865](https://github.com/MapColonies/catalog-app/issues/865)) ([8d4150b](https://github.com/MapColonies/catalog-app/commit/8d4150bbf888c3d3e28f79f860683a2e49b5906b))
+
 ## [4.4.0](https://github.com/MapColonies/catalog-app/compare/v4.3.5...v4.4.0) (2026-03-08)
 
 
