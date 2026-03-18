@@ -24,7 +24,8 @@ import { CapabilityModelType } from './CapabilityModel';
 import { ILayerImage } from './layerImage';
 import { ModelBase } from './ModelBase';
 import { IRootStore, RootStoreType } from './RootStore';
-import { LayerMetadataMixedUnion, RecordType } from './';
+import { CswCatalogsModelSelector, CswCatalogsModelType, Layer3DRecordModelType, LayerMetadataMixedUnion, RecordType, ResultType } from './';
+import { Query } from 'mst-gql';
 
 const NONE = 0;
 const TOP_LEVEL_GROUP_BY_FIELD = 'region';
@@ -294,11 +295,12 @@ export const catalogTreeStore = ModelBase.props({
      * Fetch new catalog data
      */
     const catalogSearch = flow(function* catalogSearchGen(): Generator<
-      Promise<{ search: ILayerImage[] }>,
+      Promise<{ search: CswCatalogsModelType }[]>,
       ILayerImage[],
-      ILayerImage[]
+      // RecordResponseClassModelType
+      CswCatalogsModelType[]
     > {
-      const search = store.querySearch({
+      const searchHits = store.querySearch({
         opts: {
           filter: [
             {
@@ -307,22 +309,77 @@ export const catalogTreeStore = ModelBase.props({
             },
           ],
         },
-        end: CONFIG.RUNNING_MODE.END_RECORD,
-        start: CONFIG.RUNNING_MODE.START_RECORD,
+        resultType: ResultType.HITS,
+        end: 0,
+        start: 1,
       });
+
+      //@ts-ignore
+      let searchResults: Query<{ search: CswCatalogsModelType }> = { search: {} };
 
       try {
         setSearchError(null);
 
-        // Avoiding the cache with the refetch
-        const dataSearch = yield search.refetch();
+        //@ts-ignore
+        const dataHits = yield searchHits.refetch();
+        const recordsHits: CswCatalogsModelType = cloneDeep(get(dataHits, 'search'));
+        const pageSize = 5;
 
-        const layersList = get(dataSearch, 'search') as ILayerImage[];
-        const layersImages: ILayerImage[] = cloneDeep(layersList);
-        
+        const promises: Promise<{ search: CswCatalogsModelType }>[] = [];
+
+
+
+        let highestNumberOfRecords = 0;
+
+        Object.keys(recordsHits).map((k) => {
+          const key = k as keyof CswCatalogsModelType;
+
+          if (recordsHits[key]?.cswQuerySummary?.numberOfRecordsMatched) {
+            highestNumberOfRecords = Math.max(highestNumberOfRecords, recordsHits[key]?.cswQuerySummary?.numberOfRecordsMatched);
+          }
+        })
+
+        for (let i = 0; i < highestNumberOfRecords; i += pageSize) {
+          searchResults = store.querySearch({
+            opts: {
+              filter: [
+                {
+                  field: 'mc:type',
+                  eq: store.discreteLayersStore.searchParams.recordType,
+                },
+              ],
+            },
+            resultType: ResultType.RESULTS,
+            start: i + 1,
+            end: pageSize,
+          });
+
+          promises.push(searchResults.refetch());
+        }
+
+        const results = yield Promise.all(promises);
+
+        console.log('All search results fetched successfully:', results);
+
+        let layersImages: ILayerImage[] = [];
+
+        results.forEach((res) => {
+          const layersList: CswCatalogsModelType = get(res, 'search');
+          const val = cloneDeep(layersList);
+          Object.keys(val).map((k) => {
+            const key = k as keyof CswCatalogsModelType;
+            if (!val?.[key]?.records) {
+              return;
+            }
+            const records: ILayerImage[] = layersList[key].records;
+            layersImages.push(...records);
+          });
+        });
+
         return store.discreteLayersStore.setLayersImages(layersImages, false);
       } catch (e) {
-        setSearchError(search.error);
+        console.log('error::::', e)
+        setSearchError(searchResults.error);
         resetCatalogTreeData();
         setIsDataLoading(false);
         return [];
