@@ -228,7 +228,7 @@ export const extractCswQuerysRecords = (cswCatalogs: { search: CswCatalogsModelT
     if (!cswCatalogs) {
       return;
     }
-    Object.keys(cswCatalogs).map((k) => {
+    Object.keys(cswCatalogs).forEach((k) => {
       const key = k as keyof CswCatalogsModelType;
       if (!cswCatalogs?.[key]?.records) {
         return;

@@ -321,11 +321,11 @@ export const catalogTreeStore = ModelBase.props({
         setSearchError(null);
         const dataHits = yield searchHits.refetch();
         const recordsHits: CswCatalogsModelType = cloneDeep(get(dataHits, 'search'));
-        const pageSize = 10;
+        const pageSize = CONFIG.RUNNING_MODE.END_RECORD;
         const promises: Promise<{ search: CswCatalogsModelType }>[] = [];
         let highestNumberOfRecords = 0;
 
-        Object.keys(recordsHits).map((k) => {
+        Object.keys(recordsHits).forEach((k) => {
           const key = k as keyof CswCatalogsModelType;
 
           if (recordsHits[key]?.cswQuerySummary?.numberOfRecordsMatched) {
