@@ -1,5 +1,5 @@
 import { Feature } from 'geojson';
-import { get, isEmpty } from 'lodash';
+import { cloneDeep, get, isEmpty } from 'lodash';
 import bbox from '@turf/bbox';
 import area from '@turf/area';
 import bboxPolygon from '@turf/bbox-polygon';
@@ -14,6 +14,7 @@ import CONFIG from '../../../common/config';
 import { LinkType } from '../../../common/models/link-type.enum';
 import {
   CapabilityModelType,
+  CswCatalogsModelType,
   LayerMetadataMixedUnion,
   LayerRasterRecordModelType,
   LinkModelType,
@@ -217,3 +218,25 @@ export const getWMTSOptions = (
     tilingScheme: new CesiumGeographicTilingScheme(),
   };
 };
+
+export const extractCswQuerysRecords = (cswCatalogs: { search: CswCatalogsModelType }[]) => {
+  let layersImages: ILayerImage[] = [];
+
+  cswCatalogs.forEach((res) => {
+    const cswCatalogsVal: CswCatalogsModelType = get(res, 'search');
+    const cswCatalogs = cloneDeep(cswCatalogsVal);
+    if (!cswCatalogs) {
+      return;
+    }
+    Object.keys(cswCatalogs).map((k) => {
+      const key = k as keyof CswCatalogsModelType;
+      if (!cswCatalogs?.[key]?.records) {
+        return;
+      }
+      const records: ILayerImage[] = cswCatalogs[key].records;
+      layersImages.push(...records);
+    });
+  });
+
+  return layersImages;
+}

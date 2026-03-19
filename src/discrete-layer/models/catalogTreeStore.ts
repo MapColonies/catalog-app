@@ -17,7 +17,7 @@ import CONFIG from '../../common/config';
 import { GroupBy, groupBy, KeyPredicate } from '../../common/helpers/group-by';
 import MESSAGES from '../../common/i18n';
 import { ResponseState } from '../../common/models/response-state.enum';
-import { getLayerLink } from '../components/helpers/layersUtils';
+import { extractCswQuerysRecords, getLayerLink } from '../components/helpers/layersUtils';
 import { existStatus, isUnpublished } from '../../common/helpers/style';
 import { isBest, isVector } from '../components/layer-details/utils';
 import { CapabilityModelType } from './CapabilityModel';
@@ -295,10 +295,11 @@ export const catalogTreeStore = ModelBase.props({
      * Fetch new catalog data
      */
     const catalogSearch = flow(function* catalogSearchGen(): Generator<
-      Promise<{ search: CswCatalogsModelType }[]>,
+      | Promise<{ search: CswCatalogsModelType }>
+      | Promise<{ search: CswCatalogsModelType }[]>,
       ILayerImage[],
-      // RecordResponseClassModelType
-      CswCatalogsModelType[]
+      | { search: CswCatalogsModelType }
+      | { search: CswCatalogsModelType }[]
     > {
       const searchHits = store.querySearch({
         opts: {
@@ -314,21 +315,14 @@ export const catalogTreeStore = ModelBase.props({
         start: 1,
       });
 
-      //@ts-ignore
-      let searchResults: Query<{ search: CswCatalogsModelType }> = { search: {} };
+      let searchResultsQuery!: Query<{ search: CswCatalogsModelType }>;
 
       try {
         setSearchError(null);
-
-        //@ts-ignore
         const dataHits = yield searchHits.refetch();
         const recordsHits: CswCatalogsModelType = cloneDeep(get(dataHits, 'search'));
-        const pageSize = 5;
-
+        const pageSize = 10;
         const promises: Promise<{ search: CswCatalogsModelType }>[] = [];
-
-
-
         let highestNumberOfRecords = 0;
 
         Object.keys(recordsHits).map((k) => {
@@ -340,7 +334,7 @@ export const catalogTreeStore = ModelBase.props({
         })
 
         for (let i = 0; i < highestNumberOfRecords; i += pageSize) {
-          searchResults = store.querySearch({
+          searchResultsQuery = store.querySearch({
             opts: {
               filter: [
                 {
@@ -354,32 +348,15 @@ export const catalogTreeStore = ModelBase.props({
             end: pageSize,
           });
 
-          promises.push(searchResults.refetch());
+          promises.push(searchResultsQuery.refetch());
         }
 
         const results = yield Promise.all(promises);
-
-        console.log('All search results fetched successfully:', results);
-
-        let layersImages: ILayerImage[] = [];
-
-        results.forEach((res) => {
-          const layersList: CswCatalogsModelType = get(res, 'search');
-          const val = cloneDeep(layersList);
-          Object.keys(val).map((k) => {
-            const key = k as keyof CswCatalogsModelType;
-            if (!val?.[key]?.records) {
-              return;
-            }
-            const records: ILayerImage[] = layersList[key].records;
-            layersImages.push(...records);
-          });
-        });
-
+        const layersImages = extractCswQuerysRecords(results as { search: CswCatalogsModelType }[]);
         return store.discreteLayersStore.setLayersImages(layersImages, false);
       } catch (e) {
-        console.log('error::::', e)
-        setSearchError(searchResults.error);
+        console.log('error while fetching catalog:', e)
+        setSearchError(searchResultsQuery.error);
         resetCatalogTreeData();
         setIsDataLoading(false);
         return [];

@@ -72,7 +72,8 @@ import { PolygonSelectionUi } from '../components/map-container/polygon-selectio
 import { SelectedLayersContainer } from '../components/map-container/selected-layers-container';
 import { Terrain } from '../components/map-container/terrain';
 import { SystemCoreInfoDialog } from '../components/system-status/system-core-info/system-core-info.dialog';
-import { JobModelType, LayerMetadataMixedUnion, LinkModelType, RecordType } from '../models';
+import { extractCswQuerysRecords } from '../components/helpers/layersUtils';
+import { CswCatalogsModelType, JobModelType, LayerMetadataMixedUnion, LinkModelType, RecordType } from '../models';
 import { IDispatchAction } from '../models/actionDispatcherStore';
 import { ILayerImage } from '../models/layerImage';
 import { useQuery, useStore } from '../models/RootStore';
@@ -198,7 +199,7 @@ const DiscreteLayerView: React.FC = observer(() => {
   }, []);
 
   useEffect(() => {
-    const layers = get(data, 'search', []) as ILayerImage[];
+    const layers = extractCswQuerysRecords([data as { search: CswCatalogsModelType }]);
 
     if (activeTabView === TabViews.SEARCH_RESULTS) {
       store.discreteLayersStore.setLayersImages([...layers], false);
@@ -219,7 +220,7 @@ const DiscreteLayerView: React.FC = observer(() => {
     }
 
     if (!isEmpty(data) && !isEmpty(fullCatalogLayers)) {
-      const searchLayers = get(data, 'search', []) as ILayerImage[];
+      const searchLayers = extractCswQuerysRecords([data as { search: CswCatalogsModelType }]);
 
       /**
        * There could be a case where the catalog includes outdated data (New layers has bee added).
