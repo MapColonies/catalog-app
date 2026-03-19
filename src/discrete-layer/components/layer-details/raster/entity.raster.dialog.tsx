@@ -51,6 +51,7 @@ import { RasterWorkflowProvider, RasterWorkflowContext } from './state-machine/c
 import { getUIIngestionFieldDescriptors } from './utils';
 
 import './entity.raster.dialog.css';
+import { useWorkerAPI } from './worker/useWorkerAPI';
 
 const DEFAULT_ID = 'DEFAULT_UI_ID';
 const DEFAULT_TYPE_NAME = 'DEFAULT_TYPE_NAME';
@@ -156,8 +157,18 @@ export const EntityRasterDialog: React.FC<EntityRasterDialogProps> = observer(
       return buildRasterRecord(descriptors);
     };
 
+    /*****START: REMOVE IT !!!!!!!!!!!!!!!! */
+    const api = useWorkerAPI(); 
+    const handleRun = async () => {
+      if (!api) return;
+      const res = await api.calculateArea.method([1,2,3,4,5]);
+      console.log(res);
+    };
+    /*****ENF: REMOVE IT !!!!!!!!!!!!!!!! */
+
     return (
       <RasterWorkflowProvider>
+        <button onClick={handleRun} style={{width:'100px',height:'30px',zIndex:50}}>Run {api?.calculateArea.progress}</button>
         <EntityRasterDialogInner
           {...props}
           layerRecord={getRecordLayer(job)}

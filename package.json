@@ -131,6 +131,7 @@
     "axios": "^0.21.1",
     "browserify-zlib": "^0.2.0",
     "buffer": "^6.0.3",
+    "comlink": "^4.4.2",
     "convert-units": "^2.3.4",
     "copyfiles": "^2.4.0",
     "crypto-browserify": "^3.12.0",
