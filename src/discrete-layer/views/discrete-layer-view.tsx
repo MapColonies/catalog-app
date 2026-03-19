@@ -73,7 +73,13 @@ import { SelectedLayersContainer } from '../components/map-container/selected-la
 import { Terrain } from '../components/map-container/terrain';
 import { SystemCoreInfoDialog } from '../components/system-status/system-core-info/system-core-info.dialog';
 import { extractCswQuerysRecords } from '../components/helpers/layersUtils';
-import { CswCatalogsModelType, JobModelType, LayerMetadataMixedUnion, LinkModelType, RecordType } from '../models';
+import {
+  CswCatalogsModelType,
+  JobModelType,
+  LayerMetadataMixedUnion,
+  LinkModelType,
+  RecordType,
+} from '../models';
 import { IDispatchAction } from '../models/actionDispatcherStore';
 import { ILayerImage } from '../models/layerImage';
 import { useQuery, useStore } from '../models/RootStore';

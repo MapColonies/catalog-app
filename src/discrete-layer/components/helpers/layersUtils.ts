@@ -239,4 +239,4 @@ export const extractCswQuerysRecords = (cswCatalogs: { search: CswCatalogsModelT
   });
 
   return layersImages;
-}
+};
