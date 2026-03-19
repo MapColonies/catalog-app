@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
-import { wrap, Remote, proxy } from "comlink";
-import type { WorkerAPI } from "./worker.types";
+import { useEffect, useMemo, useState } from 'react';
+import { wrap, Remote, proxy } from 'comlink';
+import type { WorkerAPI } from './worker.types';
 
 export function useWorkerAPI<T>(): {
   calculateArea: {
@@ -17,8 +17,8 @@ export function useWorkerAPI<T>(): {
 
   useEffect(() => {
     const worker = new Worker(
-      new URL("./feat-collection-area.worker-api.ts", import.meta.url),
-      { type: "module" }
+      new URL('./feat-collection-area.worker-api.ts', import.meta.url),
+      { type: 'module' }
     );
 
     const wrapped: Remote<WorkerAPI> = wrap(worker);

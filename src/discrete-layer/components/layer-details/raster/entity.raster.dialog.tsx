@@ -49,9 +49,9 @@ import EntityRasterForm from './layer-details-form.raster';
 import { Events } from './state-machine/types';
 import { RasterWorkflowProvider, RasterWorkflowContext } from './state-machine/context';
 import { getUIIngestionFieldDescriptors } from './utils';
+import { useWorkerAPI } from './worker/useWorkerAPI';
 
 import './entity.raster.dialog.css';
-import { useWorkerAPI } from './worker/useWorkerAPI';
 
 const DEFAULT_ID = 'DEFAULT_UI_ID';
 const DEFAULT_TYPE_NAME = 'DEFAULT_TYPE_NAME';
@@ -164,7 +164,7 @@ export const EntityRasterDialog: React.FC<EntityRasterDialogProps> = observer(
       const res = await api.calculateArea.method([1,2,3,4,5]);
       console.log(res);
     };
-    /*****ENF: REMOVE IT !!!!!!!!!!!!!!!! */
+    /*****END: REMOVE IT !!!!!!!!!!!!!!!! */
 
     return (
       <RasterWorkflowProvider>

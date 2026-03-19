@@ -1,7 +1,7 @@
-import { expose } from "comlink";
-import { WorkerAPI } from "./worker.types";
+import { expose } from 'comlink';
+import { WorkerAPI } from './worker.types';
 
-const api:WorkerAPI = {
+const api: WorkerAPI = {
   calculateArea(data: number[], onProgress?: (p: number) => void): number[] {
     return data.map((x, idx) => {
       onProgress?.((idx + 1) / data.length);
