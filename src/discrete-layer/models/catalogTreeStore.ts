@@ -301,8 +301,6 @@ export const catalogTreeStore = ModelBase.props({
       | { search: CswCatalogsModelType }
       | { search: CswCatalogsModelType }[]
     > {
-      let searchResultsQuery!: Query<{ search: CswCatalogsModelType }>;
-
       try {
         setSearchError(null);
         const filter = [
@@ -328,7 +326,7 @@ export const catalogTreeStore = ModelBase.props({
         return store.discreteLayersStore.setLayersImages(layersImages, false);
       } catch (e) {
         console.log('error while fetching catalog:', e);
-        setSearchError(searchResultsQuery.error);
+        setSearchError(e);
         resetCatalogTreeData();
         setIsDataLoading(false);
         return [];
