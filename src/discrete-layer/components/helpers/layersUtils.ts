@@ -1,5 +1,6 @@
 import { Feature } from 'geojson';
 import { cloneDeep, get, isEmpty } from 'lodash';
+import { Query } from 'mst-gql';
 import bbox from '@turf/bbox';
 import area from '@turf/area';
 import bboxPolygon from '@turf/bbox-polygon';
@@ -15,14 +16,17 @@ import { LinkType } from '../../../common/models/link-type.enum';
 import {
   CapabilityModelType,
   CswCatalogsModelType,
+  IRootStore,
   LayerMetadataMixedUnion,
   LayerRasterRecordModelType,
   LinkModelType,
+  ResultType,
   StyleModelType,
   TileMatrixSetModelType,
 } from '../../models';
 import { ILayerImage } from '../../models/layerImage';
 import { ResourceUrlModelType } from '../../models/ResourceUrlModel';
+import { FilterField } from '../../models/RootStore.base';
 
 const DEFAULT_RECTANGLE_FACTOR = 0.2;
 const EARTH_AREA = 509000000; //whole EARTH surface, in square km
@@ -240,3 +244,50 @@ export const extractCswQuerysRecords = (cswCatalogs: { search: CswCatalogsModelT
 
   return layersImages;
 };
+
+export const fetchSearchHits = async (store: IRootStore, filter?: FilterField[]) => {
+  const searchHits = store.querySearch({
+    opts: {
+      filter,
+    },
+    resultType: ResultType.HITS,
+    end: 0,
+    start: 1,
+  });
+
+  return searchHits.refetch();
+}
+
+export const fetchCatalogParallel = async (store: IRootStore, highestNumberOfRecords: number, pageSize: number, startIndex: number, filter?: FilterField[]) => {
+  let searchResultsQuery!: Query<{ search: CswCatalogsModelType }>;
+  const promises: Promise<{ search: CswCatalogsModelType }>[] = [];
+
+  for (let i = 0; i < highestNumberOfRecords; i += pageSize) {
+    searchResultsQuery = store.querySearch({
+      opts: {
+        filter,
+      },
+      resultType: ResultType.RESULTS,
+      start: startIndex + i,
+      end: pageSize,
+    });
+
+    promises.push(searchResultsQuery.refetch());
+  }
+
+  return Promise.all(promises);
+}
+
+export const getMaxMatchedRecordsCount = (recordsHits: CswCatalogsModelType) => {
+  let maxRecords = 0;
+
+  Object.keys(recordsHits).forEach((k) => {
+    const key = k as keyof CswCatalogsModelType;
+
+    if (recordsHits[key]?.cswQuerySummary?.numberOfRecordsMatched) {
+      maxRecords = Math.max(maxRecords, recordsHits[key]?.cswQuerySummary?.numberOfRecordsMatched);
+    }
+  });
+
+  return maxRecords;
+}

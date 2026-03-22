@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { MapMode2D } from 'cesium';
 import { Geometry, Feature, FeatureCollection, Polygon, Point } from 'geojson';
-import { find, get, isEmpty } from 'lodash';
+import { cloneDeep, find, get, isEmpty } from 'lodash';
 import { observer } from 'mobx-react-lite';
 import React, { useMemo, useState, useEffect, useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -72,7 +72,7 @@ import { PolygonSelectionUi } from '../components/map-container/polygon-selectio
 import { SelectedLayersContainer } from '../components/map-container/selected-layers-container';
 import { Terrain } from '../components/map-container/terrain';
 import { SystemCoreInfoDialog } from '../components/system-status/system-core-info/system-core-info.dialog';
-import { extractCswQuerysRecords } from '../components/helpers/layersUtils';
+import { extractCswQuerysRecords, getMaxMatchedRecordsCount, fetchCatalogParallel, fetchSearchHits } from '../components/helpers/layersUtils';
 import {
   CswCatalogsModelType,
   JobModelType,
@@ -130,8 +130,8 @@ const noDrawing: IDrawingObject = {
 const getTimeStamp = (): string => new Date().getTime().toString();
 
 const DiscreteLayerView: React.FC = observer(() => {
-  // eslint-disable-next-line
-  const { loading: searchLoading, error: searchError, data, query, setQuery } = useQuery();
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [data, setData] = useState<{} | undefined>();
   const store = useStore();
   const theme = useTheme();
   const intl = useIntl();
@@ -205,12 +205,14 @@ const DiscreteLayerView: React.FC = observer(() => {
   }, []);
 
   useEffect(() => {
-    const layers = extractCswQuerysRecords([data as { search: CswCatalogsModelType }]);
+    if (data) {
+      const layers = extractCswQuerysRecords(data as { search: CswCatalogsModelType }[]);
 
-    if (activeTabView === TabViews.SEARCH_RESULTS) {
-      store.discreteLayersStore.setLayersImages([...layers], false);
-    } else {
-      store.discreteLayersStore.setTabviewData(TabViews.SEARCH_RESULTS, layers);
+      if (activeTabView === TabViews.SEARCH_RESULTS) {
+        store.discreteLayersStore.setLayersImages([...layers], false);
+      } else {
+        store.discreteLayersStore.setTabviewData(TabViews.SEARCH_RESULTS, layers);
+      }
     }
   }, [data]);
 
@@ -226,7 +228,7 @@ const DiscreteLayerView: React.FC = observer(() => {
     }
 
     if (!isEmpty(data) && !isEmpty(fullCatalogLayers)) {
-      const searchLayers = extractCswQuerysRecords([data as { search: CswCatalogsModelType }]);
+      const searchLayers = extractCswQuerysRecords(data as { search: CswCatalogsModelType }[]);
 
       /**
        * There could be a case where the catalog includes outdated data (New layers has bee added).
@@ -243,10 +245,6 @@ const DiscreteLayerView: React.FC = observer(() => {
 
     void store.catalogTreeStore.capabilitiesFetch(fullCatalogLayers);
   }, [data]);
-
-  useEffect(() => {
-    setSearchResultsError(searchError);
-  }, [searchError]);
 
   useEffect(() => {
     /**
@@ -372,21 +370,28 @@ const DiscreteLayerView: React.FC = observer(() => {
     store.discreteLayersStore.resetPolygonParts();
   }, [store.discreteLayersStore.searchParams.recordType]);
 
+  const fetchCatalog = async () => {
+    try {
+      setSearchLoading(true);
+      const filters = buildFilters();
+      const dataHits = await fetchSearchHits(store, filters);
+      const recordsHits: CswCatalogsModelType = cloneDeep(get(dataHits, 'search'));
+      const highestNumberOfRecords = getMaxMatchedRecordsCount(recordsHits);
+      const pageSize = CONFIG.RUNNING_MODE.END_RECORD;
+      const startIndex = CONFIG.RUNNING_MODE.START_RECORD;
+      const results = await fetchCatalogParallel(store, highestNumberOfRecords, pageSize, startIndex, filters);
+      setData(results);
+      setSearchLoading(false);
+    } catch (error: any) {
+      setSearchLoading(false);
+      setSearchResultsError(error);
+    }
+  }
+
   useEffect(() => {
     if (activeTabView === TabViews.SEARCH_RESULTS) {
       void store.discreteLayersStore.clearLayersImages();
-
-      // TODO: build query params: FILTERS and SORTS
-      const filters = buildFilters();
-      setQuery(
-        store.querySearch({
-          opts: {
-            filter: filters,
-          },
-          end: CONFIG.RUNNING_MODE.END_RECORD,
-          start: CONFIG.RUNNING_MODE.START_RECORD,
-        })
-      );
+      fetchCatalog();
     }
   }, [
     store.discreteLayersStore.searchParams.geojson,
@@ -397,18 +402,12 @@ const DiscreteLayerView: React.FC = observer(() => {
     const hasFiltersEnabled =
       store.discreteLayersStore.searchParams.catalogFilters.length > START_IDX ||
       store.discreteLayersStore.searchParams.geojson;
-    if (hasFiltersEnabled) {
-      const filters = buildFilters();
-      setQuery(
-        store.querySearch({
-          opts: {
-            filter: filters,
-          },
-          end: CONFIG.RUNNING_MODE.END_RECORD,
-          start: CONFIG.RUNNING_MODE.START_RECORD,
-        })
-      );
+
+    if (!hasFiltersEnabled) { 
+      return;
     }
+    
+    fetchCatalog();
   }, [store.discreteLayersStore.searchParams.recordType]);
 
   const handlePolygonSelected = (geometry: Geometry): void => {

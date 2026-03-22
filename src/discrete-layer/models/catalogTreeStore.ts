@@ -17,7 +17,7 @@ import CONFIG from '../../common/config';
 import { GroupBy, groupBy, KeyPredicate } from '../../common/helpers/group-by';
 import MESSAGES from '../../common/i18n';
 import { ResponseState } from '../../common/models/response-state.enum';
-import { extractCswQuerysRecords, getLayerLink } from '../components/helpers/layersUtils';
+import { extractCswQuerysRecords, fetchCatalogParallel, getLayerLink, fetchSearchHits, getMaxMatchedRecordsCount } from '../components/helpers/layersUtils';
 import { existStatus, isUnpublished } from '../../common/helpers/style';
 import { isBest, isVector } from '../components/layer-details/utils';
 import { CapabilityModelType } from './CapabilityModel';
@@ -301,61 +301,33 @@ export const catalogTreeStore = ModelBase.props({
       | { search: CswCatalogsModelType }
       | { search: CswCatalogsModelType }[]
     > {
-      const searchHits = store.querySearch({
-        opts: {
-          filter: [
-            {
-              field: 'mc:type',
-              eq: store.discreteLayersStore.searchParams.recordType,
-            },
-          ],
-        },
-        resultType: ResultType.HITS,
-        end: 0,
-        start: 1,
-      });
-
       let searchResultsQuery!: Query<{ search: CswCatalogsModelType }>;
 
       try {
         setSearchError(null);
-        const dataHits = yield searchHits.refetch();
-        const recordsHits: CswCatalogsModelType = cloneDeep(get(dataHits, 'search'));
-        const pageSize = CONFIG.RUNNING_MODE.END_RECORD;
-        const promises: Promise<{ search: CswCatalogsModelType }>[] = [];
-        let highestNumberOfRecords = 0;
-
-        Object.keys(recordsHits).forEach((k) => {
-          const key = k as keyof CswCatalogsModelType;
-
-          if (recordsHits[key]?.cswQuerySummary?.numberOfRecordsMatched) {
-            highestNumberOfRecords = Math.max(highestNumberOfRecords, recordsHits[key]?.cswQuerySummary?.numberOfRecordsMatched);
+        const filter = [
+          {
+            field: 'mc:type',
+            eq: store.discreteLayersStore.searchParams.recordType,
           }
-        })
+        ]
+        const dataHits = yield fetchSearchHits(store, filter);
+        const recordsHits: CswCatalogsModelType = cloneDeep(get(dataHits, 'search'));
+        const highestNumberOfRecords = getMaxMatchedRecordsCount(recordsHits);
 
-        for (let i = 0; i < highestNumberOfRecords; i += pageSize) {
-          searchResultsQuery = store.querySearch({
-            opts: {
-              filter: [
-                {
-                  field: 'mc:type',
-                  eq: store.discreteLayersStore.searchParams.recordType,
-                },
-              ],
-            },
-            resultType: ResultType.RESULTS,
-            start: i + 1,
-            end: pageSize,
-          });
-
-          promises.push(searchResultsQuery.refetch());
-        }
-
-        const results = yield Promise.all(promises);
+        const pageSize = CONFIG.RUNNING_MODE.END_RECORD;
+        const startIndex = CONFIG.RUNNING_MODE.START_RECORD;
+        const catalogFilter = [
+          {
+            field: 'mc:type',
+            eq: store.discreteLayersStore.searchParams.recordType,
+          },
+        ];
+        const results = yield fetchCatalogParallel(store, highestNumberOfRecords, pageSize, startIndex, catalogFilter);
         const layersImages = extractCswQuerysRecords(results as { search: CswCatalogsModelType }[]);
         return store.discreteLayersStore.setLayersImages(layersImages, false);
       } catch (e) {
-        console.log('error while fetching catalog:', e)
+        console.log('error while fetching catalog:', e);
         setSearchError(searchResultsQuery.error);
         resetCatalogTreeData();
         setIsDataLoading(false);
