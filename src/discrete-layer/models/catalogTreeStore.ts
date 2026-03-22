@@ -24,7 +24,7 @@ import { CapabilityModelType } from './CapabilityModel';
 import { ILayerImage } from './layerImage';
 import { ModelBase } from './ModelBase';
 import { IRootStore, RootStoreType } from './RootStore';
-import { CswCatalogsModelSelector, CswCatalogsModelType, Layer3DRecordModelType, LayerMetadataMixedUnion, RecordType, ResultType } from './';
+import { CswCatalogsModelType, LayerMetadataMixedUnion, RecordType } from './';
 import { Query } from 'mst-gql';
 
 const NONE = 0;

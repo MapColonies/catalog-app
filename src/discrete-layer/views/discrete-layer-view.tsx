@@ -82,7 +82,7 @@ import {
 } from '../models';
 import { IDispatchAction } from '../models/actionDispatcherStore';
 import { ILayerImage } from '../models/layerImage';
-import { useQuery, useStore } from '../models/RootStore';
+import { useStore } from '../models/RootStore';
 import { FilterField } from '../models/RootStore.base';
 import { UserAction, UserRole } from '../models/userStore';
 import { ActionResolver } from './components/action-resolver.component';
