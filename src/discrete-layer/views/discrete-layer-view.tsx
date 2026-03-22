@@ -72,7 +72,12 @@ import { PolygonSelectionUi } from '../components/map-container/polygon-selectio
 import { SelectedLayersContainer } from '../components/map-container/selected-layers-container';
 import { Terrain } from '../components/map-container/terrain';
 import { SystemCoreInfoDialog } from '../components/system-status/system-core-info/system-core-info.dialog';
-import { extractCswQuerysRecords, getMaxMatchedRecordsCount, fetchCatalogParallel, fetchSearchHits } from '../components/helpers/layersUtils';
+import {
+  extractCswQuerysRecords,
+  getMaxMatchedRecordsCount,
+  fetchCatalogParallel,
+  fetchSearchHits,
+} from '../components/helpers/layersUtils';
 import {
   CswCatalogsModelType,
   JobModelType,
@@ -379,14 +384,20 @@ const DiscreteLayerView: React.FC = observer(() => {
       const highestNumberOfRecords = getMaxMatchedRecordsCount(recordsHits);
       const pageSize = CONFIG.RUNNING_MODE.END_RECORD;
       const startIndex = CONFIG.RUNNING_MODE.START_RECORD;
-      const results = await fetchCatalogParallel(store, highestNumberOfRecords, pageSize, startIndex, filters);
+      const results = await fetchCatalogParallel(
+        store,
+        highestNumberOfRecords,
+        pageSize,
+        startIndex,
+        filters
+      );
       setData(results);
       setSearchLoading(false);
     } catch (error: any) {
       setSearchLoading(false);
       setSearchResultsError(error);
     }
-  }
+  };
 
   useEffect(() => {
     if (activeTabView === TabViews.SEARCH_RESULTS) {
@@ -403,10 +414,10 @@ const DiscreteLayerView: React.FC = observer(() => {
       store.discreteLayersStore.searchParams.catalogFilters.length > START_IDX ||
       store.discreteLayersStore.searchParams.geojson;
 
-    if (!hasFiltersEnabled) { 
+    if (!hasFiltersEnabled) {
       return;
     }
-    
+
     fetchCatalog();
   }, [store.discreteLayersStore.searchParams.recordType]);
 

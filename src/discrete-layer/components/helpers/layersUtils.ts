@@ -256,9 +256,15 @@ export const fetchSearchHits = async (store: IRootStore, filter?: FilterField[])
   });
 
   return searchHits.refetch();
-}
+};
 
-export const fetchCatalogParallel = async (store: IRootStore, highestNumberOfRecords: number, pageSize: number, startIndex: number, filter?: FilterField[]) => {
+export const fetchCatalogParallel = async (
+  store: IRootStore,
+  highestNumberOfRecords: number,
+  pageSize: number,
+  startIndex: number,
+  filter?: FilterField[]
+) => {
   let searchResultsQuery!: Query<{ search: CswCatalogsModelType }>;
   const promises: Promise<{ search: CswCatalogsModelType }>[] = [];
 
@@ -276,7 +282,7 @@ export const fetchCatalogParallel = async (store: IRootStore, highestNumberOfRec
   }
 
   return Promise.all(promises);
-}
+};
 
 export const getMaxMatchedRecordsCount = (recordsHits: CswCatalogsModelType) => {
   let maxRecords = 0;
@@ -290,4 +296,4 @@ export const getMaxMatchedRecordsCount = (recordsHits: CswCatalogsModelType) => 
   });
 
   return maxRecords;
-}
+};
