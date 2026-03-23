@@ -224,9 +224,15 @@ export const getWMTSOptions = (
   };
 };
 
-export const extractCswQueryiesRecords = (cswCatalogs: { search: CswCatalogsModelType }[]): ILayerImage[] => {
-  return cswCatalogs.flatMap((cswCatalog) => Object.values(cswCatalog?.search ?? {})
-    .flatMap((c: CswCatalogModelType) => c?.records ?? []) as unknown as ILayerImage[]);
+export const extractCswQueryiesRecords = (
+  cswCatalogs: { search: CswCatalogsModelType }[]
+): ILayerImage[] => {
+  return cswCatalogs.flatMap(
+    (cswCatalog) =>
+      Object.values(cswCatalog?.search ?? {}).flatMap(
+        (c: CswCatalogModelType) => c?.records ?? []
+      ) as unknown as ILayerImage[]
+  );
 };
 
 export const fetchSearchHits = async (store: IRootStore, filter?: FilterField[]) => {
