@@ -227,6 +227,7 @@
   "polygon-parts.map-preview-legend.title": "מקרא",
   "polygon-parts.map-preview-legend.PP_PERIMETER": "היקף של חלקי התיחום",
   "polygon-parts.map-preview-legend.SOURCE_EXTENT": "שטח המקור",
+  "polygon-parts.map-preview-legend.EXISTING_PP": "חלקי תיחום הקיימים",
   "polygon-parts.map-preview.zoom-before-fetch": "התקרב כדי לראות את חלקי התיחום",
 
   "field.actions.edit-draft": "ערוך טיוטה",
