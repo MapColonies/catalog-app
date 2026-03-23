@@ -73,9 +73,9 @@ import { SelectedLayersContainer } from '../components/map-container/selected-la
 import { Terrain } from '../components/map-container/terrain';
 import { SystemCoreInfoDialog } from '../components/system-status/system-core-info/system-core-info.dialog';
 import {
-  extractCswQuerysRecords,
+  extractCswQueryiesRecords,
   getMaxMatchedRecordsCount,
-  fetchCatalogParallel,
+  fetchCatalogInParallel,
   fetchSearchHits,
 } from '../components/helpers/layersUtils';
 import {
@@ -211,7 +211,7 @@ const DiscreteLayerView: React.FC = observer(() => {
 
   useEffect(() => {
     if (data) {
-      const layers = extractCswQuerysRecords(data as { search: CswCatalogsModelType }[]);
+      const layers = extractCswQueryiesRecords(data as { search: CswCatalogsModelType }[]);
 
       if (activeTabView === TabViews.SEARCH_RESULTS) {
         store.discreteLayersStore.setLayersImages([...layers], false);
@@ -233,7 +233,7 @@ const DiscreteLayerView: React.FC = observer(() => {
     }
 
     if (!isEmpty(data) && !isEmpty(fullCatalogLayers)) {
-      const searchLayers = extractCswQuerysRecords(data as { search: CswCatalogsModelType }[]);
+      const searchLayers = extractCswQueryiesRecords(data as { search: CswCatalogsModelType }[]);
 
       /**
        * There could be a case where the catalog includes outdated data (New layers has bee added).
@@ -384,7 +384,7 @@ const DiscreteLayerView: React.FC = observer(() => {
       const highestNumberOfRecords = getMaxMatchedRecordsCount(recordsHits);
       const pageSize = CONFIG.RUNNING_MODE.END_RECORD;
       const startIndex = CONFIG.RUNNING_MODE.START_RECORD;
-      const results = await fetchCatalogParallel(
+      const results = await fetchCatalogInParallel(
         store,
         highestNumberOfRecords,
         pageSize,

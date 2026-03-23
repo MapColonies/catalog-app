@@ -1,5 +1,5 @@
 import { Feature } from 'geojson';
-import { cloneDeep, get, isEmpty } from 'lodash';
+import { cloneDeep, get, gt, isEmpty } from 'lodash';
 import { Query } from 'mst-gql';
 import bbox from '@turf/bbox';
 import area from '@turf/area';
@@ -15,6 +15,7 @@ import CONFIG from '../../../common/config';
 import { LinkType } from '../../../common/models/link-type.enum';
 import {
   CapabilityModelType,
+  CswCatalogModelType,
   CswCatalogsModelType,
   IRootStore,
   LayerMetadataMixedUnion,
@@ -223,26 +224,9 @@ export const getWMTSOptions = (
   };
 };
 
-export const extractCswQuerysRecords = (cswCatalogs: { search: CswCatalogsModelType }[]) => {
-  let layersImages: ILayerImage[] = [];
-
-  cswCatalogs.forEach((res) => {
-    const cswCatalogsVal: CswCatalogsModelType = get(res, 'search');
-    const cswCatalogs = cloneDeep(cswCatalogsVal);
-    if (!cswCatalogs) {
-      return;
-    }
-    Object.keys(cswCatalogs).forEach((k) => {
-      const key = k as keyof CswCatalogsModelType;
-      if (!cswCatalogs?.[key]?.records) {
-        return;
-      }
-      const records: ILayerImage[] = cswCatalogs[key].records;
-      layersImages.push(...records);
-    });
-  });
-
-  return layersImages;
+export const extractCswQueryiesRecords = (cswCatalogs: { search: CswCatalogsModelType }[]): ILayerImage[] => {
+  return cswCatalogs.flatMap((cswCatalog) => Object.values(cswCatalog?.search ?? {})
+    .flatMap((c: CswCatalogModelType) => c?.records ?? []) as unknown as ILayerImage[]);
 };
 
 export const fetchSearchHits = async (store: IRootStore, filter?: FilterField[]) => {
@@ -258,7 +242,7 @@ export const fetchSearchHits = async (store: IRootStore, filter?: FilterField[])
   return searchHits.refetch();
 };
 
-export const fetchCatalogParallel = async (
+export const fetchCatalogInParallel = async (
   store: IRootStore,
   highestNumberOfRecords: number,
   pageSize: number,
@@ -290,7 +274,7 @@ export const getMaxMatchedRecordsCount = (recordsHits: CswCatalogsModelType) => 
   Object.keys(recordsHits).forEach((k) => {
     const key = k as keyof CswCatalogsModelType;
 
-    if (recordsHits[key]?.cswQuerySummary?.numberOfRecordsMatched) {
+    if (gt(recordsHits[key]?.cswQuerySummary?.numberOfRecordsMatched, 0)) {
       maxRecords = Math.max(maxRecords, recordsHits[key]?.cswQuerySummary?.numberOfRecordsMatched);
     }
   });

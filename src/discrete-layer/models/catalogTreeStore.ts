@@ -17,7 +17,7 @@ import CONFIG from '../../common/config';
 import { GroupBy, groupBy, KeyPredicate } from '../../common/helpers/group-by';
 import MESSAGES from '../../common/i18n';
 import { ResponseState } from '../../common/models/response-state.enum';
-import { extractCswQuerysRecords, fetchCatalogParallel, getLayerLink, fetchSearchHits, getMaxMatchedRecordsCount } from '../components/helpers/layersUtils';
+import { extractCswQueryiesRecords, fetchCatalogInParallel, getLayerLink, fetchSearchHits, getMaxMatchedRecordsCount } from '../components/helpers/layersUtils';
 import { existStatus, isUnpublished } from '../../common/helpers/style';
 import { isBest, isVector } from '../components/layer-details/utils';
 import { CapabilityModelType } from './CapabilityModel';
@@ -25,7 +25,6 @@ import { ILayerImage } from './layerImage';
 import { ModelBase } from './ModelBase';
 import { IRootStore, RootStoreType } from './RootStore';
 import { CswCatalogsModelType, LayerMetadataMixedUnion, RecordType } from './';
-import { Query } from 'mst-gql';
 
 const NONE = 0;
 const TOP_LEVEL_GROUP_BY_FIELD = 'region';
@@ -308,24 +307,18 @@ export const catalogTreeStore = ModelBase.props({
             field: 'mc:type',
             eq: store.discreteLayersStore.searchParams.recordType,
           }
-        ]
+        ];
         const dataHits = yield fetchSearchHits(store, filter);
         const recordsHits: CswCatalogsModelType = cloneDeep(get(dataHits, 'search'));
         const highestNumberOfRecords = getMaxMatchedRecordsCount(recordsHits);
 
         const pageSize = CONFIG.RUNNING_MODE.END_RECORD;
         const startIndex = CONFIG.RUNNING_MODE.START_RECORD;
-        const catalogFilter = [
-          {
-            field: 'mc:type',
-            eq: store.discreteLayersStore.searchParams.recordType,
-          },
-        ];
-        const results = yield fetchCatalogParallel(store, highestNumberOfRecords, pageSize, startIndex, catalogFilter);
-        const layersImages = extractCswQuerysRecords(results as { search: CswCatalogsModelType }[]);
+        const results = yield fetchCatalogInParallel(store, highestNumberOfRecords, pageSize, startIndex, filter);
+        const layersImages = extractCswQueryiesRecords(results as { search: CswCatalogsModelType }[]);
         return store.discreteLayersStore.setLayersImages(layersImages, false);
       } catch (e) {
-        console.log('error while fetching catalog:', e);
+        console.error('Error while fetching catalog:', e);
         setSearchError(e);
         resetCatalogTreeData();
         setIsDataLoading(false);
