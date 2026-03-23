@@ -1,5 +1,5 @@
 import { Feature } from 'geojson';
-import { cloneDeep, get, gt, isEmpty } from 'lodash';
+import { get, gt, isEmpty } from 'lodash';
 import { Query } from 'mst-gql';
 import bbox from '@turf/bbox';
 import area from '@turf/area';
