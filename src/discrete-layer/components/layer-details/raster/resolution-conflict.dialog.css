@@ -1,0 +1,128 @@
+#resolutionConflictDialog {
+  --modal-height: calc(100vh - 2px);
+  --modal-width: min(1280px, calc(100vw - 48px));
+}
+
+@media (min-width: 900px) {
+  #resolutionConflictDialog .mdc-dialog .mdc-dialog__surface {
+    width: var(--modal-width);
+    max-width: var(--modal-width);
+    height: var(--modal-height) !important;
+  }
+}
+
+#resolutionConflictDialog .dialogBody {
+  display: flex;
+  flex-direction: column;
+  overflow-y: hidden !important;
+}
+
+#resolutionConflictDialog #updateLayerHeader {
+  position: relative;
+  display: flex;
+  background-color: var(--mdc-theme-text-primary-on-light);
+  padding: 8px;
+  width: 100%;
+  min-height: 80px;
+  border-radius: 10px;
+  margin-top: 8px;
+}
+
+#resolutionConflictDialog .content {
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+  gap: 12px;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  max-height: none !important;
+  margin-top: 12px;
+}
+
+#resolutionConflictDialog .rightPane {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  gap: 8px;
+}
+
+#resolutionConflictDialog .lowResolutionPartsCheckbox {
+  color: var(--mdc-theme-text-icon-on-dark);
+}
+
+#resolutionConflictDialog .lowResolutionPartsList {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+  padding: 8px;
+}
+
+#resolutionConflictDialog .collectionFeaturesVirtualized {
+  width: 100%;
+  height: 220px;
+  margin: 6px 0 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+}
+
+#resolutionConflictDialog .virtualizedFeatureRow {
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#resolutionConflictDialog .actionsRow {
+  display: flex;
+  gap: 8px;
+}
+
+#resolutionConflictDialog .leftPane {
+  min-height: 0;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: visible;
+}
+
+#resolutionConflictDialog .map + .checkbox {
+  display: inline-block;
+  position: relative;
+  top: -32px;
+  left: 651px;
+  height: 31px;
+  background-color: #262626bf;
+  direction: ltr;
+  padding-right: 12px;
+  z-index: 1;
+}
+
+body[dir='rtl'] #resolutionConflictDialog .map + .checkbox {
+  direction: rtl;
+  left: unset;
+  right: 1px;
+  padding-left: 12px;
+}
+
+@media (max-width: 900px) {
+  #resolutionConflictDialog {
+    --modal-height: calc(100vh - 2px);
+    --modal-width: calc(100vw - 24px);
+  }
+
+  #resolutionConflictDialog .dialogBody {
+    height: auto;
+  }
+
+  #resolutionConflictDialog .content {
+    grid-template-columns: 1fr;
+  }
+
+  #resolutionConflictDialog .rightPane,
+  #resolutionConflictDialog .leftPane {
+    min-height: 260px;
+  }
+}

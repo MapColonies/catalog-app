@@ -20,6 +20,9 @@ export type CallBack<T> = {
 export type RasterTaskParams = {
   isValid: boolean;
   errorsSummary: RasterErrorsSummary;
+  report?: {
+    url?: string;
+  };
 };
 
 export type RasterErrorsSummary = {

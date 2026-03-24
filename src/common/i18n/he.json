@@ -224,9 +224,11 @@
   "polygon-parts.button.load-from-shapeFile": "טען Shape",
   "polygon-parts.deleting.label": "מוחק",
   "polygon-parts.show-exisitng-parts-on-map.label": "הצג חלקי תיחום הקיימים",
+  "polygon-parts.show-low-resolution-parts-on-map.label": "הצג חלקי תיחום עם רזולוציה נמוכה",
   "polygon-parts.map-preview-legend.title": "מקרא",
   "polygon-parts.map-preview-legend.PP_PERIMETER": "היקף של חלקי התיחום",
   "polygon-parts.map-preview-legend.SOURCE_EXTENT": "שטח המקור",
+  "polygon-parts.map-preview-legend.EXISTING_PP": "חלקי תיחום הקיימים",
   "polygon-parts.map-preview.zoom-before-fetch": "התקרב כדי לראות את חלקי התיחום",
 
   "field.actions.edit-draft": "ערוך טיוטה",
@@ -275,6 +277,7 @@
   "validationReport.smallHoles": "פוליגונים עם חורים זעירים",
   "validationReport.smallGeometries": "פוליגונים זעירים",
   "validationReport.unknown": "פוליגונים עם שגיאות לא ידועות",
+  "validationReport.button": "בדיקה",
 
   "field-names.raster.id": "מזהה",
   "field-names.raster.productId": "מזהה חיצוני",

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Box } from '@map-colonies/react-components';
 import { Typography, useTheme } from '@map-colonies/react-core';
@@ -7,6 +7,7 @@ import { AutoDirectionBox } from '../../../../common/components/auto-direction-b
 import { Status } from '../../../models';
 import { JobErrorsSummary } from '../../job-errors-summary/job-errors-summary';
 import { Progress } from './progress';
+import { ResolutionConflictDialog } from './resolution-conflict.dialog';
 import { isJobValid, isStatusFailed, isTaskValid } from './state-machine/helpers';
 import { IJob } from './state-machine/types';
 
@@ -18,6 +19,11 @@ interface JobInfoProps {
 
 export const JobInfo: React.FC<JobInfoProps> = ({ job }) => {
   const theme = useTheme();
+  const [isResolutionConflictDialogOpen, setIsResolutionConflictDialogOpen] = useState(false);
+
+  const openResolutionConflictDialog = useCallback(() => {
+    setIsResolutionConflictDialogOpen(true);
+  }, []);
 
   if (!job) {
     return null;
@@ -57,7 +63,8 @@ export const JobInfo: React.FC<JobInfoProps> = ({ job }) => {
                   theme,
                   job.validationReport.errorsSummary,
                   'countWrapper',
-                  job.taskStatus === Status.Failed ? theme.custom?.GC_ERROR_HIGH : ''
+                  job.taskStatus === Status.Failed ? theme.custom?.GC_ERROR_HIGH : '',
+                  { key: 'resolution', action: openResolutionConflictDialog }
                 )}
               </Box>
             ) : (
@@ -80,6 +87,12 @@ export const JobInfo: React.FC<JobInfoProps> = ({ job }) => {
           )}
         </Box>
       </Box>
+      {isResolutionConflictDialogOpen && (
+        <ResolutionConflictDialog
+          isOpen={isResolutionConflictDialogOpen}
+          onSetIsOpen={setIsResolutionConflictDialogOpen}
+        />
+      )}
     </>
   );
 };

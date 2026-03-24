@@ -224,9 +224,11 @@
   "polygon-parts.button.load-from-shapeFile": "Load SHP",
   "polygon-parts.deleting.label": "Deleting",
   "polygon-parts.show-exisitng-parts-on-map.label": "Show existing polygon parts",
+  "polygon-parts.show-low-resolution-parts-on-map.label": "Show low resolution polygon parts",
   "polygon-parts.map-preview-legend.title": "Legend",
   "polygon-parts.map-preview-legend.PP_PERIMETER": "Polygon parts Perimeter",
   "polygon-parts.map-preview-legend.SOURCE_EXTENT": "Source Extent",
+  "polygon-parts.map-preview-legend.EXISTING_PP": "Existing polygon parts",
   "polygon-parts.map-preview.zoom-before-fetch": "Zoom in to see the parts",
 
   "field.actions.edit-draft": "Edit draft",
@@ -275,6 +277,7 @@
   "validationReport.smallHoles": "Polygons with small holes",
   "validationReport.smallGeometries": "Very small polygons",
   "validationReport.unknown": "Polygons with unknown errors",
+  "validationReport.button": "Check",
 
   "field-names.raster.id": "ID",
   "field-names.raster.productId": "Ext. ID",

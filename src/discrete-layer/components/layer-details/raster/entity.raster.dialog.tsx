@@ -7,8 +7,8 @@ import { observer } from 'mobx-react';
 import { DraftResult } from 'vest/vestResult';
 import * as Yup from 'yup';
 import { DialogContent } from '@material-ui/core';
-import { Dialog, DialogTitle, Icon, IconButton, Typography } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
+import { Dialog, DialogTitle, Icon, IconButton, Typography } from '@map-colonies/react-core';
 import CONFIG from '../../../../common/config';
 import { emphasizeByHTML } from '../../../../common/helpers/formatters';
 import { getTextStyle } from '../../../../common/helpers/style';
@@ -46,8 +46,8 @@ import {
 } from '../utils';
 import suite from '../validate';
 import EntityRasterForm from './layer-details-form.raster';
-import { Events } from './state-machine/types';
 import { RasterWorkflowProvider, RasterWorkflowContext } from './state-machine/context';
+import { Events } from './state-machine/types';
 import { getUIIngestionFieldDescriptors } from './utils';
 
 import './entity.raster.dialog.css';
