@@ -12,12 +12,12 @@ import {
   TreePath,
 } from 'react-sortable-tree';
 import { types, getParent, flow } from 'mobx-state-tree';
-import { cloneDeep, get, isEmpty } from 'lodash';
+import { get, isEmpty } from 'lodash';
 import CONFIG from '../../common/config';
 import { GroupBy, groupBy, KeyPredicate } from '../../common/helpers/group-by';
 import MESSAGES from '../../common/i18n';
 import { ResponseState } from '../../common/models/response-state.enum';
-import { extractCswQueryiesRecords, fetchCatalogInParallel, getLayerLink, fetchSearchHits, getMaxMatchedRecordsCount } from '../components/helpers/layersUtils';
+import { getLayerLink, buildCatalogQueries, buildRecordsPromises, processCatalogResults } from '../components/helpers/layersUtils';
 import { existStatus, isUnpublished } from '../../common/helpers/style';
 import { isBest, isVector } from '../components/layer-details/utils';
 import { CapabilityModelType } from './CapabilityModel';
@@ -294,29 +294,42 @@ export const catalogTreeStore = ModelBase.props({
      * Fetch new catalog data
      */
     const catalogSearch = flow(function* catalogSearchGen(): Generator<
-      | Promise<{ search: CswCatalogsModelType }>
-      | Promise<{ search: CswCatalogsModelType }[]>,
+      Promise<any>,
       ILayerImage[],
-      | { search: CswCatalogsModelType }
-      | { search: CswCatalogsModelType }[]
+      { search: CswCatalogsModelType }[]
     > {
       try {
         setSearchError(null);
-        const filter = [
-          {
-            field: 'mc:type',
-            eq: store.discreteLayersStore.searchParams.recordType,
-          }
-        ];
-        const dataHits = yield fetchSearchHits(store, filter);
-        const recordsHits: CswCatalogsModelType = cloneDeep(get(dataHits, 'search'));
-        const highestNumberOfRecords = getMaxMatchedRecordsCount(recordsHits);
+
+        const recordTypeToFetch = store.discreteLayersStore.searchParams.recordType;
+        if (!recordTypeToFetch) return [];
+
+        const catalogFilter = (recordType: RecordType) => {
+          return [
+            {
+              field: 'mc:type',
+              eq: recordType,
+            }
+          ]
+        }
+
+        const hitsQueriesPromise = buildCatalogQueries(store, recordTypeToFetch, catalogFilter);
+        const hitsQueries = yield Promise.all(hitsQueriesPromise);
 
         const pageSize = CONFIG.RUNNING_MODE.END_RECORD;
         const startIndex = CONFIG.RUNNING_MODE.START_RECORD;
-        const results = yield fetchCatalogInParallel(store, highestNumberOfRecords, pageSize, startIndex, filter);
-        const layersImages = extractCswQueryiesRecords(results as { search: CswCatalogsModelType }[]);
-        return store.discreteLayersStore.setLayersImages(layersImages, false);
+
+        const recordsPromises = buildRecordsPromises(
+          store,
+          hitsQueries as { search: CswCatalogsModelType }[],
+          pageSize,
+          startIndex,
+          catalogFilter
+        );
+
+        const recordsResults = (yield Promise.all(recordsPromises)).flat();
+
+        return processCatalogResults(store, recordsResults);
       } catch (e) {
         console.error('Error while fetching catalog:', e);
         setSearchError(e);
@@ -394,7 +407,7 @@ export const catalogTreeStore = ModelBase.props({
           ) as CapabilityModelType[];
         }
         return store.discreteLayersStore.setCapabilities(!isEmpty(capabilitiesList) ? capabilitiesList as CapabilityModelType[] : []);
-      } catch(e) {
+      } catch (e) {
         setErrorCapabilities(capabilitiesQuery?.error);
         return store.discreteLayersStore.setCapabilities([]);
       }

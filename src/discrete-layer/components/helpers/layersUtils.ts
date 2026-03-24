@@ -1,5 +1,5 @@
 import { Feature } from 'geojson';
-import { get, gt, isEmpty } from 'lodash';
+import { cloneDeep, get, gt, isEmpty } from 'lodash';
 import { Query } from 'mst-gql';
 import bbox from '@turf/bbox';
 import area from '@turf/area';
@@ -21,6 +21,7 @@ import {
   LayerMetadataMixedUnion,
   LayerRasterRecordModelType,
   LinkModelType,
+  RecordType,
   ResultType,
   StyleModelType,
   TileMatrixSetModelType,
@@ -224,15 +225,28 @@ export const getWMTSOptions = (
   };
 };
 
-export const extractCswQueryiesRecords = (
+export const extractCswQueriesRecords = (
   cswCatalogs: { search: CswCatalogsModelType }[]
 ): ILayerImage[] => {
-  return cswCatalogs.flatMap(
-    (cswCatalog) =>
-      Object.values(cswCatalog?.search ?? {}).flatMap(
-        (c: CswCatalogModelType) => c?.records ?? []
-      ) as unknown as ILayerImage[]
-  );
+  let layersImages: ILayerImage[] = [];
+
+  cswCatalogs.forEach((res) => {
+    const cswCatalogsVal: CswCatalogsModelType = get(res, 'search');
+    const cswCatalogs = cloneDeep(cswCatalogsVal);
+    if (!cswCatalogs) {
+      return;
+    }
+    Object.keys(cswCatalogs).forEach((k) => {
+      const key = k as keyof CswCatalogsModelType;
+      if (!cswCatalogs?.[key]?.records) {
+        return;
+      }
+      const records: ILayerImage[] = cswCatalogs[key].records;
+      layersImages.push(...records);
+    });
+  });
+
+  return layersImages;
 };
 
 export const fetchSearchHits = async (store: IRootStore, filter?: FilterField[]) => {
@@ -248,9 +262,20 @@ export const fetchSearchHits = async (store: IRootStore, filter?: FilterField[])
   return searchHits.refetch();
 };
 
+export const findFirstValidCatalog = (cswCatalogs: CswCatalogsModelType): [string, CswCatalogModelType] | undefined => {
+  const entry = Object.entries(cswCatalogs).find(
+    ([_, value]) => {
+      const dfsdf = value != undefined && typeof value !== 'string'
+      return dfsdf;
+    }
+  );
+
+  return entry;
+}
+
 export const fetchCatalogInParallel = async (
   store: IRootStore,
-  highestNumberOfRecords: number,
+  numberOfRecordsMatched: number,
   pageSize: number,
   startIndex: number,
   filter?: FilterField[]
@@ -258,7 +283,7 @@ export const fetchCatalogInParallel = async (
   let searchResultsQuery!: Query<{ search: CswCatalogsModelType }>;
   const promises: Promise<{ search: CswCatalogsModelType }>[] = [];
 
-  for (let i = 0; i < highestNumberOfRecords; i += pageSize) {
+  for (let i = 0; i < numberOfRecordsMatched; i += pageSize) {
     searchResultsQuery = store.querySearch({
       opts: {
         filter,
@@ -274,16 +299,75 @@ export const fetchCatalogInParallel = async (
   return Promise.all(promises);
 };
 
-export const getMaxMatchedRecordsCount = (recordsHits: CswCatalogsModelType) => {
-  let maxRecords = 0;
+export const domainToRecordType = (domain: string): RecordType => {
+  switch (domain) {
+    case '_DEM':
+      return RecordType.RECORD_DEM;
+    case '_3D':
+      return RecordType.RECORD_3D;
+    case '_VECTOR':
+      return RecordType.RECORD_VECTOR;
+    default:
+      return RecordType.RECORD_RASTER;
+  }
+}
 
-  Object.keys(recordsHits).forEach((k) => {
-    const key = k as keyof CswCatalogsModelType;
+export const createCatalogQuery = (store: IRootStore, type: RecordType, cbFilter: (type: RecordType) => FilterField[]) => {
+  return store.querySearch({
+    opts: { filter: cbFilter(type) },
+    resultType: ResultType.HITS,
+    end: 0,
+    start: 1,
+  }).refetch();
+}
 
-    if (gt(recordsHits[key]?.cswQuerySummary?.numberOfRecordsMatched, 0)) {
-      maxRecords = Math.max(maxRecords, recordsHits[key]?.cswQuerySummary?.numberOfRecordsMatched);
-    }
+export const buildCatalogQueries = (
+  store: IRootStore,
+  recordTypeToFetch: RecordType,
+  cbFilter: (type: RecordType) => FilterField[]
+): Promise<{ search: CswCatalogsModelType }>[] => {
+  if (recordTypeToFetch === RecordType.RECORD_ALL) {
+    return CONFIG.SERVED_ENTITY_TYPES
+      .filter(type => type !== RecordType.RECORD_ALL)
+      .map(type => createCatalogQuery(store, type as RecordType, cbFilter));
+  }
+
+  return [createCatalogQuery(store, recordTypeToFetch, cbFilter)];
+};
+
+export const buildRecordsPromises = (
+  store: IRootStore,
+  hitsQueries: { search: CswCatalogsModelType }[],
+  pageSize: number,
+  startIndex: number,
+  cbFilter: (type: RecordType) => FilterField[]
+): Promise<{ search: CswCatalogsModelType }[]>[] => {
+  const recordsPromises: Promise<{ search: CswCatalogsModelType }[]>[] = [];
+
+  hitsQueries.forEach((query) => {
+    const [key, value] = findFirstValidCatalog(query.search) as [
+      string,
+      CswCatalogModelType
+    ];
+
+    const total = value?.cswQuerySummary?.numberOfRecordsMatched;
+    if (!total) return;
+
+    recordsPromises.push(
+      fetchCatalogInParallel(
+        store,
+        total,
+        pageSize,
+        startIndex,
+        cbFilter(domainToRecordType(key))
+      )
+    );
   });
 
-  return maxRecords;
+  return recordsPromises;
+};
+
+export const processCatalogResults = (store: IRootStore, recordsResults: { search: CswCatalogsModelType }[]) => {
+  const layersImages = extractCswQueriesRecords(recordsResults);
+  return store.discreteLayersStore.setLayersImages(layersImages, false);
 };

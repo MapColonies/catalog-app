@@ -72,12 +72,7 @@ import { PolygonSelectionUi } from '../components/map-container/polygon-selectio
 import { SelectedLayersContainer } from '../components/map-container/selected-layers-container';
 import { Terrain } from '../components/map-container/terrain';
 import { SystemCoreInfoDialog } from '../components/system-status/system-core-info/system-core-info.dialog';
-import {
-  extractCswQueryiesRecords,
-  getMaxMatchedRecordsCount,
-  fetchCatalogInParallel,
-  fetchSearchHits,
-} from '../components/helpers/layersUtils';
+import { buildCatalogQueries, buildRecordsPromises, extractCswQueriesRecords, processCatalogResults } from '../components/helpers/layersUtils';
 import {
   CswCatalogsModelType,
   JobModelType,
@@ -87,7 +82,7 @@ import {
 } from '../models';
 import { IDispatchAction } from '../models/actionDispatcherStore';
 import { ILayerImage } from '../models/layerImage';
-import { useStore } from '../models/RootStore';
+import { useQuery, useStore } from '../models/RootStore';
 import { FilterField } from '../models/RootStore.base';
 import { UserAction, UserRole } from '../models/userStore';
 import { ActionResolver } from './components/action-resolver.component';
@@ -129,14 +124,14 @@ interface IDrawingObject {
 const noDrawing: IDrawingObject = {
   type: DrawType.UNKNOWN,
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  handler: (drawing: IDrawingEvent) => {},
+  handler: (drawing: IDrawingEvent) => { },
 };
 
 const getTimeStamp = (): string => new Date().getTime().toString();
 
 const DiscreteLayerView: React.FC = observer(() => {
   const [searchLoading, setSearchLoading] = useState(false);
-  const [data, setData] = useState<{} | undefined>();
+  const [data, setData] = useState<LayerMetadataMixedUnion[] | undefined>();
   const store = useStore();
   const theme = useTheme();
   const intl = useIntl();
@@ -211,12 +206,10 @@ const DiscreteLayerView: React.FC = observer(() => {
 
   useEffect(() => {
     if (data) {
-      const layers = extractCswQueryiesRecords(data as { search: CswCatalogsModelType }[]);
-
       if (activeTabView === TabViews.SEARCH_RESULTS) {
-        store.discreteLayersStore.setLayersImages([...layers], false);
+        store.discreteLayersStore.setLayersImages([...data], false);
       } else {
-        store.discreteLayersStore.setTabviewData(TabViews.SEARCH_RESULTS, layers);
+        store.discreteLayersStore.setTabviewData(TabViews.SEARCH_RESULTS, data);
       }
     }
   }, [data]);
@@ -233,14 +226,12 @@ const DiscreteLayerView: React.FC = observer(() => {
     }
 
     if (!isEmpty(data) && !isEmpty(fullCatalogLayers)) {
-      const searchLayers = extractCswQueryiesRecords(data as { search: CswCatalogsModelType }[]);
-
       /**
        * There could be a case where the catalog includes outdated data (New layers has bee added).
        * Search results will always be updated each time new filter is applied.
        * As a workaround we add the delta layers to the capabilities search to update the capabilities state with the added layers.
        */
-      searchLayers.forEach((layer) => {
+      data?.forEach((layer) => {
         const isNewLayer = !fullCatalogLayers?.some((catalogLayer) => catalogLayer.id === layer.id);
         if (isNewLayer) {
           fullCatalogLayers?.push(layer);
@@ -343,28 +334,28 @@ const DiscreteLayerView: React.FC = observer(() => {
     }
   };
 
-  const buildFilters = (): FilterField[] => {
+  const buildFilters = (recordType: RecordType): FilterField[] => {
     const coordinates = (store.discreteLayersStore.searchParams.geojson as Polygon)?.coordinates[0];
 
     const boundingBoxFilter = coordinates
       ? [
-          {
-            field: 'mc:boundingBox',
-            bbox: {
-              llon: coordinates[0][0],
-              llat: coordinates[0][1],
-              ulon: coordinates[2][0],
-              ulat: coordinates[2][1],
-            },
+        {
+          field: 'mc:boundingBox',
+          bbox: {
+            llon: coordinates[0][0],
+            llat: coordinates[0][1],
+            ulon: coordinates[2][0],
+            ulat: coordinates[2][1],
           },
-        ]
+        },
+      ]
       : [];
 
     return [
       ...boundingBoxFilter,
       {
         field: 'mc:type',
-        eq: store.discreteLayersStore.searchParams.recordType,
+        eq: recordType,
       },
       ...store.discreteLayersStore.searchParams.catalogFilters,
     ];
@@ -378,26 +369,31 @@ const DiscreteLayerView: React.FC = observer(() => {
   const fetchCatalog = async () => {
     try {
       setSearchLoading(true);
-      const filters = buildFilters();
-      const dataHits = await fetchSearchHits(store, filters);
-      const recordsHits: CswCatalogsModelType = cloneDeep(get(dataHits, 'search'));
-      const highestNumberOfRecords = getMaxMatchedRecordsCount(recordsHits);
+      const recordTypeToFetch = store.discreteLayersStore.searchParams.recordType;
+      if (!recordTypeToFetch) return [];
+      const hitsQueriesPromise = buildCatalogQueries(store, recordTypeToFetch, buildFilters);
+      const hitsQueries = await Promise.all(hitsQueriesPromise);
+
       const pageSize = CONFIG.RUNNING_MODE.END_RECORD;
       const startIndex = CONFIG.RUNNING_MODE.START_RECORD;
-      const results = await fetchCatalogInParallel(
+
+      const recordsPromises = buildRecordsPromises(
         store,
-        highestNumberOfRecords,
+        hitsQueries,
         pageSize,
         startIndex,
-        filters
+        buildFilters
       );
-      setData(results);
+
+      const recordsResults = await Promise.all(recordsPromises);
+
+      setData(processCatalogResults(store, recordsResults.flat()));
       setSearchLoading(false);
     } catch (error: any) {
       setSearchLoading(false);
       setSearchResultsError(error);
     }
-  };
+  }
 
   useEffect(() => {
     if (activeTabView === TabViews.SEARCH_RESULTS) {
