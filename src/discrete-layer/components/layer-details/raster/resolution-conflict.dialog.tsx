@@ -201,14 +201,24 @@ export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> =
                                     const feature = collection.features[index];
                                     const featureLabel = intl.formatMessage({ id: 'resolutionConflict.featureName' }, { index: index + 1 });
                                     const calculatedArea =(feature.properties?.calculatedArea as number | undefined) ?? 0;
+                                    const featureId = (feature.properties?.id as string | undefined) ?? '';
                                     return (
                                       <Box className="virtualizedFeatureRow" key={key} style={style}>
-                                        <Typography className="featureLabel" tag="span">
-                                          <AutoDirectionBox>{featureLabel}</AutoDirectionBox>
-                                        </Typography>
-                                        <Typography className="featureArea" tag="span">
-                                          <AutoDirectionBox>{formatArea(calculatedArea)}</AutoDirectionBox>
-                                        </Typography>
+                                        <Box className="featureContent">
+                                          <Box className="featureTitleRow">
+                                            <Typography className="featureLabel" tag="span">
+                                              <AutoDirectionBox>{featureLabel}</AutoDirectionBox>
+                                            </Typography>
+                                            <Typography className="featureArea" tag="span">
+                                              <AutoDirectionBox>{formatArea(calculatedArea)}</AutoDirectionBox>
+                                            </Typography>
+                                          </Box>
+                                          {featureId && (
+                                            <Typography className="featureId" tag="span">
+                                              <AutoDirectionBox>{featureId}</AutoDirectionBox>
+                                            </Typography>
+                                          )}
+                                        </Box>
                                       </Box>
                                     );
                                   }}
