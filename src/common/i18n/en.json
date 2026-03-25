@@ -279,6 +279,9 @@
   "validationReport.unknown": "Polygons with unknown errors",
   "validationReport.button": "Check",
 
+  "resolutionConflict.featureName": "Polygon {index}",
+  "resolutionConflict.units.km2": "{value}km²",
+
   "field-names.raster.id": "ID",
   "field-names.raster.productId": "Ext. ID",
   "field-names.raster.productType": "Type",

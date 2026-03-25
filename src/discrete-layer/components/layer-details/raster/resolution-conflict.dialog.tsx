@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { AutoSizer, List, ListRowProps } from 'react-virtualized';
 import { observer } from 'mobx-react';
 import { Feature } from 'geojson';
+import area from '@turf/area';
 import shp, { FeatureCollectionWithFilename } from 'shpjs';
 import { Box } from '@map-colonies/react-components';
 import {
@@ -16,11 +17,12 @@ import {
   SimpleListItem,
   Typography,
 } from '@map-colonies/react-core';
+import { AutoDirectionBox } from '../../../../common/components/auto-direction-box/auto-direction-box.component';
 import { Mode } from '../../../../common/models/mode.enum';
 import { EntityDescriptorModelType, useStore } from '../../../models';
-import { LayersDetailsComponent } from '../layer-details';
 import { GeoFeaturesPresentorComponent } from './pp-map';
 import { RasterWorkflowContext } from './state-machine/context';
+import { UpdateLayerHeader } from './update-layer-header';
 
 import './resolution-conflict.dialog.css';
 
@@ -44,7 +46,6 @@ export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> =
   const store = useStore();
   const entityDescriptors = store.discreteLayersStore.entityDescriptors as EntityDescriptorModelType[];
   const state = RasterWorkflowContext.useSelector((s) => s);
-  const layerRecord = state.context.updatedLayer;
   const [showLowResolutionPolygonParts, setShowLowResolutionPolygonParts] = useState(false);
   const [isLoadingLowResolutionParts, setIsLoadingLowResolutionParts] = useState(false);
   const [lowResolutionPartsError, setLowResolutionPartsError] = useState<string | undefined>();
@@ -52,7 +53,17 @@ export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> =
     []
   );
 
+  const formatArea = (areaSquareMeters: number): string => {
+    const areaSquareKilometers = areaSquareMeters / 1_000_000;
+    return intl.formatMessage({ id: 'resolutionConflict.units.km2' }, { value: areaSquareKilometers.toFixed(2) });
+  };
+
   const reportUrl = state.context.job?.validationReport?.report?.url;
+
+  const lowResolutionFeatures = useMemo(
+    () => lowResolutionCollections.flatMap((c) => c.features),
+    [lowResolutionCollections]
+  );
 
   useEffect(() => {
     if (!isOpen) {
@@ -78,9 +89,27 @@ export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> =
         const collections = (Array.isArray(parsed) ? parsed : [parsed]) as FeatureCollectionWithFilename[];
 
         const normalized: ParsedFeatureCollection[] = collections.map((collection, index) => {
+          const features = ((collection.features as Feature[]) ?? []).map((feature) => {
+            const calculatedArea = (() => {
+              try {
+                return area(feature);
+              } catch {
+                return 0;
+              }
+            })();
+
+            return {
+              ...feature,
+              properties: {
+                ...(feature.properties ?? {}),
+                'calculatedArea': calculatedArea,
+              },
+            } as Feature;
+          });
+
           return {
             name: collection.fileName ?? `Collection ${index + 1}`,
-            features: (collection.features as Feature[]) ?? [],
+            features,
           };
         });
 
@@ -123,17 +152,10 @@ export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> =
           <IconButton className="closeIcon mc-icon-Close" label="CLOSE" onClick={closeDialog} />
         </DialogTitle>
         <DialogContent className="dialogBody">
-          <Box id="updateLayerHeader">
-            <Box id="updateLayerHeaderContent">
-              <LayersDetailsComponent
-                className="detailsPanelProductView"
-                entityDescriptors={entityDescriptors}
-                layerRecord={layerRecord}
-                isBrief={true}
-                mode={Mode.VIEW}
-              />
-            </Box>
-          </Box>
+          <UpdateLayerHeader
+            entityDescriptors={entityDescriptors}
+            layerRecord={state.context.updatedLayer}
+          />
           <Box className="content">
             <Box className="rightPane">
               <Checkbox
@@ -177,14 +199,16 @@ export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> =
                                   overscanRowCount={8}
                                   rowRenderer={({ index, key, style }: ListRowProps): JSX.Element => {
                                     const feature = collection.features[index];
-                                    const featureLabel =
-                                      (feature.properties?.partId as string | undefined) ??
-                                      (feature.id as string | undefined) ??
-                                      `Feature ${index + 1}`;
-
+                                    const featureLabel = intl.formatMessage({ id: 'resolutionConflict.featureName' }, { index: index + 1 });
+                                    const calculatedArea =(feature.properties?.calculatedArea as number | undefined) ?? 0;
                                     return (
                                       <Box className="virtualizedFeatureRow" key={key} style={style}>
-                                        {featureLabel}
+                                        <Typography className="featureLabel" tag="span">
+                                          <AutoDirectionBox>{featureLabel}</AutoDirectionBox>
+                                        </Typography>
+                                        <Typography className="featureArea" tag="span">
+                                          <AutoDirectionBox>{formatArea(calculatedArea)}</AutoDirectionBox>
+                                        </Typography>
                                       </Box>
                                     );
                                   }}
@@ -210,6 +234,7 @@ export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> =
             <Box className="leftPane">
               <GeoFeaturesPresentorComponent
                 mode={Mode.UPDATE}
+                geoFeatures={showLowResolutionPolygonParts ? lowResolutionFeatures : []}
                 style={{ height: '100%', minHeight: '300px' }}
               />
             </Box>

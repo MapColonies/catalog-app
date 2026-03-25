@@ -279,6 +279,9 @@
   "validationReport.unknown": "פוליגונים עם שגיאות לא ידועות",
   "validationReport.button": "בדיקה",
 
+  "resolutionConflict.featureName": "פוליגון {index}",
+  "resolutionConflict.units.km2": "{value}קמ\"ר",
+
   "field-names.raster.id": "מזהה",
   "field-names.raster.productId": "מזהה חיצוני",
   "field-names.raster.productType": "סוג",

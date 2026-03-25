@@ -297,18 +297,15 @@ export const workflowMachine = createMachine<IContext, Events>({
         },
         SUBMIT: {
           actions: assign((_: { context: IContext; event: any }) => ({
-            formData: {
-              ..._.event.data,
-            },
+            formData: _.event.data,
             resolutionDegree: _.event.resolutionDegree,
           })),
           target: WORKFLOW.JOB_SUBMISSION,
         },
         RESTORE: {
           actions: assign((_: { context: IContext; event: any }) => ({
-            job: {
-              ..._.event.job,
-            },
+            job: _.event.job,
+            updatedLayer: _.event.updatedLayer,
           })),
           target: WORKFLOW.RESTORE_JOB,
         },
