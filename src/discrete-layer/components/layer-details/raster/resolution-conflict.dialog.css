@@ -64,7 +64,7 @@
 
 #resolutionConflictDialog .collectionFeaturesVirtualized {
   width: 100%;
-  height: clamp(320px, 48vh, calc(100vh - 280px));
+  height: clamp(320px, 60vh, calc(100vh - 430px));
 }
 
 #resolutionConflictDialog .virtualizedFeatureRow {

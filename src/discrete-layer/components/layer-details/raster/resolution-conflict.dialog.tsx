@@ -244,6 +244,7 @@ export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> =
             <Box className="leftPane">
               <GeoFeaturesPresentorComponent
                 mode={Mode.UPDATE}
+                layerRecord={state.context.updatedLayer}
                 geoFeatures={showLowResolutionPolygonParts ? lowResolutionFeatures : []}
                 style={{ height: '100%', minHeight: '300px' }}
               />
