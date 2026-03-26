@@ -15,3 +15,75 @@ body[dir='rtl'] #entityRasterDialog .map + .checkbox {
   right: 1px;
   padding-left: 12px;
 }
+
+.geoFeaturesMapContainer {
+  position: relative;
+}
+
+.featurePropertiesPopup {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 3;
+  min-width: 280px;
+  max-width: 420px;
+  max-height: 55%;
+  overflow: auto;
+  color: var(--mdc-theme-text-icon-on-dark);
+  background-color: var(--mdc-theme-text-primary-on-light);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 6px;
+  padding: 8px 10px 10px;
+}
+
+body[dir='rtl'] .featurePropertiesPopup {
+  left: unset;
+  right: 8px;
+}
+
+.featurePropertiesPopupHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding-bottom: 6px;
+  margin-bottom: 8px;
+}
+
+.featurePropertiesPopupClose {
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.featurePropertiesPopupRows {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.featurePropertiesPopupRow {
+  display: grid;
+  grid-template-columns: minmax(90px, 38%) 1fr;
+  gap: 8px;
+  align-items: start;
+}
+
+.featurePropertiesPopupKey {
+  opacity: 0.75;
+  font-weight: 600;
+  word-break: break-word;
+}
+
+.featurePropertiesPopupValue {
+  word-break: break-word;
+}
+
+.featurePropertiesPopupTitle {
+  font-weight: 700;
+  text-align: start;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

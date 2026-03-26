@@ -1,9 +1,12 @@
 import { CSSProperties, useEffect, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Feature } from 'geojson';
+import { Feature, MultiPolygon, Polygon } from 'geojson';
 import { get, isEmpty } from 'lodash';
+import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
+import { point } from '@turf/helpers';
 import { FitOptions } from 'ol/View';
 import { Style } from 'ol/style';
+import MapBrowserEvent from 'ol/MapBrowserEvent';
 import {
   Box,
   GeoJSONFeature,
@@ -21,7 +24,7 @@ import {
   VectorLayer,
   VectorSource,
 } from '@map-colonies/react-components';
-import { Checkbox } from '@map-colonies/react-core';
+import { Checkbox, IconButton, Typography } from '@map-colonies/react-core';
 import { Mode } from '../../../../common/models/mode.enum';
 import { MapLoadingIndicator } from '../../../../common/components/map/ol-map.loader';
 import { ILayerImage } from '../../../models/layerImage';
@@ -40,11 +43,14 @@ interface GeoFeaturesPresentorProps {
   selectionStyle?: Style;
   showExistingPolygonParts?: boolean;
   layerRecord?: ILayerImage | null;
+  enableFeaturePropertiesPopup?: boolean;
 }
 
 const DEFAULT_PROJECTION = 'EPSG:4326';
 const MIN_FEATURES_NUMBER = 4; // minimal set of fetures (source, source_marker, perimeter, perimeter_marker)
 const RENDERS_TILL_FULL_FEATURES_SET = 1; // first render with source, second with PPs perimeter geometry
+const NO_PROPERTIES_MESSAGE_KEY = '__noPropertiesMessage';
+const FEATURE_LABEL_KEY = 'featureLabel';
 
 export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> = ({
   mode,
@@ -54,11 +60,116 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   selectedFeatureKey,
   selectionStyle,
   layerRecord,
+  enableFeaturePropertiesPopup = false,
 }) => {
   const store = useStore();
   const intl = useIntl();
   const renderCount = useRef(0);
   const [showExistingPolygonParts, setShowExistingPolygonParts] = useState<boolean>(false);
+  const [selectedFeatureProperties, setSelectedFeatureProperties] = useState<
+    Record<string, unknown> | undefined
+  >();
+
+  const getClickedFeatureProperties = (coordinate: number[]): Record<string, unknown> | undefined => {
+    if (!geoFeatures || geoFeatures.length === 0) {
+      return undefined;
+    }
+
+    const clickedPoint = point(coordinate as [number, number]);
+    const clickedFeature = geoFeatures.find((feature) => {
+      if (!feature?.geometry) {
+        return false;
+      }
+
+      const geometryType = feature.geometry.type;
+      if (geometryType !== 'Polygon' && geometryType !== 'MultiPolygon') {
+        return false;
+      }
+
+      try {
+        return booleanPointInPolygon(clickedPoint, feature as Feature<Polygon | MultiPolygon>);
+      } catch {
+        return false;
+      }
+    });
+
+    if (clickedFeature) {
+      if (clickedFeature.properties && typeof clickedFeature.properties === 'object') {
+        const props = clickedFeature.properties as Record<string, unknown>;
+        if (Object.keys(props).length > 0) {
+          return props;
+        }
+      }
+
+      return {
+        [NO_PROPERTIES_MESSAGE_KEY]: intl.formatMessage({
+          id: 'polygon-parts.map-preview.no-feature-properties',
+        }),
+      };
+    }
+
+    return undefined;
+  };
+
+  const getClickedOlFeatureProperties = (olFeature: unknown): Record<string, unknown> | undefined => {
+    if (!olFeature || typeof olFeature !== 'object') {
+      return undefined;
+    }
+
+    const geometry = (olFeature as { getGeometry?: () => { getType?: () => string } }).getGeometry?.();
+    const geometryType = geometry?.getType?.();
+
+    if (geometryType !== 'Polygon' && geometryType !== 'MultiPolygon') {
+      return undefined;
+    }
+
+    const properties = (olFeature as { getProperties?: () => Record<string, unknown> }).getProperties?.();
+
+    if (!properties || typeof properties !== 'object') {
+      return undefined;
+    }
+
+    const { geometry: _geometry, ...rest } = properties;
+    if (Object.keys(rest).length > 0) {
+      return rest;
+    }
+
+    return undefined;
+  };
+
+  const isOlPolygonFeature = (olFeature: unknown): boolean => {
+    if (!olFeature || typeof olFeature !== 'object') {
+      return false;
+    }
+
+    const geometry = (olFeature as { getGeometry?: () => { getType?: () => string } }).getGeometry?.();
+    const geometryType = geometry?.getType?.();
+
+    return geometryType === 'Polygon' || geometryType === 'MultiPolygon';
+  };
+
+  const formatPropertyValue = (value: unknown): string => {
+    if (value === undefined || value === null) {
+      return '';
+    }
+
+    if (typeof value === 'object') {
+      try {
+        return JSON.stringify(value);
+      } catch {
+        return String(value);
+      }
+    }
+
+    return String(value);
+  };
+
+  const formatPropertyKey = (key: string): string => {
+    return intl.formatMessage(
+      { id: `polygon-parts.map-preview.feature-property.${key}`, defaultMessage: key },
+      {}
+    );
+  };
 
   useEffect(() => {
     const definedElements = geoFeatures?.filter((feat) => feat !== undefined);
@@ -69,6 +180,12 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
       renderCount.current += 1;
     }
   });
+
+  useEffect(() => {
+    if (!enableFeaturePropertiesPopup) {
+      setSelectedFeatureProperties(undefined);
+    }
+  }, [enableFeaturePropertiesPopup]);
 
   const previewBaseMap = useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-array-constructor
@@ -170,10 +287,74 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
     );
   };
 
+  const MapFeatureClickHandler: React.FC = () => {
+    const map = useMap();
+
+    useEffect(() => {
+      if (!enableFeaturePropertiesPopup) {
+        setSelectedFeatureProperties(undefined);
+        return;
+      }
+
+      const onSingleClick = (event: MapBrowserEvent<UIEvent>): void => {
+        let clickedProperties: Record<string, unknown> | undefined;
+        let clickedPolygonWithoutProperties = false;
+
+        map.forEachFeatureAtPixel(
+          event.pixel,
+          (feature) => {
+            const featureProperties = getClickedOlFeatureProperties(feature);
+            if (featureProperties) {
+              clickedProperties = featureProperties;
+              return feature;
+            }
+
+            if (isOlPolygonFeature(feature)) {
+              clickedPolygonWithoutProperties = true;
+            }
+
+            return undefined;
+          },
+          { hitTolerance: 4 }
+        );
+
+        if (clickedProperties) {
+          setSelectedFeatureProperties(clickedProperties);
+          return;
+        }
+
+        const fallbackProperties = getClickedFeatureProperties(event.coordinate);
+        if (fallbackProperties) {
+          setSelectedFeatureProperties(fallbackProperties);
+          return;
+        }
+
+        if (clickedPolygonWithoutProperties) {
+          setSelectedFeatureProperties({
+            [NO_PROPERTIES_MESSAGE_KEY]: intl.formatMessage({
+              id: 'polygon-parts.map-preview.no-feature-properties',
+            }),
+          });
+        }
+      };
+
+      map.on('singleclick', onSingleClick);
+
+      return (): void => {
+        map.un('singleclick', onSingleClick);
+      };
+    }, [map, enableFeaturePropertiesPopup, geoFeatures]);
+
+    return null;
+  };
+
+  const featureLabelValue = selectedFeatureProperties?.[FEATURE_LABEL_KEY];
+
   return (
-    <Box style={{ ...style }}>
+    <Box className="geoFeaturesMapContainer" style={{ ...style }}>
       <Map>
         <MapLoadingIndicator />
+        <MapFeatureClickHandler />
         {mode === Mode.UPDATE && (
           <Box className="checkbox">
             <Checkbox
@@ -198,6 +379,50 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
           title={intl.formatMessage({ id: 'polygon-parts.map-preview-legend.title' })}
         />
       </Map>
+      {enableFeaturePropertiesPopup && selectedFeatureProperties ? (
+        <Box className="featurePropertiesPopup">
+          <Box className="featurePropertiesPopupHeader">
+            <Typography className="featurePropertiesPopupTitle" tag="span">
+              {featureLabelValue !== undefined && featureLabelValue !== null
+                ? formatPropertyValue(featureLabelValue)
+                : ''}
+            </Typography>
+            <IconButton
+              className="featurePropertiesPopupClose mc-icon-Close"
+              label="CLOSE"
+              onClick={(): void => {
+                setSelectedFeatureProperties(undefined);
+              }}
+            />
+          </Box>
+          <Box className="featurePropertiesPopupRows">
+            {Object.entries(selectedFeatureProperties)
+              .filter(([key]) => key !== FEATURE_LABEL_KEY)
+              .map(([key, value]) => {
+              if (key === NO_PROPERTIES_MESSAGE_KEY) {
+                return (
+                  <Box className="featurePropertiesPopupRow" key={key}>
+                    <Typography className="featurePropertiesPopupValue" tag="span">
+                      {formatPropertyValue(value)}
+                    </Typography>
+                  </Box>
+                );
+              }
+
+              return (
+                <Box className="featurePropertiesPopupRow" key={key}>
+                  <Typography className="featurePropertiesPopupKey" tag="span">
+                    {formatPropertyKey(key)}
+                  </Typography>
+                  <Typography className="featurePropertiesPopupValue" tag="span">
+                    {formatPropertyValue(value)}
+                  </Typography>
+                </Box>
+              );
+            })}
+          </Box>
+        </Box>
+      ) : null}
     </Box>
   );
 };

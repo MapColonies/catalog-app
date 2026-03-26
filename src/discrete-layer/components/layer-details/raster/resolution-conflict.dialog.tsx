@@ -21,6 +21,7 @@ import { AutoDirectionBox } from '../../../../common/components/auto-direction-b
 import { Mode } from '../../../../common/models/mode.enum';
 import { EntityDescriptorModelType, useStore } from '../../../models';
 import { GeoFeaturesPresentorComponent } from './pp-map';
+import { FeatureType } from './pp-map.utils';
 import { RasterWorkflowContext } from './state-machine/context';
 import { UpdateLayerHeader } from './update-layer-header';
 
@@ -84,7 +85,7 @@ export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> =
         const collections = (Array.isArray(parsed) ? parsed : [parsed]) as FeatureCollectionWithFilename[];
 
         const normalized: ParsedFeatureCollection[] = collections.map((collection, index) => {
-          const features = ((collection.features as Feature[]) ?? []).map((feature) => {
+          const features = ((collection.features as Feature[]) ?? []).map((feature, featureIndex) => {
             const calculatedArea = (() => {
               try {
                 return area(feature);
@@ -93,11 +94,18 @@ export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> =
               }
             })();
 
+            const featureLabel = intl.formatMessage(
+              { id: 'resolutionConflict.featureName' },
+              { index: featureIndex + 1 }
+            );
+
             return {
               ...feature,
               properties: {
                 ...(feature.properties ?? {}),
                 calculatedArea,
+                featureLabel,
+                featureType: FeatureType.LOW_RESOLUTION_PP,
               },
             } as Feature;
           });
@@ -199,7 +207,12 @@ export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> =
                                   overscanRowCount={8}
                                   rowRenderer={({ index, key, style }: ListRowProps): JSX.Element => {
                                     const feature = collection.features[index];
-                                    const featureLabel = intl.formatMessage({ id: 'resolutionConflict.featureName' }, { index: index + 1 });
+                                    const featureLabel =
+                                      (feature.properties?.featureLabel as string | undefined) ??
+                                      intl.formatMessage(
+                                        { id: 'resolutionConflict.featureName' },
+                                        { index: index + 1 }
+                                      );
                                     const calculatedArea =(feature.properties?.calculatedArea as number | undefined) ?? 0;
                                     const featureId = (feature.properties?.id as string | undefined) ?? '';
                                     return (
@@ -245,6 +258,7 @@ export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> =
               <GeoFeaturesPresentorComponent
                 mode={Mode.UPDATE}
                 layerRecord={state.context.updatedLayer}
+                enableFeaturePropertiesPopup={true}
                 geoFeatures={showLowResolutionPolygonParts ? lowResolutionFeatures : []}
                 style={{ height: '100%', minHeight: '300px' }}
               />

@@ -12,6 +12,7 @@ export enum FeatureType {
   SOURCE_EXTENT = 'SOURCE_EXTENT',
   SOURCE_EXTENT_MARKER = 'SOURCE_EXTENT_MARKER',
   EXISTING_PP = 'EXISTING_PP',
+  LOW_RESOLUTION_PP = 'LOW_RESOLUTION_PP',
 }
 
 export const PPMapStyles = new Map<FeatureType, Style | undefined>([
@@ -62,6 +63,18 @@ export const PPMapStyles = new Map<FeatureType, Style | undefined>([
       }),
       fill: new Fill({
         color: CONFIG.CONTEXT_MENUS.MAP.POLYGON_PARTS_FEATURE_CONFIG.color,
+      }),
+    }),
+  ],
+  [
+    FeatureType.LOW_RESOLUTION_PP,
+    new Style({
+      stroke: new Stroke({
+        width: 2,
+        color: '#ff8c00',
+      }),
+      fill: new Fill({
+        color: 'rgba(255, 140, 0, 0.25)',
       }),
     }),
   ],

@@ -22,7 +22,7 @@
 }
 
 #resolutionConflictDialog #updateLayerHeader {
-  padding-top: 10px;
+  padding-top: 12px;
 }
 
 #resolutionConflictDialog .content {
@@ -34,6 +34,7 @@
   min-height: 0;
   max-height: none !important;
   margin-top: 12px;
+  overflow-y: hidden !important;
 }
 
 #resolutionConflictDialog .rightPane {
