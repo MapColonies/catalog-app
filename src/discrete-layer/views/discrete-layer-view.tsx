@@ -73,12 +73,7 @@ import { SelectedLayersContainer } from '../components/map-container/selected-la
 import { Terrain } from '../components/map-container/terrain';
 import { SystemCoreInfoDialog } from '../components/system-status/system-core-info/system-core-info.dialog';
 import { fetchAllCatalog } from '../components/helpers/layersUtils';
-import {
-  JobModelType,
-  LayerMetadataMixedUnion,
-  LinkModelType,
-  RecordType,
-} from '../models';
+import { JobModelType, LayerMetadataMixedUnion, LinkModelType, RecordType } from '../models';
 import { IDispatchAction } from '../models/actionDispatcherStore';
 import { ILayerImage } from '../models/layerImage';
 import { useStore } from '../models/RootStore';
@@ -123,7 +118,7 @@ interface IDrawingObject {
 const noDrawing: IDrawingObject = {
   type: DrawType.UNKNOWN,
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  handler: (drawing: IDrawingEvent) => { },
+  handler: (drawing: IDrawingEvent) => {},
 };
 
 const getTimeStamp = (): string => new Date().getTime().toString();
@@ -338,16 +333,16 @@ const DiscreteLayerView: React.FC = observer(() => {
 
     const boundingBoxFilter = coordinates
       ? [
-        {
-          field: 'mc:boundingBox',
-          bbox: {
-            llon: coordinates[0][0],
-            llat: coordinates[0][1],
-            ulon: coordinates[2][0],
-            ulat: coordinates[2][1],
+          {
+            field: 'mc:boundingBox',
+            bbox: {
+              llon: coordinates[0][0],
+              llat: coordinates[0][1],
+              ulon: coordinates[2][0],
+              ulat: coordinates[2][1],
+            },
           },
-        },
-      ]
+        ]
       : [];
 
     return [
@@ -365,7 +360,7 @@ const DiscreteLayerView: React.FC = observer(() => {
     store.discreteLayersStore.resetPolygonParts();
   }, [store.discreteLayersStore.searchParams.recordType]);
 
-	const fetchCatalog = async () => {
+  const fetchCatalog = async () => {
     try {
       setSearchLoading(true);
       const catalog = await fetchAllCatalog(store, buildFilters);
@@ -375,7 +370,7 @@ const DiscreteLayerView: React.FC = observer(() => {
       setSearchLoading(false);
       setSearchResultsError(error);
     }
-  }
+  };
 
   useEffect(() => {
     if (activeTabView === TabViews.SEARCH_RESULTS) {
