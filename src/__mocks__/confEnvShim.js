@@ -1,5 +1,5 @@
 if (!window._env_) {
-  window._env_ = (function (undefined) {
+  window._env_ = (function () {
     return {
       LANGUAGE: 'he',
       BACKEND_LOCALE: 'he',
