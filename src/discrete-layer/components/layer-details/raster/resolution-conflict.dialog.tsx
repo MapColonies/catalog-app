@@ -53,13 +53,6 @@ export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> =
     []
   );
 
-  const formatArea = (areaSquareMeters: number): string => {
-    const areaSquareKilometers = areaSquareMeters / 1_000_000;
-    return intl.formatMessage({ id: 'resolutionConflict.units.km2' }, { value: areaSquareKilometers.toFixed(2) });
-  };
-
-  const reportUrl = state.context.job?.validationReport?.report?.url;
-
   const lowResolutionFeatures = useMemo(
     () => lowResolutionCollections.flatMap((c) => c.features),
     [lowResolutionCollections]
@@ -69,6 +62,8 @@ export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> =
     if (!isOpen) {
       return;
     }
+
+    const reportUrl = state.context.job?.validationReport?.report?.url;
 
     if (!reportUrl) {
       setLowResolutionCollections([]);
@@ -102,7 +97,7 @@ export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> =
               ...feature,
               properties: {
                 ...(feature.properties ?? {}),
-                'calculatedArea': calculatedArea,
+                calculatedArea,
               },
             } as Feature;
           });
@@ -119,7 +114,7 @@ export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> =
       } catch (error) {
         if (!isCancelled) {
           setLowResolutionCollections([]);
-          setLowResolutionPartsError((error as Error)?.message ?? 'Failed to parse low resolution parts');
+          setLowResolutionPartsError((error as Error)?.message ?? 'Failed to parse low resolution parts from report');
         }
       } finally {
         if (!isCancelled) {
@@ -142,6 +137,11 @@ export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> =
   const approveDialog = (): void => {
     onApprove?.();
     closeDialog();
+  };
+
+  const formatArea = (areaSquareMeters: number): string => {
+    const areaSquareKilometers = areaSquareMeters / 1_000_000;
+    return intl.formatMessage({ id: 'resolutionConflict.units.km2' }, { value: areaSquareKilometers.toFixed(2) });
   };
 
   return (
