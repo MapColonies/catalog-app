@@ -72,9 +72,8 @@ import { PolygonSelectionUi } from '../components/map-container/polygon-selectio
 import { SelectedLayersContainer } from '../components/map-container/selected-layers-container';
 import { Terrain } from '../components/map-container/terrain';
 import { SystemCoreInfoDialog } from '../components/system-status/system-core-info/system-core-info.dialog';
-import { buildCatalogQueries, buildRecordsPromises, extractCswQueriesRecords, processCatalogResults } from '../components/helpers/layersUtils';
+import { fetchAllCatalog } from '../components/helpers/layersUtils';
 import {
-  CswCatalogsModelType,
   JobModelType,
   LayerMetadataMixedUnion,
   LinkModelType,
@@ -82,7 +81,7 @@ import {
 } from '../models';
 import { IDispatchAction } from '../models/actionDispatcherStore';
 import { ILayerImage } from '../models/layerImage';
-import { useQuery, useStore } from '../models/RootStore';
+import { useStore } from '../models/RootStore';
 import { FilterField } from '../models/RootStore.base';
 import { UserAction, UserRole } from '../models/userStore';
 import { ActionResolver } from './components/action-resolver.component';
@@ -366,28 +365,11 @@ const DiscreteLayerView: React.FC = observer(() => {
     store.discreteLayersStore.resetPolygonParts();
   }, [store.discreteLayersStore.searchParams.recordType]);
 
-  const fetchCatalog = async () => {
+	const fetchCatalog = async () => {
     try {
       setSearchLoading(true);
-      const recordTypeToFetch = store.discreteLayersStore.searchParams.recordType;
-      if (!recordTypeToFetch) return [];
-      const hitsQueriesPromise = buildCatalogQueries(store, recordTypeToFetch, buildFilters);
-      const hitsQueries = await Promise.all(hitsQueriesPromise);
-
-      const pageSize = CONFIG.RUNNING_MODE.END_RECORD;
-      const startIndex = CONFIG.RUNNING_MODE.START_RECORD;
-
-      const recordsPromises = buildRecordsPromises(
-        store,
-        hitsQueries,
-        pageSize,
-        startIndex,
-        buildFilters
-      );
-
-      const recordsResults = await Promise.all(recordsPromises);
-
-      setData(processCatalogResults(store, recordsResults.flat()));
+      const catalog = await fetchAllCatalog(store, buildFilters);
+      setData(catalog);
       setSearchLoading(false);
     } catch (error: any) {
       setSearchLoading(false);

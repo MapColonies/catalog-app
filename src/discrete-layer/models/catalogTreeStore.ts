@@ -17,14 +17,14 @@ import CONFIG from '../../common/config';
 import { GroupBy, groupBy, KeyPredicate } from '../../common/helpers/group-by';
 import MESSAGES from '../../common/i18n';
 import { ResponseState } from '../../common/models/response-state.enum';
-import { getLayerLink, buildCatalogQueries, buildRecordsPromises, processCatalogResults } from '../components/helpers/layersUtils';
+import { getLayerLink, fetchAllCatalog } from '../components/helpers/layersUtils';
 import { existStatus, isUnpublished } from '../../common/helpers/style';
 import { isBest, isVector } from '../components/layer-details/utils';
 import { CapabilityModelType } from './CapabilityModel';
 import { ILayerImage } from './layerImage';
 import { ModelBase } from './ModelBase';
 import { IRootStore, RootStoreType } from './RootStore';
-import { CswCatalogsModelType, LayerMetadataMixedUnion, RecordType } from './';
+import { LayerMetadataMixedUnion, RecordType } from './';
 
 const NONE = 0;
 const TOP_LEVEL_GROUP_BY_FIELD = 'region';
@@ -148,14 +148,14 @@ export const catalogTreeStore = ModelBase.props({
         })
         .filter(Boolean); // Remove null values
 
-        if (filteredChildren.length > 0) {
-          return {
-            ...tree,
-            children: filteredChildren
-          };
-        }
+      if (filteredChildren.length > 0) {
+        return {
+          ...tree,
+          children: filteredChildren
+        };
+      }
 
-        return null;
+      return null;
     }
 
     function getFilteredCatalogTreeData(): TreeItem[] {
@@ -294,16 +294,12 @@ export const catalogTreeStore = ModelBase.props({
      * Fetch new catalog data
      */
     const catalogSearch = flow(function* catalogSearchGen(): Generator<
-      Promise<any>,
+      | Promise<LayerMetadataMixedUnion[]>,
       ILayerImage[],
-      { search: CswCatalogsModelType }[]
+      LayerMetadataMixedUnion[]
     > {
       try {
         setSearchError(null);
-
-        const recordTypeToFetch = store.discreteLayersStore.searchParams.recordType;
-        if (!recordTypeToFetch) return [];
-
         const catalogFilter = (recordType: RecordType) => {
           return [
             {
@@ -313,23 +309,8 @@ export const catalogTreeStore = ModelBase.props({
           ]
         }
 
-        const hitsQueriesPromise = buildCatalogQueries(store, recordTypeToFetch, catalogFilter);
-        const hitsQueries = yield Promise.all(hitsQueriesPromise);
-
-        const pageSize = CONFIG.RUNNING_MODE.END_RECORD;
-        const startIndex = CONFIG.RUNNING_MODE.START_RECORD;
-
-        const recordsPromises = buildRecordsPromises(
-          store,
-          hitsQueries as { search: CswCatalogsModelType }[],
-          pageSize,
-          startIndex,
-          catalogFilter
-        );
-
-        const recordsResults = (yield Promise.all(recordsPromises)).flat();
-
-        return processCatalogResults(store, recordsResults);
+        const catalog = yield fetchAllCatalog(store, catalogFilter);
+        return store.discreteLayersStore.setLayersImages(catalog, false);
       } catch (e) {
         console.error('Error while fetching catalog:', e);
         setSearchError(e);
@@ -454,11 +435,11 @@ export const catalogTreeStore = ModelBase.props({
      */
     function changeNodeByPath(
       data: TreePath & {
-          treeData?: TreeItem[],
-          newNode: any,
-          ignoreCollapsed?: boolean,
+        treeData?: TreeItem[],
+        newNode: any,
+        ignoreCollapsed?: boolean,
       }): TreeItem[] {
-      return changeNodeAtPath({ ...data, getNodeKey: keyFromTreeIndex, treeData: data.treeData ?? self.catalogTreeData as TreeItem[]});
+      return changeNodeAtPath({ ...data, getNodeKey: keyFromTreeIndex, treeData: data.treeData ?? self.catalogTreeData as TreeItem[] });
     };
 
     /**
@@ -468,7 +449,7 @@ export const catalogTreeStore = ModelBase.props({
      * @returns The first NodeData it finds that matches the provided title
      */
     function findNodeByTitle(title: string, useTranslation = false): NodeData | null {
-      const nodeTitle =  useTranslation ? intl.formatMessage({ id: title }) : title;
+      const nodeTitle = useTranslation ? intl.formatMessage({ id: title }) : title;
       const node = find({
         treeData: self.catalogTreeData as TreeItem[],
         getNodeKey: keyFromTreeIndex,
@@ -565,7 +546,7 @@ export const catalogTreeStore = ModelBase.props({
      */
     function updateNodeById(id: string, updatedNodeData: ILayerImage): void {
       if ((self.catalogTreeData as TreeItem[]).length > NONE) {
-        let newTreeData: TreeItem[] = [...self.catalogTreeData as TreeItem[]] ;
+        let newTreeData: TreeItem[] = [...self.catalogTreeData as TreeItem[]];
 
         find({
           treeData: self.catalogTreeData as TreeItem[],
@@ -583,7 +564,7 @@ export const catalogTreeStore = ModelBase.props({
           });
 
           const { parentNode, path: parentPath } = getParentNode(item, newTreeData);
-          
+
           // Re-sort parent group children after the changes (like if title has changed)
           const sortedParentNode = sortGroupChildrenByFieldValue(parentNode?.node as TreeItem);
 
@@ -600,7 +581,7 @@ export const catalogTreeStore = ModelBase.props({
 
     function updateFieldNodeById(id: string, updatedNodeData: ILayerImage, field: keyof ILayerImage): void {
       if ((self.catalogTreeData as TreeItem[]).length > NONE) {
-        let newTreeData: TreeItem[] = [...self.catalogTreeData as TreeItem[]] ;
+        let newTreeData: TreeItem[] = [...self.catalogTreeData as TreeItem[]];
 
         find({
           treeData: self.catalogTreeData as TreeItem[],
@@ -618,7 +599,7 @@ export const catalogTreeStore = ModelBase.props({
           });
 
           const { parentNode, path: parentPath } = getParentNode(item, newTreeData);
-          
+
           // Re-sort parent group children after the changes (like if title has changed)
           const sortedParentNode = sortGroupChildrenByFieldValue(parentNode?.node as TreeItem);
 
@@ -640,11 +621,11 @@ export const catalogTreeStore = ModelBase.props({
      */
     function removeNodeFromTree(path: (string | number)[]): void {
       const newTree = removeNodeAtPath({
-         treeData: self.catalogTreeData as TreeItem[],
-         getNodeKey: keyFromTreeIndex,
-         path
-       });
- 
+        treeData: self.catalogTreeData as TreeItem[],
+        getNodeKey: keyFromTreeIndex,
+        path
+      });
+
       self.catalogTreeData = newTree;
     }
 

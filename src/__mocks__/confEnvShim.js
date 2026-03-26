@@ -62,6 +62,7 @@ if (!window._env_) {
       RUNNING_MODE: {
         type: 'DEVELOPMENT',
         autocomplete: false,
+        cswDefaultPageSize: 200,
       },
       NUMBER_OF_CHARACTERS_LIMIT: 18,
       SERVED_ENTITY_TYPES: 'RECORD_ALL,RECORD_RASTER,RECORD_3D,RECORD_DEM,RECORD_VECTOR',

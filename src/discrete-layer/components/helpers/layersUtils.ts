@@ -1,5 +1,5 @@
 import { Feature } from 'geojson';
-import { cloneDeep, get, gt, isEmpty } from 'lodash';
+import { get, isEmpty } from 'lodash';
 import { Query } from 'mst-gql';
 import bbox from '@turf/bbox';
 import area from '@turf/area';
@@ -231,8 +231,7 @@ export const extractCswQueriesRecords = (
   let layersImages: ILayerImage[] = [];
 
   cswCatalogs.forEach((res) => {
-    const cswCatalogsVal: CswCatalogsModelType = get(res, 'search');
-    const cswCatalogs = cloneDeep(cswCatalogsVal);
+    const cswCatalogs: CswCatalogsModelType = get(res, 'search');
     if (!cswCatalogs) {
       return;
     }
@@ -249,31 +248,17 @@ export const extractCswQueriesRecords = (
   return layersImages;
 };
 
-export const fetchSearchHits = async (store: IRootStore, filter?: FilterField[]) => {
-  const searchHits = store.querySearch({
-    opts: {
-      filter,
-    },
-    resultType: ResultType.HITS,
-    end: 0,
-    start: 1,
-  });
-
-  return searchHits.refetch();
-};
-
-export const findFirstValidCatalog = (cswCatalogs: CswCatalogsModelType): [string, CswCatalogModelType] | undefined => {
+export const findFirstValidCatalog = (cswCatalogs: CswCatalogsModelType): [keyof CswCatalogsModelType, CswCatalogModelType] | undefined => {
   const entry = Object.entries(cswCatalogs).find(
     ([_, value]) => {
-      const dfsdf = value != undefined && typeof value !== 'string'
-      return dfsdf;
+      return value != undefined && typeof value !== 'string'
     }
   );
 
-  return entry;
+  return entry as [keyof CswCatalogsModelType, CswCatalogModelType] | undefined;
 }
 
-export const fetchCatalogInParallel = async (
+const fetchCatalogInParallel = async (
   store: IRootStore,
   numberOfRecordsMatched: number,
   pageSize: number,
@@ -282,6 +267,10 @@ export const fetchCatalogInParallel = async (
 ) => {
   let searchResultsQuery!: Query<{ search: CswCatalogsModelType }>;
   const promises: Promise<{ search: CswCatalogsModelType }>[] = [];
+
+  if (!pageSize || pageSize <= 0) {
+    return Promise.resolve([]);
+  }
 
   for (let i = 0; i < numberOfRecordsMatched; i += pageSize) {
     searchResultsQuery = store.querySearch({
@@ -299,59 +288,67 @@ export const fetchCatalogInParallel = async (
   return Promise.all(promises);
 };
 
-export const domainToRecordType = (domain: string): RecordType => {
-  switch (domain) {
-    case '_DEM':
-      return RecordType.RECORD_DEM;
-    case '_3D':
+const domainToRecordType = (domain: keyof CswCatalogsModelType): RecordType => {
+  switch (true) {
+    case (domain === '_3D'):
       return RecordType.RECORD_3D;
-    case '_VECTOR':
+    case (domain === '_DEM'):
+      return RecordType.RECORD_DEM;
+    case (domain === '_VECTOR'):
       return RecordType.RECORD_VECTOR;
     default:
       return RecordType.RECORD_RASTER;
   }
 }
 
-export const createCatalogQuery = (store: IRootStore, type: RecordType, cbFilter: (type: RecordType) => FilterField[]) => {
+const createQueryAndFetch = (store: IRootStore, type: RecordType, pageSize: number, filterFn: (type: RecordType) => FilterField[]) => {
   return store.querySearch({
-    opts: { filter: cbFilter(type) },
-    resultType: ResultType.HITS,
-    end: 0,
+    opts: { filter: filterFn(type) },
+    resultType: ResultType.RESULTS,
+    end: pageSize,
     start: 1,
   }).refetch();
 }
 
-export const buildCatalogQueries = (
+const buildCatalogsQueries = (
   store: IRootStore,
   recordTypeToFetch: RecordType,
-  cbFilter: (type: RecordType) => FilterField[]
+  pageSize: number,
+  filterFn: (type: RecordType) => FilterField[]
 ): Promise<{ search: CswCatalogsModelType }>[] => {
   if (recordTypeToFetch === RecordType.RECORD_ALL) {
     return CONFIG.SERVED_ENTITY_TYPES
       .filter(type => type !== RecordType.RECORD_ALL)
-      .map(type => createCatalogQuery(store, type as RecordType, cbFilter));
+      .map(type => createQueryAndFetch(store, type as RecordType, pageSize, filterFn));
   }
 
-  return [createCatalogQuery(store, recordTypeToFetch, cbFilter)];
+  return [createQueryAndFetch(store, recordTypeToFetch, pageSize, filterFn)];
 };
 
-export const buildRecordsPromises = (
+const buildRecordsPromises = (
   store: IRootStore,
-  hitsQueries: { search: CswCatalogsModelType }[],
-  pageSize: number,
-  startIndex: number,
-  cbFilter: (type: RecordType) => FilterField[]
+  firstQuery: { search: CswCatalogsModelType }[],
+  filterFn: (type: RecordType) => FilterField[]
 ): Promise<{ search: CswCatalogsModelType }[]>[] => {
   const recordsPromises: Promise<{ search: CswCatalogsModelType }[]>[] = [];
 
-  hitsQueries.forEach((query) => {
-    const [key, value] = findFirstValidCatalog(query.search) as [
+  firstQuery.forEach((query) => {
+    const entry = findFirstValidCatalog(query.search) as [
       string,
       CswCatalogModelType
     ];
 
+    if (!entry) {
+      return;
+    }
+
+    const [key, value] = entry;
+
     const total = value?.cswQuerySummary?.numberOfRecordsMatched;
-    if (!total) return;
+    const pageSize = value?.cswQuerySummary?.numberOfRecordsReturned;
+    const startIndex = value?.cswQuerySummary?.nextRecord;
+
+    if (!total || !startIndex) return;
 
     recordsPromises.push(
       fetchCatalogInParallel(
@@ -359,7 +356,7 @@ export const buildRecordsPromises = (
         total,
         pageSize,
         startIndex,
-        cbFilter(domainToRecordType(key))
+        filterFn(domainToRecordType(key as keyof CswCatalogsModelType))
       )
     );
   });
@@ -367,7 +364,28 @@ export const buildRecordsPromises = (
   return recordsPromises;
 };
 
-export const processCatalogResults = (store: IRootStore, recordsResults: { search: CswCatalogsModelType }[]) => {
-  const layersImages = extractCswQueriesRecords(recordsResults);
-  return store.discreteLayersStore.setLayersImages(layersImages, false);
+const processCatalogResults = (recordsResults: { search: CswCatalogsModelType }[]) => {
+  return extractCswQueriesRecords(recordsResults);
 };
+
+export const fetchAllCatalog = async (store: IRootStore, filterFn: (type: RecordType) => FilterField[]) => {
+  const recordTypeToFetch = store.discreteLayersStore.searchParams.recordType;
+  if (!recordTypeToFetch) {
+    return [];
+  }
+
+  const pageSize = CONFIG.RUNNING_MODE.CSW_DEFAULT_PAGE_SIZE;
+
+  const initialCatalogQueryPromises = buildCatalogsQueries(store, recordTypeToFetch, pageSize, filterFn);
+  const initialCatalogResults = await Promise.all(initialCatalogQueryPromises);
+
+  const fetchedRecordsPromises = buildRecordsPromises(
+    store,
+    initialCatalogResults,
+    filterFn
+  );
+
+  const fetchedRecords = (await Promise.all(fetchedRecordsPromises)).flat();
+
+  return processCatalogResults([...initialCatalogResults, ...fetchedRecords]);
+}

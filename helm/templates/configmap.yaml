@@ -39,6 +39,7 @@
   CONFIGURATION_DEFAULT_USER_ROLE: {{ quote .Values.env.defaultUser.role }}
   CONFIGURATION_RUNNING_MODE_TYPE: {{ quote .Values.env.runningMode.type }}
   CONFIGURATION_RUNNING_MODE_AUTOCOMPLETE: {{ quote .Values.env.runningMode.autoComplete }}
+  CONFIGURATION_RUNNING_MODE_CSW_DEFAULT_PAGE_SIZE: {{ quote .Values.env.runningMode.cswDefaultPageSize }}
   CONFIGURATION_EXPORT_DEFAULT_ZOOM_LEVEL: {{ quote .Values.env.export.defaultZoomLevel }}
   CONFIGURATION_EXPORT_MAX_ZOOM_LEVEL: {{ quote .Values.env.export.maxZoomLevel }}
   CONFIGURATION_MAP_CENTER: {{ quote .Values.env.map.center }}
