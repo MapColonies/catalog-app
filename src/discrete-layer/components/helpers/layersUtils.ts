@@ -252,7 +252,7 @@ export const findFirstValidCatalog = (
   cswCatalogs: CswCatalogsModelType
 ): [keyof CswCatalogsModelType, CswCatalogModelType] | undefined => {
   const entry = Object.entries(cswCatalogs).find(([_, value]) => {
-    return value != undefined && typeof value !== 'string';
+    return value !== undefined && value !== null && typeof value !== 'string';
   });
 
   return entry as [keyof CswCatalogsModelType, CswCatalogModelType] | undefined;

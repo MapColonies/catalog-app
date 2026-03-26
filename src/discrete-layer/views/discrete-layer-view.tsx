@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { MapMode2D } from 'cesium';
 import { Geometry, Feature, FeatureCollection, Polygon, Point } from 'geojson';
-import { cloneDeep, find, get, isEmpty } from 'lodash';
+import { find, get, isEmpty } from 'lodash';
 import { observer } from 'mobx-react-lite';
 import React, { useMemo, useState, useEffect, useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
