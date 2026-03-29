@@ -84,7 +84,7 @@ export const JobErrorsSummary = (
               type="button"
               outlined
               className="resolutionConflictButton"
-              style={{ color: 'orange', borderColor: 'orange' }}
+              style={{ color: 'orange', borderColor: 'orange', fontWeight: 'bold' }}
               onClick={(e): void => {
                 e.preventDefault();
                 e.stopPropagation();
