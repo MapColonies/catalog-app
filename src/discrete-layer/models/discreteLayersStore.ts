@@ -27,7 +27,10 @@ import { CapabilityModelType } from './CapabilityModel';
 import { FieldConfigModelType } from './FieldConfigModel';
 import { GetFeatureModelType } from './GetFeatureModel';
 import { RecordType } from './RecordTypeEnum';
-import { WfsPolygonPartsGetFeatureParams } from './RootStore.base';
+import { FilterField, WfsPolygonPartsGetFeatureParams } from './RootStore.base';
+import { CswCatalogsModelType } from './CswCatalogsModel';
+import { CswCatalogModelType } from './CswCatalogModel';
+import { ResultType } from './ResultTypeEnum';
 
 export type LayersImagesResponse = ILayerImage[];
 
@@ -490,6 +493,155 @@ export const discreteLayersStore = ModelBase
       }
     }
 
+    type CswCatalogsKeys = '_3D' | '_DEM' | '_VECTOR' | '_RASTER';
+
+    const cswCatalogsTypeToRecordTypeMap: Record<CswCatalogsKeys, RecordType> = {
+      _3D: RecordType.RECORD_3D,
+      _DEM: RecordType.RECORD_DEM,
+      _VECTOR: RecordType.RECORD_VECTOR,
+      _RASTER: RecordType.RECORD_RASTER,
+    };
+
+    const extractLayerImagesFromCswQueries = (
+      cswQueries: { search: CswCatalogsModelType }[]
+    ): ILayerImage[] => {
+      let layersImages: ILayerImage[] = [];
+
+      for (const cswQuerySearch of cswQueries) {
+        const cswCatalogs = cswQuerySearch.search;
+        if (!cswCatalogs) {
+          continue;
+        }
+
+        Object.values(cswCatalogs).forEach((cswCatalog: CswCatalogModelType) => {
+          if (!cswCatalog?.records) {
+            return;
+          }
+          layersImages.push(...(cswCatalog.records as ILayerImage[]));
+        });
+      }
+
+      return layersImages;
+    };
+
+    const findFirstCatalogWithRecords = (
+      cswCatalogs: CswCatalogsModelType
+    ): [keyof CswCatalogsModelType, CswCatalogModelType] | undefined => {
+      const entry = Object.entries(cswCatalogs).find(([_, value]) => {
+        return value !== undefined && value !== null && typeof value === 'object';
+      });
+
+      return entry as [keyof CswCatalogsModelType, CswCatalogModelType] | undefined;
+    };
+
+    const fetchCatalogsInParallel = async (
+      numberOfRecordsMatched: number,
+      pageSize: number,
+      startIndex: number,
+      filterFn: (type: RecordType) => FilterField[],
+      recordType: RecordType
+    ) => {
+      const promises: Promise<{ search: CswCatalogsModelType }>[] = [];
+
+      if (!pageSize || pageSize <= 0) {
+        return Promise.resolve([]);
+      }
+
+      for (let i = startIndex; i <= numberOfRecordsMatched; i += pageSize) {
+        const searchResultsQuery = createQueryAndFetch(recordType, i, pageSize, filterFn);
+        promises.push(searchResultsQuery);
+      }
+
+      return Promise.all(promises);
+    };
+
+    const createQueryAndFetch = (
+      type: RecordType,
+      start: number,
+      pageSize: number,
+      filterFn: (type: RecordType) => FilterField[]
+    ) => {
+      return store
+        .querySearch({
+          opts: { filter: filterFn(type) },
+          resultType: ResultType.RESULTS,
+          start,
+          end: pageSize,
+        })
+        .refetch();
+    };
+
+    const buildCatalogsQueries = (
+      recordTypeToFetch: RecordType,
+      pageSize: number,
+      filterFn: (type: RecordType) => FilterField[]
+    ): Promise<{ search: CswCatalogsModelType }>[] => {
+      const startIndex = 1;
+      if (recordTypeToFetch === RecordType.RECORD_ALL) {
+        return CONFIG.SERVED_ENTITY_TYPES.filter((type) => type !== RecordType.RECORD_ALL).map((type) =>
+          createQueryAndFetch(type as RecordType, startIndex, pageSize, filterFn)
+        );
+      }
+
+      return [createQueryAndFetch(recordTypeToFetch, startIndex, pageSize, filterFn)];
+    };
+
+    const buildRecordsPromises = (
+      firstQuery: { search: CswCatalogsModelType }[],
+      filterFn: (type: RecordType) => FilterField[]
+    ): Promise<{ search: CswCatalogsModelType }[]>[] => {
+      const recordsPromises: Promise<{ search: CswCatalogsModelType }[]>[] = [];
+
+      firstQuery.forEach((query) => {
+        const entry = findFirstCatalogWithRecords(query.search) as [string, CswCatalogModelType];
+
+        if (!entry) {
+          return;
+        }
+
+        const [key, value] = entry;
+
+        const total = value?.cswQuerySummary?.numberOfRecordsMatched;
+        const pageSize = value?.cswQuerySummary?.numberOfRecordsReturned;
+        const startIndex = value?.cswQuerySummary?.nextRecord;
+
+        const recordType = cswCatalogsTypeToRecordTypeMap[key as CswCatalogsKeys];
+
+        if (!total || !recordType || startIndex <= 0) {
+          return;
+        }
+
+        recordsPromises.push(
+          fetchCatalogsInParallel(total, pageSize, startIndex, filterFn, recordType)
+        );
+      });
+
+      return recordsPromises;
+    };
+
+    const fetchAllCatalog = async (
+      filterFn: (type: RecordType) => FilterField[]
+    ) => {
+      const recordTypeToFetch = self.searchParams.recordType;
+      if (!recordTypeToFetch) {
+        return [];
+      }
+
+      const pageSize = CONFIG.RUNNING_MODE.CSW_DEFAULT_PAGE_SIZE;
+
+      const initialCatalogQueryPromises = buildCatalogsQueries(
+        recordTypeToFetch,
+        pageSize,
+        filterFn
+      );
+      const initialCatalogResults = await Promise.all(initialCatalogQueryPromises);
+
+      const fetchedRecordsPromises = buildRecordsPromises(initialCatalogResults, filterFn);
+
+      const fetchedRecords = (await Promise.all(fetchedRecordsPromises)).flat();
+
+      return extractLayerImagesFromCswQueries([...initialCatalogResults, ...fetchedRecords]);
+    };
 
     return {
       getLayersImages,
@@ -532,7 +684,8 @@ export const discreteLayersStore = ModelBase
       setPolygonPartsInfo,
       addPolygonPartsInfo,
       resetPolygonPartsInfo,
-      resetPolygonParts
+      resetPolygonParts,
+      fetchAllCatalog
     };
   });
 

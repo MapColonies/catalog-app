@@ -72,7 +72,6 @@ import { PolygonSelectionUi } from '../components/map-container/polygon-selectio
 import { SelectedLayersContainer } from '../components/map-container/selected-layers-container';
 import { Terrain } from '../components/map-container/terrain';
 import { SystemCoreInfoDialog } from '../components/system-status/system-core-info/system-core-info.dialog';
-import { fetchAllCatalog } from '../components/helpers/layersUtils';
 import { JobModelType, LayerMetadataMixedUnion, LinkModelType, RecordType } from '../models';
 import { IDispatchAction } from '../models/actionDispatcherStore';
 import { ILayerImage } from '../models/layerImage';
@@ -363,7 +362,7 @@ const DiscreteLayerView: React.FC = observer(() => {
   const fetchCatalog = async () => {
     try {
       setSearchLoading(true);
-      const catalog = await fetchAllCatalog(store, buildFilters);
+      const catalog = await store.discreteLayersStore.fetchAllCatalog(buildFilters);
       setData(catalog);
       setSearchLoading(false);
     } catch (error: any) {

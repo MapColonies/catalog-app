@@ -17,7 +17,7 @@ import CONFIG from '../../common/config';
 import { GroupBy, groupBy, KeyPredicate } from '../../common/helpers/group-by';
 import MESSAGES from '../../common/i18n';
 import { ResponseState } from '../../common/models/response-state.enum';
-import { getLayerLink, fetchAllCatalog } from '../components/helpers/layersUtils';
+import { getLayerLink } from '../components/helpers/layersUtils';
 import { existStatus, isUnpublished } from '../../common/helpers/style';
 import { isBest, isVector } from '../components/layer-details/utils';
 import { CapabilityModelType } from './CapabilityModel';
@@ -294,7 +294,7 @@ export const catalogTreeStore = ModelBase.props({
      * Fetch new catalog data
      */
     const catalogSearch = flow(function* catalogSearchGen(): Generator<
-      | Promise<LayerMetadataMixedUnion[]>,
+      Promise<LayerMetadataMixedUnion[]>,
       ILayerImage[],
       LayerMetadataMixedUnion[]
     > {
@@ -309,7 +309,7 @@ export const catalogTreeStore = ModelBase.props({
           ]
         }
 
-        const catalog = yield fetchAllCatalog(store, catalogFilter);
+        const catalog = yield store.discreteLayersStore.fetchAllCatalog(catalogFilter);
         return store.discreteLayersStore.setLayersImages(catalog, false);
       } catch (e) {
         setSearchError(e);
