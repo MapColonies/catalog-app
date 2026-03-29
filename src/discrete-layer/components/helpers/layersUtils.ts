@@ -225,47 +225,46 @@ export const getWMTSOptions = (
   };
 };
 
-export const extractCswQueriesRecords = (
-  cswCatalogs: { search: CswCatalogsModelType }[]
+export const extractLayerImagesFromCswQueries = (
+  cswQueries: { search: CswCatalogsModelType }[]
 ): ILayerImage[] => {
   let layersImages: ILayerImage[] = [];
 
-  cswCatalogs.forEach((res) => {
-    const cswCatalogs: CswCatalogsModelType = get(res, 'search');
+  for (const cswQuerySearch of cswQueries) {
+    const cswCatalogs: CswCatalogsModelType = get(cswQuerySearch, 'search');
     if (!cswCatalogs) {
-      return;
+      continue;
     }
-    Object.keys(cswCatalogs).forEach((k) => {
-      const key = k as keyof CswCatalogsModelType;
-      if (!cswCatalogs?.[key]?.records) {
+
+    Object.values(cswCatalogs).forEach((cswCatalog: CswCatalogModelType) => {
+      if (!cswCatalog?.records) {
         return;
       }
-      const records: ILayerImage[] = cswCatalogs[key].records;
-      layersImages.push(...records);
+      layersImages.push(...cswCatalog.records as ILayerImage[]);
     });
-  });
+  }
 
   return layersImages;
 };
 
-export const findFirstValidCatalog = (
+export const findFirstCatalogWithRecords = (
   cswCatalogs: CswCatalogsModelType
 ): [keyof CswCatalogsModelType, CswCatalogModelType] | undefined => {
   const entry = Object.entries(cswCatalogs).find(([_, value]) => {
-    return value !== undefined && value !== null && typeof value !== 'string';
+    return value !== undefined && value !== null && typeof value === 'object';
   });
 
   return entry as [keyof CswCatalogsModelType, CswCatalogModelType] | undefined;
 };
 
-const fetchCatalogInParallel = async (
+const fetchCatalogsInParallel = async (
   store: IRootStore,
   numberOfRecordsMatched: number,
   pageSize: number,
   startIndex: number,
   filter?: FilterField[]
 ) => {
-  let searchResultsQuery!: Query<{ search: CswCatalogsModelType }>;
+  let searchResultsQuery: Query<{ search: CswCatalogsModelType }>;
   const promises: Promise<{ search: CswCatalogsModelType }>[] = [];
 
   if (!pageSize || pageSize <= 0) {
@@ -288,17 +287,11 @@ const fetchCatalogInParallel = async (
   return Promise.all(promises);
 };
 
-const domainToRecordType = (domain: keyof CswCatalogsModelType): RecordType => {
-  switch (true) {
-    case domain === '_3D':
-      return RecordType.RECORD_3D;
-    case domain === '_DEM':
-      return RecordType.RECORD_DEM;
-    case domain === '_VECTOR':
-      return RecordType.RECORD_VECTOR;
-    default:
-      return RecordType.RECORD_RASTER;
-  }
+const domainToRecordTypeMap: Record<string, RecordType> = {
+  '_3D': RecordType.RECORD_3D,
+  '_DEM': RecordType.RECORD_DEM,
+  '_VECTOR': RecordType.RECORD_VECTOR,
+  '_RASTER': RecordType.RECORD_RASTER
 };
 
 const createQueryAndFetch = (
@@ -311,8 +304,8 @@ const createQueryAndFetch = (
     .querySearch({
       opts: { filter: filterFn(type) },
       resultType: ResultType.RESULTS,
-      end: pageSize,
       start: 1,
+      end: pageSize,
     })
     .refetch();
 };
@@ -340,7 +333,7 @@ const buildRecordsPromises = (
   const recordsPromises: Promise<{ search: CswCatalogsModelType }[]>[] = [];
 
   firstQuery.forEach((query) => {
-    const entry = findFirstValidCatalog(query.search) as [string, CswCatalogModelType];
+    const entry = findFirstCatalogWithRecords(query.search) as [string, CswCatalogModelType];
 
     if (!entry) {
       return;
@@ -352,24 +345,24 @@ const buildRecordsPromises = (
     const pageSize = value?.cswQuerySummary?.numberOfRecordsReturned;
     const startIndex = value?.cswQuerySummary?.nextRecord;
 
-    if (!total || !startIndex) return;
+    const recordType = domainToRecordTypeMap[key];
+
+    if (!total || !recordType || startIndex <= 0) {
+      return;
+    }
 
     recordsPromises.push(
-      fetchCatalogInParallel(
+      fetchCatalogsInParallel(
         store,
         total,
         pageSize,
         startIndex,
-        filterFn(domainToRecordType(key as keyof CswCatalogsModelType))
+        filterFn(recordType)
       )
     );
   });
 
   return recordsPromises;
-};
-
-const processCatalogResults = (recordsResults: { search: CswCatalogsModelType }[]) => {
-  return extractCswQueriesRecords(recordsResults);
 };
 
 export const fetchAllCatalog = async (
@@ -395,5 +388,5 @@ export const fetchAllCatalog = async (
 
   const fetchedRecords = (await Promise.all(fetchedRecordsPromises)).flat();
 
-  return processCatalogResults([...initialCatalogResults, ...fetchedRecords]);
+  return extractLayerImagesFromCswQueries([...initialCatalogResults, ...fetchedRecords]);
 };

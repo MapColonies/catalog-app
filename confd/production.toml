@@ -46,7 +46,7 @@ keys = [
   "/configuration/model/viewer/token/value",
   "/configuration/running/mode/type",
   "/configuration/running/mode/autocomplete",
-  "/configuration/running/mode/cswDefaultPageSize",
+  "/configuration/running/mode/cswdefaultpagesize",
   "/configuration/served/entity/types",
   "/configuration/access/token/attribute/name",
   "/configuration/access/token/injection/type",
