@@ -20,6 +20,7 @@ import {
   TileWMTS,
   TileXYZ,
   useMap,
+  useVectorLayer,
   useVectorSource,
   VectorLayer,
   VectorSource,
@@ -52,8 +53,19 @@ const MIN_FEATURES_NUMBER = 4; // minimal set of fetures (source, source_marker,
 const RENDERS_TILL_FULL_FEATURES_SET = 1; // first render with source, second with PPs perimeter geometry
 const NO_PROPERTIES_MESSAGE_KEY = '__noPropertiesMessage';
 const FEATURE_LABEL_KEY = 'featureLabel';
+const LOW_RESOLUTION_LAYER_Z_INDEX = 2;
 const ISO_DATE_TIME_REGEX =
   /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:?\d{2})?$/;
+
+const LowResolutionLayerOrder: React.FC = () => {
+  const vectorLayer = useVectorLayer();
+
+  useEffect(() => {
+    vectorLayer.setZIndex(LOW_RESOLUTION_LAYER_Z_INDEX);
+  }, [vectorLayer]);
+
+  return null;
+};
 
 export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> = ({
   mode,
@@ -397,6 +409,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
         )}
         {previewBaseMap}
         <VectorLayer>
+          <LowResolutionLayerOrder />
           <VectorSource>
             <GeoFeaturesInnerComponent />
           </VectorSource>

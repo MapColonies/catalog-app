@@ -10,7 +10,13 @@ import { Style } from 'ol/style';
 import intersect from '@turf/intersect';
 import { polygon } from '@turf/helpers';
 import bboxPolygon from '@turf/bbox-polygon';
-import { GeoJSONFeature, useMap, VectorLayer, VectorSource } from '@map-colonies/react-components';
+import {
+  GeoJSONFeature,
+  useMap,
+  useVectorLayer,
+  VectorLayer,
+  VectorSource,
+} from '@map-colonies/react-components';
 import CONFIG from '../../../../common/config';
 import { useEnums } from '../../../../common/hooks/useEnum.hook';
 import {
@@ -40,6 +46,17 @@ interface PolygonPartsVectorLayerProps {
 const START_OFFSET = 0;
 const STARTING_PAGE = 0;
 const DEBOUNCE_MOUSE_INTERVAL = 500;
+const EXISTING_PP_LAYER_Z_INDEX = 1;
+
+const ExistingPPLayerOrder: React.FC = () => {
+  const vectorLayer = useVectorLayer();
+
+  useEffect(() => {
+    vectorLayer.setZIndex(EXISTING_PP_LAYER_Z_INDEX);
+  }, [vectorLayer]);
+
+  return null;
+};
 
 export const PolygonPartsVectorLayer: React.FC<PolygonPartsVectorLayerProps> = observer(
   ({ layerRecord, onFeaturesChange }) => {
@@ -165,6 +182,7 @@ export const PolygonPartsVectorLayer: React.FC<PolygonPartsVectorLayerProps> = o
 
     return (
       <VectorLayer>
+        <ExistingPPLayerOrder />
         <VectorSource>
           {existingPolygonParts.map((feat, idx) => {
             const greenStyle = new Style({
