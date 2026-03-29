@@ -240,7 +240,7 @@ export const extractLayerImagesFromCswQueries = (
       if (!cswCatalog?.records) {
         return;
       }
-      layersImages.push(...cswCatalog.records as ILayerImage[]);
+      layersImages.push(...(cswCatalog.records as ILayerImage[]));
     });
   }
 
@@ -288,10 +288,10 @@ const fetchCatalogsInParallel = async (
 };
 
 const domainToRecordTypeMap: Record<string, RecordType> = {
-  '_3D': RecordType.RECORD_3D,
-  '_DEM': RecordType.RECORD_DEM,
-  '_VECTOR': RecordType.RECORD_VECTOR,
-  '_RASTER': RecordType.RECORD_RASTER
+  _3D: RecordType.RECORD_3D,
+  _DEM: RecordType.RECORD_DEM,
+  _VECTOR: RecordType.RECORD_VECTOR,
+  _RASTER: RecordType.RECORD_RASTER,
 };
 
 const createQueryAndFetch = (
@@ -352,13 +352,7 @@ const buildRecordsPromises = (
     }
 
     recordsPromises.push(
-      fetchCatalogsInParallel(
-        store,
-        total,
-        pageSize,
-        startIndex,
-        filterFn(recordType)
-      )
+      fetchCatalogsInParallel(store, total, pageSize, startIndex, filterFn(recordType))
     );
   });
 
