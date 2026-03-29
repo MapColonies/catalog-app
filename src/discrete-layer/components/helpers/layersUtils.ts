@@ -1,6 +1,5 @@
 import { Feature } from 'geojson';
 import { get, isEmpty } from 'lodash';
-import { Query } from 'mst-gql';
 import bbox from '@turf/bbox';
 import area from '@turf/area';
 import bboxPolygon from '@turf/bbox-polygon';
@@ -15,20 +14,14 @@ import CONFIG from '../../../common/config';
 import { LinkType } from '../../../common/models/link-type.enum';
 import {
   CapabilityModelType,
-  CswCatalogModelType,
-  CswCatalogsModelType,
-  IRootStore,
   LayerMetadataMixedUnion,
   LayerRasterRecordModelType,
   LinkModelType,
-  RecordType,
-  ResultType,
   StyleModelType,
   TileMatrixSetModelType,
 } from '../../models';
 import { ILayerImage } from '../../models/layerImage';
 import { ResourceUrlModelType } from '../../models/ResourceUrlModel';
-import { FilterField } from '../../models/RootStore.base';
 
 const DEFAULT_RECTANGLE_FACTOR = 0.2;
 const EARTH_AREA = 509000000; //whole EARTH surface, in square km
