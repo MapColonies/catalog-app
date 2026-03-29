@@ -34,6 +34,7 @@ import {
 
 interface PolygonPartsVectorLayerProps {
   layerRecord?: ILayerImage | null;
+  onFeaturesChange?: (features: Feature[]) => void;
 }
 
 const START_OFFSET = 0;
@@ -41,12 +42,16 @@ const STARTING_PAGE = 0;
 const DEBOUNCE_MOUSE_INTERVAL = 500;
 
 export const PolygonPartsVectorLayer: React.FC<PolygonPartsVectorLayerProps> = observer(
-  ({ layerRecord }) => {
+  ({ layerRecord, onFeaturesChange }) => {
     const store = useStore();
     const mapOl = useMap();
     const intl = useIntl();
 
     const [existingPolygonParts, setExistingPolygonParts] = useState<Feature[]>([]);
+
+    useEffect(() => {
+      onFeaturesChange?.(existingPolygonParts);
+    }, [existingPolygonParts]);
     const [page, setPage] = useState(STARTING_PAGE);
     const { data, error, loading, setQuery } = useQuery<{
       getPolygonPartsFeature: GetFeatureModelType;

@@ -65,18 +65,24 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   const store = useStore();
   const intl = useIntl();
   const renderCount = useRef(0);
+  const existingPPFeaturesRef = useRef<Feature[]>([]);
   const [showExistingPolygonParts, setShowExistingPolygonParts] = useState<boolean>(false);
   const [selectedFeatureProperties, setSelectedFeatureProperties] = useState<
     Record<string, unknown> | undefined
   >();
 
   const getClickedFeatureProperties = (coordinate: number[]): Record<string, unknown> | undefined => {
-    if (!geoFeatures || geoFeatures.length === 0) {
+    const allFeatures = [
+      ...(geoFeatures ?? []),
+      ...existingPPFeaturesRef.current,
+    ];
+
+    if (allFeatures.length === 0) {
       return undefined;
     }
 
     const clickedPoint = point(coordinate as [number, number]);
-    const clickedFeature = geoFeatures.find((feature) => {
+    const clickedFeature = allFeatures.find((feature) => {
       if (!feature?.geometry) {
         return false;
       }
@@ -373,7 +379,14 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
             <GeoFeaturesInnerComponent />
           </VectorSource>
         </VectorLayer>
-        {showExistingPolygonParts && <PolygonPartsExtentVectorLayer layerRecord={layerRecord} />}
+        {showExistingPolygonParts && (
+          <PolygonPartsExtentVectorLayer
+            layerRecord={layerRecord}
+            onFeaturesChange={(features): void => {
+              existingPPFeaturesRef.current = features;
+            }}
+          />
+        )}
         <Legend
           legendItems={LegendsArray}
           title={intl.formatMessage({ id: 'polygon-parts.map-preview-legend.title' })}
