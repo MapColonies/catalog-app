@@ -33,7 +33,6 @@
   flex: 1;
   min-height: 0;
   max-height: none !important;
-  margin-top: 12px;
   overflow-y: hidden !important;
 }
 
@@ -52,11 +51,17 @@
   height: 12px;
 }
 
+#resolutionConflictDialog .emptyList {
+  text-align: center;
+  opacity: 0.5;
+  cursor: default;
+}
+
 #resolutionConflictDialog .lowResolutionPartsList {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  border: 1px solid var(--mdc-theme-gc-selection-background);
   border-radius: 8px;
   padding: 8px;
 }
@@ -74,7 +79,7 @@
 
 #resolutionConflictDialog .collectionFeaturesVirtualized {
   width: 100%;
-  height: clamp(320px, 60vh, calc(100vh - 430px));
+  height: 75vh;
 }
 
 #resolutionConflictDialog .virtualizedFeatureRow {
@@ -84,7 +89,7 @@
   gap: 4px;
   padding: 0 24px;
   box-sizing: border-box;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid var(--mdc-theme-gc-selection-background);
 }
 
 #resolutionConflictDialog .virtualizedFeatureRow .featureContent {
@@ -133,9 +138,16 @@
 }
 
 #resolutionConflictDialog .leftPane {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   min-height: 0;
-  border: 1px solid rgba(255, 255, 255, 0.08);
   overflow: visible;
+}
+
+#resolutionConflictDialog .polygonPartsMap {
+  flex: 1;
+  min-height: 0;
 }
 
 #resolutionConflictDialog .map + .checkbox {

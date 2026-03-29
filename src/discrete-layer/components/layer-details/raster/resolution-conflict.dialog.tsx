@@ -20,6 +20,7 @@ import {
 import { AutoDirectionBox } from '../../../../common/components/auto-direction-box/auto-direction-box.component';
 import { Mode } from '../../../../common/models/mode.enum';
 import { EntityDescriptorModelType, useStore } from '../../../models';
+import { Curtain } from './curtain/curtain.component';
 import { GeoFeaturesPresentorComponent } from './pp-map';
 import { FeatureType } from './pp-map.utils';
 import { RasterWorkflowContext } from './state-machine/context';
@@ -60,15 +61,11 @@ export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> =
   );
 
   useEffect(() => {
-    if (!isOpen) {
-      return;
-    }
-
     const reportUrl = state.context.job?.validationReport?.report?.url;
 
     if (!reportUrl) {
       setLowResolutionCollections([]);
-      setLowResolutionPartsError('Missing validation report URL');
+      setLowResolutionPartsError(intl.formatMessage({ id: 'polygon-parts.error.missingUrl' }));
       return;
     }
 
@@ -121,8 +118,9 @@ export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> =
         }
       } catch (error) {
         if (!isCancelled) {
+          const errorMessage = (error as Error)?.message;
           setLowResolutionCollections([]);
-          setLowResolutionPartsError((error as Error)?.message ?? 'Failed to parse low resolution parts from report');
+          setLowResolutionPartsError(`${intl.formatMessage({ id: 'polygon-parts.error.fetchFailed' })}${errorMessage ? `: ${errorMessage}` : ''}`);
         }
       } finally {
         if (!isCancelled) {
@@ -160,29 +158,26 @@ export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> =
           <IconButton className="closeIcon mc-icon-Close" label="CLOSE" onClick={closeDialog} />
         </DialogTitle>
         <DialogContent className="dialogBody">
-          <UpdateLayerHeader
-            entityDescriptors={entityDescriptors}
-            layerRecord={state.context.updatedLayer}
-          />
           <Box className="content">
             <Box className="rightPane">
-              <Checkbox
-                className="lowResolutionPartsCheckbox"
-                label={intl.formatMessage({ id: 'polygon-parts.show-low-resolution-parts-on-map.label' })}
-                checked={showLowResolutionPolygonParts}
-                onClick={(evt: React.MouseEvent<HTMLInputElement>): void => {
-                  setShowLowResolutionPolygonParts(evt.currentTarget.checked);
-                }}
-              />
-              <Box className="lowResolutionPartsList">
+              <Box className="lowResolutionPartsList curtainContainer">
+                <Checkbox
+                  className="lowResolutionPartsCheckbox"
+                  label={intl.formatMessage({ id: 'polygon-parts.show-low-resolution-parts-on-map.label' })}
+                  checked={showLowResolutionPolygonParts}
+                  disabled={lowResolutionCollections.length === 0}
+                  onClick={(evt: React.MouseEvent<HTMLInputElement>): void => {
+                    setShowLowResolutionPolygonParts(evt.currentTarget.checked);
+                  }}
+                />
                 {isLoadingLowResolutionParts ? (
-                  <Typography tag="p">Loading shapefile...</Typography>
+                  <Curtain showProgress={true} />
                 ) : lowResolutionPartsError ? (
-                  <Typography className="error" tag="p">
-                    {lowResolutionPartsError}
-                  </Typography>
+                  <></>
                 ) : lowResolutionCollections.length === 0 ? (
-                  <Typography tag="p">No low resolution parts found</Typography>
+                  <Typography tag="p" className="emptyList">
+                    <FormattedMessage id="general.empty.text" />
+                  </Typography>
                 ) : (
                   lowResolutionCollections.map((collection, collectionIndex) => {
                     return (
@@ -246,22 +241,41 @@ export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> =
                 )}
               </Box>
               <Box className="actionsRow">
-                <Button raised type="button" onClick={approveDialog}>
+                <Button
+                  raised
+                  type="button"
+                  onClick={approveDialog}
+                  disabled={isLoadingLowResolutionParts || lowResolutionCollections.length === 0}
+                >
                   <FormattedMessage id="general.ok-btn.text" />
                 </Button>
-                <Button type="button" onClick={closeDialog}>
+                <Button
+                  type="button"
+                  onClick={closeDialog}
+                >
                   <FormattedMessage id="general.close-btn.text" />
                 </Button>
+                {lowResolutionPartsError && (
+                  <Typography className="error" tag="span">
+                    {lowResolutionPartsError}
+                  </Typography>
+                )}
               </Box>
             </Box>
             <Box className="leftPane">
-              <GeoFeaturesPresentorComponent
-                mode={Mode.UPDATE}
+              <UpdateLayerHeader
+                entityDescriptors={entityDescriptors}
                 layerRecord={state.context.updatedLayer}
-                enableFeaturePropertiesPopup={true}
-                geoFeatures={showLowResolutionPolygonParts ? lowResolutionFeatures : []}
-                style={{ height: '100%', minHeight: '300px' }}
               />
+              <Box className="polygonPartsMap">
+                <GeoFeaturesPresentorComponent
+                  mode={Mode.UPDATE}
+                  layerRecord={state.context.updatedLayer}
+                  enableFeaturePropertiesPopup={true}
+                  geoFeatures={showLowResolutionPolygonParts ? lowResolutionFeatures : []}
+                  style={{ height: '100%', minHeight: '300px' }}
+                />
+              </Box>
             </Box>
           </Box>
         </DialogContent>

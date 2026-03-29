@@ -231,8 +231,7 @@
   "polygon-parts.map-preview-legend.EXISTING_PP": "Existing polygon parts",
   "polygon-parts.map-preview-legend.LOW_RESOLUTION_PP": "Low resolution polygon parts",
   "polygon-parts.map-preview.zoom-before-fetch": "Zoom in to see the parts",
-
-  "polygon-parts.map-preview.no-feature-properties": "No properties available for this feature",
+  "polygon-parts.map-preview.no-feature-properties": "No properties available",
   "polygon-parts.map-preview.feature-property.id": "ID",
   "polygon-parts.map-preview.feature-property.partId": "Part ID",
   "polygon-parts.map-preview.feature-property.catalogId": "Catalog ID",
@@ -261,6 +260,8 @@
   "polygon-parts.map-preview.feature-property.e_res": "Error reason",
   "polygon-parts.map-preview.feature-property.calculatedArea": "Calculated area",
   "polygon-parts.map-preview.feature-property.featureType": "Feature type",
+  "polygon-parts.error.missingUrl": "Missing validation report URL",
+  "polygon-parts.error.fetchFailed": "Failed to fetch polygon parts",
 
   "field.actions.edit-draft": "Edit draft",
   "field.actions.more": "More options",

@@ -231,8 +231,7 @@
   "polygon-parts.map-preview-legend.EXISTING_PP": "חלקי תיחום הקיימים",
   "polygon-parts.map-preview-legend.LOW_RESOLUTION_PP": "חלקי תיחום עם רזולוציה נמוכה",
   "polygon-parts.map-preview.zoom-before-fetch": "התקרב כדי לראות את חלקי התיחום",
-
-  "polygon-parts.map-preview.no-feature-properties": "לפריט זה אין מאפיינים להצגה",
+  "polygon-parts.map-preview.no-feature-properties": "אין מאפיינים להצגה",
   "polygon-parts.map-preview.feature-property.id": "מזהה",
   "polygon-parts.map-preview.feature-property.partId": "מזהה חלק",
   "polygon-parts.map-preview.feature-property.catalogId": "מזהה קטלוגי",
@@ -261,6 +260,8 @@
   "polygon-parts.map-preview.feature-property.e_res": "סיבת שגיאה",
   "polygon-parts.map-preview.feature-property.calculatedArea": "שטח מחושב",
   "polygon-parts.map-preview.feature-property.featureType": "סוג פריט",
+  "polygon-parts.error.missingUrl": "חסר URL לדו\"ח ולידציה",
+  "polygon-parts.error.fetchFailed": "נכשל בטעינת חלקי תיחום",
 
   "field.actions.edit-draft": "ערוך טיוטה",
   "field.actions.more": "פעולות נוספות",

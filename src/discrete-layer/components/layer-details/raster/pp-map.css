@@ -28,17 +28,14 @@ body[dir='rtl'] #entityRasterDialog .map + .checkbox {
   min-width: 280px;
   max-width: 420px;
   max-height: 55%;
-  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   color: var(--mdc-theme-text-icon-on-dark);
   background-color: var(--mdc-theme-text-primary-on-light);
-  border: 1px solid rgba(255, 255, 255, 0.22);
+  border: 1px solid var(--mdc-theme-text-primary-on-light);
   border-radius: 6px;
   padding: 8px 10px 10px;
-}
-
-body[dir='rtl'] .featurePropertiesPopup {
-  left: unset;
-  right: 8px;
 }
 
 .featurePropertiesPopupHeader {
@@ -46,7 +43,7 @@ body[dir='rtl'] .featurePropertiesPopup {
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 1px solid var(--mdc-theme-gc-selection-background);
   padding-bottom: 6px;
   margin-bottom: 8px;
 }
@@ -60,6 +57,9 @@ body[dir='rtl'] .featurePropertiesPopup {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .featurePropertiesPopupRow {
