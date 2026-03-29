@@ -25,6 +25,7 @@ import {
   VectorSource,
 } from '@map-colonies/react-components';
 import { Checkbox, IconButton, Typography } from '@map-colonies/react-core';
+import { dateFormatter } from '../../../../common/helpers/formatters';
 import { Mode } from '../../../../common/models/mode.enum';
 import { MapLoadingIndicator } from '../../../../common/components/map/ol-map.loader';
 import { ILayerImage } from '../../../models/layerImage';
@@ -51,6 +52,8 @@ const MIN_FEATURES_NUMBER = 4; // minimal set of fetures (source, source_marker,
 const RENDERS_TILL_FULL_FEATURES_SET = 1; // first render with source, second with PPs perimeter geometry
 const NO_PROPERTIES_MESSAGE_KEY = '__noPropertiesMessage';
 const FEATURE_LABEL_KEY = 'featureLabel';
+const ISO_DATE_TIME_REGEX =
+  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:?\d{2})?$/;
 
 export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> = ({
   mode,
@@ -154,9 +157,28 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
     return geometryType === 'Polygon' || geometryType === 'MultiPolygon';
   };
 
-  const formatPropertyValue = (value: unknown): string => {
+  const formatPropertyValue = (value: unknown, key?: string): string => {
     if (value === undefined || value === null) {
       return '';
+    }
+
+    if (value instanceof Date) {
+      return dateFormatter(value, false);
+    }
+    if (typeof value === 'string') {
+      const isDateKey = key !== undefined && /(date|time|utc)/i.test(key);
+      const isIsoDateValue = ISO_DATE_TIME_REGEX.test(value.trim());
+      if ((isDateKey || isIsoDateValue) && !Number.isNaN(Date.parse(value))) {
+        return dateFormatter(value, false);
+      }
+      return value;
+    }
+    if (
+      typeof value === 'object' &&
+      'toISOString' in (value as Record<string, unknown>) &&
+      typeof (value as { toISOString?: unknown }).toISOString === 'function'
+    ) {
+      return dateFormatter(value as Date, false);
     }
 
     if (typeof value === 'object') {
@@ -416,7 +438,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
                 return (
                   <Box className="featurePropertiesPopupRow" key={key}>
                     <Typography className="featurePropertiesPopupValue" tag="span">
-                      {formatPropertyValue(value)}
+                      {formatPropertyValue(value, key)}
                     </Typography>
                   </Box>
                 );
@@ -428,7 +450,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
                     {formatPropertyKey(key)}
                   </Typography>
                   <Typography className="featurePropertiesPopupValue" tag="span">
-                    {formatPropertyValue(value)}
+                    {formatPropertyValue(value, key)}
                   </Typography>
                 </Box>
               );
