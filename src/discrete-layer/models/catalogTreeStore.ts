@@ -312,7 +312,6 @@ export const catalogTreeStore = ModelBase.props({
         const catalog = yield fetchAllCatalog(store, catalogFilter);
         return store.discreteLayersStore.setLayersImages(catalog, false);
       } catch (e) {
-        console.error('Error while fetching catalog:', e);
         setSearchError(e);
         resetCatalogTreeData();
         setIsDataLoading(false);

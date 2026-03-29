@@ -231,7 +231,7 @@ export const extractLayerImagesFromCswQueries = (
   let layersImages: ILayerImage[] = [];
 
   for (const cswQuerySearch of cswQueries) {
-    const cswCatalogs: CswCatalogsModelType = get(cswQuerySearch, 'search');
+    const cswCatalogs = cswQuerySearch.search;
     if (!cswCatalogs) {
       continue;
     }
@@ -262,26 +262,18 @@ const fetchCatalogsInParallel = async (
   numberOfRecordsMatched: number,
   pageSize: number,
   startIndex: number,
-  filter?: FilterField[]
+  filterFn: (type: RecordType) => FilterField[],
+  recordType: RecordType
 ) => {
-  let searchResultsQuery: Query<{ search: CswCatalogsModelType }>;
   const promises: Promise<{ search: CswCatalogsModelType }>[] = [];
 
   if (!pageSize || pageSize <= 0) {
     return Promise.resolve([]);
   }
 
-  for (let i = 0; i < numberOfRecordsMatched; i += pageSize) {
-    searchResultsQuery = store.querySearch({
-      opts: {
-        filter,
-      },
-      resultType: ResultType.RESULTS,
-      start: startIndex + i,
-      end: pageSize,
-    });
-
-    promises.push(searchResultsQuery.refetch());
+  for (let i = startIndex; i <= numberOfRecordsMatched; i += pageSize) {
+    const searchResultsQuery = createQueryAndFetch(store, recordType, i, pageSize, filterFn);
+    promises.push(searchResultsQuery);
   }
 
   return Promise.all(promises);
@@ -297,6 +289,7 @@ const domainToRecordTypeMap: Record<string, RecordType> = {
 const createQueryAndFetch = (
   store: IRootStore,
   type: RecordType,
+  start: number,
   pageSize: number,
   filterFn: (type: RecordType) => FilterField[]
 ) => {
@@ -304,7 +297,7 @@ const createQueryAndFetch = (
     .querySearch({
       opts: { filter: filterFn(type) },
       resultType: ResultType.RESULTS,
-      start: 1,
+      start,
       end: pageSize,
     })
     .refetch();
@@ -316,13 +309,14 @@ const buildCatalogsQueries = (
   pageSize: number,
   filterFn: (type: RecordType) => FilterField[]
 ): Promise<{ search: CswCatalogsModelType }>[] => {
+  const startIndex = 1;
   if (recordTypeToFetch === RecordType.RECORD_ALL) {
     return CONFIG.SERVED_ENTITY_TYPES.filter((type) => type !== RecordType.RECORD_ALL).map((type) =>
-      createQueryAndFetch(store, type as RecordType, pageSize, filterFn)
+      createQueryAndFetch(store, type as RecordType, startIndex, pageSize, filterFn)
     );
   }
 
-  return [createQueryAndFetch(store, recordTypeToFetch, pageSize, filterFn)];
+  return [createQueryAndFetch(store, recordTypeToFetch, startIndex, pageSize, filterFn)];
 };
 
 const buildRecordsPromises = (
@@ -352,7 +346,7 @@ const buildRecordsPromises = (
     }
 
     recordsPromises.push(
-      fetchCatalogsInParallel(store, total, pageSize, startIndex, filterFn(recordType))
+      fetchCatalogsInParallel(store, total, pageSize, startIndex, filterFn, recordType)
     );
   });
 
