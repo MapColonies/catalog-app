@@ -314,6 +314,9 @@ export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> =
                     setSelectedLowResolutionFeatureRequestId((current) => current + 1);
                     setSelectedLowResolutionFeatureKey(featureKey);
                   }}
+                  onFeaturePropertiesPopupClose={(): void => {
+                    setSelectedLowResolutionFeatureKey(undefined);
+                  }}
                 />
               </Box>
             </Box>

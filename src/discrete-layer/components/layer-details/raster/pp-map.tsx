@@ -49,6 +49,7 @@ interface GeoFeaturesPresentorProps {
   layerRecord?: ILayerImage | null;
   enableFeaturePropertiesPopup?: boolean;
   onMapFeatureClick?: (featureKey: string | undefined) => void;
+  onFeaturePropertiesPopupClose?: () => void;
 }
 
 const DEFAULT_PROJECTION = 'EPSG:4326';
@@ -95,12 +96,15 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   layerRecord,
   enableFeaturePropertiesPopup = false,
   onMapFeatureClick,
+  onFeaturePropertiesPopupClose,
 }) => {
   const store = useStore();
   const intl = useIntl();
   const renderCount = useRef(0);
   const existingPPFeaturesRef = useRef<Feature[]>([]);
   const showExistingPolygonPartsRef = useRef(false);
+  const lastHandledSelectedFeatureKeyRef = useRef<string | undefined>(undefined);
+  const lastHandledSelectedFeatureRequestIdRef = useRef<number | undefined>(undefined);
   const [showExistingPolygonParts, setShowExistingPolygonParts] = useState<boolean>(false);
   showExistingPolygonPartsRef.current = showExistingPolygonParts;
   const [selectedFeatureProperties, setSelectedFeatureProperties] = useState<
@@ -353,6 +357,8 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
 
     useEffect(() => {
       if (!selectedFeatureKey) {
+        lastHandledSelectedFeatureKeyRef.current = undefined;
+        lastHandledSelectedFeatureRequestIdRef.current = undefined;
         return;
       }
 
@@ -362,16 +368,24 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
         return;
       }
 
-      try {
-        const geometry = new GeoJSON().readGeometry(selectedFeature.geometry);
-        map.getView().fit(geometry.getExtent(), {
-          duration: 250,
-          maxZoom: 18,
-          padding: [32, 32, 32, 32],
-          ...fitOptions,
-        });
-      } catch {
-        return;
+      const shouldFitToSelectedFeature = selectedFeatureRequestId !== undefined
+        ? lastHandledSelectedFeatureRequestIdRef.current !== selectedFeatureRequestId
+        : lastHandledSelectedFeatureKeyRef.current !== selectedFeatureKey;
+
+      if (shouldFitToSelectedFeature) {
+        try {
+          const geometry = new GeoJSON().readGeometry(selectedFeature.geometry);
+          map.getView().fit(geometry.getExtent(), {
+            duration: 250,
+            maxZoom: 18,
+            padding: [32, 32, 32, 32],
+            ...fitOptions,
+          });
+          lastHandledSelectedFeatureKeyRef.current = selectedFeatureKey;
+          lastHandledSelectedFeatureRequestIdRef.current = selectedFeatureRequestId;
+        } catch {
+          return;
+        }
       }
 
       if (!enableFeaturePropertiesPopup) {
@@ -593,6 +607,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
               label="CLOSE"
               onClick={(): void => {
                 setSelectedFeatureProperties(undefined);
+                onFeaturePropertiesPopupClose?.();
               }}
             />
           </Box>
