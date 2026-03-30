@@ -79,6 +79,22 @@
   padding: 0 24px;
   box-sizing: border-box;
   border-bottom: 1px solid var(--mdc-theme-gc-selection-background);
+  cursor: pointer;
+  transition: background-color 120ms ease, box-shadow 120ms ease;
+}
+
+#resolutionConflictDialog .virtualizedFeatureRow:hover {
+  background-color: rgba(255, 127, 0, 0.08);
+}
+
+#resolutionConflictDialog .virtualizedFeatureRow.selected {
+  background-color: rgba(255, 127, 0, 0.18);
+  box-shadow: inset 4px 0 0 rgb(255, 127, 0);
+}
+
+#resolutionConflictDialog .virtualizedFeatureRow.selected .featureArea,
+#resolutionConflictDialog .virtualizedFeatureRow.selected .featureId {
+  opacity: 0.9;
 }
 
 #resolutionConflictDialog .virtualizedFeatureRow .featureContent {

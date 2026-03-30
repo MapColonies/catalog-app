@@ -5,7 +5,8 @@ import { get, isEmpty } from 'lodash';
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
 import { point } from '@turf/helpers';
 import { FitOptions } from 'ol/View';
-import { Style } from 'ol/style';
+import GeoJSON from 'ol/format/GeoJSON';
+import { Fill, Stroke, Style } from 'ol/style';
 import MapBrowserEvent from 'ol/MapBrowserEvent';
 import {
   Box,
@@ -42,10 +43,12 @@ interface GeoFeaturesPresentorProps {
   style?: CSSProperties | undefined;
   fitOptions?: FitOptions | undefined;
   selectedFeatureKey?: string;
+  selectedFeatureRequestId?: number;
   selectionStyle?: Style;
   showExistingPolygonParts?: boolean;
   layerRecord?: ILayerImage | null;
   enableFeaturePropertiesPopup?: boolean;
+  onMapFeatureClick?: (featureKey: string | undefined) => void;
 }
 
 const DEFAULT_PROJECTION = 'EPSG:4326';
@@ -67,21 +70,39 @@ const LowResolutionLayerOrder: React.FC = () => {
   return null;
 };
 
+const getHighlightedStyle = (baseStyle: Style | undefined, fallbackColor = 'rgb(255, 127, 0)'): Style => {
+  return new Style({
+    stroke: new Stroke({
+      color: baseStyle?.getStroke()?.getColor() ?? fallbackColor,
+      width: 5,
+    }),
+    fill: new Fill({
+      color: baseStyle?.getFill()?.getColor() ?? 'rgba(255, 127, 0, 0.4)',
+    }),
+    image: baseStyle?.getImage() ?? undefined,
+    text: baseStyle?.getText() ?? undefined,
+  });
+};
+
 export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> = ({
   mode,
   geoFeatures,
   style,
   fitOptions,
   selectedFeatureKey,
+  selectedFeatureRequestId,
   selectionStyle,
   layerRecord,
   enableFeaturePropertiesPopup = false,
+  onMapFeatureClick,
 }) => {
   const store = useStore();
   const intl = useIntl();
   const renderCount = useRef(0);
   const existingPPFeaturesRef = useRef<Feature[]>([]);
+  const showExistingPolygonPartsRef = useRef(false);
   const [showExistingPolygonParts, setShowExistingPolygonParts] = useState<boolean>(false);
+  showExistingPolygonPartsRef.current = showExistingPolygonParts;
   const [selectedFeatureProperties, setSelectedFeatureProperties] = useState<
     Record<string, unknown> | undefined
   >();
@@ -89,7 +110,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   const getClickedFeatureProperties = (coordinate: number[]): Record<string, unknown> | undefined => {
     const allFeatures = [
       ...(geoFeatures ?? []),
-      ...existingPPFeaturesRef.current,
+      ...(showExistingPolygonPartsRef.current ? existingPPFeaturesRef.current : []),
     ];
 
     if (allFeatures.length === 0) {
@@ -311,7 +332,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
           let featureStyle = PPMapStyles.get(feat?.properties?.featureType);
 
           if (selectedFeatureKey && feat?.properties?.key === selectedFeatureKey) {
-            featureStyle = selectionStyle;
+            featureStyle = selectionStyle ?? getHighlightedStyle(featureStyle);
           }
 
           return feat && !isEmpty(feat.geometry) ? (
@@ -327,6 +348,52 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
     );
   };
 
+  const FeatureSelectionHandler: React.FC = () => {
+    const map = useMap();
+
+    useEffect(() => {
+      if (!selectedFeatureKey) {
+        return;
+      }
+
+      const selectedFeature = geoFeatures?.find((feature) => feature?.properties?.key === selectedFeatureKey);
+
+      if (!selectedFeature?.geometry) {
+        return;
+      }
+
+      try {
+        const geometry = new GeoJSON().readGeometry(selectedFeature.geometry);
+        map.getView().fit(geometry.getExtent(), {
+          duration: 250,
+          maxZoom: 18,
+          padding: [32, 32, 32, 32],
+          ...fitOptions,
+        });
+      } catch {
+        return;
+      }
+
+      if (!enableFeaturePropertiesPopup) {
+        return;
+      }
+
+      const properties = selectedFeature.properties as Record<string, unknown> | null | undefined;
+      if (properties && Object.keys(properties).length > 0) {
+        setSelectedFeatureProperties(properties);
+        return;
+      }
+
+      setSelectedFeatureProperties({
+        [NO_PROPERTIES_MESSAGE_KEY]: intl.formatMessage({
+          id: 'polygon-parts.map-preview.no-feature-properties',
+        }),
+      });
+    }, [map, geoFeatures, selectedFeatureKey, selectedFeatureRequestId, fitOptions, enableFeaturePropertiesPopup]);
+
+    return null;
+  };
+
   const MapFeatureClickHandler: React.FC = () => {
     const map = useMap();
 
@@ -339,6 +406,8 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
       const onSingleClick = (event: MapBrowserEvent<UIEvent>): void => {
         let clickedProperties: Record<string, unknown> | undefined;
         let clickedPolygonWithoutProperties = false;
+        let clickedFeatureKey: string | undefined;
+        let clickedExistingFeature = false;
 
         map.forEachFeatureAtPixel(
           event.pixel,
@@ -346,10 +415,47 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
             const featureProperties = getClickedOlFeatureProperties(feature);
             if (featureProperties) {
               clickedProperties = featureProperties;
+              clickedFeatureKey = featureProperties.key as string | undefined;
               return feature;
             }
 
             if (isOlPolygonFeature(feature)) {
+              // Geometry-only OL feature (no attached properties) — likely an existing green feature.
+              // Only search the existing features ref when the existing PP layer is visible.
+              if (showExistingPolygonPartsRef.current) {
+                // Do a turf lookup to find its GeoJSON counterpart and stop iteration
+                // before it falls through to the orange low-resolution feature below it.
+                const clickedPoint = point(event.coordinate as [number, number]);
+                const matchingExisting = existingPPFeaturesRef.current.find((f) => {
+                  if (!f?.geometry) {
+                    return false;
+                  }
+                  const gType = f.geometry.type;
+                  if (gType !== 'Polygon' && gType !== 'MultiPolygon') {
+                    return false;
+                  }
+                  try {
+                    return booleanPointInPolygon(clickedPoint, f as Feature<Polygon | MultiPolygon>);
+                  } catch {
+                    return false;
+                  }
+                });
+
+                if (matchingExisting) {
+                  clickedExistingFeature = true;
+                  if (matchingExisting.properties && Object.keys(matchingExisting.properties).length > 0) {
+                    clickedProperties = matchingExisting.properties as Record<string, unknown>;
+                  } else {
+                    clickedProperties = {
+                      [NO_PROPERTIES_MESSAGE_KEY]: intl.formatMessage({
+                        id: 'polygon-parts.map-preview.no-feature-properties',
+                      }),
+                    };
+                  }
+                  return feature; // stop iteration — do not continue to orange features
+                }
+              }
+
               clickedPolygonWithoutProperties = true;
             }
 
@@ -360,11 +466,57 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
 
         if (clickedProperties) {
           setSelectedFeatureProperties(clickedProperties);
+          if (clickedExistingFeature) {
+            // Green existing feature was clicked — clear any orange list selection
+            onMapFeatureClick?.(undefined);
+          } else if (clickedFeatureKey) {
+            onMapFeatureClick?.(clickedFeatureKey);
+          }
           return;
         }
 
         const fallbackProperties = getClickedFeatureProperties(event.coordinate);
         if (fallbackProperties) {
+          // Determine whether the hit feature belongs to the list (orange) or existing (green)
+          const clickedPoint = point(event.coordinate as [number, number]);
+          const isExistingFallback = showExistingPolygonPartsRef.current && existingPPFeaturesRef.current.some((f) => {
+            if (!f?.geometry) {
+              return false;
+            }
+            const gType = f.geometry.type;
+            if (gType !== 'Polygon' && gType !== 'MultiPolygon') {
+              return false;
+            }
+            try {
+              return booleanPointInPolygon(clickedPoint, f as Feature<Polygon | MultiPolygon>);
+            } catch {
+              return false;
+            }
+          });
+
+          if (isExistingFallback) {
+            onMapFeatureClick?.(undefined);
+          } else {
+            const orangeFeature = (geoFeatures ?? []).find((f) => {
+              if (!f?.geometry) {
+                return false;
+              }
+              const gType = f.geometry.type;
+              if (gType !== 'Polygon' && gType !== 'MultiPolygon') {
+                return false;
+              }
+              try {
+                return booleanPointInPolygon(clickedPoint, f as Feature<Polygon | MultiPolygon>);
+              } catch {
+                return false;
+              }
+            });
+            const fallbackFeatureKey = orangeFeature?.properties?.key as string | undefined;
+            if (fallbackFeatureKey) {
+              onMapFeatureClick?.(fallbackFeatureKey);
+            }
+          }
+
           setSelectedFeatureProperties(fallbackProperties);
           return;
         }
@@ -383,7 +535,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
       return (): void => {
         map.un('singleclick', onSingleClick);
       };
-    }, [map, enableFeaturePropertiesPopup, geoFeatures]);
+    }, [map, enableFeaturePropertiesPopup, geoFeatures, onMapFeatureClick]);
 
     return null;
   };
@@ -395,6 +547,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
       <Map>
         <MapLoadingIndicator />
         <MapFeatureClickHandler />
+        <FeatureSelectionHandler />
         {mode === Mode.UPDATE && (
           <Box className="checkbox">
             <Checkbox

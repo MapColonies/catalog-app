@@ -50,6 +50,8 @@ export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> =
   const entityDescriptors = store.discreteLayersStore.entityDescriptors as EntityDescriptorModelType[];
   const state = RasterWorkflowContext.useSelector((s) => s);
   const [showLowResolutionPolygonParts, setShowLowResolutionPolygonParts] = useState(false);
+  const [selectedLowResolutionFeatureKey, setSelectedLowResolutionFeatureKey] = useState<string>();
+  const [selectedLowResolutionFeatureRequestId, setSelectedLowResolutionFeatureRequestId] = useState(0);
   const [isLoadingLowResolutionParts, setIsLoadingLowResolutionParts] = useState(false);
   const [lowResolutionPartsError, setLowResolutionPartsError] = useState<string | undefined>();
   const [lowResolutionCollections, setLowResolutionCollections] = useState<ParsedFeatureCollection[]>([]);
@@ -65,6 +67,7 @@ export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> =
 
     if (!reportUrl) {
       setLowResolutionCollections([]);
+      setSelectedLowResolutionFeatureKey(undefined);
       setLowResolutionPartsError(intl.formatMessage({ id: 'resolutionConflict.error.missingUrl' }));
       return;
     }
@@ -83,6 +86,7 @@ export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> =
 
         const normalized: ParsedFeatureCollection[] = collections.map((collection, index) => {
           const features = ((collection.features as Feature[]) ?? []).map((feature, featureIndex) => {
+            const featureKey = `${index}-${featureIndex}`;
             const calculatedArea = (() => {
               try {
                 return area(feature);
@@ -100,6 +104,7 @@ export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> =
               ...feature,
               properties: {
                 ...(feature.properties ?? {}),
+                key: featureKey,
                 calculatedArea,
                 featureLabel,
                 featureType: FeatureType.LOW_RESOLUTION_PP,
@@ -118,11 +123,13 @@ export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> =
 
         if (!isCancelled) {
           setLowResolutionCollections(normalized);
+          setSelectedLowResolutionFeatureKey(undefined);
         }
       } catch (error) {
         if (!isCancelled) {
           const errorMessage = (error as Error)?.message;
           setLowResolutionCollections([]);
+          setSelectedLowResolutionFeatureKey(undefined);
           setLowResolutionPartsError(`${intl.formatMessage({ id: 'resolutionConflict.error.fetchFailed' })}${errorMessage ? `: ${errorMessage}` : ''}`);
         }
       } finally {
@@ -218,8 +225,21 @@ export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> =
                                       );
                                     const calculatedArea =(feature.properties?.calculatedArea as number | undefined) ?? 0;
                                     const featureId = (feature.properties?.id as string | undefined) ?? '';
+                                    const featureKey = feature.properties?.key as string | undefined;
+                                    const isSelected = featureKey === selectedLowResolutionFeatureKey;
                                     return (
-                                      <Box className="virtualizedFeatureRow" key={key} style={style}>
+                                      <Box
+                                        className={`virtualizedFeatureRow${isSelected ? ' selected' : ''}`}
+                                        key={key}
+                                        style={style}
+                                        onClick={(): void => {
+                                          setShowLowResolutionPolygonParts(true);
+                                          setSelectedLowResolutionFeatureRequestId((current) => current + 1);
+                                          if (featureKey) {
+                                            setSelectedLowResolutionFeatureKey(featureKey);
+                                          }
+                                        }}
+                                      >
                                         <Box className="featureContent">
                                           <Box className="featureTitleRow">
                                             <Typography className="featureLabel" tag="span">
@@ -281,7 +301,19 @@ export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> =
                   layerRecord={state.context.updatedLayer}
                   enableFeaturePropertiesPopup={true}
                   geoFeatures={showLowResolutionPolygonParts ? lowResolutionFeatures : []}
+                  selectedFeatureKey={selectedLowResolutionFeatureKey}
+                  selectedFeatureRequestId={selectedLowResolutionFeatureRequestId}
                   style={{ height: '100%', minHeight: '300px' }}
+                  onMapFeatureClick={(featureKey) => {
+                    if (featureKey === undefined) {
+                      // An existing (green) feature was clicked — clear list selection
+                      setSelectedLowResolutionFeatureKey(undefined);
+                      return;
+                    }
+                    setShowLowResolutionPolygonParts(true);
+                    setSelectedLowResolutionFeatureRequestId((current) => current + 1);
+                    setSelectedLowResolutionFeatureKey(featureKey);
+                  }}
                 />
               </Box>
             </Box>
