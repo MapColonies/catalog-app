@@ -156,10 +156,10 @@ export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> =
     onSetIsOpen(false);
   };
 
-  const approveDialog = (): void => {
-    onApprove?.();
-    closeDialog();
-  };
+  // const approveDialog = (): void => {
+  //   onApprove?.();
+  //   closeDialog();
+  // };
 
   const formatArea = (areaSquareMeters: number): string => {
     const areaSquareKilometers = areaSquareMeters / 1_000_000;
@@ -199,6 +199,7 @@ export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> =
                     return (
                       <CollapsibleList
                         key={`${collection.name}-${collectionIndex}`}
+                        open={collectionIndex === 0}
                         handle={
                           <SimpleListItem
                             text={`${collection.name} (${collection.features.length})`}
@@ -270,14 +271,14 @@ export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> =
                 )}
               </Box>
               <Box className="actionsRow">
-                <Button
+                {/* <Button
                   raised
                   type="button"
                   onClick={approveDialog}
                   disabled={isLoadingLowResolutionParts || lowResolutionCollections.length === 0}
                 >
                   <FormattedMessage id="general.ok-btn.text" />
-                </Button>
+                </Button> */}
                 <Button
                   type="button"
                   onClick={closeDialog}

@@ -32,8 +32,9 @@ import { Mode } from '../../../../common/models/mode.enum';
 import { MapLoadingIndicator } from '../../../../common/components/map/ol-map.loader';
 import { ILayerImage } from '../../../models/layerImage';
 import { useStore } from '../../../models/RootStore';
+import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
 import { PolygonPartsVectorLayer as PolygonPartsExtentVectorLayer } from './pp-extent-vector-layer';
-import { FeatureType, PPMapStyles } from './pp-map.utils';
+import { FEATURE_LABEL_CONFIG, FeatureType, getText, PPMapStyles } from './pp-map.utils';
 
 import './pp-map.css';
 
@@ -71,14 +72,14 @@ const LowResolutionLayerOrder: React.FC = () => {
   return null;
 };
 
-const getHighlightedStyle = (baseStyle: Style | undefined, fallbackColor = 'rgb(255, 127, 0)'): Style => {
+const getHighlightedStyle = (baseStyle: Style | undefined, fallbackColor = '#ff7f00'): Style => {
   return new Style({
     stroke: new Stroke({
       color: baseStyle?.getStroke()?.getColor() ?? fallbackColor,
       width: 5,
     }),
     fill: new Fill({
-      color: baseStyle?.getFill()?.getColor() ?? 'rgba(255, 127, 0, 0.4)',
+      color: baseStyle?.getFill()?.getColor() ?? '#ff7f0066',
     }),
     image: baseStyle?.getImage() ?? undefined,
     text: baseStyle?.getText() ?? undefined,
@@ -100,6 +101,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
 }) => {
   const store = useStore();
   const intl = useIntl();
+  const ZOOM_LEVELS_TABLE = useZoomLevelsTable();
   const renderCount = useRef(0);
   const existingPPFeaturesRef = useRef<Feature[]>([]);
   const showExistingPolygonPartsRef = useRef(false);
@@ -237,6 +239,24 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
     );
   };
 
+  const addExistingFeatureLabelToProperties = (
+    properties: Record<string, unknown>,
+    existingFeature: Feature
+  ): Record<string, unknown> => {
+    const existingLabel = getText(
+      existingFeature,
+      4,
+      FEATURE_LABEL_CONFIG.polygons,
+      ZOOM_LEVELS_TABLE,
+      intl.formatMessage({ id: 'polygon-parts.map-preview.zoom-before-fetch' })
+    );
+
+    return {
+      ...properties,
+      [FEATURE_LABEL_KEY]: existingLabel,
+    };
+  };
+
   useEffect(() => {
     const definedElements = geoFeatures?.filter((feat) => feat !== undefined);
     if (definedElements?.length === 0) {
@@ -351,8 +371,8 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
                 textAlign: 'center',
                 textBaseline: 'middle',
                 font: 'bold 10px/1 Roboto',
-                fill: new Fill({ color: 'rgb(255, 127, 0)' }),
-                stroke: new Stroke({ color: '#000', width: 1 }),
+                fill: new Fill({ color: '#ff7f00' }),
+                stroke: new Stroke({ color: '#000', width: 3 }),
                 placement: 'point',
                 overflow: true,
               }),
@@ -485,13 +505,16 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
                   clickedExistingFeature = true;
                   setSelectedExistingFeature(matchingExisting);
                   if (matchingExisting.properties && Object.keys(matchingExisting.properties).length > 0) {
-                    clickedProperties = matchingExisting.properties as Record<string, unknown>;
+                    clickedProperties = addExistingFeatureLabelToProperties(
+                      matchingExisting.properties as Record<string, unknown>,
+                      matchingExisting
+                    );
                   } else {
-                    clickedProperties = {
+                    clickedProperties = addExistingFeatureLabelToProperties({
                       [NO_PROPERTIES_MESSAGE_KEY]: intl.formatMessage({
                         id: 'polygon-parts.map-preview.no-feature-properties',
                       }),
-                    };
+                    }, matchingExisting);
                   }
                   return feature; // stop iteration — do not continue to orange features
                 }
@@ -539,6 +562,10 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
           if (matchingExistingFallback) {
             setSelectedExistingFeature(matchingExistingFallback);
             onMapFeatureClick?.(undefined);
+            setSelectedFeatureProperties(
+              addExistingFeatureLabelToProperties(fallbackProperties, matchingExistingFallback)
+            );
+            return;
           } else {
             setSelectedExistingFeature(undefined);
             const orangeFeature = (geoFeatures ?? []).find((f) => {

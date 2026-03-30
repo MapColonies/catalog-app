@@ -71,10 +71,10 @@ export const PPMapStyles = new Map<FeatureType, Style | undefined>([
     new Style({
       stroke: new Stroke({
         width: 2,
-        color: 'rgb(255, 127, 0)',
+        color: '#ff7f00',
       }),
       fill: new Fill({
-        color: 'rgba(255, 127, 0, 0.4)',
+        color: '#ff7f0066',
       }),
     }),
   ],

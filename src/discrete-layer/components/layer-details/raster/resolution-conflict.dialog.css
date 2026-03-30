@@ -84,12 +84,12 @@
 }
 
 #resolutionConflictDialog .virtualizedFeatureRow:hover {
-  background-color: rgba(255, 127, 0, 0.08);
+  background-color: #ff7f0014;
 }
 
 #resolutionConflictDialog .virtualizedFeatureRow.selected {
-  background-color: rgba(255, 127, 0, 0.18);
-  box-shadow: inset 4px 0 0 rgb(255, 127, 0);
+  background-color: #ff7f002e;
+  box-shadow: inset 4px 0 0 #ff7f00;
 }
 
 #resolutionConflictDialog .virtualizedFeatureRow.selected .featureArea,
