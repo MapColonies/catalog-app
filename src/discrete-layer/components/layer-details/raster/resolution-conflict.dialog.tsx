@@ -107,6 +107,7 @@ export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> =
                 key: featureKey,
                 calculatedArea,
                 featureLabel,
+                zoomLevel: resolutionDegreeToZoomLevel[state.context.job?.details?.parameters?.ingestionResolution as string],
                 featureType: FeatureType.LOW_RESOLUTION_PP,
               },
             } as Feature;

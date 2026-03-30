@@ -6,7 +6,7 @@ import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
 import { point } from '@turf/helpers';
 import { FitOptions } from 'ol/View';
 import GeoJSON from 'ol/format/GeoJSON';
-import { Fill, Stroke, Style } from 'ol/style';
+import { Fill, Stroke, Style, Text } from 'ol/style';
 import MapBrowserEvent from 'ol/MapBrowserEvent';
 import {
   Box,
@@ -33,7 +33,7 @@ import { MapLoadingIndicator } from '../../../../common/components/map/ol-map.lo
 import { ILayerImage } from '../../../models/layerImage';
 import { useStore } from '../../../models/RootStore';
 import { PolygonPartsVectorLayer as PolygonPartsExtentVectorLayer } from './pp-extent-vector-layer';
-import { PPMapStyles } from './pp-map.utils';
+import { FeatureType, PPMapStyles } from './pp-map.utils';
 
 import './pp-map.css';
 
@@ -335,6 +335,29 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
       <>
         {geoFeatures?.map((feat, idx) => {
           let featureStyle = PPMapStyles.get(feat?.properties?.featureType);
+
+          if (feat?.properties?.featureType === FeatureType.LOW_RESOLUTION_PP) {
+            const featureLabel = feat.properties?.featureLabel as string | undefined;
+            const zoomLevel = feat.properties?.zoomLevel;
+            const labelParts: string[] = [];
+            if (featureLabel) labelParts.push(featureLabel);
+            if (zoomLevel !== undefined && zoomLevel !== null) labelParts.push(`(${String(zoomLevel)})`);
+
+            featureStyle = new Style({
+              stroke: featureStyle?.getStroke(),
+              fill: featureStyle?.getFill(),
+              text: new Text({
+                text: labelParts.join('\n'),
+                textAlign: 'center',
+                textBaseline: 'middle',
+                font: 'bold 10px/1 Roboto',
+                fill: new Fill({ color: 'rgb(255, 127, 0)' }),
+                stroke: new Stroke({ color: '#000', width: 1 }),
+                placement: 'point',
+                overflow: true,
+              }),
+            });
+          }
 
           if (selectedFeatureKey && feat?.properties?.key === selectedFeatureKey) {
             featureStyle = selectionStyle ?? getHighlightedStyle(featureStyle);
