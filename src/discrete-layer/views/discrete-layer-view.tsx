@@ -75,7 +75,7 @@ import { SystemCoreInfoDialog } from '../components/system-status/system-core-in
 import { JobModelType, LayerMetadataMixedUnion, LinkModelType, RecordType } from '../models';
 import { IDispatchAction } from '../models/actionDispatcherStore';
 import { ILayerImage } from '../models/layerImage';
-import { useQuery, useStore } from '../models/RootStore';
+import { useStore } from '../models/RootStore';
 import { FilterField } from '../models/RootStore.base';
 import { UserAction, UserRole } from '../models/userStore';
 import { ActionResolver } from './components/action-resolver.component';
@@ -123,8 +123,8 @@ const noDrawing: IDrawingObject = {
 const getTimeStamp = (): string => new Date().getTime().toString();
 
 const DiscreteLayerView: React.FC = observer(() => {
-  // eslint-disable-next-line
-  const { loading: searchLoading, error: searchError, data, query, setQuery } = useQuery();
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [data, setData] = useState<LayerMetadataMixedUnion[] | undefined>();
   const store = useStore();
   const theme = useTheme();
   const intl = useIntl();
@@ -198,12 +198,12 @@ const DiscreteLayerView: React.FC = observer(() => {
   }, []);
 
   useEffect(() => {
-    const layers = get(data, 'search', []) as ILayerImage[];
-
-    if (activeTabView === TabViews.SEARCH_RESULTS) {
-      store.discreteLayersStore.setLayersImages([...layers], false);
-    } else {
-      store.discreteLayersStore.setTabviewData(TabViews.SEARCH_RESULTS, layers);
+    if (data) {
+      if (activeTabView === TabViews.SEARCH_RESULTS) {
+        store.discreteLayersStore.setLayersImages([...data], false);
+      } else {
+        store.discreteLayersStore.setTabviewData(TabViews.SEARCH_RESULTS, data);
+      }
     }
   }, [data]);
 
@@ -219,14 +219,12 @@ const DiscreteLayerView: React.FC = observer(() => {
     }
 
     if (!isEmpty(data) && !isEmpty(fullCatalogLayers)) {
-      const searchLayers = get(data, 'search', []) as ILayerImage[];
-
       /**
        * There could be a case where the catalog includes outdated data (New layers has bee added).
        * Search results will always be updated each time new filter is applied.
        * As a workaround we add the delta layers to the capabilities search to update the capabilities state with the added layers.
        */
-      searchLayers.forEach((layer) => {
+      data?.forEach((layer) => {
         const isNewLayer = !fullCatalogLayers?.some((catalogLayer) => catalogLayer.id === layer.id);
         if (isNewLayer) {
           fullCatalogLayers?.push(layer);
@@ -236,10 +234,6 @@ const DiscreteLayerView: React.FC = observer(() => {
 
     void store.catalogTreeStore.capabilitiesFetch(fullCatalogLayers);
   }, [data]);
-
-  useEffect(() => {
-    setSearchResultsError(searchError);
-  }, [searchError]);
 
   useEffect(() => {
     /**
@@ -333,7 +327,7 @@ const DiscreteLayerView: React.FC = observer(() => {
     }
   };
 
-  const buildFilters = (): FilterField[] => {
+  const buildFilters = (recordType: RecordType): FilterField[] => {
     const coordinates = (store.discreteLayersStore.searchParams.geojson as Polygon)?.coordinates[0];
 
     const boundingBoxFilter = coordinates
@@ -354,7 +348,7 @@ const DiscreteLayerView: React.FC = observer(() => {
       ...boundingBoxFilter,
       {
         field: 'mc:type',
-        eq: store.discreteLayersStore.searchParams.recordType,
+        eq: recordType,
       },
       ...store.discreteLayersStore.searchParams.catalogFilters,
     ];
@@ -365,21 +359,22 @@ const DiscreteLayerView: React.FC = observer(() => {
     store.discreteLayersStore.resetPolygonParts();
   }, [store.discreteLayersStore.searchParams.recordType]);
 
+  const fetchCatalog = async () => {
+    try {
+      setSearchLoading(true);
+      const catalog = await store.discreteLayersStore.fetchAllCatalog(buildFilters);
+      setData(catalog);
+      setSearchLoading(false);
+    } catch (error: any) {
+      setSearchLoading(false);
+      setSearchResultsError(error);
+    }
+  };
+
   useEffect(() => {
     if (activeTabView === TabViews.SEARCH_RESULTS) {
       void store.discreteLayersStore.clearLayersImages();
-
-      // TODO: build query params: FILTERS and SORTS
-      const filters = buildFilters();
-      setQuery(
-        store.querySearch({
-          opts: {
-            filter: filters,
-          },
-          end: CONFIG.RUNNING_MODE.END_RECORD,
-          start: CONFIG.RUNNING_MODE.START_RECORD,
-        })
-      );
+      fetchCatalog();
     }
   }, [
     store.discreteLayersStore.searchParams.geojson,
@@ -390,18 +385,12 @@ const DiscreteLayerView: React.FC = observer(() => {
     const hasFiltersEnabled =
       store.discreteLayersStore.searchParams.catalogFilters.length > START_IDX ||
       store.discreteLayersStore.searchParams.geojson;
-    if (hasFiltersEnabled) {
-      const filters = buildFilters();
-      setQuery(
-        store.querySearch({
-          opts: {
-            filter: filters,
-          },
-          end: CONFIG.RUNNING_MODE.END_RECORD,
-          start: CONFIG.RUNNING_MODE.START_RECORD,
-        })
-      );
+
+    if (!hasFiltersEnabled) {
+      return;
     }
+
+    fetchCatalog();
   }, [store.discreteLayersStore.searchParams.recordType]);
 
   const handlePolygonSelected = (geometry: Geometry): void => {

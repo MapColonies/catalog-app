@@ -126,6 +126,7 @@ env:
   runningMode:
     type: PRODUCTION
     autoComplete: false
+    cswDefaultPageSize: 200
   export:
     defaultZoomLevel: '' #todo
     maxZoomLevel: '' #todo
