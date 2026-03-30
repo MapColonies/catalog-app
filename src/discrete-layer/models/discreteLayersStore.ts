@@ -564,9 +564,9 @@ export const discreteLayersStore = ModelBase
       return store
         .querySearch({
           opts: { filter: filterFn(type) },
-          resultType: ResultType.RESULTS,
           start,
           end: pageSize,
+          resultType: ResultType.RESULTS
         })
         .refetch();
     };

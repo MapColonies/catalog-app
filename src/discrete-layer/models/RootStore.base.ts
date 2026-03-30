@@ -522,8 +522,8 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
         ${typeof resultSelector === "function" ? resultSelector(new CapabilityModelSelector()).toString() : resultSelector}
       } }`, variables, options)
     },
-    querySearch(variables: { opts?: SearchOptions, end?: number, start?: number, resultType?: ResultType }, resultSelector: string | ((qb: CswCatalogsModelSelector) => CswCatalogsModelSelector) = cswCatalogsModelPrimitives.toString(), options: QueryOptions = {}) {
-      return self.query<{ search: CswCatalogsModelType}>(`query search($opts: SearchOptions, $end: Float, $start: Float, $resultType: ResultType) { search(opts: $opts, end: $end, start: $start, resultType: $resultType) {
+    querySearch(variables: { resultType?: ResultType, end?: number, start?: number, opts?: SearchOptions }, resultSelector: string | ((qb: CswCatalogsModelSelector) => CswCatalogsModelSelector) = cswCatalogsModelPrimitives.toString(), options: QueryOptions = {}) {
+      return self.query<{ search: CswCatalogsModelType}>(`query search($resultType: ResultType, $end: Float, $start: Float, $opts: SearchOptions) { search(resultType: $resultType, end: $end, start: $start, opts: $opts) {
         ${typeof resultSelector === "function" ? resultSelector(new CswCatalogsModelSelector()).toString() : resultSelector}
       } }`, variables, options)
     },
