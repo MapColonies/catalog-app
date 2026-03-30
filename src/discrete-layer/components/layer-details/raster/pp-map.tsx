@@ -257,6 +257,31 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
     };
   };
 
+  const addLowResolutionFeatureLabelToProperties = (
+    properties: Record<string, unknown>
+  ): Record<string, unknown> => {
+    if (properties.featureType !== FeatureType.LOW_RESOLUTION_PP) {
+      return properties;
+    }
+
+    const featureLabel = properties.featureLabel as string | undefined;
+    const zoomLevel = properties.zoomLevel;
+    const labelParts: string[] = [];
+
+    if (featureLabel) {
+      labelParts.push(featureLabel);
+    }
+
+    if (zoomLevel !== undefined && zoomLevel !== null) {
+      labelParts.push(`(${String(zoomLevel)})`);
+    }
+
+    return {
+      ...properties,
+      [FEATURE_LABEL_KEY]: labelParts.join(' '),
+    };
+  };
+
   useEffect(() => {
     const definedElements = geoFeatures?.filter((feat) => feat !== undefined);
     if (definedElements?.length === 0) {
@@ -360,8 +385,8 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
             const featureLabel = feat.properties?.featureLabel as string | undefined;
             const zoomLevel = feat.properties?.zoomLevel;
             const labelParts: string[] = [];
-            if (featureLabel) labelParts.push(featureLabel);
-            if (zoomLevel !== undefined && zoomLevel !== null) labelParts.push(`(${String(zoomLevel)})`);
+            if (featureLabel) { labelParts.push(featureLabel); }
+            if (zoomLevel !== undefined && zoomLevel !== null) { labelParts.push(`(${String(zoomLevel)})`); }
 
             featureStyle = new Style({
               stroke: featureStyle?.getStroke(),
@@ -440,7 +465,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
 
       const properties = selectedFeature.properties as Record<string, unknown> | null | undefined;
       if (properties && Object.keys(properties).length > 0) {
-        setSelectedFeatureProperties(properties);
+        setSelectedFeatureProperties(addLowResolutionFeatureLabelToProperties(properties));
         return;
       }
 
@@ -529,7 +554,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
         );
 
         if (clickedProperties) {
-          setSelectedFeatureProperties(clickedProperties);
+          setSelectedFeatureProperties(addLowResolutionFeatureLabelToProperties(clickedProperties));
           if (clickedExistingFeature) {
             // Green existing feature was clicked — clear any orange list selection
             onMapFeatureClick?.(undefined);
@@ -588,7 +613,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
             }
           }
 
-          setSelectedFeatureProperties(fallbackProperties);
+          setSelectedFeatureProperties(addLowResolutionFeatureLabelToProperties(fallbackProperties));
           return;
         }
 
@@ -612,6 +637,30 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   };
 
   const featureLabelValue = selectedFeatureProperties?.[FEATURE_LABEL_KEY];
+
+  const featureTitleColor = useMemo(() => {
+    const toCssColor = (color: unknown): string | undefined => {
+      if (typeof color === 'string') {
+        return color;
+      }
+
+      if (Array.isArray(color)) {
+        return color.length === 4 ? `rgba(${color.join(',')})` : `rgb(${color.join(',')})`;
+      }
+
+      return undefined;
+    };
+
+    if (selectedExistingFeature) {
+      return toCssColor(PPMapStyles.get(FeatureType.EXISTING_PP)?.getStroke()?.getColor());
+    }
+
+    if (selectedFeatureProperties?.featureType === FeatureType.LOW_RESOLUTION_PP) {
+      return toCssColor(PPMapStyles.get(FeatureType.LOW_RESOLUTION_PP)?.getStroke()?.getColor());
+    }
+
+    return undefined;
+  }, [selectedExistingFeature, selectedFeatureProperties?.featureType]);
 
   return (
     <Box className="geoFeaturesMapContainer" style={{ ...style }}>
@@ -655,7 +704,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
       {enableFeaturePropertiesPopup && selectedFeatureProperties ? (
         <Box className="featurePropertiesPopup">
           <Box className="featurePropertiesPopupHeader">
-            <Typography className="featurePropertiesPopupTitle" tag="span">
+            <Typography className="featurePropertiesPopupTitle" tag="span" style={{ color: featureTitleColor }}>
               {featureLabelValue !== undefined && featureLabelValue !== null
                 ? formatPropertyValue(featureLabelValue)
                 : ''}
