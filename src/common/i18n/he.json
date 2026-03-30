@@ -260,8 +260,6 @@
   "polygon-parts.map-preview.feature-property.e_res": "סיבת שגיאה",
   "polygon-parts.map-preview.feature-property.calculatedArea": "שטח מחושב",
   "polygon-parts.map-preview.feature-property.featureType": "סוג פריט",
-  "polygon-parts.error.missingUrl": "חסר URL לדו\"ח ולידציה",
-  "polygon-parts.error.fetchFailed": "נכשל בטעינת חלקי תיחום",
 
   "field.actions.edit-draft": "ערוך טיוטה",
   "field.actions.more": "פעולות נוספות",
@@ -311,8 +309,11 @@
   "validationReport.unknown": "פוליגונים עם שגיאות לא ידועות",
   "validationReport.button": "בדיקה",
 
-  "resolutionConflict.featureName": "פוליגון {index}",
+  "resolutionConflict.collectionName": "פוליגונים ברמת זום {value}",
+  "resolutionConflict.partName": "פוליגון {index}",
   "resolutionConflict.units.km2": "{value}קמ\"ר",
+  "resolutionConflict.error.missingUrl": "חסר URL לדו\"ח ולידציה",
+  "resolutionConflict.error.fetchFailed": "נכשל בטעינת חלקי תיחום",
 
   "field-names.raster.id": "מזהה",
   "field-names.raster.productId": "מזהה חיצוני",

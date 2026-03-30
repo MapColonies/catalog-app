@@ -20,6 +20,7 @@ import {
 import { AutoDirectionBox } from '../../../../common/components/auto-direction-box/auto-direction-box.component';
 import { Mode } from '../../../../common/models/mode.enum';
 import { EntityDescriptorModelType, useStore } from '../../../models';
+import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
 import { Curtain } from './curtain/curtain.component';
 import { GeoFeaturesPresentorComponent } from './pp-map';
 import { FeatureType } from './pp-map.utils';
@@ -51,9 +52,8 @@ export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> =
   const [showLowResolutionPolygonParts, setShowLowResolutionPolygonParts] = useState(false);
   const [isLoadingLowResolutionParts, setIsLoadingLowResolutionParts] = useState(false);
   const [lowResolutionPartsError, setLowResolutionPartsError] = useState<string | undefined>();
-  const [lowResolutionCollections, setLowResolutionCollections] = useState<ParsedFeatureCollection[]>(
-    []
-  );
+  const [lowResolutionCollections, setLowResolutionCollections] = useState<ParsedFeatureCollection[]>([]);
+  const ZOOM_LEVELS_TABLE = useZoomLevelsTable();
 
   const lowResolutionFeatures = useMemo(
     () => lowResolutionCollections.flatMap((c) => c.features),
@@ -65,7 +65,7 @@ export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> =
 
     if (!reportUrl) {
       setLowResolutionCollections([]);
-      setLowResolutionPartsError(intl.formatMessage({ id: 'polygon-parts.error.missingUrl' }));
+      setLowResolutionPartsError(intl.formatMessage({ id: 'resolutionConflict.error.missingUrl' }));
       return;
     }
 
@@ -92,7 +92,7 @@ export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> =
             })();
 
             const featureLabel = intl.formatMessage(
-              { id: 'resolutionConflict.featureName' },
+              { id: 'resolutionConflict.partName' },
               { index: featureIndex + 1 }
             );
 
@@ -108,7 +108,10 @@ export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> =
           });
 
           return {
-            name: collection.fileName ?? `Collection ${index + 1}`,
+            name: intl.formatMessage(
+              { id: 'resolutionConflict.collectionName' },
+              { value: resolutionDegreeToZoomLevel[state.context.job?.details?.parameters?.ingestionResolution] }
+            ),
             features,
           };
         });
@@ -120,7 +123,7 @@ export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> =
         if (!isCancelled) {
           const errorMessage = (error as Error)?.message;
           setLowResolutionCollections([]);
-          setLowResolutionPartsError(`${intl.formatMessage({ id: 'polygon-parts.error.fetchFailed' })}${errorMessage ? `: ${errorMessage}` : ''}`);
+          setLowResolutionPartsError(`${intl.formatMessage({ id: 'resolutionConflict.error.fetchFailed' })}${errorMessage ? `: ${errorMessage}` : ''}`);
         }
       } finally {
         if (!isCancelled) {
@@ -134,6 +137,11 @@ export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> =
     return () => {
       isCancelled = true;
     };
+  }, []);
+
+  const resolutionDegreeToZoomLevel = useMemo(() => {
+    const table = Object.values(ZOOM_LEVELS_TABLE);
+    return Object.fromEntries(table.map((v, i) => [v, i]));
   }, []);
 
   const closeDialog = (): void => {
@@ -205,7 +213,7 @@ export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> =
                                     const featureLabel =
                                       (feature.properties?.featureLabel as string | undefined) ??
                                       intl.formatMessage(
-                                        { id: 'resolutionConflict.featureName' },
+                                        { id: 'resolutionConflict.partName' },
                                         { index: index + 1 }
                                       );
                                     const calculatedArea =(feature.properties?.calculatedArea as number | undefined) ?? 0;
