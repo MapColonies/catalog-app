@@ -127,11 +127,11 @@ export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> =
               ...feature,
               properties: {
                 ...(feature.properties ?? {}),
-                key: featureKey,
-                calculatedArea,
-                featureLabel,
-                zoomLevel: resolutionDegreeToZoomLevel[state.context.job?.details?.parameters?.ingestionResolution as string],
-                featureType: FeatureType.LOW_RESOLUTION_PP,
+                _key: featureKey,
+                _area: calculatedArea,
+                _featureLabel: featureLabel,
+                _zoomLevel: resolutionDegreeToZoomLevel[state.context.job?.details?.parameters?.ingestionResolution as string],
+                _featureType: FeatureType.LOW_RESOLUTION_PP,
               },
             } as Feature;
           });
@@ -257,14 +257,14 @@ export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> =
                                   rowRenderer={({ index, key, style }: ListRowProps): JSX.Element => {
                                     const feature = collection.features[index];
                                     const featureLabel =
-                                      (feature.properties?.featureLabel as string | undefined) ??
+                                      (feature.properties?._featureLabel as string | undefined) ??
                                       intl.formatMessage(
                                         { id: 'resolutionConflict.partName' },
                                         { index: index + 1 }
                                       );
-                                    const calculatedArea =(feature.properties?.calculatedArea as number | undefined) ?? 0;
+                                    const calculatedArea =(feature.properties?._area as number | undefined) ?? 0;
                                     const featureId = (feature.properties?.id as string | undefined) ?? '';
-                                    const featureKey = feature.properties?.key as string | undefined;
+                                    const featureKey = feature.properties?._key as string | undefined;
                                     const isSelected = featureKey === selectedLowResolutionFeatureKey;
                                     return (
                                       <Box

@@ -258,8 +258,6 @@
   "polygon-parts.map-preview.feature-property.publishRes": "Publish resolution (m)",
   "polygon-parts.map-preview.feature-property.classify": "Classification",
   "polygon-parts.map-preview.feature-property.e_res": "Error reason",
-  "polygon-parts.map-preview.feature-property.calculatedArea": "Calculated area",
-  "polygon-parts.map-preview.feature-property.featureType": "Feature type",
 
   "field.actions.edit-draft": "Edit draft",
   "field.actions.more": "More options",

@@ -258,8 +258,6 @@
   "polygon-parts.map-preview.feature-property.publishRes": "רזולוצית הפקה (מ`)",
   "polygon-parts.map-preview.feature-property.classify": "סיווג",
   "polygon-parts.map-preview.feature-property.e_res": "סיבת שגיאה",
-  "polygon-parts.map-preview.feature-property.calculatedArea": "שטח מחושב",
-  "polygon-parts.map-preview.feature-property.featureType": "סוג פריט",
 
   "field.actions.edit-draft": "ערוך טיוטה",
   "field.actions.more": "פעולות נוספות",

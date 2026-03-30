@@ -263,12 +263,12 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   const addLowResolutionFeatureLabelToProperties = (
     properties: Record<string, unknown>
   ): Record<string, unknown> => {
-    if (properties.featureType !== FeatureType.LOW_RESOLUTION_PP) {
+    if (properties._featureType !== FeatureType.LOW_RESOLUTION_PP) {
       return properties;
     }
 
-    const featureLabel = properties.featureLabel as string | undefined;
-    const zoomLevel = properties.zoomLevel;
+    const featureLabel = properties._featureLabel as string | undefined;
+    const zoomLevel = properties._zoomLevel;
     const labelParts: string[] = [];
 
     if (featureLabel) {
@@ -408,11 +408,11 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
     return (
       <>
         {geoFeatures?.map((feat, idx) => {
-          let featureStyle = PPMapStyles.get(feat?.properties?.featureType);
+          let featureStyle = PPMapStyles.get(feat?.properties?._featureType);
 
-          if (feat?.properties?.featureType === FeatureType.LOW_RESOLUTION_PP) {
-            const featureLabel = feat.properties?.featureLabel as string | undefined;
-            const zoomLevel = feat.properties?.zoomLevel;
+          if (feat?.properties?._featureType === FeatureType.LOW_RESOLUTION_PP) {
+            const featureLabel = feat.properties?._featureLabel as string | undefined;
+            const zoomLevel = feat.properties?._zoomLevel;
             const labelParts: string[] = [];
             if (featureLabel) { labelParts.push(featureLabel); }
             if (zoomLevel !== undefined && zoomLevel !== null) { labelParts.push(`(${String(zoomLevel)})`); }
@@ -688,12 +688,12 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
       return toCssColor(PPMapStyles.get(FeatureType.EXISTING_PP)?.getStroke()?.getColor());
     }
 
-    if (selectedFeatureProperties?.featureType === FeatureType.LOW_RESOLUTION_PP) {
+    if (selectedFeatureProperties?._featureType === FeatureType.LOW_RESOLUTION_PP) {
       return toCssColor(PPMapStyles.get(FeatureType.LOW_RESOLUTION_PP)?.getStroke()?.getColor());
     }
 
     return undefined;
-  }, [selectedExistingFeature, selectedFeatureProperties?.featureType]);
+  }, [selectedExistingFeature, selectedFeatureProperties?._featureType]);
 
   return (
     <Box className="geoFeaturesMapContainer" style={{ ...style }}>
@@ -766,7 +766,12 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
           </Box>
           <Box className="featurePropertiesPopupRows">
             {Object.entries(selectedFeatureProperties)
-              .filter(([key]) => key !== FEATURE_LABEL_KEY)
+              .filter(([key]) => {
+                if (key === NO_PROPERTIES_MESSAGE_KEY) {
+                  return true;
+                }
+                return key !== FEATURE_LABEL_KEY && !key.startsWith('_');
+              })
               .map(([key, value]) => {
               if (key === NO_PROPERTIES_MESSAGE_KEY) {
                 return (
