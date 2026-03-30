@@ -107,6 +107,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   const lastHandledSelectedFeatureRequestIdRef = useRef<number | undefined>(undefined);
   const [showExistingPolygonParts, setShowExistingPolygonParts] = useState<boolean>(false);
   showExistingPolygonPartsRef.current = showExistingPolygonParts;
+  const [selectedExistingFeature, setSelectedExistingFeature] = useState<Feature | undefined>(undefined);
   const [selectedFeatureProperties, setSelectedFeatureProperties] = useState<
     Record<string, unknown> | undefined
   >();
@@ -362,6 +363,8 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
         return;
       }
 
+      setSelectedExistingFeature(undefined);
+
       const selectedFeature = geoFeatures?.find((feature) => feature?.properties?.key === selectedFeatureKey);
 
       if (!selectedFeature?.geometry) {
@@ -457,6 +460,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
 
                 if (matchingExisting) {
                   clickedExistingFeature = true;
+                  setSelectedExistingFeature(matchingExisting);
                   if (matchingExisting.properties && Object.keys(matchingExisting.properties).length > 0) {
                     clickedProperties = matchingExisting.properties as Record<string, unknown>;
                   } else {
@@ -484,6 +488,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
             // Green existing feature was clicked — clear any orange list selection
             onMapFeatureClick?.(undefined);
           } else if (clickedFeatureKey) {
+            setSelectedExistingFeature(undefined);
             onMapFeatureClick?.(clickedFeatureKey);
           }
           return;
@@ -493,7 +498,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
         if (fallbackProperties) {
           // Determine whether the hit feature belongs to the list (orange) or existing (green)
           const clickedPoint = point(event.coordinate as [number, number]);
-          const isExistingFallback = showExistingPolygonPartsRef.current && existingPPFeaturesRef.current.some((f) => {
+          const matchingExistingFallback = showExistingPolygonPartsRef.current ? existingPPFeaturesRef.current.find((f) => {
             if (!f?.geometry) {
               return false;
             }
@@ -506,11 +511,13 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
             } catch {
               return false;
             }
-          });
+          }) : undefined;
 
-          if (isExistingFallback) {
+          if (matchingExistingFallback) {
+            setSelectedExistingFeature(matchingExistingFallback);
             onMapFeatureClick?.(undefined);
           } else {
+            setSelectedExistingFeature(undefined);
             const orangeFeature = (geoFeatures ?? []).find((f) => {
               if (!f?.geometry) {
                 return false;
@@ -584,6 +591,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
         {showExistingPolygonParts && (
           <PolygonPartsExtentVectorLayer
             layerRecord={layerRecord}
+            selectedFeature={selectedExistingFeature}
             onFeaturesChange={(features): void => {
               existingPPFeaturesRef.current = features;
             }}
@@ -607,6 +615,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
               label="CLOSE"
               onClick={(): void => {
                 setSelectedFeatureProperties(undefined);
+                setSelectedExistingFeature(undefined);
                 onFeaturePropertiesPopupClose?.();
               }}
             />
