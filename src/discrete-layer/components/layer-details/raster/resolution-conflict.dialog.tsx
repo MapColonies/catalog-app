@@ -183,7 +183,12 @@ export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> =
                   checked={showLowResolutionPolygonParts}
                   disabled={lowResolutionCollections.length === 0}
                   onClick={(evt: React.MouseEvent<HTMLInputElement>): void => {
-                    setShowLowResolutionPolygonParts(evt.currentTarget.checked);
+                    const isChecked = evt.currentTarget.checked;
+                    setShowLowResolutionPolygonParts(isChecked);
+
+                    if (!isChecked) {
+                      setSelectedLowResolutionFeatureKey(undefined);
+                    }
                   }}
                 />
                 {isLoadingLowResolutionParts ? (

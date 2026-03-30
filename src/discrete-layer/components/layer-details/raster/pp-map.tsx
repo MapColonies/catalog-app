@@ -105,6 +105,9 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   const renderCount = useRef(0);
   const existingPPFeaturesRef = useRef<Feature[]>([]);
   const showExistingPolygonPartsRef = useRef(false);
+  const previousShowExistingPolygonPartsRef = useRef(false);
+  const lastCheckboxClickTimestampRef = useRef(0);
+  const previousGeoFeaturesLengthRef = useRef(geoFeatures?.length ?? 0);
   const lastHandledSelectedFeatureKeyRef = useRef<string | undefined>(undefined);
   const lastHandledSelectedFeatureRequestIdRef = useRef<number | undefined>(undefined);
   const [showExistingPolygonParts, setShowExistingPolygonParts] = useState<boolean>(false);
@@ -298,6 +301,32 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
     }
   }, [enableFeaturePropertiesPopup]);
 
+  useEffect(() => {
+    const wasShown = previousShowExistingPolygonPartsRef.current;
+
+    if (wasShown && !showExistingPolygonParts) {
+      setSelectedExistingFeature(undefined);
+      setSelectedFeatureProperties(undefined);
+      onMapFeatureClick?.(undefined);
+      onFeaturePropertiesPopupClose?.();
+    }
+
+    previousShowExistingPolygonPartsRef.current = showExistingPolygonParts;
+  }, [showExistingPolygonParts, onMapFeatureClick, onFeaturePropertiesPopupClose]);
+
+  useEffect(() => {
+    const currentGeoFeaturesLength = geoFeatures?.length ?? 0;
+
+    if (previousGeoFeaturesLengthRef.current > 0 && currentGeoFeaturesLength === 0) {
+      setSelectedFeatureProperties(undefined);
+      setSelectedExistingFeature(undefined);
+      onMapFeatureClick?.(undefined);
+      onFeaturePropertiesPopupClose?.();
+    }
+
+    previousGeoFeaturesLengthRef.current = currentGeoFeaturesLength;
+  }, [geoFeatures, onMapFeatureClick, onFeaturePropertiesPopupClose]);
+
   const previewBaseMap = useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-array-constructor
     const olBaseMap = new Array();
@@ -489,6 +518,10 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
       }
 
       const onSingleClick = (event: MapBrowserEvent<UIEvent>): void => {
+        if (Date.now() - lastCheckboxClickTimestampRef.current < 150) {
+          return;
+        }
+
         let clickedProperties: Record<string, unknown> | undefined;
         let clickedPolygonWithoutProperties = false;
         let clickedFeatureKey: string | undefined;
@@ -675,7 +708,19 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
               label={intl.formatMessage({ id: 'polygon-parts.show-exisitng-parts-on-map.label' })}
               checked={showExistingPolygonParts}
               onClick={(evt: React.MouseEvent<HTMLInputElement>): void => {
-                setShowExistingPolygonParts(evt.currentTarget.checked);
+                evt.preventDefault();
+                evt.stopPropagation();
+                lastCheckboxClickTimestampRef.current = Date.now();
+
+                const isChecked = evt.currentTarget.checked;
+                setShowExistingPolygonParts(isChecked);
+
+                if (!isChecked) {
+                  setSelectedExistingFeature(undefined);
+                  setSelectedFeatureProperties(undefined);
+                  onMapFeatureClick?.(undefined);
+                  onFeaturePropertiesPopupClose?.();
+                }
               }}
             />
           </Box>
