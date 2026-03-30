@@ -20,9 +20,14 @@ interface JobInfoProps {
 export const JobInfo: React.FC<JobInfoProps> = ({ job }) => {
   const theme = useTheme();
   const [isResolutionConflictDialogOpen, setIsResolutionConflictDialogOpen] = useState(false);
+  const [isResolutionConflictApproved, setIsResolutionConflictApproved] = useState(false);
 
   const openResolutionConflictDialog = useCallback(() => {
     setIsResolutionConflictDialogOpen(true);
+  }, []);
+
+  const approveResolutionConflictDialog = useCallback(() => {
+    setIsResolutionConflictApproved(true);
   }, []);
 
   if (!job) {
@@ -64,7 +69,11 @@ export const JobInfo: React.FC<JobInfoProps> = ({ job }) => {
                   job.validationReport.errorsSummary,
                   'countWrapper',
                   job.taskStatus === Status.Failed ? theme.custom?.GC_ERROR_HIGH : '',
-                  { key: 'resolution', action: openResolutionConflictDialog }
+                  {
+                    key: 'resolution',
+                    action: openResolutionConflictDialog,
+                    isApproved: isResolutionConflictApproved,
+                  }
                 )}
               </Box>
             ) : (
@@ -91,6 +100,7 @@ export const JobInfo: React.FC<JobInfoProps> = ({ job }) => {
         <ResolutionConflictDialog
           isOpen={isResolutionConflictDialogOpen}
           onSetIsOpen={setIsResolutionConflictDialogOpen}
+          onApprove={approveResolutionConflictDialog}
         />
       )}
     </>

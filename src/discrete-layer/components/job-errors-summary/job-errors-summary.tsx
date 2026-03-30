@@ -17,6 +17,7 @@ interface ErrorCountProps {
 interface RasterErrorsSummaryOptions {
   key?: string;
   action?: (key: string) => void;
+  isApproved?: boolean;
 }
 
 const ErrorCount = ({ name, value, className, color, action }: ErrorCountProps): JSX.Element => {
@@ -58,13 +59,14 @@ export const JobErrorsSummary = (
   if (!errorsSummary) {
     return;
   }
+
   return Object.entries(errorsSummary.errorsCount).map(([key, value]) => {
     let color = overrideColor;
     if (!overrideColor) {
       color =
         value === 0
           ? theme.custom?.GC_SUCCESS
-          : getRasterErrorCount(errorsSummary, key)?.exceeded === false
+          : (getRasterErrorCount(errorsSummary, key)?.exceeded === false || (options?.key === key && options?.isApproved === true))
           ? theme.custom?.GC_WARNING_HIGH
           : theme.custom?.GC_ERROR_HIGH;
     }
