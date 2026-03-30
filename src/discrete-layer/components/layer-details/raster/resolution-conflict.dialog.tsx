@@ -33,6 +33,7 @@ interface ResolutionConflictDialogProps {
   isOpen: boolean;
   onSetIsOpen: (open: boolean) => void;
   onApprove?: () => void;
+  viewOnly?: boolean;
 }
 
 interface ParsedFeatureCollection {
@@ -44,6 +45,7 @@ export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> =
   isOpen,
   onSetIsOpen,
   onApprove,
+  viewOnly = false,
 }) => {
   const intl = useIntl();
   const store = useStore();
@@ -306,14 +308,16 @@ export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> =
                 )}
               </Box>
               <Box className="actionsRow">
-                <Button
-                  raised
-                  type="button"
-                  onClick={approveDialog}
-                  disabled={isLoadingLowResolutionParts || lowResolutionCollections.length === 0}
-                >
-                  <FormattedMessage id="general.ok-btn.text" />
-                </Button>
+                {!viewOnly && (
+                  <Button
+                    raised
+                    type="button"
+                    onClick={approveDialog}
+                    disabled={isLoadingLowResolutionParts || lowResolutionCollections.length === 0}
+                  >
+                    <FormattedMessage id="general.ok-btn.text" />
+                  </Button>
+                )}
                 <Button
                   type="button"
                   onClick={closeDialog}
