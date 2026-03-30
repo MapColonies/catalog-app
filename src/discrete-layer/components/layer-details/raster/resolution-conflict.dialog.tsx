@@ -62,6 +62,27 @@ export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> =
     [lowResolutionCollections]
   );
 
+  const selectedLowResolutionPosition = useMemo(() => {
+    if (!selectedLowResolutionFeatureKey) {
+      return undefined;
+    }
+
+    for (let collectionIndex = 0; collectionIndex < lowResolutionCollections.length; collectionIndex += 1) {
+      const featureIndex = lowResolutionCollections[collectionIndex].features.findIndex(
+        (feature) => feature.properties?.key === selectedLowResolutionFeatureKey
+      );
+
+      if (featureIndex !== -1) {
+        return {
+          collectionIndex,
+          featureIndex,
+        };
+      }
+    }
+
+    return undefined;
+  }, [lowResolutionCollections, selectedLowResolutionFeatureKey]);
+
   useEffect(() => {
     const reportUrl = state.context.job?.validationReport?.report?.url;
 
@@ -204,7 +225,10 @@ export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> =
                     return (
                       <CollapsibleList
                         key={`${collection.name}-${collectionIndex}`}
-                        open={collectionIndex === 0}
+                        open={
+                          collectionIndex === 0 ||
+                          collectionIndex === selectedLowResolutionPosition?.collectionIndex
+                        }
                         handle={
                           <SimpleListItem
                             text={`${collection.name} (${collection.features.length})`}
@@ -222,6 +246,12 @@ export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> =
                                   rowCount={collection.features.length}
                                   rowHeight={32}
                                   overscanRowCount={8}
+                                  scrollToIndex={
+                                    collectionIndex === selectedLowResolutionPosition?.collectionIndex
+                                      ? selectedLowResolutionPosition.featureIndex
+                                      : undefined
+                                  }
+                                  scrollToAlignment="center"
                                   rowRenderer={({ index, key, style }: ListRowProps): JSX.Element => {
                                     const feature = collection.features[index];
                                     const featureLabel =
