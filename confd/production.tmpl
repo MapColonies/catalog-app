@@ -58,6 +58,7 @@ window._env_ = {
   RUNNING_MODE: {
     type: '{{ getv "/configuration/running/mode/type" "DEVELOPMENT" }}',
     autocomplete: {{ getv "/configuration/running/mode/autocomplete" "false" }},
+    cswDefaultPageSize: {{ getv "/configuration/running/mode/cswdefaultpagesize" "200" }},
   },
   NUMBER_OF_CHARACTERS_LIMIT: {{ getv "/configuration/number/of/characters/limit" "15" }},
   SERVED_ENTITY_TYPES: '{{ getv "/configuration/served/entity/types" "RECORD_ALL,RECORD_RASTER,RECORD_3D,RECORD_DEM,RECORD_VECTOR" }}',

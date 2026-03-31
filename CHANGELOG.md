@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.4.3](https://github.com/MapColonies/catalog-app/compare/v4.4.2...v4.4.3) (2026-03-30)
+
+
+### Bug Fixes
+
+* change search query to be paginated ([#867](https://github.com/MapColonies/catalog-app/issues/867)) ([4c1611d](https://github.com/MapColonies/catalog-app/commit/4c1611dffc1df37d5fa153b5157acf11fbad598c))
+
+## [4.4.2](https://github.com/MapColonies/catalog-app/compare/v4.4.1...v4.4.2) (2026-03-18)
+
+
+### Bug Fixes
+
+* artifacts.json in build-and-push.yaml ([#868](https://github.com/MapColonies/catalog-app/issues/868)) ([94d7901](https://github.com/MapColonies/catalog-app/commit/94d7901b0660b429592b699f2c27a77a14742589))
+
+## [4.4.1](https://github.com/MapColonies/catalog-app/compare/v4.4.0...v4.4.1) (2026-03-18)
+
+
+### Bug Fixes
+
+* nginx worker_processes from auto to 4 for faster startup ([#865](https://github.com/MapColonies/catalog-app/issues/865)) ([8d4150b](https://github.com/MapColonies/catalog-app/commit/8d4150bbf888c3d3e28f79f860683a2e49b5906b))
+
 ## [4.4.0](https://github.com/MapColonies/catalog-app/compare/v4.3.5...v4.4.0) (2026-03-08)
 
 
