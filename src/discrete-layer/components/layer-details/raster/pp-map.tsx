@@ -101,7 +101,6 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
 }) => {
   const store = useStore();
   const intl = useIntl();
-  const ZOOM_LEVELS_TABLE = useZoomLevelsTable();
   const renderCount = useRef(0);
   const existingPPFeaturesRef = useRef<Feature[]>([]);
   const showExistingPolygonPartsRef = useRef(false);
@@ -113,9 +112,12 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   const [showExistingPolygonParts, setShowExistingPolygonParts] = useState<boolean>(false);
   showExistingPolygonPartsRef.current = showExistingPolygonParts;
   const [selectedExistingFeature, setSelectedExistingFeature] = useState<Feature | undefined>(undefined);
-  const [selectedFeatureProperties, setSelectedFeatureProperties] = useState<
-    Record<string, unknown> | undefined
-  >();
+  const [selectedFeatureProperties, setSelectedFeatureProperties] = useState<Record<string, unknown> | undefined>();
+  const ZOOM_LEVELS_TABLE = useZoomLevelsTable();
+  const resolutionDegreeToZoomLevel = useMemo(() => {
+    const table = Object.values(ZOOM_LEVELS_TABLE);
+    return Object.fromEntries(table.map((value, index) => [String(value), index]));
+  }, [ZOOM_LEVELS_TABLE]);
 
   const getClickedFeatureProperties = (coordinate: number[]): Record<string, unknown> | undefined => {
     const allFeatures = [
@@ -204,7 +206,10 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
     if (value === undefined || value === null) {
       return '';
     }
-
+    if (key === 'resolutionDegree') {
+      const zoomLevel = resolutionDegreeToZoomLevel[String(value)];
+      return zoomLevel !== undefined ? `${String(value)} (${String(zoomLevel)})` : String(value);
+    }
     if (value instanceof Date) {
       return dateFormatter(value, false);
     }
@@ -223,7 +228,6 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
     ) {
       return dateFormatter(value as Date, false);
     }
-
     if (typeof value === 'object') {
       try {
         return JSON.stringify(value);
@@ -231,7 +235,6 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
         return String(value);
       }
     }
-
     return String(value);
   };
 
