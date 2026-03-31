@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.5.0](https://github.com/MapColonies/catalog-app/compare/v4.4.3...v4.5.0) (2026-03-31)
+
+
+### Features
+
+* geo worker api ([#871](https://github.com/MapColonies/catalog-app/issues/871)) ([059273d](https://github.com/MapColonies/catalog-app/commit/059273d78ceca44dd64b4014d7b941c7748a729a))
+
 ## [4.4.3](https://github.com/MapColonies/catalog-app/compare/v4.4.2...v4.4.3) (2026-03-30)
 
 
