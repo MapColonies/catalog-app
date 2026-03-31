@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useMemo, useState, useEffect, useCallback, useRef } from 'react';
+import React, { useMemo, useState, useEffect, useCallback } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { withFormik, FormikProps, FormikErrors, Form, FormikHandlers, FormikBag } from 'formik';
 import { Feature, GeoJsonProperties, Geometry } from 'geojson';
@@ -121,44 +121,6 @@ export const InnerRasterForm = (
   const [firstPhaseErrors, setFirstPhaseErrors] = useState<Record<string, string[]>>({});
   const [isSubmittedForm, setIsSubmittedForm] = useState(false);
   const [ingestionFieldsCurtain, setIngestionFieldsCurtain] = useState(false);
-
-  //#region GEOS-WASM
-  const geosWasmFileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleGeosWasmFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>): void => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (event): void => {
-      const buffer = event.target?.result as ArrayBuffer;
-      if (!buffer) return;
-
-      const worker = new Worker(new URL('./compute-areas.worker.ts', import.meta.url));
-      worker.onmessage = (msg: MessageEvent): void => {
-        const { type, processed, total, result, error } = msg.data;
-        if (type === 'progress') {
-          console.info(`[GEOS-WASM] Progress: ${processed}/${total}`);
-        } else if (type === 'result') {
-          console.info('[GEOS-WASM] Result:', result);
-          worker.terminate();
-        } else if (type === 'error') {
-          console.error('[GEOS-WASM] Worker error:', error);
-          worker.terminate();
-        }
-      };
-      worker.onerror = (err): void => {
-        console.error('[GEOS-WASM] Worker onerror:', err);
-        worker.terminate();
-      };
-      // Transfer the buffer to the worker (zero-copy)
-      worker.postMessage({ buffer }, [buffer]);
-    };
-    reader.readAsArrayBuffer(file);
-    // Reset so the same file can be re-selected
-    e.target.value = '';
-  }, []);
-  //#endregion
 
   //#region STATE MACHINE
   const actorRef = RasterWorkflowContext.useActorRef();
@@ -392,24 +354,6 @@ export const InnerRasterForm = (
               )}
           </Box>
           <Box className="buttons">
-            <input
-              ref={geosWasmFileInputRef}
-              type="file"
-              accept=".zip"
-              style={{ display: 'none' }}
-              onChange={handleGeosWasmFileChange}
-            />
-            <Button
-              raised
-              type="button"
-              onClick={(e): void => {
-                e.preventDefault();
-                e.stopPropagation();
-                geosWasmFileInputRef.current?.click();
-              }}
-            >
-              GEOS-WASM
-            </Button>
             {isGoToJobEnabled(state.context) && (
               <Button
                 raised

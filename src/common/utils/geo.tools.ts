@@ -15,6 +15,7 @@ import { geoJSONValidation } from './geojson.validation';
 export const DEGREES_PER_METER = 0.00001;
 export const ZERO_MERIDIAN = 0;
 export const ANTI_MERIDIAN = 180;
+export const ONE_DEGREE_KM = 111.32;
 
 export type geoArgs = { name: string; value: any }[];
 
