@@ -37,32 +37,38 @@ export function useWorkerAPI(): {
   const [progressLoadShapeFile, setProgressLoadShapeFile] = useState<WorkerMessage | null>(null);
 
   useEffect(() => {
-    const worker = new Worker(
-      new URL('./feat-collection.worker-api.ts', import.meta.url),
-      { type: 'module' }
-    );
+    const worker = new Worker(new URL('./feat-collection.worker-api.ts', import.meta.url), {
+      type: 'module',
+    });
 
     const wrapped: Remote<WorkerAPI> = wrap(worker);
     setWorkerApi({
       init: async () => await wrapped.init(),
       dispose: async () => await wrapped.dispose(),
       load: async (fc: FeatureCollection) => await wrapped.load(fc),
-      loadFromShapeFile: async (url: string, onProgress?: (p: WorkerMessage | null) => void) => await wrapped.loadFromShapeFile(url, onProgress),
-      updateAreas: async (onProgress?: (p: WorkerMessage | null) => void) => await wrapped.updateAreas(onProgress),
-      computeOuterGeometry: async (onProgress?: (p: WorkerMessage | null) => void) => await wrapped.computeOuterGeometry(onProgress),
-      getFeatureCollection: async (onProgress?: (p: WorkerMessage | null) => void) => await wrapped.getFeatureCollection(onProgress),
-      query: async (bbox: BBoxObj, onProgress?: (p: WorkerMessage | null) => void): Promise<FeatureCollection> => await wrapped.query(bbox, onProgress),
+      loadFromShapeFile: async (url: string, onProgress?: (p: WorkerMessage | null) => void) =>
+        await wrapped.loadFromShapeFile(url, onProgress),
+      updateAreas: async (onProgress?: (p: WorkerMessage | null) => void) =>
+        await wrapped.updateAreas(onProgress),
+      computeOuterGeometry: async (onProgress?: (p: WorkerMessage | null) => void) =>
+        await wrapped.computeOuterGeometry(onProgress),
+      getFeatureCollection: async (onProgress?: (p: WorkerMessage | null) => void) =>
+        await wrapped.getFeatureCollection(onProgress),
+      query: async (
+        bbox: BBoxObj,
+        onProgress?: (p: WorkerMessage | null) => void
+      ): Promise<FeatureCollection> => await wrapped.query(bbox, onProgress),
     });
 
     return () => {
       wrapped.dispose();
       worker.terminate();
-    }
+    };
   }, []);
 
   const api = useMemo(() => {
     if (!workerApi) return null;
-    
+
     return {
       init: {
         method: async () => {
@@ -73,7 +79,7 @@ export function useWorkerAPI(): {
         method: async (fc: FeatureCollection) => {
           return await workerApi.load(fc);
         },
-        progress: "-1"
+        progress: '-1',
       },
       loadFromShapeFile: {
         method: async (url: string) => {
@@ -81,50 +87,55 @@ export function useWorkerAPI(): {
           return await workerApi.loadFromShapeFile(
             url,
             proxy((p: WorkerMessage) => {
-              console.log("**** Progress LoadShape: ", p);
+              console.log('**** Progress LoadShape: ', p);
               setProgressLoadShapeFile(p);
-            }));
+            })
+          );
         },
-        progress: progressLoadShapeFile
+        progress: progressLoadShapeFile,
       },
       updateAreas: {
         method: async () => {
           setProgressComputeArea(null);
           return await workerApi.updateAreas(
             proxy((p: WorkerMessage) => {
-              console.log("**** Progress Area: ", p);
+              console.log('**** Progress Area: ', p);
               setProgressComputeArea(p);
-            }));
+            })
+          );
         },
-        progress: progressComputeArea
+        progress: progressComputeArea,
       },
       computeOuterGeometry: {
         method: async () => {
           return await workerApi.computeOuterGeometry(
             proxy((p: WorkerMessage) => {
-              console.log("**** Progress Outer Geometry: ", p);
-            }));
+              console.log('**** Progress Outer Geometry: ', p);
+            })
+          );
         },
-        progress: null
+        progress: null,
       },
       getFeatureCollection: {
-        method: async (): Promise<FeatureCollection>=> {
+        method: async (): Promise<FeatureCollection> => {
           return await workerApi.getFeatureCollection(
             proxy((p: WorkerMessage) => {
-              console.log("**** GET FEATURECOLLECTION: ", p);
-            }));
+              console.log('**** GET FEATURECOLLECTION: ', p);
+            })
+          );
         },
-        progress: null
+        progress: null,
       },
       query: {
-        method: async (bbox: BBoxObj): Promise<FeatureCollection>=> {
+        method: async (bbox: BBoxObj): Promise<FeatureCollection> => {
           return await workerApi.query(
             bbox,
             proxy((p: WorkerMessage) => {
-              console.log("**** QUERY by BBOX: ", p);
-            }));
+              console.log('**** QUERY by BBOX: ', p);
+            })
+          );
         },
-        progress: null
+        progress: null,
       },
     };
   }, [workerApi, progressComputeArea, progressLoadShapeFile]);

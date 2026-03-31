@@ -49,11 +49,13 @@ import EntityRasterForm from './layer-details-form.raster';
 import { Events } from './state-machine/types';
 import { RasterWorkflowProvider, RasterWorkflowContext } from './state-machine/context';
 import { getUIIngestionFieldDescriptors } from './utils';
-import { useWorkerAPI } from './worker/useWorkerAPI';
 
 import './entity.raster.dialog.css';
+/*****START: REMOVE IT !!!!!!!!!!!!!!!! */
+import { useWorkerAPI } from './worker/useWorkerAPI';
 import { FeatureCollection } from 'geojson';
 import { MOCK_POLYGON } from './state-machine/MOCK';
+/*****END: REMOVE IT !!!!!!!!!!!!!!!! */
 
 const DEFAULT_ID = 'DEFAULT_UI_ID';
 const DEFAULT_TYPE_NAME = 'DEFAULT_TYPE_NAME';
@@ -160,20 +162,22 @@ export const EntityRasterDialog: React.FC<EntityRasterDialogProps> = observer(
     };
 
     /*****START: REMOVE IT !!!!!!!!!!!!!!!! */
-    const api = useWorkerAPI(); 
+    const api = useWorkerAPI();
     const handleRun = async () => {
       if (!api) return;
-      const FC: FeatureCollection = { type: "FeatureCollection", features: [] };
+      const FC: FeatureCollection = { type: 'FeatureCollection', features: [] };
       for (let i = 0; i < 10000; i++) {
         FC.features.push({
-          type: "Feature",
+          type: 'Feature',
           geometry: MOCK_POLYGON,
-          properties: null
+          properties: null,
         });
       }
       await api.init.method();
       // await api.load.method(FC);
-      await api.loadFromShapeFile.method('https://download-int.mapcolonies.net/api/raster/v1/downloads/validation-reports/a80296ad-06f4-4d3c-9c2d-8982eb65d04b/vivid_ihud_orthophoto_v3.0_report_2026-02-04T15:32:09.836Z.zip');
+      await api.loadFromShapeFile.method(
+        'https://download-int.mapcolonies.net/api/raster/v1/downloads/validation-reports/a80296ad-06f4-4d3c-9c2d-8982eb65d04b/vivid_ihud_orthophoto_v3.0_report_2026-02-04T15:32:09.836Z.zip'
+      );
       await api.updateAreas.method();
       const outerPerimeterGeom = await api.computeOuterGeometry.method();
       console.log(outerPerimeterGeom);
@@ -185,21 +189,23 @@ export const EntityRasterDialog: React.FC<EntityRasterDialogProps> = observer(
       //       maxY: 29.21600387903102
       //     }); //1066
       await api.query.method({
-            minX: 54.35290071061968,
-            minY: 25.72995702729723,
-            maxX: 55.45933754011244,
-            maxY: 26.38730710623136
-          }); //11
-      
+        minX: 54.35290071061968,
+        minY: 25.72995702729723,
+        maxX: 55.45933754011244,
+        maxY: 26.38730710623136,
+      }); //11
+
       const updatedFC = await api.getFeatureCollection.method();
     };
-        /*****END: REMOVE IT !!!!!!!!!!!!!!!! */
+    /*****END: REMOVE IT !!!!!!!!!!!!!!!! */
 
     return (
       <RasterWorkflowProvider>
-        <button onClick={handleRun} style={{width:'100px',height:'30px',zIndex:50}}>
+        {/*****START: REMOVE IT !!!!!!!!!!!!!!!! */}
+        <button onClick={handleRun} style={{ width: '100px', height: '30px', zIndex: 50 }}>
           Run {`${api?.updateAreas.progress?.message} ${api?.loadFromShapeFile.progress?.message}`}
         </button>
+        {/*****END: REMOVE IT !!!!!!!!!!!!!!!! */}
         <EntityRasterDialogInner
           {...props}
           layerRecord={getRecordLayer(job)}
