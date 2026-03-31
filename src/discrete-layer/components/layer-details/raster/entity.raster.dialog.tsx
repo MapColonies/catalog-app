@@ -196,7 +196,7 @@ export const EntityRasterDialog: React.FC<EntityRasterDialogProps> = observer(
       }); //11
 
       const updatedFC = await api.getFeatureCollection.method();
-      console.log('api.getFeatureCollection:', updatedFC.features.length)
+      console.log('api.getFeatureCollection:', updatedFC.features.length);
     };
     /*****END: REMOVE IT !!!!!!!!!!!!!!!! */
 
