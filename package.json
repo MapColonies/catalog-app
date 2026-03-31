@@ -189,6 +189,7 @@
     "@types/enzyme": "^3.10.5",
     "@types/enzyme-adapter-react-16": "^1.0.6",
     "@types/ol": "^6.3.1",
+    "@types/rbush": "^4.0.0",
     "@types/react-test-renderer": "^16.9.2",
     "@types/webpack-env": "^1.18.1",
     "@typescript-eslint/eslint-plugin": "^5.61.0",
