@@ -180,7 +180,7 @@ export const EntityRasterDialog: React.FC<EntityRasterDialogProps> = observer(
       );
       await api.updateAreas.method();
       const outerPerimeterGeom = await api.computeOuterGeometry.method();
-      console.log(outerPerimeterGeom);
+      console.log('api.computeOuterGeometry:', outerPerimeterGeom);
 
       // await api.query.method({
       //       minX: 53.028770883699195,
@@ -196,6 +196,7 @@ export const EntityRasterDialog: React.FC<EntityRasterDialogProps> = observer(
       }); //11
 
       const updatedFC = await api.getFeatureCollection.method();
+      console.log('api.getFeatureCollection:', updatedFC.features.length)
     };
     /*****END: REMOVE IT !!!!!!!!!!!!!!!! */
 
