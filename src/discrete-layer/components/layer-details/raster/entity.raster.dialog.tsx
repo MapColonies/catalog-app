@@ -163,6 +163,7 @@ export const EntityRasterDialog: React.FC<EntityRasterDialogProps> = observer(
 
     /*****START: REMOVE IT !!!!!!!!!!!!!!!! */
     const api = useWorkerAPI();
+    const intl = useIntl();
     const handleRun = async () => {
       if (!api) return;
       const FC: FeatureCollection = { type: 'FeatureCollection', features: [] };
@@ -176,7 +177,15 @@ export const EntityRasterDialog: React.FC<EntityRasterDialogProps> = observer(
       await api.init.method();
       // await api.load.method(FC);
       await api.loadFromShapeFile.method(
-        'https://download-int.mapcolonies.net/api/raster/v1/downloads/validation-reports/a80296ad-06f4-4d3c-9c2d-8982eb65d04b/vivid_ihud_orthophoto_v3.0_report_2026-02-04T15:32:09.836Z.zip'
+        'https://download-int.mapcolonies.net/api/raster/v1/downloads/validation-reports/a80296ad-06f4-4d3c-9c2d-8982eb65d04b/vivid_ihud_orthophoto_v3.0_report_2026-02-04T15:32:09.836Z.zip',
+        {
+          customProperties: {
+            _key: 'featureKey',
+            _featureLabel: intl.formatMessage({ id: 'resolutionConflict.partName' }),
+            _zoomLevel: '9',
+            // _featureType: 'LOW_RESOLUTION_PP'
+          },
+        }
       );
       await api.updateAreas.method();
       const outerPerimeterGeom = await api.computeOuterGeometry.method();

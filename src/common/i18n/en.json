@@ -277,6 +277,8 @@
   "validationReport.smallGeometries": "Very small polygons",
   "validationReport.unknown": "Polygons with unknown errors",
 
+  "resolutionConflict.partName": "Polygon {index}",
+
   "field-names.raster.id": "ID",
   "field-names.raster.productId": "Ext. ID",
   "field-names.raster.productType": "Type",
