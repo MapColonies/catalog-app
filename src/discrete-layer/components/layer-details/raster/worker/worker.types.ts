@@ -20,8 +20,12 @@ export interface LoadOptions {
 export interface WorkerAPI {
   init(): Promise<void>;
   dispose(): void;
-  load(fc: FeatureCollection, options?:LoadOptions): Promise<void>;
-  loadFromShapeFile(url: string, options?:LoadOptions, onProgress?: (p: WorkerMessage | null) => void): Promise<void>;
+  load(fc: FeatureCollection, options?: LoadOptions): Promise<void>;
+  loadFromShapeFile(
+    url: string,
+    options?: LoadOptions,
+    onProgress?: (p: WorkerMessage | null) => void
+  ): Promise<void>;
   updateAreas(onProgress?: (p: WorkerMessage | null) => void): void;
   computeOuterGeometry(onProgress?: (p: WorkerMessage | null) => void): Geometry;
   getFeatureCollection(onProgress?: (p: WorkerMessage | null) => void): FeatureCollection;

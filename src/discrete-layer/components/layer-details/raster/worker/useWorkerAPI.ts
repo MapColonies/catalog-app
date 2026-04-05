@@ -46,8 +46,11 @@ export function useWorkerAPI(): {
       init: async () => await wrapped.init(),
       dispose: async () => await wrapped.dispose(),
       load: async (fc: FeatureCollection, options?: LoadOptions) => await wrapped.load(fc, options),
-      loadFromShapeFile: async (url: string, options?: LoadOptions, onProgress?: (p: WorkerMessage | null) => void) =>
-        await wrapped.loadFromShapeFile(url, options, onProgress),
+      loadFromShapeFile: async (
+        url: string,
+        options?: LoadOptions,
+        onProgress?: (p: WorkerMessage | null) => void
+      ) => await wrapped.loadFromShapeFile(url, options, onProgress),
       updateAreas: async (onProgress?: (p: WorkerMessage | null) => void) =>
         await wrapped.updateAreas(onProgress),
       computeOuterGeometry: async (onProgress?: (p: WorkerMessage | null) => void) =>

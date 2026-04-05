@@ -11,7 +11,14 @@ import {
 } from 'geojson';
 import RBush from 'rbush';
 import { DEGREES_PER_METER, ONE_DEGREE_KM } from '../../../../../common/utils/geo.tools';
-import { WorkerAPI, WorkerMessage, IndexedItem, BBoxObj, LoadOptions, CustomProperties } from './worker.types';
+import {
+  WorkerAPI,
+  WorkerMessage,
+  IndexedItem,
+  BBoxObj,
+  LoadOptions,
+  CustomProperties,
+} from './worker.types';
 
 type ShpJsParser = (buffer: ArrayBuffer) => Promise<unknown>;
 
@@ -152,21 +159,17 @@ const parseShpFileContent = async (buffer: ArrayBuffer): Promise<FeatureCollecti
   return collection;
 };
 
-function _getCustomProps<T extends CustomProperties>(
-  templates: T, 
-  replacement: string
-): T {
-  if (!templates)
-    return {} as T;
+function _getCustomProps<T extends CustomProperties>(templates: T, replacement: string): T {
+  if (!templates) return {} as T;
   return Object.fromEntries(
-    Object.entries(templates).map(([key, value]) => [
-      key, 
-      value.replace(/{index}/g, replacement) 
-    ])
+    Object.entries(templates).map(([key, value]) => [key, value.replace(/{index}/g, replacement)])
   ) as T;
 }
 
-const prepareGEOSData = (customProps?: CustomProperties, onProgress?: (p: WorkerMessage | null) => void) => {
+const prepareGEOSData = (
+  customProps?: CustomProperties,
+  onProgress?: (p: WorkerMessage | null) => void
+) => {
   const t0 = performance.now();
   const reader = _geos.GEOSGeoJSONReader_create();
 
@@ -184,9 +187,9 @@ const prepareGEOSData = (customProps?: CustomProperties, onProgress?: (p: Worker
     _geos.Module._free(ptr);
 
     _geoms.push(geomPtr);
-    _properties.push({ 
+    _properties.push({
       ...(f.properties || {}),
-      ..._getCustomProps(customProps as CustomProperties, i.toString()), 
+      ..._getCustomProps(customProps as CustomProperties, i.toString()),
     });
 
     // store lightweight feature shell
