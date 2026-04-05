@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { wrap, Remote, proxy } from 'comlink';
-import type { BBoxObj, WorkerAPI, WorkerMessage } from './worker.types';
+import type { BBoxObj, LoadOptions, WorkerAPI, WorkerMessage } from './worker.types';
 import { FeatureCollection, Geometry } from 'geojson';
 
 export function useWorkerAPI(): {
@@ -8,11 +8,11 @@ export function useWorkerAPI(): {
     method: () => Promise<void>;
   };
   load: {
-    method: (fc: FeatureCollection) => Promise<void>;
+    method: (fc: FeatureCollection, options?: LoadOptions) => Promise<void>;
     progress: string;
   };
   loadFromShapeFile: {
-    method: (url: string) => Promise<void>;
+    method: (url: string, options?: LoadOptions) => Promise<void>;
     progress: WorkerMessage | null;
   };
   updateAreas: {
@@ -45,9 +45,9 @@ export function useWorkerAPI(): {
     setWorkerApi({
       init: async () => await wrapped.init(),
       dispose: async () => await wrapped.dispose(),
-      load: async (fc: FeatureCollection) => await wrapped.load(fc),
-      loadFromShapeFile: async (url: string, onProgress?: (p: WorkerMessage | null) => void) =>
-        await wrapped.loadFromShapeFile(url, onProgress),
+      load: async (fc: FeatureCollection, options?: LoadOptions) => await wrapped.load(fc, options),
+      loadFromShapeFile: async (url: string, options?: LoadOptions, onProgress?: (p: WorkerMessage | null) => void) =>
+        await wrapped.loadFromShapeFile(url, options, onProgress),
       updateAreas: async (onProgress?: (p: WorkerMessage | null) => void) =>
         await wrapped.updateAreas(onProgress),
       computeOuterGeometry: async (onProgress?: (p: WorkerMessage | null) => void) =>
@@ -76,16 +76,17 @@ export function useWorkerAPI(): {
         },
       },
       load: {
-        method: async (fc: FeatureCollection) => {
-          return await workerApi.load(fc);
+        method: async (fc: FeatureCollection, options?: LoadOptions) => {
+          return await workerApi.load(fc, options);
         },
         progress: '-1',
       },
       loadFromShapeFile: {
-        method: async (url: string) => {
+        method: async (url: string, options?: LoadOptions) => {
           setProgressLoadShapeFile(null);
           return await workerApi.loadFromShapeFile(
             url,
+            options,
             proxy((p: WorkerMessage) => {
               console.log('**** Progress LoadShape: ', p);
               setProgressLoadShapeFile(p);

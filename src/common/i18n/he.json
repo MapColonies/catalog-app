@@ -277,6 +277,8 @@
   "validationReport.smallGeometries": "פוליגונים זעירים",
   "validationReport.unknown": "פוליגונים עם שגיאות לא ידועות",
 
+  "resolutionConflict.partName": "פוליגון {index}",
+  
   "field-names.raster.id": "מזהה",
   "field-names.raster.productId": "מזהה חיצוני",
   "field-names.raster.productType": "סוג",

@@ -11,7 +11,7 @@ import {
 } from 'geojson';
 import RBush from 'rbush';
 import { DEGREES_PER_METER, ONE_DEGREE_KM } from '../../../../../common/utils/geo.tools';
-import { WorkerAPI, WorkerMessage, IndexedItem, BBoxObj } from './worker.types';
+import { WorkerAPI, WorkerMessage, IndexedItem, BBoxObj, LoadOptions, CustomProperties } from './worker.types';
 
 type ShpJsParser = (buffer: ArrayBuffer) => Promise<unknown>;
 
@@ -152,7 +152,21 @@ const parseShpFileContent = async (buffer: ArrayBuffer): Promise<FeatureCollecti
   return collection;
 };
 
-const prepareGEOSData = (onProgress?: (p: WorkerMessage | null) => void) => {
+function _getCustomProps<T extends CustomProperties>(
+  templates: T, 
+  replacement: string
+): T {
+  if (!templates)
+    return {} as T;
+  return Object.fromEntries(
+    Object.entries(templates).map(([key, value]) => [
+      key, 
+      value.replace(/{index}/g, replacement) 
+    ])
+  ) as T;
+}
+
+const prepareGEOSData = (customProps?: CustomProperties, onProgress?: (p: WorkerMessage | null) => void) => {
   const t0 = performance.now();
   const reader = _geos.GEOSGeoJSONReader_create();
 
@@ -170,7 +184,10 @@ const prepareGEOSData = (onProgress?: (p: WorkerMessage | null) => void) => {
     _geos.Module._free(ptr);
 
     _geoms.push(geomPtr);
-    _properties.push({ ...(f.properties || {}) });
+    _properties.push({ 
+      ...(f.properties || {}),
+      ..._getCustomProps(customProps as CustomProperties, i.toString()), 
+    });
 
     // store lightweight feature shell
     _featureTemplate.push({
@@ -231,13 +248,14 @@ const api: WorkerAPI = {
     _tree.clear();
     console.log('******** DISPOSED');
   },
-  async load(fc: FeatureCollection): Promise<void> {
+  async load(fc: FeatureCollection, options?: LoadOptions): Promise<void> {
     api.dispose();
     _fc = cloneDeep(fc);
-    prepareGEOSData();
+    prepareGEOSData(options?.customProperties);
   },
   async loadFromShapeFile(
     url: string,
+    options?: LoadOptions,
     onProgress?: (p: WorkerMessage | null) => void
   ): Promise<void> {
     api.dispose();
@@ -245,7 +263,7 @@ const api: WorkerAPI = {
     if (buffer) {
       const fc = await parseShpFileContent(buffer);
       _fc = cloneDeep(fc);
-      prepareGEOSData(onProgress);
+      prepareGEOSData(options?.customProperties, onProgress);
     }
   },
   updateAreas(onProgress?: (p: WorkerMessage | null) => void): void {
@@ -269,11 +287,11 @@ const api: WorkerAPI = {
         return;
       }
 
-      _properties[i].area =
+      _properties[i]._area =
         _geos.Module.getValue(areaPtr, 'double') *
         Math.pow(ONE_DEGREE_KM, 2) *
         Math.cos(lat * (Math.PI / 180));
-      // console.log(`**** AREA(${_properties[i].id}): ${_properties[i].area}`);
+      // console.log(`**** AREA(${_properties[i].id}): ${_properties[i]._area}`);
 
       if (i % 50 === 0) {
         onProgress?.({
