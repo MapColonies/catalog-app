@@ -71,7 +71,7 @@ export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> =
 
     for (let collectionIndex = 0; collectionIndex < lowResolutionCollections.length; collectionIndex += 1) {
       const featureIndex = lowResolutionCollections[collectionIndex].features.findIndex(
-        (feature) => feature.properties?.key === selectedLowResolutionFeatureKey
+        (feature) => feature.properties?._key === selectedLowResolutionFeatureKey
       );
 
       if (featureIndex !== -1) {
@@ -341,7 +341,7 @@ export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> =
                   mode={Mode.UPDATE}
                   layerRecord={state.context.updatedLayer}
                   enableFeaturePropertiesPopup={true}
-                  geoFeatures={showLowResolutionPolygonParts ? lowResolutionFeatures : []}
+                  lowResolutionFeatures={showLowResolutionPolygonParts ? lowResolutionFeatures : undefined}
                   selectedFeatureKey={selectedLowResolutionFeatureKey}
                   selectedFeatureRequestId={selectedLowResolutionFeatureRequestId}
                   style={{ height: '100%', minHeight: '300px' }}
