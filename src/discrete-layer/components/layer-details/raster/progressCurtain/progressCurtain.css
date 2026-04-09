@@ -1,0 +1,35 @@
+#progressCurtain {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  font-weight: 600;
+  background-color: blue;
+}
+
+#progressCurtain .curtainContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+#progressCurtain .curtainRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 20px;
+  color: var(--mdc-theme-text-primary-on-background);
+  text-align: center;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+}
+
+#progressCurtain .curtainRow.inactive {
+  opacity: 0.6;
+}
