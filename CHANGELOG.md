@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.5.0](https://github.com/MapColonies/catalog-app/compare/v4.4.3...v4.5.0) (2026-04-09)
+
+
+### Features
+
+* geo worker api ([#871](https://github.com/MapColonies/catalog-app/issues/871)) ([059273d](https://github.com/MapColonies/catalog-app/commit/059273d78ceca44dd64b4014d7b941c7748a729a))
+
+
+### Bug Fixes
+
+* add custom props ([#873](https://github.com/MapColonies/catalog-app/issues/873)) ([9847264](https://github.com/MapColonies/catalog-app/commit/984726409ac38cfb752ce68f8a52139651335be8))
+* values ([61734f5](https://github.com/MapColonies/catalog-app/commit/61734f52f340e1764de6ce1d9a46f4e60dc7477e))
+
+## [4.4.3](https://github.com/MapColonies/catalog-app/compare/v4.4.2...v4.4.3) (2026-03-30)
+
+
+### Bug Fixes
+
+* change search query to be paginated ([#867](https://github.com/MapColonies/catalog-app/issues/867)) ([4c1611d](https://github.com/MapColonies/catalog-app/commit/4c1611dffc1df37d5fa153b5157acf11fbad598c))
+
 ## [4.4.2](https://github.com/MapColonies/catalog-app/compare/v4.4.1...v4.4.2) (2026-03-18)
 
 

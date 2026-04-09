@@ -12,7 +12,7 @@ import {
   TreePath,
 } from 'react-sortable-tree';
 import { types, getParent, flow } from 'mobx-state-tree';
-import { cloneDeep, get, isEmpty } from 'lodash';
+import { get, isEmpty } from 'lodash';
 import CONFIG from '../../common/config';
 import { GroupBy, groupBy, KeyPredicate } from '../../common/helpers/group-by';
 import MESSAGES from '../../common/i18n';
@@ -148,14 +148,14 @@ export const catalogTreeStore = ModelBase.props({
         })
         .filter(Boolean); // Remove null values
 
-        if (filteredChildren.length > 0) {
-          return {
-            ...tree,
-            children: filteredChildren
-          };
-        }
+      if (filteredChildren.length > 0) {
+        return {
+          ...tree,
+          children: filteredChildren
+        };
+      }
 
-        return null;
+      return null;
     }
 
     function getFilteredCatalogTreeData(): TreeItem[] {
@@ -294,35 +294,25 @@ export const catalogTreeStore = ModelBase.props({
      * Fetch new catalog data
      */
     const catalogSearch = flow(function* catalogSearchGen(): Generator<
-      Promise<{ search: ILayerImage[] }>,
+      Promise<LayerMetadataMixedUnion[]>,
       ILayerImage[],
-      ILayerImage[]
+      LayerMetadataMixedUnion[]
     > {
-      const search = store.querySearch({
-        opts: {
-          filter: [
-            {
-              field: 'mc:type',
-              eq: store.discreteLayersStore.searchParams.recordType,
-            },
-          ],
-        },
-        end: CONFIG.RUNNING_MODE.END_RECORD,
-        start: CONFIG.RUNNING_MODE.START_RECORD,
-      });
-
       try {
         setSearchError(null);
+        const catalogFilter = (recordType: RecordType) => {
+          return [
+            {
+              field: 'mc:type',
+              eq: recordType,
+            }
+          ]
+        }
 
-        // Avoiding the cache with the refetch
-        const dataSearch = yield search.refetch();
-
-        const layersList = get(dataSearch, 'search') as ILayerImage[];
-        const layersImages: ILayerImage[] = cloneDeep(layersList);
-        
-        return store.discreteLayersStore.setLayersImages(layersImages, false);
+        const catalog = yield store.discreteLayersStore.fetchAllCatalog(catalogFilter);
+        return store.discreteLayersStore.setLayersImages(catalog, false);
       } catch (e) {
-        setSearchError(search.error);
+        setSearchError(e);
         resetCatalogTreeData();
         setIsDataLoading(false);
         return [];
@@ -397,7 +387,7 @@ export const catalogTreeStore = ModelBase.props({
           ) as CapabilityModelType[];
         }
         return store.discreteLayersStore.setCapabilities(!isEmpty(capabilitiesList) ? capabilitiesList as CapabilityModelType[] : []);
-      } catch(e) {
+      } catch (e) {
         setErrorCapabilities(capabilitiesQuery?.error);
         return store.discreteLayersStore.setCapabilities([]);
       }
@@ -444,11 +434,11 @@ export const catalogTreeStore = ModelBase.props({
      */
     function changeNodeByPath(
       data: TreePath & {
-          treeData?: TreeItem[],
-          newNode: any,
-          ignoreCollapsed?: boolean,
+        treeData?: TreeItem[],
+        newNode: any,
+        ignoreCollapsed?: boolean,
       }): TreeItem[] {
-      return changeNodeAtPath({ ...data, getNodeKey: keyFromTreeIndex, treeData: data.treeData ?? self.catalogTreeData as TreeItem[]});
+      return changeNodeAtPath({ ...data, getNodeKey: keyFromTreeIndex, treeData: data.treeData ?? self.catalogTreeData as TreeItem[] });
     };
 
     /**
@@ -458,7 +448,7 @@ export const catalogTreeStore = ModelBase.props({
      * @returns The first NodeData it finds that matches the provided title
      */
     function findNodeByTitle(title: string, useTranslation = false): NodeData | null {
-      const nodeTitle =  useTranslation ? intl.formatMessage({ id: title }) : title;
+      const nodeTitle = useTranslation ? intl.formatMessage({ id: title }) : title;
       const node = find({
         treeData: self.catalogTreeData as TreeItem[],
         getNodeKey: keyFromTreeIndex,
@@ -555,7 +545,7 @@ export const catalogTreeStore = ModelBase.props({
      */
     function updateNodeById(id: string, updatedNodeData: ILayerImage): void {
       if ((self.catalogTreeData as TreeItem[]).length > NONE) {
-        let newTreeData: TreeItem[] = [...self.catalogTreeData as TreeItem[]] ;
+        let newTreeData: TreeItem[] = [...self.catalogTreeData as TreeItem[]];
 
         find({
           treeData: self.catalogTreeData as TreeItem[],
@@ -573,7 +563,7 @@ export const catalogTreeStore = ModelBase.props({
           });
 
           const { parentNode, path: parentPath } = getParentNode(item, newTreeData);
-          
+
           // Re-sort parent group children after the changes (like if title has changed)
           const sortedParentNode = sortGroupChildrenByFieldValue(parentNode?.node as TreeItem);
 
@@ -590,7 +580,7 @@ export const catalogTreeStore = ModelBase.props({
 
     function updateFieldNodeById(id: string, updatedNodeData: ILayerImage, field: keyof ILayerImage): void {
       if ((self.catalogTreeData as TreeItem[]).length > NONE) {
-        let newTreeData: TreeItem[] = [...self.catalogTreeData as TreeItem[]] ;
+        let newTreeData: TreeItem[] = [...self.catalogTreeData as TreeItem[]];
 
         find({
           treeData: self.catalogTreeData as TreeItem[],
@@ -608,7 +598,7 @@ export const catalogTreeStore = ModelBase.props({
           });
 
           const { parentNode, path: parentPath } = getParentNode(item, newTreeData);
-          
+
           // Re-sort parent group children after the changes (like if title has changed)
           const sortedParentNode = sortGroupChildrenByFieldValue(parentNode?.node as TreeItem);
 
@@ -630,11 +620,11 @@ export const catalogTreeStore = ModelBase.props({
      */
     function removeNodeFromTree(path: (string | number)[]): void {
       const newTree = removeNodeAtPath({
-         treeData: self.catalogTreeData as TreeItem[],
-         getNodeKey: keyFromTreeIndex,
-         path
-       });
- 
+        treeData: self.catalogTreeData as TreeItem[],
+        getNodeKey: keyFromTreeIndex,
+        path
+      });
+
       self.catalogTreeData = newTree;
     }
 
