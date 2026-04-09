@@ -1,39 +1,51 @@
 import { useEffect, useMemo, useState } from 'react';
 import { wrap, Remote, proxy } from 'comlink';
-import type { BBoxObj, LoadOptions, WorkerAPI, WorkerMessage } from './worker.types';
+import {
+  BBoxObj,
+  Descriptor,
+  LoadOptions,
+  Process,
+  Stage,
+  WorkerAPI,
+  WorkerMessage,
+} from './worker.types';
 import { FeatureCollection, Geometry } from 'geojson';
 
-export function useWorkerAPI(): {
-  init: {
-    method: () => Promise<void>;
-  };
-  load: {
-    method: (fc: FeatureCollection, options?: LoadOptions) => Promise<void>;
-    progress: string;
-  };
-  loadFromShapeFile: {
-    method: (url: string, options?: LoadOptions) => Promise<void>;
-    progress: WorkerMessage | null;
-  };
-  updateAreas: {
-    method: () => Promise<void>;
-    progress: WorkerMessage | null;
-  };
-  computeOuterGeometry: {
-    method: () => Promise<Geometry>;
-    progress: WorkerMessage | null;
-  };
-  getFeatureCollection: {
-    method: () => Promise<FeatureCollection>;
-    progress: WorkerMessage | null;
-  };
-  query: {
-    method: (bbox: BBoxObj) => Promise<FeatureCollection>;
-    progress: WorkerMessage | null;
-  };
-} | null {
+export function useWorkerAPI(): [
+  {
+    init: {
+      method: () => Promise<void>;
+    };
+    load: {
+      method: (fc: FeatureCollection, options?: LoadOptions) => Promise<void>;
+      progress: [WorkerMessage | null];
+    };
+    loadFromShapeFile: {
+      method: (url: string, options?: LoadOptions) => Promise<void>;
+      progress: [WorkerMessage | null];
+    };
+    updateAreas: {
+      method: () => Promise<void>;
+      progress: WorkerMessage | null;
+    };
+    computeOuterGeometry: {
+      method: () => Promise<Geometry>;
+      progress: WorkerMessage | null;
+    };
+    getFeatureCollection: {
+      method: () => Promise<FeatureCollection>;
+      progress: WorkerMessage | null;
+    };
+    query: {
+      method: (bbox: BBoxObj) => Promise<FeatureCollection>;
+      progress: WorkerMessage | null;
+    };
+  } | null,
+  Descriptor
+] {
   const [workerApi, setWorkerApi] = useState<any>(null);
   const [progressComputeArea, setProgressComputeArea] = useState<WorkerMessage | null>(null);
+  const [progressComputeOuterGeometry, setProgressComputeOuterGeometry] = useState<WorkerMessage | null>(null);
   const [progressLoadShapeFile, setProgressLoadShapeFile] = useState<WorkerMessage | null>(null);
 
   useEffect(() => {
@@ -70,7 +82,9 @@ export function useWorkerAPI(): {
   }, []);
 
   const api = useMemo(() => {
-    if (!workerApi) return null;
+    if (!workerApi) {
+      return null;
+    }
 
     return {
       init: {
@@ -82,7 +96,7 @@ export function useWorkerAPI(): {
         method: async (fc: FeatureCollection, options?: LoadOptions) => {
           return await workerApi.load(fc, options);
         },
-        progress: '-1',
+        progress: null,
       },
       loadFromShapeFile: {
         method: async (url: string, options?: LoadOptions) => {
@@ -110,15 +124,67 @@ export function useWorkerAPI(): {
         },
         progress: progressComputeArea,
       },
+      // computeOuterGeometry: {
+      //   method: async () => {
+      //     return await workerApi.computeOuterGeometry(
+      //       proxy((p: WorkerMessage) => {
+      //         console.log('**** Progress Outer Geometry: ', p);
+      //         setProgressComputeOuterGeometry(p);
+      //       })
+      //     );
+      //   },
+      //   progress: progressComputeOuterGeometry,
+      // },
+
       computeOuterGeometry: {
         method: async () => {
-          return await workerApi.computeOuterGeometry(
-            proxy((p: WorkerMessage) => {
-              console.log('**** Progress Outer Geometry: ', p);
-            })
-          );
+          // 1. Setup the "Fake" Progress interval
+          const startTime = Date.now();
+          const duration = 10000; // 10 seconds
+
+          const timer = setInterval(() => {
+            const elapsed = Date.now() - startTime;
+            const ratio = Math.min(elapsed / duration, 1);
+
+            // Fast-start easing: (1 - (1 - x)^2) slows down towards the end
+            const fakePercent = Math.floor((1 - Math.pow(1 - ratio, 2)) * 95);
+
+            setProgressComputeOuterGeometry({
+              process: Process.ComputeOuterGeometry,
+              stage: Stage.ComputeOuterGeometry,
+              type: 'Progress',
+              message: fakePercent
+            } as any);
+
+            // Safety: Stop updating if we hit the 95% cap
+            if (fakePercent >= 95) clearInterval(timer);
+          }, 200); // Update every 200ms (5 times per second) is plenty for a bar
+
+          try {
+            // 2. Await the actual heavy worker task
+            const result = await workerApi.computeOuterGeometry(
+              proxy((p: WorkerMessage) => {
+                // If the worker sends real pulses, they still work here
+                setProgressComputeOuterGeometry(p);
+              })
+            );
+
+            // 3. Cleanup and finish
+            clearInterval(timer);
+            setProgressComputeOuterGeometry({
+              process: Process.ComputeOuterGeometry,
+              stage: Stage.ComputeOuterGeometry,
+              type: 'Done',
+              message: '100%',
+            } as any);
+            return result;
+
+          } catch (err) {
+            clearInterval(timer);
+            throw err;
+          }
         },
-        progress: null,
+        progress: progressComputeOuterGeometry,
       },
       getFeatureCollection: {
         method: async (): Promise<FeatureCollection> => {
@@ -142,7 +208,52 @@ export function useWorkerAPI(): {
         progress: null,
       },
     };
-  }, [workerApi, progressComputeArea, progressLoadShapeFile]);
+  }, [workerApi, progressComputeArea, progressComputeOuterGeometry, progressLoadShapeFile]);
 
-  return api;
+  const descriptors: Descriptor = useMemo(() => {
+    return {
+      [Process.Init]: {
+        stages: {
+          [Stage.Init]: {
+            translationCode: 'progress.stage.init.translationCode',
+            isReportingOnProgress: false,
+          },
+        },
+      },
+      [Process.Load]: {
+        stages: {
+          [Stage.Download]: {
+            translationCode: 'progress.stage.load.translationCode',
+            isReportingOnProgress: true,
+          },
+          [Stage.Parsing]: {
+            translationCode: 'progress.stage.parsing.translationCode',
+            isReportingOnProgress: true,
+          },
+          [Stage.Cache]: {
+            translationCode: 'progress.stage.cache.translationCode',
+            isReportingOnProgress: true,
+          },
+        },
+      },
+      [Process.UpdateAreas]: {
+        stages: {
+          [Stage.UpdateAreas]: {
+            translationCode: 'progress.stage.updateAreas.translationCode',
+            isReportingOnProgress: true,
+          },
+        },
+      },
+      [Process.ComputeOuterGeometry]: {
+        stages: {
+          [Stage.ComputeOuterGeometry]: {
+            translationCode: 'progress.stage.computeOuterGeometry.translationCode',
+            isReportingOnProgress: true,
+          },
+        },
+      },
+    };
+  }, []);
+
+  return [api, descriptors];
 }

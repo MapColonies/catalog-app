@@ -18,6 +18,8 @@ import {
   BBoxObj,
   LoadOptions,
   CustomProperties,
+  Process,
+  Stage,
 } from './worker.types';
 
 type ShpJsParser = (buffer: ArrayBuffer) => Promise<unknown>;
@@ -96,7 +98,8 @@ const _downloadFile = async (
       received += value.length;
 
       onProgress?.({
-        process: 'Download',
+        process: Process.Load,
+        stage: Stage.Download,
         type: 'Progress',
         message: total ? (received / total).toString() : '',
       });
@@ -105,10 +108,18 @@ const _downloadFile = async (
     // Combine chunks into one ArrayBuffer
     const blob = new Blob(chunks);
     const arrayBuffer = await blob.arrayBuffer();
+
+    onProgress?.({
+      process: Process.Load,
+      stage: Stage.Download,
+      type: 'Done',
+      message: '100%',
+    });
     return arrayBuffer;
   } catch (error) {
     onProgress?.({
-      process: 'Download',
+      process: Process.Load,
+      stage: Stage.Download,
       type: 'Error',
       message: (error as any).message,
     });
@@ -208,7 +219,8 @@ const prepareGEOSData = (
 
     if (i % 50 === 0) {
       onProgress?.({
-        process: 'Parsing',
+        process: Process.Load,
+        stage: Stage.Parsing,
         type: 'Progress',
         message: ((i + 1) / _fc.features.length).toString(),
       });
@@ -218,18 +230,20 @@ const prepareGEOSData = (
 
   _geos.GEOSGeoJSONReader_destroy(reader);
   onProgress?.({
-    process: 'Parsing',
+    process: Process.Load,
+    stage: Stage.Parsing,
     type: 'Done',
-    message: `${performance.now() - t0} (ms)}`,
+    message: `${performance.now() - t0} (ms)`,
   });
   // console.log('******* prepareGEOSData', performance.now()-t0, '(ms)'); // ~12K --> 23000ms
 
   const t1 = performance.now();
   _tree.load(items);
   onProgress?.({
-    process: 'Cache',
+    process: Process.Load,
+    stage: Stage.Cache,
     type: 'Done',
-    message: `${performance.now() - t1} (ms)}`,
+    message: `${performance.now() - t1} (ms)`,
   });
   // console.log('******* initQueryCache', performance.now()-t1, '(ms)'); // ~12K --> 17ms
 };
@@ -244,7 +258,7 @@ const api: WorkerAPI = {
     for (const g of _geoms) {
       try {
         _geos.GEOSGeom_destroy(g);
-      } catch {}
+      } catch { }
     }
     _geoms = [];
 
@@ -253,7 +267,7 @@ const api: WorkerAPI = {
   },
   async load(fc: FeatureCollection, options?: LoadOptions): Promise<void> {
     api.dispose();
-    _fc = cloneDeep(fc);
+    _fc = fc; //cloneDeep(fc);
     prepareGEOSData(options?.customProperties);
   },
   async loadFromShapeFile(
@@ -265,7 +279,7 @@ const api: WorkerAPI = {
     const buffer = await _downloadFile(url, onProgress);
     if (buffer) {
       const fc = await parseShpFileContent(buffer);
-      _fc = cloneDeep(fc);
+      _fc = fc; //cloneDeep(fc);
       prepareGEOSData(options?.customProperties, onProgress);
     }
   },
@@ -283,7 +297,8 @@ const api: WorkerAPI = {
       const status = _geos.GEOSArea(_geoms[i], areaPtr);
       if (status !== 1) {
         onProgress?.({
-          process: 'UpdateAreas',
+          process: Process.UpdateAreas,
+          stage: Stage.UpdateAreas,
           type: 'Error',
           message: `BAD geometry: ${_properties[i].id}`,
         });
@@ -298,7 +313,8 @@ const api: WorkerAPI = {
 
       if (i % 50 === 0) {
         onProgress?.({
-          process: 'UpdateAreas',
+          process: Process.UpdateAreas,
+          stage: Stage.UpdateAreas,
           type: 'Progress',
           message: ((i + 1) / total).toString(),
         });
@@ -308,6 +324,12 @@ const api: WorkerAPI = {
       _geos.Module._free(latitudePtr);
       _geos.GEOSGeom_destroy(centroidPtr);
     }
+    onProgress?.({
+      process: Process.UpdateAreas,
+      stage: Stage.UpdateAreas,
+      type: 'Done',
+      message: '100%',
+    });
     const t1 = performance.now();
     console.log('updateAreas took:', t1 - t0, 'ms');
   },
@@ -316,7 +338,8 @@ const api: WorkerAPI = {
     const t0 = performance.now();
 
     onProgress?.({
-      process: 'ComputeOuterGeometry',
+      process: Process.ComputeOuterGeometry,
+      stage: Stage.ComputeOuterGeometry,
       type: 'Progress',
       message: '0',
     });
@@ -343,7 +366,8 @@ const api: WorkerAPI = {
     );
 
     onProgress?.({
-      process: 'ComputeOuterGeometry',
+      process: Process.ComputeOuterGeometry,
+      stage: Stage.ComputeOuterGeometry,
       type: 'Progress',
       message: '10',
     });
@@ -363,11 +387,12 @@ const api: WorkerAPI = {
     _geos.GEOSGeom_destroy(simplified);
 
     onProgress?.({
-      process: 'ComputeOuterGeometry',
+      process: Process.ComputeOuterGeometry,
+      stage: Stage.ComputeOuterGeometry,
       type: 'Done',
-      message: `${performance.now() - t0} (ms)}`,
+      message: `${performance.now() - t0} (ms)`,
     });
-    // console.log('computeOuterGeometry took:', performance.now()-t0, 'ms'); // ~12K --> 18657ms
+    console.log('computeOuterGeometry took:', performance.now()-t0, 'ms'); // ~12K --> 18657ms
 
     return simplifiedOuterJSON;
   },

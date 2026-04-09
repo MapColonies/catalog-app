@@ -92,6 +92,10 @@ import '@material/tab-scroller/dist/mdc.tab-scroller.css';
 import '@material/tab-indicator/dist/mdc.tab-indicator.css';
 
 import './discrete-layer-view.css';
+import { ProgressCurtain } from '../components/layer-details/raster/progressCurtain/progressCurtain';
+import { useWorkerAPI } from '../components/layer-details/raster/worker/useWorkerAPI';
+import { MOCK_POLYGON } from '../components/layer-details/raster/state-machine/MOCK';
+import { WorkerMessage } from '../components/layer-details/raster/worker/worker.types';
 
 const ZERO = 0;
 const EXPANDED_PANEL_WIDTH = '28%';
@@ -1093,6 +1097,63 @@ const DiscreteLayerView: React.FC = observer(() => {
     [intl]
   );
 
+  /*****START: REMOVE IT !!!!!!!!!!!!!!!! */
+
+  const [api, descriptors] = useWorkerAPI();
+
+  const extractProgressArray = (api: any): WorkerMessage[] => {
+    if (!api) {
+      return [];
+    }
+
+    return Object.values(api)
+      .map((proc: any) => proc?.progress)
+      .filter((p): p is WorkerMessage => p != null);
+  };
+
+  const handleRun = async () => {
+    if (!api) return;
+    const FC: FeatureCollection = { type: 'FeatureCollection', features: [] };
+    for (let i = 0; i < 10000; i++) {
+      FC.features.push({
+        type: 'Feature',
+        geometry: MOCK_POLYGON,
+        properties: null,
+      });
+    }
+    // await api.init.method();
+    // await workerAPI?.init.process.method();
+    await api.init.method();
+    // await api.load.method(FC);
+    await api.loadFromShapeFile.method(
+      'https://download-int.mapcolonies.net/api/raster/v1/downloads/validation-reports/a80296ad-06f4-4d3c-9c2d-8982eb65d04b/vivid_ihud_orthophoto_v3.0_report_2026-02-04T15:32:09.836Z.zip'
+    );
+    await api.updateAreas.method();
+    const outerPerimeterGeom = await api.computeOuterGeometry.method();
+    console.log('api.computeOuterGeometry:', outerPerimeterGeom);
+
+    // await api.query.method({
+    //       minX: 53.028770883699195,
+    //       minY: 22.697544881824143,
+    //       maxX: 61.174158863397594,
+    //       maxY: 29.21600387903102
+    //     }); //1066
+    await api.query.method({
+      minX: 54.35290071061968,
+      minY: 25.72995702729723,
+      maxX: 55.45933754011244,
+      maxY: 26.38730710623136,
+    }); //11
+
+    const updatedFC = await api.getFeatureCollection.method();
+    console.log('api.getFeatureCollection:', updatedFC.features.length);
+  };
+  /*****END: REMOVE IT !!!!!!!!!!!!!!!! */
+
+  const progresses = useMemo(() => {
+    return extractProgressArray(api);
+  }, [api]);
+
   return (
     <>
       <Box className={`headerContainer ${disableOnDrawingClassName}`}>
@@ -1111,6 +1172,13 @@ const DiscreteLayerView: React.FC = observer(() => {
             }
           />
         </Box>
+
+        {/*****START: REMOVE IT !!!!!!!!!!!!!!!! */}
+        <button onClick={handleRun} style={{ position: 'relative', zIndex: 50 }}>
+          Run
+        </button>
+        {/*****END: REMOVE IT !!!!!!!!!!!!!!!! */}
+
         <Box className="headerSearchOptionsContainer">
           <PolygonSelectionUi
             onCancelDraw={(): void => {
@@ -1248,7 +1316,38 @@ const DiscreteLayerView: React.FC = observer(() => {
             >
               {getActiveTabHeader(activeTabView, site)}
               <Box className="panelContent" style={{ overflow: 'hidden' }}>
-                <CatalogTreeComponent refresh={catalogRefresh} isFiltered={catalogFilter} />
+                {/* <CatalogTreeComponent refresh={catalogRefresh} isFiltered={catalogFilter} /> */}
+
+                {/* <ProgressCurtain progressElements={
+                  [
+                    {
+                      // label: descriptors?.Load.stages.download.label,
+                      descriptor: descriptors.Load,
+                      // workerMessage: descriptors?.Load.process.progress?.Download
+                      workerMessage: api?.load.progress?.message
+                    },
+                    {
+                      translationKey: api.Load.stages.parsing.label,
+                      workerMessage: descriptors?.Load.process.progress?.Parsing
+                    },
+                    {
+                      translationKey: descriptors?.Load.stages.cache.label,
+                      workerMessage: descriptors?.Load.process.progress?.Cache
+                    },
+                    {
+                      translationKey: descriptors?.updateArea.stages.updateArea.label,
+                      workerMessage: descriptors?.updateArea.process.progress,
+                    },
+                    {
+                      translationKey: descriptors?.computeOuterGeometry.stages.computeOuterGeometry.label,
+                      workerMessage: descriptors?.computeOuterGeometry.process.progress,
+                    },
+                  ]
+                } /> */}
+                <ProgressCurtain
+                  descriptors={descriptors}
+                  workerMessages={progresses}
+                ></ProgressCurtain>
               </Box>
             </Box>
             {activeTabView === TabViews.SEARCH_RESULTS && (

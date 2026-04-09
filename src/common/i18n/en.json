@@ -874,5 +874,12 @@
   "export-layer.validations.relations.lower": "lower than-",
   "export-layer.validations.relations.lowerOrEqual": "lower or equal to-",
   "export-layer.validations.relations.equal": "equals to-",
-  "export-layer.validations.againstOtherField": "Value should be {relation} field {fieldName}"
+  "export-layer.validations.againstOtherField": "Value should be {relation} field {fieldName}",
+
+  "progress.stage.init.translationCode": "Boot",
+  "progress.stage.load.translationCode": "Loading",
+  "progress.stage.parsing.translationCode": "Parsing info",
+  "progress.stage.cache.translationCode": "Cache",
+  "progress.stage.updateAreas.translationCode": "Compute polygons area",
+  "progress.stage.computeOuterGeometry.translationCode": "Compute polygons perimeter"
 }

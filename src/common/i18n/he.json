@@ -874,5 +874,12 @@
   "export-layer.validations.relations.lower": "קטן מ-",
   "export-layer.validations.relations.lowerOrEqual": "קטן או שווה מ-",
   "export-layer.validations.relations.equal": "שווה ל-",
-  "export-layer.validations.againstOtherField": "הערך צריך להיות {relation} שדה {fieldName}"
+  "export-layer.validations.againstOtherField": "הערך צריך להיות {relation} שדה {fieldName}",
+
+  "progress.stage.init.translationCode": "מאתחל",
+  "progress.stage.load.translationCode": "טוען",
+  "progress.stage.parsing.translationCode": "מנתח מידע",
+  "progress.stage.cache.translationCode": "מטמון",
+  "progress.stage.updateAreas.translationCode": "מחשב שטחי פוליגונים",
+  "progress.stage.computeOuterGeometry.translationCode": "מחשב היקף חיצוני"
 }

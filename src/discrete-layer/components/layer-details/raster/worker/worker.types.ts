@@ -32,14 +32,60 @@ export interface WorkerAPI {
   query(bbox: BBoxObj, onProgress?: (p: WorkerMessage | null) => void): FeatureCollection;
 }
 
+// export type Process =
+//   | { loadFromShapeFile: 'Download' | 'Parsing' | 'Cache' }
+//   | { UpdateAreas: 'UpdateAreas' }
+//   | { ComputeOuterGeometry: 'ComputeOuterGeometry' }
+//   | { GetFeatureCollection: 'GetFeatureCollection' };
+
+// export type Processes =
+//   | { loadFromShapeFile: 'Download' | 'Parsing' | 'Cache' }
+//   | { UpdateAreas: 'UpdateAreas' }
+//   | { ComputeOuterGeometry: 'ComputeOuterGeometry' }
+//   | { GetFeatureCollection: 'GetFeatureCollection' };
+
+export enum Process {
+  Init = 'Init',
+  Load = 'Load',
+  UpdateAreas = 'UpdateAreas',
+  ComputeOuterGeometry = 'ComputeOuterGeometry',
+}
+
+export enum Stage {
+  Init = 'Init',
+  Download = 'Download',
+  Parsing = 'Parsing',
+  Cache = 'Cache',
+  UpdateAreas = 'UpdateAreas',
+  ComputeOuterGeometry = 'ComputeOuterGeometry',
+  GetFeatureCollection = 'GetFeatureCollection',
+}
+
+type StageProp = {
+  translationCode: string;
+  isReportingOnProgress: boolean;
+};
+
+type WorkerType = 'Progress' | 'Done' | 'Error';
+
 export interface WorkerMessage {
-  process:
-    | 'Download'
-    | 'Parsing'
-    | 'Cache'
-    | 'UpdateAreas'
-    | 'ComputeOuterGeometry'
-    | 'GetFeatureCollection';
-  type: 'Progress' | 'Done' | 'Error';
+  process: Process;
+  stage: Stage;
+  type: WorkerType;
   message: string;
 }
+
+export type ProcessStagesMap = {
+  [Process.Init]: Stage.Init;
+  [Process.Load]: Stage.Download | Stage.Parsing | Stage.Cache;
+  [Process.UpdateAreas]: Stage.UpdateAreas;
+  [Process.ComputeOuterGeometry]: Stage.ComputeOuterGeometry;
+};
+
+export type StagesFor<P extends Process> = Partial<Record<ProcessStagesMap[P], StageProp>>;
+
+export type Descriptor = {
+  [P in Process]: {
+    stages: StagesFor<P>;
+  };
+};

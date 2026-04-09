@@ -162,7 +162,7 @@ export const EntityRasterDialog: React.FC<EntityRasterDialogProps> = observer(
     };
 
     /*****START: REMOVE IT !!!!!!!!!!!!!!!! */
-    const api = useWorkerAPI();
+    const [api, descriptors] = useWorkerAPI();
     const intl = useIntl();
     const handleRun = async () => {
       if (!api) return;
@@ -212,9 +212,9 @@ export const EntityRasterDialog: React.FC<EntityRasterDialogProps> = observer(
     return (
       <RasterWorkflowProvider>
         {/*****START: REMOVE IT !!!!!!!!!!!!!!!! */}
-        <button onClick={handleRun} style={{ width: '100px', height: '30px', zIndex: 50 }}>
+        {/* <button onClick={handleRun} style={{ width: '100px', height: '30px', zIndex: 50 }}>
           Run {`${api?.updateAreas.progress?.message} ${api?.loadFromShapeFile.progress?.message}`}
-        </button>
+        </button> */}
         {/*****END: REMOVE IT !!!!!!!!!!!!!!!! */}
         <EntityRasterDialogInner
           {...props}
