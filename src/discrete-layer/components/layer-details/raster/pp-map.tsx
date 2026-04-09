@@ -32,8 +32,8 @@ import { MapLoadingIndicator } from '../../../../common/components/map/ol-map.lo
 import { ILayerImage } from '../../../models/layerImage';
 import { useStore } from '../../../models/RootStore';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
-import { PolygonPartsVectorLayer as PolygonPartsExtentVectorLayer } from './pp-extent-vector-layer';
-import { LowResolutionVectorLayer } from './pp-low-resolution-vector-layer';
+import { PolygonPartsVectorLayer as PolygonPartsExtentVectorLayer } from './polygon-parts-vector-layer';
+import { LowResolutionVectorLayer } from './low-resolution-vector-layer';
 import { FEATURE_LABEL_CONFIG, FeatureType, getText, PPMapStyles } from './pp-map.utils';
 
 import './pp-map.css';
