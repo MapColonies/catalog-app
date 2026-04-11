@@ -90,7 +90,10 @@ export const LowResolutionVectorLayer: React.FC<LowResolutionVectorLayerProps> =
         lowResolutionFootprint.current = {
           type: 'Feature',
           geometry: bboxPolygon([minX, minY, maxX, maxY]).geometry as Geometry,
-          properties: { _showAsFootprint: true } as GeoJsonProperties,
+          properties: {
+            _showAsFootprint: true,
+            _featureType: FeatureType.LOW_RESOLUTION_PP,
+          } as GeoJsonProperties,
         };
       } else {
         lowResolutionFootprint.current = undefined;

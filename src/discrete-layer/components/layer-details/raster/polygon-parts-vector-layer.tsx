@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { BBox, Feature, GeoJsonProperties, Geometry } from 'geojson';
 import { debounce } from 'lodash';
@@ -49,6 +49,20 @@ const STARTING_PAGE = 0;
 const DEBOUNCE_MOUSE_INTERVAL = 500;
 const EXISTING_PP_LAYER_Z_INDEX = 1;
 
+const createZoomedOutFootprintFeature = (
+  layerRecord?: ILayerImage | null
+): Feature<Geometry, GeoJsonProperties> => ({
+  type: 'Feature',
+  geometry: {
+    ...layerRecord?.footprint,
+  },
+  properties: {
+    text: 'hide',
+    _showAsFootprint: true,
+    _featureType: FeatureType.EXISTING_PP,
+  },
+});
+
 const ExistingPPLayerOrder: React.FC = () => {
   const vectorLayer = useVectorLayer();
 
@@ -66,11 +80,11 @@ export const PolygonPartsVectorLayer: React.FC<PolygonPartsVectorLayerProps> = o
   const mapOl = useMap();
   const intl = useIntl();
   const [existingPolygonParts, setExistingPolygonParts] = useState<Feature[]>([]);
+  const requestedStartIndexRef = useRef(START_OFFSET);
 
   useEffect(() => {
     onFeaturesChange?.(existingPolygonParts);
   }, [existingPolygonParts]);
-  const [page, setPage] = useState(STARTING_PAGE);
   const { data, error, loading, setQuery } = useQuery<{
     getPolygonPartsFeature: GetFeatureModelType;
   }>();
@@ -85,18 +99,8 @@ export const PolygonPartsVectorLayer: React.FC<PolygonPartsVectorLayerProps> = o
 
   useEffect(() => {
     const handleMoveEndEvent = (e: MapEvent): void => {
-      setPage(STARTING_PAGE);
-      setExistingPolygonParts([
-        {
-          type: 'Feature',
-          geometry: {
-            ...layerRecord?.footprint,
-          },
-          properties: {
-            text: 'hide',
-          },
-        },
-      ]);
+      requestedStartIndexRef.current = START_OFFSET;
+      setExistingPolygonParts([createZoomedOutFootprintFeature(layerRecord)]);
       getExistingPolygonParts(mapOl.getView().calculateExtent() as BBox, START_OFFSET);
     };
 
@@ -116,16 +120,34 @@ export const PolygonPartsVectorLayer: React.FC<PolygonPartsVectorLayerProps> = o
 
   useEffect(() => {
     if (!loading && data) {
-      setExistingPolygonParts([
-        ...(page === 0 ? existingPolygonParts.slice(1) : existingPolygonParts),
-        ...(data.getPolygonPartsFeature.features as Feature<Geometry, GeoJsonProperties>[]),
-      ]);
-      if ((data.getPolygonPartsFeature.numberReturned as number) !== 0) {
+      const currentStartIndex = requestedStartIndexRef.current;
+      const fetchedFeatures =
+        data.getPolygonPartsFeature.features as Feature<Geometry, GeoJsonProperties>[];
+      const hasMoreFeatures =
+        fetchedFeatures.length === CONFIG.POLYGON_PARTS.MAX.WFS_FEATURES;
+
+      setExistingPolygonParts((currentFeatures) => {
+        const nextFeatures =
+          currentStartIndex === STARTING_PAGE
+            ? currentFeatures.filter(
+              (feature) => !(feature.properties as GeoJsonProperties | null)?._showAsFootprint
+            )
+            : currentFeatures;
+
+        if (currentStartIndex === STARTING_PAGE && fetchedFeatures.length === 0) {
+          return [];
+        }
+
+        return [...nextFeatures, ...fetchedFeatures];
+      });
+
+      if (hasMoreFeatures) {
+        const nextStartIndex = currentStartIndex + CONFIG.POLYGON_PARTS.MAX.WFS_FEATURES;
+        requestedStartIndexRef.current = nextStartIndex;
         getExistingPolygonParts(
           mapOl.getView().calculateExtent() as BBox,
-          (page + 1) * CONFIG.POLYGON_PARTS.MAX.WFS_FEATURES
+          nextStartIndex
         );
-        setPage(page + 1);
       }
     }
     if (loading) {
@@ -147,26 +169,17 @@ export const PolygonPartsVectorLayer: React.FC<PolygonPartsVectorLayerProps> = o
   }, [error, loading]);
 
   const getExistingPolygonParts = (bbox: BBox, startIndex: number) => {
-    // const fakePP = squareGrid(bbox, 10, {units: 'miles'});
-    // console.log(fakePP);
-    // setExistingPolygonParts(fakePP.features);
-
     const currentZoomLevel = mapOl.getView().getZoom();
 
     if (
       currentZoomLevel &&
       currentZoomLevel < CONFIG.POLYGON_PARTS.MAX.SHOW_FOOTPRINT_ZOOM_LEVEL
     ) {
-      setExistingPolygonParts([
-        {
-          type: 'Feature',
-          geometry: {
-            ...layerRecord?.footprint,
-          },
-          properties: null,
-        },
-      ]);
+      requestedStartIndexRef.current = START_OFFSET;
+      showLoadingSpinner(false);
+      setExistingPolygonParts([createZoomedOutFootprintFeature(layerRecord)]);
     } else {
+      requestedStartIndexRef.current = startIndex;
       showLoadingSpinner(true);
       setQuery(
         store.queryGetPolygonPartsFeature({

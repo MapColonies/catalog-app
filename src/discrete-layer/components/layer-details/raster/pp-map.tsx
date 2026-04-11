@@ -144,6 +144,10 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
     if (clickedFeature) {
       if (clickedFeature.properties && typeof clickedFeature.properties === 'object') {
         const props = clickedFeature.properties as Record<string, unknown>;
+        if (props._showAsFootprint) {
+          return undefined;
+        }
+
         if (Object.keys(props).length > 0) {
           return props;
         }
@@ -178,6 +182,10 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
     }
 
     const { geometry: _geometry, ...rest } = properties;
+    if (rest._showAsFootprint) {
+      return undefined;
+    }
+
     if (Object.keys(rest).length > 0) {
       return rest;
     }
@@ -282,6 +290,30 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
     };
   };
 
+  const isFootprintProperties = (properties?: Record<string, unknown>): boolean => {
+    return Boolean(properties?._showAsFootprint);
+  };
+
+  const isFootprintOnlyDisplay = (features?: Feature[]): boolean => {
+    if (!features || features.length !== 1) {
+      return false;
+    }
+
+    const properties = features[0]?.properties;
+    return Boolean(
+      properties &&
+      typeof properties === 'object' &&
+      (properties as Record<string, unknown>)._showAsFootprint
+    );
+  };
+
+  const clearPreviewSelection = (): void => {
+    setSelectedExistingFeature(undefined);
+    setSelectedFeatureProperties(undefined);
+    onMapFeatureClick?.(undefined);
+    onFeaturePropertiesPopupClose?.();
+  };
+
   useEffect(() => {
     const definedElements = geoFeatures?.filter((feat) => feat !== undefined);
     if (definedElements?.length === 0) {
@@ -302,10 +334,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
     const wasShown = previousShowExistingPolygonPartsRef.current;
 
     if (wasShown && !showExistingPolygonParts) {
-      setSelectedExistingFeature(undefined);
-      setSelectedFeatureProperties(undefined);
-      onMapFeatureClick?.(undefined);
-      onFeaturePropertiesPopupClose?.();
+      clearPreviewSelection();
     }
 
     previousShowExistingPolygonPartsRef.current = showExistingPolygonParts;
@@ -315,10 +344,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
     const currentGeoFeaturesLength = geoFeatures?.length ?? 0;
 
     if (previousGeoFeaturesLengthRef.current > 0 && currentGeoFeaturesLength === 0) {
-      setSelectedFeatureProperties(undefined);
-      setSelectedExistingFeature(undefined);
-      onMapFeatureClick?.(undefined);
-      onFeaturePropertiesPopupClose?.();
+      clearPreviewSelection();
     }
 
     previousGeoFeaturesLengthRef.current = currentGeoFeaturesLength;
@@ -329,10 +355,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
 
     if (previousLowResolutionFeaturesLengthRef.current > 0 && currentLength === 0) {
       lowResolutionFeaturesRef.current = [];
-      setSelectedFeatureProperties(undefined);
-      setSelectedExistingFeature(undefined);
-      onMapFeatureClick?.(undefined);
-      onFeaturePropertiesPopupClose?.();
+      clearPreviewSelection();
     }
 
     previousLowResolutionFeaturesLengthRef.current = currentLength;
@@ -550,6 +573,14 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
                 });
 
                 if (matchingExisting) {
+                  if (
+                    isFootprintProperties(
+                      matchingExisting.properties as Record<string, unknown> | undefined
+                    )
+                  ) {
+                    return undefined;
+                  }
+
                   clickedExistingFeature = true;
                   setSelectedExistingFeature(matchingExisting);
                   if (matchingExisting.properties && Object.keys(matchingExisting.properties).length > 0) {
@@ -590,6 +621,12 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
 
         const fallbackProperties = getClickedFeatureProperties(event.coordinate);
         if (fallbackProperties) {
+          if (isFootprintProperties(fallbackProperties)) {
+            setSelectedExistingFeature(undefined);
+            setSelectedFeatureProperties(undefined);
+            return;
+          }
+
           // Determine whether the hit feature belongs to the list (orange) or existing (green)
           const clickedPoint = point(event.coordinate as [number, number]);
           const matchingExistingFallback = showExistingPolygonPartsRef.current ? existingPPFeaturesRef.current.find((f) => {
@@ -608,6 +645,16 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
           }) : undefined;
 
           if (matchingExistingFallback) {
+            if (
+              isFootprintProperties(
+                matchingExistingFallback.properties as Record<string, unknown> | undefined
+              )
+            ) {
+              setSelectedExistingFeature(undefined);
+              setSelectedFeatureProperties(undefined);
+              return;
+            }
+
             setSelectedExistingFeature(matchingExistingFallback);
             onMapFeatureClick?.(undefined);
             setSelectedFeatureProperties(
@@ -650,11 +697,8 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
         }
 
         if (clickedPolygonWithoutProperties) {
-          setSelectedFeatureProperties({
-            [NO_PROPERTIES_MESSAGE_KEY]: intl.formatMessage({
-              id: 'polygon-parts.map-preview.no-feature-properties',
-            }),
-          });
+          setSelectedExistingFeature(undefined);
+          setSelectedFeatureProperties(undefined);
         }
       };
 
@@ -715,10 +759,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
                 setShowExistingPolygonParts(isChecked);
 
                 if (!isChecked) {
-                  setSelectedExistingFeature(undefined);
-                  setSelectedFeatureProperties(undefined);
-                  onMapFeatureClick?.(undefined);
-                  onFeaturePropertiesPopupClose?.();
+                  clearPreviewSelection();
                 }
               }}
             />
@@ -737,6 +778,10 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
             fitOptions={fitOptions}
             onFeaturesChange={(updatedFeatures): void => {
               lowResolutionFeaturesRef.current = updatedFeatures;
+
+              if (isFootprintOnlyDisplay(updatedFeatures)) {
+                clearPreviewSelection();
+              }
             }}
           />
         )}
@@ -746,6 +791,10 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
             selectedFeature={selectedExistingFeature}
             onFeaturesChange={(features): void => {
               existingPPFeaturesRef.current = features;
+
+              if (isFootprintOnlyDisplay(features)) {
+                clearPreviewSelection();
+              }
             }}
           />
         )}
@@ -766,9 +815,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
               className="featurePropertiesPopupClose mc-icon-Close"
               label="CLOSE"
               onClick={(): void => {
-                setSelectedFeatureProperties(undefined);
-                setSelectedExistingFeature(undefined);
-                onFeaturePropertiesPopupClose?.();
+                clearPreviewSelection();
               }}
             />
           </Box>
