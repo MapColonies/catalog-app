@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
+import { SetStateAction, useEffect, useMemo, useState } from 'react';
 import { wrap, Remote, proxy } from 'comlink';
+import { FeatureCollection, Geometry } from 'geojson';
 import {
   BBoxObj,
   Descriptor,
@@ -9,44 +10,45 @@ import {
   WorkerAPI,
   WorkerMessage,
 } from './worker.types';
-import { FeatureCollection, Geometry } from 'geojson';
+
+type WorkerService = {
+  init: {
+    method: () => Promise<void>;
+  };
+  load: {
+    method: (fc: FeatureCollection, options?: LoadOptions) => Promise<void>;
+    progress: WorkerMessage[] | null;
+  };
+  loadFromShapeFile: {
+    method: (url: string, options?: LoadOptions) => Promise<void>;
+    progress: WorkerMessage[] | null;
+  };
+  updateAreas: {
+    method: () => Promise<void>;
+    progress: WorkerMessage | null;
+  };
+  computeOuterGeometry: {
+    method: () => Promise<Geometry>;
+    progress: WorkerMessage | null;
+  };
+  getFeatureCollection: {
+    method: () => Promise<FeatureCollection>;
+    progress: WorkerMessage | null;
+  };
+  query: {
+    method: (bbox: BBoxObj) => Promise<FeatureCollection>;
+    progress: WorkerMessage | null;
+  };
+}
 
 export function useWorkerAPI(): [
-  {
-    init: {
-      method: () => Promise<void>;
-    };
-    load: {
-      method: (fc: FeatureCollection, options?: LoadOptions) => Promise<void>;
-      progress: [WorkerMessage | null];
-    };
-    loadFromShapeFile: {
-      method: (url: string, options?: LoadOptions) => Promise<void>;
-      progress: [WorkerMessage | null];
-    };
-    updateAreas: {
-      method: () => Promise<void>;
-      progress: WorkerMessage | null;
-    };
-    computeOuterGeometry: {
-      method: () => Promise<Geometry>;
-      progress: WorkerMessage | null;
-    };
-    getFeatureCollection: {
-      method: () => Promise<FeatureCollection>;
-      progress: WorkerMessage | null;
-    };
-    query: {
-      method: (bbox: BBoxObj) => Promise<FeatureCollection>;
-      progress: WorkerMessage | null;
-    };
-  } | null,
+  WorkerService | null,
   Descriptor
 ] {
   const [workerApi, setWorkerApi] = useState<any>(null);
   const [progressComputeArea, setProgressComputeArea] = useState<WorkerMessage | null>(null);
   const [progressComputeOuterGeometry, setProgressComputeOuterGeometry] = useState<WorkerMessage | null>(null);
-  const [progressLoadShapeFile, setProgressLoadShapeFile] = useState<WorkerMessage | null>(null);
+  const [loadShapeFileProgress, setLoadShapeFileProgress] = useState<WorkerMessage[] | null>(null);
 
   useEffect(() => {
     const worker = new Worker(new URL('./feat-collection.worker-api.ts', import.meta.url), {
@@ -81,7 +83,27 @@ export function useWorkerAPI(): [
     };
   }, []);
 
-  const api = useMemo(() => {
+  const upsertWorkerMessageByStage = (process: Process, workerMessage: WorkerMessage, setProgresses: (value: SetStateAction<WorkerMessage[] | null>) => void) => {
+    if (process !== workerMessage.process) {
+      return;
+    }
+
+    setProgresses(prev => {
+      const current = prev ?? [];
+
+      const stageIndex = current.findIndex(msg => msg.stage === workerMessage.stage);
+
+      if (stageIndex > -1) {
+        const newArr = [...current];
+        newArr[stageIndex] = workerMessage;
+        return newArr;
+      } else {
+        return [...current, workerMessage];
+      }
+    });
+  };
+
+  const api: WorkerService | null = useMemo(() => {
     if (!workerApi) {
       return null;
     }
@@ -100,17 +122,17 @@ export function useWorkerAPI(): [
       },
       loadFromShapeFile: {
         method: async (url: string, options?: LoadOptions) => {
-          setProgressLoadShapeFile(null);
+          setLoadShapeFileProgress(null);
           return await workerApi.loadFromShapeFile(
             url,
             options,
             proxy((p: WorkerMessage) => {
               console.log('**** Progress LoadShape: ', p);
-              setProgressLoadShapeFile(p);
+              upsertWorkerMessageByStage(Process.Load, p, setLoadShapeFileProgress);
             })
           );
         },
-        progress: progressLoadShapeFile,
+        progress: loadShapeFileProgress,
       },
       updateAreas: {
         method: async () => {
@@ -208,7 +230,7 @@ export function useWorkerAPI(): [
         progress: null,
       },
     };
-  }, [workerApi, progressComputeArea, progressComputeOuterGeometry, progressLoadShapeFile]);
+  }, [workerApi, progressComputeArea, progressComputeOuterGeometry, loadShapeFileProgress]);
 
   const descriptors: Descriptor = useMemo(() => {
     return {

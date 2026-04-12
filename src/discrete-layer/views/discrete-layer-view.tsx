@@ -1107,7 +1107,13 @@ const DiscreteLayerView: React.FC = observer(() => {
     }
 
     return Object.values(api)
-      .map((proc: any) => proc?.progress)
+      .flatMap((proc: any) => {
+        const progress = proc?.progress;
+        if (!progress) {
+          return [];
+        }
+        return Array.isArray(progress) ? progress : [progress];
+      })
       .filter((p): p is WorkerMessage => p != null);
   };
 

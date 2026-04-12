@@ -6,7 +6,7 @@ import './progressCurtain.css';
 
 interface CurtainProps {
   descriptors: Descriptor;
-  workerMessages?: Array<WorkerMessage> | null;
+  workerMessages?: WorkerMessage[] | null;
 }
 
 export const ProgressCurtain: React.FC<CurtainProps> = (props) => {
