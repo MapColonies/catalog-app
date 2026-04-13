@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { AutoSizer, List, ListRowProps } from 'react-virtualized';
 import { Feature } from 'geojson';
@@ -57,6 +57,8 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
   const [lowResolutionCollections, setLowResolutionCollections] = useState<ParsedFeatureCollection[]>([]);
   const ZOOM_LEVELS_TABLE = useZoomLevelsTable();
   const api = useWorkerAPI();
+  const reportUrl = state.context.job?.validationReport?.report?.url;
+  const ingestionResolution = state.context.job?.details?.parameters?.ingestionResolution as string | undefined;
 
   const lowResolutionFeatures = useMemo(
     () => lowResolutionCollections.flatMap((c) => c.features),
@@ -87,10 +89,26 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
   const resolutionDegreeToZoomLevel = useMemo(() => {
     const table = Object.values(ZOOM_LEVELS_TABLE);
     return Object.fromEntries(table.map((v, i) => [v, i]));
-  }, [ZOOM_LEVELS_TABLE]);
+  }, []);
+
+  const zoomLevelForIngestion = useMemo(() => {
+    if (!ingestionResolution) {
+      return undefined;
+    }
+    return resolutionDegreeToZoomLevel[ingestionResolution];
+  }, [ingestionResolution]);
+
+  const collectionName = useMemo(() => {
+    return intl.formatMessage(
+      { id: 'resolutionConflict.collectionName' },
+      { value: zoomLevelForIngestion }
+    );
+  }, [zoomLevelForIngestion]);
 
   useEffect(() => {
-    const reportUrl = state.context.job?.validationReport?.report?.url;
+    if (!api) {
+      return;
+    }
 
     if (!reportUrl) {
       setLowResolutionCollections([]);
@@ -106,21 +124,13 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
       setLowResolutionPartsError(undefined);
 
       try {
-        if (!api) {
-          return;
-        }
-
         await api.init.method();
 
         await api.loadFromShapeFile.method(reportUrl, {
           customProperties: {
             _key: '{index}',
             _featureLabel: '{index}',
-            _zoomLevel: String(
-              resolutionDegreeToZoomLevel[
-                state.context.job?.details?.parameters?.ingestionResolution as string
-              ]
-            ),
+            _zoomLevel: String(zoomLevelForIngestion),
             _featureType: FeatureType.LOW_RESOLUTION_PP,
           },
         });
@@ -140,10 +150,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                 { id: 'resolutionConflict.partName' },
                 { index: index + 1 }
               ),
-              _zoomLevel:
-                resolutionDegreeToZoomLevel[
-                  state.context.job?.details?.parameters?.ingestionResolution as string
-                ],
+              _zoomLevel: zoomLevelForIngestion,
               _featureType: FeatureType.LOW_RESOLUTION_PP,
             },
           } as Feature;
@@ -151,10 +158,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
 
         const normalized: ParsedFeatureCollection[] = [
           {
-            name: intl.formatMessage(
-              { id: 'resolutionConflict.collectionName' },
-              { value: resolutionDegreeToZoomLevel[state.context.job?.details?.parameters?.ingestionResolution] }
-            ),
+            name: collectionName,
             features: normalizedFeatures,
           },
         ];
@@ -184,19 +188,19 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
     };
   }, []);
 
-  const closeDialog = (): void => {
+  const closeDialog = useCallback((): void => {
     onSetIsOpen(false);
-  };
+  }, []);
 
-  const approveDialog = (): void => {
+  const approveDialog = useCallback((): void => {
     onApprove?.();
     closeDialog();
-  };
+  }, []);
 
-  const formatArea = (areaSquareMeters: number): string => {
+  const formatArea = useCallback((areaSquareMeters: number): string => {
     const areaSquareKilometers = areaSquareMeters / 1_000_000;
     return intl.formatMessage({ id: 'resolutionConflict.units.km2' }, { value: areaSquareKilometers.toFixed(2) });
-  };
+  }, []);
 
   return (
     <Box id="resolutionConflictDialog">
