@@ -2,8 +2,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { AutoSizer, List, ListRowProps } from 'react-virtualized';
 import { Feature } from 'geojson';
-// import area from '@turf/area';
-// import shp, { FeatureCollectionWithFilename } from 'shpjs';
+import area from '@turf/area';
+import shp, { FeatureCollectionWithFilename } from 'shpjs';
 import { Box } from '@map-colonies/react-components';
 import {
   Button,
@@ -60,7 +60,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
   const ZOOM_LEVELS_TABLE = useZoomLevelsTable();
   const api = useWorkerAPI();
 
-  const fetchData = async () => {
+  /*const fetchData = async () => {
     if (!api) { return; }
 
     // 1. Init
@@ -103,7 +103,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
 
   useEffect(() => {
     fetchData(); 
-  }, []);
+  }, []);*/
 
   const lowResolutionFeatures = useMemo(
     () => lowResolutionCollections.flatMap((c) => c.features),
@@ -131,7 +131,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
     return undefined;
   }, [lowResolutionCollections, selectedLowResolutionFeatureKey]);
 
-  /*useEffect(() => {
+  useEffect(() => {
     const reportUrl = state.context.job?.validationReport?.report?.url;
 
     if (!reportUrl) {
@@ -214,7 +214,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
     return () => {
       isCancelled = true;
     };
-  }, []);*/
+  }, []);
 
   const resolutionDegreeToZoomLevel = useMemo(() => {
     const table = Object.values(ZOOM_LEVELS_TABLE);

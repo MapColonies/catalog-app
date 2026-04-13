@@ -499,23 +499,23 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
         } catch {
           return;
         }
-      }
 
-      if (!enableFeaturePropertiesPopup) {
-        return;
-      }
+        if (!enableFeaturePropertiesPopup) {
+          return;
+        }
 
-      const properties = selectedFeature.properties as Record<string, unknown> | null | undefined;
-      if (properties && Object.keys(properties).length > 0) {
-        setSelectedFeatureProperties(addLowResolutionFeatureLabelToProperties(properties));
-        return;
-      }
+        const properties = selectedFeature.properties as Record<string, unknown> | null | undefined;
+        if (properties && Object.keys(properties).length > 0) {
+          setSelectedFeatureProperties(addLowResolutionFeatureLabelToProperties(properties));
+          return;
+        }
 
-      setSelectedFeatureProperties({
-        [NO_PROPERTIES_MESSAGE_KEY]: intl.formatMessage({
-          id: 'polygon-parts.map-preview.no-feature-properties',
-        }),
-      });
+        setSelectedFeatureProperties({
+          [NO_PROPERTIES_MESSAGE_KEY]: intl.formatMessage({
+            id: 'polygon-parts.map-preview.no-feature-properties',
+          }),
+        });
+      }
     }, [map, geoFeatures, lowResolutionFeatures, selectedFeatureKey, selectedFeatureRequestId, fitOptions, enableFeaturePropertiesPopup]);
 
     return null;
