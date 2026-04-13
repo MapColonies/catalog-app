@@ -2,8 +2,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { AutoSizer, List, ListRowProps } from 'react-virtualized';
 import { Feature } from 'geojson';
-import area from '@turf/area';
-import shp, { FeatureCollectionWithFilename } from 'shpjs';
 import { Box } from '@map-colonies/react-components';
 import {
   Button,
@@ -60,51 +58,6 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
   const ZOOM_LEVELS_TABLE = useZoomLevelsTable();
   const api = useWorkerAPI();
 
-  /*const fetchData = async () => {
-    if (!api) { return; }
-
-    // 1. Init
-    await api.init.method();
-
-    // 2. Load from shape file
-    await api.loadFromShapeFile.method(
-      // state.context.job?.validationReport?.report?.url as string, 
-      'https://download-int.mapcolonies.net/api/raster/v1/downloads/validation-reports/a80296ad-06f4-4d3c-9c2d-8982eb65d04b/vivid_ihud_orthophoto_v3.0_report_2026-02-04T15:32:09.836Z.zip',
-      {
-        customProperties: {
-          _key: 'featureKey',
-          _featureLabel: intl.formatMessage({ id: 'resolutionConflict.partName' }),
-          _zoomLevel: '9',
-          _featureType: FeatureType.LOW_RESOLUTION_PP
-        },
-      }
-    );
-    // 3. Update areas 
-    await api.updateAreas.method();
-
-    // 4. Get outer geometry 
-    const outerPerimeterGeom = await api.computeOuterGeometry.method();
-    console.log('api.computeOuterGeometry:', outerPerimeterGeom);
-
-    await api.query.method({
-      minX: 54.35290071061968,
-      minY: 25.72995702729723,
-      maxX: 55.45933754011244,
-      maxY: 26.38730710623136,
-    });
-
-    const updatedFC = await api.getFeatureCollection.method();
-    console.log('api.getFeatureCollection:', updatedFC.features.length);
-    setLowResolutionCollections([{
-      name: 'KUKU',
-      features: updatedFC.features
-    }]);
-  };
-
-  useEffect(() => {
-    fetchData(); 
-  }, []);*/
-
   const lowResolutionFeatures = useMemo(
     () => lowResolutionCollections.flatMap((c) => c.features),
     [lowResolutionCollections]
@@ -131,6 +84,11 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
     return undefined;
   }, [lowResolutionCollections, selectedLowResolutionFeatureKey]);
 
+  const resolutionDegreeToZoomLevel = useMemo(() => {
+    const table = Object.values(ZOOM_LEVELS_TABLE);
+    return Object.fromEntries(table.map((v, i) => [v, i]));
+  }, [ZOOM_LEVELS_TABLE]);
+
   useEffect(() => {
     const reportUrl = state.context.job?.validationReport?.report?.url;
 
@@ -148,48 +106,58 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
       setLowResolutionPartsError(undefined);
 
       try {
-        const response = await store.fetch(reportUrl, 'GET', {}, { responseType: 'arraybuffer' });
+        if (!api) {
+          return;
+        }
 
-        const parsed = await shp(response as unknown as ArrayBuffer);
-        const collections = (Array.isArray(parsed) ? parsed : [parsed]) as FeatureCollectionWithFilename[];
+        await api.init.method();
 
-        const normalized: ParsedFeatureCollection[] = collections.map((collection, index) => {
-          const features = ((collection.features as Feature[]) ?? []).map((feature, featureIndex) => {
-            const featureKey = `${index}-${featureIndex}`;
-            const calculatedArea = (() => {
-              try {
-                return area(feature);
-              } catch {
-                return 0;
-              }
-            })();
+        await api.loadFromShapeFile.method(reportUrl, {
+          customProperties: {
+            _key: '{index}',
+            _featureLabel: '{index}',
+            _zoomLevel: String(
+              resolutionDegreeToZoomLevel[
+                state.context.job?.details?.parameters?.ingestionResolution as string
+              ]
+            ),
+            _featureType: FeatureType.LOW_RESOLUTION_PP,
+          },
+        });
 
-            const featureLabel = intl.formatMessage(
-              { id: 'resolutionConflict.partName' },
-              { index: featureIndex + 1 }
-            );
+        await api.updateAreas.method();
 
-            return {
-              ...feature,
-              properties: {
-                ...(feature.properties ?? {}),
-                _key: featureKey,
-                _area: calculatedArea,
-                _featureLabel: featureLabel,
-                _zoomLevel: resolutionDegreeToZoomLevel[state.context.job?.details?.parameters?.ingestionResolution as string],
-                _featureType: FeatureType.LOW_RESOLUTION_PP,
-              },
-            } as Feature;
-          });
+        await api.computeOuterGeometry.method();
 
+        const updatedFC = await api.getFeatureCollection.method();
+        const normalizedFeatures = ((updatedFC.features as Feature[]) ?? []).map((feature, index) => {
           return {
+            ...feature,
+            properties: {
+              ...(feature.properties ?? {}),
+              _key: String(index),
+              _featureLabel: intl.formatMessage(
+                { id: 'resolutionConflict.partName' },
+                { index: index + 1 }
+              ),
+              _zoomLevel:
+                resolutionDegreeToZoomLevel[
+                  state.context.job?.details?.parameters?.ingestionResolution as string
+                ],
+              _featureType: FeatureType.LOW_RESOLUTION_PP,
+            },
+          } as Feature;
+        });
+
+        const normalized: ParsedFeatureCollection[] = [
+          {
             name: intl.formatMessage(
               { id: 'resolutionConflict.collectionName' },
               { value: resolutionDegreeToZoomLevel[state.context.job?.details?.parameters?.ingestionResolution] }
             ),
-            features,
-          };
-        });
+            features: normalizedFeatures,
+          },
+        ];
 
         if (!isCancelled) {
           setLowResolutionCollections(normalized);
@@ -214,11 +182,6 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
     return () => {
       isCancelled = true;
     };
-  }, []);
-
-  const resolutionDegreeToZoomLevel = useMemo(() => {
-    const table = Object.values(ZOOM_LEVELS_TABLE);
-    return Object.fromEntries(table.map((v, i) => [v, i]));
   }, []);
 
   const closeDialog = (): void => {
