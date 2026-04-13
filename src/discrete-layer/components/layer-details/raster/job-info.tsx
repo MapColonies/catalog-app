@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Box } from '@map-colonies/react-components';
 import { Typography, useTheme } from '@map-colonies/react-core';
@@ -17,10 +17,17 @@ interface JobInfoProps {
   job?: IJob;
 }
 
-export const JobInfo: React.FC<JobInfoProps> = ({ job }) => {
+const JobInfoComponent: React.FC<JobInfoProps> = ({ job }) => {
   const theme = useTheme();
   const [isResolutionConflictDialogOpen, setIsResolutionConflictDialogOpen] = useState(false);
   const [isResolutionConflictApproved, setIsResolutionConflictApproved] = useState(false);
+  const latestJobRef = useRef<IJob | undefined>(job);
+
+  if (job) {
+    latestJobRef.current = job;
+  }
+
+  const displayJob = latestJobRef.current;
 
   const openResolutionConflictDialog = useCallback(() => {
     setIsResolutionConflictDialogOpen(true);
@@ -30,7 +37,7 @@ export const JobInfo: React.FC<JobInfoProps> = ({ job }) => {
     setIsResolutionConflictApproved(true);
   }, []);
 
-  const errorsCount = job?.validationReport?.errorsSummary?.errorsCount;
+  const errorsCount = displayJob?.validationReport?.errorsSummary?.errorsCount;
 
   const isResolutionConflictViewOnly = useMemo(() => {
     if (!errorsCount) {
@@ -41,7 +48,7 @@ export const JobInfo: React.FC<JobInfoProps> = ({ job }) => {
     );
   }, [errorsCount]);
 
-  if (!job) {
+  if (!displayJob) {
     return null;
   }
 
@@ -52,7 +59,7 @@ export const JobInfo: React.FC<JobInfoProps> = ({ job }) => {
     taskPercentage,
     details,
     validationReport,
-  } = job;
+  } = displayJob;
 
   const errorsSummary = validationReport?.errorsSummary;
 
@@ -69,7 +76,7 @@ export const JobInfo: React.FC<JobInfoProps> = ({ job }) => {
           status={taskStatus}
           reason={taskReason}
           isFailed={isStatusFailed(taskStatus)}
-          isValid={isTaskValid(job)}
+          isValid={isTaskValid(displayJob)}
         />
 
         <Progress
@@ -130,9 +137,13 @@ export const JobInfo: React.FC<JobInfoProps> = ({ job }) => {
           isOpen={isResolutionConflictDialogOpen}
           onSetIsOpen={setIsResolutionConflictDialogOpen}
           onApprove={approveResolutionConflictDialog}
-          viewOnly={isResolutionConflictViewOnly || isResolutionConflictApproved || true}
+          viewOnly={isResolutionConflictViewOnly || isResolutionConflictApproved}
         />
       )}
     </>
   );
 };
+
+JobInfoComponent.displayName = 'JobInfo';
+
+export const JobInfo = React.memo(JobInfoComponent);

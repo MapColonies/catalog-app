@@ -1,10 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { AutoSizer, List, ListRowProps } from 'react-virtualized';
-import { observer } from 'mobx-react';
 import { Feature } from 'geojson';
-import area from '@turf/area';
-import shp, { FeatureCollectionWithFilename } from 'shpjs';
+// import area from '@turf/area';
+// import shp, { FeatureCollectionWithFilename } from 'shpjs';
 import { Box } from '@map-colonies/react-components';
 import {
   Button,
@@ -26,6 +25,7 @@ import { GeoFeaturesPresentorComponent } from './pp-map';
 import { FeatureType } from './pp-map.utils';
 import { RasterWorkflowContext } from './state-machine/context';
 import { UpdateLayerHeader } from './update-layer-header';
+import { useWorkerAPI } from './worker/useWorkerAPI';
 
 import './resolution-conflict.dialog.css';
 
@@ -41,7 +41,7 @@ interface ParsedFeatureCollection {
   features: Feature[];
 }
 
-export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> = observer(({
+const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps> = ({
   isOpen,
   onSetIsOpen,
   onApprove,
@@ -58,6 +58,52 @@ export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> =
   const [lowResolutionPartsError, setLowResolutionPartsError] = useState<string | undefined>();
   const [lowResolutionCollections, setLowResolutionCollections] = useState<ParsedFeatureCollection[]>([]);
   const ZOOM_LEVELS_TABLE = useZoomLevelsTable();
+  const api = useWorkerAPI();
+
+  const fetchData = async () => {
+    if (!api) { return; }
+
+    // 1. Init
+    await api.init.method();
+
+    // 2. Load from shape file
+    await api.loadFromShapeFile.method(
+      // state.context.job?.validationReport?.report?.url as string, 
+      'https://download-int.mapcolonies.net/api/raster/v1/downloads/validation-reports/a80296ad-06f4-4d3c-9c2d-8982eb65d04b/vivid_ihud_orthophoto_v3.0_report_2026-02-04T15:32:09.836Z.zip',
+      {
+        customProperties: {
+          _key: 'featureKey',
+          _featureLabel: intl.formatMessage({ id: 'resolutionConflict.partName' }),
+          _zoomLevel: '9',
+          _featureType: FeatureType.LOW_RESOLUTION_PP
+        },
+      }
+    );
+    // 3. Update areas 
+    await api.updateAreas.method();
+
+    // 4. Get outer geometry 
+    const outerPerimeterGeom = await api.computeOuterGeometry.method();
+    console.log('api.computeOuterGeometry:', outerPerimeterGeom);
+
+    await api.query.method({
+      minX: 54.35290071061968,
+      minY: 25.72995702729723,
+      maxX: 55.45933754011244,
+      maxY: 26.38730710623136,
+    });
+
+    const updatedFC = await api.getFeatureCollection.method();
+    console.log('api.getFeatureCollection:', updatedFC.features.length);
+    setLowResolutionCollections([{
+      name: 'KUKU',
+      features: updatedFC.features
+    }]);
+  };
+
+  useEffect(() => {
+    fetchData(); 
+  }, []);
 
   const lowResolutionFeatures = useMemo(
     () => lowResolutionCollections.flatMap((c) => c.features),
@@ -85,7 +131,7 @@ export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> =
     return undefined;
   }, [lowResolutionCollections, selectedLowResolutionFeatureKey]);
 
-  useEffect(() => {
+  /*useEffect(() => {
     const reportUrl = state.context.job?.validationReport?.report?.url;
 
     if (!reportUrl) {
@@ -168,7 +214,7 @@ export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> =
     return () => {
       isCancelled = true;
     };
-  }, []);
+  }, []);*/
 
   const resolutionDegreeToZoomLevel = useMemo(() => {
     const table = Object.values(ZOOM_LEVELS_TABLE);
@@ -366,4 +412,8 @@ export const ResolutionConflictDialog: React.FC<ResolutionConflictDialogProps> =
       </Dialog>
     </Box>
   );
-});
+};
+
+ResolutionConflictDialogComponent.displayName = 'ResolutionConflictDialog';
+
+export const ResolutionConflictDialog = React.memo(ResolutionConflictDialogComponent);
