@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { AutoSizer, List, ListRowProps } from 'react-virtualized';
 import { Feature } from 'geojson';
@@ -16,7 +16,7 @@ import {
 } from '@map-colonies/react-core';
 import { AutoDirectionBox } from '../../../../common/components/auto-direction-box/auto-direction-box.component';
 import { Mode } from '../../../../common/models/mode.enum';
-import { EntityDescriptorModelType, useStore } from '../../../models';
+import { EntityDescriptorModelType } from '../../../models';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
 import { Curtain } from './curtain/curtain.component';
 import { GeoFeaturesPresentorComponent } from './pp-map';
@@ -46,8 +46,9 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
   viewOnly = false,
 }) => {
   const intl = useIntl();
-  const store = useStore();
-  const entityDescriptors = store.discreteLayersStore.entityDescriptors as EntityDescriptorModelType[];
+  const api = useWorkerAPI();
+  const hasLoadedRef = useRef(false);
+  const ZOOM_LEVELS_TABLE = useZoomLevelsTable();
   const state = RasterWorkflowContext.useSelector((s) => s);
   const [showLowResolutionPolygonParts, setShowLowResolutionPolygonParts] = useState(false);
   const [selectedLowResolutionFeatureKey, setSelectedLowResolutionFeatureKey] = useState<string>();
@@ -55,10 +56,10 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
   const [isLoadingLowResolutionParts, setIsLoadingLowResolutionParts] = useState(false);
   const [lowResolutionPartsError, setLowResolutionPartsError] = useState<string | undefined>();
   const [lowResolutionCollections, setLowResolutionCollections] = useState<ParsedFeatureCollection[]>([]);
-  const ZOOM_LEVELS_TABLE = useZoomLevelsTable();
-  const api = useWorkerAPI();
+  const [perimeter, setPerimeter] = useState<Feature | undefined>();
   const reportUrl = state.context.job?.validationReport?.report?.url;
   const ingestionResolution = state.context.job?.details?.parameters?.ingestionResolution as string | undefined;
+  const entityDescriptors = state.context.store.discreteLayersStore?.entityDescriptors as EntityDescriptorModelType[];
 
   const lowResolutionFeatures = useMemo(
     () => lowResolutionCollections.flatMap((c) => c.features),
@@ -106,9 +107,9 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
   }, [zoomLevelForIngestion]);
 
   useEffect(() => {
-    if (!api) {
-      return;
-    }
+    if (!api || hasLoadedRef.current) { return; }
+
+    hasLoadedRef.current = true;
 
     if (!reportUrl) {
       setLowResolutionCollections([]);
@@ -116,8 +117,6 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
       setLowResolutionPartsError(intl.formatMessage({ id: 'resolutionConflict.error.missingUrl' }));
       return;
     }
-
-    let isCancelled = false;
 
     const loadLowResolutionParts = async (): Promise<void> => {
       setIsLoadingLowResolutionParts(true);
@@ -129,7 +128,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
         await api.loadFromShapeFile.method(reportUrl, {
           customProperties: {
             _key: '{index}',
-            _featureLabel: '{index}',
+            _featureLabel: intl.formatMessage({ id: 'resolutionConflict.partName' }),
             _zoomLevel: String(zoomLevelForIngestion),
             _featureType: FeatureType.LOW_RESOLUTION_PP,
           },
@@ -137,56 +136,37 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
 
         await api.updateAreas.method();
 
-        await api.computeOuterGeometry.method();
-
-        const updatedFC = await api.getFeatureCollection.method();
-        const normalizedFeatures = ((updatedFC.features as Feature[]) ?? []).map((feature, index) => {
-          return {
-            ...feature,
-            properties: {
-              ...(feature.properties ?? {}),
-              _key: String(index),
-              _featureLabel: intl.formatMessage(
-                { id: 'resolutionConflict.partName' },
-                { index: index + 1 }
-              ),
-              _zoomLevel: zoomLevelForIngestion,
-              _featureType: FeatureType.LOW_RESOLUTION_PP,
-            },
-          } as Feature;
+        const lowResolutionPerimeter = await api.computeOuterGeometry.method();
+        setPerimeter({
+          type: 'Feature',
+          properties: {
+            featureType: FeatureType.LOW_RESOLUTION_PP
+          },
+          geometry: lowResolutionPerimeter,
         });
 
-        const normalized: ParsedFeatureCollection[] = [
+        const featureCollection = await api.getFeatureCollection.method();
+
+        setLowResolutionCollections([
           {
             name: collectionName,
-            features: normalizedFeatures,
+            features: featureCollection.features,
           },
-        ];
-
-        if (!isCancelled) {
-          setLowResolutionCollections(normalized);
-          setSelectedLowResolutionFeatureKey(undefined);
-        }
+        ]);
+        setSelectedLowResolutionFeatureKey(undefined);
       } catch (error) {
-        if (!isCancelled) {
-          const errorMessage = (error as Error)?.message;
-          setLowResolutionCollections([]);
-          setSelectedLowResolutionFeatureKey(undefined);
-          setLowResolutionPartsError(`${intl.formatMessage({ id: 'resolutionConflict.error.fetchFailed' })}${errorMessage ? `: ${errorMessage}` : ''}`);
-        }
+        const errorMessage = (error as Error)?.message;
+        setLowResolutionCollections([]);
+        setSelectedLowResolutionFeatureKey(undefined);
+        setLowResolutionPartsError(`${intl.formatMessage({ id: 'resolutionConflict.error.fetchFailed' })}${errorMessage ? `: ${errorMessage}` : ''}`);
       } finally {
-        if (!isCancelled) {
-          setIsLoadingLowResolutionParts(false);
-        }
+        setIsLoadingLowResolutionParts(false);
       }
     };
 
     void loadLowResolutionParts();
 
-    return () => {
-      isCancelled = true;
-    };
-  }, []);
+  }, [api]);
 
   const closeDialog = useCallback((): void => {
     onSetIsOpen(false);
@@ -269,13 +249,8 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                                   scrollToAlignment="center"
                                   rowRenderer={({ index, key, style }: ListRowProps): JSX.Element => {
                                     const feature = collection.features[index];
-                                    const featureLabel =
-                                      (feature.properties?._featureLabel as string | undefined) ??
-                                      intl.formatMessage(
-                                        { id: 'resolutionConflict.partName' },
-                                        { index: index + 1 }
-                                      );
-                                    const calculatedArea =(feature.properties?._area as number | undefined) ?? 0;
+                                    const featureLabel = feature.properties?._featureLabel;
+                                    const calculatedArea = (feature.properties?._area as number | undefined) ?? 0;
                                     const featureId = (feature.properties?.id as string | undefined) ?? '';
                                     const featureKey = feature.properties?._key as string | undefined;
                                     const isSelected = featureKey === selectedLowResolutionFeatureKey;
