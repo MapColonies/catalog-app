@@ -28,7 +28,10 @@ import CONFIG from '../../../common/config';
 import { getMax } from '../../../common/helpers/array';
 import { dateFormatter } from '../../../common/helpers/formatters';
 import { isPolygonPartsShown } from '../../../common/helpers/style';
-import { getResponseErrorMesssage, getResponseErrorURL } from '../../../common/helpers/server-error';
+import {
+  getResponseErrorMesssage,
+  getResponseErrorURL,
+} from '../../../common/helpers/server-error';
 // import { usePrevious } from '../../../common/hooks/previous.hook';
 import { LayerRasterRecordModelType } from '../../models';
 import { IDispatchAction } from '../../models/actionDispatcherStore';

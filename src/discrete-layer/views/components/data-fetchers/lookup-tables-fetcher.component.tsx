@@ -7,7 +7,10 @@ import lookupTablesContext, {
 import { useStore, useQuery } from '../../../models/RootStore';
 import { Error } from './../../../../common/components/tree/statuses/error';
 import { queue } from '../../../../discrete-layer/components/snackbar/notification-queue';
-import { getResponseErrorMesssage, getResponseErrorURL } from '../../../../common/helpers/server-error';
+import {
+  getResponseErrorMesssage,
+  getResponseErrorURL,
+} from '../../../../common/helpers/server-error';
 
 export const HOT_AREAS_TABLES_KEY = 'hotAreas';
 
