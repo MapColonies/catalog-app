@@ -19,6 +19,7 @@ import { Mode } from '../../../../common/models/mode.enum';
 import { EntityDescriptorModelType } from '../../../models';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
 import { Curtain } from './curtain/curtain.component';
+import { LowResolutionVectorLayer } from './low-resolution-vector-layer';
 import { GeoFeaturesPresentorComponent } from './pp-map';
 import { FeatureType } from './pp-map.utils';
 import { RasterWorkflowContext } from './state-machine/context';
@@ -65,6 +66,21 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
     () => lowResolutionCollections.flatMap((c) => c.features),
     [lowResolutionCollections]
   );
+  const lowResolutionFeaturesRef = useRef<Feature[]>([]);
+  lowResolutionFeaturesRef.current = lowResolutionFeatures;
+
+  const isFootprintOnlyDisplay = useCallback((features?: Feature[]): boolean => {
+    if (!features || features.length !== 1) {
+      return false;
+    }
+
+    const properties = features[0]?.properties;
+    return Boolean(
+      properties &&
+      typeof properties === 'object' &&
+      (properties as Record<string, unknown>)._showAsFootprint
+    );
+  }, []);
 
   const selectedLowResolutionPosition = useMemo(() => {
     if (!selectedLowResolutionFeatureKey) {
@@ -328,10 +344,10 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                   mode={Mode.UPDATE}
                   layerRecord={state.context.updatedLayer}
                   enableFeaturePropertiesPopup={true}
-                  lowResolutionFeatures={showLowResolutionPolygonParts ? lowResolutionFeatures : undefined}
                   selectedFeatureKey={selectedLowResolutionFeatureKey}
                   selectedFeatureRequestId={selectedLowResolutionFeatureRequestId}
                   style={{ height: '100%', minHeight: '300px' }}
+                  externalFeaturesRef={lowResolutionFeaturesRef}
                   onMapFeatureClick={(featureKey) => {
                     if (featureKey === undefined) {
                       // An existing (green) feature was clicked — clear list selection
@@ -345,7 +361,19 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                   onFeaturePropertiesPopupClose={(): void => {
                     setSelectedLowResolutionFeatureKey(undefined);
                   }}
-                />
+                >
+                  {showLowResolutionPolygonParts && lowResolutionFeatures !== undefined ? (
+                      <LowResolutionVectorLayer
+                        features={lowResolutionFeatures}
+                        selectedFeatureKey={selectedLowResolutionFeatureKey}
+                        onFeaturesChange={(updatedFeatures): void => {
+                          if (isFootprintOnlyDisplay(updatedFeatures)) {
+                            setSelectedLowResolutionFeatureKey(undefined);
+                          }
+                        }}
+                      />
+                    ) : null}
+                </GeoFeaturesPresentorComponent>
               </Box>
             </Box>
           </Box>

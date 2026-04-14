@@ -1,4 +1,4 @@
-import { CSSProperties, useEffect, useMemo, useRef, useState } from 'react';
+import { CSSProperties, MutableRefObject, useEffect, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Feature, MultiPolygon, Polygon } from 'geojson';
 import { get, isEmpty } from 'lodash';
@@ -33,7 +33,6 @@ import { ILayerImage } from '../../../models/layerImage';
 import { useStore } from '../../../models/RootStore';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
 import { PolygonPartsVectorLayer as PolygonPartsExtentVectorLayer } from './polygon-parts-vector-layer';
-import { LowResolutionVectorLayer } from './low-resolution-vector-layer';
 import { FEATURE_LABEL_CONFIG, FeatureType, getText, PPMapStyles } from './pp-map.utils';
 
 import './pp-map.css';
@@ -41,7 +40,7 @@ import './pp-map.css';
 interface GeoFeaturesPresentorProps {
   mode: Mode;
   geoFeatures?: Feature[];
-  lowResolutionFeatures?: Feature[];
+  children?: JSX.Element | null;
   style?: CSSProperties | undefined;
   fitOptions?: FitOptions | undefined;
   selectedFeatureKey?: string;
@@ -52,6 +51,7 @@ interface GeoFeaturesPresentorProps {
   enableFeaturePropertiesPopup?: boolean;
   onMapFeatureClick?: (featureKey: string | undefined) => void;
   onFeaturePropertiesPopupClose?: () => void;
+  externalFeaturesRef?: MutableRefObject<Feature[]>;
 }
 
 const DEFAULT_PROJECTION = 'EPSG:4326';
@@ -62,10 +62,10 @@ const FEATURE_LABEL_KEY = '_featureLabel';
 const ISO_DATE_TIME_REGEX =
   /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:?\d{2})?$/;
 
-const getHighlightedStyle = (baseStyle: Style | undefined, fallbackColor = '#ff7f00'): Style => {
+const getHighlightedStyle = (baseStyle: Style | undefined): Style => {
   return new Style({
     stroke: new Stroke({
-      color: baseStyle?.getStroke()?.getColor() ?? fallbackColor,
+      color: baseStyle?.getStroke()?.getColor() ?? '#ff7f00',
       width: 5,
     }),
     fill: new Fill({
@@ -79,9 +79,9 @@ const getHighlightedStyle = (baseStyle: Style | undefined, fallbackColor = '#ff7
 export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> = ({
   mode,
   geoFeatures,
-  lowResolutionFeatures,
   style,
   fitOptions,
+  children,
   selectedFeatureKey,
   selectedFeatureRequestId,
   selectionStyle,
@@ -89,6 +89,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   enableFeaturePropertiesPopup = false,
   onMapFeatureClick,
   onFeaturePropertiesPopupClose,
+  externalFeaturesRef,
 }) => {
   const store = useStore();
   const intl = useIntl();
@@ -100,8 +101,6 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   const previousGeoFeaturesLengthRef = useRef(geoFeatures?.length ?? 0);
   const lastHandledSelectedFeatureKeyRef = useRef<string | undefined>(undefined);
   const lastHandledSelectedFeatureRequestIdRef = useRef<number | undefined>(undefined);
-  const lowResolutionFeaturesRef = useRef<Feature[]>([]);
-  const previousLowResolutionFeaturesLengthRef = useRef(lowResolutionFeatures?.length ?? 0);
   const [showExistingPolygonParts, setShowExistingPolygonParts] = useState<boolean>(false);
   showExistingPolygonPartsRef.current = showExistingPolygonParts;
   const [selectedExistingFeature, setSelectedExistingFeature] = useState<Feature | undefined>(undefined);
@@ -115,7 +114,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   const getClickedFeatureProperties = (coordinate: number[]): Record<string, unknown> | undefined => {
     const allFeatures = [
       ...(geoFeatures ?? []),
-      ...lowResolutionFeaturesRef.current,
+      ...(externalFeaturesRef?.current ?? []),
       ...(showExistingPolygonPartsRef.current ? existingPPFeaturesRef.current : []),
     ];
 
@@ -255,8 +254,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
       existingFeature,
       4,
       FEATURE_LABEL_CONFIG.polygons,
-      ZOOM_LEVELS_TABLE,
-      intl.formatMessage({ id: 'polygon-parts.map-preview.zoom-before-fetch' })
+      ZOOM_LEVELS_TABLE
     );
 
     return {
@@ -265,15 +263,16 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
     };
   };
 
-  const addLowResolutionFeatureLabelToProperties = (
+  const addFeatureLabelToProperties = (
     properties: Record<string, unknown>
   ): Record<string, unknown> => {
-    if (properties._featureType !== FeatureType.LOW_RESOLUTION_PP) {
+    const featureLabel = properties._featureLabel as string | undefined;
+    if (!featureLabel) {
       return properties;
     }
 
-    const featureLabel = properties._featureLabel as string | undefined;
     const zoomLevel = properties._zoomLevel;
+
     const labelParts: string[] = [];
 
     if (featureLabel) {
@@ -349,17 +348,6 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
 
     previousGeoFeaturesLengthRef.current = currentGeoFeaturesLength;
   }, [geoFeatures, onMapFeatureClick, onFeaturePropertiesPopupClose]);
-
-  useEffect(() => {
-    const currentLength = lowResolutionFeatures?.length ?? 0;
-
-    if (previousLowResolutionFeaturesLengthRef.current > 0 && currentLength === 0) {
-      lowResolutionFeaturesRef.current = [];
-      clearPreviewSelection();
-    }
-
-    previousLowResolutionFeaturesLengthRef.current = currentLength;
-  }, [lowResolutionFeatures, onMapFeatureClick, onFeaturePropertiesPopupClose]);
 
   const previewBaseMap = useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-array-constructor
@@ -443,8 +431,9 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
       <>
         {geoFeatures?.map((feat, idx) => {
           let featureStyle = PPMapStyles.get(feat?.properties?._featureType);
+          const featureKey = (feat?.properties?._key as string | undefined) ?? (feat?.properties?.key as string | undefined);
 
-          if (selectedFeatureKey && feat?.properties?.key === selectedFeatureKey) {
+          if (selectedFeatureKey && featureKey === selectedFeatureKey) {
             featureStyle = selectionStyle ?? getHighlightedStyle(featureStyle);
           }
 
@@ -473,9 +462,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
 
       setSelectedExistingFeature(undefined);
 
-      const selectedFeature =
-        geoFeatures?.find((feature) => feature?.properties?._key === selectedFeatureKey) ??
-        lowResolutionFeatures?.find((feature) => feature?.properties?._key === selectedFeatureKey);
+      const selectedFeature = geoFeatures?.find((feature) => feature?.properties?._key === selectedFeatureKey);
 
       if (!selectedFeature?.geometry) {
         return;
@@ -506,7 +493,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
 
         const properties = selectedFeature.properties as Record<string, unknown> | null | undefined;
         if (properties && Object.keys(properties).length > 0) {
-          setSelectedFeatureProperties(addLowResolutionFeatureLabelToProperties(properties));
+          setSelectedFeatureProperties(addFeatureLabelToProperties(properties));
           return;
         }
 
@@ -516,7 +503,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
           }),
         });
       }
-    }, [map, geoFeatures, lowResolutionFeatures, selectedFeatureKey, selectedFeatureRequestId, fitOptions, enableFeaturePropertiesPopup]);
+    }, [map, geoFeatures, selectedFeatureKey, selectedFeatureRequestId, fitOptions, enableFeaturePropertiesPopup]);
 
     return null;
   };
@@ -546,7 +533,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
             const featureProperties = getClickedOlFeatureProperties(feature);
             if (featureProperties) {
               clickedProperties = featureProperties;
-              clickedFeatureKey = featureProperties.key as string | undefined;
+              clickedFeatureKey = (featureProperties._key as string | undefined) ?? (featureProperties.key as string | undefined);
               return feature;
             }
 
@@ -595,7 +582,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
                       }),
                     }, matchingExisting);
                   }
-                  return feature; // stop iteration — do not continue to orange features
+                  return feature; // stop iteration — do not continue to external features
                 }
               }
 
@@ -608,7 +595,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
         );
 
         if (clickedProperties) {
-          setSelectedFeatureProperties(addLowResolutionFeatureLabelToProperties(clickedProperties));
+          setSelectedFeatureProperties(addFeatureLabelToProperties(clickedProperties));
           if (clickedExistingFeature) {
             // Green existing feature was clicked — clear any orange list selection
             onMapFeatureClick?.(undefined);
@@ -627,7 +614,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
             return;
           }
 
-          // Determine whether the hit feature belongs to the list (orange) or existing (green)
+          // Determine whether the hit feature belongs to the existing (green) or external (orange)
           const clickedPoint = point(event.coordinate as [number, number]);
           const matchingExistingFallback = showExistingPolygonPartsRef.current ? existingPPFeaturesRef.current.find((f) => {
             if (!f?.geometry) {
@@ -661,38 +648,29 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
               addExistingFeatureLabelToProperties(fallbackProperties, matchingExistingFallback)
             );
             return;
-          } else {
-            setSelectedExistingFeature(undefined);
-            // Detect low-res feature by its internal type marker
-            if (fallbackProperties._featureType === FeatureType.LOW_RESOLUTION_PP) {
-              const lowResKey = fallbackProperties._key as string | undefined;
-              if (lowResKey) {
-                onMapFeatureClick?.(lowResKey);
-              }
-            } else {
-              // Regular geoFeature (perimeter, source extent, etc.)
-              const orangeFeature = (geoFeatures ?? []).find((f) => {
-                if (!f?.geometry) {
-                  return false;
-                }
-                const gType = f.geometry.type;
-                if (gType !== 'Polygon' && gType !== 'MultiPolygon') {
-                  return false;
-                }
-                try {
-                  return booleanPointInPolygon(clickedPoint, f as Feature<Polygon | MultiPolygon>);
-                } catch {
-                  return false;
-                }
-              });
-              const fallbackFeatureKey = orangeFeature?.properties?.key as string | undefined;
-              if (fallbackFeatureKey) {
-                onMapFeatureClick?.(fallbackFeatureKey);
-              }
-            }
           }
 
-          setSelectedFeatureProperties(addLowResolutionFeatureLabelToProperties(fallbackProperties));
+          setSelectedExistingFeature(undefined);
+          const orangeFeature = [...(geoFeatures ?? []), ...(externalFeaturesRef?.current ?? [])].find((f) => {
+            if (!f?.geometry) {
+              return false;
+            }
+            const gType = f.geometry.type;
+            if (gType !== 'Polygon' && gType !== 'MultiPolygon') {
+              return false;
+            }
+            try {
+              return booleanPointInPolygon(clickedPoint, f as Feature<Polygon | MultiPolygon>);
+            } catch {
+              return false;
+            }
+          });
+          const fallbackFeatureKey = (orangeFeature?.properties?._key as string | undefined) ?? (orangeFeature?.properties?.key as string | undefined);
+          if (fallbackFeatureKey) {
+            onMapFeatureClick?.(fallbackFeatureKey);
+          }
+
+          setSelectedFeatureProperties(addFeatureLabelToProperties(fallbackProperties));
           return;
         }
 
@@ -771,20 +749,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
             <GeoFeaturesInnerComponent />
           </VectorSource>
         </VectorLayer>
-        {lowResolutionFeatures !== undefined && (
-          <LowResolutionVectorLayer
-            features={lowResolutionFeatures}
-            selectedFeatureKey={selectedFeatureKey}
-            fitOptions={fitOptions}
-            onFeaturesChange={(updatedFeatures): void => {
-              lowResolutionFeaturesRef.current = updatedFeatures;
-
-              if (isFootprintOnlyDisplay(updatedFeatures)) {
-                clearPreviewSelection();
-              }
-            }}
-          />
-        )}
+        {children}
         {showExistingPolygonParts && (
           <PolygonPartsExtentVectorLayer
             layerRecord={layerRecord}
