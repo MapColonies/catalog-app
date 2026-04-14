@@ -365,6 +365,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                   {showLowResolutionPolygonParts && lowResolutionFeatures !== undefined ? (
                       <LowResolutionVectorLayer
                         features={lowResolutionFeatures}
+                        perimeter={perimeter}
                         selectedFeatureKey={selectedLowResolutionFeatureKey}
                         onFeaturesChange={(updatedFeatures): void => {
                           if (isFootprintOnlyDisplay(updatedFeatures)) {

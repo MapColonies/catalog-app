@@ -21,6 +21,7 @@ import { FeatureType, PPMapStyles } from './pp-map.utils';
 
 export interface LowResolutionVectorLayerProps {
   features: Feature[];
+  perimeter?: Feature;
   selectedFeatureKey?: string;
   fitOptions?: FitOptions;
   onFeaturesChange?: (features: Feature[]) => void;
@@ -42,6 +43,7 @@ const LayerOrder: React.FC = () => {
 
 export const LowResolutionVectorLayer: React.FC<LowResolutionVectorLayerProps> = ({
   features,
+  perimeter,
   selectedFeatureKey,
   fitOptions,
   onFeaturesChange,
@@ -55,53 +57,20 @@ export const LowResolutionVectorLayer: React.FC<LowResolutionVectorLayerProps> =
   const lowResolutionFootprint = useRef<Feature | undefined>(undefined);
 
   useEffect(() => {
-    if (features.length === 0) {
+    if (!perimeter?.geometry) {
       lowResolutionFootprint.current = undefined;
       return;
     }
 
-    try {
-      const olFormat = new GeoJSON();
-      let minX = Infinity;
-      let minY = Infinity;
-      let maxX = -Infinity;
-      let maxY = -Infinity;
-
-      features.forEach((feat) => {
-        if (!feat?.geometry) {
-          return;
-        }
-
-        try {
-          const olGeom = olFormat.readGeometry(feat.geometry);
-          const ext = olGeom.getExtent();
-          if (ext && ext.length === 4) {
-            minX = Math.min(minX, ext[0]);
-            minY = Math.min(minY, ext[1]);
-            maxX = Math.max(maxX, ext[2]);
-            maxY = Math.max(maxY, ext[3]);
-          }
-        } catch {
-          /* ignore invalid feature geometry */
-        }
-      });
-
-      if (isFinite(minX)) {
-        lowResolutionFootprint.current = {
-          type: 'Feature',
-          geometry: bboxPolygon([minX, minY, maxX, maxY]).geometry as Geometry,
-          properties: {
-            _showAsFootprint: true,
-            _featureType: FeatureType.LOW_RESOLUTION_PP,
-          } as GeoJsonProperties,
-        };
-      } else {
-        lowResolutionFootprint.current = undefined;
-      }
-    } catch {
-      lowResolutionFootprint.current = undefined;
-    }
-  }, [features]);
+    lowResolutionFootprint.current = {
+      ...perimeter,
+      properties: {
+        ...(perimeter.properties as GeoJsonProperties | undefined),
+        _showAsFootprint: true,
+        _featureType: FeatureType.LOW_RESOLUTION_PP,
+      },
+    };
+  }, [perimeter]);
 
   const computeVisibleFeatures = (): void => {
     const currentFeatures = featuresRef.current;
@@ -158,6 +127,11 @@ export const LowResolutionVectorLayer: React.FC<LowResolutionVectorLayerProps> =
   useEffect(() => {
     onFeaturesChange?.(visibleFeatures);
   }, [visibleFeatures]);
+
+  useEffect(() => {
+    computeVisibleFeatures();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [perimeter]);
 
   // Fit to features extent on first load, then compute visible features
   useEffect(() => {
