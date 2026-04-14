@@ -9,39 +9,51 @@ const isHttpError = (response: any) => {
 
 export const getResponseErrorMesssage = (response: any) => {
   let errMessage = '*** UNKNOWN_MSG ***';
-  if (isHttpError(response)) {
-    errMessage = response[HTTP_RESPONSE_ERROR_FEILD]
-      .replace(/<[^>]*>/g, "") // remove tags
-      .replace(/\n/g, " ")     // remove \n
-      .replace(/\s+/g, " ")    // clean extra spaces
-      .trim();
-  } else {
-    const serverError = response.errors[0];
-    errMessage = serverError.serverResponse?.data.message
-      ? serverError.serverResponse.data.message
-      : serverError.serverResponse?.statusText
-      ? serverError.serverResponse?.statusText
-      : serverError.message.substring(+serverError.message.indexOf('; ') + 1);
+  if (response) {
+    if (isHttpError(response)) {
+      errMessage = response[HTTP_RESPONSE_ERROR_FEILD]
+        .replace(/<[^>]*>/g, "") // remove tags
+        .replace(/\n/g, " ")     // remove \n
+        .replace(/\s+/g, " ")    // clean extra spaces
+        .trim();
+    } else {
+      const serverError = response.errors[0];
+      errMessage = serverError.serverResponse?.data.message
+        ? serverError.serverResponse.data.message
+        : serverError.serverResponse?.statusText
+          ? serverError.serverResponse?.statusText
+          : serverError.message.substring(+serverError.message.indexOf('; ') + 1);
 
+    }
+  } else {
+    errMessage = '';
   }
   return errMessage;
 }
 
 export const getResponseErrorStatus = (response: any) => {
   let status = '*** UNKNOWN_STATUS ***';
-  if (isHttpError(response)) {
-    status = response[HTTP_RESPONSE_STATUS_FEILD];
+  if (response) {
+    if (isHttpError(response)) {
+      status = response[HTTP_RESPONSE_STATUS_FEILD];
+    } else {
+      const serverError = response.errors[0];
+      status = serverError.serverResponse?.status ?? NONE;
+    }
   } else {
-    const serverError = response.errors[0];
-    status = serverError.serverResponse?.status ?? NONE;
+    status = '';
   }
   return status;
 }
 
 export const getResponseErrorURL = (response: any) => {
   let url = '*** UNKNOWN_URL ***';
-  if (!isHttpError(response)) {
-    url = response?.errors?.[0].extensions?.exception?.config?.url;
+  if (response) {
+    if (!isHttpError(response)) {
+      url = response?.errors?.[0].extensions?.exception?.config?.url;
+    }
+  } else {
+    url = '';
   }
   return url;
 }
