@@ -177,9 +177,8 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
     closeDialog();
   }, []);
 
-  const formatArea = useCallback((areaSquareMeters: number): string => {
-    const areaSquareKilometers = areaSquareMeters / 1_000_000;
-    return intl.formatMessage({ id: 'resolutionConflict.units.km2' }, { value: areaSquareKilometers.toFixed(2) });
+  const formatArea = useCallback((area: number): string => {
+    return intl.formatMessage({ id: 'resolutionConflict.units.km2' }, { value: area.toFixed(2) });
   }, []);
 
   return (
