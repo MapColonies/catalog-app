@@ -127,7 +127,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
 
         await api.loadFromShapeFile.method(reportUrl, {
           customProperties: {
-            _key: '{index}',
+            _key: '{index}-0',
             _featureLabel: intl.formatMessage({ id: 'resolutionConflict.partName' }),
             _zoomLevel: String(zoomLevelForIngestion),
             _featureType: FeatureType.LOW_RESOLUTION_PP,
