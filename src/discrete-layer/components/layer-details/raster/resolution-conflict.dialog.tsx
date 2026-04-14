@@ -66,8 +66,13 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
     () => lowResolutionCollections.flatMap((c) => c.features),
     [lowResolutionCollections]
   );
-  const lowResolutionFeaturesRef = useRef<Feature[]>([]);
-  lowResolutionFeaturesRef.current = lowResolutionFeatures;
+  const displayedLowResolutionFeaturesRef = useRef<Feature[]>([]);
+
+  useEffect(() => {
+    if (!showLowResolutionPolygonParts) {
+      displayedLowResolutionFeaturesRef.current = [];
+    }
+  }, [showLowResolutionPolygonParts]);
 
   const isFootprintOnlyDisplay = useCallback((features?: Feature[]): boolean => {
     if (!features || features.length !== 1) {
@@ -347,7 +352,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                   selectedFeatureKey={selectedLowResolutionFeatureKey}
                   selectedFeatureRequestId={selectedLowResolutionFeatureRequestId}
                   style={{ height: '100%', minHeight: '300px' }}
-                  externalFeaturesRef={lowResolutionFeaturesRef}
+                  externalFeaturesRef={displayedLowResolutionFeaturesRef}
                   onMapFeatureClick={(featureKey) => {
                     if (featureKey === undefined) {
                       // An existing (green) feature was clicked — clear list selection
@@ -368,6 +373,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                         perimeter={perimeter}
                         selectedFeatureKey={selectedLowResolutionFeatureKey}
                         onFeaturesChange={(updatedFeatures): void => {
+                          displayedLowResolutionFeaturesRef.current = updatedFeatures;
                           if (isFootprintOnlyDisplay(updatedFeatures)) {
                             setSelectedLowResolutionFeatureKey(undefined);
                           }
