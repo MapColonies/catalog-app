@@ -18,6 +18,7 @@ import { Loading } from '../../../common/components/tree/statuses/loading';
 import { getTextStyle } from '../../../common/helpers/style';
 import { isValidLayerMetadata } from '../../../common/helpers/layer-url';
 import { LinkType } from '../../../common/models/link-type.enum';
+import { getResponseErrorMesssage, getResponseErrorURL } from '../../../common/helpers/server-error';
 import { IDispatchAction } from '../../models/actionDispatcherStore';
 import { ILayerImage } from '../../models/layerImage';
 import { useStore } from '../../models/RootStore';
@@ -64,8 +65,8 @@ export const CatalogTreeComponent: React.FC<CatalogTreeComponentProps> = observe
           body: (
             <Error
               className="errorNotification"
-              message={errorCapabilities.response?.errors[0].message}
-              details={errorCapabilities.response?.errors[0].extensions?.exception?.config?.url}
+              message={getResponseErrorMesssage(errorCapabilities.response)}
+              details={getResponseErrorURL(errorCapabilities.response)}
             />
           ),
         });
@@ -205,8 +206,8 @@ export const CatalogTreeComponent: React.FC<CatalogTreeComponentProps> = observe
       return (
         <Error
           className="errorMessage"
-          message={errorSearch.response?.errors[0].message}
-          details={errorSearch.response?.errors[0].extensions?.exception?.config?.url}
+          message={getResponseErrorMesssage(errorSearch.response)}
+          details={getResponseErrorURL(errorSearch.response)}
         />
       );
     }

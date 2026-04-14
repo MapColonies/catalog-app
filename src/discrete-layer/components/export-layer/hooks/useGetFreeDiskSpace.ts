@@ -1,10 +1,11 @@
 import { useContext, useEffect } from 'react';
-import { FreeDiskSpaceModelType, RecordType, useQuery, useStore } from '../../../models';
+import { get } from 'lodash';
 import EnumsMapContext, {
   IEnumDescriptor,
   IEnumsMapType,
 } from '../../../../common/contexts/enumsMap.context';
-import { get } from 'lodash';
+import { getResponseErrorMesssage } from '../../../../common/helpers/server-error';
+import { FreeDiskSpaceModelType, RecordType, useQuery, useStore } from '../../../models';
 
 export const useGetFreeDiskSpace = (): {
   data: number | null | undefined;
@@ -40,6 +41,6 @@ export const useGetFreeDiskSpace = (): {
     data: data?.getFreeDiskSpace.freeDiskSpaceBytes,
     loading,
     refetch: query?.refetch,
-    error: get(query?.error, 'response.errors[0].message') as string,
+    error: getResponseErrorMesssage(query?.error?.response),
   };
 };
