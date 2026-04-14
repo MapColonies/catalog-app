@@ -311,7 +311,7 @@
   "resolutionConflict.partName": "פוליגון {index}",
   "resolutionConflict.units.km2": "{value}ק\"מ²",
   "resolutionConflict.error.missingUrl": "חסר URL לדו\"ח ולידציה",
-  "resolutionConflict.error.fetchFailed": "נכשל בטעינת חלקי תיחום",
+  "resolutionConflict.error.fetchFailed": "נכשל בטעינת חלקי תיחום מקובץ",
 
   "field-names.raster.id": "מזהה",
   "field-names.raster.productId": "מזהה חיצוני",
