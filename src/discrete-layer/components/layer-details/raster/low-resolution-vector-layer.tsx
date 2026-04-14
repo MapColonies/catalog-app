@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { BBox, Feature, GeoJsonProperties, Geometry } from 'geojson';
+import { BBox, Feature, GeoJsonProperties } from 'geojson';
 import { debounce } from 'lodash';
 import { MapEvent } from 'ol';
 import GeoJSON from 'ol/format/GeoJSON';
