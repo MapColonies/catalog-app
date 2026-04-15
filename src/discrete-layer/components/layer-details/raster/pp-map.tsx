@@ -52,6 +52,7 @@ interface GeoFeaturesPresentorProps {
   onMapFeatureClick?: (featureKey: string | undefined) => void;
   onFeaturePropertiesPopupClose?: () => void;
   externalFeaturesRef?: MutableRefObject<Feature[]>;
+  pendingSelectionFeatureRef?: MutableRefObject<Feature | null>;
 }
 
 const DEFAULT_PROJECTION = 'EPSG:4326';
@@ -90,6 +91,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   onMapFeatureClick,
   onFeaturePropertiesPopupClose,
   externalFeaturesRef,
+  pendingSelectionFeatureRef,
 }) => {
   const store = useStore();
   const intl = useIntl();
@@ -462,9 +464,22 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
 
       setSelectedExistingFeature(undefined);
 
-      const selectedFeature = geoFeatures?.find((feature) => feature?.properties?._key === selectedFeatureKey);
+      const selectedFeature = [...(geoFeatures ?? []), ...(externalFeaturesRef?.current ?? [])].find((feature) => {
+        return feature?.properties?._key === selectedFeatureKey;
+      });
 
-      if (!selectedFeature?.geometry) {
+      // If not in viewport, fall back to pendingSelectionFeatureRef (set by list click)
+      let featureToFit = selectedFeature;
+      if (!featureToFit) {
+        const pending = pendingSelectionFeatureRef?.current;
+        const pendingKey = pending?.properties?._key;
+        if (pendingSelectionFeatureRef && pendingKey === selectedFeatureKey) {
+          featureToFit = pending ?? undefined;
+          pendingSelectionFeatureRef.current = null;
+        }
+      }
+
+      if (!featureToFit?.geometry) {
         return;
       }
 
@@ -474,7 +489,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
 
       if (shouldFitToSelectedFeature) {
         try {
-          const geometry = new GeoJSON().readGeometry(selectedFeature.geometry);
+          const geometry = new GeoJSON().readGeometry(featureToFit.geometry);
           map.getView().fit(geometry.getExtent(), {
             duration: 250,
             maxZoom: 18,
@@ -491,7 +506,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
           return;
         }
 
-        const properties = selectedFeature.properties as Record<string, unknown> | null | undefined;
+        const properties = featureToFit.properties as Record<string, unknown> | null | undefined;
         if (properties && Object.keys(properties).length > 0) {
           setSelectedFeatureProperties(addFeatureLabelToProperties(properties));
           return;
@@ -503,7 +518,16 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
           }),
         });
       }
-    }, [map, geoFeatures, selectedFeatureKey, selectedFeatureRequestId, fitOptions, enableFeaturePropertiesPopup]);
+    }, [
+      map,
+      geoFeatures,
+      externalFeaturesRef,
+      pendingSelectionFeatureRef,
+      selectedFeatureKey,
+      selectedFeatureRequestId,
+      fitOptions,
+      enableFeaturePropertiesPopup,
+    ]);
 
     return null;
   };
@@ -665,7 +689,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
               return false;
             }
           });
-          const fallbackFeatureKey = (orangeFeature?.properties?._key as string | undefined) ?? (orangeFeature?.properties?.key as string | undefined);
+          const fallbackFeatureKey = orangeFeature?.properties?._key;
           if (fallbackFeatureKey) {
             onMapFeatureClick?.(fallbackFeatureKey);
           }
@@ -762,6 +786,46 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
               }
             }}
           />
+          ///////WFS RASTER PARTS LAYER///////
+          // <PolygonPartsExtentQueryVectorLayer
+          //   style={PPMapStyles.get(FeatureType.EXISTING_PP)}
+          //   outterPrimeter={layerRecord.footprint}
+          //   queryExecutor={async (extent_bbox): Promise<void>  => {
+          //     return await store.queryGetPolygonPartsFeature({
+          //       data: {
+          //         feature: bboxPolygon(bbox) as GeojsonFeatureInput,
+          //         typeName: getWFSFeatureTypeName(layerRecord as LayerRasterRecordModelType, ENUMS),
+          //         count: CONFIG.POLYGON_PARTS.MAX.WFS_FEATURES,
+          //         startIndex,
+          //       },
+          //     })
+          //   }}
+          //   selectedFeature={selectedExistingFeature}
+          //   onFeaturesChange={(features): void => {
+          //     existingPPFeaturesRef.current = features;
+
+          //     if (isFootprintOnlyDisplay(features)) {
+          //       clearPreviewSelection();
+          //     }
+          //   }}
+          // />
+
+          // ///////REPORT PARTS LAYER///////
+          // <PolygonPartsExtentQueryVectorLayer
+          //   style={PPMapStyles.get(FeatureType.LOW_RESOLUTION_PP)}
+          //   outterPrimeter={api.perimeter}
+          //   queryExecutor={async (extent_bbox): Promise<void>  => {
+          //     return await api.query(bbox)
+          //   }}
+          //   selectedFeature={selectedExistingFeature}
+          //   onFeaturesChange={(features): void => {
+          //     existingPPFeaturesRef.current = features;
+
+          //     if (isFootprintOnlyDisplay(features)) {
+          //       clearPreviewSelection();
+          //     }
+          //   }}
+          // />
         )}
         <Legend
           legendItems={LegendsArray}

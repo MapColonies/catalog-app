@@ -54,6 +54,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
   const [showLowResolutionPolygonParts, setShowLowResolutionPolygonParts] = useState(false);
   const [selectedLowResolutionFeatureKey, setSelectedLowResolutionFeatureKey] = useState<string>();
   const [selectedLowResolutionFeatureRequestId, setSelectedLowResolutionFeatureRequestId] = useState(0);
+  const [autoScrollListToSelection, setAutoScrollListToSelection] = useState(false);
   const [isLoadingLowResolutionParts, setIsLoadingLowResolutionParts] = useState(false);
   const [lowResolutionPartsError, setLowResolutionPartsError] = useState<string | undefined>();
   const [lowResolutionCollections, setLowResolutionCollections] = useState<ParsedFeatureCollection[]>([]);
@@ -66,6 +67,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
     () => lowResolutionCollections.flatMap((c) => c.features),
     [lowResolutionCollections]
   );
+  const pendingSelectionFeatureRef = useRef<Feature | null>(null);
   const displayedLowResolutionFeaturesRef = useRef<Feature[]>([]);
 
   useEffect(() => {
@@ -107,6 +109,20 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
 
     return undefined;
   }, [lowResolutionCollections, selectedLowResolutionFeatureKey]);
+
+  useEffect(() => {
+    if (!autoScrollListToSelection || !selectedLowResolutionPosition) {
+      return;
+    }
+
+    const timerId = window.setTimeout(() => {
+      setAutoScrollListToSelection(false);
+    }, 0);
+
+    return () => {
+      window.clearTimeout(timerId);
+    };
+  }, [autoScrollListToSelection, selectedLowResolutionPosition]);
 
   const resolutionDegreeToZoomLevel = useMemo(() => {
     const table = Object.values(ZOOM_LEVELS_TABLE);
@@ -161,7 +177,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
         setPerimeter({
           type: 'Feature',
           properties: {
-            featureType: FeatureType.LOW_RESOLUTION_PP
+            _featureType: FeatureType.LOW_RESOLUTION_PP
           },
           geometry: lowResolutionPerimeter,
         });
@@ -223,6 +239,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                     setShowLowResolutionPolygonParts(isChecked);
 
                     if (!isChecked) {
+                      setAutoScrollListToSelection(false);
                       setSelectedLowResolutionFeatureKey(undefined);
                     }
                   }}
@@ -262,6 +279,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                                   rowHeight={32}
                                   overscanRowCount={8}
                                   scrollToIndex={
+                                    autoScrollListToSelection &&
                                     collectionIndex === selectedLowResolutionPosition?.collectionIndex
                                       ? selectedLowResolutionPosition.featureIndex
                                       : undefined
@@ -281,8 +299,11 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                                         style={style}
                                         onClick={(): void => {
                                           setShowLowResolutionPolygonParts(true);
+                                          setAutoScrollListToSelection(false);
                                           setSelectedLowResolutionFeatureRequestId((current) => current + 1);
                                           if (featureKey) {
+                                            pendingSelectionFeatureRef.current =
+                                              lowResolutionFeatures.find((f) => f.properties?._key === featureKey) ?? null;
                                             setSelectedLowResolutionFeatureKey(featureKey);
                                           }
                                         }}
@@ -353,33 +374,41 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                   selectedFeatureRequestId={selectedLowResolutionFeatureRequestId}
                   style={{ height: '100%', minHeight: '300px' }}
                   externalFeaturesRef={displayedLowResolutionFeaturesRef}
+                  pendingSelectionFeatureRef={pendingSelectionFeatureRef}
                   onMapFeatureClick={(featureKey) => {
+                    pendingSelectionFeatureRef.current = null;
                     if (featureKey === undefined) {
                       // An existing (green) feature was clicked — clear list selection
+                      setAutoScrollListToSelection(false);
                       setSelectedLowResolutionFeatureKey(undefined);
                       return;
                     }
                     setShowLowResolutionPolygonParts(true);
+                    setAutoScrollListToSelection(true);
                     setSelectedLowResolutionFeatureRequestId((current) => current + 1);
                     setSelectedLowResolutionFeatureKey(featureKey);
                   }}
                   onFeaturePropertiesPopupClose={(): void => {
+                    setAutoScrollListToSelection(false);
                     setSelectedLowResolutionFeatureKey(undefined);
                   }}
                 >
-                  {showLowResolutionPolygonParts && lowResolutionFeatures !== undefined ? (
-                      <LowResolutionVectorLayer
-                        features={lowResolutionFeatures}
-                        perimeter={perimeter}
-                        selectedFeatureKey={selectedLowResolutionFeatureKey}
-                        onFeaturesChange={(updatedFeatures): void => {
-                          displayedLowResolutionFeaturesRef.current = updatedFeatures;
-                          if (isFootprintOnlyDisplay(updatedFeatures)) {
-                            setSelectedLowResolutionFeatureKey(undefined);
-                          }
-                        }}
-                      />
-                    ) : null}
+                  {
+                    showLowResolutionPolygonParts && lowResolutionFeatures !== undefined
+                      ? <LowResolutionVectorLayer
+                          features={lowResolutionFeatures}
+                          perimeter={perimeter}
+                          selectedFeatureKey={selectedLowResolutionFeatureKey}
+                          onFeaturesChange={(updatedFeatures): void => {
+                            displayedLowResolutionFeaturesRef.current = updatedFeatures;
+                            if (isFootprintOnlyDisplay(updatedFeatures)) {
+                              setAutoScrollListToSelection(false);
+                              setSelectedLowResolutionFeatureKey(undefined);
+                            }
+                          }}
+                        />
+                      : null
+                  }
                 </GeoFeaturesPresentorComponent>
               </Box>
             </Box>
