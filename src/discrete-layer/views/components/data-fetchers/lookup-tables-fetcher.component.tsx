@@ -7,6 +7,10 @@ import lookupTablesContext, {
 import { useStore, useQuery } from '../../../models/RootStore';
 import { Error } from './../../../../common/components/tree/statuses/error';
 import { queue } from '../../../../discrete-layer/components/snackbar/notification-queue';
+import {
+  getResponseErrorMesssage,
+  getResponseErrorURL,
+} from '../../../../common/helpers/server-error';
 
 export const HOT_AREAS_TABLES_KEY = 'hotAreas';
 
@@ -32,8 +36,8 @@ export const LookupTablesFetcher: React.FC = observer(() => {
         body: (
           <Error
             className="errorNotification"
-            message={error.response?.errors[0].message}
-            details={error.response?.errors[0].extensions?.exception?.config?.url}
+            message={getResponseErrorMesssage(error.response)}
+            details={getResponseErrorURL(error.response)}
           />
         ),
       });
