@@ -39,7 +39,7 @@ import {
 } from './pp-map.utils';
 
 interface PolygonPartsExtentQueryVectorLayerProps {
-  perimeter?: Geometry;
+  outerPerimeter?: Geometry;
   layerRecord?: ILayerImage | null;
   selectedFeature?: Feature;
   onFeaturesChange?: (features: Feature[]) => void;
@@ -51,16 +51,16 @@ const DEBOUNCE_MOUSE_INTERVAL = 500;
 const LAYER_Z_INDEX = 1;
 
 const createZoomedOutFootprintFeature = (
-  perimeter?: Geometry
+  outerPerimeter?: Geometry
 ): Feature<Geometry, GeoJsonProperties> | undefined => {
-  if (!perimeter) {
+  if (!outerPerimeter) {
     return undefined;
   }
 
   return {
     type: 'Feature',
     geometry: {
-      ...perimeter,
+      ...outerPerimeter,
     },
     properties: {
       text: 'hide',
@@ -71,7 +71,7 @@ const createZoomedOutFootprintFeature = (
 };
 
 export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQueryVectorLayerProps> = observer(({
-  perimeter,
+  outerPerimeter,
   layerRecord,
   selectedFeature,
   onFeaturesChange,
@@ -100,7 +100,7 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
   useEffect(() => {
     const handleMoveEndEvent = (e: MapEvent): void => {
       requestedStartIndexRef.current = START_OFFSET;
-      const footprintFeature = createZoomedOutFootprintFeature(perimeter);
+      const footprintFeature = createZoomedOutFootprintFeature(outerPerimeter);
       setExistingPolygonParts(footprintFeature ? [footprintFeature] : []);
       getExistingPolygonParts(mapOl.getView().calculateExtent() as BBox, START_OFFSET);
     };
@@ -178,7 +178,7 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
     ) {
       requestedStartIndexRef.current = START_OFFSET;
       showLoadingSpinner(false);
-      const footprintFeature = createZoomedOutFootprintFeature(perimeter);
+      const footprintFeature = createZoomedOutFootprintFeature(outerPerimeter);
       setExistingPolygonParts(footprintFeature ? [footprintFeature] : []);
     } else {
       requestedStartIndexRef.current = startIndex;

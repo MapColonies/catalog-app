@@ -21,7 +21,7 @@ import { FeatureType, PPMapStyles } from './pp-map.utils';
 
 export interface LowResolutionVectorLayerProps {
   features: Feature[];
-  perimeter?: Feature;
+  outerPerimeter?: Feature;
   selectedFeatureKey?: string;
   fitOptions?: FitOptions;
   onFeaturesChange?: (features: Feature[]) => void;
@@ -33,7 +33,7 @@ const EXTENT_BUFFER = 2;
 
 export const LowResolutionVectorLayer: React.FC<LowResolutionVectorLayerProps> = ({
   features,
-  perimeter,
+  outerPerimeter,
   selectedFeatureKey,
   fitOptions,
   onFeaturesChange,
@@ -46,20 +46,20 @@ export const LowResolutionVectorLayer: React.FC<LowResolutionVectorLayerProps> =
   const footprint = useRef<Feature | undefined>(undefined);
 
   useEffect(() => {
-    if (!perimeter?.geometry) {
+    if (!outerPerimeter?.geometry) {
       footprint.current = undefined;
       return;
     }
 
     footprint.current = {
-      ...perimeter,
+      ...outerPerimeter,
       properties: {
-        ...(perimeter.properties as GeoJsonProperties | undefined),
+        ...(outerPerimeter.properties as GeoJsonProperties | undefined),
         _showAsFootprint: true,
         _featureType: FeatureType.LOW_RESOLUTION_PP,
       },
     };
-  }, [perimeter]);
+  }, [outerPerimeter]);
 
   const computeVisibleFeatures = (): void => {
     const currentFeatures = featuresRef.current;
@@ -120,7 +120,7 @@ export const LowResolutionVectorLayer: React.FC<LowResolutionVectorLayerProps> =
   useEffect(() => {
     computeVisibleFeatures();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [perimeter]);
+  }, [outerPerimeter]);
 
   useEffect(() => {
     if (features.length === 0) {

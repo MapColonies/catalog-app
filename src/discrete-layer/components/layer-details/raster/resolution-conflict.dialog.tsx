@@ -58,7 +58,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
   const [isLoadingLowResolutionParts, setIsLoadingLowResolutionParts] = useState(false);
   const [lowResolutionPartsError, setLowResolutionPartsError] = useState<string | undefined>();
   const [lowResolutionCollections, setLowResolutionCollections] = useState<ParsedFeatureCollection[]>([]);
-  const [perimeter, setPerimeter] = useState<Feature | undefined>();
+  const [outerPerimeter, setOuterPerimeter] = useState<Feature | undefined>();
   const reportUrl = state.context.job?.validationReport?.report?.url;
   const ingestionResolution = state.context.job?.details?.parameters?.ingestionResolution as string | undefined;
   const entityDescriptors = state.context.store.discreteLayersStore?.entityDescriptors as EntityDescriptorModelType[];
@@ -173,13 +173,13 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
 
         await api.updateAreas.method();
 
-        const lowResolutionPerimeter = await api.computeOuterGeometry.method();
-        setPerimeter({
+        const outerGeometry = await api.computeOuterGeometry.method();
+        setOuterPerimeter({
           type: 'Feature',
           properties: {
             _featureType: FeatureType.LOW_RESOLUTION_PP
           },
-          geometry: lowResolutionPerimeter,
+          geometry: outerGeometry,
         });
 
         const featureCollection = await api.getFeatureCollection.method();
@@ -397,7 +397,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                     showLowResolutionPolygonParts && lowResolutionFeatures !== undefined
                       ? <LowResolutionVectorLayer
                           features={lowResolutionFeatures}
-                          perimeter={perimeter}
+                          outerPerimeter={outerPerimeter}
                           selectedFeatureKey={selectedLowResolutionFeatureKey}
                           onFeaturesChange={(updatedFeatures): void => {
                             displayedLowResolutionFeaturesRef.current = updatedFeatures;

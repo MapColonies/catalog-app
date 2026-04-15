@@ -553,7 +553,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
         {children}
         {showExistingPolygonParts && (
           <PolygonPartsExtentQueryVectorLayer
-            perimeter={layerRecord?.footprint as Geometry | undefined}
+            outerPerimeter={layerRecord?.footprint as Geometry | undefined}
             layerRecord={layerRecord}
             selectedFeature={selectedExistingFeature}
             onFeaturesChange={(features): void => {
