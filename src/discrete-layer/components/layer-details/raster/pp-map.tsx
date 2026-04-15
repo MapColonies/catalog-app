@@ -33,7 +33,7 @@ import { isValidGeometryType } from '../../../../common/utils/geojson.validation
 import { ILayerImage } from '../../../models/layerImage';
 import { useStore } from '../../../models/RootStore';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
-import { PolygonPartsVectorLayer as PolygonPartsExtentVectorLayer } from './polygon-parts-vector-layer';
+import { PolygonPartsExtentQueryVectorLayer } from './polygon-parts-vector-layer';
 import { FEATURE_LABEL_CONFIG, FeatureType, getText, PPMapStyles } from './pp-map.utils';
 
 import './pp-map.css';
@@ -552,7 +552,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
         </VectorLayer>
         {children}
         {showExistingPolygonParts && (
-          <PolygonPartsExtentVectorLayer
+          <PolygonPartsExtentQueryVectorLayer
             layerRecord={layerRecord}
             selectedFeature={selectedExistingFeature}
             onFeaturesChange={(features): void => {

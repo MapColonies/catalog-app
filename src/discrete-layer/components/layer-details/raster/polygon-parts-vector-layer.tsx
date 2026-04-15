@@ -38,7 +38,7 @@ import {
   PPMapStyles,
 } from './pp-map.utils';
 
-interface PolygonPartsVectorLayerProps {
+interface PolygonPartsExtentQueryVectorLayerProps {
   layerRecord?: ILayerImage | null;
   selectedFeature?: Feature;
   onFeaturesChange?: (features: Feature[]) => void;
@@ -63,7 +63,7 @@ const createZoomedOutFootprintFeature = (
   },
 });
 
-export const PolygonPartsVectorLayer: React.FC<PolygonPartsVectorLayerProps> = observer(({
+export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQueryVectorLayerProps> = observer(({
   layerRecord, selectedFeature, onFeaturesChange
 }) => {
   const store = useStore();
