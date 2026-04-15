@@ -1,16 +1,16 @@
-const HTTP_RESPONSE_ERROR_FEILD = 'error';
-const HTTP_RESPONSE_STATUS_FEILD = 'status';
+const HTTP_RESPONSE_ERROR_FIELD = 'error';
+const HTTP_RESPONSE_STATUS_FIELD = 'status';
 const NONE = 0;
 
 const isHttpError = (response: any) => {
-  return HTTP_RESPONSE_ERROR_FEILD in response;
+  return HTTP_RESPONSE_ERROR_FIELD in response;
 };
 
 export const getResponseErrorMesssage = (response: any) => {
   let errMessage = '*** UNKNOWN_MSG ***';
   if (response) {
     if (isHttpError(response)) {
-      errMessage = response[HTTP_RESPONSE_ERROR_FEILD].replace(/<[^>]*>/g, '') // remove tags
+      errMessage = response[HTTP_RESPONSE_ERROR_FIELD].replace(/<[^>]*>/g, '') // remove tags
         .replace(/\n/g, ' ') // remove \n
         .replace(/\s+/g, ' ') // clean extra spaces
         .trim();
@@ -32,7 +32,7 @@ export const getResponseErrorStatus = (response: any) => {
   let status = '*** UNKNOWN_STATUS ***';
   if (response) {
     if (isHttpError(response)) {
-      status = response[HTTP_RESPONSE_STATUS_FEILD];
+      status = response[HTTP_RESPONSE_STATUS_FIELD];
     } else {
       const serverError = response.errors[0];
       status = serverError.serverResponse?.status ?? NONE;
