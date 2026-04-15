@@ -47,7 +47,7 @@ interface PolygonPartsVectorLayerProps {
 const START_OFFSET = 0;
 const STARTING_PAGE = 0;
 const DEBOUNCE_MOUSE_INTERVAL = 500;
-const EXISTING_PP_LAYER_Z_INDEX = 1;
+const LAYER_Z_INDEX = 1;
 
 const createZoomedOutFootprintFeature = (
   layerRecord?: ILayerImage | null
@@ -186,7 +186,7 @@ export const PolygonPartsVectorLayer: React.FC<PolygonPartsVectorLayerProps> = o
 
   return (
     <VectorLayer>
-      <VectorLayerOrder zIndex={EXISTING_PP_LAYER_Z_INDEX} />
+      <VectorLayerOrder zIndex={LAYER_Z_INDEX} />
       <VectorSource>
         {existingPolygonParts.map((feat, idx) => {
           const greenStyle = new Style({

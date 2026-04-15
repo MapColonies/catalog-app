@@ -28,7 +28,7 @@ export interface LowResolutionVectorLayerProps {
 }
 
 const DEBOUNCE_INTERVAL = 300;
-const LOW_RESOLUTION_LAYER_Z_INDEX = 2;
+const LAYER_Z_INDEX = 2;
 const EXTENT_BUFFER = 2;
 
 export const LowResolutionVectorLayer: React.FC<LowResolutionVectorLayerProps> = ({
@@ -152,7 +152,7 @@ export const LowResolutionVectorLayer: React.FC<LowResolutionVectorLayerProps> =
 
   return (
     <VectorLayer>
-      <VectorLayerOrder zIndex={LOW_RESOLUTION_LAYER_Z_INDEX} />
+      <VectorLayerOrder zIndex={LAYER_Z_INDEX} />
       <VectorSource>
         {visibleFeatures.map((feat, idx) => {
           const isFootprint = Boolean(feat.properties?._showAsFootprint);
