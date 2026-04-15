@@ -1321,8 +1321,8 @@ const DiscreteLayerView: React.FC = observer(() => {
               style={{ display: activeTabView === TabViews.CATALOG ? 'block' : 'none' }}
             >
               {getActiveTabHeader(activeTabView, site)}
-              <Box className="panelContent" style={{ overflow: 'hidden' }}>
-                {/* <CatalogTreeComponent refresh={catalogRefresh} isFiltered={catalogFilter} /> */}
+              <Box className="panelContent relativePosition" style={{ overflow: 'hidden' }}>
+                <CatalogTreeComponent refresh={catalogRefresh} isFiltered={catalogFilter} />
 
                 {/* <ProgressCurtain progressElements={
                   [

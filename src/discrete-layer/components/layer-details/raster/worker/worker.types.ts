@@ -72,7 +72,12 @@ export interface WorkerMessage {
   process: Process;
   stage: Stage;
   type: WorkerType;
-  message: string;
+  message: Message | string;
+}
+
+export interface Message {
+  progress: string;
+  timeItTookInMs: string;
 }
 
 export type ProcessStagesMap = {

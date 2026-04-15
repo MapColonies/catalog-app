@@ -165,21 +165,23 @@ export function useWorkerAPI(): [
           const duration = 10000; // 10 seconds
 
           const timer = setInterval(() => {
-            const elapsed = Date.now() - startTime;
-            const ratio = Math.min(elapsed / duration, 1);
+            const passedTimeFromTheBeginning = Date.now() - startTime;
+            const ratioOfPassedTime = Math.min(passedTimeFromTheBeginning / duration, 1);
 
             // Fast-start easing: (1 - (1 - x)^2) slows down towards the end
-            const fakePercent = Math.floor((1 - Math.pow(1 - ratio, 2)) * 95);
+            const fakePercent = Math.floor((1 - Math.pow(1 - ratioOfPassedTime, 2)) * 95);
 
             setProgressComputeOuterGeometry({
               process: Process.ComputeOuterGeometry,
               stage: Stage.ComputeOuterGeometry,
               type: 'Progress',
-              message: fakePercent
+              message: `${fakePercent}%`
             } as any);
 
             // Safety: Stop updating if we hit the 95% cap
-            if (fakePercent >= 95) clearInterval(timer);
+            if (fakePercent >= 95) {
+              clearInterval(timer);
+            }
           }, 200); // Update every 200ms (5 times per second) is plenty for a bar
 
           try {
@@ -193,12 +195,12 @@ export function useWorkerAPI(): [
 
             // 3. Cleanup and finish
             clearInterval(timer);
-            setProgressComputeOuterGeometry({
-              process: Process.ComputeOuterGeometry,
-              stage: Stage.ComputeOuterGeometry,
-              type: 'Done',
-              message: '100%',
-            } as any);
+            // setProgressComputeOuterGeometry({
+            //   process: Process.ComputeOuterGeometry,
+            //   stage: Stage.ComputeOuterGeometry,
+            //   type: 'Done',
+            //   message: '100%',
+            // } as any);
             return result;
 
           } catch (err) {
@@ -254,7 +256,7 @@ export function useWorkerAPI(): [
           },
           [Stage.Cache]: {
             translationCode: 'progress.stage.cache.translationCode',
-            isReportingOnProgress: true,
+            isReportingOnProgress: false,
           },
         },
       },

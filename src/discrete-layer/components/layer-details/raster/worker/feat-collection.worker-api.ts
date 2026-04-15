@@ -20,6 +20,7 @@ import {
   CustomProperties,
   Process,
   Stage,
+  Message,
 } from './worker.types';
 
 type ShpJsParser = (buffer: ArrayBuffer) => Promise<unknown>;
@@ -30,6 +31,27 @@ let _geoms: number[] = [];
 let _tree = new RBush<IndexedItem>();
 const _properties: Record<string, unknown>[] = [];
 const _featureTemplate: Feature[] = [];
+
+const formatTime = (startTime: number) => {
+  return (performance.now() - startTime).toFixed(0);
+}
+
+const percentageOfTotal = (total: number | null | undefined, partial: number, startTime: number): Message => {
+  const timeItTookInMs = `${formatTime(startTime)} (ms)`;
+
+  if (total != null && total !== undefined) {
+    // return `${Math.floor((partial / total) * 100)}%`;
+    return {
+      progress: `${Math.floor((partial / total) * 100)}%`,
+      timeItTookInMs
+    }
+  } else {
+    return {
+      progress: '0%',
+      timeItTookInMs
+    };
+  }
+}
 
 const _computeBBox = (geometry: Polygon | MultiPolygon) => {
   let minX = Infinity,
@@ -76,6 +98,7 @@ const _downloadFile = async (
   onProgress?: (p: WorkerMessage | null) => void
 ): Promise<ArrayBuffer | null> => {
   try {
+    const t0 = performance.now();
     const response = await fetch(url);
 
     if (!response.ok || !response.body) {
@@ -88,6 +111,7 @@ const _downloadFile = async (
     const reader = response.body.getReader();
     const chunks = [];
     let received = 0;
+    let message: Message;
 
     while (true) {
       const { done, value } = await reader.read();
@@ -97,23 +121,26 @@ const _downloadFile = async (
       chunks.push(value);
       received += value.length;
 
+      message = percentageOfTotal(total, received, t0);
+
       onProgress?.({
         process: Process.Load,
         stage: Stage.Download,
         type: 'Progress',
-        message: total ? (received / total).toString() : '',
+        message,
       });
     }
 
     // Combine chunks into one ArrayBuffer
     const blob = new Blob(chunks);
     const arrayBuffer = await blob.arrayBuffer();
+    message = percentageOfTotal(total, received, t0);
 
     onProgress?.({
       process: Process.Load,
       stage: Stage.Download,
       type: 'Done',
-      message: '100%',
+      message
     });
     return arrayBuffer;
   } catch (error) {
@@ -181,7 +208,8 @@ const prepareGEOSData = (
   customProps?: CustomProperties,
   onProgress?: (p: WorkerMessage | null) => void
 ) => {
-  const t0 = performance.now();
+  const startParsingTime = performance.now();
+  let message: Message;
   const reader = _geos.GEOSGeoJSONReader_create();
 
   const items: IndexedItem[] = [];
@@ -218,32 +246,37 @@ const prepareGEOSData = (
     });
 
     if (i % 50 === 0) {
+      message = percentageOfTotal(_fc.features.length, i + 1, startParsingTime);
       onProgress?.({
         process: Process.Load,
         stage: Stage.Parsing,
         type: 'Progress',
-        message: ((i + 1) / _fc.features.length).toString(),
+        message
       });
     }
     i++;
   }
 
   _geos.GEOSGeoJSONReader_destroy(reader);
+  message = percentageOfTotal(_fc.features.length, i + 1, startParsingTime);
+
   onProgress?.({
     process: Process.Load,
     stage: Stage.Parsing,
     type: 'Done',
-    message: `${performance.now() - t0} (ms)`,
+    message,
   });
   // console.log('******* prepareGEOSData', performance.now()-t0, '(ms)'); // ~12K --> 23000ms
 
-  const t1 = performance.now();
+  const startCacheTime = performance.now();
   _tree.load(items);
+  message = percentageOfTotal(_fc.features.length, i + 1, startCacheTime);
+
   onProgress?.({
     process: Process.Load,
     stage: Stage.Cache,
     type: 'Done',
-    message: `${performance.now() - t1} (ms)`,
+    message,
   });
   // console.log('******* initQueryCache', performance.now()-t1, '(ms)'); // ~12K --> 17ms
 };
@@ -286,6 +319,7 @@ const api: WorkerAPI = {
   updateAreas(onProgress?: (p: WorkerMessage | null) => void): void {
     const total = _geoms.length;
     const t0 = performance.now();
+    let message: Message;
 
     for (let i = 0; i < total; i++) {
       const areaPtr = _geos.Module._malloc(8);
@@ -312,11 +346,12 @@ const api: WorkerAPI = {
       // console.log(`**** AREA(${_properties[i].id}): ${_properties[i]._area}`);
 
       if (i % 50 === 0) {
+        message = percentageOfTotal(_fc.features.length, i + 1, t0);
         onProgress?.({
           process: Process.UpdateAreas,
           stage: Stage.UpdateAreas,
           type: 'Progress',
-          message: ((i + 1) / total).toString(),
+          message
         });
       }
 
@@ -324,24 +359,28 @@ const api: WorkerAPI = {
       _geos.Module._free(latitudePtr);
       _geos.GEOSGeom_destroy(centroidPtr);
     }
+
+    message = percentageOfTotal(total, total, t0);
+
     onProgress?.({
       process: Process.UpdateAreas,
       stage: Stage.UpdateAreas,
       type: 'Done',
-      message: '100%',
+      message,
     });
-    const t1 = performance.now();
-    console.log('updateAreas took:', t1 - t0, 'ms');
   },
 
   computeOuterGeometry(onProgress?: (p: WorkerMessage | null) => void): Geometry {
     const t0 = performance.now();
+    let message: Message;
+
+    message = percentageOfTotal(0, 0, t0);
 
     onProgress?.({
       process: Process.ComputeOuterGeometry,
       stage: Stage.ComputeOuterGeometry,
       type: 'Progress',
-      message: '0',
+      message,
     });
 
     const count = _geoms.length;
@@ -365,11 +404,13 @@ const api: WorkerAPI = {
       count
     );
 
+    message = percentageOfTotal(10, 3, t0);
+
     onProgress?.({
       process: Process.ComputeOuterGeometry,
       stage: Stage.ComputeOuterGeometry,
       type: 'Progress',
-      message: '10',
+      message,
     });
 
     // 5. Calculate the merged geometry (Unary Union)
@@ -386,13 +427,14 @@ const api: WorkerAPI = {
     _geos.Module._free(bufferPtr);
     _geos.GEOSGeom_destroy(simplified);
 
+    message = percentageOfTotal(10, 10, t0);
+
     onProgress?.({
       process: Process.ComputeOuterGeometry,
       stage: Stage.ComputeOuterGeometry,
       type: 'Done',
-      message: `${performance.now() - t0} (ms)`,
+      message,
     });
-    console.log('computeOuterGeometry took:', performance.now()-t0, 'ms'); // ~12K --> 18657ms
 
     return simplifiedOuterJSON;
   },

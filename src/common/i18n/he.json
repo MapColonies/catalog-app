@@ -877,9 +877,9 @@
   "export-layer.validations.againstOtherField": "הערך צריך להיות {relation} שדה {fieldName}",
 
   "progress.stage.init.translationCode": "מאתחל",
-  "progress.stage.load.translationCode": "טוען",
-  "progress.stage.parsing.translationCode": "מנתח מידע",
+  "progress.stage.load.translationCode": "טעינה",
+  "progress.stage.parsing.translationCode": "הכנת המידע",
   "progress.stage.cache.translationCode": "מטמון",
-  "progress.stage.updateAreas.translationCode": "מחשב שטחי פוליגונים",
-  "progress.stage.computeOuterGeometry.translationCode": "מחשב היקף חיצוני"
+  "progress.stage.updateAreas.translationCode": "חישוב השטחים",
+  "progress.stage.computeOuterGeometry.translationCode": "חישוב ההיקף"
 }

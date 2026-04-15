@@ -1,5 +1,9 @@
-#progressCurtain {
+.relativePosition {
   position: relative;
+}
+
+#progressCurtain {
+  position: absolute;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -8,15 +12,13 @@
   width: 100%;
   height: 100%;
   font-weight: 600;
-  background-color: blue;
-}
-
-#progressCurtain .curtainContent {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 8px;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 4;
 }
 
 #progressCurtain .curtainRow {
@@ -24,12 +26,32 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  gap: 20px;
   color: var(--mdc-theme-text-primary-on-background);
   text-align: center;
+  padding-left: 24px;
+  padding-right: 24px;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+}
+
+#progressCurtain .curtainVal {
+  display: flex;
+  gap: 12px;
+}
+
+.curtainPercent {
+  min-width: 88px;
+  text-align: right;
+}
+
+.curtainTime {
+  min-width: 88px;
+  text-align: right;
 }
 
 #progressCurtain .curtainRow.inactive {
   opacity: 0.6;
+}
+
+#progressCurtain .curtainRow.blink {
+  animation: blink 3s ease-in-out infinite alternate;
 }
