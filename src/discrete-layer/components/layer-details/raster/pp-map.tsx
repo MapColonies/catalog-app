@@ -28,7 +28,7 @@ import {
 import { Checkbox, IconButton, Typography } from '@map-colonies/react-core';
 import { dateFormatter } from '../../../../common/helpers/formatters';
 import { Mode } from '../../../../common/models/mode.enum';
-import { MapLoadingIndicator } from '../../../../common/components/map/ol-map.loader';
+import { MapLoadingIndicator } from '../../../../common/components/ol-map/map-loading-indicator';
 import { ILayerImage } from '../../../models/layerImage';
 import { useStore } from '../../../models/RootStore';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';

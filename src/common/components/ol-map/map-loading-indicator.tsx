@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
-import { useMap } from '@map-colonies/react-components';
 import { MapEvent } from 'ol';
+import { useMap } from '@map-colonies/react-components';
 
-import './ol-map.loader.css';
+import './map-loading-indicator.css';
 
 interface MapLoadingIndicatorProps {}
 

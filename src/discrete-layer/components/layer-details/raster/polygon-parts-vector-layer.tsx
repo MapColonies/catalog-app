@@ -13,11 +13,11 @@ import bboxPolygon from '@turf/bbox-polygon';
 import {
   GeoJSONFeature,
   useMap,
-  useVectorLayer,
   VectorLayer,
   VectorSource,
 } from '@map-colonies/react-components';
 import CONFIG from '../../../../common/config';
+import { VectorLayerOrder } from '../../../../common/components/ol-map/vector-layer-order';
 import { useEnums } from '../../../../common/hooks/useEnum.hook';
 import {
   GetFeatureModelType,
@@ -62,16 +62,6 @@ const createZoomedOutFootprintFeature = (
     _featureType: FeatureType.EXISTING_PP,
   },
 });
-
-const ExistingPPLayerOrder: React.FC = () => {
-  const vectorLayer = useVectorLayer();
-
-  useEffect(() => {
-    vectorLayer.setZIndex(EXISTING_PP_LAYER_Z_INDEX);
-  }, [vectorLayer]);
-
-  return null;
-};
 
 export const PolygonPartsVectorLayer: React.FC<PolygonPartsVectorLayerProps> = observer(({
   layerRecord, selectedFeature, onFeaturesChange
@@ -196,7 +186,7 @@ export const PolygonPartsVectorLayer: React.FC<PolygonPartsVectorLayerProps> = o
 
   return (
     <VectorLayer>
-      <ExistingPPLayerOrder />
+      <VectorLayerOrder zIndex={EXISTING_PP_LAYER_Z_INDEX} />
       <VectorSource>
         {existingPolygonParts.map((feat, idx) => {
           const greenStyle = new Style({

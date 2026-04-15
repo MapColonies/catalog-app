@@ -12,11 +12,11 @@ import bboxPolygon from '@turf/bbox-polygon';
 import {
   GeoJSONFeature,
   useMap,
-  useVectorLayer,
   VectorLayer,
   VectorSource,
 } from '@map-colonies/react-components';
 import CONFIG from '../../../../common/config';
+import { VectorLayerOrder } from '../../../../common/components/ol-map/vector-layer-order';
 import { FeatureType, PPMapStyles } from './pp-map.utils';
 
 export interface LowResolutionVectorLayerProps {
@@ -30,16 +30,6 @@ export interface LowResolutionVectorLayerProps {
 const DEBOUNCE_INTERVAL = 300;
 const LOW_RESOLUTION_LAYER_Z_INDEX = 2;
 const EXTENT_BUFFER = 2;
-
-const LayerOrder: React.FC = () => {
-  const vectorLayer = useVectorLayer();
-
-  useEffect(() => {
-    vectorLayer.setZIndex(LOW_RESOLUTION_LAYER_Z_INDEX);
-  }, [vectorLayer]);
-
-  return null;
-};
 
 export const LowResolutionVectorLayer: React.FC<LowResolutionVectorLayerProps> = ({
   features,
@@ -162,7 +152,7 @@ export const LowResolutionVectorLayer: React.FC<LowResolutionVectorLayerProps> =
 
   return (
     <VectorLayer>
-      <LayerOrder />
+      <VectorLayerOrder zIndex={LOW_RESOLUTION_LAYER_Z_INDEX} />
       <VectorSource>
         {visibleFeatures.map((feat, idx) => {
           const isFootprint = Boolean(feat.properties?._showAsFootprint);
