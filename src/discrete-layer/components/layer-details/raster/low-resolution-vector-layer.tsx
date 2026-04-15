@@ -43,15 +43,15 @@ export const LowResolutionVectorLayer: React.FC<LowResolutionVectorLayerProps> =
   const featuresRef = useRef<Feature[]>(features);
   featuresRef.current = features;
 
-  const lowResolutionFootprint = useRef<Feature | undefined>(undefined);
+  const footprint = useRef<Feature | undefined>(undefined);
 
   useEffect(() => {
     if (!perimeter?.geometry) {
-      lowResolutionFootprint.current = undefined;
+      footprint.current = undefined;
       return;
     }
 
-    lowResolutionFootprint.current = {
+    footprint.current = {
       ...perimeter,
       properties: {
         ...(perimeter.properties as GeoJsonProperties | undefined),
@@ -75,8 +75,8 @@ export const LowResolutionVectorLayer: React.FC<LowResolutionVectorLayerProps> =
       currentZoomLevel !== undefined &&
       currentZoomLevel < CONFIG.POLYGON_PARTS.MAX.SHOW_FOOTPRINT_ZOOM_LEVEL
     ) {
-      if (lowResolutionFootprint.current) {
-        setVisibleFeatures([lowResolutionFootprint.current]);
+      if (footprint.current) {
+        setVisibleFeatures([footprint.current]);
       } else {
         setVisibleFeatures([]);
       }
