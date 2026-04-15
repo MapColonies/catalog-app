@@ -91,7 +91,7 @@ export const hasSelfIntersections = (json: Geometry): boolean => {
   return isectsLength > 0;
 };
 
-const isValidGeometryType = (json: Geometry): boolean => {
+export const isValidGeometryType = (json: Geometry): boolean => {
   return json.type === 'Polygon' || json.type === 'MultiPolygon';
 };
 

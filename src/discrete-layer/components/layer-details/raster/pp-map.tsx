@@ -29,6 +29,7 @@ import { Checkbox, IconButton, Typography } from '@map-colonies/react-core';
 import { dateFormatter } from '../../../../common/helpers/formatters';
 import { Mode } from '../../../../common/models/mode.enum';
 import { MapLoadingIndicator } from '../../../../common/components/ol-map/map-loading-indicator';
+import { isValidGeometryType } from '../../../../common/utils/geojson.validation';
 import { ILayerImage } from '../../../models/layerImage';
 import { useStore } from '../../../models/RootStore';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
@@ -126,12 +127,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
 
     const clickedPoint = point(coordinate as [number, number]);
     const clickedFeature = allFeatures.find((feature) => {
-      if (!feature?.geometry) {
-        return false;
-      }
-
-      const geometryType = feature.geometry.type;
-      if (geometryType !== 'Polygon' && geometryType !== 'MultiPolygon') {
+      if (!feature?.geometry || !isValidGeometryType(feature.geometry)) {
         return false;
       }
 
@@ -575,11 +571,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
                 // before it falls through to the external features.
                 const clickedPoint = point(event.coordinate as [number, number]);
                 const matchingExisting = existingPPFeaturesRef.current.find((f) => {
-                  if (!f?.geometry) {
-                    return false;
-                  }
-                  const gType = f.geometry.type;
-                  if (gType !== 'Polygon' && gType !== 'MultiPolygon') {
+                  if (!f?.geometry || !isValidGeometryType(f.geometry)) {
                     return false;
                   }
                   try {
@@ -647,11 +639,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
           // Determine whether the hit feature belongs to the existing features or external features
           const clickedPoint = point(event.coordinate as [number, number]);
           const matchingExistingFallback = showExistingPolygonPartsRef.current ? existingPPFeaturesRef.current.find((f) => {
-            if (!f?.geometry) {
-              return false;
-            }
-            const gType = f.geometry.type;
-            if (gType !== 'Polygon' && gType !== 'MultiPolygon') {
+            if (!f?.geometry || !isValidGeometryType(f.geometry)) {
               return false;
             }
             try {
@@ -682,11 +670,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
 
           setSelectedExistingFeature(undefined);
           const external = [...(geoFeatures ?? []), ...(externalFeaturesRef?.current ?? [])].find((f) => {
-            if (!f?.geometry) {
-              return false;
-            }
-            const gType = f.geometry.type;
-            if (gType !== 'Polygon' && gType !== 'MultiPolygon') {
+            if (!f?.geometry || !isValidGeometryType(f.geometry)) {
               return false;
             }
             try {
