@@ -22,6 +22,7 @@ import { FeatureType, PPMapStyles } from './pp-map.utils';
 export interface LowResolutionVectorLayerProps {
   features: Feature[];
   outerPerimeter?: Feature;
+  featureType: FeatureType;
   selectedFeatureKey?: string;
   fitOptions?: FitOptions;
   onFeaturesChange?: (features: Feature[]) => void;
@@ -34,6 +35,7 @@ const EXTENT_BUFFER = 2;
 export const LowResolutionVectorLayer: React.FC<LowResolutionVectorLayerProps> = ({
   features,
   outerPerimeter,
+  featureType,
   selectedFeatureKey,
   fitOptions,
   onFeaturesChange,
@@ -56,10 +58,10 @@ export const LowResolutionVectorLayer: React.FC<LowResolutionVectorLayerProps> =
       properties: {
         ...(outerPerimeter.properties as GeoJsonProperties | undefined),
         _showAsFootprint: true,
-        _featureType: FeatureType.LOW_RESOLUTION_PP,
+        _featureType: featureType,
       },
     };
-  }, [outerPerimeter]);
+  }, [outerPerimeter, featureType]);
 
   const computeVisibleFeatures = (): void => {
     const currentFeatures = featuresRef.current;
@@ -173,7 +175,7 @@ export const LowResolutionVectorLayer: React.FC<LowResolutionVectorLayerProps> =
             }
           }
 
-          const baseStroke = PPMapStyles.get(FeatureType.LOW_RESOLUTION_PP)?.getStroke();
+          const baseStroke = PPMapStyles.get(featureType)?.getStroke();
           const featureStyle = new Style({
             stroke: (() => {
               const s = baseStroke?.clone();
@@ -182,7 +184,7 @@ export const LowResolutionVectorLayer: React.FC<LowResolutionVectorLayerProps> =
               }
               return s;
             })(),
-            fill: PPMapStyles.get(FeatureType.LOW_RESOLUTION_PP)?.getFill(),
+            fill: PPMapStyles.get(featureType)?.getFill(),
             text:
               isFootprint || labelParts.length === 0
                 ? undefined

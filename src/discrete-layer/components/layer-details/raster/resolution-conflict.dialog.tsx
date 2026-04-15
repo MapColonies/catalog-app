@@ -398,6 +398,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                       ? <LowResolutionVectorLayer
                           features={lowResolutionFeatures}
                           outerPerimeter={outerPerimeter}
+                          featureType={FeatureType.LOW_RESOLUTION_PP}
                           selectedFeatureKey={selectedLowResolutionFeatureKey}
                           onFeaturesChange={(updatedFeatures): void => {
                             displayedLowResolutionFeaturesRef.current = updatedFeatures;
