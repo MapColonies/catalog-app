@@ -39,6 +39,7 @@ import {
 } from './pp-map.utils';
 
 interface PolygonPartsExtentQueryVectorLayerProps {
+  perimeter?: Geometry;
   layerRecord?: ILayerImage | null;
   selectedFeature?: Feature;
   onFeaturesChange?: (features: Feature[]) => void;
@@ -50,21 +51,30 @@ const DEBOUNCE_MOUSE_INTERVAL = 500;
 const LAYER_Z_INDEX = 1;
 
 const createZoomedOutFootprintFeature = (
-  layerRecord?: ILayerImage | null
-): Feature<Geometry, GeoJsonProperties> => ({
-  type: 'Feature',
-  geometry: {
-    ...layerRecord?.footprint,
-  },
-  properties: {
-    text: 'hide',
-    _showAsFootprint: true,
-    _featureType: FeatureType.EXISTING_PP,
-  },
-});
+  perimeter?: Geometry
+): Feature<Geometry, GeoJsonProperties> | undefined => {
+  if (!perimeter) {
+    return undefined;
+  }
+
+  return {
+    type: 'Feature',
+    geometry: {
+      ...perimeter,
+    },
+    properties: {
+      text: 'hide',
+      _showAsFootprint: true,
+      _featureType: FeatureType.EXISTING_PP,
+    },
+  };
+};
 
 export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQueryVectorLayerProps> = observer(({
-  layerRecord, selectedFeature, onFeaturesChange
+  perimeter,
+  layerRecord,
+  selectedFeature,
+  onFeaturesChange,
 }) => {
   const store = useStore();
   const mapOl = useMap();
@@ -90,7 +100,8 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
   useEffect(() => {
     const handleMoveEndEvent = (e: MapEvent): void => {
       requestedStartIndexRef.current = START_OFFSET;
-      setExistingPolygonParts([createZoomedOutFootprintFeature(layerRecord)]);
+      const footprintFeature = createZoomedOutFootprintFeature(perimeter);
+      setExistingPolygonParts(footprintFeature ? [footprintFeature] : []);
       getExistingPolygonParts(mapOl.getView().calculateExtent() as BBox, START_OFFSET);
     };
 
@@ -167,7 +178,8 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
     ) {
       requestedStartIndexRef.current = START_OFFSET;
       showLoadingSpinner(false);
-      setExistingPolygonParts([createZoomedOutFootprintFeature(layerRecord)]);
+      const footprintFeature = createZoomedOutFootprintFeature(perimeter);
+      setExistingPolygonParts(footprintFeature ? [footprintFeature] : []);
     } else {
       requestedStartIndexRef.current = startIndex;
       showLoadingSpinner(true);

@@ -1,6 +1,6 @@
 import { CSSProperties, MutableRefObject, useEffect, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Feature, MultiPolygon, Polygon } from 'geojson';
+import { Feature, Geometry, MultiPolygon, Polygon } from 'geojson';
 import { get, isEmpty } from 'lodash';
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
 import { point } from '@turf/helpers';
@@ -553,6 +553,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
         {children}
         {showExistingPolygonParts && (
           <PolygonPartsExtentQueryVectorLayer
+            perimeter={layerRecord?.footprint as Geometry | undefined}
             layerRecord={layerRecord}
             selectedFeature={selectedExistingFeature}
             onFeaturesChange={(features): void => {
