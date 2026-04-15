@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.5.1](https://github.com/MapColonies/catalog-app/compare/v4.5.0...v4.5.1) (2026-04-15)
+
+
+### Bug Fixes
+
+* openshift route timeout error ([#875](https://github.com/MapColonies/catalog-app/issues/875)) ([a0e831c](https://github.com/MapColonies/catalog-app/commit/a0e831ce917a380025fbae71f957294f311b6533))
+
 ## [4.5.0](https://github.com/MapColonies/catalog-app/compare/v4.4.3...v4.5.0) (2026-04-09)
 
 
