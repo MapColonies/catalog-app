@@ -52,7 +52,6 @@ export const LowResolutionVectorLayer: React.FC<LowResolutionVectorLayerProps> =
   const [visibleFeatures, setVisibleFeatures] = useState<Feature[]>([]);
   const featuresRef = useRef<Feature[]>(features);
   featuresRef.current = features;
-  const hasFitRef = useRef(false);
 
   const lowResolutionFootprint = useRef<Feature | undefined>(undefined);
 
@@ -133,54 +132,10 @@ export const LowResolutionVectorLayer: React.FC<LowResolutionVectorLayerProps> =
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [perimeter]);
 
-  // Fit to features extent on first load, then compute visible features
   useEffect(() => {
     if (features.length === 0) {
-      hasFitRef.current = false;
       setVisibleFeatures([]);
       return;
-    }
-
-    if (!hasFitRef.current) {
-      hasFitRef.current = true;
-      try {
-        const olFormat = new GeoJSON();
-        let minX = Infinity;
-        let minY = Infinity;
-        let maxX = -Infinity;
-        let maxY = -Infinity;
-
-        features.forEach((feat) => {
-          if (!feat?.geometry) {
-            return;
-          }
-          try {
-            const olGeom = olFormat.readGeometry(feat.geometry);
-            const ext = olGeom.getExtent();
-            if (ext && ext.length === 4) {
-              minX = Math.min(minX, ext[0]);
-              minY = Math.min(minY, ext[1]);
-              maxX = Math.max(maxX, ext[2]);
-              maxY = Math.max(maxY, ext[3]);
-            }
-          } catch {
-            /* ignore */
-          }
-        });
-
-        if (isFinite(minX)) {
-          mapOl.getView().fit([minX, minY, maxX, maxY], {
-            duration: 250,
-            padding: [32, 32, 32, 32],
-            ...fitOptions,
-          });
-          // Compute visible features after the fit animation completes
-          setTimeout(computeVisibleFeatures, 300);
-          return;
-        }
-      } catch {
-        /* ignore */
-      }
     }
 
     computeVisibleFeatures();

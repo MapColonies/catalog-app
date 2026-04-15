@@ -332,6 +332,12 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   }, [enableFeaturePropertiesPopup]);
 
   useEffect(() => {
+    if (!selectedFeatureKey && !selectedExistingFeature) {
+      setSelectedFeatureProperties(undefined);
+    }
+  }, [selectedFeatureKey, selectedExistingFeature]);
+
+  useEffect(() => {
     const wasShown = previousShowExistingPolygonPartsRef.current;
 
     if (wasShown && !showExistingPolygonParts) {
