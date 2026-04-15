@@ -32,18 +32,6 @@ export interface WorkerAPI {
   query(bbox: BBoxObj, onProgress?: (p: WorkerMessage | null) => void): FeatureCollection;
 }
 
-// export type Process =
-//   | { loadFromShapeFile: 'Download' | 'Parsing' | 'Cache' }
-//   | { UpdateAreas: 'UpdateAreas' }
-//   | { ComputeOuterGeometry: 'ComputeOuterGeometry' }
-//   | { GetFeatureCollection: 'GetFeatureCollection' };
-
-// export type Processes =
-//   | { loadFromShapeFile: 'Download' | 'Parsing' | 'Cache' }
-//   | { UpdateAreas: 'UpdateAreas' }
-//   | { ComputeOuterGeometry: 'ComputeOuterGeometry' }
-//   | { GetFeatureCollection: 'GetFeatureCollection' };
-
 export enum Process {
   Init = 'Init',
   Load = 'Load',
@@ -61,23 +49,28 @@ export enum Stage {
   GetFeatureCollection = 'GetFeatureCollection',
 }
 
+export enum WorkerType {
+  Progress = 'Progress',
+  Done = 'Done',
+  Error = 'Error',
+}
+
 type StageProp = {
   translationCode: string;
-  isReportingOnProgress: boolean;
+  shouldShowProgress: boolean;
 };
-
-type WorkerType = 'Progress' | 'Done' | 'Error';
 
 export interface WorkerMessage {
   process: Process;
   stage: Stage;
   type: WorkerType;
-  message: Message | string;
+  details: MessageDetails;
 }
 
-export interface Message {
-  progress: string;
-  timeItTookInMs: string;
+export interface MessageDetails {
+  progress?: string;
+  elapsedTime?: string;
+  error?: string;
 }
 
 export type ProcessStagesMap = {

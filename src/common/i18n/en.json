@@ -878,8 +878,8 @@
 
   "progress.stage.init.translationCode": "Boot",
   "progress.stage.load.translationCode": "Loading",
-  "progress.stage.parsing.translationCode": "Parsing info",
+  "progress.stage.parsing.translationCode": "Preparing info",
   "progress.stage.cache.translationCode": "Cache",
-  "progress.stage.updateAreas.translationCode": "Compute polygons area",
-  "progress.stage.computeOuterGeometry.translationCode": "Compute polygons perimeter"
+  "progress.stage.updateAreas.translationCode": "Calculating areas",
+  "progress.stage.computeOuterGeometry.translationCode": "Calculating perimeter"
 }

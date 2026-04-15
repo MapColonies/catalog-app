@@ -5,47 +5,60 @@
 #progressCurtain {
   position: absolute;
   display: flex;
-  justify-content: center;
-  align-items: center;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
   font-weight: 600;
-  display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 8px;
   background-color: rgba(0, 0, 0, 0.6);
   z-index: 4;
+  font-size: 16px;
 }
 
 #progressCurtain .curtainRow {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   width: 100%;
   color: var(--mdc-theme-text-primary-on-background);
   text-align: center;
-  padding-left: 24px;
-  padding-right: 24px;
+  padding: 16px;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
 }
 
-#progressCurtain .curtainVal {
+#progressCurtain .curtainRow .workerTypeStage {
+  font-size: 20px;
+}
+
+#progressCurtain .processName {
+  min-width: 200px;
+  display: inline-block;
+  text-align: start;
+  padding: 0px 5px;
+}
+
+#progressCurtain .info {
   display: flex;
   gap: 12px;
 }
 
-.curtainPercent {
+#progressCurtain .progress {
   min-width: 88px;
   text-align: right;
 }
 
-.curtainTime {
+#progressCurtain .elapsedTime {
   min-width: 88px;
   text-align: right;
+}
+
+#progressCurtain .errorsContainer {
+  height: 100px;
+  padding-top: 100px;
+  justify-self: end;
 }
 
 #progressCurtain .curtainRow.inactive {

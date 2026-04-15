@@ -20,7 +20,8 @@ import {
   CustomProperties,
   Process,
   Stage,
-  Message,
+  MessageDetails,
+  WorkerType,
 } from './worker.types';
 
 type ShpJsParser = (buffer: ArrayBuffer) => Promise<unknown>;
@@ -32,26 +33,39 @@ let _tree = new RBush<IndexedItem>();
 const _properties: Record<string, unknown>[] = [];
 const _featureTemplate: Feature[] = [];
 
-const formatTime = (startTime: number) => {
-  return (performance.now() - startTime).toFixed(0);
-}
+const formatTime = (performanceStartTime: number) => {
+  return (performance.now() - performanceStartTime).toFixed(0);
+};
 
-const percentageOfTotal = (total: number | null | undefined, partial: number, startTime: number): Message => {
-  const timeItTookInMs = `${formatTime(startTime)} (ms)`;
+export const buildMessage = (
+  percent: number,
+  performanceStartTime: number,
+  error?: string
+): MessageDetails => ({
+  progress: `${percent}%`,
+  elapsedTime: `${formatTime(performanceStartTime)} (ms)`,
+  error: error,
+});
 
-  if (total != null && total !== undefined) {
-    // return `${Math.floor((partial / total) * 100)}%`;
+export const percentageOfTotal = (
+  total: number | null | undefined,
+  partial: number,
+  performanceStartTime: number
+): MessageDetails => {
+  const timeItTookInMs = `${formatTime(performanceStartTime)} (ms)`;
+
+  if (total !== null && total !== undefined) {
     return {
       progress: `${Math.floor((partial / total) * 100)}%`,
-      timeItTookInMs
-    }
+      elapsedTime: timeItTookInMs,
+    };
   } else {
     return {
       progress: '0%',
-      timeItTookInMs
+      elapsedTime: timeItTookInMs,
     };
   }
-}
+};
 
 const _computeBBox = (geometry: Polygon | MultiPolygon) => {
   let minX = Infinity,
@@ -111,7 +125,7 @@ const _downloadFile = async (
     const reader = response.body.getReader();
     const chunks = [];
     let received = 0;
-    let message: Message;
+    let details: MessageDetails;
 
     while (true) {
       const { done, value } = await reader.read();
@@ -121,34 +135,34 @@ const _downloadFile = async (
       chunks.push(value);
       received += value.length;
 
-      message = percentageOfTotal(total, received, t0);
+      details = percentageOfTotal(total, received, t0);
 
       onProgress?.({
         process: Process.Load,
         stage: Stage.Download,
-        type: 'Progress',
-        message,
+        type: WorkerType.Progress,
+        details: details,
       });
     }
 
     // Combine chunks into one ArrayBuffer
     const blob = new Blob(chunks);
     const arrayBuffer = await blob.arrayBuffer();
-    message = percentageOfTotal(total, received, t0);
+    details = percentageOfTotal(total, received, t0);
 
     onProgress?.({
       process: Process.Load,
       stage: Stage.Download,
-      type: 'Done',
-      message
+      type: WorkerType.Error,
+      details,
     });
     return arrayBuffer;
   } catch (error) {
     onProgress?.({
       process: Process.Load,
       stage: Stage.Download,
-      type: 'Error',
-      message: (error as any).message,
+      type: WorkerType.Error,
+      details: (error as any).message,
     });
     return null;
   }
@@ -209,7 +223,7 @@ const prepareGEOSData = (
   onProgress?: (p: WorkerMessage | null) => void
 ) => {
   const startParsingTime = performance.now();
-  let message: Message;
+  let message: MessageDetails;
   const reader = _geos.GEOSGeoJSONReader_create();
 
   const items: IndexedItem[] = [];
@@ -250,8 +264,8 @@ const prepareGEOSData = (
       onProgress?.({
         process: Process.Load,
         stage: Stage.Parsing,
-        type: 'Progress',
-        message
+        type: WorkerType.Progress,
+        details: message,
       });
     }
     i++;
@@ -263,8 +277,8 @@ const prepareGEOSData = (
   onProgress?.({
     process: Process.Load,
     stage: Stage.Parsing,
-    type: 'Done',
-    message,
+    type: WorkerType.Done,
+    details: message,
   });
   // console.log('******* prepareGEOSData', performance.now()-t0, '(ms)'); // ~12K --> 23000ms
 
@@ -275,8 +289,8 @@ const prepareGEOSData = (
   onProgress?.({
     process: Process.Load,
     stage: Stage.Cache,
-    type: 'Done',
-    message,
+    type: WorkerType.Done,
+    details: message,
   });
   // console.log('******* initQueryCache', performance.now()-t1, '(ms)'); // ~12K --> 17ms
 };
@@ -291,7 +305,7 @@ const api: WorkerAPI = {
     for (const g of _geoms) {
       try {
         _geos.GEOSGeom_destroy(g);
-      } catch { }
+      } catch {}
     }
     _geoms = [];
 
@@ -319,7 +333,7 @@ const api: WorkerAPI = {
   updateAreas(onProgress?: (p: WorkerMessage | null) => void): void {
     const total = _geoms.length;
     const t0 = performance.now();
-    let message: Message;
+    let message: MessageDetails;
 
     for (let i = 0; i < total; i++) {
       const areaPtr = _geos.Module._malloc(8);
@@ -333,8 +347,10 @@ const api: WorkerAPI = {
         onProgress?.({
           process: Process.UpdateAreas,
           stage: Stage.UpdateAreas,
-          type: 'Error',
-          message: `BAD geometry: ${_properties[i].id}`,
+          type: WorkerType.Error,
+          details: {
+            error: `BAD geometry: ${_properties[i].id}`,
+          },
         });
         return;
       }
@@ -350,8 +366,8 @@ const api: WorkerAPI = {
         onProgress?.({
           process: Process.UpdateAreas,
           stage: Stage.UpdateAreas,
-          type: 'Progress',
-          message
+          type: WorkerType.Progress,
+          details: message,
         });
       }
 
@@ -365,22 +381,22 @@ const api: WorkerAPI = {
     onProgress?.({
       process: Process.UpdateAreas,
       stage: Stage.UpdateAreas,
-      type: 'Done',
-      message,
+      type: WorkerType.Done,
+      details: message,
     });
   },
 
   computeOuterGeometry(onProgress?: (p: WorkerMessage | null) => void): Geometry {
     const t0 = performance.now();
-    let message: Message;
+    let message: MessageDetails;
 
     message = percentageOfTotal(0, 0, t0);
 
     onProgress?.({
       process: Process.ComputeOuterGeometry,
       stage: Stage.ComputeOuterGeometry,
-      type: 'Progress',
-      message,
+      type: WorkerType.Progress,
+      details: message,
     });
 
     const count = _geoms.length;
@@ -409,8 +425,8 @@ const api: WorkerAPI = {
     onProgress?.({
       process: Process.ComputeOuterGeometry,
       stage: Stage.ComputeOuterGeometry,
-      type: 'Progress',
-      message,
+      type: WorkerType.Progress,
+      details: message,
     });
 
     // 5. Calculate the merged geometry (Unary Union)
@@ -432,8 +448,8 @@ const api: WorkerAPI = {
     onProgress?.({
       process: Process.ComputeOuterGeometry,
       stage: Stage.ComputeOuterGeometry,
-      type: 'Done',
-      message,
+      type: WorkerType.Done,
+      details: message,
     });
 
     return simplifiedOuterJSON;

@@ -9,7 +9,9 @@ import {
   Stage,
   WorkerAPI,
   WorkerMessage,
+  WorkerType,
 } from './worker.types';
+import { buildMessage } from './feat-collection.worker-api';
 
 type WorkerService = {
   init: {
@@ -39,15 +41,13 @@ type WorkerService = {
     method: (bbox: BBoxObj) => Promise<FeatureCollection>;
     progress: WorkerMessage | null;
   };
-}
+};
 
-export function useWorkerAPI(): [
-  WorkerService | null,
-  Descriptor
-] {
+export function useWorkerAPI(): [WorkerService | null, Descriptor] {
   const [workerApi, setWorkerApi] = useState<any>(null);
   const [progressComputeArea, setProgressComputeArea] = useState<WorkerMessage | null>(null);
-  const [progressComputeOuterGeometry, setProgressComputeOuterGeometry] = useState<WorkerMessage | null>(null);
+  const [progressComputeOuterGeometry, setProgressComputeOuterGeometry] =
+    useState<WorkerMessage | null>(null);
   const [loadShapeFileProgress, setLoadShapeFileProgress] = useState<WorkerMessage[] | null>(null);
 
   useEffect(() => {
@@ -83,15 +83,19 @@ export function useWorkerAPI(): [
     };
   }, []);
 
-  const upsertWorkerMessageByStage = (process: Process, workerMessage: WorkerMessage, setProgresses: (value: SetStateAction<WorkerMessage[] | null>) => void) => {
+  const upsertWorkerMessageByStage = (
+    process: Process,
+    workerMessage: WorkerMessage,
+    setProgresses: (value: SetStateAction<WorkerMessage[] | null>) => void
+  ) => {
     if (process !== workerMessage.process) {
       return;
     }
 
-    setProgresses(prev => {
+    setProgresses((prev) => {
       const current = prev ?? [];
 
-      const stageIndex = current.findIndex(msg => msg.stage === workerMessage.stage);
+      const stageIndex = current.findIndex((msg) => msg.stage === workerMessage.stage);
 
       if (stageIndex > -1) {
         const newArr = [...current];
@@ -146,37 +150,32 @@ export function useWorkerAPI(): [
         },
         progress: progressComputeArea,
       },
-      // computeOuterGeometry: {
-      //   method: async () => {
-      //     return await workerApi.computeOuterGeometry(
-      //       proxy((p: WorkerMessage) => {
-      //         console.log('**** Progress Outer Geometry: ', p);
-      //         setProgressComputeOuterGeometry(p);
-      //       })
-      //     );
-      //   },
-      //   progress: progressComputeOuterGeometry,
-      // },
 
       computeOuterGeometry: {
         method: async () => {
           // 1. Setup the "Fake" Progress interval
-          const startTime = Date.now();
           const duration = 10000; // 10 seconds
+          const t0 = performance.now();
 
           const timer = setInterval(() => {
-            const passedTimeFromTheBeginning = Date.now() - startTime;
+            const passedTimeFromTheBeginning = performance.now() - t0;
             const ratioOfPassedTime = Math.min(passedTimeFromTheBeginning / duration, 1);
 
+            const eased =
+              ratioOfPassedTime < 0.5
+                ? 2 * ratioOfPassedTime * ratioOfPassedTime
+                : 1 - Math.pow(-2 * ratioOfPassedTime + 2, 2) / 2;
             // Fast-start easing: (1 - (1 - x)^2) slows down towards the end
-            const fakePercent = Math.floor((1 - Math.pow(1 - ratioOfPassedTime, 2)) * 95);
+            // const fakePercent = Math.floor((1 - Math.pow(1 - ratioOfPassedTime, 2)) * 95);
+            const fakePercent = Math.floor(eased * 95);
+            const details = buildMessage(fakePercent, t0);
 
             setProgressComputeOuterGeometry({
               process: Process.ComputeOuterGeometry,
               stage: Stage.ComputeOuterGeometry,
-              type: 'Progress',
-              message: `${fakePercent}%`
-            } as any);
+              type: WorkerType.Progress,
+              details,
+            });
 
             // Safety: Stop updating if we hit the 95% cap
             if (fakePercent >= 95) {
@@ -195,14 +194,7 @@ export function useWorkerAPI(): [
 
             // 3. Cleanup and finish
             clearInterval(timer);
-            // setProgressComputeOuterGeometry({
-            //   process: Process.ComputeOuterGeometry,
-            //   stage: Stage.ComputeOuterGeometry,
-            //   type: 'Done',
-            //   message: '100%',
-            // } as any);
             return result;
-
           } catch (err) {
             clearInterval(timer);
             throw err;
@@ -240,7 +232,7 @@ export function useWorkerAPI(): [
         stages: {
           [Stage.Init]: {
             translationCode: 'progress.stage.init.translationCode',
-            isReportingOnProgress: false,
+            shouldShowProgress: false,
           },
         },
       },
@@ -248,15 +240,15 @@ export function useWorkerAPI(): [
         stages: {
           [Stage.Download]: {
             translationCode: 'progress.stage.load.translationCode',
-            isReportingOnProgress: true,
+            shouldShowProgress: true,
           },
           [Stage.Parsing]: {
             translationCode: 'progress.stage.parsing.translationCode',
-            isReportingOnProgress: true,
+            shouldShowProgress: true,
           },
           [Stage.Cache]: {
             translationCode: 'progress.stage.cache.translationCode',
-            isReportingOnProgress: false,
+            shouldShowProgress: false,
           },
         },
       },
@@ -264,7 +256,7 @@ export function useWorkerAPI(): [
         stages: {
           [Stage.UpdateAreas]: {
             translationCode: 'progress.stage.updateAreas.translationCode',
-            isReportingOnProgress: true,
+            shouldShowProgress: true,
           },
         },
       },
@@ -272,7 +264,7 @@ export function useWorkerAPI(): [
         stages: {
           [Stage.ComputeOuterGeometry]: {
             translationCode: 'progress.stage.computeOuterGeometry.translationCode',
-            isReportingOnProgress: true,
+            shouldShowProgress: true,
           },
         },
       },
