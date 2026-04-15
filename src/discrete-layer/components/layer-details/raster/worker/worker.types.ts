@@ -82,7 +82,7 @@ export type ProcessStagesMap = {
 
 export type StagesFor<P extends Process> = Partial<Record<ProcessStagesMap[P], StageProp>>;
 
-export type Descriptor = {
+export type StagesInfo = {
   [P in Process]: {
     stages: StagesFor<P>;
   };

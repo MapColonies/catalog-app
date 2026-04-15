@@ -1351,7 +1351,7 @@ const DiscreteLayerView: React.FC = observer(() => {
                   ]
                 } /> */}
                 <ProgressCurtain
-                  descriptors={descriptors}
+                  stagesInfo={descriptors}
                   workerMessages={progresses}
                 ></ProgressCurtain>
               </Box>

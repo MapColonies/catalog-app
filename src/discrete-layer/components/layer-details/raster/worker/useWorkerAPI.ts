@@ -3,7 +3,7 @@ import { wrap, Remote, proxy } from 'comlink';
 import { FeatureCollection, Geometry } from 'geojson';
 import {
   BBoxObj,
-  Descriptor,
+  StagesInfo,
   LoadOptions,
   Process,
   Stage,
@@ -43,7 +43,7 @@ type WorkerService = {
   };
 };
 
-export function useWorkerAPI(): [WorkerService | null, Descriptor] {
+export function useWorkerAPI(): [WorkerService | null, StagesInfo] {
   const [workerApi, setWorkerApi] = useState<any>(null);
   const [progressComputeArea, setProgressComputeArea] = useState<WorkerMessage | null>(null);
   const [progressComputeOuterGeometry, setProgressComputeOuterGeometry] =
@@ -226,7 +226,7 @@ export function useWorkerAPI(): [WorkerService | null, Descriptor] {
     };
   }, [workerApi, progressComputeArea, progressComputeOuterGeometry, loadShapeFileProgress]);
 
-  const descriptors: Descriptor = useMemo(() => {
+  const stagesInfo: StagesInfo = useMemo(() => {
     return {
       [Process.Init]: {
         stages: {
@@ -271,5 +271,5 @@ export function useWorkerAPI(): [WorkerService | null, Descriptor] {
     };
   }, []);
 
-  return [api, descriptors];
+  return [api, stagesInfo];
 }
