@@ -408,6 +408,21 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                           }}
                         />
                       : null
+                      // <PolygonPartsExtentQueryVectorLayer
+                      //   style={PPMapStyles.get(FeatureType.LOW_RESOLUTION_PP)}
+                      //   outerPerimeter={api.perimeter}
+                      //   queryExecutor={async (extent_bbox): Promise<void>  => {
+                      //     return await api.query(bbox)
+                      //   }}
+                      //   selectedFeature={selectedExistingFeature}
+                      //   onFeaturesChange={(features): void => {
+                      //     existingPPFeaturesRef.current = features;
+            
+                      //     if (isFootprintOnlyDisplay(features)) {
+                      //       clearPreviewSelection();
+                      //     }
+                      //   }}
+                      // />
                   }
                 </GeoFeaturesPresentorComponent>
               </Box>

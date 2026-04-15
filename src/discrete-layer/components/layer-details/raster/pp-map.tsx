@@ -4,6 +4,7 @@ import { Feature, Geometry, MultiPolygon, Polygon } from 'geojson';
 import { get, isEmpty } from 'lodash';
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
 import { point } from '@turf/helpers';
+import bboxPolygon from '@turf/bbox-polygon';
 import { FitOptions } from 'ol/View';
 import { Fill, Stroke, Style } from 'ol/style';
 import {
@@ -25,16 +26,26 @@ import {
 } from '@map-colonies/react-components';
 import { Checkbox, IconButton, Typography } from '@map-colonies/react-core';
 import { dateFormatter } from '../../../../common/helpers/formatters';
+import CONFIG from '../../../../common/config';
+import { useEnums } from '../../../../common/hooks/useEnum.hook';
 import { Mode } from '../../../../common/models/mode.enum';
 import { FeatureSelectionHandler } from '../../../../common/components/ol-map/feature-selection-handler';
 import { MapFeatureClickHandler } from '../../../../common/components/ol-map/map-feature-click-handler';
 import { MapLoadingIndicator } from '../../../../common/components/ol-map/map-loading-indicator';
 import { isValidGeometryType } from '../../../../common/utils/geojson.validation';
+import { LayerRasterRecordModelType } from '../../../models';
 import { ILayerImage } from '../../../models/layerImage';
+import { GeojsonFeatureInput } from '../../../models/RootStore.base';
 import { useStore } from '../../../models/RootStore';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
 import { PolygonPartsExtentQueryVectorLayer } from './polygon-parts-extent-query-vector-layer';
-import { FEATURE_LABEL_CONFIG, FeatureType, getText, PPMapStyles } from './pp-map.utils';
+import {
+  FEATURE_LABEL_CONFIG,
+  FeatureType,
+  getText,
+  getWFSFeatureTypeName,
+  PPMapStyles,
+} from './pp-map.utils';
 
 import './pp-map.css';
 
@@ -95,6 +106,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   pendingSelectionFeatureRef,
 }) => {
   const store = useStore();
+  const ENUMS = useEnums();
   const intl = useIntl();
   const renderCount = useRef(0);
   const existingPPFeaturesRef = useRef<Feature[]>([]);
@@ -554,7 +566,17 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
         {showExistingPolygonParts && (
           <PolygonPartsExtentQueryVectorLayer
             outerPerimeter={layerRecord?.footprint as Geometry | undefined}
-            layerRecord={layerRecord}
+            featureType={FeatureType.EXISTING_PP}
+            queryExecutor={async (bbox, startIndex): Promise<unknown> => {
+              return await store.queryGetPolygonPartsFeature({
+                data: {
+                  feature: bboxPolygon(bbox) as GeojsonFeatureInput,
+                  typeName: getWFSFeatureTypeName(layerRecord as LayerRasterRecordModelType, ENUMS),
+                  count: CONFIG.POLYGON_PARTS.MAX.WFS_FEATURES,
+                  startIndex,
+                },
+              });
+            }}
             selectedFeature={selectedExistingFeature}
             onFeaturesChange={(features): void => {
               existingPPFeaturesRef.current = features;
@@ -564,10 +586,9 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
               }
             }}
           />
-          ///////WFS RASTER PARTS LAYER///////
           // <PolygonPartsExtentQueryVectorLayer
           //   style={PPMapStyles.get(FeatureType.EXISTING_PP)}
-          //   outterPrimeter={layerRecord.footprint}
+          //   outerPerimeter={layerRecord.footprint}
           //   queryExecutor={async (extent_bbox): Promise<void>  => {
           //     return await store.queryGetPolygonPartsFeature({
           //       data: {
@@ -577,23 +598,6 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
           //         startIndex,
           //       },
           //     })
-          //   }}
-          //   selectedFeature={selectedExistingFeature}
-          //   onFeaturesChange={(features): void => {
-          //     existingPPFeaturesRef.current = features;
-
-          //     if (isFootprintOnlyDisplay(features)) {
-          //       clearPreviewSelection();
-          //     }
-          //   }}
-          // />
-
-          // ///////REPORT PARTS LAYER///////
-          // <PolygonPartsExtentQueryVectorLayer
-          //   style={PPMapStyles.get(FeatureType.LOW_RESOLUTION_PP)}
-          //   outterPrimeter={api.perimeter}
-          //   queryExecutor={async (extent_bbox): Promise<void>  => {
-          //     return await api.query(bbox)
           //   }}
           //   selectedFeature={selectedExistingFeature}
           //   onFeaturesChange={(features): void => {

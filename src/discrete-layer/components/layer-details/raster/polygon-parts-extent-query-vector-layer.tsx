@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { BBox, Feature, GeoJsonProperties, Geometry } from 'geojson';
-import { debounce } from 'lodash';
+import { debounce, get } from 'lodash';
 import { observer } from 'mobx-react';
 import { MapEvent } from 'ol';
 import GeoJSON from 'ol/format/GeoJSON';
@@ -18,29 +18,21 @@ import {
 } from '@map-colonies/react-components';
 import CONFIG from '../../../../common/config';
 import { VectorLayerOrder } from '../../../../common/components/ol-map/vector-layer-order';
-import { useEnums } from '../../../../common/hooks/useEnum.hook';
-import {
-  GetFeatureModelType,
-  LayerRasterRecordModelType,
-  useQuery,
-  useStore,
-} from '../../../models';
+import { useStore } from '../../../models';
 import { IDispatchAction } from '../../../models/actionDispatcherStore';
-import { ILayerImage } from '../../../models/layerImage';
-import { GeojsonFeatureInput } from '../../../models/RootStore.base';
 import { UserAction } from '../../../models/userStore';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
 import {
   createTextStyle,
   FeatureType,
   FEATURE_LABEL_CONFIG,
-  getWFSFeatureTypeName,
   PPMapStyles,
 } from './pp-map.utils';
 
 interface PolygonPartsExtentQueryVectorLayerProps {
   outerPerimeter?: Geometry;
-  layerRecord?: ILayerImage | null;
+  queryExecutor: (bbox: BBox, startIndex: number) => Promise<unknown>;
+  featureType: FeatureType;
   selectedFeature?: Feature;
   onFeaturesChange?: (features: Feature[]) => void;
 }
@@ -51,7 +43,8 @@ const DEBOUNCE_MOUSE_INTERVAL = 500;
 const LAYER_Z_INDEX = 1;
 
 const createZoomedOutFootprintFeature = (
-  outerPerimeter?: Geometry
+  outerPerimeter?: Geometry,
+  featureType?: FeatureType
 ): Feature<Geometry, GeoJsonProperties> | undefined => {
   if (!outerPerimeter) {
     return undefined;
@@ -65,14 +58,15 @@ const createZoomedOutFootprintFeature = (
     properties: {
       text: 'hide',
       _showAsFootprint: true,
-      _featureType: FeatureType.EXISTING_PP,
+      _featureType: featureType,
     },
   };
 };
 
 export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQueryVectorLayerProps> = observer(({
   outerPerimeter,
-  layerRecord,
+  queryExecutor,
+  featureType,
   selectedFeature,
   onFeaturesChange,
 }) => {
@@ -80,16 +74,12 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
   const mapOl = useMap();
   const intl = useIntl();
   const [existingPolygonParts, setExistingPolygonParts] = useState<Feature[]>([]);
-  const requestedStartIndexRef = useRef(START_OFFSET);
+  const activeRequestIdRef = useRef(0);
 
   useEffect(() => {
     onFeaturesChange?.(existingPolygonParts);
   }, [existingPolygonParts]);
-  const { data, error, loading, setQuery } = useQuery<{
-    getPolygonPartsFeature: GetFeatureModelType;
-  }>();
   const ZOOM_LEVELS_TABLE = useZoomLevelsTable();
-  const ENUMS = useEnums();
 
   const showLoadingSpinner = (isShown: boolean) => {
     isShown
@@ -99,16 +89,15 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
 
   useEffect(() => {
     const handleMoveEndEvent = (e: MapEvent): void => {
-      requestedStartIndexRef.current = START_OFFSET;
-      const footprintFeature = createZoomedOutFootprintFeature(outerPerimeter);
+      const footprintFeature = createZoomedOutFootprintFeature(outerPerimeter, featureType);
       setExistingPolygonParts(footprintFeature ? [footprintFeature] : []);
-      getExistingPolygonParts(mapOl.getView().calculateExtent() as BBox, START_OFFSET);
+      void getExistingPolygonParts(mapOl.getView().calculateExtent() as BBox, START_OFFSET);
     };
 
     const debounceCall = debounce(handleMoveEndEvent, DEBOUNCE_MOUSE_INTERVAL);
     mapOl.on('moveend', debounceCall);
 
-    getExistingPolygonParts(mapOl.getView().calculateExtent() as BBox, START_OFFSET);
+    void getExistingPolygonParts(mapOl.getView().calculateExtent() as BBox, START_OFFSET);
 
     return (): void => {
       try {
@@ -119,80 +108,73 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
     };
   }, []);
 
-  useEffect(() => {
-    if (!loading && data) {
-      const currentStartIndex = requestedStartIndexRef.current;
-      const fetchedFeatures =
-        data.getPolygonPartsFeature.features as Feature<Geometry, GeoJsonProperties>[];
-      const hasMoreFeatures =
-        fetchedFeatures.length === CONFIG.POLYGON_PARTS.MAX.WFS_FEATURES;
-
-      setExistingPolygonParts((currentFeatures) => {
-        const nextFeatures =
-          currentStartIndex === STARTING_PAGE
-            ? currentFeatures.filter(
-              (feature) => !(feature.properties as GeoJsonProperties | null)?._showAsFootprint
-            )
-            : currentFeatures;
-
-        if (currentStartIndex === STARTING_PAGE && fetchedFeatures.length === 0) {
-          return [];
-        }
-
-        return [...nextFeatures, ...fetchedFeatures];
-      });
-
-      if (hasMoreFeatures) {
-        const nextStartIndex = currentStartIndex + CONFIG.POLYGON_PARTS.MAX.WFS_FEATURES;
-        requestedStartIndexRef.current = nextStartIndex;
-        getExistingPolygonParts(
-          mapOl.getView().calculateExtent() as BBox,
-          nextStartIndex
-        );
-      }
-    }
-    if (loading) {
-      showLoadingSpinner(true);
-    } else {
-      showLoadingSpinner(false);
-    }
-  }, [data, loading]);
-
-  useEffect(() => {
-    if (!loading && error) {
-      store.actionDispatcherStore.dispatchAction({
-        action: UserAction.SYSTEM_CALLBACK_SHOW_PPERROR_ON_UPDATE,
-        data: {
-          error: [intl.formatMessage({ id: 'validation-general.polygonParts.wfsServerError' })],
-        },
-      } as IDispatchAction);
-    }
-  }, [error, loading]);
-
-  const getExistingPolygonParts = (bbox: BBox, startIndex: number) => {
+  const getExistingPolygonParts = async (bbox: BBox, startIndex: number): Promise<void> => {
     const currentZoomLevel = mapOl.getView().getZoom();
 
     if (
       currentZoomLevel &&
       currentZoomLevel < CONFIG.POLYGON_PARTS.MAX.SHOW_FOOTPRINT_ZOOM_LEVEL
     ) {
-      requestedStartIndexRef.current = START_OFFSET;
       showLoadingSpinner(false);
-      const footprintFeature = createZoomedOutFootprintFeature(outerPerimeter);
+      const footprintFeature = createZoomedOutFootprintFeature(outerPerimeter, featureType);
       setExistingPolygonParts(footprintFeature ? [footprintFeature] : []);
-    } else {
-      requestedStartIndexRef.current = startIndex;
-      showLoadingSpinner(true);
-      setQuery(
-        store.queryGetPolygonPartsFeature({
+      return;
+    }
+
+    const requestId = activeRequestIdRef.current + 1;
+    activeRequestIdRef.current = requestId;
+    showLoadingSpinner(true);
+
+    try {
+      let nextStartIndex = startIndex;
+
+      while (true) {
+        const extent = mapOl.getView().calculateExtent() as BBox;
+        const result = await queryExecutor(extent, nextStartIndex);
+        const pageStartIndex = nextStartIndex;
+
+        if (activeRequestIdRef.current !== requestId) {
+          return;
+        }
+
+        const rawFeatures = get(result, 'getPolygonPartsFeature.features', get(result, 'features', []));
+        const fetchedFeatures = (Array.isArray(rawFeatures) ? rawFeatures : []) as Feature<Geometry, GeoJsonProperties>[];
+
+        setExistingPolygonParts((currentFeatures) => {
+          const baseFeatures =
+            pageStartIndex === STARTING_PAGE
+              ? currentFeatures.filter(
+                (feature) => !(feature.properties as GeoJsonProperties | null)?._showAsFootprint
+              )
+              : currentFeatures;
+
+          if (pageStartIndex === STARTING_PAGE && fetchedFeatures.length === 0) {
+            return [];
+          }
+
+          return [...baseFeatures, ...fetchedFeatures];
+        });
+
+        const hasMoreFeatures = fetchedFeatures.length === CONFIG.POLYGON_PARTS.MAX.WFS_FEATURES;
+        if (!hasMoreFeatures) {
+          break;
+        }
+
+        nextStartIndex += CONFIG.POLYGON_PARTS.MAX.WFS_FEATURES;
+      }
+    } catch {
+      if (activeRequestIdRef.current === requestId) {
+        store.actionDispatcherStore.dispatchAction({
+          action: UserAction.SYSTEM_CALLBACK_SHOW_PPERROR_ON_UPDATE,
           data: {
-            feature: bboxPolygon(bbox) as GeojsonFeatureInput,
-            typeName: getWFSFeatureTypeName(layerRecord as LayerRasterRecordModelType, ENUMS),
-            count: CONFIG.POLYGON_PARTS.MAX.WFS_FEATURES,
-            startIndex,
+            error: [intl.formatMessage({ id: 'validation-general.polygonParts.wfsServerError' })],
           },
-        })
-      );
+        } as IDispatchAction);
+      }
+    } finally {
+      if (activeRequestIdRef.current === requestId) {
+        showLoadingSpinner(false);
+      }
     }
   };
 
@@ -209,12 +191,12 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
               ZOOM_LEVELS_TABLE,
               intl.formatMessage({ id: 'polygon-parts.map-preview.zoom-before-fetch' })
             ),
-            stroke: PPMapStyles.get(FeatureType.EXISTING_PP)?.getStroke(),
-            fill: PPMapStyles.get(FeatureType.EXISTING_PP)?.getFill(),
+            stroke: PPMapStyles.get(featureType)?.getStroke(),
+            fill: PPMapStyles.get(featureType)?.getFill(),
           });
 
           if (selectedFeature === feat) {
-            const baseStroke = PPMapStyles.get(FeatureType.EXISTING_PP)?.getStroke();
+            const baseStroke = PPMapStyles.get(featureType)?.getStroke();
             if (baseStroke) {
               const selectedStroke = baseStroke.clone();
               selectedStroke.setWidth(5);
