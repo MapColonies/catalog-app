@@ -568,11 +568,11 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
             }
 
             if (isOlPolygonFeature(feature)) {
-              // Geometry-only OL feature (no attached properties) — likely an existing green feature.
+              // Geometry-only OL feature (no attached properties) - likely an existing feature.
               // Only search the existing features ref when the existing PP layer is visible.
               if (showExistingPolygonPartsRef.current) {
                 // Do a turf lookup to find its GeoJSON counterpart and stop iteration
-                // before it falls through to the orange low-resolution feature below it.
+                // before it falls through to the external features.
                 const clickedPoint = point(event.coordinate as [number, number]);
                 const matchingExisting = existingPPFeaturesRef.current.find((f) => {
                   if (!f?.geometry) {
@@ -627,7 +627,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
         if (clickedProperties) {
           setSelectedFeatureProperties(addFeatureLabelToProperties(clickedProperties));
           if (clickedExistingFeature) {
-            // Green existing feature was clicked — clear any orange list selection
+            // Existing feature was clicked - clear any external list selection
             onMapFeatureClick?.(undefined);
           } else if (clickedFeatureKey) {
             setSelectedExistingFeature(undefined);
@@ -644,7 +644,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
             return;
           }
 
-          // Determine whether the hit feature belongs to the existing (green) or external (orange)
+          // Determine whether the hit feature belongs to the existing features or external features
           const clickedPoint = point(event.coordinate as [number, number]);
           const matchingExistingFallback = showExistingPolygonPartsRef.current ? existingPPFeaturesRef.current.find((f) => {
             if (!f?.geometry) {
@@ -681,7 +681,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
           }
 
           setSelectedExistingFeature(undefined);
-          const orangeFeature = [...(geoFeatures ?? []), ...(externalFeaturesRef?.current ?? [])].find((f) => {
+          const external = [...(geoFeatures ?? []), ...(externalFeaturesRef?.current ?? [])].find((f) => {
             if (!f?.geometry) {
               return false;
             }
@@ -695,7 +695,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
               return false;
             }
           });
-          const fallbackFeatureKey = orangeFeature?.properties?._key;
+          const fallbackFeatureKey = external?.properties?._key;
           if (fallbackFeatureKey) {
             onMapFeatureClick?.(fallbackFeatureKey);
           }
