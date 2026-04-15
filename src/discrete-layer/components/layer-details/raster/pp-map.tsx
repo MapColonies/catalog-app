@@ -5,7 +5,6 @@ import { get, isEmpty } from 'lodash';
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
 import { point } from '@turf/helpers';
 import { FitOptions } from 'ol/View';
-import GeoJSON from 'ol/format/GeoJSON';
 import { Fill, Stroke, Style } from 'ol/style';
 import MapBrowserEvent from 'ol/MapBrowserEvent';
 import {
@@ -28,6 +27,7 @@ import {
 import { Checkbox, IconButton, Typography } from '@map-colonies/react-core';
 import { dateFormatter } from '../../../../common/helpers/formatters';
 import { Mode } from '../../../../common/models/mode.enum';
+import { FeatureSelectionHandler } from '../../../../common/components/ol-map/feature-selection-handler';
 import { MapLoadingIndicator } from '../../../../common/components/ol-map/map-loading-indicator';
 import { isValidGeometryType } from '../../../../common/utils/geojson.validation';
 import { ILayerImage } from '../../../models/layerImage';
@@ -454,86 +454,6 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
     );
   };
 
-  const FeatureSelectionHandler: React.FC = () => {
-    const map = useMap();
-
-    useEffect(() => {
-      if (!selectedFeatureKey) {
-        lastHandledSelectedFeatureKeyRef.current = undefined;
-        lastHandledSelectedFeatureRequestIdRef.current = undefined;
-        return;
-      }
-
-      setSelectedExistingFeature(undefined);
-
-      const selectedFeature = [...(geoFeatures ?? []), ...(externalFeaturesRef?.current ?? [])].find((feature) => {
-        return feature?.properties?._key === selectedFeatureKey;
-      });
-
-      // If not in viewport, fall back to pendingSelectionFeatureRef (set by list click)
-      let featureToFit = selectedFeature;
-      if (!featureToFit) {
-        const pending = pendingSelectionFeatureRef?.current;
-        const pendingKey = pending?.properties?._key;
-        if (pendingSelectionFeatureRef && pendingKey === selectedFeatureKey) {
-          featureToFit = pending ?? undefined;
-          pendingSelectionFeatureRef.current = null;
-        }
-      }
-
-      if (!featureToFit?.geometry) {
-        return;
-      }
-
-      const shouldFitToSelectedFeature = selectedFeatureRequestId !== undefined
-        ? lastHandledSelectedFeatureRequestIdRef.current !== selectedFeatureRequestId
-        : lastHandledSelectedFeatureKeyRef.current !== selectedFeatureKey;
-
-      if (shouldFitToSelectedFeature) {
-        try {
-          const geometry = new GeoJSON().readGeometry(featureToFit.geometry);
-          map.getView().fit(geometry.getExtent(), {
-            duration: 250,
-            maxZoom: 18,
-            padding: [32, 32, 32, 32],
-            ...fitOptions,
-          });
-          lastHandledSelectedFeatureKeyRef.current = selectedFeatureKey;
-          lastHandledSelectedFeatureRequestIdRef.current = selectedFeatureRequestId;
-        } catch {
-          return;
-        }
-
-        if (!enableFeaturePropertiesPopup) {
-          return;
-        }
-
-        const properties = featureToFit.properties as Record<string, unknown> | null | undefined;
-        if (properties && Object.keys(properties).length > 0) {
-          setSelectedFeatureProperties(addFeatureLabelToProperties(properties));
-          return;
-        }
-
-        setSelectedFeatureProperties({
-          [NO_PROPERTIES_MESSAGE_KEY]: intl.formatMessage({
-            id: 'polygon-parts.map-preview.no-feature-properties',
-          }),
-        });
-      }
-    }, [
-      map,
-      geoFeatures,
-      externalFeaturesRef,
-      pendingSelectionFeatureRef,
-      selectedFeatureKey,
-      selectedFeatureRequestId,
-      fitOptions,
-      enableFeaturePropertiesPopup,
-    ]);
-
-    return null;
-  };
-
   const MapFeatureClickHandler: React.FC = () => {
     const map = useMap();
 
@@ -735,7 +655,24 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
       <Map>
         <MapLoadingIndicator />
         <MapFeatureClickHandler />
-        <FeatureSelectionHandler />
+        <FeatureSelectionHandler
+          geoFeatures={geoFeatures}
+          externalFeaturesRef={externalFeaturesRef}
+          pendingSelectionFeatureRef={pendingSelectionFeatureRef}
+          selectedFeatureKey={selectedFeatureKey}
+          selectedFeatureRequestId={selectedFeatureRequestId}
+          fitOptions={fitOptions}
+          enableFeaturePropertiesPopup={enableFeaturePropertiesPopup}
+          noPropertiesMessageKey={NO_PROPERTIES_MESSAGE_KEY}
+          noPropertiesMessage={intl.formatMessage({
+            id: 'polygon-parts.map-preview.no-feature-properties',
+          })}
+          addFeatureLabelToProperties={addFeatureLabelToProperties}
+          setSelectedExistingFeature={setSelectedExistingFeature}
+          setSelectedFeatureProperties={setSelectedFeatureProperties}
+          lastHandledSelectedFeatureKeyRef={lastHandledSelectedFeatureKeyRef}
+          lastHandledSelectedFeatureRequestIdRef={lastHandledSelectedFeatureRequestIdRef}
+        />
         {mode === Mode.UPDATE && (
           <Box className="checkbox">
             <Checkbox
