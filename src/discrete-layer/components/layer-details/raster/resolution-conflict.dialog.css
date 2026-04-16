@@ -127,6 +127,10 @@
   padding-top: 2px;
 }
 
+#resolutionConflictDialog .virtualizedFeatureRow .featureAreaUnits {
+  font-size: 0.8em;
+}
+
 #resolutionConflictDialog .virtualizedFeatureRow .featureId {
   font-size: 0.75em;
   line-height: 1.2;

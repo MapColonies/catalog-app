@@ -308,7 +308,7 @@
 
   "resolutionConflict.collectionName": "פוליגונים ברמת זום {value}",
   "resolutionConflict.partName": "פוליגון {index}",
-  "resolutionConflict.units.km2": "{value}ק\"מ²",
+  "resolutionConflict.units.km2": " קמ\"ר",
   "resolutionConflict.error.missingUrl": "חסר URL לדו\"ח ולידציה",
   "resolutionConflict.error.fetchFailed": "נכשל בטעינת חלקי תיחום מקובץ",
 

@@ -214,10 +214,6 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
     closeDialog();
   }, []);
 
-  const formatArea = useCallback((area: number): string => {
-    return intl.formatMessage({ id: 'resolutionConflict.units.km2' }, { value: area.toFixed(2) });
-  }, []);
-
   return (
     <Box id="resolutionConflictDialog">
       <Dialog open={isOpen} preventOutsideDismiss={true}>
@@ -314,7 +310,10 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                                               <AutoDirectionBox>{featureLabel}</AutoDirectionBox>
                                             </Typography>
                                             <Typography className="featureArea" tag="span">
-                                              <AutoDirectionBox>{formatArea(calculatedArea)}</AutoDirectionBox>
+                                              <AutoDirectionBox>
+                                                <Typography tag="span">{calculatedArea.toFixed(2)}</Typography>
+                                                <Typography tag="span" className="featureAreaUnits"><FormattedMessage id="resolutionConflict.units.km2"/></Typography>
+                                              </AutoDirectionBox>
                                             </Typography>
                                           </Box>
                                           {featureId && (
