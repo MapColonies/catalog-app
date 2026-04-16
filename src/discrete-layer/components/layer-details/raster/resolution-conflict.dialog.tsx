@@ -395,7 +395,6 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                   {
                     showLowResolutionPolygonParts && lowResolutionFeatures !== undefined
                       ? <LowResolutionVectorLayer
-                          features={lowResolutionFeatures}
                           outerPerimeter={outerPerimeter}
                           featureType={FeatureType.LOW_RESOLUTION_PP}
                           queryExecutor={async (bbox): Promise<unknown> => {

@@ -20,7 +20,6 @@ import { VectorLayerOrder } from '../../../../common/components/ol-map/vector-la
 import { FeatureType, PPMapStyles } from './pp-map.utils';
 
 export interface LowResolutionVectorLayerProps {
-  features: Feature[];
   outerPerimeter?: Feature;
   featureType: FeatureType;
   queryExecutor: (bbox: BBox) => Promise<unknown>;
@@ -34,7 +33,6 @@ const LAYER_Z_INDEX = 2;
 const EXTENT_BUFFER = 2;
 
 export const LowResolutionVectorLayer: React.FC<LowResolutionVectorLayerProps> = ({
-  features,
   outerPerimeter,
   featureType,
   queryExecutor,
@@ -65,7 +63,7 @@ export const LowResolutionVectorLayer: React.FC<LowResolutionVectorLayerProps> =
   }, [outerPerimeter, featureType]);
 
   const computeVisibleFeatures = async (): Promise<void> => {
-    if (features.length === 0) {
+    if (!outerPerimeter?.geometry) {
       setVisibleFeatures([]);
       return;
     }
@@ -116,16 +114,6 @@ export const LowResolutionVectorLayer: React.FC<LowResolutionVectorLayerProps> =
     void computeVisibleFeatures();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [outerPerimeter]);
-
-  useEffect(() => {
-    if (features.length === 0) {
-      setVisibleFeatures([]);
-      return;
-    }
-
-    void computeVisibleFeatures();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [features]);
 
   // Subscribe to map moveend to re-filter features on pan/zoom
   useEffect(() => {
