@@ -219,7 +219,7 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
           if (selectedFeature === feat || isSelectedByKey) {
             if (baseStroke) {
               const selectedStroke = baseStroke.clone();
-              selectedStroke.setWidth(5);
+              selectedStroke.setWidth(8);
               greenStyle.setStroke(selectedStroke);
             }
           }
