@@ -119,6 +119,11 @@
   text-align: start;
 }
 
+#resolutionConflictDialog .virtualizedFeatureRow .featureLabelType {
+  font-size: 0.95em;
+  opacity: 0.65;
+}
+
 #resolutionConflictDialog .virtualizedFeatureRow .featureArea {
   font-size: 0.95em;
   flex-shrink: 0;

@@ -309,7 +309,10 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                                         <Box className="featureContent">
                                           <Box className="featureTitleRow">
                                             <Typography className="featureLabel" tag="span">
-                                              <AutoDirectionBox>{featureLabel} ({type})</AutoDirectionBox>
+                                              <AutoDirectionBox>
+                                                <Typography tag="span">{featureLabel}</Typography>
+                                                <Typography tag="span" className="featureLabelType"> ({type})</Typography>
+                                              </AutoDirectionBox>
                                             </Typography>
                                             <Typography className="featureArea" tag="span">
                                               <AutoDirectionBox>
