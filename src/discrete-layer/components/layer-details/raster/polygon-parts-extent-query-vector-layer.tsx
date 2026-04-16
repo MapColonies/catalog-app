@@ -6,7 +6,7 @@ import { observer } from 'mobx-react';
 import { MapEvent } from 'ol';
 import GeoJSON from 'ol/format/GeoJSON';
 import { Size } from 'ol/size';
-import { Style } from 'ol/style';
+import { Style, Text } from 'ol/style';
 import intersect from '@turf/intersect';
 import { polygon } from '@turf/helpers';
 import bboxPolygon from '@turf/bbox-polygon';
@@ -30,17 +30,22 @@ import {
 } from './pp-map.utils';
 
 interface PolygonPartsExtentQueryVectorLayerProps {
-  outerPerimeter?: Geometry;
-  queryExecutor: (bbox: BBox, startIndex: number) => Promise<unknown>;
   featureType: FeatureType;
+  queryExecutor: (bbox: BBox, startIndex: number) => Promise<unknown>;
+  outerPerimeter?: Geometry;
   selectedFeature?: Feature;
+  selectedFeatureKey?: string;
   onFeaturesChange?: (features: Feature[]) => void;
+  textStyleFactory?: (feature: Feature) => Text | undefined;
+  layerZIndex?: number;
+  enablePagination?: boolean;
+  dispatchQueryError?: boolean;
 }
 
 const START_OFFSET = 0;
 const STARTING_PAGE = 0;
-const DEBOUNCE_MOUSE_INTERVAL = 500;
-const LAYER_Z_INDEX = 1;
+const DEBOUNCE_MOUSE_INTERVAL = 300;
+const DEFAULT_LAYER_Z_INDEX = 1;
 
 const createZoomedOutFootprintFeature = (
   outerPerimeter?: Geometry,
@@ -64,34 +69,37 @@ const createZoomedOutFootprintFeature = (
 };
 
 export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQueryVectorLayerProps> = observer(({
-  outerPerimeter,
-  queryExecutor,
   featureType,
+  queryExecutor,
+  outerPerimeter,
   selectedFeature,
+  selectedFeatureKey,
   onFeaturesChange,
+  textStyleFactory,
+  layerZIndex = DEFAULT_LAYER_Z_INDEX,
+  enablePagination = true,
+  dispatchQueryError = true,
 }) => {
-  const store = useStore();
   const mapOl = useMap();
   const intl = useIntl();
-  const ZOOM_LEVELS_TABLE = useZoomLevelsTable();
-  const [existingPolygonParts, setExistingPolygonParts] = useState<Feature[]>([]);
+  const store = useStore();
   const activeRequestIdRef = useRef(0);
+  const ZOOM_LEVELS_TABLE = useZoomLevelsTable();
+  const [polygonParts, setPolygonParts] = useState<Feature[]>([]);
 
   useEffect(() => {
-    onFeaturesChange?.(existingPolygonParts);
-  }, [existingPolygonParts]);
+    onFeaturesChange?.(polygonParts);
+  }, [polygonParts]);
 
   useEffect(() => {
     const handleMoveEndEvent = (e: MapEvent): void => {
-      const footprintFeature = createZoomedOutFootprintFeature(outerPerimeter, featureType);
-      setExistingPolygonParts(footprintFeature ? [footprintFeature] : []);
-      void getExistingPolygonParts(mapOl.getView().calculateExtent() as BBox, START_OFFSET);
+      void getPolygonParts(mapOl.getView().calculateExtent() as BBox, START_OFFSET);
     };
 
     const debounceCall = debounce(handleMoveEndEvent, DEBOUNCE_MOUSE_INTERVAL);
     mapOl.on('moveend', debounceCall);
 
-    void getExistingPolygonParts(mapOl.getView().calculateExtent() as BBox, START_OFFSET);
+    void getPolygonParts(mapOl.getView().calculateExtent() as BBox, START_OFFSET);
 
     return (): void => {
       try {
@@ -108,7 +116,7 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
       : mapOl.getTargetElement().classList.remove('olSpinner');
   };
 
-  const getExistingPolygonParts = async (bbox: BBox, startIndex: number): Promise<void> => {
+  const getPolygonParts = async (bbox: BBox, startIndex: number): Promise<void> => {
     const currentZoomLevel = mapOl.getView().getZoom();
 
     if (
@@ -117,7 +125,7 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
     ) {
       showLoadingSpinner(false);
       const footprintFeature = createZoomedOutFootprintFeature(outerPerimeter, featureType);
-      setExistingPolygonParts(footprintFeature ? [footprintFeature] : []);
+      setPolygonParts(footprintFeature ? [footprintFeature] : []);
       return;
     }
 
@@ -140,12 +148,10 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
         const rawFeatures = get(result, 'getPolygonPartsFeature.features', get(result, 'features', []));
         const fetchedFeatures = (Array.isArray(rawFeatures) ? rawFeatures : []) as Feature<Geometry, GeoJsonProperties>[];
 
-        setExistingPolygonParts((currentFeatures) => {
+        setPolygonParts((currentFeatures) => {
           const baseFeatures =
             pageStartIndex === STARTING_PAGE
-              ? currentFeatures.filter(
-                (feature) => !(feature.properties as GeoJsonProperties | null)?._showAsFootprint
-              )
+              ? []
               : currentFeatures;
 
           if (pageStartIndex === STARTING_PAGE && fetchedFeatures.length === 0) {
@@ -155,7 +161,8 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
           return [...baseFeatures, ...fetchedFeatures];
         });
 
-        const hasMoreFeatures = fetchedFeatures.length === CONFIG.POLYGON_PARTS.MAX.WFS_FEATURES;
+        const hasMoreFeatures =
+          enablePagination && fetchedFeatures.length === CONFIG.POLYGON_PARTS.MAX.WFS_FEATURES;
         if (!hasMoreFeatures) {
           break;
         }
@@ -163,7 +170,7 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
         nextStartIndex += CONFIG.POLYGON_PARTS.MAX.WFS_FEATURES;
       }
     } catch {
-      if (activeRequestIdRef.current === requestId) {
+      if (dispatchQueryError && activeRequestIdRef.current === requestId) {
         store.actionDispatcherStore.dispatchAction({
           action: UserAction.SYSTEM_CALLBACK_SHOW_PPERROR_ON_UPDATE,
           data: {
@@ -180,23 +187,36 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
 
   return (
     <VectorLayer>
-      <VectorLayerOrder zIndex={LAYER_Z_INDEX} />
+      <VectorLayerOrder zIndex={layerZIndex} />
       <VectorSource>
-        {existingPolygonParts.map((feat, idx) => {
+        {polygonParts.map((feat, idx) => {
+          const baseStyle = PPMapStyles.get(featureType);
+          const baseStroke = baseStyle?.getStroke()?.clone();
+          const baseFill = baseStyle?.getFill()?.clone();
+
+          if (featureType === FeatureType.LOW_RESOLUTION_PP) {
+            baseStroke?.setColor('#ff7f00');
+            baseFill?.setColor('#ff7f0066');
+          }
+
           const greenStyle = new Style({
-            text: createTextStyle(
-              feat,
-              4,
-              FEATURE_LABEL_CONFIG.polygons,
-              ZOOM_LEVELS_TABLE,
-              intl.formatMessage({ id: 'polygon-parts.map-preview.zoom-before-fetch' })
-            ),
-            stroke: PPMapStyles.get(featureType)?.getStroke(),
-            fill: PPMapStyles.get(featureType)?.getFill(),
+            text:
+              textStyleFactory?.(feat) ??
+              createTextStyle(
+                feat,
+                4,
+                FEATURE_LABEL_CONFIG.polygons,
+                ZOOM_LEVELS_TABLE,
+                intl.formatMessage({ id: 'polygon-parts.map-preview.zoom-before-fetch' })
+              ),
+            stroke: baseStroke,
+            fill: baseFill,
           });
 
-          if (selectedFeature === feat) {
-            const baseStroke = PPMapStyles.get(featureType)?.getStroke();
+          const isSelectedByKey =
+            selectedFeatureKey !== undefined && feat.properties?._key === selectedFeatureKey;
+
+          if (selectedFeature === feat || isSelectedByKey) {
             if (baseStroke) {
               const selectedStroke = baseStroke.clone();
               selectedStroke.setWidth(5);
@@ -232,6 +252,7 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
 
           return feat ? (
             <GeoJSONFeature
+              key={(feat.properties?._key as string | undefined) ?? `feature-${idx}`}
               geometry={{ ...feat.geometry }}
               fit={false}
               featureStyle={greenStyle}

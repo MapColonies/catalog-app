@@ -565,7 +565,6 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
         {children}
         {showExistingPolygonParts && (
           <PolygonPartsExtentQueryVectorLayer
-            outerPerimeter={layerRecord?.footprint as Geometry | undefined}
             featureType={FeatureType.EXISTING_PP}
             queryExecutor={async (bbox, startIndex): Promise<unknown> => {
               return await store.queryGetPolygonPartsFeature({
@@ -577,11 +576,11 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
                 },
               });
             }}
+            outerPerimeter={layerRecord?.footprint as Geometry | undefined}
             selectedFeature={selectedExistingFeature}
-            onFeaturesChange={(features): void => {
-              existingPPFeaturesRef.current = features;
-
-              if (isFootprintOnlyDisplay(features)) {
+            onFeaturesChange={(updatedFeatures): void => {
+              existingPPFeaturesRef.current = updatedFeatures;
+              if (isFootprintOnlyDisplay(updatedFeatures)) {
                 clearPreviewSelection();
               }
             }}

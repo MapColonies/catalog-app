@@ -19,7 +19,8 @@ import { Mode } from '../../../../common/models/mode.enum';
 import { EntityDescriptorModelType } from '../../../models';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
 import { Curtain } from './curtain/curtain.component';
-import { LowResolutionVectorLayer } from './low-resolution-vector-layer';
+import { Fill, Stroke, Text } from 'ol/style';
+import { PolygonPartsExtentQueryVectorLayer } from './polygon-parts-extent-query-vector-layer';
 import { GeoFeaturesPresentorComponent } from './pp-map';
 import { FeatureType } from './pp-map.utils';
 import { RasterWorkflowContext } from './state-machine/context';
@@ -284,9 +285,10 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                                   rowRenderer={({ index, key, style }: ListRowProps): JSX.Element => {
                                     const feature = collection.features[index];
                                     const featureLabel = feature.properties?._featureLabel;
+                                    const type = feature.geometry.type;
                                     const calculatedArea = (feature.properties?._area as number | undefined) ?? 0;
                                     const featureId = (feature.properties?.id as string | undefined) ?? '';
-                                    const featureKey = feature.properties?._key as string | undefined;
+                                    const featureKey = feature.properties?._key;
                                     const isSelected = featureKey === selectedLowResolutionFeatureKey;
                                     return (
                                       <Box
@@ -307,7 +309,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                                         <Box className="featureContent">
                                           <Box className="featureTitleRow">
                                             <Typography className="featureLabel" tag="span">
-                                              <AutoDirectionBox>{featureLabel}</AutoDirectionBox>
+                                              <AutoDirectionBox>{featureLabel} ({type})</AutoDirectionBox>
                                             </Typography>
                                             <Typography className="featureArea" tag="span">
                                               <AutoDirectionBox>
@@ -394,14 +396,12 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                 >
                   {
                     showLowResolutionPolygonParts && lowResolutionFeatures !== undefined
-                      ? <LowResolutionVectorLayer
-                          outerPerimeter={outerPerimeter}
+                      ? <PolygonPartsExtentQueryVectorLayer
                           featureType={FeatureType.LOW_RESOLUTION_PP}
-                          queryExecutor={async (bbox): Promise<unknown> => {
+                          queryExecutor={async (bbox, _startIndex): Promise<unknown> => {
                             if (!api) {
                               return { type: 'FeatureCollection', features: [] };
                             }
-
                             return await api.query.method({
                               minX: bbox[0],
                               minY: bbox[1],
@@ -409,6 +409,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                               maxY: bbox[3],
                             });
                           }}
+                          outerPerimeter={outerPerimeter?.geometry}
                           selectedFeatureKey={selectedLowResolutionFeatureKey}
                           onFeaturesChange={(updatedFeatures): void => {
                             displayedLowResolutionFeaturesRef.current = updatedFeatures;
@@ -417,6 +418,41 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                               setSelectedLowResolutionFeatureKey(undefined);
                             }
                           }}
+                          textStyleFactory={(feat) => {
+                            const isFootprint = Boolean(feat.properties?._showAsFootprint);
+                            if (isFootprint) {
+                              return undefined;
+                            }
+
+                            const featureLabel = feat.properties?._featureLabel as string | undefined;
+                            const zoomLevel = feat.properties?._zoomLevel;
+                            const labelParts: string[] = [];
+
+                            if (featureLabel) {
+                              labelParts.push(featureLabel);
+                            }
+                            if (zoomLevel !== undefined && zoomLevel !== null) {
+                              labelParts.push(`(${String(zoomLevel)})`);
+                            }
+
+                            if (labelParts.length === 0) {
+                              return undefined;
+                            }
+
+                            return new Text({
+                              text: labelParts.join('\n'),
+                              textAlign: 'center',
+                              textBaseline: 'middle',
+                              font: 'bold 10px/1 Roboto',
+                              fill: new Fill({ color: '#ff7f00' }),
+                              stroke: new Stroke({ color: '#000', width: 3 }),
+                              placement: 'point',
+                              overflow: true,
+                            });
+                          }}
+                          layerZIndex={2}
+                          enablePagination={false}
+                          dispatchQueryError={false}
                         />
                       : null
                   }
