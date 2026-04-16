@@ -586,28 +586,6 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
               }
             }}
           />
-          // <PolygonPartsExtentQueryVectorLayer
-          //   style={PPMapStyles.get(FeatureType.EXISTING_PP)}
-          //   outerPerimeter={layerRecord.footprint}
-          //   queryExecutor={async (extent_bbox): Promise<void>  => {
-          //     return await store.queryGetPolygonPartsFeature({
-          //       data: {
-          //         feature: bboxPolygon(bbox) as GeojsonFeatureInput,
-          //         typeName: getWFSFeatureTypeName(layerRecord as LayerRasterRecordModelType, ENUMS),
-          //         count: CONFIG.POLYGON_PARTS.MAX.WFS_FEATURES,
-          //         startIndex,
-          //       },
-          //     })
-          //   }}
-          //   selectedFeature={selectedExistingFeature}
-          //   onFeaturesChange={(features): void => {
-          //     existingPPFeaturesRef.current = features;
-
-          //     if (isFootprintOnlyDisplay(features)) {
-          //       clearPreviewSelection();
-          //     }
-          //   }}
-          // />
         )}
         <Legend
           legendItems={LegendsArray}

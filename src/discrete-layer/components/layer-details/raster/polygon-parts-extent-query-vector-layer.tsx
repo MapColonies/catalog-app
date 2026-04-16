@@ -73,19 +73,13 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
   const store = useStore();
   const mapOl = useMap();
   const intl = useIntl();
+  const ZOOM_LEVELS_TABLE = useZoomLevelsTable();
   const [existingPolygonParts, setExistingPolygonParts] = useState<Feature[]>([]);
   const activeRequestIdRef = useRef(0);
 
   useEffect(() => {
     onFeaturesChange?.(existingPolygonParts);
   }, [existingPolygonParts]);
-  const ZOOM_LEVELS_TABLE = useZoomLevelsTable();
-
-  const showLoadingSpinner = (isShown: boolean) => {
-    isShown
-      ? mapOl.getTargetElement().classList.add('olSpinner')
-      : mapOl.getTargetElement().classList.remove('olSpinner');
-  };
 
   useEffect(() => {
     const handleMoveEndEvent = (e: MapEvent): void => {
@@ -107,6 +101,12 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
       }
     };
   }, []);
+
+  const showLoadingSpinner = (isShown: boolean) => {
+    isShown
+      ? mapOl.getTargetElement().classList.add('olSpinner')
+      : mapOl.getTargetElement().classList.remove('olSpinner');
+  };
 
   const getExistingPolygonParts = async (bbox: BBox, startIndex: number): Promise<void> => {
     const currentZoomLevel = mapOl.getView().getZoom();

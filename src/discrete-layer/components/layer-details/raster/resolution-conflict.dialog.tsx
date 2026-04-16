@@ -398,6 +398,18 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                           features={lowResolutionFeatures}
                           outerPerimeter={outerPerimeter}
                           featureType={FeatureType.LOW_RESOLUTION_PP}
+                          queryExecutor={async (bbox): Promise<unknown> => {
+                            if (!api) {
+                              return { type: 'FeatureCollection', features: [] };
+                            }
+
+                            return await api.query.method({
+                              minX: bbox[0],
+                              minY: bbox[1],
+                              maxX: bbox[2],
+                              maxY: bbox[3],
+                            });
+                          }}
                           selectedFeatureKey={selectedLowResolutionFeatureKey}
                           onFeaturesChange={(updatedFeatures): void => {
                             displayedLowResolutionFeaturesRef.current = updatedFeatures;
@@ -408,21 +420,6 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                           }}
                         />
                       : null
-                      // <PolygonPartsExtentQueryVectorLayer
-                      //   style={PPMapStyles.get(FeatureType.LOW_RESOLUTION_PP)}
-                      //   outerPerimeter={api.perimeter}
-                      //   queryExecutor={async (extent_bbox): Promise<void>  => {
-                      //     return await api.query(bbox)
-                      //   }}
-                      //   selectedFeature={selectedExistingFeature}
-                      //   onFeaturesChange={(features): void => {
-                      //     existingPPFeaturesRef.current = features;
-            
-                      //     if (isFootprintOnlyDisplay(features)) {
-                      //       clearPreviewSelection();
-                      //     }
-                      //   }}
-                      // />
                   }
                 </GeoFeaturesPresentorComponent>
               </Box>

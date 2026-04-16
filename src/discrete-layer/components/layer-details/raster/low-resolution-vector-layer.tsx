@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { BBox, Feature, GeoJsonProperties } from 'geojson';
-import { debounce } from 'lodash';
+import { debounce, get } from 'lodash';
 import { MapEvent } from 'ol';
 import GeoJSON from 'ol/format/GeoJSON';
 import { Size } from 'ol/size';
@@ -23,6 +23,7 @@ export interface LowResolutionVectorLayerProps {
   features: Feature[];
   outerPerimeter?: Feature;
   featureType: FeatureType;
+  queryExecutor: (bbox: BBox) => Promise<unknown>;
   selectedFeatureKey?: string;
   fitOptions?: FitOptions;
   onFeaturesChange?: (features: Feature[]) => void;
@@ -36,14 +37,14 @@ export const LowResolutionVectorLayer: React.FC<LowResolutionVectorLayerProps> =
   features,
   outerPerimeter,
   featureType,
+  queryExecutor,
   selectedFeatureKey,
   fitOptions,
   onFeaturesChange,
 }) => {
   const mapOl = useMap();
   const [visibleFeatures, setVisibleFeatures] = useState<Feature[]>([]);
-  const featuresRef = useRef<Feature[]>(features);
-  featuresRef.current = features;
+  const activeRequestIdRef = useRef(0);
 
   const footprint = useRef<Feature | undefined>(undefined);
 
@@ -63,10 +64,8 @@ export const LowResolutionVectorLayer: React.FC<LowResolutionVectorLayerProps> =
     };
   }, [outerPerimeter, featureType]);
 
-  const computeVisibleFeatures = (): void => {
-    const currentFeatures = featuresRef.current;
-
-    if (currentFeatures.length === 0) {
+  const computeVisibleFeatures = async (): Promise<void> => {
+    if (features.length === 0) {
       setVisibleFeatures([]);
       return;
     }
@@ -85,33 +84,27 @@ export const LowResolutionVectorLayer: React.FC<LowResolutionVectorLayerProps> =
       return;
     }
 
+    const requestId = activeRequestIdRef.current + 1;
+    activeRequestIdRef.current = requestId;
+
     try {
       const size = mapOl.getSize() as Size;
       const extentBbox = mapOl
         .getView()
         .calculateExtent([size[0] + EXTENT_BUFFER, size[1] + EXTENT_BUFFER]) as BBox;
-      const extentPoly = polygon(bboxPolygon(extentBbox).geometry.coordinates);
 
-      const filtered = currentFeatures.filter((feat) => {
-        if (!feat?.geometry) {
-          return false;
-        }
-        const gType = feat.geometry.type;
-        if (gType !== 'Polygon' && gType !== 'MultiPolygon') {
-          return false;
-        }
-        try {
-          // @ts-ignore
-          return intersect(feat, extentPoly) !== null;
-        } catch {
-          return false;
-        }
-      });
+      const result = await queryExecutor(extentBbox);
+      if (activeRequestIdRef.current !== requestId) {
+        return;
+      }
 
-      setVisibleFeatures(filtered);
+      const rawFeatures = get(result, 'features', get(result, 'getPolygonPartsFeature.features', []));
+      const queriedFeatures = (Array.isArray(rawFeatures) ? rawFeatures : []) as Feature[];
+      setVisibleFeatures(queriedFeatures);
     } catch {
-      // If extent computation fails, show all features
-      setVisibleFeatures(currentFeatures);
+      if (activeRequestIdRef.current === requestId) {
+        setVisibleFeatures([]);
+      }
     }
   };
 
@@ -120,7 +113,7 @@ export const LowResolutionVectorLayer: React.FC<LowResolutionVectorLayerProps> =
   }, [visibleFeatures]);
 
   useEffect(() => {
-    computeVisibleFeatures();
+    void computeVisibleFeatures();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [outerPerimeter]);
 
@@ -130,14 +123,14 @@ export const LowResolutionVectorLayer: React.FC<LowResolutionVectorLayerProps> =
       return;
     }
 
-    computeVisibleFeatures();
+    void computeVisibleFeatures();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [features]);
 
   // Subscribe to map moveend to re-filter features on pan/zoom
   useEffect(() => {
     const debouncedHandler = debounce((_e: MapEvent) => {
-      computeVisibleFeatures();
+      void computeVisibleFeatures();
     }, DEBOUNCE_INTERVAL);
 
     mapOl.on('moveend', debouncedHandler);
