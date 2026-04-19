@@ -10,6 +10,7 @@ import {
   WorkerAPI,
   WorkerMessage,
   WorkerType,
+  WorkerError,
 } from './worker.types';
 import { buildMessage } from './feat-collection.worker-api';
 
@@ -18,11 +19,11 @@ type WorkerService = {
     method: () => Promise<void>;
   };
   load: {
-    method: (fc: FeatureCollection, options?: LoadOptions) => Promise<void>;
+    method: (fc: FeatureCollection, options?: LoadOptions) => Promise<WorkerError | void>;
     progress: WorkerMessage[] | null;
   };
   loadFromShapeFile: {
-    method: (url: string, options?: LoadOptions) => Promise<void>;
+    method: (url: string, options?: LoadOptions) => Promise<WorkerError | void>;
     progress: WorkerMessage[] | null;
   };
   updateAreas: {
@@ -168,7 +169,7 @@ export function useWorkerAPI(): [WorkerService | null, StagesInfo] {
             // Fast-start easing: (1 - (1 - x)^2) slows down towards the end
             // const fakePercent = Math.floor((1 - Math.pow(1 - ratioOfPassedTime, 2)) * 95);
             const fakePercent = Math.floor(eased * 95);
-            const details = buildMessage(fakePercent, t0);
+            const details = buildMessage(`${fakePercent}`, t0);
 
             setProgressComputeOuterGeometry({
               process: Process.ComputeOuterGeometry,

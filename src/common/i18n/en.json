@@ -876,6 +876,10 @@
   "export-layer.validations.relations.equal": "equals to-",
   "export-layer.validations.againstOtherField": "Value should be {relation} field {fieldName}",
 
+  "progress.titleProcess": "process",
+  "progress.titleProgress": "progress",
+  "progress.titleTime": "time (ms)",
+
   "progress.stage.init.translationCode": "Boot",
   "progress.stage.load.translationCode": "Loading",
   "progress.stage.parsing.translationCode": "Preparing info",

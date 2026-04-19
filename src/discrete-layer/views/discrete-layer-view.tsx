@@ -1131,9 +1131,12 @@ const DiscreteLayerView: React.FC = observer(() => {
     // await workerAPI?.init.process.method();
     await api.init.method();
     // await api.load.method(FC);
-    await api.loadFromShapeFile.method(
+    const downloadWorkerError = await api.loadFromShapeFile.method(
       'https://download-int.mapcolonies.net/api/raster/v1/downloads/validation-reports/a80296ad-06f4-4d3c-9c2d-8982eb65d04b/vivid_ihud_orthophoto_v3.0_report_2026-02-04T15:32:09.836Z.zip'
     );
+    if (downloadWorkerError && !downloadWorkerError.success) {
+      return;
+    }
     await api.updateAreas.method();
     const outerPerimeterGeom = await api.computeOuterGeometry.method();
     console.log('api.computeOuterGeometry:', outerPerimeterGeom);

@@ -17,15 +17,20 @@ export interface LoadOptions {
   customProperties?: CustomProperties;
 }
 
+export type WorkerError = {
+  success: boolean;
+  error?: any;
+};
+
 export interface WorkerAPI {
   init(): Promise<void>;
   dispose(): void;
-  load(fc: FeatureCollection, options?: LoadOptions): Promise<void>;
+  load(fc: FeatureCollection, options?: LoadOptions): Promise<WorkerError | void>;
   loadFromShapeFile(
     url: string,
     options?: LoadOptions,
     onProgress?: (p: WorkerMessage | null) => void
-  ): Promise<void>;
+  ): Promise<WorkerError | void>;
   updateAreas(onProgress?: (p: WorkerMessage | null) => void): void;
   computeOuterGeometry(onProgress?: (p: WorkerMessage | null) => void): Geometry;
   getFeatureCollection(onProgress?: (p: WorkerMessage | null) => void): FeatureCollection;
