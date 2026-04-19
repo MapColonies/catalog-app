@@ -17,7 +17,6 @@ import {
   VectorSource,
 } from '@map-colonies/react-components';
 import CONFIG from '../../../../common/config';
-import { VectorLayerOrder } from '../../../../common/components/ol-map/vector-layer-order';
 import { useStore } from '../../../models';
 import { IDispatchAction } from '../../../models/actionDispatcherStore';
 import { UserAction } from '../../../models/userStore';
@@ -183,8 +182,7 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
   };
 
   return (
-    <VectorLayer>
-      <VectorLayerOrder zIndex={layerZIndex} />
+    <VectorLayer options={{ zIndex: layerZIndex }}>
       <VectorSource>
         {polygonParts.map((feat, idx) => {
           const baseStyle = PPMapStyles.get(featureType);
