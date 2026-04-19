@@ -461,7 +461,6 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                           }}
                           layerZIndex={2}
                           enablePagination={false}
-                          dispatchQueryError={false}
                         />
                       : null
                   }

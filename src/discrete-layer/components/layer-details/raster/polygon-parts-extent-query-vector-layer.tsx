@@ -39,7 +39,6 @@ interface PolygonPartsExtentQueryVectorLayerProps {
   textStyleFactory?: (feature: Feature) => Text | undefined;
   layerZIndex?: number;
   enablePagination?: boolean;
-  dispatchQueryError?: boolean;
 }
 
 const START_OFFSET = 0;
@@ -78,7 +77,6 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
   textStyleFactory,
   layerZIndex = DEFAULT_LAYER_Z_INDEX,
   enablePagination = true,
-  dispatchQueryError = true,
 }) => {
   const mapOl = useMap();
   const intl = useIntl();
@@ -170,11 +168,11 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
         nextStartIndex += CONFIG.POLYGON_PARTS.MAX.WFS_FEATURES;
       }
     } catch {
-      if (dispatchQueryError && activeRequestIdRef.current === requestId) {
+      if (activeRequestIdRef.current === requestId) {
         store.actionDispatcherStore.dispatchAction({
           action: UserAction.SYSTEM_CALLBACK_SHOW_PPERROR_ON_UPDATE,
           data: {
-            error: [intl.formatMessage({ id: 'validation-general.polygonParts.wfsServerError' })],
+            error: [intl.formatMessage({ id: 'resolutionConflict.error.queryFailed' })],
           },
         } as IDispatchAction);
       }

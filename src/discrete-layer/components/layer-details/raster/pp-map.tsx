@@ -6,7 +6,7 @@ import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
 import { point } from '@turf/helpers';
 import bboxPolygon from '@turf/bbox-polygon';
 import { FitOptions } from 'ol/View';
-import { Fill, Stroke, Style } from 'ol/style';
+import { Style } from 'ol/style';
 import {
   Box,
   GeoJSONFeature,
@@ -74,20 +74,6 @@ const NO_PROPERTIES_MESSAGE_KEY = '__noPropertiesMessage';
 const FEATURE_LABEL_KEY = '_featureLabel';
 const ISO_DATE_TIME_REGEX =
   /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:?\d{2})?$/;
-
-const getHighlightedStyle = (baseStyle: Style | undefined): Style => {
-  return new Style({
-    stroke: new Stroke({
-      color: baseStyle?.getStroke()?.getColor() ?? '#ff7f00',
-      width: 5,
-    }),
-    fill: new Fill({
-      color: baseStyle?.getFill()?.getColor() ?? '#ff7f0066',
-    }),
-    image: baseStyle?.getImage() ?? undefined,
-    text: baseStyle?.getText() ?? undefined,
-  });
-};
 
 export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> = ({
   mode,
@@ -446,11 +432,10 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
     return (
       <>
         {geoFeatures?.map((feat, idx) => {
-          let featureStyle = PPMapStyles.get(feat?.properties?._featureType);
-          const featureKey = (feat?.properties?._key as string | undefined) ?? (feat?.properties?.key as string | undefined);
+          let featureStyle = PPMapStyles.get(feat?.properties?.featureType);
 
-          if (selectedFeatureKey && featureKey === selectedFeatureKey) {
-            featureStyle = selectionStyle ?? getHighlightedStyle(featureStyle);
+          if (selectedFeatureKey && feat?.properties?.key === selectedFeatureKey) {
+            featureStyle = selectionStyle;
           }
 
           return feat && !isEmpty(feat.geometry) ? (
