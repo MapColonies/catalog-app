@@ -244,7 +244,6 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                   onClick={(evt: React.MouseEvent<HTMLInputElement>): void => {
                     const isChecked = evt.currentTarget.checked;
                     setShowLowResolutionPolygonParts(isChecked);
-
                     if (!isChecked) {
                       setAutoScrollListToSelection(false);
                       setSelectedLowResolutionFeatureKey(undefined);
