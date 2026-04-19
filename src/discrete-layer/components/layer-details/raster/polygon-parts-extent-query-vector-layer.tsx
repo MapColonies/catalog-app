@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { BBox, Feature, GeoJsonProperties, Geometry } from 'geojson';
-import { debounce, get } from 'lodash';
+import { debounce } from 'lodash';
 import { observer } from 'mobx-react';
 import { MapEvent } from 'ol';
 import GeoJSON from 'ol/format/GeoJSON';
@@ -29,16 +29,20 @@ import {
   PPMapStyles,
 } from './pp-map.utils';
 
+export interface IQueryExecutorResponse {
+  fetchedFeatures: Feature<Geometry, GeoJsonProperties>[];
+  withPagination: boolean;
+}
+
 interface PolygonPartsExtentQueryVectorLayerProps {
   featureType: FeatureType;
-  queryExecutor: (bbox: BBox, startIndex: number) => Promise<unknown>;
+  queryExecutor: (bbox: BBox, startIndex: number) => Promise<IQueryExecutorResponse>;
   outerPerimeter?: Geometry;
   selectedFeature?: Feature;
   selectedFeatureKey?: string;
   onFeaturesChange?: (features: Feature[]) => void;
   textStyleFactory?: (feature: Feature) => Text | undefined;
   layerZIndex?: number;
-  enablePagination?: boolean;
 }
 
 const START_OFFSET = 0;
@@ -76,7 +80,6 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
   onFeaturesChange,
   textStyleFactory,
   layerZIndex = DEFAULT_LAYER_Z_INDEX,
-  enablePagination = true,
 }) => {
   const mapOl = useMap();
   const intl = useIntl();
@@ -143,24 +146,20 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
           return;
         }
 
-        const rawFeatures = get(result, 'getPolygonPartsFeature.features', get(result, 'features', []));
-        const fetchedFeatures = (Array.isArray(rawFeatures) ? rawFeatures : []) as Feature<Geometry, GeoJsonProperties>[];
+        const { fetchedFeatures, withPagination } = result;
 
         setPolygonParts((currentFeatures) => {
           const baseFeatures =
             pageStartIndex === STARTING_PAGE
               ? []
               : currentFeatures;
-
           if (pageStartIndex === STARTING_PAGE && fetchedFeatures.length === 0) {
             return [];
           }
-
           return [...baseFeatures, ...fetchedFeatures];
         });
 
-        const hasMoreFeatures =
-          enablePagination && fetchedFeatures.length === CONFIG.POLYGON_PARTS.MAX.WFS_FEATURES;
+        const hasMoreFeatures = withPagination && fetchedFeatures.length === CONFIG.POLYGON_PARTS.MAX.WFS_FEATURES;
         if (!hasMoreFeatures) {
           break;
         }

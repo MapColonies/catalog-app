@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { FormattedMessage, useIntl } from 'react-intl';
 import { AutoSizer, List, ListRowProps } from 'react-virtualized';
 import { Feature } from 'geojson';
+import { get } from 'lodash';
 import { Box } from '@map-colonies/react-components';
 import {
   Button,
@@ -20,7 +21,7 @@ import { EntityDescriptorModelType } from '../../../models';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
 import { Curtain } from './curtain/curtain.component';
 import { Fill, Stroke, Text } from 'ol/style';
-import { PolygonPartsExtentQueryVectorLayer } from './polygon-parts-extent-query-vector-layer';
+import { IQueryExecutorResponse, PolygonPartsExtentQueryVectorLayer } from './polygon-parts-extent-query-vector-layer';
 import { GeoFeaturesPresentorComponent } from './pp-map';
 import { FeatureType } from './pp-map.utils';
 import { RasterWorkflowContext } from './state-machine/context';
@@ -407,16 +408,19 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                     showLowResolutionPolygonParts && lowResolutionFeatures !== undefined
                       ? <PolygonPartsExtentQueryVectorLayer
                           featureType={FeatureType.LOW_RESOLUTION_PP}
-                          queryExecutor={async (bbox, _startIndex): Promise<unknown> => {
+                          queryExecutor={async (bbox, _startIndex): Promise<IQueryExecutorResponse> => {
                             if (!api) {
-                              return { type: 'FeatureCollection', features: [] };
+                              return { fetchedFeatures: [], withPagination: false };
                             }
-                            return await api.query.method({
+                            const result = await api.query.method({
                               minX: bbox[0],
                               minY: bbox[1],
                               maxX: bbox[2],
                               maxY: bbox[3],
                             });
+                            const rawFeatures = get(result, 'features', []);
+                            const fetchedFeatures = Array.isArray(rawFeatures) ? rawFeatures : [];
+                            return { fetchedFeatures, withPagination: false };
                           }}
                           outerPerimeter={outerPerimeter?.geometry}
                           selectedFeatureKey={selectedLowResolutionFeatureKey}
@@ -460,7 +464,6 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                             });
                           }}
                           layerZIndex={2}
-                          enablePagination={false}
                         />
                       : null
                   }

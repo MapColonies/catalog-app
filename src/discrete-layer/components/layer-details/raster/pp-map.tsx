@@ -38,7 +38,7 @@ import { ILayerImage } from '../../../models/layerImage';
 import { GeojsonFeatureInput } from '../../../models/RootStore.base';
 import { useStore } from '../../../models/RootStore';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
-import { PolygonPartsExtentQueryVectorLayer } from './polygon-parts-extent-query-vector-layer';
+import { IQueryExecutorResponse, PolygonPartsExtentQueryVectorLayer } from './polygon-parts-extent-query-vector-layer';
 import {
   FEATURE_LABEL_CONFIG,
   FeatureType,
@@ -551,8 +551,8 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
         {showExistingPolygonParts && (
           <PolygonPartsExtentQueryVectorLayer
             featureType={FeatureType.EXISTING_PP}
-            queryExecutor={async (bbox, startIndex): Promise<unknown> => {
-              return await store.queryGetPolygonPartsFeature({
+            queryExecutor={async (bbox, startIndex): Promise<IQueryExecutorResponse> => {
+              const result = await store.queryGetPolygonPartsFeature({
                 data: {
                   feature: bboxPolygon(bbox) as GeojsonFeatureInput,
                   typeName: getWFSFeatureTypeName(layerRecord as LayerRasterRecordModelType, ENUMS),
@@ -560,6 +560,9 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
                   startIndex,
                 },
               });
+              const rawFeatures = get(result, 'getPolygonPartsFeature.features', []);
+              const fetchedFeatures = (Array.isArray(rawFeatures) ? rawFeatures : []);
+              return { fetchedFeatures, withPagination: true };
             }}
             outerPerimeter={layerRecord?.footprint as Geometry | undefined}
             selectedFeature={selectedExistingFeature}
