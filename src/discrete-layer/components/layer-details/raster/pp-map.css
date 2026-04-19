@@ -19,6 +19,11 @@ body[dir='rtl'] #entityRasterDialog .geoFeaturesMapContainer .checkbox {
   position: relative;
 }
 
+.geoFeaturesMapContainer .ol-zoom button,
+.geoFeaturesMapContainer .ol-legend button {
+  cursor: pointer;
+}
+
 .featurePropertiesPopup {
   position: absolute;
   top: 8px;
