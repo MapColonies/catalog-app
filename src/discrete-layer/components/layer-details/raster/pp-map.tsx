@@ -32,6 +32,7 @@ import { Mode } from '../../../../common/models/mode.enum';
 import { FeatureSelectionHandler } from '../../../../common/components/ol-map/feature-selection-handler';
 import { MapFeatureClickHandler } from '../../../../common/components/ol-map/map-feature-click-handler';
 import { MapLoadingIndicator } from '../../../../common/components/ol-map/map-loading-indicator';
+import { ZoomLevelIndicator } from '../../../../common/components/ol-map/zoom-level-indicator';
 import { isValidGeometryType } from '../../../../common/utils/geojson.validation';
 import { LayerRasterRecordModelType } from '../../../models';
 import { ILayerImage } from '../../../models/layerImage';
@@ -481,6 +482,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
     <Box className="geoFeaturesMapContainer" style={{ ...style }}>
       <Map>
         <MapLoadingIndicator />
+        <ZoomLevelIndicator />
         <MapFeatureClickHandler
           enableFeaturePropertiesPopup={enableFeaturePropertiesPopup}
           geoFeatures={geoFeatures}

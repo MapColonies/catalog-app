@@ -311,7 +311,7 @@
   "resolutionConflict.units.km2": " קמ\"ר",
   "resolutionConflict.error.missingUrl": "חסר URL לדו\"ח ולידציה",
   "resolutionConflict.error.fetchFailed": "נכשל בטעינת חלקי תיחום מקובץ",
-  "resolutionConflict.error.queryFailed": "נכשל בהרצת השאילתה",
+  "resolutionConflict.error.queryFailed": "נכשל בהרצת שאילתת חלקי תיחום בתצוגה",
 
   "field-names.raster.id": "מזהה",
   "field-names.raster.productId": "מזהה חיצוני",
