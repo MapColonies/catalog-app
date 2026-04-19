@@ -28,6 +28,10 @@ import CONFIG from '../../../common/config';
 import { getMax } from '../../../common/helpers/array';
 import { dateFormatter } from '../../../common/helpers/formatters';
 import { isPolygonPartsShown } from '../../../common/helpers/style';
+import {
+  getResponseErrorMesssage,
+  getResponseErrorURL,
+} from '../../../common/helpers/server-error';
 // import { usePrevious } from '../../../common/hooks/previous.hook';
 import { LayerRasterRecordModelType } from '../../models';
 import { IDispatchAction } from '../../models/actionDispatcherStore';
@@ -343,8 +347,8 @@ export const LayersResults: React.FC<LayersResultsProps> = observer((props) => {
       {props.searchError ? (
         <Error
           className="errorMessage"
-          message={props.searchError.response?.errors[0].message}
-          details={props.searchError.response?.errors[0].extensions?.exception?.config?.url}
+          message={getResponseErrorMesssage(props.searchError.response)}
+          details={getResponseErrorURL(props.searchError.response)}
         />
       ) : (
         <GridComponent
