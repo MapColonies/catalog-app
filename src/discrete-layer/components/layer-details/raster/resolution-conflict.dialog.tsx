@@ -60,6 +60,9 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
   const [lowResolutionPartsError, setLowResolutionPartsError] = useState<string | undefined>();
   const [lowResolutionCollections, setLowResolutionCollections] = useState<ParsedFeatureCollection[]>([]);
   const [outerPerimeter, setOuterPerimeter] = useState<Feature | undefined>();
+  const [collectionMountKeys, setCollectionMountKeys] = useState<number[]>([]);
+  const pendingSelectionFeatureRef = useRef<Feature | null>(null);
+  const displayedLowResolutionFeaturesRef = useRef<Feature[]>([]);
   const reportUrl = state.context.job?.validationReport?.report?.url;
   const ingestionResolution = state.context.job?.details?.parameters?.ingestionResolution as string | undefined;
   const entityDescriptors = state.context.store.discreteLayersStore?.entityDescriptors as EntityDescriptorModelType[];
@@ -68,8 +71,6 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
     () => lowResolutionCollections.flatMap((c) => c.features),
     [lowResolutionCollections]
   );
-  const pendingSelectionFeatureRef = useRef<Feature | null>(null);
-  const displayedLowResolutionFeaturesRef = useRef<Feature[]>([]);
 
   useEffect(() => {
     if (!showLowResolutionPolygonParts) {
@@ -115,6 +116,12 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
     if (!autoScrollListToSelection || !selectedLowResolutionPosition) {
       return;
     }
+
+    setCollectionMountKeys((prev) => {
+      const next = prev.slice();
+      next[selectedLowResolutionPosition.collectionIndex] = (next[selectedLowResolutionPosition.collectionIndex] ?? 0) + 1;
+      return next;
+    });
 
     const timerId = window.setTimeout(() => {
       setAutoScrollListToSelection(false);
@@ -185,12 +192,14 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
 
         const featureCollection = await api.getFeatureCollection.method();
 
-        setLowResolutionCollections([
+        const newCollections = [
           {
             name: collectionName,
             features: featureCollection.features,
           },
-        ]);
+        ];
+        setLowResolutionCollections(newCollections);
+        setCollectionMountKeys(newCollections.map(() => 0));
         setSelectedLowResolutionFeatureKey(undefined);
       } catch (error) {
         const errorMessage = (error as Error)?.message;
@@ -253,11 +262,8 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                   lowResolutionCollections.map((collection, collectionIndex) => {
                     return (
                       <CollapsibleList
-                        key={`${collection.name}-${collectionIndex}`}
-                        open={
-                          collectionIndex === 0 ||
-                          collectionIndex === selectedLowResolutionPosition?.collectionIndex
-                        }
+                        key={`${collection.name}-${collectionIndex}-${collectionMountKeys[collectionIndex] ?? 0}`}
+                        defaultOpen={true}
                         handle={
                           <SimpleListItem
                             text={`${collection.name} (${collection.features.length})`}
