@@ -508,7 +508,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                           featureType={FeatureType.LOW_RESOLUTION_PP}
                           queryExecutor={async (bbox, _startIndex): Promise<IQueryExecutorResponse> => {
                             if (!api) {
-                              return { fetchedFeatures: [], withPagination: false };
+                              return { features: [], pageSize: -1 };
                             }
                             const result = await api.query.method({
                               minX: bbox[0],
@@ -516,7 +516,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                               maxX: bbox[2],
                               maxY: bbox[3],
                             });
-                            const rawFeatures = get(result, 'features', []);
+                            const fetchedFeatures = get(result, 'features', []);
                             // DELETE ME - start
                             const exceededByKey = new Map(
                               lowResolutionFeatures.map((feature) => [
@@ -524,7 +524,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                                 feature.properties?.exceeded === true,
                               ])
                             );
-                            const fetchedFeatures = (Array.isArray(rawFeatures) ? rawFeatures : []).map((feature) => {
+                            const features = (Array.isArray(fetchedFeatures) ? fetchedFeatures : []).map((feature) => {
                               const featureKey = feature?.properties?._key;
                               const isExceeded = featureKey ? exceededByKey.get(featureKey) === true : false;
                               if (!isExceeded) {
@@ -539,8 +539,8 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                               };
                             });
                             // DELETE ME - end
-                            // const fetchedFeatures = Array.isArray(rawFeatures) ? rawFeatures : [];
-                            return { fetchedFeatures, withPagination: false };
+                            // const features = Array.isArray(fetchedFeatures) ? fetchedFeatures : [];
+                            return { features, pageSize: -1 };
                           }}
                           outerPerimeter={outerPerimeter?.geometry}
                           selectedFeatureKey={selectedLowResolutionFeatureKey}

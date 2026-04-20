@@ -570,9 +570,9 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
                   startIndex,
                 },
               });
-              const rawFeatures = get(result, 'getPolygonPartsFeature.features', []);
-              const fetchedFeatures = (Array.isArray(rawFeatures) ? rawFeatures : []);
-              return { fetchedFeatures, withPagination: true };
+              const fetchedFeatures = get(result, 'getPolygonPartsFeature.features', []);
+              const features = (Array.isArray(fetchedFeatures) ? fetchedFeatures : []);
+              return { features, pageSize: CONFIG.POLYGON_PARTS.MAX.WFS_FEATURES };
             }}
             outerPerimeter={layerRecord?.footprint as Geometry | undefined}
             selectedFeature={selectedExistingFeature}

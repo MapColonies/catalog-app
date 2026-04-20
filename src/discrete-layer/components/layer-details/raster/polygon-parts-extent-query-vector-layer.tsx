@@ -30,8 +30,8 @@ import {
 } from './pp-map.utils';
 
 export interface IQueryExecutorResponse {
-  fetchedFeatures: Feature<Geometry, GeoJsonProperties>[];
-  withPagination: boolean;
+  features: Feature<Geometry, GeoJsonProperties>[];
+  pageSize: number;
 }
 
 interface PolygonPartsExtentQueryVectorLayerProps {
@@ -144,20 +144,20 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
           return;
         }
 
-        const { fetchedFeatures, withPagination } = result;
+        const { features, pageSize } = result;
 
         setPolygonParts((currentFeatures) => {
           const baseFeatures =
             pageStartIndex === START
               ? []
               : currentFeatures;
-          if (pageStartIndex === START && fetchedFeatures.length === 0) {
+          if (pageStartIndex === START && features.length === 0) {
             return [];
           }
-          return [...baseFeatures, ...fetchedFeatures];
+          return [...baseFeatures, ...features];
         });
 
-        const hasMoreFeatures = withPagination && fetchedFeatures.length === CONFIG.POLYGON_PARTS.MAX.WFS_FEATURES;
+        const hasMoreFeatures = pageSize > 0 && features.length === pageSize;
         if (!hasMoreFeatures) {
           break;
         }
