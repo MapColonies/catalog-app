@@ -582,6 +582,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
                 clearPreviewSelection();
               }
             }}
+            options={{ zIndex: 1 }}
           />
         )}
         <Legend

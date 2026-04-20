@@ -5,6 +5,7 @@ import { debounce } from 'lodash';
 import { observer } from 'mobx-react';
 import { MapEvent } from 'ol';
 import GeoJSON from 'ol/format/GeoJSON';
+import { Options } from 'ol/layer/Base';
 import { Size } from 'ol/size';
 import { Style, Text } from 'ol/style';
 import intersect from '@turf/intersect';
@@ -41,13 +42,11 @@ interface PolygonPartsExtentQueryVectorLayerProps {
   selectedFeatureKey?: string;
   onFeaturesChange?: (features: Feature[]) => void;
   textStyleFactory?: (feature: Feature) => Text | undefined;
-  layerZIndex?: number;
+  options?: Options;
 }
 
-const START_OFFSET = 0;
-const STARTING_PAGE = 0;
+const START = 0;
 const DEBOUNCE_MOUSE_INTERVAL = 300;
-const DEFAULT_LAYER_Z_INDEX = 1;
 
 const createZoomedOutFootprintFeature = (
   outerPerimeter?: Geometry,
@@ -78,7 +77,7 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
   selectedFeatureKey,
   onFeaturesChange,
   textStyleFactory,
-  layerZIndex = DEFAULT_LAYER_Z_INDEX,
+  options,
 }) => {
   const mapOl = useMap();
   const intl = useIntl();
@@ -93,13 +92,13 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
 
   useEffect(() => {
     const handleMoveEndEvent = (e: MapEvent): void => {
-      void getPolygonParts(mapOl.getView().calculateExtent() as BBox, START_OFFSET);
+      void getPolygonParts(mapOl.getView().calculateExtent() as BBox, START);
     };
 
     const debounceCall = debounce(handleMoveEndEvent, DEBOUNCE_MOUSE_INTERVAL);
     mapOl.on('moveend', debounceCall);
 
-    void getPolygonParts(mapOl.getView().calculateExtent() as BBox, START_OFFSET);
+    void getPolygonParts(mapOl.getView().calculateExtent() as BBox, START);
 
     return (): void => {
       try {
@@ -149,10 +148,10 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
 
         setPolygonParts((currentFeatures) => {
           const baseFeatures =
-            pageStartIndex === STARTING_PAGE
+            pageStartIndex === START
               ? []
               : currentFeatures;
-          if (pageStartIndex === STARTING_PAGE && fetchedFeatures.length === 0) {
+          if (pageStartIndex === START && fetchedFeatures.length === 0) {
             return [];
           }
           return [...baseFeatures, ...fetchedFeatures];
@@ -182,7 +181,7 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
   };
 
   return (
-    <VectorLayer options={{ zIndex: layerZIndex }}>
+    <VectorLayer options={options}>
       <VectorSource>
         {polygonParts.map((feat, idx) => {
           const baseStyle = PPMapStyles.get(featureType);

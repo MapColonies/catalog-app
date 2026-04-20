@@ -585,7 +585,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                               overflow: true,
                             });
                           }}
-                          layerZIndex={2}
+                          options={{ zIndex: 2 }}
                         />
                       : null
                   }
