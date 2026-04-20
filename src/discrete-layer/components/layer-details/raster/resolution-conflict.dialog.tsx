@@ -210,26 +210,11 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
         });
 
         const featureCollection = await api.getFeatureCollection.method();
-        // DELETE ME - start
-        const MOCK = featureCollection.features.map((feature, index) => {
-          if (index !== 0) {
-            return feature;
-          }
-
-          return {
-            ...feature,
-            properties: {
-              ...(feature.properties ?? {}),
-              exceeded: true,
-            },
-          };
-        });
-        // DELETE ME - end
 
         const newCollections = [
           {
             name: collectionName,
-            features: MOCK,//featureCollection.features,
+            features: featureCollection.features,
           },
         ];
         setLowResolutionCollections(newCollections);
@@ -517,29 +502,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                               maxY: bbox[3],
                             });
                             const fetchedFeatures = get(result, 'features', []);
-                            // DELETE ME - start
-                            const exceededByKey = new Map(
-                              lowResolutionFeatures.map((feature) => [
-                                feature.properties?._key,
-                                feature.properties?.exceeded === true,
-                              ])
-                            );
-                            const features = (Array.isArray(fetchedFeatures) ? fetchedFeatures : []).map((feature) => {
-                              const featureKey = feature?.properties?._key;
-                              const isExceeded = featureKey ? exceededByKey.get(featureKey) === true : false;
-                              if (!isExceeded) {
-                                return feature;
-                              }
-                              return {
-                                ...feature,
-                                properties: {
-                                  ...(feature.properties ?? {}),
-                                  exceeded: true,
-                                },
-                              };
-                            });
-                            // DELETE ME - end
-                            // const features = Array.isArray(fetchedFeatures) ? fetchedFeatures : [];
+                            const features = Array.isArray(fetchedFeatures) ? fetchedFeatures : [];
                             return { features, pageSize: -1 };
                           }}
                           outerPerimeter={outerPerimeter?.geometry}
