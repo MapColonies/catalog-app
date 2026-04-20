@@ -78,8 +78,15 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
     [lowResolutionCollections]
   );
 
+  const totalFeaturesCount = lowResolutionFeatures.length;
+
   const hasExceededFeatures = useMemo(
     () => lowResolutionFeatures.some((feature) => feature.properties?.exceeded === true),
+    [lowResolutionFeatures]
+  );
+
+  const exceededFeaturesCount = useMemo(
+    () => lowResolutionFeatures.filter((feature) => feature.properties?.exceeded === true).length,
     [lowResolutionFeatures]
   );
 
@@ -98,6 +105,12 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
     () => filteredLowResolutionCollections.some((collection) => collection.features.length > 0),
     [filteredLowResolutionCollections]
   );
+
+  useEffect(() => {
+    if (listFilterMode === 'exceeded' && !hasExceededFeatures) {
+      setListFilterMode('all');
+    }
+  }, [hasExceededFeatures, listFilterMode]);
 
   useEffect(() => {
     if (!showLowResolutionPolygonParts) {
@@ -292,19 +305,19 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                         setListFilterMode('all');
                       }}
                     >
-                      <FormattedMessage id="resolutionConflict.filter.all" />
+                      <FormattedMessage id="resolutionConflict.filter.all" /> ({totalFeaturesCount})
                     </Button>
                     <Button
                       type="button"
                       outlined
                       className={`filterButton${listFilterMode === 'exceeded' ? ' active' : ''}`}
-                      disabled={lowResolutionCollections.length === 0}
+                      disabled={lowResolutionCollections.length === 0 || !hasExceededFeatures}
                       onClick={(): void => {
                         clearLowResolutionSelection();
                         setListFilterMode('exceeded');
                       }}
                     >
-                      <FormattedMessage id="resolutionConflict.filter.exceeded" />
+                      <FormattedMessage id="resolutionConflict.filter.exceeded" /> ({exceededFeaturesCount})
                     </Button>
                   </Box>
                 }
