@@ -1111,7 +1111,6 @@ const DiscreteLayerView: React.FC = observer(() => {
             }
           />
         </Box>
-
         <Box className="headerSearchOptionsContainer">
           <PolygonSelectionUi
             onCancelDraw={(): void => {
@@ -1248,7 +1247,7 @@ const DiscreteLayerView: React.FC = observer(() => {
               style={{ display: activeTabView === TabViews.CATALOG ? 'block' : 'none' }}
             >
               {getActiveTabHeader(activeTabView, site)}
-              <Box className="panelContent relativePosition" style={{ overflow: 'hidden' }}>
+              <Box className="panelContent" style={{ overflow: 'hidden' }}>
                 <CatalogTreeComponent refresh={catalogRefresh} isFiltered={catalogFilter} />
               </Box>
             </Box>
