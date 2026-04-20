@@ -110,7 +110,7 @@ const _GEOSGeomToGeoJSON = (geomPtr: number): Geometry => {
 const _downloadFile = async (
   url: string,
   onProgress?: (p: WorkerMessage | null) => void
-): Promise<ArrayBuffer | null> => {
+): Promise<ArrayBuffer> => {
   const t0 = performance.now();
   let details: MessageDetails;
   let total: number | null = null;
@@ -154,7 +154,17 @@ const _downloadFile = async (
     details = getMessage(total, received, t0);
 
     if (!arrayBuffer) {
-      throw new Error('Array buffer is not defiend');
+      details = getMessage(total, received, t0, {
+        code: 'general.http.empty-stream.error'
+      });
+
+      onProgress?.({
+        process: Process.Load,
+        stage: Stage.Download,
+        type: WorkerType.Error,
+        details,
+      });
+      throw new Error('Array buffer is empty');
     }
 
     onProgress?.({
@@ -341,21 +351,6 @@ const api: WorkerAPI = {
     try {
       api.dispose();
       const buffer = await _downloadFile(url, onProgress);
-      if (!buffer) {
-        const code = 'general.http.empty-stream.error'
-        const details = getMessage(0, 0, 0, {
-          code,
-        });
-        onProgress?.({
-          process: Process.Load,
-          stage: Stage.Download,
-          type: WorkerType.Progress,
-          details,
-        });
-        return {
-          code,
-        };
-      }
       const fc = await parseShpFileContent(buffer);
       _fc = fc; //cloneDeep(fc);
       _prepareGEOSData(options?.customProperties, onProgress);

@@ -167,20 +167,16 @@ export function useWorkerAPI(): [WorkerService | null, StagesInfo] {
               details,
             });
           });
-          try {
-            const result = await workerApi.computeOuterGeometry(
-              proxy((p: WorkerMessage) => {
-                // If the worker sends real pulses, they still work here
-                setProgressComputeOuterGeometry(p);
-              })
-            );
 
-            clear();
-            return result;
-          } catch (err) {
-            clear();
-            throw err;
-          }
+          const result = await workerApi.computeOuterGeometry(
+            proxy((p: WorkerMessage) => {
+              // If the worker sends real pulses, they still work here
+              setProgressComputeOuterGeometry(p);
+            })
+          );
+
+          clear();
+          return result;
         },
         progress: progressComputeOuterGeometry,
       },
