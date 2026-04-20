@@ -133,7 +133,7 @@ export function useWorkerAPI(): [WorkerService | null, StagesInfo] {
             url,
             options,
             proxy((p: WorkerMessage) => {
-              console.log('**** Progress LoadShape: ', p);
+              // console.log('**** Progress LoadShape: ', p);
               upsertWorkerMessageByStage(Process.Load, p, setLoadShapeFileProgress);
             })
           );
@@ -145,7 +145,7 @@ export function useWorkerAPI(): [WorkerService | null, StagesInfo] {
           setProgressComputeArea(null);
           return await workerApi.updateAreas(
             proxy((p: WorkerMessage) => {
-              console.log('**** Progress Area: ', p);
+              // console.log('**** Progress Area: ', p);
               setProgressComputeArea(p);
             })
           );
@@ -184,7 +184,7 @@ export function useWorkerAPI(): [WorkerService | null, StagesInfo] {
         method: async (): Promise<FeatureCollection> => {
           return await workerApi.getFeatureCollection(
             proxy((p: WorkerMessage) => {
-              console.log('**** GET FEATURECOLLECTION: ', p);
+              // console.log('**** GET FEATURECOLLECTION: ', p);
             })
           );
         },
@@ -195,7 +195,7 @@ export function useWorkerAPI(): [WorkerService | null, StagesInfo] {
           return await workerApi.query(
             bbox,
             proxy((p: WorkerMessage) => {
-              console.log('**** QUERY by BBOX: ', p);
+              // console.log('**** QUERY by BBOX: ', p);
             })
           );
         },

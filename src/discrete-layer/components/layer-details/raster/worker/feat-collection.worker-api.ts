@@ -330,7 +330,7 @@ const api: WorkerAPI = {
     _geoms = [];
 
     _tree.clear();
-    console.log('******** DISPOSED');
+    console.log('******** WORKER DISPOSED');
   },
   async load(fc: FeatureCollection, options?: LoadOptions): Promise<void | WorkerError> {
     try {
@@ -494,7 +494,7 @@ const api: WorkerAPI = {
     return simplifiedOuterJSON;
   },
   getFeatureCollection(onProgress?: (p: WorkerMessage | null) => void): FeatureCollection {
-    const t0 = performance.now();
+    // const t0 = performance.now();
     const featuresArray = cloneDeep(
       _featureTemplate.map((item, idx) => {
         return {
@@ -504,13 +504,13 @@ const api: WorkerAPI = {
       })
     );
 
-    console.log(
-      'getFeatureCollection took:',
-      _featureTemplate.length,
-      '    ',
-      performance.now() - t0,
-      'ms'
-    );
+    // console.log(
+    //   'getFeatureCollection took:',
+    //   _featureTemplate.length,
+    //   '    ',
+    //   performance.now() - t0,
+    //   'ms'
+    // );
 
     return {
       type: 'FeatureCollection',
@@ -518,9 +518,9 @@ const api: WorkerAPI = {
     };
   },
   query(bbox: BBoxObj, onProgress?: (p: WorkerMessage | null) => void): FeatureCollection {
-    const t0 = performance.now();
+    // const t0 = performance.now();
     const matches = _tree.search(bbox);
-    console.log('query took:', matches.length, '    ', performance.now() - t0, 'ms');
+    // console.log('query took:', matches.length, '    ', performance.now() - t0, 'ms');
     return {
       type: 'FeatureCollection',
       features: matches.map((item) => {
