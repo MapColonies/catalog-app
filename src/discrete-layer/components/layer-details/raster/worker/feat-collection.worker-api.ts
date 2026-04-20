@@ -47,7 +47,7 @@ const getMessage = (
   total: number | null | undefined,
   partial: number,
   performanceStartTime: number,
-  error?: string
+  error?: WorkerError
 ) => {
   const percent = calculatePercentage(total, partial);
   return buildMessage(percent, performanceStartTime, error);
@@ -60,7 +60,7 @@ const getElapsedTime = (performanceStartTime: number) => {
 export const buildMessage = (
   percent: string,
   performanceStartTime: number,
-  error?: string
+  error?: WorkerError
 ): MessageDetails => ({
   progress: `${percent}%`,
   elapsedTime: getElapsedTime(performanceStartTime),
@@ -165,7 +165,9 @@ const _downloadFile = async (
     });
     return arrayBuffer;
   } catch (error) {
-    details = getMessage(total, received, t0, (error as { message: string })?.message as string);
+    details = getMessage(total, received, t0, {
+      text: (error as { message: string })?.message as string,
+    });
     onProgress?.({
       process: Process.Load,
       stage: Stage.Download,
@@ -327,8 +329,7 @@ const api: WorkerAPI = {
       _prepareGEOSData(options?.customProperties);
     } catch (error) {
       return {
-        success: false,
-        error,
+        text: (error as { message: string })?.message as string,
       };
     }
   },
@@ -341,9 +342,18 @@ const api: WorkerAPI = {
       api.dispose();
       const buffer = await _downloadFile(url, onProgress);
       if (!buffer) {
+        const code = 'general.http.empty-stream.error'
+        const details = getMessage(0, 0, 0, {
+          code,
+        });
+        onProgress?.({
+          process: Process.Load,
+          stage: Stage.Download,
+          type: WorkerType.Progress,
+          details,
+        });
         return {
-          success: false,
-          error: 'Download returned empty buffer',
+          code,
         };
       }
       const fc = await parseShpFileContent(buffer);
@@ -351,12 +361,11 @@ const api: WorkerAPI = {
       _prepareGEOSData(options?.customProperties, onProgress);
     } catch (error) {
       return {
-        success: false,
-        error,
+        text: (error as { message: string })?.message as string,
       };
     }
   },
-  updateAreas(onProgress?: (p: WorkerMessage | null) => void): void {
+  updateAreas(onProgress?: (p: WorkerMessage | null) => void): WorkerError | void {
     const total = _geoms.length;
     const t0 = performance.now();
     let details: MessageDetails;
@@ -370,15 +379,24 @@ const api: WorkerAPI = {
 
       const status = _geos.GEOSArea(_geoms[i], areaPtr);
       if (status !== 1) {
+        const code = 'general.invalid.geometry';
+        const codeParam = _properties[i].id as string;
+
         onProgress?.({
           process: Process.UpdateAreas,
           stage: Stage.UpdateAreas,
           type: WorkerType.Error,
           details: {
-            error: `BAD geometry: ${_properties[i].id}`,
+            error: {
+              code,
+              codeParam,
+            },
           },
         });
-        return;
+        return {
+          code,
+          codeParam,
+        };
       }
 
       _properties[i]._area =

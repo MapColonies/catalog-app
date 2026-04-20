@@ -66,6 +66,8 @@
   "general.more.text": "עוד...",
   "general.missing.translation": "##MISSING_TRANSLATION##",
   "general.search.placeholder": "חיפוש...",
+  "general.invalid.geometry": "גיאומטריה {value} לא תקינה",
+  "general.http.empty-stream.error": "לא התקבלו נתונים מההורדה",
 
   "terrain-provider.access.error": "מידע פני השטח לא זמין",
 

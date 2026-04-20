@@ -66,6 +66,8 @@
   "general.more.text": "more...",
   "general.missing.translation": "##MISSING_TRANSLATION##",
   "general.search.placeholder": "Search...",
+  "general.invalid.geometry": "Invalid geometry {value}",
+  "general.http.empty-stream.error": "No data was received",
 
   "terrain-provider.access.error": "Unavailable terrain information",
 

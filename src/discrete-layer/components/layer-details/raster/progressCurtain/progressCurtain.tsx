@@ -2,7 +2,7 @@ import { useIntl } from 'react-intl';
 import { Icon, Typography } from '@map-colonies/react-core';
 import { Box } from '@material-ui/core';
 import { AutoDirectionBox } from '../../../../../common/components/auto-direction-box/auto-direction-box.component';
-import { StagesInfo, WorkerMessage, WorkerType } from '../worker/worker.types';
+import { StagesInfo, WorkerError, WorkerMessage, WorkerType } from '../worker/worker.types';
 
 import './progressCurtain.css';
 
@@ -52,6 +52,20 @@ export const ProgressCurtain: React.FC<CurtainProps> = (props) => {
     return type ? stateMap[type] : '';
   };
 
+  const collectErrors = (messageDetails: WorkerError, errors: string[]) => {
+    if (messageDetails.text) {
+      errors.push(messageDetails.text);
+    }
+
+    if (messageDetails.code) {
+      const message = messageDetails.codeParam
+        ? intl.formatMessage({ id: messageDetails.code }, { value: messageDetails.codeParam })
+        : intl.formatMessage({ id: messageDetails.code });
+
+      errors.push(message);
+    }
+  };
+
   const buildRows = () => {
     const errors: string[] = [];
 
@@ -78,8 +92,9 @@ export const ProgressCurtain: React.FC<CurtainProps> = (props) => {
           if (rawMessage) {
             progress = rawMessage.progress;
             elapsedTime = rawMessage.elapsedTime;
+
             if (rawMessage.error) {
-              errors.push(rawMessage.error);
+              collectErrors(rawMessage.error, errors);
             }
           }
 

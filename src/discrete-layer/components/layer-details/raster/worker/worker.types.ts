@@ -18,8 +18,9 @@ export interface LoadOptions {
 }
 
 export type WorkerError = {
-  success: boolean;
-  error?: any;
+  text?: string;
+  code?: string;
+  codeParam?: string;
 };
 
 export interface WorkerAPI {
@@ -31,7 +32,7 @@ export interface WorkerAPI {
     options?: LoadOptions,
     onProgress?: (p: WorkerMessage | null) => void
   ): Promise<WorkerError | void>;
-  updateAreas(onProgress?: (p: WorkerMessage | null) => void): void;
+  updateAreas(onProgress?: (p: WorkerMessage | null) => void): WorkerError | void;
   computeOuterGeometry(onProgress?: (p: WorkerMessage | null) => void): Geometry;
   getFeatureCollection(onProgress?: (p: WorkerMessage | null) => void): FeatureCollection;
   query(bbox: BBoxObj, onProgress?: (p: WorkerMessage | null) => void): FeatureCollection;
@@ -75,7 +76,7 @@ export interface WorkerMessage {
 export interface MessageDetails {
   progress?: string;
   elapsedTime?: number;
-  error?: string;
+  error?: WorkerError;
 }
 
 export type ProcessStagesMap = {

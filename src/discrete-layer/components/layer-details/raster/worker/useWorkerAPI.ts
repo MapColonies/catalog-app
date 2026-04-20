@@ -28,7 +28,7 @@ type WorkerService = {
     progress: WorkerMessage[] | null;
   };
   updateAreas: {
-    method: () => Promise<void>;
+    method: () => Promise<WorkerError | void>;
     progress: WorkerMessage | null;
   };
   computeOuterGeometry: {
