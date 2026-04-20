@@ -66,6 +66,8 @@
   "general.more.text": "עוד...",
   "general.missing.translation": "##MISSING_TRANSLATION##",
   "general.search.placeholder": "חיפוש...",
+  "general.invalid.geometry": "גיאומטריה {value} לא תקינה",
+  "general.http.empty-stream.error": "לא התקבלו נתונים מההורדה",
 
   "terrain-provider.access.error": "מידע פני השטח לא זמין",
 
@@ -874,5 +876,16 @@
   "export-layer.validations.relations.lower": "קטן מ-",
   "export-layer.validations.relations.lowerOrEqual": "קטן או שווה מ-",
   "export-layer.validations.relations.equal": "שווה ל-",
-  "export-layer.validations.againstOtherField": "הערך צריך להיות {relation} שדה {fieldName}"
+  "export-layer.validations.againstOtherField": "הערך צריך להיות {relation} שדה {fieldName}",
+
+  "progress.titleProcess": "תהליך",
+  "progress.titleProgress": "התקדמות",
+  "progress.titleTime": "זמן (ms)",
+
+  "progress.stage.init": "מאתחל",
+  "progress.stage.load": "טעינה",
+  "progress.stage.parsing": "הכנת המידע",
+  "progress.stage.cache": "מטמון",
+  "progress.stage.updateAreas": "חישוב השטחים",
+  "progress.stage.computeOuterGeometry": "חישוב ההיקף"
 }
