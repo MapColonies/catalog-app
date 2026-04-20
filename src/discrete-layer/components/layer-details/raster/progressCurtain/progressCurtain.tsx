@@ -1,6 +1,7 @@
 import { useIntl } from 'react-intl';
-import { Icon } from '@map-colonies/react-core';
+import { Icon, Typography } from '@map-colonies/react-core';
 import { Box } from '@material-ui/core';
+import { AutoDirectionBox } from '../../../../../common/components/auto-direction-box/auto-direction-box.component';
 import { StagesInfo, WorkerMessage, WorkerType } from '../worker/worker.types';
 
 import './progressCurtain.css';
@@ -70,7 +71,7 @@ export const ProgressCurtain: React.FC<CurtainProps> = (props) => {
           state = getStateByType(type);
 
           let progress: string | undefined = '—';
-          let elapsedTime: string | undefined = '—';
+          let elapsedTime: number | undefined = 0;
 
           const rawMessage = message?.details;
 
@@ -102,13 +103,17 @@ export const ProgressCurtain: React.FC<CurtainProps> = (props) => {
   return (
     <Box id="progressCurtain">
       <Box className="titles">
-        <span className="titleIconSpacer" />
-        <span className="titleProcess">{intl.formatMessage({ id: 'progress.titleProcess' })}</span>
+        <Typography tag="span" className="titleIconSpacer"></Typography>
+        <Typography tag="span" className="titleProcess">
+          {intl.formatMessage({ id: 'progress.titleProcess' })}
+        </Typography>
         <Box className="info">
-          <span className="titleProgress">
+          <Typography tag="span" className="titleProgress">
             {intl.formatMessage({ id: 'progress.titleProgress' })}
-          </span>
-          <span className="titleTime">{intl.formatMessage({ id: 'progress.titleTime' })}</span>
+          </Typography>
+          <Typography tag="span" className="titleTime">
+            {intl.formatMessage({ id: 'progress.titleTime' })}
+          </Typography>
         </Box>
       </Box>
       <Box className="rows">
@@ -116,11 +121,12 @@ export const ProgressCurtain: React.FC<CurtainProps> = (props) => {
           return (
             <Box key={row.key} className={`curtainRow ${row.state}`}>
               {getIconByType(row.type)}
-              <span className="processName">{intl.formatMessage({ id: row.label })}</span>
-
+              <Typography tag="span" className="processName">
+                {intl.formatMessage({ id: row.label })}
+              </Typography>
               <Box className="info">
-                <bdi className="progress">{row.progress}</bdi>
-                <bdi className="elapsedTime">{row.elapsedTime}</bdi>
+                <AutoDirectionBox className="progress">{row.progress}</AutoDirectionBox>
+                <AutoDirectionBox className="elapsedTime">{row.elapsedTime}</AutoDirectionBox>
               </Box>
             </Box>
           );
@@ -130,7 +136,7 @@ export const ProgressCurtain: React.FC<CurtainProps> = (props) => {
         {errors.length > 0 && (
           <>
             <Icon className="mc-icon-Status-Warnings error" />
-            <span>{errors}</span>
+            <Typography tag="span">{errors}</Typography>
           </>
         )}
       </Box>

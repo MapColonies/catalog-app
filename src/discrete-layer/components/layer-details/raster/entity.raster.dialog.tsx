@@ -162,7 +162,7 @@ export const EntityRasterDialog: React.FC<EntityRasterDialogProps> = observer(
     };
 
     /*****START: REMOVE IT !!!!!!!!!!!!!!!! */
-    const [api, descriptors] = useWorkerAPI();
+    const [api, stagesInfo] = useWorkerAPI();
     const intl = useIntl();
     const handleRun = async () => {
       if (!api) return;

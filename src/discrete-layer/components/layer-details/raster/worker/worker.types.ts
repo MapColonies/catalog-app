@@ -74,7 +74,7 @@ export interface WorkerMessage {
 
 export interface MessageDetails {
   progress?: string;
-  elapsedTime?: string;
+  elapsedTime?: number;
   error?: string;
 }
 

@@ -880,10 +880,10 @@
   "progress.titleProgress": "progress",
   "progress.titleTime": "time (ms)",
 
-  "progress.stage.init.translationCode": "Boot",
-  "progress.stage.load.translationCode": "Loading",
-  "progress.stage.parsing.translationCode": "Preparing info",
-  "progress.stage.cache.translationCode": "Cache",
-  "progress.stage.updateAreas.translationCode": "Calculating areas",
-  "progress.stage.computeOuterGeometry.translationCode": "Calculating perimeter"
+  "progress.stage.init": "Boot",
+  "progress.stage.load": "Loading",
+  "progress.stage.parsing": "Preparing info",
+  "progress.stage.cache": "Cache",
+  "progress.stage.updateAreas": "Calculating areas",
+  "progress.stage.computeOuterGeometry": "Calculating perimeter"
 }

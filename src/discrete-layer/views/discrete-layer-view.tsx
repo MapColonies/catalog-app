@@ -1099,7 +1099,7 @@ const DiscreteLayerView: React.FC = observer(() => {
 
   /*****START: REMOVE IT !!!!!!!!!!!!!!!! */
 
-  const [api, descriptors] = useWorkerAPI();
+  const [api, stagesInfo] = useWorkerAPI();
 
   const extractProgressArray = (api: any): WorkerMessage[] => {
     if (!api) {
@@ -1127,7 +1127,6 @@ const DiscreteLayerView: React.FC = observer(() => {
         properties: null,
       });
     }
-    // await api.init.method();
     // await workerAPI?.init.process.method();
     await api.init.method();
     // await api.load.method(FC);
@@ -1354,7 +1353,7 @@ const DiscreteLayerView: React.FC = observer(() => {
                   ]
                 } /> */}
                 <ProgressCurtain
-                  stagesInfo={descriptors}
+                  stagesInfo={stagesInfo}
                   workerMessages={progresses}
                 ></ProgressCurtain>
               </Box>

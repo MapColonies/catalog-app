@@ -1,6 +1,7 @@
 import { SetStateAction, useEffect, useMemo, useState } from 'react';
 import { wrap, Remote, proxy } from 'comlink';
 import { FeatureCollection, Geometry } from 'geojson';
+import { fakeProgress } from '../../../../../common/helpers/fake-progress';
 import {
   BBoxObj,
   StagesInfo,
@@ -154,21 +155,9 @@ export function useWorkerAPI(): [WorkerService | null, StagesInfo] {
 
       computeOuterGeometry: {
         method: async () => {
-          // 1. Setup the "Fake" Progress interval
-          const duration = 10000; // 10 seconds
           const t0 = performance.now();
 
-          const timer = setInterval(() => {
-            const passedTimeFromTheBeginning = performance.now() - t0;
-            const ratioOfPassedTime = Math.min(passedTimeFromTheBeginning / duration, 1);
-
-            const eased =
-              ratioOfPassedTime < 0.5
-                ? 2 * ratioOfPassedTime * ratioOfPassedTime
-                : 1 - Math.pow(-2 * ratioOfPassedTime + 2, 2) / 2;
-            // Fast-start easing: (1 - (1 - x)^2) slows down towards the end
-            // const fakePercent = Math.floor((1 - Math.pow(1 - ratioOfPassedTime, 2)) * 95);
-            const fakePercent = Math.floor(eased * 95);
+          const clear = fakeProgress(10000, (fakePercent: number) => {
             const details = buildMessage(`${fakePercent}`, t0);
 
             setProgressComputeOuterGeometry({
@@ -177,15 +166,8 @@ export function useWorkerAPI(): [WorkerService | null, StagesInfo] {
               type: WorkerType.Progress,
               details,
             });
-
-            // Safety: Stop updating if we hit the 95% cap
-            if (fakePercent >= 95) {
-              clearInterval(timer);
-            }
-          }, 200); // Update every 200ms (5 times per second) is plenty for a bar
-
+          });
           try {
-            // 2. Await the actual heavy worker task
             const result = await workerApi.computeOuterGeometry(
               proxy((p: WorkerMessage) => {
                 // If the worker sends real pulses, they still work here
@@ -193,11 +175,10 @@ export function useWorkerAPI(): [WorkerService | null, StagesInfo] {
               })
             );
 
-            // 3. Cleanup and finish
-            clearInterval(timer);
+            clear();
             return result;
           } catch (err) {
-            clearInterval(timer);
+            clear();
             throw err;
           }
         },
@@ -232,7 +213,7 @@ export function useWorkerAPI(): [WorkerService | null, StagesInfo] {
       [Process.Init]: {
         stages: {
           [Stage.Init]: {
-            translationCode: 'progress.stage.init.translationCode',
+            translationCode: 'progress.stage.init',
             shouldShowProgress: false,
           },
         },
@@ -240,15 +221,15 @@ export function useWorkerAPI(): [WorkerService | null, StagesInfo] {
       [Process.Load]: {
         stages: {
           [Stage.Download]: {
-            translationCode: 'progress.stage.load.translationCode',
+            translationCode: 'progress.stage.load',
             shouldShowProgress: true,
           },
           [Stage.Parsing]: {
-            translationCode: 'progress.stage.parsing.translationCode',
+            translationCode: 'progress.stage.parsing',
             shouldShowProgress: true,
           },
           [Stage.Cache]: {
-            translationCode: 'progress.stage.cache.translationCode',
+            translationCode: 'progress.stage.cache',
             shouldShowProgress: false,
           },
         },
@@ -256,7 +237,7 @@ export function useWorkerAPI(): [WorkerService | null, StagesInfo] {
       [Process.UpdateAreas]: {
         stages: {
           [Stage.UpdateAreas]: {
-            translationCode: 'progress.stage.updateAreas.translationCode',
+            translationCode: 'progress.stage.updateAreas',
             shouldShowProgress: true,
           },
         },
@@ -264,7 +245,7 @@ export function useWorkerAPI(): [WorkerService | null, StagesInfo] {
       [Process.ComputeOuterGeometry]: {
         stages: {
           [Stage.ComputeOuterGeometry]: {
-            translationCode: 'progress.stage.computeOuterGeometry.translationCode',
+            translationCode: 'progress.stage.computeOuterGeometry',
             shouldShowProgress: true,
           },
         },

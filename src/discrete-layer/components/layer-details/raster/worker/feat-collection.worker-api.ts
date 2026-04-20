@@ -35,8 +35,12 @@ let _tree = new RBush<IndexedItem>();
 const _properties: Record<string, unknown>[] = [];
 const _featureTemplate: Feature[] = [];
 
-const formatTime = (performanceStartTime: number) => {
-  return (performance.now() - performanceStartTime).toFixed(0);
+const calculatePercentage = (total: number | null | undefined, partial: number): string => {
+  if (total !== null && total !== undefined && total > 0) {
+    return `${Math.floor((partial / total) * 100)}`;
+  } else {
+    return '0';
+  }
 };
 
 const getMessage = (
@@ -49,12 +53,8 @@ const getMessage = (
   return buildMessage(percent, performanceStartTime, error);
 };
 
-const calculatePercentage = (total: number | null | undefined, partial: number): string => {
-  if (total !== null && total !== undefined && total > 0) {
-    return `${Math.floor((partial / total) * 100)}`;
-  } else {
-    return '0';
-  }
+const getElapsedTime = (performanceStartTime: number) => {
+  return Math.floor(performance.now() - performanceStartTime);
 };
 
 export const buildMessage = (
@@ -63,8 +63,8 @@ export const buildMessage = (
   error?: string
 ): MessageDetails => ({
   progress: `${percent}%`,
-  elapsedTime: `${formatTime(performanceStartTime)}`,
-  error: error,
+  elapsedTime: getElapsedTime(performanceStartTime),
+  error,
 });
 
 const _computeBBox = (geometry: Polygon | MultiPolygon) => {
@@ -143,7 +143,7 @@ const _downloadFile = async (
         process: Process.Load,
         stage: Stage.Download,
         type: WorkerType.Progress,
-        details: details,
+        details,
       });
     }
 
@@ -320,10 +320,17 @@ const api: WorkerAPI = {
     _tree.clear();
     console.log('******** DISPOSED');
   },
-  async load(fc: FeatureCollection, options?: LoadOptions): Promise<void> {
-    api.dispose();
-    _fc = fc; //cloneDeep(fc);
-    _prepareGEOSData(options?.customProperties);
+  async load(fc: FeatureCollection, options?: LoadOptions): Promise<void | WorkerError> {
+    try {
+      api.dispose();
+      _fc = fc; //cloneDeep(fc);
+      _prepareGEOSData(options?.customProperties);
+    } catch (error) {
+      return {
+        success: false,
+        error,
+      };
+    }
   },
   async loadFromShapeFile(
     url: string,
@@ -342,10 +349,10 @@ const api: WorkerAPI = {
       const fc = await parseShpFileContent(buffer);
       _fc = fc; //cloneDeep(fc);
       _prepareGEOSData(options?.customProperties, onProgress);
-    } catch (err) {
+    } catch (error) {
       return {
         success: false,
-        error: err,
+        error,
       };
     }
   },

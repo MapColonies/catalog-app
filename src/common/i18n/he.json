@@ -880,10 +880,10 @@
   "progress.titleProgress": "התקדמות",
   "progress.titleTime": "זמן (ms)",
 
-  "progress.stage.init.translationCode": "מאתחל",
-  "progress.stage.load.translationCode": "טעינה",
-  "progress.stage.parsing.translationCode": "הכנת המידע",
-  "progress.stage.cache.translationCode": "מטמון",
-  "progress.stage.updateAreas.translationCode": "חישוב השטחים",
-  "progress.stage.computeOuterGeometry.translationCode": "חישוב ההיקף"
+  "progress.stage.init": "מאתחל",
+  "progress.stage.load": "טעינה",
+  "progress.stage.parsing": "הכנת המידע",
+  "progress.stage.cache": "מטמון",
+  "progress.stage.updateAreas": "חישוב השטחים",
+  "progress.stage.computeOuterGeometry": "חישוב ההיקף"
 }

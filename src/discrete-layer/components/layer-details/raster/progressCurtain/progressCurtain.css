@@ -15,7 +15,6 @@
   justify-content: center;
   gap: 1ch;
   background-color: rgba(0, 0, 0, 0.6);
-  z-index: 4;
   font-size: 2ch;
   overflow-y: auto;
 }
