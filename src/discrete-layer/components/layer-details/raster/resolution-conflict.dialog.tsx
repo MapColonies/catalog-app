@@ -13,6 +13,7 @@ import {
   DialogTitle,
   IconButton,
   SimpleListItem,
+  TextField,
   Typography,
 } from '@map-colonies/react-core';
 import { AutoDirectionBox } from '../../../../common/components/auto-direction-box/auto-direction-box.component';
@@ -42,6 +43,8 @@ interface ParsedFeatureCollection {
   features: Feature[];
 }
 
+type FilterMode = 'all' | 'exceeded';
+
 const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps> = ({
   isOpen,
   onSetIsOpen,
@@ -62,6 +65,8 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
   const [lowResolutionCollections, setLowResolutionCollections] = useState<ParsedFeatureCollection[]>([]);
   const [outerPerimeter, setOuterPerimeter] = useState<Feature | undefined>();
   const [collectionMountKeys, setCollectionMountKeys] = useState<number[]>([]);
+  const [approver, setApprover] = useState('');
+  const [listFilterMode, setListFilterMode] = useState<FilterMode>('all');
   const pendingSelectionFeatureRef = useRef<Feature | null>(null);
   const displayedLowResolutionFeaturesRef = useRef<Feature[]>([]);
   const reportUrl = state.context.job?.validationReport?.report?.url;
@@ -71,6 +76,27 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
   const lowResolutionFeatures = useMemo(
     () => lowResolutionCollections.flatMap((c) => c.features),
     [lowResolutionCollections]
+  );
+
+  const hasExceededFeatures = useMemo(
+    () => lowResolutionFeatures.some((feature) => feature.properties?.exceeded === true),
+    [lowResolutionFeatures]
+  );
+
+  const filteredLowResolutionCollections = useMemo(() => {
+    if (listFilterMode === 'all') {
+      return lowResolutionCollections;
+    }
+
+    return lowResolutionCollections.map((collection) => ({
+      ...collection,
+      features: collection.features.filter((feature) => feature.properties?.exceeded === true),
+    }));
+  }, [lowResolutionCollections, listFilterMode]);
+
+  const hasFilteredFeatures = useMemo(
+    () => filteredLowResolutionCollections.some((collection) => collection.features.length > 0),
+    [filteredLowResolutionCollections]
   );
 
   useEffect(() => {
@@ -97,8 +123,8 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
       return undefined;
     }
 
-    for (let collectionIndex = 0; collectionIndex < lowResolutionCollections.length; collectionIndex += 1) {
-      const featureIndex = lowResolutionCollections[collectionIndex].features.findIndex(
+    for (let collectionIndex = 0; collectionIndex < filteredLowResolutionCollections.length; collectionIndex += 1) {
+      const featureIndex = filteredLowResolutionCollections[collectionIndex].features.findIndex(
         (feature) => feature.properties?._key === selectedLowResolutionFeatureKey
       );
 
@@ -111,7 +137,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
     }
 
     return undefined;
-  }, [lowResolutionCollections, selectedLowResolutionFeatureKey]);
+  }, [filteredLowResolutionCollections, selectedLowResolutionFeatureKey]);
 
   useEffect(() => {
     if (!autoScrollListToSelection || !selectedLowResolutionPosition) {
@@ -192,11 +218,26 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
         });
 
         const featureCollection = await api.getFeatureCollection.method();
+        // DELETE ME - start
+        const MOCK = featureCollection.features.map((feature, index) => {
+          if (index !== 0) {
+            return feature;
+          }
+
+          return {
+            ...feature,
+            properties: {
+              ...(feature.properties ?? {}),
+              exceeded: true,
+            },
+          };
+        });
+        // DELETE ME - end
 
         const newCollections = [
           {
             name: collectionName,
-            features: featureCollection.features,
+            features: MOCK,//featureCollection.features,
           },
         ];
         setLowResolutionCollections(newCollections);
@@ -236,30 +277,62 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
           <Box className="content">
             <Box className="rightPane">
               <Box className="lowResolutionPartsList curtainContainer">
-                <Checkbox
-                  className="lowResolutionPartsCheckbox"
-                  label={intl.formatMessage({ id: 'polygon-parts.show-low-resolution-parts-on-map.label' })}
-                  checked={showLowResolutionPolygonParts}
-                  disabled={lowResolutionCollections.length === 0}
-                  onClick={(evt: React.MouseEvent<HTMLInputElement>): void => {
-                    const isChecked = evt.currentTarget.checked;
-                    setShowLowResolutionPolygonParts(isChecked);
-                    if (!isChecked) {
-                      setAutoScrollListToSelection(false);
-                      setSelectedLowResolutionFeatureKey(undefined);
-                    }
-                  }}
-                />
+                <Box className="lowResolutionPartsCheckboxContainer">
+                  {
+                    !isLoadingLowResolutionParts &&
+                    <Checkbox
+                      className="lowResolutionPartsCheckbox"
+                      label={intl.formatMessage({ id: 'polygon-parts.show-low-resolution-parts-on-map.label' })}
+                      checked={showLowResolutionPolygonParts}
+                      disabled={lowResolutionCollections.length === 0}
+                      onClick={(evt: React.MouseEvent<HTMLInputElement>): void => {
+                        const isChecked = evt.currentTarget.checked;
+                        setShowLowResolutionPolygonParts(isChecked);
+                        if (!isChecked) {
+                          setAutoScrollListToSelection(false);
+                          setSelectedLowResolutionFeatureKey(undefined);
+                        }
+                      }}
+                    />
+                  }
+                </Box>
+                {
+                  !isLoadingLowResolutionParts &&
+                  <Box className="filterContainer">
+                    <Button
+                      type="button"
+                      outlined
+                      className={`filterButton${listFilterMode === 'all' ? ' active' : ''}`}
+                      disabled={lowResolutionCollections.length === 0}
+                      onClick={(): void => {
+                        setListFilterMode('all');
+                      }}
+                    >
+                      <FormattedMessage id="resolutionConflict.filter.all" />
+                    </Button>
+                    <Button
+                      type="button"
+                      outlined
+                      className={`filterButton${listFilterMode === 'exceeded' ? ' active' : ''}`}
+                      disabled={lowResolutionCollections.length === 0}
+                      onClick={(): void => {
+                        setListFilterMode('exceeded');
+                      }}
+                    >
+                      <FormattedMessage id="resolutionConflict.filter.exceeded" />
+                    </Button>
+                  </Box>
+                }
                 {isLoadingLowResolutionParts ? (
                   <Curtain showProgress={true} />
                 ) : lowResolutionPartsError ? (
                   <></>
-                ) : lowResolutionCollections.length === 0 ? (
+                ) : lowResolutionCollections.length === 0 || !hasFilteredFeatures ? (
                   <Typography tag="p" className="emptyList">
                     <FormattedMessage id="general.empty.text" />
                   </Typography>
                 ) : (
-                  lowResolutionCollections.map((collection, collectionIndex) => {
+                  filteredLowResolutionCollections.map((collection, collectionIndex) => {
                     return (
                       <CollapsibleList
                         key={`${collection.name}-${collectionIndex}-${collectionMountKeys[collectionIndex] ?? 0}`}
@@ -271,7 +344,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                           />
                         }
                       >
-                        <Box className="collectionFeaturesVirtualized">
+                        <Box className="virtualizedFeatureList">
                           <AutoSizer>
                             {({ width, height }): JSX.Element => {
                               return (
@@ -296,9 +369,10 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                                     const featureId = (feature.properties?.id as string | undefined) ?? '';
                                     const featureKey = feature.properties?._key;
                                     const isSelected = featureKey === selectedLowResolutionFeatureKey;
+                                    const isExceeded = feature.properties?.exceeded === true;
                                     return (
                                       <Box
-                                        className={`virtualizedFeatureRow${isSelected ? ' selected' : ''}`}
+                                        className={`virtualizedFeatureItem${isSelected ? ' selected' : ''}${isExceeded ? ' exceeded' : ''}`}
                                         key={key}
                                         style={style}
                                         onClick={(): void => {
@@ -346,28 +420,45 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                   })
                 )}
               </Box>
-              <Box className="actionsRow">
-                {!viewOnly && (
+              <Box className="rightPaneFooter">
+                <Box className="detailsFieldValue approverNameFieldContainer">
+                  <TextField
+                    className="approverNameField"
+                    disabled={isLoadingLowResolutionParts || hasExceededFeatures}
+                    value={approver}
+                    onChange={(event): void => {
+                      setApprover(event.currentTarget.value);
+                    }}
+                    label={intl.formatMessage({ id: 'resolutionConflict.approver.label' })}
+                  />
+                </Box>
+                <Box className="actionsRow">
+                  {!viewOnly && (
+                    <Button
+                      raised
+                      type="button"
+                      onClick={approveDialog}
+                      disabled={
+                        isLoadingLowResolutionParts ||
+                        lowResolutionCollections.length === 0 ||
+                        approver.trim().length === 0
+                      }
+                    >
+                      <FormattedMessage id="general.ok-btn.text" />
+                    </Button>
+                  )}
                   <Button
-                    raised
                     type="button"
-                    onClick={approveDialog}
-                    disabled={isLoadingLowResolutionParts || lowResolutionCollections.length === 0}
+                    onClick={closeDialog}
                   >
-                    <FormattedMessage id="general.ok-btn.text" />
+                    <FormattedMessage id="general.close-btn.text" />
                   </Button>
-                )}
-                <Button
-                  type="button"
-                  onClick={closeDialog}
-                >
-                  <FormattedMessage id="general.close-btn.text" />
-                </Button>
-                {lowResolutionPartsError && (
-                  <Typography className="error" tag="span">
-                    {lowResolutionPartsError}
-                  </Typography>
-                )}
+                  {lowResolutionPartsError && (
+                    <Typography className="error" tag="span">
+                      {lowResolutionPartsError}
+                    </Typography>
+                  )}
+                </Box>
               </Box>
             </Box>
             <Box className="leftPane">
@@ -393,6 +484,14 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                       setSelectedLowResolutionFeatureKey(undefined);
                       return;
                     }
+
+                    const clickedFeature = lowResolutionFeatures.find(
+                      (feature) => feature.properties?._key === featureKey
+                    );
+                    if (listFilterMode === 'exceeded' && clickedFeature?.properties?.exceeded !== true) {
+                      setListFilterMode('all');
+                    }
+
                     setShowLowResolutionPolygonParts(true);
                     setAutoScrollListToSelection(true);
                     setSelectedLowResolutionFeatureRequestId((current) => current + 1);
@@ -418,7 +517,29 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                               maxY: bbox[3],
                             });
                             const rawFeatures = get(result, 'features', []);
-                            const fetchedFeatures = Array.isArray(rawFeatures) ? rawFeatures : [];
+                            // DELETE ME - start
+                            const exceededByKey = new Map(
+                              lowResolutionFeatures.map((feature) => [
+                                feature.properties?._key,
+                                feature.properties?.exceeded === true,
+                              ])
+                            );
+                            const fetchedFeatures = (Array.isArray(rawFeatures) ? rawFeatures : []).map((feature) => {
+                              const featureKey = feature?.properties?._key;
+                              const isExceeded = featureKey ? exceededByKey.get(featureKey) === true : false;
+                              if (!isExceeded) {
+                                return feature;
+                              }
+                              return {
+                                ...feature,
+                                properties: {
+                                  ...(feature.properties ?? {}),
+                                  exceeded: true,
+                                },
+                              };
+                            });
+                            // DELETE ME - end
+                            // const fetchedFeatures = Array.isArray(rawFeatures) ? rawFeatures : [];
                             return { fetchedFeatures, withPagination: false };
                           }}
                           outerPerimeter={outerPerimeter?.geometry}
@@ -435,6 +556,8 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                             if (isFootprint) {
                               return undefined;
                             }
+
+                            const isExceeded = feat.properties?.exceeded === true;
 
                             const featureLabel = feat.properties?._featureLabel as string | undefined;
                             const zoomLevel = feat.properties?._zoomLevel;
@@ -456,7 +579,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                               textAlign: 'center',
                               textBaseline: 'middle',
                               font: 'bold 10px/1 Roboto',
-                              fill: new Fill({ color: '#ff7f00' }),
+                              fill: new Fill({ color: isExceeded ? '#d32f2f' : '#ff7f00' }),
                               stroke: new Stroke({ color: '#000', width: 3 }),
                               placement: 'point',
                               overflow: true,

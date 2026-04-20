@@ -188,10 +188,16 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
           const baseStyle = PPMapStyles.get(featureType);
           const baseStroke = baseStyle?.getStroke()?.clone();
           const baseFill = baseStyle?.getFill()?.clone();
+          const isExceeded = feat.properties?.exceeded === true;
 
           if (featureType === FeatureType.LOW_RESOLUTION_PP) {
-            baseStroke?.setColor('#ff7f00');
-            baseFill?.setColor('#ff7f0066');
+            if (isExceeded) {
+              baseStroke?.setColor('#d32f2f');
+              baseFill?.setColor('#d32f2f66');
+            } else {
+              baseStroke?.setColor('#ff7f00');
+              baseFill?.setColor('#ff7f0066');
+            }
           }
 
           const greenStyle = new Style({

@@ -306,9 +306,12 @@
   "validationReport.unknown": "פוליגונים עם שגיאות לא ידועות",
   "validationReport.button": "בדיקה",
 
+  "resolutionConflict.filter.all": "הכל",
+  "resolutionConflict.filter.exceeded": "חריגים",
   "resolutionConflict.collectionName": "פוליגונים ברמת זום {value}",
   "resolutionConflict.partName": "פוליגון {index}",
   "resolutionConflict.units.km2": " קמ\"ר",
+  "resolutionConflict.approver.label": "שם מלא של מאשר החריגה",
   "resolutionConflict.error.missingUrl": "חסר URL לדו\"ח ולידציה",
   "resolutionConflict.error.fetchFailed": "נכשל בטעינת חלקי תיחום מקובץ",
   "resolutionConflict.error.queryFailed": "נכשל בהרצת שאילתת חלקי תיחום בתצוגה",

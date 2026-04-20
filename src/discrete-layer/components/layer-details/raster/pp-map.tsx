@@ -471,12 +471,20 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
       return toCssColor(PPMapStyles.get(FeatureType.EXISTING_PP)?.getStroke()?.getColor());
     }
 
+    if (selectedFeatureProperties?.exceeded === true) {
+      return '#d32f2f';
+    }
+
     if (selectedFeatureProperties?._featureType === FeatureType.LOW_RESOLUTION_PP) {
       return toCssColor(PPMapStyles.get(FeatureType.LOW_RESOLUTION_PP)?.getStroke()?.getColor());
     }
 
     return undefined;
-  }, [selectedExistingFeature, selectedFeatureProperties?._featureType]);
+  }, [
+    selectedExistingFeature,
+    selectedFeatureProperties?._featureType,
+    selectedFeatureProperties?.exceeded,
+  ]);
 
   return (
     <Box className="geoFeaturesMapContainer" style={{ ...style }}>
