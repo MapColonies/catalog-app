@@ -8,7 +8,7 @@ const formatZoomLevelValue = (zoomLevel?: number): string => {
   if (zoomLevel === undefined || Number.isNaN(zoomLevel)) {
     return '-';
   }
-  return Math.round(zoomLevel).toString();
+  return Math.trunc(zoomLevel).toString();
 };
 
 export const ZoomLevelIndicator: React.FC = () => {
