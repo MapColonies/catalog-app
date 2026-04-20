@@ -1,7 +1,7 @@
 import { CSSProperties, MutableRefObject, useEffect, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Feature, Geometry, MultiPolygon, Polygon } from 'geojson';
-import { get, isEmpty } from 'lodash';
+import { get } from 'lodash';
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
 import { point } from '@turf/helpers';
 import bboxPolygon from '@turf/bbox-polygon';
@@ -9,7 +9,6 @@ import { FitOptions } from 'ol/View';
 import { Style } from 'ol/style';
 import {
   Box,
-  GeoJSONFeature,
   getWMTSOptions,
   getXYZOptions,
   IBaseMap,
@@ -19,8 +18,6 @@ import {
   TileLayer,
   TileWMTS,
   TileXYZ,
-  useMap,
-  useVectorSource,
   VectorLayer,
   VectorSource,
 } from '@map-colonies/react-components';
@@ -39,6 +36,7 @@ import { ILayerImage } from '../../../models/layerImage';
 import { GeojsonFeatureInput } from '../../../models/RootStore.base';
 import { useStore } from '../../../models/RootStore';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
+import { GeoFeaturesInnerComponent } from './geo-features-inner.component';
 import { IQueryExecutorResponse, PolygonPartsExtentQueryVectorLayer } from './polygon-parts-extent-query-vector-layer';
 import {
   FEATURE_LABEL_CONFIG,
@@ -70,7 +68,6 @@ interface GeoFeaturesPresentorProps {
 
 const DEFAULT_PROJECTION = 'EPSG:4326';
 const MIN_FEATURES_NUMBER = 4; // minimal set of fetures (source, source_marker, perimeter, perimeter_marker)
-const RENDERS_TILL_FULL_FEATURES_SET = 1; // first render with source, second with PPs perimeter geometry
 const NO_PROPERTIES_MESSAGE_KEY = '__noPropertiesMessage';
 const FEATURE_LABEL_KEY = '_featureLabel';
 const ISO_DATE_TIME_REGEX =
@@ -340,7 +337,8 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
     }
 
     previousShowExistingPolygonPartsRef.current = showExistingPolygonParts;
-  }, [showExistingPolygonParts, onMapFeatureClick, onFeaturePropertiesPopupClose]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showExistingPolygonParts]);
 
   useEffect(() => {
     const currentGeoFeaturesLength = geoFeatures?.length ?? 0;
@@ -350,7 +348,8 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
     }
 
     previousGeoFeaturesLengthRef.current = currentGeoFeaturesLength;
-  }, [geoFeatures, onMapFeatureClick, onFeaturePropertiesPopupClose]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [geoFeatures]);
 
   const previewBaseMap = useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-array-constructor
@@ -415,42 +414,6 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
     });
     return res;
   }, []);
-
-  const GeoFeaturesInnerComponent: React.FC = () => {
-    const source = useVectorSource();
-    const map = useMap();
-
-    if (renderCount.current < RENDERS_TILL_FULL_FEATURES_SET) {
-      source.once('change', () => {
-        if (source.getState() === 'ready') {
-          setTimeout(() => {
-            map.getView().fit(source.getExtent(), fitOptions);
-          }, 0);
-        }
-      });
-    }
-
-    return (
-      <>
-        {geoFeatures?.map((feat, idx) => {
-          let featureStyle = PPMapStyles.get(feat?.properties?.featureType);
-
-          if (selectedFeatureKey && feat?.properties?.key === selectedFeatureKey) {
-            featureStyle = selectionStyle;
-          }
-
-          return feat && !isEmpty(feat.geometry) ? (
-            <GeoJSONFeature
-              geometry={{ ...feat.geometry }}
-              fit={false}
-              key={feat.id ?? idx}
-              featureStyle={featureStyle}
-            />
-          ) : null;
-        })}
-      </>
-    );
-  };
 
   const featureLabelValue = selectedFeatureProperties?.[FEATURE_LABEL_KEY];
 
@@ -554,7 +517,13 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
         {previewBaseMap}
         <VectorLayer>
           <VectorSource>
-            <GeoFeaturesInnerComponent />
+            <GeoFeaturesInnerComponent
+              geoFeatures={geoFeatures}
+              selectedFeatureKey={selectedFeatureKey}
+              selectionStyle={selectionStyle}
+              fitOptions={fitOptions}
+              renderCount={renderCount}
+            />
           </VectorSource>
         </VectorLayer>
         {children}

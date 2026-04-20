@@ -149,14 +149,6 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
       next[selectedLowResolutionPosition.collectionIndex] = (next[selectedLowResolutionPosition.collectionIndex] ?? 0) + 1;
       return next;
     });
-
-    const timerId = window.setTimeout(() => {
-      setAutoScrollListToSelection(false);
-    }, 0);
-
-    return () => {
-      window.clearTimeout(timerId);
-    };
   }, [autoScrollListToSelection, selectedLowResolutionPosition]);
 
   const resolutionDegreeToZoomLevel = useMemo(() => {
