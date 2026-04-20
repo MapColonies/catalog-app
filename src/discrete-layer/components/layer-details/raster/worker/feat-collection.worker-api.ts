@@ -11,6 +11,7 @@ import {
 } from 'geojson';
 import RBush from 'rbush';
 import { DEGREES_PER_METER, ONE_DEGREE_KM } from '../../../../../common/utils/geo.tools';
+import { abortableFetch, safeRead } from '../../../../../common/helpers/http';
 import {
   WorkerAPI,
   WorkerMessage,
@@ -24,7 +25,7 @@ import {
   WorkerType,
   WorkerError,
 } from './worker.types';
-import { abortableFetch, safeRead } from '../../../../../common/helpers/http';
+import { createMessageDetails } from './utils';
 
 type ShpJsParser = (buffer: ArrayBuffer) => Promise<unknown>;
 
@@ -34,38 +35,6 @@ let _geoms: number[] = [];
 let _tree = new RBush<IndexedItem>();
 const _properties: Record<string, unknown>[] = [];
 const _featureTemplate: Feature[] = [];
-
-const calculatePercentage = (total: number | null | undefined, partial: number): string => {
-  if (total !== null && total !== undefined && total > 0) {
-    return `${Math.floor((partial / total) * 100)}`;
-  } else {
-    return '0';
-  }
-};
-
-const getMessage = (
-  total: number | null | undefined,
-  partial: number,
-  performanceStartTime: number,
-  error?: WorkerError
-) => {
-  const percent = calculatePercentage(total, partial);
-  return buildMessage(percent, performanceStartTime, error);
-};
-
-const getElapsedTime = (performanceStartTime: number) => {
-  return Math.floor(performance.now() - performanceStartTime);
-};
-
-export const buildMessage = (
-  percent: string,
-  performanceStartTime: number,
-  error?: WorkerError
-): MessageDetails => ({
-  progress: `${percent}%`,
-  elapsedTime: getElapsedTime(performanceStartTime),
-  error,
-});
 
 const _computeBBox = (geometry: Polygon | MultiPolygon) => {
   let minX = Infinity,
@@ -137,7 +106,7 @@ const _downloadFile = async (
       chunks.push(value);
       received += value.length;
 
-      details = getMessage(total, received, t0);
+      details = createMessageDetails(total, received, t0);
 
       onProgress?.({
         process: Process.Load,
@@ -151,11 +120,11 @@ const _downloadFile = async (
     const blob = new Blob(chunks);
     const arrayBuffer = await blob.arrayBuffer();
 
-    details = getMessage(total, received, t0);
+    details = createMessageDetails(total, received, t0);
 
     if (!arrayBuffer) {
-      details = getMessage(total, received, t0, {
-        code: 'general.http.empty-stream.error'
+      details = createMessageDetails(total, received, t0, {
+        code: 'general.http.empty-stream.error',
       });
 
       onProgress?.({
@@ -175,7 +144,7 @@ const _downloadFile = async (
     });
     return arrayBuffer;
   } catch (error) {
-    details = getMessage(total, received, t0, {
+    details = createMessageDetails(total, received, t0, {
       text: (error as { message: string })?.message as string,
     });
     onProgress?.({
@@ -280,7 +249,7 @@ const _prepareGEOSData = (
     });
 
     if (i % 50 === 0) {
-      details = getMessage(_fc.features.length, i, startParsingTime);
+      details = createMessageDetails(_fc.features.length, i, startParsingTime);
       onProgress?.({
         process: Process.Load,
         stage: Stage.Parsing,
@@ -292,7 +261,7 @@ const _prepareGEOSData = (
   }
 
   _geos.GEOSGeoJSONReader_destroy(reader);
-  details = getMessage(_fc.features.length, i + 1, startParsingTime);
+  details = createMessageDetails(_fc.features.length, i + 1, startParsingTime);
 
   onProgress?.({
     process: Process.Load,
@@ -304,7 +273,7 @@ const _prepareGEOSData = (
 
   const startCacheTime = performance.now();
   _tree.load(items);
-  details = getMessage(_fc.features.length, i + 1, startCacheTime);
+  details = createMessageDetails(_fc.features.length, i + 1, startCacheTime);
 
   onProgress?.({
     process: Process.Load,
@@ -402,7 +371,7 @@ const api: WorkerAPI = {
 
       if (i % 50 === 0) {
         // message = percentageOfTotal(_fc.features.length, i + 1, t0);
-        details = getMessage(_fc.features.length, i + 1, t0);
+        details = createMessageDetails(_fc.features.length, i + 1, t0);
         onProgress?.({
           process: Process.UpdateAreas,
           stage: Stage.UpdateAreas,
@@ -416,7 +385,7 @@ const api: WorkerAPI = {
       _geos.GEOSGeom_destroy(centroidPtr);
     }
 
-    details = getMessage(total, total, t0);
+    details = createMessageDetails(total, total, t0);
     onProgress?.({
       process: Process.UpdateAreas,
       stage: Stage.UpdateAreas,
@@ -429,7 +398,7 @@ const api: WorkerAPI = {
     const t0 = performance.now();
     let details: MessageDetails;
 
-    details = getMessage(0, 0, t0);
+    details = createMessageDetails(0, 0, t0);
 
     onProgress?.({
       process: Process.ComputeOuterGeometry,
@@ -459,7 +428,7 @@ const api: WorkerAPI = {
       count
     );
 
-    details = getMessage(10, 3, t0);
+    details = createMessageDetails(10, 3, t0);
 
     onProgress?.({
       process: Process.ComputeOuterGeometry,
@@ -482,7 +451,7 @@ const api: WorkerAPI = {
     _geos.Module._free(bufferPtr);
     _geos.GEOSGeom_destroy(simplified);
 
-    details = getMessage(10, 10, t0);
+    details = createMessageDetails(10, 10, t0);
 
     onProgress?.({
       process: Process.ComputeOuterGeometry,

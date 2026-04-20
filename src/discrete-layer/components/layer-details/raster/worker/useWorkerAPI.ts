@@ -13,7 +13,7 @@ import {
   WorkerType,
   WorkerError,
 } from './worker.types';
-import { buildMessage } from './feat-collection.worker-api';
+import { buildMessageDetails } from './utils';
 
 type WorkerService = {
   init: {
@@ -158,7 +158,7 @@ export function useWorkerAPI(): [WorkerService | null, StagesInfo] {
           const t0 = performance.now();
 
           const clear = fakeProgress(10000, (fakePercent: number) => {
-            const details = buildMessage(`${fakePercent}`, t0);
+            const details = buildMessageDetails(`${fakePercent}`, t0);
 
             setProgressComputeOuterGeometry({
               process: Process.ComputeOuterGeometry,

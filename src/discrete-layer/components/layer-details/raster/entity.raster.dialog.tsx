@@ -51,11 +51,6 @@ import { RasterWorkflowProvider, RasterWorkflowContext } from './state-machine/c
 import { getUIIngestionFieldDescriptors } from './utils';
 
 import './entity.raster.dialog.css';
-/*****START: REMOVE IT !!!!!!!!!!!!!!!! */
-import { useWorkerAPI } from './worker/useWorkerAPI';
-import { FeatureCollection } from 'geojson';
-import { MOCK_POLYGON } from './state-machine/MOCK';
-/*****END: REMOVE IT !!!!!!!!!!!!!!!! */
 
 const DEFAULT_ID = 'DEFAULT_UI_ID';
 const DEFAULT_TYPE_NAME = 'DEFAULT_TYPE_NAME';
@@ -161,61 +156,8 @@ export const EntityRasterDialog: React.FC<EntityRasterDialogProps> = observer(
       return buildRasterRecord(descriptors);
     };
 
-    /*****START: REMOVE IT !!!!!!!!!!!!!!!! */
-    const [api, stagesInfo] = useWorkerAPI();
-    const intl = useIntl();
-    const handleRun = async () => {
-      if (!api) return;
-      const FC: FeatureCollection = { type: 'FeatureCollection', features: [] };
-      for (let i = 0; i < 10000; i++) {
-        FC.features.push({
-          type: 'Feature',
-          geometry: MOCK_POLYGON,
-          properties: null,
-        });
-      }
-      await api.init.method();
-      // await api.load.method(FC);
-      await api.loadFromShapeFile.method(
-        'https://download-int.mapcolonies.net/api/raster/v1/downloads/validation-reports/a80296ad-06f4-4d3c-9c2d-8982eb65d04b/vivid_ihud_orthophoto_v3.0_report_2026-02-04T15:32:09.836Z.zip',
-        {
-          customProperties: {
-            _key: 'featureKey',
-            _featureLabel: intl.formatMessage({ id: 'resolutionConflict.partName' }),
-            _zoomLevel: '9',
-            // _featureType: 'LOW_RESOLUTION_PP'
-          },
-        }
-      );
-      await api.updateAreas.method();
-      const outerPerimeterGeom = await api.computeOuterGeometry.method();
-      console.log('api.computeOuterGeometry:', outerPerimeterGeom);
-
-      // await api.query.method({
-      //       minX: 53.028770883699195,
-      //       minY: 22.697544881824143,
-      //       maxX: 61.174158863397594,
-      //       maxY: 29.21600387903102
-      //     }); //1066
-      await api.query.method({
-        minX: 54.35290071061968,
-        minY: 25.72995702729723,
-        maxX: 55.45933754011244,
-        maxY: 26.38730710623136,
-      }); //11
-
-      const updatedFC = await api.getFeatureCollection.method();
-      console.log('api.getFeatureCollection:', updatedFC.features.length);
-    };
-    /*****END: REMOVE IT !!!!!!!!!!!!!!!! */
-
     return (
       <RasterWorkflowProvider>
-        {/*****START: REMOVE IT !!!!!!!!!!!!!!!! */}
-        {/* <button onClick={handleRun} style={{ width: '100px', height: '30px', zIndex: 50 }}>
-          Run {`${api?.updateAreas.progress?.message} ${api?.loadFromShapeFile.progress?.message}`}
-        </button> */}
-        {/*****END: REMOVE IT !!!!!!!!!!!!!!!! */}
         <EntityRasterDialogInner
           {...props}
           layerRecord={getRecordLayer(job)}
