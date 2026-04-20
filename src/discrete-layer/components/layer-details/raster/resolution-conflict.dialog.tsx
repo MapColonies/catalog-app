@@ -266,6 +266,12 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
     closeDialog();
   }, []);
 
+  const clearLowResolutionSelection = useCallback((): void => {
+    pendingSelectionFeatureRef.current = null;
+    setAutoScrollListToSelection(false);
+    setSelectedLowResolutionFeatureKey(undefined);
+  }, []);
+
   return (
     <Box id="resolutionConflictDialog">
       <Dialog open={isOpen} preventOutsideDismiss={true}>
@@ -305,6 +311,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                       className={`filterButton${listFilterMode === 'all' ? ' active' : ''}`}
                       disabled={lowResolutionCollections.length === 0}
                       onClick={(): void => {
+                        clearLowResolutionSelection();
                         setListFilterMode('all');
                       }}
                     >
@@ -316,6 +323,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                       className={`filterButton${listFilterMode === 'exceeded' ? ' active' : ''}`}
                       disabled={lowResolutionCollections.length === 0}
                       onClick={(): void => {
+                        clearLowResolutionSelection();
                         setListFilterMode('exceeded');
                       }}
                     >

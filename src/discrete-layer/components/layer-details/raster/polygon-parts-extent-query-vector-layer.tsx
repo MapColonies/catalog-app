@@ -7,7 +7,7 @@ import { MapEvent } from 'ol';
 import GeoJSON from 'ol/format/GeoJSON';
 import { Options } from 'ol/layer/Base';
 import { Size } from 'ol/size';
-import { Style, Text } from 'ol/style';
+import { Fill, Stroke, Style, Text } from 'ol/style';
 import intersect from '@turf/intersect';
 import { polygon } from '@turf/helpers';
 import bboxPolygon from '@turf/bbox-polygon';
@@ -184,22 +184,25 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
     <VectorLayer options={options}>
       <VectorSource>
         {polygonParts.map((feat, idx) => {
-          const baseStyle = PPMapStyles.get(featureType);
-          const baseStroke = baseStyle?.getStroke()?.clone();
-          const baseFill = baseStyle?.getFill()?.clone();
           const isExceeded = feat.properties?.exceeded === true;
+          const baseStyle = PPMapStyles.get(featureType);
+          let baseStroke = baseStyle?.getStroke()?.clone();
+          let baseFill = baseStyle?.getFill()?.clone();
 
           if (featureType === FeatureType.LOW_RESOLUTION_PP) {
-            if (isExceeded) {
-              baseStroke?.setColor('#d32f2f');
-              baseFill?.setColor('#d32f2f66');
-            } else {
-              baseStroke?.setColor('#ff7f00');
-              baseFill?.setColor('#ff7f0066');
-            }
+            const strokeColor = isExceeded ? '#d32f2f' : '#ff7f00';
+            const fillColor = isExceeded ? '#d32f2f66' : '#ff7f0066';
+
+            baseStroke = new Stroke({
+              width: 2,
+              color: strokeColor,
+            });
+            baseFill = new Fill({
+              color: fillColor,
+            });
           }
 
-          const greenStyle = new Style({
+          const featureStyle = new Style({
             text:
               textStyleFactory?.(feat) ??
               createTextStyle(
@@ -220,7 +223,7 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
             if (baseStroke) {
               const selectedStroke = baseStroke.clone();
               selectedStroke.setWidth(8);
-              greenStyle.setStroke(selectedStroke);
+              featureStyle.setStroke(selectedStroke);
             }
           }
 
@@ -238,7 +241,7 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
 
             if (featureClippedPolygon) {
               const geometry = new GeoJSON().readGeometry(featureClippedPolygon.geometry);
-              greenStyle.setGeometry(geometry);
+              featureStyle.setGeometry(geometry);
             }
           } catch (e) {
             console.log(
@@ -255,7 +258,7 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
               key={(feat.properties?._key as string | undefined) ?? `feature-${idx}`}
               geometry={{ ...feat.geometry }}
               fit={false}
-              featureStyle={greenStyle}
+              featureStyle={featureStyle}
             />
           ) : (
             <></>
