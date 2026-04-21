@@ -41,6 +41,7 @@ interface PolygonPartsExtentQueryVectorLayerProps {
   selectedFeature?: Feature;
   selectedFeatureKey?: string;
   onFeaturesChange?: (features: Feature[]) => void;
+  onQueryError?: (errorMessage: string) => void;
   textStyleFactory?: (feature: Feature) => Text | undefined;
   options?: Options;
 }
@@ -76,6 +77,7 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
   selectedFeature,
   selectedFeatureKey,
   onFeaturesChange,
+  onQueryError,
   textStyleFactory,
   options,
 }) => {
@@ -166,12 +168,17 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
       }
     } catch {
       if (activeRequestIdRef.current === requestId) {
-        store.actionDispatcherStore.dispatchAction({
-          action: UserAction.SYSTEM_CALLBACK_SHOW_PPERROR_ON_UPDATE,
-          data: {
-            error: [intl.formatMessage({ id: 'resolutionConflict.error.queryFailed' })],
-          },
-        } as IDispatchAction);
+        const errorMessage = intl.formatMessage({ id: 'resolutionConflict.error.queryFailed' });
+        if (onQueryError) {
+          onQueryError(errorMessage);
+        } else {
+          store.actionDispatcherStore.dispatchAction({
+            action: UserAction.SYSTEM_CALLBACK_SHOW_PPERROR_ON_UPDATE,
+            data: {
+              error: [errorMessage],
+            },
+          } as IDispatchAction);
+        }
       }
     } finally {
       if (activeRequestIdRef.current === requestId) {

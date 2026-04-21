@@ -256,12 +256,12 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
     const resumeJob = async (): Promise<void> => {
       try {
         await state.context.store.mutateJobRetry({
-          jobRetryParams: {
+          jobRetryParams: { // bypass-validation-error
             id: 'f2a61783-6b16-4520-9b18-ae216e642d54',
             domain: Domain.RASTER,
             type: String(state.context.job?.details?.type ?? ''),
-            // error: 'resolution',
-            // name: approver.trim(),
+            // allowedValidationrrors: 'resolution',
+            // approver: approver.trim(),
           },
         });
         onApprove?.();
@@ -545,6 +545,9 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                               setAutoScrollListToSelection(false);
                               setSelectedLowResolutionFeatureKey(undefined);
                             }
+                          }}
+                          onQueryError={(errorMessage): void => {
+                            setLowResolutionPartsError(errorMessage);
                           }}
                           textStyleFactory={(feat) => {
                             const isFootprint = Boolean(feat.properties?._showAsFootprint);
