@@ -315,6 +315,7 @@
   "resolutionConflict.error.missingUrl": "חסר URL לדו\"ח ולידציה",
   "resolutionConflict.error.fetchFailed": "נכשל בטעינת חלקי תיחום מקובץ",
   "resolutionConflict.error.queryFailed": "נכשל בהרצת שאילתת חלקי תיחום בתצוגה",
+  "resolutionConflict.error.approveFailed": "נכשל באישור החריגה",
 
   "field-names.raster.id": "מזהה",
   "field-names.raster.productId": "מזהה חיצוני",

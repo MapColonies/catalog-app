@@ -315,6 +315,7 @@
   "resolutionConflict.error.missingUrl": "Missing validation report URL",
   "resolutionConflict.error.fetchFailed": "Failed to fetch polygon parts from file",
   "resolutionConflict.error.queryFailed": "Failed to query polygon parts by extent",
+  "resolutionConflict.error.approveFailed": "Failed to resume job",
 
   "field-names.raster.id": "ID",
   "field-names.raster.productId": "Ext. ID",

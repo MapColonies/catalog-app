@@ -17,6 +17,7 @@ import {
   Typography,
 } from '@map-colonies/react-core';
 import { AutoDirectionBox } from '../../../../common/components/auto-direction-box/auto-direction-box.component';
+import { Domain } from '../../../../common/models/domain';
 import { Mode } from '../../../../common/models/mode.enum';
 import { EntityDescriptorModelType } from '../../../models';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
@@ -252,9 +253,25 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
   }, []);
 
   const approveDialog = useCallback((): void => {
-    onApprove?.();
-    closeDialog();
-  }, []);
+    const resumeJob = async (): Promise<void> => {
+      try {
+        await state.context.store.mutateJobRetry({
+          jobRetryParams: {
+            id: 'f2a61783-6b16-4520-9b18-ae216e642d54',
+            domain: Domain.RASTER,
+            type: String(state.context.job?.details?.type ?? ''),
+            // error: 'resolution',
+            // name: approver.trim(),
+          },
+        });
+        onApprove?.();
+        closeDialog();
+      } catch (error) {
+        setLowResolutionPartsError(intl.formatMessage({ id: 'resolutionConflict.error.approveFailed' }));
+      }
+    };
+    void resumeJob();
+  }, [approver]);
 
   const clearLowResolutionSelection = useCallback((): void => {
     pendingSelectionFeatureRef.current = null;
@@ -454,7 +471,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                     <FormattedMessage id="general.close-btn.text" />
                   </Button>
                   {lowResolutionPartsError && (
-                    <Typography className="error" tag="span">
+                    <Typography className="error errorMessage" tag="span">
                       {lowResolutionPartsError}
                     </Typography>
                   )}

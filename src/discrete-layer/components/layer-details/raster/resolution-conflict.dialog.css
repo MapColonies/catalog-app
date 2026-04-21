@@ -257,6 +257,10 @@ body[dir='rtl'] #resolutionConflictDialog .approverNameFieldContainer {
   gap: 8px;
 }
 
+#resolutionConflictDialog .errorMessage {
+  padding-top: 8px;
+}
+
 #resolutionConflictDialog .leftPane {
   display: flex;
   flex-direction: column;
