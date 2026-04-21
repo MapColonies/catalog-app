@@ -420,15 +420,17 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
               </Box>
               <Box className="rightPaneFooter">
                 <Box className="detailsFieldValue approverNameFieldContainer">
-                  <TextField
-                    className="approverNameField"
-                    disabled={isLoadingLowResolutionParts || hasExceededFeatures}
-                    value={approver}
-                    onChange={(event): void => {
-                      setApprover(event.currentTarget.value);
-                    }}
-                    label={intl.formatMessage({ id: 'resolutionConflict.approver.label' })}
-                  />
+                  {!viewOnly && (
+                    <TextField
+                      className="approverNameField"
+                      disabled={isLoadingLowResolutionParts || hasExceededFeatures}
+                      value={approver}
+                      onChange={(event): void => {
+                        setApprover(event.currentTarget.value);
+                      }}
+                      label={intl.formatMessage({ id: 'resolutionConflict.approver.label' })}
+                    />
+                  )}
                 </Box>
                 <Box className="actionsRow">
                   {!viewOnly && (
