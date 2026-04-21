@@ -476,8 +476,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
           })}
         />
         <FeatureSelectionHandler
-          geoFeatures={geoFeatures}
-          externalFeaturesRef={externalFeaturesRef}
+          featuresRef={externalFeaturesRef}
           pendingSelectionFeatureRef={pendingSelectionFeatureRef}
           selectedFeatureKey={selectedFeatureKey}
           selectedFeatureRequestId={selectedFeatureRequestId}

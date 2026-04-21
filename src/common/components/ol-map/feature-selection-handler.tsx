@@ -5,8 +5,7 @@ import { FitOptions } from 'ol/View';
 import { useMap } from '@map-colonies/react-components';
 
 interface FeatureSelectionHandlerProps {
-  geoFeatures?: Feature[];
-  externalFeaturesRef?: MutableRefObject<Feature[]>;
+  featuresRef?: MutableRefObject<Feature[]>;
   pendingSelectionFeatureRef?: MutableRefObject<Feature | null>;
   selectedFeatureKey?: string;
   selectedFeatureRequestId?: number;
@@ -22,8 +21,7 @@ interface FeatureSelectionHandlerProps {
 }
 
 export const FeatureSelectionHandler: React.FC<FeatureSelectionHandlerProps> = ({
-  geoFeatures,
-  externalFeaturesRef,
+  featuresRef,
   pendingSelectionFeatureRef,
   selectedFeatureKey,
   selectedFeatureRequestId,
@@ -48,11 +46,11 @@ export const FeatureSelectionHandler: React.FC<FeatureSelectionHandlerProps> = (
 
     setSelectedExistingFeature(undefined);
 
-    const selectedFeature = [...(geoFeatures ?? []), ...(externalFeaturesRef?.current ?? [])].find((feature) => {
+    const selectedFeature = [...(featuresRef?.current ?? [])].find((feature) => {
       return feature?.properties?._key === selectedFeatureKey;
     });
 
-    // If not in viewport, fall back to pendingSelectionFeatureRef (set by list click)
+    // If not in viewport, use pendingSelectionFeatureRef (set by list click)
     let featureToFit = selectedFeature;
     if (!featureToFit) {
       const pending = pendingSelectionFeatureRef?.current;
@@ -102,8 +100,7 @@ export const FeatureSelectionHandler: React.FC<FeatureSelectionHandlerProps> = (
     }
   }, [
     map,
-    geoFeatures,
-    externalFeaturesRef,
+    featuresRef,
     pendingSelectionFeatureRef,
     selectedFeatureKey,
     selectedFeatureRequestId,
