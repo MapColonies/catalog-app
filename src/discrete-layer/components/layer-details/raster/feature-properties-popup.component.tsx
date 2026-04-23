@@ -1,15 +1,25 @@
-import { useMemo } from 'react';
+import { memo, useCallback, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import { Feature } from 'geojson';
 import { Box } from '@map-colonies/react-components';
 import { IconButton, Typography } from '@map-colonies/react-core';
 import { dateFormatter } from '../../../../common/helpers/formatters';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
-import { NO_PROPERTIES_MESSAGE_KEY } from './pp-map';
 import { FEATURE_LABEL_CONFIG, FeatureType, getText, PPMapStyles } from './pp-map.utils';
 
 const ISO_DATE_TIME_REGEX =
 /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:?\d{2})?$/;
+const NO_PROPERTIES_MESSAGE_KEY = '__noPropertiesMessage';
+
+const toCssColor = (color: unknown): string | undefined => {
+  if (typeof color === 'string') {
+    return color;
+  }
+  if (Array.isArray(color)) {
+    return color.length === 4 ? `rgba(${color.join(',')})` : `rgb(${color.join(',')})`;
+  }
+  return undefined;
+};
 
 interface FeaturePropertiesPopupProps {
   selectedFeatureProperties?: Record<string, unknown>;
@@ -17,7 +27,7 @@ interface FeaturePropertiesPopupProps {
   onClose: () => void;
 }
 
-export const FeaturePropertiesPopupComponent: React.FC<FeaturePropertiesPopupProps> = ({
+const FeaturePropertiesPopup: React.FC<FeaturePropertiesPopupProps> = ({
   selectedFeatureProperties,
   selectedExistingFeature,
   onClose,
@@ -29,17 +39,13 @@ export const FeaturePropertiesPopupComponent: React.FC<FeaturePropertiesPopupPro
     return Object.fromEntries(table.map((value, index) => [String(value), index]));
   }, [ZOOM_LEVELS_TABLE]);
 
-  if (!selectedFeatureProperties) {
-    return null;
-  }
-
-  const formatPropertyKey = (key: string): string => {
+  const formatPropertyKey = useCallback((key: string): string => {
     return intl.formatMessage(
       { id: `polygon-parts.map-preview.feature-property.${key}`, defaultMessage: key }
     );
-  };
+  }, []);
 
-  const formatPropertyValue = (value: unknown, key?: string): string => {
+  const formatPropertyValue = useCallback((value: unknown, key?: string): string => {
     if (value === undefined || value === null) {
       return '';
     }
@@ -73,9 +79,9 @@ export const FeaturePropertiesPopupComponent: React.FC<FeaturePropertiesPopupPro
       }
     }
     return String(value);
-  };
+  }, [resolutionDegreeToZoomLevel]);
 
-  const getTitle = (
+  const getTitle = useCallback((
     properties: Record<string, unknown>,
     existingFeature: Feature | undefined
   ): string => {
@@ -91,35 +97,54 @@ export const FeaturePropertiesPopupComponent: React.FC<FeaturePropertiesPopupPro
       FEATURE_LABEL_CONFIG.polygons,
       ZOOM_LEVELS_TABLE
     );
-  };
+  }, [ZOOM_LEVELS_TABLE]);
 
-  const color = (() => {
-    const toCssColor = (color: unknown): string | undefined => {
-      if (typeof color === 'string') {
-        return color;
-      }
-      if (Array.isArray(color)) {
-        return color.length === 4 ? `rgba(${color.join(',')})` : `rgb(${color.join(',')})`;
-      }
+  const title = useMemo(() => {
+    if (!selectedFeatureProperties) {
+      return '';
+    }
+    return getTitle(selectedFeatureProperties, selectedExistingFeature);
+  }, [getTitle, selectedExistingFeature, selectedFeatureProperties]);
+
+  const color = useMemo(() => {
+    if (!selectedFeatureProperties) {
       return undefined;
-    };
-    if (selectedExistingFeature) {
-      return toCssColor(PPMapStyles.get(FeatureType.EXISTING_PP)?.getStroke()?.getColor());
+    }
+
+    if (selectedFeatureProperties?._featureType === FeatureType.LOW_RESOLUTION_PP) {
+      return toCssColor(PPMapStyles.get(FeatureType.LOW_RESOLUTION_PP)?.getStroke()?.getColor());
     }
     if (selectedFeatureProperties?.exceeded === true) {
       return '#d32f2f';
     }
-    if (selectedFeatureProperties?._featureType === FeatureType.LOW_RESOLUTION_PP) {
-      return toCssColor(PPMapStyles.get(FeatureType.LOW_RESOLUTION_PP)?.getStroke()?.getColor());
+    if (selectedExistingFeature) {
+      return toCssColor(PPMapStyles.get(FeatureType.EXISTING_PP)?.getStroke()?.getColor());
     }
     return undefined;
-  })();
+  }, [selectedExistingFeature, selectedFeatureProperties]);
+
+  const visibleProperties = useMemo(() => {
+    if (!selectedFeatureProperties) {
+      return [] as Array<[string, unknown]>;
+    }
+
+    return Object.entries(selectedFeatureProperties).filter(([key]) => {
+      if (key === NO_PROPERTIES_MESSAGE_KEY) {
+        return true;
+      }
+      return !key.startsWith('_');
+    });
+  }, [selectedFeatureProperties]);
+
+  if (!selectedFeatureProperties) {
+    return null;
+  }
 
   return (
     <Box className="featurePropertiesPopup">
       <Box className="featurePropertiesPopupHeader">
         <Typography className="featurePropertiesPopupTitle" tag="span" style={{ color }}>
-          {getTitle(selectedFeatureProperties, selectedExistingFeature)}
+          {title}
         </Typography>
         <IconButton
           className="featurePropertiesPopupClose mc-icon-Close"
@@ -128,13 +153,7 @@ export const FeaturePropertiesPopupComponent: React.FC<FeaturePropertiesPopupPro
         />
       </Box>
       <Box className="featurePropertiesPopupRows">
-        {Object.entries(selectedFeatureProperties)
-          .filter(([key]) => {
-            if (key === NO_PROPERTIES_MESSAGE_KEY) {
-              return true;
-            }
-            return !key.startsWith('_');
-          })
+        {visibleProperties
           .map(([key, value]) => {
           if (key === NO_PROPERTIES_MESSAGE_KEY) {
             return (
@@ -161,3 +180,6 @@ export const FeaturePropertiesPopupComponent: React.FC<FeaturePropertiesPopupPro
     </Box>
   );
 };
+
+export const FeaturePropertiesPopupComponent = memo(FeaturePropertiesPopup);
+FeaturePropertiesPopupComponent.displayName = 'FeaturePropertiesPopupComponent';
