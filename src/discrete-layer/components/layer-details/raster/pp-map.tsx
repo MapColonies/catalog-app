@@ -456,7 +456,6 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
         <ZoomLevelIndicator />
         <MapFeatureClickHandler
           enableFeaturePropertiesPopup={enableFeaturePropertiesPopup}
-          geoFeatures={geoFeatures}
           externalFeaturesRef={externalFeaturesRef}
           existingPPFeaturesRef={existingPPFeaturesRef}
           showExistingPolygonPartsRef={showExistingPolygonPartsRef}

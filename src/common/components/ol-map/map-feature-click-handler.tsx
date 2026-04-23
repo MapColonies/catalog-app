@@ -8,7 +8,6 @@ import { isValidGeometryType } from '../../utils/geojson.validation';
 
 interface MapFeatureClickHandlerProps {
   enableFeaturePropertiesPopup: boolean;
-  geoFeatures?: Feature[];
   externalFeaturesRef?: MutableRefObject<Feature[]>;
   existingPPFeaturesRef: MutableRefObject<Feature[]>;
   showExistingPolygonPartsRef: MutableRefObject<boolean>;
@@ -33,7 +32,6 @@ interface MapFeatureClickHandlerProps {
 
 export const MapFeatureClickHandler: React.FC<MapFeatureClickHandlerProps> = ({
   enableFeaturePropertiesPopup,
-  geoFeatures,
   externalFeaturesRef,
   existingPPFeaturesRef,
   showExistingPolygonPartsRef,
@@ -182,7 +180,7 @@ export const MapFeatureClickHandler: React.FC<MapFeatureClickHandlerProps> = ({
         }
 
         setSelectedExistingFeature(undefined);
-        const external = [...(geoFeatures ?? []), ...(externalFeaturesRef?.current ?? [])].find((f) => {
+        const external = [...(externalFeaturesRef?.current ?? [])].find((f) => {
           if (!f?.geometry || !isValidGeometryType(f.geometry)) {
             return false;
           }
@@ -215,7 +213,6 @@ export const MapFeatureClickHandler: React.FC<MapFeatureClickHandlerProps> = ({
   }, [
     map,
     enableFeaturePropertiesPopup,
-    geoFeatures,
     externalFeaturesRef,
     existingPPFeaturesRef,
     showExistingPolygonPartsRef,
