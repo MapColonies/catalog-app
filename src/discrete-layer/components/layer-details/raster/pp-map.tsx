@@ -22,7 +22,6 @@ import {
   VectorSource,
 } from '@map-colonies/react-components';
 import { Checkbox } from '@map-colonies/react-core';
-import { dateFormatter } from '../../../../common/helpers/formatters';
 import CONFIG from '../../../../common/config';
 import { useEnums } from '../../../../common/hooks/useEnum.hook';
 import { Mode } from '../../../../common/models/mode.enum';
@@ -35,17 +34,10 @@ import { LayerRasterRecordModelType } from '../../../models';
 import { ILayerImage } from '../../../models/layerImage';
 import { GeojsonFeatureInput } from '../../../models/RootStore.base';
 import { useStore } from '../../../models/RootStore';
-import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
 import { FeaturePropertiesPopupComponent } from './feature-properties-popup.component';
 import { GeoFeaturesInnerComponent } from './geo-features-inner.component';
 import { IQueryExecutorResponse, PolygonPartsExtentQueryVectorLayer } from './polygon-parts-extent-query-vector-layer';
-import {
-  FEATURE_LABEL_CONFIG,
-  FeatureType,
-  getText,
-  getWFSFeatureTypeName,
-  PPMapStyles,
-} from './pp-map.utils';
+import { FeatureType, getWFSFeatureTypeName, PPMapStyles } from './pp-map.utils';
 
 import './pp-map.css';
 
@@ -69,9 +61,6 @@ interface GeoFeaturesPresentorProps {
 
 const DEFAULT_PROJECTION = 'EPSG:4326';
 const MIN_FEATURES_NUMBER = 4; // minimal set of fetures (source, source_marker, perimeter, perimeter_marker)
-const FEATURE_LABEL_KEY = '_featureLabel';
-const ISO_DATE_TIME_REGEX =
-/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:?\d{2})?$/;
 export const NO_PROPERTIES_MESSAGE_KEY = '__noPropertiesMessage';
 export const NO_PROPERTIES_MESSAGE_CODE = 'polygon-parts.map-preview.no-feature-properties';
 
@@ -106,11 +95,6 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   showExistingPolygonPartsRef.current = showExistingPolygonParts;
   const [selectedExistingFeature, setSelectedExistingFeature] = useState<Feature | undefined>(undefined);
   const [selectedFeatureProperties, setSelectedFeatureProperties] = useState<Record<string, unknown> | undefined>();
-  const ZOOM_LEVELS_TABLE = useZoomLevelsTable();
-  const resolutionDegreeToZoomLevel = useMemo(() => {
-    const table = Object.values(ZOOM_LEVELS_TABLE);
-    return Object.fromEntries(table.map((value, index) => [String(value), index]));
-  }, [ZOOM_LEVELS_TABLE]);
 
   const getClickedFeatureProperties = (coordinate: number[]): Record<string, unknown> | undefined => {
     const allFeatures = [
@@ -195,92 +179,6 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
     const geometryType = geometry?.getType?.();
 
     return geometryType === 'Polygon' || geometryType === 'MultiPolygon';
-  };
-
-  const formatPropertyValue = (value: unknown, key?: string): string => {
-    if (value === undefined || value === null) {
-      return '';
-    }
-    if (key === 'resolutionDegree') {
-      const zoomLevel = resolutionDegreeToZoomLevel[String(value)];
-      return zoomLevel !== undefined ? `${String(value)} (${String(zoomLevel)})` : String(value);
-    }
-    if (value instanceof Date) {
-      return dateFormatter(value, false);
-    }
-    if (typeof value === 'string') {
-      const isDateKey = key !== undefined && /(date|time|utc)/i.test(key);
-      const isIsoDateValue = ISO_DATE_TIME_REGEX.test(value.trim());
-      if ((isDateKey || isIsoDateValue) && !Number.isNaN(Date.parse(value))) {
-        return dateFormatter(value, false);
-      }
-      return value;
-    }
-    if (
-      typeof value === 'object' &&
-      'toISOString' in (value as Record<string, unknown>) &&
-      typeof (value as { toISOString?: unknown }).toISOString === 'function'
-    ) {
-      return dateFormatter(value as Date, false);
-    }
-    if (typeof value === 'object') {
-      try {
-        return JSON.stringify(value);
-      } catch {
-        return String(value);
-      }
-    }
-    return String(value);
-  };
-
-  const formatPropertyKey = (key: string): string => {
-    return intl.formatMessage(
-      { id: `polygon-parts.map-preview.feature-property.${key}`, defaultMessage: key },
-      {}
-    );
-  };
-
-  const addExistingFeatureLabelToProperties = (
-    properties: Record<string, unknown>,
-    existingFeature: Feature
-  ): Record<string, unknown> => {
-    const existingLabel = getText(
-      existingFeature,
-      4,
-      FEATURE_LABEL_CONFIG.polygons,
-      ZOOM_LEVELS_TABLE
-    );
-
-    return {
-      ...properties,
-      [FEATURE_LABEL_KEY]: existingLabel,
-    };
-  };
-
-  const addFeatureLabelToProperties = (
-    properties: Record<string, unknown>
-  ): Record<string, unknown> => {
-    const featureLabel = properties._featureLabel as string | undefined;
-    if (!featureLabel) {
-      return properties;
-    }
-
-    const zoomLevel = properties._zoomLevel;
-
-    const labelParts: string[] = [];
-
-    if (featureLabel) {
-      labelParts.push(featureLabel);
-    }
-
-    if (zoomLevel !== undefined && zoomLevel !== null) {
-      labelParts.push(`(${String(zoomLevel)})`);
-    }
-
-    return {
-      ...properties,
-      [FEATURE_LABEL_KEY]: labelParts.join(' '),
-    };
   };
 
   const isFootprintProperties = (properties?: Record<string, unknown>): boolean => {
@@ -433,8 +331,6 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
           isOlPolygonFeature={isOlPolygonFeature}
           getClickedFeatureProperties={getClickedFeatureProperties}
           isFootprintProperties={isFootprintProperties}
-          addExistingFeatureLabelToProperties={addExistingFeatureLabelToProperties}
-          addFeatureLabelToProperties={addFeatureLabelToProperties}
         />
         <FeatureSelectionHandler
           featuresRef={externalFeaturesRef}
@@ -443,7 +339,6 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
           selectedFeatureRequestId={selectedFeatureRequestId}
           fitOptions={fitOptions}
           enableFeaturePropertiesPopup={enableFeaturePropertiesPopup}
-          addFeatureLabelToProperties={addFeatureLabelToProperties}
           setSelectedExistingFeature={setSelectedExistingFeature}
           setSelectedFeatureProperties={setSelectedFeatureProperties}
           lastHandledSelectedFeatureKeyRef={lastHandledSelectedFeatureKeyRef}
@@ -520,8 +415,6 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
           selectedFeatureProperties={selectedFeatureProperties}
           selectedExistingFeature={selectedExistingFeature}
           onClose={clearPreviewSelection}
-          formatPropertyValue={formatPropertyValue}
-          formatPropertyKey={formatPropertyKey}
         />
       )}
     </Box>

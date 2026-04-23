@@ -16,7 +16,6 @@ interface FeatureSelectionHandlerProps {
   selectedFeatureRequestId?: number;
   fitOptions?: FitOptions;
   enableFeaturePropertiesPopup: boolean;
-  addFeatureLabelToProperties: (properties: Record<string, unknown>) => Record<string, unknown>;
   setSelectedExistingFeature: Dispatch<SetStateAction<Feature | undefined>>;
   setSelectedFeatureProperties: Dispatch<SetStateAction<Record<string, unknown> | undefined>>;
   lastHandledSelectedFeatureKeyRef: MutableRefObject<string | undefined>;
@@ -30,7 +29,6 @@ export const FeatureSelectionHandler: React.FC<FeatureSelectionHandlerProps> = (
   selectedFeatureRequestId,
   fitOptions,
   enableFeaturePropertiesPopup,
-  addFeatureLabelToProperties,
   setSelectedExistingFeature,
   setSelectedFeatureProperties,
   lastHandledSelectedFeatureKeyRef,
@@ -92,7 +90,7 @@ export const FeatureSelectionHandler: React.FC<FeatureSelectionHandlerProps> = (
 
       const properties = featureToFit.properties as Record<string, unknown> | null | undefined;
       if (properties && Object.keys(properties).length > 0) {
-        setSelectedFeatureProperties(addFeatureLabelToProperties(properties));
+        setSelectedFeatureProperties(properties);
         return;
       }
 
@@ -108,7 +106,6 @@ export const FeatureSelectionHandler: React.FC<FeatureSelectionHandlerProps> = (
     selectedFeatureRequestId,
     fitOptions,
     enableFeaturePropertiesPopup,
-    addFeatureLabelToProperties,
     setSelectedExistingFeature,
     setSelectedFeatureProperties,
     lastHandledSelectedFeatureKeyRef,

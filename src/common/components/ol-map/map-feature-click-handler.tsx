@@ -24,13 +24,6 @@ interface MapFeatureClickHandlerProps {
   isOlPolygonFeature: (olFeature: unknown) => boolean;
   getClickedFeatureProperties: (coordinate: number[]) => Record<string, unknown> | undefined;
   isFootprintProperties: (properties?: Record<string, unknown>) => boolean;
-  addExistingFeatureLabelToProperties: (
-    properties: Record<string, unknown>,
-    existingFeature: Feature
-  ) => Record<string, unknown>;
-  addFeatureLabelToProperties: (
-    properties: Record<string, unknown>
-  ) => Record<string, unknown>;
 }
 
 export const MapFeatureClickHandler: React.FC<MapFeatureClickHandlerProps> = ({
@@ -46,8 +39,6 @@ export const MapFeatureClickHandler: React.FC<MapFeatureClickHandlerProps> = ({
   isOlPolygonFeature,
   getClickedFeatureProperties,
   isFootprintProperties,
-  addExistingFeatureLabelToProperties,
-  addFeatureLabelToProperties,
 }) => {
   const intl = useIntl();
   const map = useMap();
@@ -108,14 +99,9 @@ export const MapFeatureClickHandler: React.FC<MapFeatureClickHandlerProps> = ({
                 clickedExistingFeature = true;
                 setSelectedExistingFeature(matchingExisting);
                 if (matchingExisting.properties && Object.keys(matchingExisting.properties).length > 0) {
-                  clickedProperties = addExistingFeatureLabelToProperties(
-                    matchingExisting.properties as Record<string, unknown>,
-                    matchingExisting
-                  );
+                  clickedProperties = matchingExisting.properties;
                 } else {
-                  clickedProperties = addExistingFeatureLabelToProperties({
-                    [NO_PROPERTIES_MESSAGE_KEY]: intl.formatMessage({ id: NO_PROPERTIES_MESSAGE_CODE }),
-                  }, matchingExisting);
+                  clickedProperties = { [NO_PROPERTIES_MESSAGE_KEY]: intl.formatMessage({ id: NO_PROPERTIES_MESSAGE_CODE }) };
                 }
                 return feature; // stop iteration — do not continue to external features
               }
@@ -130,7 +116,7 @@ export const MapFeatureClickHandler: React.FC<MapFeatureClickHandlerProps> = ({
       );
 
       if (clickedProperties) {
-        setSelectedFeatureProperties(addFeatureLabelToProperties(clickedProperties));
+        setSelectedFeatureProperties(clickedProperties);
         if (clickedExistingFeature) {
           // Existing feature was clicked - clear any external list selection
           onMapFeatureClick?.(undefined);
@@ -175,9 +161,7 @@ export const MapFeatureClickHandler: React.FC<MapFeatureClickHandlerProps> = ({
 
           setSelectedExistingFeature(matchingExistingFallback);
           onMapFeatureClick?.(undefined);
-          setSelectedFeatureProperties(
-            addExistingFeatureLabelToProperties(fallbackProperties, matchingExistingFallback)
-          );
+          setSelectedFeatureProperties(fallbackProperties);
           return;
         }
 
@@ -197,7 +181,7 @@ export const MapFeatureClickHandler: React.FC<MapFeatureClickHandlerProps> = ({
           onMapFeatureClick?.(fallbackFeatureKey);
         }
 
-        setSelectedFeatureProperties(addFeatureLabelToProperties(fallbackProperties));
+        setSelectedFeatureProperties(fallbackProperties);
         return;
       }
 
@@ -226,8 +210,6 @@ export const MapFeatureClickHandler: React.FC<MapFeatureClickHandlerProps> = ({
     isOlPolygonFeature,
     getClickedFeatureProperties,
     isFootprintProperties,
-    addExistingFeatureLabelToProperties,
-    addFeatureLabelToProperties,
   ]);
 
   return null;
