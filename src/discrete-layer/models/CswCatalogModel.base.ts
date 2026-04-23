@@ -24,7 +24,6 @@ export const CswCatalogModelBase = ModelBase
   .named('CswCatalog')
   .props({
     __typename: types.optional(types.literal("CSWCatalog"), "CSWCatalog"),
-    // records: types.union(types.undefined, types.array(types.union(types.late(() => Layer3DRecordModel), types.late(() => LayerRasterRecordModel), types.late(() => LayerDemRecordModel), types.late(() => VectorBestRecordModel), types.late(() => QuantizedMeshBestRecordModel)))),
     records: types.union(types.undefined, types.array(MSTGQLRef(types.union(types.late(() => Layer3DRecordModel), types.late(() => LayerRasterRecordModel), types.late(() => LayerDemRecordModel), types.late(() => VectorBestRecordModel), types.late(() => QuantizedMeshBestRecordModel)) as unknown as IAnyModelType))),
     cswQuerySummary: types.union(types.undefined, types.null, types.late((): any => CswQuerySummaryModel)),
   })
