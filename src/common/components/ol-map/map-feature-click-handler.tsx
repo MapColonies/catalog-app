@@ -1,9 +1,14 @@
 import { Dispatch, MutableRefObject, SetStateAction, useEffect } from 'react';
+import { useIntl } from 'react-intl';
 import { Feature, MultiPolygon, Polygon } from 'geojson';
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
 import { point } from '@turf/helpers';
 import MapBrowserEvent from 'ol/MapBrowserEvent';
 import { useMap } from '@map-colonies/react-components';
+import {
+  NO_PROPERTIES_MESSAGE_CODE,
+  NO_PROPERTIES_MESSAGE_KEY
+} from '../../../discrete-layer/components/layer-details/raster/pp-map';
 import { isValidGeometryType } from '../../utils/geojson.validation';
 
 interface MapFeatureClickHandlerProps {
@@ -26,8 +31,6 @@ interface MapFeatureClickHandlerProps {
   addFeatureLabelToProperties: (
     properties: Record<string, unknown>
   ) => Record<string, unknown>;
-  noPropertiesMessageKey: string;
-  noPropertiesMessage: string;
 }
 
 export const MapFeatureClickHandler: React.FC<MapFeatureClickHandlerProps> = ({
@@ -45,9 +48,8 @@ export const MapFeatureClickHandler: React.FC<MapFeatureClickHandlerProps> = ({
   isFootprintProperties,
   addExistingFeatureLabelToProperties,
   addFeatureLabelToProperties,
-  noPropertiesMessageKey,
-  noPropertiesMessage,
 }) => {
+  const intl = useIntl();
   const map = useMap();
 
   useEffect(() => {
@@ -112,7 +114,7 @@ export const MapFeatureClickHandler: React.FC<MapFeatureClickHandlerProps> = ({
                   );
                 } else {
                   clickedProperties = addExistingFeatureLabelToProperties({
-                    [noPropertiesMessageKey]: noPropertiesMessage,
+                    [NO_PROPERTIES_MESSAGE_KEY]: intl.formatMessage({ id: NO_PROPERTIES_MESSAGE_CODE }),
                   }, matchingExisting);
                 }
                 return feature; // stop iteration — do not continue to external features
@@ -226,8 +228,6 @@ export const MapFeatureClickHandler: React.FC<MapFeatureClickHandlerProps> = ({
     isFootprintProperties,
     addExistingFeatureLabelToProperties,
     addFeatureLabelToProperties,
-    noPropertiesMessageKey,
-    noPropertiesMessage,
   ]);
 
   return null;

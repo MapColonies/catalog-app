@@ -1,8 +1,13 @@
 import { Dispatch, MutableRefObject, SetStateAction, useEffect } from 'react';
+import { useIntl } from 'react-intl';
 import { Feature } from 'geojson';
 import GeoJSON from 'ol/format/GeoJSON';
 import { FitOptions } from 'ol/View';
 import { useMap } from '@map-colonies/react-components';
+import {
+  NO_PROPERTIES_MESSAGE_CODE,
+  NO_PROPERTIES_MESSAGE_KEY
+} from '../../../discrete-layer/components/layer-details/raster/pp-map';
 
 interface FeatureSelectionHandlerProps {
   featuresRef?: MutableRefObject<Feature[]>;
@@ -11,8 +16,6 @@ interface FeatureSelectionHandlerProps {
   selectedFeatureRequestId?: number;
   fitOptions?: FitOptions;
   enableFeaturePropertiesPopup: boolean;
-  noPropertiesMessageKey: string;
-  noPropertiesMessage: string;
   addFeatureLabelToProperties: (properties: Record<string, unknown>) => Record<string, unknown>;
   setSelectedExistingFeature: Dispatch<SetStateAction<Feature | undefined>>;
   setSelectedFeatureProperties: Dispatch<SetStateAction<Record<string, unknown> | undefined>>;
@@ -27,14 +30,13 @@ export const FeatureSelectionHandler: React.FC<FeatureSelectionHandlerProps> = (
   selectedFeatureRequestId,
   fitOptions,
   enableFeaturePropertiesPopup,
-  noPropertiesMessageKey,
-  noPropertiesMessage,
   addFeatureLabelToProperties,
   setSelectedExistingFeature,
   setSelectedFeatureProperties,
   lastHandledSelectedFeatureKeyRef,
   lastHandledSelectedFeatureRequestIdRef,
 }) => {
+  const intl = useIntl();
   const map = useMap();
 
   useEffect(() => {
@@ -95,7 +97,7 @@ export const FeatureSelectionHandler: React.FC<FeatureSelectionHandlerProps> = (
       }
 
       setSelectedFeatureProperties({
-        [noPropertiesMessageKey]: noPropertiesMessage,
+        [NO_PROPERTIES_MESSAGE_KEY]: intl.formatMessage({ id: NO_PROPERTIES_MESSAGE_CODE }),
       });
     }
   }, [
@@ -106,8 +108,6 @@ export const FeatureSelectionHandler: React.FC<FeatureSelectionHandlerProps> = (
     selectedFeatureRequestId,
     fitOptions,
     enableFeaturePropertiesPopup,
-    noPropertiesMessage,
-    noPropertiesMessageKey,
     addFeatureLabelToProperties,
     setSelectedExistingFeature,
     setSelectedFeatureProperties,

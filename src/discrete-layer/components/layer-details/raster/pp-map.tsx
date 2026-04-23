@@ -69,10 +69,11 @@ interface GeoFeaturesPresentorProps {
 
 const DEFAULT_PROJECTION = 'EPSG:4326';
 const MIN_FEATURES_NUMBER = 4; // minimal set of fetures (source, source_marker, perimeter, perimeter_marker)
-const NO_PROPERTIES_MESSAGE_KEY = '__noPropertiesMessage';
 const FEATURE_LABEL_KEY = '_featureLabel';
 const ISO_DATE_TIME_REGEX =
-  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:?\d{2})?$/;
+/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:?\d{2})?$/;
+export const NO_PROPERTIES_MESSAGE_KEY = '__noPropertiesMessage';
+export const NO_PROPERTIES_MESSAGE_CODE = 'polygon-parts.map-preview.no-feature-properties';
 
 export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> = ({
   mode,
@@ -148,9 +149,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
       }
 
       return {
-        [NO_PROPERTIES_MESSAGE_KEY]: intl.formatMessage({
-          id: 'polygon-parts.map-preview.no-feature-properties',
-        }),
+        [NO_PROPERTIES_MESSAGE_KEY]: intl.formatMessage({ id: NO_PROPERTIES_MESSAGE_CODE }),
       };
     }
 
@@ -436,10 +435,6 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
           isFootprintProperties={isFootprintProperties}
           addExistingFeatureLabelToProperties={addExistingFeatureLabelToProperties}
           addFeatureLabelToProperties={addFeatureLabelToProperties}
-          noPropertiesMessageKey={NO_PROPERTIES_MESSAGE_KEY}
-          noPropertiesMessage={intl.formatMessage({
-            id: 'polygon-parts.map-preview.no-feature-properties',
-          })}
         />
         <FeatureSelectionHandler
           featuresRef={externalFeaturesRef}
@@ -448,10 +443,6 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
           selectedFeatureRequestId={selectedFeatureRequestId}
           fitOptions={fitOptions}
           enableFeaturePropertiesPopup={enableFeaturePropertiesPopup}
-          noPropertiesMessageKey={NO_PROPERTIES_MESSAGE_KEY}
-          noPropertiesMessage={intl.formatMessage({
-            id: 'polygon-parts.map-preview.no-feature-properties',
-          })}
           addFeatureLabelToProperties={addFeatureLabelToProperties}
           setSelectedExistingFeature={setSelectedExistingFeature}
           setSelectedFeatureProperties={setSelectedFeatureProperties}
