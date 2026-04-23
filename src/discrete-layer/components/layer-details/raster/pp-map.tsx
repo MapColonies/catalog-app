@@ -21,7 +21,7 @@ import {
   VectorLayer,
   VectorSource,
 } from '@map-colonies/react-components';
-import { Checkbox, IconButton, Typography } from '@map-colonies/react-core';
+import { Checkbox } from '@map-colonies/react-core';
 import { dateFormatter } from '../../../../common/helpers/formatters';
 import CONFIG from '../../../../common/config';
 import { useEnums } from '../../../../common/hooks/useEnum.hook';
@@ -36,6 +36,7 @@ import { ILayerImage } from '../../../models/layerImage';
 import { GeojsonFeatureInput } from '../../../models/RootStore.base';
 import { useStore } from '../../../models/RootStore';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
+import { FeaturePropertiesPopupComponent } from './feature-properties-popup.component';
 import { GeoFeaturesInnerComponent } from './geo-features-inner.component';
 import { IQueryExecutorResponse, PolygonPartsExtentQueryVectorLayer } from './polygon-parts-extent-query-vector-layer';
 import {
@@ -415,40 +416,6 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
     return res;
   }, []);
 
-  const featureLabelValue = selectedFeatureProperties?.[FEATURE_LABEL_KEY];
-
-  const featureTitleColor = useMemo(() => {
-    const toCssColor = (color: unknown): string | undefined => {
-      if (typeof color === 'string') {
-        return color;
-      }
-
-      if (Array.isArray(color)) {
-        return color.length === 4 ? `rgba(${color.join(',')})` : `rgb(${color.join(',')})`;
-      }
-
-      return undefined;
-    };
-
-    if (selectedExistingFeature) {
-      return toCssColor(PPMapStyles.get(FeatureType.EXISTING_PP)?.getStroke()?.getColor());
-    }
-
-    if (selectedFeatureProperties?.exceeded === true) {
-      return '#d32f2f';
-    }
-
-    if (selectedFeatureProperties?._featureType === FeatureType.LOW_RESOLUTION_PP) {
-      return toCssColor(PPMapStyles.get(FeatureType.LOW_RESOLUTION_PP)?.getStroke()?.getColor());
-    }
-
-    return undefined;
-  }, [
-    selectedExistingFeature,
-    selectedFeatureProperties?._featureType,
-    selectedFeatureProperties?.exceeded,
-  ]);
-
   return (
     <Box className="geoFeaturesMapContainer" style={{ ...style }}>
       <Map>
@@ -557,55 +524,15 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
           title={intl.formatMessage({ id: 'polygon-parts.map-preview-legend.title' })}
         />
       </Map>
-      {enableFeaturePropertiesPopup && selectedFeatureProperties ? (
-        <Box className="featurePropertiesPopup">
-          <Box className="featurePropertiesPopupHeader">
-            <Typography className="featurePropertiesPopupTitle" tag="span" style={{ color: featureTitleColor }}>
-              {featureLabelValue !== undefined && featureLabelValue !== null
-                ? formatPropertyValue(featureLabelValue)
-                : ''}
-            </Typography>
-            <IconButton
-              className="featurePropertiesPopupClose mc-icon-Close"
-              label="CLOSE"
-              onClick={(): void => {
-                clearPreviewSelection();
-              }}
-            />
-          </Box>
-          <Box className="featurePropertiesPopupRows">
-            {Object.entries(selectedFeatureProperties)
-              .filter(([key]) => {
-                if (key === NO_PROPERTIES_MESSAGE_KEY) {
-                  return true;
-                }
-                return key !== FEATURE_LABEL_KEY && !key.startsWith('_');
-              })
-              .map(([key, value]) => {
-              if (key === NO_PROPERTIES_MESSAGE_KEY) {
-                return (
-                  <Box className="featurePropertiesPopupRow" key={key}>
-                    <Typography className="featurePropertiesPopupValue" tag="span">
-                      {formatPropertyValue(value, key)}
-                    </Typography>
-                  </Box>
-                );
-              }
-
-              return (
-                <Box className="featurePropertiesPopupRow" key={key}>
-                  <Typography className="featurePropertiesPopupKey" tag="span">
-                    {formatPropertyKey(key)}
-                  </Typography>
-                  <Typography className="featurePropertiesPopupValue" tag="span">
-                    {formatPropertyValue(value, key)}
-                  </Typography>
-                </Box>
-              );
-            })}
-          </Box>
-        </Box>
-      ) : null}
+      {enableFeaturePropertiesPopup && (
+        <FeaturePropertiesPopupComponent
+          selectedFeatureProperties={selectedFeatureProperties}
+          selectedExistingFeature={selectedExistingFeature}
+          onClose={clearPreviewSelection}
+          formatPropertyValue={formatPropertyValue}
+          formatPropertyKey={formatPropertyKey}
+        />
+      )}
     </Box>
   );
 };
