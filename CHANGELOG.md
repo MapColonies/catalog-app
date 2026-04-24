@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.6.0](https://github.com/MapColonies/catalog-app/compare/v4.5.1...v4.6.0) (2026-04-24)
+
+
+### Features
+
+* Worker progress curtain ([#874](https://github.com/MapColonies/catalog-app/issues/874)) ([8d2b4a9](https://github.com/MapColonies/catalog-app/commit/8d2b4a90c4c6a284f7ffd34e1e97c8dbc25e8de8))
+
+
+### Bug Fixes
+
+* change CswCatalogModel records to use reference instead of redec… ([#878](https://github.com/MapColonies/catalog-app/issues/878)) ([febf309](https://github.com/MapColonies/catalog-app/commit/febf309afa962ece3a90b8d9b3e83f93f64dcccd))
+
 ## [4.5.1](https://github.com/MapColonies/catalog-app/compare/v4.5.0...v4.5.1) (2026-04-15)
 
 
