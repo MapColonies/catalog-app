@@ -2,8 +2,8 @@
 /* eslint-disable */
 /* tslint:disable */
 
-import { types } from "mobx-state-tree"
-import { QueryBuilder } from "mst-gql"
+import { IAnyModelType, types } from "mobx-state-tree"
+import { MSTGQLRef, QueryBuilder } from "mst-gql"
 import { ModelBase } from "./ModelBase"
 import { CswQuerySummaryModel, CswQuerySummaryModelType } from "./CswQuerySummaryModel"
 import { cswQuerySummaryModelPrimitives, CswQuerySummaryModelSelector } from "./CswQuerySummaryModel.base"
@@ -24,7 +24,7 @@ export const CswCatalogModelBase = ModelBase
   .named('CswCatalog')
   .props({
     __typename: types.optional(types.literal("CSWCatalog"), "CSWCatalog"),
-    records: types.union(types.undefined, types.array(types.union(types.late(() => Layer3DRecordModel), types.late(() => LayerRasterRecordModel), types.late(() => LayerDemRecordModel), types.late(() => VectorBestRecordModel), types.late(() => QuantizedMeshBestRecordModel)))),
+    records: types.union(types.undefined, types.array(MSTGQLRef(types.union(types.late(() => Layer3DRecordModel), types.late(() => LayerRasterRecordModel), types.late(() => LayerDemRecordModel), types.late(() => VectorBestRecordModel), types.late(() => QuantizedMeshBestRecordModel)) as unknown as IAnyModelType))),
     cswQuerySummary: types.union(types.undefined, types.null, types.late((): any => CswQuerySummaryModel)),
   })
   .views(self => ({
