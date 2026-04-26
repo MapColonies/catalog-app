@@ -536,15 +536,6 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                             });
                             const fetchedFeatures = get(result, 'features', []);
                             const features = Array.isArray(fetchedFeatures) ? fetchedFeatures : [];
-                            // const features = (Array.isArray(fetchedFeatures) ? fetchedFeatures : []).map((feature) => {
-                            //   return {
-                            //     ...feature,
-                            //     properties: {
-                            //       ...(feature.properties ?? {}),
-                            //       _featureTitle: `${String(feature.properties?._featureLabel)} (${String(feature.properties?._zoomLevel)})`,
-                            //     },
-                            //   };
-                            // });
                             return { features, pageSize: -1 };
                           }}
                           outerPerimeter={outerPerimeter?.geometry}

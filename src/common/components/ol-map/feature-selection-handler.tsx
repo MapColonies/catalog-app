@@ -1,4 +1,4 @@
-import { Dispatch, MutableRefObject, SetStateAction, useEffect } from 'react';
+import { Dispatch, MutableRefObject, SetStateAction, useCallback, useEffect } from 'react';
 import { useIntl } from 'react-intl';
 import { Feature } from 'geojson';
 import GeoJSON from 'ol/format/GeoJSON';
@@ -15,8 +15,7 @@ interface FeatureSelectionHandlerProps {
   selectedFeatureRequestId?: number;
   fitOptions?: FitOptions;
   enableFeaturePropertiesPopup: boolean;
-  setSelectedExistingFeature: Dispatch<SetStateAction<Feature | undefined>>;
-  setSelectedFeatureProperties: Dispatch<SetStateAction<Record<string, unknown> | undefined>>;
+  setSelectedFeature: Dispatch<SetStateAction<Feature | undefined>>;
   lastHandledSelectedFeatureKeyRef: MutableRefObject<string | undefined>;
   lastHandledSelectedFeatureRequestIdRef: MutableRefObject<number | undefined>;
 }
@@ -28,13 +27,26 @@ export const FeatureSelectionHandler: React.FC<FeatureSelectionHandlerProps> = (
   selectedFeatureRequestId,
   fitOptions,
   enableFeaturePropertiesPopup,
-  setSelectedExistingFeature,
-  setSelectedFeatureProperties,
+  setSelectedFeature,
   lastHandledSelectedFeatureKeyRef,
   lastHandledSelectedFeatureRequestIdRef,
 }) => {
   const intl = useIntl();
   const map = useMap();
+
+  const toSelectedFeature = useCallback((feature: Feature): Feature => {
+    const properties = feature.properties as Record<string, unknown> | null | undefined;
+    if (properties && Object.keys(properties).length > 0) {
+      return feature;
+    }
+    return {
+      ...feature,
+      properties: {
+        ...(properties ?? {}),
+        [NO_PROPERTIES_MESSAGE_KEY]: intl.formatMessage({ id: NO_PROPERTIES_MESSAGE_CODE }),
+      },
+    };
+  }, []);
 
   useEffect(() => {
     if (!selectedFeatureKey) {
@@ -42,8 +54,6 @@ export const FeatureSelectionHandler: React.FC<FeatureSelectionHandlerProps> = (
       lastHandledSelectedFeatureRequestIdRef.current = undefined;
       return;
     }
-
-    setSelectedExistingFeature(undefined);
 
     const selectedFeature = [...(featuresRef?.current ?? [])].find((feature) => {
       return feature?.properties?._key === selectedFeatureKey;
@@ -87,15 +97,7 @@ export const FeatureSelectionHandler: React.FC<FeatureSelectionHandlerProps> = (
         return;
       }
 
-      const properties = featureToFit.properties as Record<string, unknown> | null | undefined;
-      if (properties && Object.keys(properties).length > 0) {
-        setSelectedFeatureProperties(properties);
-        return;
-      }
-
-      setSelectedFeatureProperties({
-        [NO_PROPERTIES_MESSAGE_KEY]: intl.formatMessage({ id: NO_PROPERTIES_MESSAGE_CODE }),
-      });
+      setSelectedFeature(toSelectedFeature(featureToFit));
     }
   }, [
     map,
@@ -105,10 +107,10 @@ export const FeatureSelectionHandler: React.FC<FeatureSelectionHandlerProps> = (
     selectedFeatureRequestId,
     fitOptions,
     enableFeaturePropertiesPopup,
-    setSelectedExistingFeature,
-    setSelectedFeatureProperties,
+    setSelectedFeature,
     lastHandledSelectedFeatureKeyRef,
     lastHandledSelectedFeatureRequestIdRef,
+    toSelectedFeature,
   ]);
 
   return null;

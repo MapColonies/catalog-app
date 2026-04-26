@@ -22,14 +22,12 @@ const toCssColor = (color: unknown): string | undefined => {
 };
 
 interface FeaturePropertiesPopupProps {
-  selectedFeatureProperties?: Record<string, unknown>;
-  selectedExistingFeature?: Feature;
+  selectedFeature?: Feature;
   onClose: () => void;
 }
 
 const FeaturePropertiesPopup: React.FC<FeaturePropertiesPopupProps> = ({
-  selectedFeatureProperties,
-  selectedExistingFeature,
+  selectedFeature,
   onClose,
 }) => {
   const intl = useIntl();
@@ -81,6 +79,8 @@ const FeaturePropertiesPopup: React.FC<FeaturePropertiesPopupProps> = ({
     return String(value);
   }, [resolutionDegreeToZoomLevel]);
 
+  const selectedFeatureProperties = selectedFeature?.properties as Record<string, unknown> | undefined;
+
   const title = useMemo((): string => {
     if (!selectedFeatureProperties) {
       return '';
@@ -99,11 +99,11 @@ const FeaturePropertiesPopup: React.FC<FeaturePropertiesPopupProps> = ({
     if (selectedFeatureProperties?.exceeded === true) {
       return '#d32f2f';
     }
-    if (selectedExistingFeature) {
+    if (selectedFeatureProperties?._featureType === FeatureType.EXISTING_PP) {
       return toCssColor(PPMapStyles.get(FeatureType.EXISTING_PP)?.getStroke()?.getColor());
     }
     return undefined;
-  }, [selectedExistingFeature, selectedFeatureProperties]);
+  }, [selectedFeatureProperties]);
 
   const visibleProperties = useMemo(() => {
     if (!selectedFeatureProperties) {

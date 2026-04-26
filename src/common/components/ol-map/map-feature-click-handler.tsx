@@ -1,72 +1,54 @@
-import { Dispatch, MutableRefObject, SetStateAction, useEffect } from 'react';
+import { Dispatch, MutableRefObject, SetStateAction, useCallback, useEffect } from 'react';
 import { useIntl } from 'react-intl';
-import { Feature, MultiPolygon, Polygon } from 'geojson';
-import { get } from 'lodash';
-import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
-import { point } from '@turf/helpers';
+import { Feature } from 'geojson';
 import MapBrowserEvent from 'ol/MapBrowserEvent';
 import { useMap } from '@map-colonies/react-components';
-import { isValidGeometryType } from '../../utils/geojson.validation';
 
 const NO_PROPERTIES_MESSAGE_KEY = '__noPropertiesMessage';
 const NO_PROPERTIES_MESSAGE_CODE = 'polygon-parts.map-preview.no-feature-properties';
 
 interface MapFeatureClickHandlerProps {
   enableFeaturePropertiesPopup: boolean;
-  externalFeaturesRef?: MutableRefObject<Feature[]>;
-  existingPPFeaturesRef: MutableRefObject<Feature[]>;
-  showExistingPolygonPartsRef: MutableRefObject<boolean>;
   lastCheckboxClickTimestampRef: MutableRefObject<number>;
   onMapFeatureClick?: (featureKey: string | undefined) => void;
-  setSelectedExistingFeature: Dispatch<SetStateAction<Feature | undefined>>;
-  setSelectedFeatureProperties: Dispatch<SetStateAction<Record<string, unknown> | undefined>>;
+  setSelectedFeature: Dispatch<SetStateAction<Feature | undefined>>;
   isOlPolygonFeature: (olFeature: unknown) => boolean;
-  getClickedFeatureProperties: (coordinate: number[]) => Record<string, unknown> | undefined;
+  getClickedFeature: (coordinate: number[]) => Feature | undefined;
   isFootprintProperties: (properties?: Record<string, unknown>) => boolean;
 }
 
 export const MapFeatureClickHandler: React.FC<MapFeatureClickHandlerProps> = ({
   enableFeaturePropertiesPopup,
-  externalFeaturesRef,
-  existingPPFeaturesRef,
-  showExistingPolygonPartsRef,
   lastCheckboxClickTimestampRef,
   onMapFeatureClick,
-  setSelectedExistingFeature,
-  setSelectedFeatureProperties,
+  setSelectedFeature,
   isOlPolygonFeature,
-  getClickedFeatureProperties,
+  getClickedFeature,
   isFootprintProperties,
 }) => {
   const intl = useIntl();
   const map = useMap();
 
-  const getClickedOlFeatureProperties = (olFeature: unknown): Record<string, unknown> | undefined => {
-    if (!olFeature || typeof olFeature !== 'object') {
-      return undefined;
+  const toSelectedFeature = useCallback((feature: Feature): Feature => {
+    const properties =
+      feature.properties && typeof feature.properties === 'object'
+        ? feature.properties
+        : undefined;
+    if (properties && Object.keys(properties).length > 0) {
+      return feature;
     }
-    const geometry = (olFeature as { getGeometry?: () => { getType?: () => string } }).getGeometry?.();
-    const geometryType = geometry?.getType?.();
-    if (geometryType !== 'Polygon' && geometryType !== 'MultiPolygon') {
-      return undefined;
-    }
-    const properties = (olFeature as { getProperties?: () => Record<string, unknown> }).getProperties?.();
-    if (!properties || typeof properties !== 'object') {
-      return undefined;
-    }
-    const { geometry: _geometry, ...rest } = properties;
-    if (rest._showAsFootprint) {
-      return undefined;
-    }
-    if (Object.keys(rest).length > 0) {
-      return rest;
-    }
-    return undefined;
-  };
+    return {
+      ...feature,
+      properties: {
+        ...(properties ?? {}),
+        [NO_PROPERTIES_MESSAGE_KEY]: intl.formatMessage({ id: NO_PROPERTIES_MESSAGE_CODE }),
+      },
+    };
+  }, []);
 
   useEffect(() => {
     if (!enableFeaturePropertiesPopup) {
-      setSelectedFeatureProperties(undefined);
+      setSelectedFeature(undefined);
       return;
     }
 
@@ -75,60 +57,14 @@ export const MapFeatureClickHandler: React.FC<MapFeatureClickHandlerProps> = ({
         return;
       }
 
-      let clickedProperties: Record<string, unknown> | undefined;
       let clickedPolygonWithoutProperties = false;
-      let clickedFeatureKey: string | undefined;
-      let clickedExistingFeature = false;
 
       map.forEachFeatureAtPixel(
         event.pixel,
         (feature) => {
-          const featureProperties = getClickedOlFeatureProperties(feature);
-          if (featureProperties) {
-            clickedProperties = featureProperties;
-            clickedFeatureKey = get(featureProperties, '_key', '') as string;
-            return feature;
-          }
-
           if (isOlPolygonFeature(feature)) {
-            // Geometry-only OL feature (no attached properties) - likely an existing feature.
-            // Only search the existing features ref when the existing PP layer is visible.
-            if (showExistingPolygonPartsRef.current) {
-              // Do a turf lookup to find its GeoJSON counterpart and stop iteration
-              // before it falls through to the external features.
-              const clickedPoint = point(event.coordinate as [number, number]);
-              const matchingExisting = existingPPFeaturesRef.current.find((f) => {
-                if (!f?.geometry || !isValidGeometryType(f.geometry)) {
-                  return false;
-                }
-                try {
-                  return booleanPointInPolygon(clickedPoint, f as Feature<Polygon | MultiPolygon>);
-                } catch {
-                  return false;
-                }
-              });
-
-              if (matchingExisting) {
-                if (
-                  isFootprintProperties(
-                    matchingExisting.properties as Record<string, unknown> | undefined
-                  )
-                ) {
-                  return undefined;
-                }
-
-                clickedExistingFeature = true;
-                setSelectedExistingFeature(matchingExisting);
-                if (matchingExisting.properties && Object.keys(matchingExisting.properties).length > 0) {
-                  clickedProperties = matchingExisting.properties;
-                } else {
-                  clickedProperties = { [NO_PROPERTIES_MESSAGE_KEY]: intl.formatMessage({ id: NO_PROPERTIES_MESSAGE_CODE }) };
-                }
-                return feature; // stop iteration — do not continue to external features
-              }
-            }
-
             clickedPolygonWithoutProperties = true;
+            return feature;
           }
 
           return undefined;
@@ -136,79 +72,35 @@ export const MapFeatureClickHandler: React.FC<MapFeatureClickHandlerProps> = ({
         { hitTolerance: 4 }
       );
 
-      if (clickedProperties) {
-        setSelectedFeatureProperties(clickedProperties);
-        if (clickedExistingFeature) {
-          // Existing feature was clicked - clear any external list selection
-          onMapFeatureClick?.(undefined);
-        } else if (clickedFeatureKey) {
-          setSelectedExistingFeature(undefined);
-          onMapFeatureClick?.(clickedFeatureKey);
-        }
-        return;
-      }
-
-      const fallbackProperties = getClickedFeatureProperties(event.coordinate);
-      if (fallbackProperties) {
-        if (isFootprintProperties(fallbackProperties)) {
-          setSelectedExistingFeature(undefined);
-          setSelectedFeatureProperties(undefined);
+      const clickedFeature = getClickedFeature(event.coordinate);
+      if (clickedFeature) {
+        const properties = clickedFeature.properties as Record<string, unknown> | undefined;
+        if (isFootprintProperties(properties)) {
+          setSelectedFeature(undefined);
           return;
         }
 
-        // Determine whether the hit feature belongs to the existing features or external features
-        const clickedPoint = point(event.coordinate as [number, number]);
-        const matchingExistingFallback = showExistingPolygonPartsRef.current ? existingPPFeaturesRef.current.find((f) => {
-          if (!f?.geometry || !isValidGeometryType(f.geometry)) {
-            return false;
-          }
-          try {
-            return booleanPointInPolygon(clickedPoint, f as Feature<Polygon | MultiPolygon>);
-          } catch {
-            return false;
-          }
-        }) : undefined;
+        const featureKey = properties?._key as string | undefined;
+        const featureType = properties?._featureType as string | undefined;
 
-        if (matchingExistingFallback) {
-          if (
-            isFootprintProperties(
-              matchingExistingFallback.properties as Record<string, unknown> | undefined
-            )
-          ) {
-            setSelectedExistingFeature(undefined);
-            setSelectedFeatureProperties(undefined);
-            return;
-          }
+        setSelectedFeature(toSelectedFeature(clickedFeature));
 
-          setSelectedExistingFeature(matchingExistingFallback);
+        if (featureType === 'EXISTING_PP') {
           onMapFeatureClick?.(undefined);
-          setSelectedFeatureProperties(fallbackProperties);
           return;
         }
 
-        setSelectedExistingFeature(undefined);
-        const external = [...(externalFeaturesRef?.current ?? [])].find((f) => {
-          if (!f?.geometry || !isValidGeometryType(f.geometry)) {
-            return false;
-          }
-          try {
-            return booleanPointInPolygon(clickedPoint, f as Feature<Polygon | MultiPolygon>);
-          } catch {
-            return false;
-          }
-        });
-        const fallbackFeatureKey = external?.properties?._key;
-        if (fallbackFeatureKey) {
-          onMapFeatureClick?.(fallbackFeatureKey);
+        if (featureKey) {
+          onMapFeatureClick?.(featureKey);
+          return;
         }
 
-        setSelectedFeatureProperties(fallbackProperties);
+        onMapFeatureClick?.(undefined);
         return;
       }
 
       if (clickedPolygonWithoutProperties) {
-        setSelectedExistingFeature(undefined);
-        setSelectedFeatureProperties(undefined);
+        setSelectedFeature(undefined);
       }
     };
 
@@ -220,16 +112,13 @@ export const MapFeatureClickHandler: React.FC<MapFeatureClickHandlerProps> = ({
   }, [
     map,
     enableFeaturePropertiesPopup,
-    externalFeaturesRef,
-    existingPPFeaturesRef,
-    showExistingPolygonPartsRef,
     lastCheckboxClickTimestampRef,
     onMapFeatureClick,
-    setSelectedExistingFeature,
-    setSelectedFeatureProperties,
+    setSelectedFeature,
     isOlPolygonFeature,
-    getClickedFeatureProperties,
+    getClickedFeature,
     isFootprintProperties,
+    toSelectedFeature,
   ]);
 
   return null;
