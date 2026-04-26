@@ -263,7 +263,9 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
           return feat ? (
             <GeoJSONFeature
               key={(feat.properties?._key as string | undefined) ?? `feature-${idx}`}
-              geometry={{ ...feat.geometry }}
+              // geometry={{ ...feat.geometry }}
+              // @ts-ignore
+              geometry={{ ...feat }}
               fit={false}
               featureStyle={featureStyle}
             />

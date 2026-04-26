@@ -4,10 +4,9 @@ import { Feature } from 'geojson';
 import GeoJSON from 'ol/format/GeoJSON';
 import { FitOptions } from 'ol/View';
 import { useMap } from '@map-colonies/react-components';
-import {
-  NO_PROPERTIES_MESSAGE_CODE,
-  NO_PROPERTIES_MESSAGE_KEY
-} from '../../../discrete-layer/components/layer-details/raster/pp-map';
+
+const NO_PROPERTIES_MESSAGE_KEY = '__noPropertiesMessage';
+const NO_PROPERTIES_MESSAGE_CODE = 'polygon-parts.map-preview.no-feature-properties';
 
 interface FeatureSelectionHandlerProps {
   featuresRef?: MutableRefObject<Feature[]>;

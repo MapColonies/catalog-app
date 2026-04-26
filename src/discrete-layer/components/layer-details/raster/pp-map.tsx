@@ -34,10 +34,11 @@ import { LayerRasterRecordModelType } from '../../../models';
 import { ILayerImage } from '../../../models/layerImage';
 import { GeojsonFeatureInput } from '../../../models/RootStore.base';
 import { useStore } from '../../../models/RootStore';
+import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
 import { FeaturePropertiesPopupComponent } from './feature-properties-popup.component';
 import { GeoFeaturesInnerComponent } from './geo-features-inner.component';
 import { IQueryExecutorResponse, PolygonPartsExtentQueryVectorLayer } from './polygon-parts-extent-query-vector-layer';
-import { FeatureType, getWFSFeatureTypeName, PPMapStyles } from './pp-map.utils';
+import { FEATURE_LABEL_CONFIG, FeatureType, getText, getWFSFeatureTypeName, PPMapStyles } from './pp-map.utils';
 
 import './pp-map.css';
 
@@ -61,8 +62,8 @@ interface GeoFeaturesPresentorProps {
 
 const DEFAULT_PROJECTION = 'EPSG:4326';
 const MIN_FEATURES_NUMBER = 4; // minimal set of fetures (source, source_marker, perimeter, perimeter_marker)
-export const NO_PROPERTIES_MESSAGE_KEY = '__noPropertiesMessage';
-export const NO_PROPERTIES_MESSAGE_CODE = 'polygon-parts.map-preview.no-feature-properties';
+const NO_PROPERTIES_MESSAGE_KEY = '__noPropertiesMessage';
+const NO_PROPERTIES_MESSAGE_CODE = 'polygon-parts.map-preview.no-feature-properties';
 
 export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> = ({
   mode,
@@ -83,6 +84,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   const store = useStore();
   const ENUMS = useEnums();
   const intl = useIntl();
+  const ZOOM_LEVELS_TABLE = useZoomLevelsTable();
   const renderCount = useRef(0);
   const existingPPFeaturesRef = useRef<Feature[]>([]);
   const showExistingPolygonPartsRef = useRef(false);
@@ -135,36 +137,6 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
       return {
         [NO_PROPERTIES_MESSAGE_KEY]: intl.formatMessage({ id: NO_PROPERTIES_MESSAGE_CODE }),
       };
-    }
-
-    return undefined;
-  };
-
-  const getClickedOlFeatureProperties = (olFeature: unknown): Record<string, unknown> | undefined => {
-    if (!olFeature || typeof olFeature !== 'object') {
-      return undefined;
-    }
-
-    const geometry = (olFeature as { getGeometry?: () => { getType?: () => string } }).getGeometry?.();
-    const geometryType = geometry?.getType?.();
-
-    if (geometryType !== 'Polygon' && geometryType !== 'MultiPolygon') {
-      return undefined;
-    }
-
-    const properties = (olFeature as { getProperties?: () => Record<string, unknown> }).getProperties?.();
-
-    if (!properties || typeof properties !== 'object') {
-      return undefined;
-    }
-
-    const { geometry: _geometry, ...rest } = properties;
-    if (rest._showAsFootprint) {
-      return undefined;
-    }
-
-    if (Object.keys(rest).length > 0) {
-      return rest;
     }
 
     return undefined;
@@ -327,7 +299,6 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
           onMapFeatureClick={onMapFeatureClick}
           setSelectedExistingFeature={setSelectedExistingFeature}
           setSelectedFeatureProperties={setSelectedFeatureProperties}
-          getClickedOlFeatureProperties={getClickedOlFeatureProperties}
           isOlPolygonFeature={isOlPolygonFeature}
           getClickedFeatureProperties={getClickedFeatureProperties}
           isFootprintProperties={isFootprintProperties}
@@ -391,7 +362,21 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
                 },
               });
               const fetchedFeatures = get(result, 'getPolygonPartsFeature.features', []);
-              const features = (Array.isArray(fetchedFeatures) ? fetchedFeatures : []);
+              const features = (Array.isArray(fetchedFeatures) ? fetchedFeatures : []).map((feature) => {
+                return {
+                  ...feature,
+                  properties: {
+                    ...(feature?.properties ?? {}),
+                    _featureType: FeatureType.EXISTING_PP,
+                    _featureTitle: getText(
+                      feature?.properties,
+                      4,
+                      FEATURE_LABEL_CONFIG.polygons,
+                      ZOOM_LEVELS_TABLE
+                    ),
+                  },
+                };
+              });
               return { features, pageSize: CONFIG.POLYGON_PARTS.MAX.WFS_FEATURES };
             }}
             outerPerimeter={layerRecord?.footprint as Geometry | undefined}

@@ -5,7 +5,7 @@ import { Box } from '@map-colonies/react-components';
 import { IconButton, Typography } from '@map-colonies/react-core';
 import { dateFormatter } from '../../../../common/helpers/formatters';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
-import { FEATURE_LABEL_CONFIG, FeatureType, getText, PPMapStyles } from './pp-map.utils';
+import { FeatureType, PPMapStyles } from './pp-map.utils';
 
 const ISO_DATE_TIME_REGEX =
 /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:?\d{2})?$/;
@@ -81,30 +81,12 @@ const FeaturePropertiesPopup: React.FC<FeaturePropertiesPopupProps> = ({
     return String(value);
   }, [resolutionDegreeToZoomLevel]);
 
-  const getTitle = useCallback((
-    properties: Record<string, unknown>,
-    existingFeature: Feature | undefined
-  ): string => {
-    if (properties._featureType === FeatureType.LOW_RESOLUTION_PP) {
-      return `${String(properties._featureLabel)} (${String(properties._zoomLevel)})`;
-    }
-    if (existingFeature === undefined) {
-      return '';
-    }
-    return getText(
-      existingFeature,
-      4,
-      FEATURE_LABEL_CONFIG.polygons,
-      ZOOM_LEVELS_TABLE
-    );
-  }, [ZOOM_LEVELS_TABLE]);
-
-  const title = useMemo(() => {
+  const title = useMemo((): string => {
     if (!selectedFeatureProperties) {
       return '';
     }
-    return getTitle(selectedFeatureProperties, selectedExistingFeature);
-  }, [getTitle, selectedExistingFeature, selectedFeatureProperties]);
+    return String(selectedFeatureProperties?._featureTitle ?? '');
+  }, [selectedFeatureProperties]);
 
   const color = useMemo(() => {
     if (!selectedFeatureProperties) {

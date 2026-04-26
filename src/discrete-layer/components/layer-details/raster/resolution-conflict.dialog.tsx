@@ -208,6 +208,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
             _key: '{index}-0',
             _featureLabel: intl.formatMessage({ id: 'resolutionConflict.partName' }),
             _zoomLevel: String(zoomLevelForIngestion),
+            _featureTitle: `${intl.formatMessage({ id: 'resolutionConflict.partName' })} (${String(zoomLevelForIngestion)})`,
             _featureType: FeatureType.LOW_RESOLUTION_PP,
           },
         });
@@ -535,6 +536,15 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                             });
                             const fetchedFeatures = get(result, 'features', []);
                             const features = Array.isArray(fetchedFeatures) ? fetchedFeatures : [];
+                            // const features = (Array.isArray(fetchedFeatures) ? fetchedFeatures : []).map((feature) => {
+                            //   return {
+                            //     ...feature,
+                            //     properties: {
+                            //       ...(feature.properties ?? {}),
+                            //       _featureTitle: `${String(feature.properties?._featureLabel)} (${String(feature.properties?._zoomLevel)})`,
+                            //     },
+                            //   };
+                            // });
                             return { features, pageSize: -1 };
                           }}
                           outerPerimeter={outerPerimeter?.geometry}

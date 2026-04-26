@@ -1,15 +1,15 @@
 import { Dispatch, MutableRefObject, SetStateAction, useEffect } from 'react';
 import { useIntl } from 'react-intl';
 import { Feature, MultiPolygon, Polygon } from 'geojson';
+import { get } from 'lodash';
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
 import { point } from '@turf/helpers';
 import MapBrowserEvent from 'ol/MapBrowserEvent';
 import { useMap } from '@map-colonies/react-components';
-import {
-  NO_PROPERTIES_MESSAGE_CODE,
-  NO_PROPERTIES_MESSAGE_KEY
-} from '../../../discrete-layer/components/layer-details/raster/pp-map';
 import { isValidGeometryType } from '../../utils/geojson.validation';
+
+const NO_PROPERTIES_MESSAGE_KEY = '__noPropertiesMessage';
+const NO_PROPERTIES_MESSAGE_CODE = 'polygon-parts.map-preview.no-feature-properties';
 
 interface MapFeatureClickHandlerProps {
   enableFeaturePropertiesPopup: boolean;
@@ -20,7 +20,6 @@ interface MapFeatureClickHandlerProps {
   onMapFeatureClick?: (featureKey: string | undefined) => void;
   setSelectedExistingFeature: Dispatch<SetStateAction<Feature | undefined>>;
   setSelectedFeatureProperties: Dispatch<SetStateAction<Record<string, unknown> | undefined>>;
-  getClickedOlFeatureProperties: (olFeature: unknown) => Record<string, unknown> | undefined;
   isOlPolygonFeature: (olFeature: unknown) => boolean;
   getClickedFeatureProperties: (coordinate: number[]) => Record<string, unknown> | undefined;
   isFootprintProperties: (properties?: Record<string, unknown>) => boolean;
@@ -35,13 +34,35 @@ export const MapFeatureClickHandler: React.FC<MapFeatureClickHandlerProps> = ({
   onMapFeatureClick,
   setSelectedExistingFeature,
   setSelectedFeatureProperties,
-  getClickedOlFeatureProperties,
   isOlPolygonFeature,
   getClickedFeatureProperties,
   isFootprintProperties,
 }) => {
   const intl = useIntl();
   const map = useMap();
+
+  const getClickedOlFeatureProperties = (olFeature: unknown): Record<string, unknown> | undefined => {
+    if (!olFeature || typeof olFeature !== 'object') {
+      return undefined;
+    }
+    const geometry = (olFeature as { getGeometry?: () => { getType?: () => string } }).getGeometry?.();
+    const geometryType = geometry?.getType?.();
+    if (geometryType !== 'Polygon' && geometryType !== 'MultiPolygon') {
+      return undefined;
+    }
+    const properties = (olFeature as { getProperties?: () => Record<string, unknown> }).getProperties?.();
+    if (!properties || typeof properties !== 'object') {
+      return undefined;
+    }
+    const { geometry: _geometry, ...rest } = properties;
+    if (rest._showAsFootprint) {
+      return undefined;
+    }
+    if (Object.keys(rest).length > 0) {
+      return rest;
+    }
+    return undefined;
+  };
 
   useEffect(() => {
     if (!enableFeaturePropertiesPopup) {
@@ -65,7 +86,7 @@ export const MapFeatureClickHandler: React.FC<MapFeatureClickHandlerProps> = ({
           const featureProperties = getClickedOlFeatureProperties(feature);
           if (featureProperties) {
             clickedProperties = featureProperties;
-            clickedFeatureKey = (featureProperties._key as string | undefined) ?? (featureProperties.key as string | undefined);
+            clickedFeatureKey = get(featureProperties, '_key', '') as string;
             return feature;
           }
 
@@ -206,7 +227,6 @@ export const MapFeatureClickHandler: React.FC<MapFeatureClickHandlerProps> = ({
     onMapFeatureClick,
     setSelectedExistingFeature,
     setSelectedFeatureProperties,
-    getClickedOlFeatureProperties,
     isOlPolygonFeature,
     getClickedFeatureProperties,
     isFootprintProperties,
