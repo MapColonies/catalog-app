@@ -59,7 +59,6 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
   const state = RasterWorkflowContext.useSelector((s) => s);
   const [showLowResolutionPolygonParts, setShowLowResolutionPolygonParts] = useState(false);
   const [selectedLowResolutionFeatureKey, setSelectedLowResolutionFeatureKey] = useState<string>();
-  const [selectedLowResolutionFeatureRequestId, setSelectedLowResolutionFeatureRequestId] = useState(0);
   const [autoScrollListToSelection, setAutoScrollListToSelection] = useState(false);
   const [isLoadingLowResolutionParts, setIsLoadingLowResolutionParts] = useState(false);
   const [lowResolutionPartsError, setLowResolutionPartsError] = useState<string | undefined>();
@@ -68,7 +67,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
   const [collectionMountKeys, setCollectionMountKeys] = useState<number[]>([]);
   const [approver, setApprover] = useState('');
   const [listFilterMode, setListFilterMode] = useState<FilterMode>('all');
-  const pendingSelectionFeatureRef = useRef<Feature | null>(null);
+  const [selectedItem, setSelectedItem] = useState<Feature>();
   const displayedLowResolutionFeaturesRef = useRef<Feature[]>([]);
   const reportUrl = state.context.job?.validationReport?.report?.url;
   const ingestionResolution = state.context.job?.details?.parameters?.ingestionResolution as string | undefined;
@@ -275,7 +274,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
   }, [approver]);
 
   const clearLowResolutionSelection = useCallback((): void => {
-    pendingSelectionFeatureRef.current = null;
+    setSelectedItem(undefined);
     setAutoScrollListToSelection(false);
     setSelectedLowResolutionFeatureKey(undefined);
   }, []);
@@ -394,10 +393,8 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                                         onClick={(): void => {
                                           setShowLowResolutionPolygonParts(true);
                                           setAutoScrollListToSelection(false);
-                                          setSelectedLowResolutionFeatureRequestId((current) => current + 1);
                                           if (featureKey) {
-                                            pendingSelectionFeatureRef.current =
-                                              lowResolutionFeatures.find((f) => f.properties?._key === featureKey) ?? null;
+                                            setSelectedItem(lowResolutionFeatures.find((f) => f.properties?._key === featureKey) ?? undefined);
                                             setSelectedLowResolutionFeatureKey(featureKey);
                                           }
                                         }}
@@ -490,12 +487,11 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                   layerRecord={state.context.updatedLayer}
                   enableFeaturePropertiesPopup={true}
                   selectedFeatureKey={selectedLowResolutionFeatureKey}
-                  selectedFeatureRequestId={selectedLowResolutionFeatureRequestId}
                   style={{ height: '100%', minHeight: '300px' }}
-                  externalFeaturesRef={displayedLowResolutionFeaturesRef}
-                  pendingSelectionFeatureRef={pendingSelectionFeatureRef}
+                  externalFeatures={lowResolutionFeatures}
+                  selectedItem={selectedItem}
                   onMapFeatureClick={(featureKey) => {
-                    pendingSelectionFeatureRef.current = null;
+                    setSelectedItem(undefined);
                     if (featureKey === undefined) {
                       // An existing (green) feature was clicked — clear list selection
                       setAutoScrollListToSelection(false);
@@ -512,7 +508,6 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
 
                     setShowLowResolutionPolygonParts(true);
                     setAutoScrollListToSelection(true);
-                    setSelectedLowResolutionFeatureRequestId((current) => current + 1);
                     setSelectedLowResolutionFeatureKey(featureKey);
                   }}
                   onFeaturePropertiesPopupClose={(): void => {

@@ -1,4 +1,4 @@
-import { CSSProperties, MutableRefObject, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Feature, Geometry, MultiPolygon, Polygon } from 'geojson';
 import { get } from 'lodash';
@@ -49,15 +49,14 @@ interface GeoFeaturesPresentorProps {
   style?: CSSProperties | undefined;
   fitOptions?: FitOptions | undefined;
   selectedFeatureKey?: string;
-  selectedFeatureRequestId?: number;
   selectionStyle?: Style;
   showExistingPolygonParts?: boolean;
   layerRecord?: ILayerImage | null;
   enableFeaturePropertiesPopup?: boolean;
   onMapFeatureClick?: (featureKey: string | undefined) => void;
   onFeaturePropertiesPopupClose?: () => void;
-  externalFeaturesRef?: MutableRefObject<Feature[]>;
-  pendingSelectionFeatureRef?: MutableRefObject<Feature | null>;
+  externalFeatures?: Feature[];
+  selectedItem?: Feature;
 }
 
 const DEFAULT_PROJECTION = 'EPSG:4326';
@@ -70,14 +69,13 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   fitOptions,
   children,
   selectedFeatureKey,
-  selectedFeatureRequestId,
   selectionStyle,
   layerRecord,
   enableFeaturePropertiesPopup = false,
   onMapFeatureClick,
   onFeaturePropertiesPopupClose,
-  externalFeaturesRef,
-  pendingSelectionFeatureRef,
+  externalFeatures,
+  selectedItem,
 }) => {
   const store = useStore();
   const ENUMS = useEnums();
@@ -96,7 +94,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   const getClickedFeature = useCallback((coordinate: number[]): Feature | undefined => {
     const allFeatures = [
       ...(geoFeatures ?? []),
-      ...(externalFeaturesRef?.current ?? []),
+      ...(externalFeatures ?? []),
       ...(showExistingPolygonPartsRef.current ? existingPPFeaturesRef.current : []),
     ];
 
@@ -129,7 +127,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
     }
 
     return undefined;
-  }, [geoFeatures, externalFeaturesRef, showExistingPolygonPartsRef]);
+  }, [geoFeatures, externalFeatures, showExistingPolygonPartsRef]);
 
   const isOlPolygonFeature = useCallback((olFeature: unknown): boolean => {
     if (!olFeature || typeof olFeature !== 'object') {
@@ -358,6 +356,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
           />
         }
         {children}
+        <FeatureSelectionHandler selectedItem={selectedItem} setSelectedFeature={setSelectedFeature} />
         <MapFeatureClickHandler
           enableFeaturePropertiesPopup={enableFeaturePropertiesPopup}
           lastCheckboxClickTimestampRef={lastCheckboxClickTimestampRef}
@@ -366,14 +365,6 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
           isOlPolygonFeature={isOlPolygonFeature}
           getClickedFeature={getClickedFeature}
           isFootprintProperties={isFootprintProperties}
-        />
-        <FeatureSelectionHandler
-          featuresRef={externalFeaturesRef}
-          pendingSelectionFeatureRef={pendingSelectionFeatureRef}
-          selectedFeatureKey={selectedFeatureKey}
-          selectedFeatureRequestId={selectedFeatureRequestId}
-          enableFeaturePropertiesPopup={enableFeaturePropertiesPopup}
-          setSelectedFeature={setSelectedFeature}
         />
         {
           enableFeaturePropertiesPopup &&
