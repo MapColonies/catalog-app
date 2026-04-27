@@ -106,7 +106,7 @@ const FeaturePropertiesPopup: React.FC<FeaturePropertiesPopupProps> = ({
     <Box className="featurePropertiesPopup">
       <Box className="featurePropertiesPopupHeader">
         <Typography className="featurePropertiesPopupTitle" tag="span" style={{ color }}>
-          {selectedFeature?.properties?._featureTitle }
+          {selectedFeature?.properties?._featureTitle}
         </Typography>
         <IconButton
           className="featurePropertiesPopupClose mc-icon-Close"

@@ -279,50 +279,13 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   return (
     <Box className="geoFeaturesMapContainer" style={{ ...style }}>
       <Map>
+        {previewBaseMap}
         <MapLoadingIndicator />
         <ZoomLevelIndicator />
-        <MapFeatureClickHandler
-          enableFeaturePropertiesPopup={enableFeaturePropertiesPopup}
-          lastCheckboxClickTimestampRef={lastCheckboxClickTimestampRef}
-          onMapFeatureClick={onMapFeatureClick}
-          setSelectedFeature={setSelectedFeature}
-          isOlPolygonFeature={isOlPolygonFeature}
-          getClickedFeature={getClickedFeature}
-          isFootprintProperties={isFootprintProperties}
+        <Legend
+          legendItems={LegendsArray}
+          title={intl.formatMessage({ id: 'polygon-parts.map-preview-legend.title' })}
         />
-        <FeatureSelectionHandler
-          featuresRef={externalFeaturesRef}
-          pendingSelectionFeatureRef={pendingSelectionFeatureRef}
-          selectedFeatureKey={selectedFeatureKey}
-          selectedFeatureRequestId={selectedFeatureRequestId}
-          fitOptions={fitOptions}
-          enableFeaturePropertiesPopup={enableFeaturePropertiesPopup}
-          setSelectedFeature={setSelectedFeature}
-          lastHandledSelectedFeatureKeyRef={lastHandledSelectedFeatureKeyRef}
-          lastHandledSelectedFeatureRequestIdRef={lastHandledSelectedFeatureRequestIdRef}
-        />
-        {mode === Mode.UPDATE && (
-          <Box className="checkbox">
-            <Checkbox
-              className="flexCheckItem showOnMapContainer"
-              label={intl.formatMessage({ id: 'polygon-parts.show-exisitng-parts-on-map.label' })}
-              checked={showExistingPolygonParts}
-              onClick={(evt: React.MouseEvent<HTMLInputElement>): void => {
-                evt.preventDefault();
-                evt.stopPropagation();
-                lastCheckboxClickTimestampRef.current = Date.now();
-
-                const isChecked = evt.currentTarget.checked;
-                setShowExistingPolygonParts(isChecked);
-
-                if (!isChecked) {
-                  clearPreviewSelection();
-                }
-              }}
-            />
-          </Box>
-        )}
-        {previewBaseMap}
         <VectorLayer>
           <VectorSource>
             <GeoFeaturesInnerComponent
@@ -334,8 +297,28 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
             />
           </VectorSource>
         </VectorLayer>
-        {children}
-        {showExistingPolygonParts && (
+        {
+          mode === Mode.UPDATE &&
+          <Box className="checkbox">
+            <Checkbox
+              className="flexCheckItem showOnMapContainer"
+              label={intl.formatMessage({ id: 'polygon-parts.show-exisitng-parts-on-map.label' })}
+              checked={showExistingPolygonParts}
+              onClick={(evt: React.MouseEvent<HTMLInputElement>): void => {
+                evt.preventDefault();
+                evt.stopPropagation();
+                lastCheckboxClickTimestampRef.current = Date.now();
+                const isChecked = evt.currentTarget.checked;
+                setShowExistingPolygonParts(isChecked);
+                if (!isChecked) {
+                  clearPreviewSelection();
+                }
+              }}
+            />
+          </Box>
+        }
+        {
+          showExistingPolygonParts &&
           <PolygonPartsExtentQueryVectorLayer
             featureType={FeatureType.EXISTING_PP}
             queryExecutor={async (bbox, startIndex): Promise<IQueryExecutorResponse> => {
@@ -375,10 +358,27 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
             }}
             options={{ zIndex: 1 }}
           />
-        )}
-        <Legend
-          legendItems={LegendsArray}
-          title={intl.formatMessage({ id: 'polygon-parts.map-preview-legend.title' })}
+        }
+        {children}
+        <MapFeatureClickHandler
+          enableFeaturePropertiesPopup={enableFeaturePropertiesPopup}
+          lastCheckboxClickTimestampRef={lastCheckboxClickTimestampRef}
+          onMapFeatureClick={onMapFeatureClick}
+          setSelectedFeature={setSelectedFeature}
+          isOlPolygonFeature={isOlPolygonFeature}
+          getClickedFeature={getClickedFeature}
+          isFootprintProperties={isFootprintProperties}
+        />
+        <FeatureSelectionHandler
+          featuresRef={externalFeaturesRef}
+          pendingSelectionFeatureRef={pendingSelectionFeatureRef}
+          selectedFeatureKey={selectedFeatureKey}
+          selectedFeatureRequestId={selectedFeatureRequestId}
+          fitOptions={fitOptions}
+          enableFeaturePropertiesPopup={enableFeaturePropertiesPopup}
+          setSelectedFeature={setSelectedFeature}
+          lastHandledSelectedFeatureKeyRef={lastHandledSelectedFeatureKeyRef}
+          lastHandledSelectedFeatureRequestIdRef={lastHandledSelectedFeatureRequestIdRef}
         />
         {
           enableFeaturePropertiesPopup &&
