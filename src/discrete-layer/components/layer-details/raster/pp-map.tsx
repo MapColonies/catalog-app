@@ -89,8 +89,6 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   const previousShowExistingPolygonPartsRef = useRef(false);
   const lastCheckboxClickTimestampRef = useRef(0);
   const previousGeoFeaturesLengthRef = useRef(geoFeatures?.length ?? 0);
-  const lastHandledSelectedFeatureKeyRef = useRef<string | undefined>(undefined);
-  const lastHandledSelectedFeatureRequestIdRef = useRef<number | undefined>(undefined);
   const [showExistingPolygonParts, setShowExistingPolygonParts] = useState<boolean>(false);
   showExistingPolygonPartsRef.current = showExistingPolygonParts;
   const [selectedFeature, setSelectedFeature] = useState<Feature | undefined>(undefined);
@@ -374,11 +372,8 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
           pendingSelectionFeatureRef={pendingSelectionFeatureRef}
           selectedFeatureKey={selectedFeatureKey}
           selectedFeatureRequestId={selectedFeatureRequestId}
-          fitOptions={fitOptions}
           enableFeaturePropertiesPopup={enableFeaturePropertiesPopup}
           setSelectedFeature={setSelectedFeature}
-          lastHandledSelectedFeatureKeyRef={lastHandledSelectedFeatureKeyRef}
-          lastHandledSelectedFeatureRequestIdRef={lastHandledSelectedFeatureRequestIdRef}
         />
         {
           enableFeaturePropertiesPopup &&

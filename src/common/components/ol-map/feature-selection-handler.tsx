@@ -1,8 +1,7 @@
-import { Dispatch, MutableRefObject, SetStateAction, useCallback, useEffect } from 'react';
+import { Dispatch, MutableRefObject, SetStateAction, useCallback, useEffect, useRef } from 'react';
 import { useIntl } from 'react-intl';
 import { Feature } from 'geojson';
 import GeoJSON from 'ol/format/GeoJSON';
-import { FitOptions } from 'ol/View';
 import { useMap } from '@map-colonies/react-components';
 
 const NO_PROPERTIES_MESSAGE_KEY = '__noPropertiesMessage';
@@ -13,11 +12,8 @@ interface FeatureSelectionHandlerProps {
   pendingSelectionFeatureRef?: MutableRefObject<Feature | null>;
   selectedFeatureKey?: string;
   selectedFeatureRequestId?: number;
-  fitOptions?: FitOptions;
   enableFeaturePropertiesPopup: boolean;
   setSelectedFeature: Dispatch<SetStateAction<Feature | undefined>>;
-  lastHandledSelectedFeatureKeyRef: MutableRefObject<string | undefined>;
-  lastHandledSelectedFeatureRequestIdRef: MutableRefObject<number | undefined>;
 }
 
 export const FeatureSelectionHandler: React.FC<FeatureSelectionHandlerProps> = ({
@@ -25,14 +21,13 @@ export const FeatureSelectionHandler: React.FC<FeatureSelectionHandlerProps> = (
   pendingSelectionFeatureRef,
   selectedFeatureKey,
   selectedFeatureRequestId,
-  fitOptions,
   enableFeaturePropertiesPopup,
   setSelectedFeature,
-  lastHandledSelectedFeatureKeyRef,
-  lastHandledSelectedFeatureRequestIdRef,
 }) => {
   const intl = useIntl();
   const map = useMap();
+  const lastHandledSelectedFeatureKeyRef = useRef<string | undefined>(undefined);
+  const lastHandledSelectedFeatureRequestIdRef = useRef<number | undefined>(undefined);
 
   const toSelectedFeature = useCallback((feature: Feature): Feature => {
     const properties = feature.properties as Record<string, unknown> | null | undefined;
@@ -81,11 +76,11 @@ export const FeatureSelectionHandler: React.FC<FeatureSelectionHandlerProps> = (
     if (shouldFitToSelectedFeature) {
       try {
         const geometry = new GeoJSON().readGeometry(featureToFit.geometry);
+        const view = map.getView();
         map.getView().fit(geometry.getExtent(), {
           duration: 250,
-          maxZoom: 18,
+          maxZoom: view.getMaxZoom() ?? 18,
           padding: [32, 32, 32, 32],
-          ...fitOptions,
         });
         lastHandledSelectedFeatureKeyRef.current = selectedFeatureKey;
         lastHandledSelectedFeatureRequestIdRef.current = selectedFeatureRequestId;
@@ -105,11 +100,8 @@ export const FeatureSelectionHandler: React.FC<FeatureSelectionHandlerProps> = (
     pendingSelectionFeatureRef,
     selectedFeatureKey,
     selectedFeatureRequestId,
-    fitOptions,
     enableFeaturePropertiesPopup,
     setSelectedFeature,
-    lastHandledSelectedFeatureKeyRef,
-    lastHandledSelectedFeatureRequestIdRef,
     toSelectedFeature,
   ]);
 
