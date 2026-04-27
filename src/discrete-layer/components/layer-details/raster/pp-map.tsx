@@ -92,10 +92,11 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   const [selectedFeature, setSelectedFeature] = useState<Feature | undefined>(undefined);
 
   const getClickedFeature = useCallback((coordinate: number[]): Feature | undefined => {
+    const existingFeatures = showExistingPolygonPartsRef.current ? existingPPFeaturesRef.current : [];
     const allFeatures = [
-      ...(geoFeatures ?? []),
+      ...existingFeatures,
       ...(externalFeatures ?? []),
-      ...(showExistingPolygonPartsRef.current ? existingPPFeaturesRef.current : []),
+      ...(geoFeatures ?? []),
     ];
 
     if (allFeatures.length === 0) {
