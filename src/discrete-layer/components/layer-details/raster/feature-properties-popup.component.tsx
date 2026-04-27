@@ -1,5 +1,4 @@
 import { memo, useCallback, useMemo } from 'react';
-import { useIntl } from 'react-intl';
 import { Feature } from 'geojson';
 import { Box } from '@map-colonies/react-components';
 import { IconButton, Typography } from '@map-colonies/react-core';
@@ -30,34 +29,11 @@ const FeaturePropertiesPopup: React.FC<FeaturePropertiesPopupProps> = ({
   selectedFeature,
   onClose,
 }) => {
-  const intl = useIntl();
   const ZOOM_LEVELS_TABLE = useZoomLevelsTable();
 
   const resolutionDegreeToZoomLevel = useMemo(() => {
     const table = Object.values(ZOOM_LEVELS_TABLE);
     return Object.fromEntries(table.map((value, index) => [String(value), index]));
-  }, []);
-
-  const formatPropertyKeyOrig = useCallback((key: string): string => {
-    return intl.formatMessage(
-      { id: `polygon-parts.map-preview.feature-property.${key}`, defaultMessage: key }
-    );
-  }, []);
-
-  const hasMessage = useCallback((id: string): boolean => {
-    return Object.prototype.hasOwnProperty.call(intl.messages, id);
-  }, []);
-
-  const formatPropertyKey = useCallback((key: string): string => {
-    const ppMessageId = `field-names.polygon-parts.${key}`;
-    if (hasMessage(ppMessageId)) {
-      return intl.formatMessage({ id: ppMessageId });
-    }
-    const rasterMessageId = `field-names.raster.${key}`;
-    if (hasMessage(rasterMessageId)) {
-      return intl.formatMessage({ id: rasterMessageId });
-    }
-    return key;
   }, []);
 
   const formatPropertyValue = useCallback((value: unknown, key?: string): string => {
@@ -154,7 +130,7 @@ const FeaturePropertiesPopup: React.FC<FeaturePropertiesPopupProps> = ({
           return (
             <Box className="featurePropertiesPopupRow" key={key}>
               <Typography className="featurePropertiesPopupKey" tag="span">
-                {formatPropertyKey(key)}
+                {key}
               </Typography>
               <Typography className="featurePropertiesPopupValue" tag="span">
                 {formatPropertyValue(value, key)}
