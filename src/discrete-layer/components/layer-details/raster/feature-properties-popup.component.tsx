@@ -40,7 +40,7 @@ const FeaturePropertiesPopup: React.FC<FeaturePropertiesPopupProps> = ({
 
   const formatPropertyKeyOrig = useCallback((key: string): string => {
     return intl.formatMessage(
-      { id: `field-names.polygon-parts.${key}`, defaultMessage: key }
+      { id: `polygon-parts.map-preview.feature-property.${key}`, defaultMessage: key }
     );
   }, []);
 
