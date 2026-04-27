@@ -48,7 +48,6 @@ interface GeoFeaturesPresentorProps {
   style?: CSSProperties | undefined;
   fitOptions?: FitOptions | undefined;
   selectedFeatureKey?: string;
-  selectionStyle?: Style;
   showExistingPolygonParts?: boolean;
   layerRecord?: ILayerImage | null;
   enableFeaturePropertiesPopup?: boolean;
@@ -68,7 +67,6 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   fitOptions,
   children,
   selectedFeatureKey,
-  selectionStyle,
   layerRecord,
   enableFeaturePropertiesPopup = false,
   onMapFeatureClick,
@@ -293,8 +291,6 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
           <VectorSource>
             <GeoFeaturesInnerComponent
               geoFeatures={geoFeatures}
-              selectedFeatureKey={selectedFeatureKey}
-              selectionStyle={selectionStyle}
               fitOptions={fitOptions}
               renderCount={renderCount}
             />
