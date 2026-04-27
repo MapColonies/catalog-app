@@ -1,19 +1,17 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { isEmpty } from 'lodash';
 import { observer } from 'mobx-react-lite';
 import { useIntl } from 'react-intl';
 import { Box } from '@map-colonies/react-components';
 import { IconButton, Tooltip, useTheme } from '@map-colonies/react-core';
-
 import { useStore } from '../../models/RootStore';
 import { TabViews } from '../tab-views';
 
 import './tabs-views-switcher.component.css';
-import { isEmpty } from 'lodash';
 
 interface TabViewsSwitcherComponentProps {
   handleTabViewChange: (tabView: TabViews) => void;
   activeTabView: TabViews;
-  disabled?: boolean;
 }
 
 export interface ITabView {
@@ -77,10 +75,7 @@ export const TabViewsSwitcher: React.FC<TabViewsSwitcherComponentProps> = observ
 
   return (
     <>
-      <Box
-        style={(props.disabled as boolean) ? { pointerEvents: 'none', opacity: 0.3 } : {}}
-        className="headerViewsSwitcherContainer"
-      >
+      <Box className="headerViewsSwitcherContainer">
         {availableTabs.map((tab) => {
           return (
             <Tooltip
