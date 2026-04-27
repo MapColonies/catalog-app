@@ -3,6 +3,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { AutoSizer, List, ListRowProps } from 'react-virtualized';
 import { Feature } from 'geojson';
 import { get } from 'lodash';
+import { Fill, Stroke, Text } from 'ol/style';
 import { Box } from '@map-colonies/react-components';
 import {
   Button,
@@ -17,12 +18,12 @@ import {
   Typography,
 } from '@map-colonies/react-core';
 import { AutoDirectionBox } from '../../../../common/components/auto-direction-box/auto-direction-box.component';
+import { FeatureSelectionHandler } from '../../../../common/components/ol-map/feature-selection-handler';
 import { Domain } from '../../../../common/models/domain';
 import { Mode } from '../../../../common/models/mode.enum';
 import { EntityDescriptorModelType } from '../../../models';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
 import { Curtain } from './curtain/curtain.component';
-import { Fill, Stroke, Text } from 'ol/style';
 import { IQueryExecutorResponse, PolygonPartsExtentQueryVectorLayer } from './polygon-parts-extent-query-vector-layer';
 import { GeoFeaturesPresentorComponent } from './pp-map';
 import { FeatureType } from './pp-map.utils';
