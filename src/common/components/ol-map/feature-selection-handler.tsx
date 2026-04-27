@@ -5,10 +5,9 @@ import { useMap } from '@map-colonies/react-components';
 
 interface FeatureSelectionHandlerProps {
   selectedItem?: Feature;
-  setSelectedFeature: (feature: Feature | undefined) => void;
 }
 
-export const FeatureSelectionHandler: React.FC<FeatureSelectionHandlerProps> = ({ selectedItem, setSelectedFeature }) => {
+export const FeatureSelectionHandler: React.FC<FeatureSelectionHandlerProps> = ({ selectedItem }) => {
   const map = useMap();
 
   useEffect(() => {
@@ -23,7 +22,6 @@ export const FeatureSelectionHandler: React.FC<FeatureSelectionHandlerProps> = (
         maxZoom: view.getMaxZoom() ?? 18,
         padding: [32, 32, 32, 32],
       });
-      setSelectedFeature(selectedItem);
     } catch {
       return;
     }

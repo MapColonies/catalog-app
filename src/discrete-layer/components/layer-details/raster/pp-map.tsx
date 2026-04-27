@@ -25,7 +25,6 @@ import { Checkbox } from '@map-colonies/react-core';
 import CONFIG from '../../../../common/config';
 import { useEnums } from '../../../../common/hooks/useEnum.hook';
 import { Mode } from '../../../../common/models/mode.enum';
-import { FeatureSelectionHandler } from '../../../../common/components/ol-map/feature-selection-handler';
 import { MapFeatureClickHandler } from '../../../../common/components/ol-map/map-feature-click-handler';
 import { MapLoadingIndicator } from '../../../../common/components/ol-map/map-loading-indicator';
 import { ZoomLevelIndicator } from '../../../../common/components/ol-map/zoom-level-indicator';
@@ -179,6 +178,13 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
       setSelectedFeature(undefined);
     }
   }, [enableFeaturePropertiesPopup]);
+
+  useEffect(() => {
+    if (!selectedItem) {
+      return;
+    }
+    setSelectedFeature(selectedItem);
+  }, [selectedItem]);
 
   useEffect(() => {
     const selectedFeatureType = selectedFeature?.properties?._featureType;
@@ -357,7 +363,6 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
           />
         }
         {children}
-        <FeatureSelectionHandler selectedItem={selectedItem} setSelectedFeature={setSelectedFeature} />
         <MapFeatureClickHandler
           enableFeaturePropertiesPopup={enableFeaturePropertiesPopup}
           lastCheckboxClickTimestampRef={lastCheckboxClickTimestampRef}
