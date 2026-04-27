@@ -1,11 +1,7 @@
-import { Dispatch, MutableRefObject, SetStateAction, useCallback, useEffect } from 'react';
-import { useIntl } from 'react-intl';
+import { Dispatch, MutableRefObject, SetStateAction, useEffect } from 'react';
 import { Feature } from 'geojson';
 import MapBrowserEvent from 'ol/MapBrowserEvent';
 import { useMap } from '@map-colonies/react-components';
-
-const NO_PROPERTIES_MESSAGE_KEY = '__noPropertiesMessage';
-const NO_PROPERTIES_MESSAGE_CODE = 'polygon-parts.map-preview.no-feature-properties';
 
 interface MapFeatureClickHandlerProps {
   enableFeaturePropertiesPopup: boolean;
@@ -26,25 +22,7 @@ export const MapFeatureClickHandler: React.FC<MapFeatureClickHandlerProps> = ({
   getClickedFeature,
   isFootprintProperties,
 }) => {
-  const intl = useIntl();
   const map = useMap();
-
-  const toSelectedFeature = useCallback((feature: Feature): Feature => {
-    const properties =
-      feature.properties && typeof feature.properties === 'object'
-        ? feature.properties
-        : undefined;
-    if (properties && Object.keys(properties).length > 0) {
-      return feature;
-    }
-    return {
-      ...feature,
-      properties: {
-        ...(properties ?? {}),
-        [NO_PROPERTIES_MESSAGE_KEY]: intl.formatMessage({ id: NO_PROPERTIES_MESSAGE_CODE }),
-      },
-    };
-  }, []);
 
   useEffect(() => {
     if (!enableFeaturePropertiesPopup) {
@@ -83,7 +61,7 @@ export const MapFeatureClickHandler: React.FC<MapFeatureClickHandlerProps> = ({
         const featureKey = properties?._key as string | undefined;
         const featureType = properties?._featureType as string | undefined;
 
-        setSelectedFeature(toSelectedFeature(clickedFeature));
+        setSelectedFeature(clickedFeature);
 
         if (featureType === 'EXISTING_PP') {
           onMapFeatureClick?.(undefined);
@@ -110,7 +88,6 @@ export const MapFeatureClickHandler: React.FC<MapFeatureClickHandlerProps> = ({
       map.un('singleclick', onSingleClick);
     };
   }, [
-    map,
     enableFeaturePropertiesPopup,
     lastCheckboxClickTimestampRef,
     onMapFeatureClick,
@@ -118,7 +95,6 @@ export const MapFeatureClickHandler: React.FC<MapFeatureClickHandlerProps> = ({
     isOlPolygonFeature,
     getClickedFeature,
     isFootprintProperties,
-    toSelectedFeature,
   ]);
 
   return null;
