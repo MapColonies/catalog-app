@@ -38,10 +38,26 @@ const FeaturePropertiesPopup: React.FC<FeaturePropertiesPopupProps> = ({
     return Object.fromEntries(table.map((value, index) => [String(value), index]));
   }, []);
 
-  const formatPropertyKey = useCallback((key: string): string => {
+  const formatPropertyKeyOrig = useCallback((key: string): string => {
     return intl.formatMessage(
       { id: `field-names.polygon-parts.${key}`, defaultMessage: key }
     );
+  }, []);
+
+  const hasMessage = useCallback((id: string): boolean => {
+    return Object.prototype.hasOwnProperty.call(intl.messages, id);
+  }, []);
+
+  const formatPropertyKey = useCallback((key: string): string => {
+    const ppMessageId = `field-names.polygon-parts.${key}`;
+    if (hasMessage(ppMessageId)) {
+      return intl.formatMessage({ id: ppMessageId });
+    }
+    const rasterMessageId = `field-names.raster.${key}`;
+    if (hasMessage(rasterMessageId)) {
+      return intl.formatMessage({ id: rasterMessageId });
+    }
+    return key;
   }, []);
 
   const formatPropertyValue = useCallback((value: unknown, key?: string): string => {
