@@ -70,7 +70,7 @@ const createZoomedOutFootprintFeature = (
   };
 };
 
-export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQueryVectorLayerProps> = observer(({
+export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQueryVectorLayerProps> = ({
   featureType,
   queryExecutor,
   outerPerimeter,
@@ -276,4 +276,4 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
       </VectorSource>
     </VectorLayer>
   );
-});
+};

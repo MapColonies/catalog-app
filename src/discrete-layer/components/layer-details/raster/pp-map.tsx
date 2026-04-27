@@ -355,7 +355,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
                     ...(feature?.properties ?? {}),
                     _featureType: FeatureType.EXISTING_PP,
                     _featureTitle: getText(
-                      feature?.properties,
+                      feature,
                       4,
                       FEATURE_LABEL_CONFIG.polygons,
                       ZOOM_LEVELS_TABLE
@@ -380,13 +380,14 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
           legendItems={LegendsArray}
           title={intl.formatMessage({ id: 'polygon-parts.map-preview-legend.title' })}
         />
+        {
+          enableFeaturePropertiesPopup &&
+          <FeaturePropertiesPopupComponent
+            selectedFeature={selectedFeature}
+            onClose={clearPreviewSelection}
+          />
+        }
       </Map>
-      {enableFeaturePropertiesPopup && (
-        <FeaturePropertiesPopupComponent
-          selectedFeature={selectedFeature}
-          onClose={clearPreviewSelection}
-        />
-      )}
     </Box>
   );
 };

@@ -32,14 +32,15 @@ const FeaturePropertiesPopup: React.FC<FeaturePropertiesPopupProps> = ({
 }) => {
   const intl = useIntl();
   const ZOOM_LEVELS_TABLE = useZoomLevelsTable();
+
   const resolutionDegreeToZoomLevel = useMemo(() => {
     const table = Object.values(ZOOM_LEVELS_TABLE);
     return Object.fromEntries(table.map((value, index) => [String(value), index]));
-  }, [ZOOM_LEVELS_TABLE]);
+  }, []);
 
   const formatPropertyKey = useCallback((key: string): string => {
     return intl.formatMessage(
-      { id: `polygon-parts.map-preview.feature-property.${key}`, defaultMessage: key }
+      { id: `field-names.polygon-parts.${key}`, defaultMessage: key }
     );
   }, []);
 
@@ -77,48 +78,35 @@ const FeaturePropertiesPopup: React.FC<FeaturePropertiesPopupProps> = ({
       }
     }
     return String(value);
-  }, [resolutionDegreeToZoomLevel]);
-
-  const selectedFeatureProperties = selectedFeature?.properties as Record<string, unknown> | undefined;
-
-  const title = useMemo((): string => {
-    if (!selectedFeatureProperties) {
-      return '';
-    }
-    return String(selectedFeatureProperties?._featureTitle ?? '');
-  }, [selectedFeatureProperties]);
+  }, []);
 
   const color = useMemo(() => {
-    if (!selectedFeatureProperties) {
+    if (!selectedFeature?.properties) {
       return undefined;
     }
 
-    if (selectedFeatureProperties?._featureType === FeatureType.LOW_RESOLUTION_PP) {
+    if (selectedFeature?.properties?._featureType === FeatureType.LOW_RESOLUTION_PP) {
       return toCssColor(PPMapStyles.get(FeatureType.LOW_RESOLUTION_PP)?.getStroke()?.getColor());
     }
-    if (selectedFeatureProperties?.exceeded === true) {
+    if (selectedFeature?.properties?.exceeded === true) {
       return '#d32f2f';
     }
-    if (selectedFeatureProperties?._featureType === FeatureType.EXISTING_PP) {
+    if (selectedFeature?.properties?._featureType === FeatureType.EXISTING_PP) {
       return toCssColor(PPMapStyles.get(FeatureType.EXISTING_PP)?.getStroke()?.getColor());
     }
     return undefined;
-  }, [selectedFeatureProperties]);
+  }, [selectedFeature?.properties]);
 
   const visibleProperties = useMemo(() => {
-    if (!selectedFeatureProperties) {
+    if (!selectedFeature?.properties) {
       return [] as Array<[string, unknown]>;
     }
-
-    return Object.entries(selectedFeatureProperties).filter(([key]) => {
-      if (key === NO_PROPERTIES_MESSAGE_KEY) {
-        return true;
-      }
+    return Object.entries(selectedFeature?.properties).filter(([key]) => {
       return !key.startsWith('_');
     });
-  }, [selectedFeatureProperties]);
+  }, [selectedFeature?.properties]);
 
-  if (!selectedFeatureProperties) {
+  if (!selectedFeature?.properties) {
     return null;
   }
 
@@ -126,7 +114,7 @@ const FeaturePropertiesPopup: React.FC<FeaturePropertiesPopupProps> = ({
     <Box className="featurePropertiesPopup">
       <Box className="featurePropertiesPopupHeader">
         <Typography className="featurePropertiesPopupTitle" tag="span" style={{ color }}>
-          {title}
+          {selectedFeature?.properties?._featureTitle }
         </Typography>
         <IconButton
           className="featurePropertiesPopupClose mc-icon-Close"
