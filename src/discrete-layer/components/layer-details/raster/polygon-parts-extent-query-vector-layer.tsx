@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { BBox, Feature, GeoJsonProperties, Geometry } from 'geojson';
 import { debounce } from 'lodash';
-import { observer } from 'mobx-react';
 import { MapEvent } from 'ol';
 import GeoJSON from 'ol/format/GeoJSON';
 import { Options } from 'ol/layer/Base';
