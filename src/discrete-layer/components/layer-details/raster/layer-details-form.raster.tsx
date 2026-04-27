@@ -31,7 +31,6 @@ import { Curtain } from './curtain/curtain.component';
 import { IngestionFields } from './ingestion-fields.raster';
 import { JobInfo } from './job-info';
 import { GeoFeaturesPresentorComponent } from './pp-map';
-import { FeatureType, PPMapStyles } from './pp-map.utils';
 import { StateError } from './state-error';
 import { RasterWorkflowContext } from './state-machine/context';
 import {
@@ -303,11 +302,6 @@ export const InnerRasterForm = (
                   Geometry,
                   GeoJsonProperties
                 >,
-              ]}
-              // selectedFeatureKey={selectedFeature}
-              selectionStyle={[
-                PPMapStyles.get(FeatureType.SELECTED_FILL),
-                PPMapStyles.get(FeatureType.SELECTED_MARKER),
               ]}
               style={{ width: '520px', position: 'relative', direction: 'ltr' }}
               fitOptions={{ padding: [10, 20, 10, 20] }}
