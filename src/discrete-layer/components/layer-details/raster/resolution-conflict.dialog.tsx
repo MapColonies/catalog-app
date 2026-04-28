@@ -476,10 +476,9 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                   layerRecord={state.context.updatedLayer}
                   enableFeaturePropertiesPopup={true}
                   style={{ height: '100%', minHeight: '300px' }}
-                  externalFeatures={lowResolutionFeatures}
                   selectedItem={selectedItem}
-                  onMapFeatureClick={(featureKey) => {
-                    if (featureKey === undefined) {
+                  onMapFeatureClick={(feature) => {
+                    if (feature?.properties?._key === undefined) {
                       // An existing (green) feature was clicked — clear list selection
                       setSelectedLowResolutionItem(undefined);
                       setAutoScrollListToSelection(false);
@@ -487,7 +486,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                     }
 
                     const clickedFeature = lowResolutionFeatures.find(
-                      (feature) => feature.properties?._key === featureKey
+                      (feat) => feat.properties?._key === feature?.properties?._key
                     );
                     if (listFilterMode === 'exceeded' && clickedFeature?.properties?.exceeded !== true) {
                       setListFilterMode('all');

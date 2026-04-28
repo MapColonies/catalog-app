@@ -1,9 +1,7 @@
 import { CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Feature, Geometry, MultiPolygon, Polygon } from 'geojson';
+import { Feature, Geometry } from 'geojson';
 import { get } from 'lodash';
-import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
-import { point } from '@turf/helpers';
 import bboxPolygon from '@turf/bbox-polygon';
 import { FitOptions } from 'ol/View';
 import { Style } from 'ol/style';
@@ -28,7 +26,6 @@ import { Mode } from '../../../../common/models/mode.enum';
 import { MapFeatureClickHandler } from '../../../../common/components/ol-map/map-feature-click-handler';
 import { MapLoadingIndicator } from '../../../../common/components/ol-map/map-loading-indicator';
 import { ZoomLevelIndicator } from '../../../../common/components/ol-map/zoom-level-indicator';
-import { isValidGeometryType } from '../../../../common/utils/geojson.validation';
 import { LayerRasterRecordModelType } from '../../../models';
 import { ILayerImage } from '../../../models/layerImage';
 import { GeojsonFeatureInput } from '../../../models/RootStore.base';
@@ -50,9 +47,8 @@ interface GeoFeaturesPresentorProps {
   showExistingPolygonParts?: boolean;
   layerRecord?: ILayerImage | null;
   enableFeaturePropertiesPopup?: boolean;
-  onMapFeatureClick?: (featureKey: string | undefined) => void;
+  onMapFeatureClick?: (feature: Feature | undefined) => void;
   onFeaturePropertiesPopupClose?: () => void;
-  externalFeatures?: Feature[];
   selectedItem?: Feature;
 }
 
@@ -69,7 +65,6 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   enableFeaturePropertiesPopup = false,
   onMapFeatureClick,
   onFeaturePropertiesPopupClose,
-  externalFeatures,
   selectedItem,
 }) => {
   const store = useStore();
@@ -80,65 +75,10 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   const existingPPFeaturesRef = useRef<Feature[]>([]);
   const showExistingPolygonPartsRef = useRef(false);
   const previousShowExistingPolygonPartsRef = useRef(false);
-  const lastCheckboxClickTimestampRef = useRef(0);
   const previousGeoFeaturesLengthRef = useRef(geoFeatures?.length ?? 0);
+  const [selectedFeature, setSelectedFeature] = useState<Feature | undefined>(undefined);
   const [showExistingPolygonParts, setShowExistingPolygonParts] = useState<boolean>(false);
   showExistingPolygonPartsRef.current = showExistingPolygonParts;
-  const [selectedFeature, setSelectedFeature] = useState<Feature | undefined>(undefined);
-
-  const getClickedFeature = useCallback((coordinate: number[]): Feature | undefined => {
-    const existingFeatures = showExistingPolygonPartsRef.current ? existingPPFeaturesRef.current : [];
-    const allFeatures = [
-      ...existingFeatures,
-      ...(externalFeatures ?? []),
-      ...(geoFeatures ?? []),
-    ];
-
-    if (allFeatures.length === 0) {
-      return undefined;
-    }
-
-    const clickedPoint = point(coordinate as [number, number]);
-    const clickedFeature = allFeatures.find((feature) => {
-      if (!feature?.geometry || !isValidGeometryType(feature.geometry)) {
-        return false;
-      }
-
-      try {
-        return booleanPointInPolygon(clickedPoint, feature as Feature<Polygon | MultiPolygon>);
-      } catch {
-        return false;
-      }
-    });
-
-    if (clickedFeature) {
-      if (clickedFeature.properties && typeof clickedFeature.properties === 'object') {
-        const props = clickedFeature.properties as Record<string, unknown>;
-        if (props._showAsFootprint) {
-          return undefined;
-        }
-      }
-
-      return clickedFeature;
-    }
-
-    return undefined;
-  }, [geoFeatures, externalFeatures, showExistingPolygonPartsRef]);
-
-  const isOlPolygonFeature = useCallback((olFeature: unknown): boolean => {
-    if (!olFeature || typeof olFeature !== 'object') {
-      return false;
-    }
-
-    const geometry = (olFeature as { getGeometry?: () => { getType?: () => string } }).getGeometry?.();
-    const geometryType = geometry?.getType?.();
-
-    return geometryType === 'Polygon' || geometryType === 'MultiPolygon';
-  }, []);
-
-  const isFootprintProperties = useCallback((properties?: Record<string, unknown>): boolean => {
-    return Boolean(properties?._showAsFootprint);
-  }, []);
 
   const isFootprintOnlyDisplay = useCallback((features?: Feature[]): boolean => {
     if (!features || features.length !== 1) {
@@ -308,7 +248,6 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
               onClick={(evt: React.MouseEvent<HTMLInputElement>): void => {
                 evt.preventDefault();
                 evt.stopPropagation();
-                lastCheckboxClickTimestampRef.current = Date.now();
                 const isChecked = evt.currentTarget.checked;
                 setShowExistingPolygonParts(isChecked);
                 if (!isChecked) {
@@ -362,13 +301,8 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
         }
         {children}
         <MapFeatureClickHandler
-          enableFeaturePropertiesPopup={enableFeaturePropertiesPopup}
-          lastCheckboxClickTimestampRef={lastCheckboxClickTimestampRef}
           onMapFeatureClick={onMapFeatureClick}
           setSelectedFeature={setSelectedFeature}
-          isOlPolygonFeature={isOlPolygonFeature}
-          getClickedFeature={getClickedFeature}
-          isFootprintProperties={isFootprintProperties}
         />
         {
           enableFeaturePropertiesPopup &&
