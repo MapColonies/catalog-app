@@ -520,7 +520,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                   {
                     showLowResolutionPolygonParts && lowResolutionFeatures !== undefined
                       ? <>
-                          <FeatureSelectionHandler selectedItem={selectedItem} />
+                          <FeatureSelectionHandler feature={selectedItem} />
                           <PolygonPartsExtentQueryVectorLayer
                             featureType={FeatureType.LOW_RESOLUTION_PP}
                             queryExecutor={async (bbox, _startIndex): Promise<IQueryExecutorResponse> => {

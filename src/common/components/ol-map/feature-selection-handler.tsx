@@ -4,18 +4,18 @@ import GeoJSON from 'ol/format/GeoJSON';
 import { useMap } from '@map-colonies/react-components';
 
 interface FeatureSelectionHandlerProps {
-  selectedItem?: Feature;
+  feature?: Feature;
 }
 
-export const FeatureSelectionHandler: React.FC<FeatureSelectionHandlerProps> = ({ selectedItem }) => {
+export const FeatureSelectionHandler: React.FC<FeatureSelectionHandlerProps> = ({ feature }) => {
   const map = useMap();
 
   useEffect(() => {
-    if (!selectedItem) {
+    if (!feature) {
       return;
     }
     try {
-      const geometry = new GeoJSON().readGeometry(selectedItem?.geometry);
+      const geometry = new GeoJSON().readGeometry(feature?.geometry);
       const view = map.getView();
       map.getView().fit(geometry.getExtent(), {
         duration: 250,
@@ -25,7 +25,7 @@ export const FeatureSelectionHandler: React.FC<FeatureSelectionHandlerProps> = (
     } catch {
       return;
     }
-  }, [selectedItem]);
+  }, [feature]);
 
   return null;
 };
