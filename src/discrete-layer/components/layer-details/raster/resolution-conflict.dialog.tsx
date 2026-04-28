@@ -68,6 +68,8 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
   const [approver, setApprover] = useState('');
   const [listFilterMode, setListFilterMode] = useState<FilterMode>('all');
   const [selectedItem, setSelectedItem] = useState<Feature>();
+  const wasSelectedItemInExtentRef = useRef(false);
+  const selectedLowResolutionFeatureKeyRef = useRef<string | undefined>(undefined);
   const selectedLowResolutionFeatureKey = selectedItem?.properties?._key as string | undefined;
   const reportUrl = state.context.job?.validationReport?.report?.url;
   const ingestionResolution = state.context.job?.details?.parameters?.ingestionResolution as string | undefined;
@@ -157,6 +159,11 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
       return next;
     });
   }, [autoScrollListToSelection, selectedLowResolutionPosition]);
+
+  useEffect(() => {
+    selectedLowResolutionFeatureKeyRef.current = selectedLowResolutionFeatureKey;
+    wasSelectedItemInExtentRef.current = false;
+  }, [selectedLowResolutionFeatureKey]);
 
   const resolutionDegreeToZoomLevel = useMemo(() => {
     const table = Object.values(ZOOM_LEVELS_TABLE);
@@ -528,16 +535,16 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                             outerPerimeter={outerPerimeter?.geometry}
                             selectedFeature={selectedItem}
                             onFeaturesChange={(updatedFeatures): void => {
-                              const currentSelectedKey = selectedItem?.properties?._key;
+                              const currentSelectedKey = selectedLowResolutionFeatureKeyRef.current;
                               if (currentSelectedKey !== undefined) {
                                 const selectedFromUpdatedFeatures = updatedFeatures.find(
                                   (feature) => feature.properties?._key === currentSelectedKey
                                 );
-                                if (!selectedFromUpdatedFeatures) {
+                                if (selectedFromUpdatedFeatures) {
+                                  wasSelectedItemInExtentRef.current = true;
+                                } else if (wasSelectedItemInExtentRef.current) {
                                   setSelectedItem(undefined);
                                   setAutoScrollListToSelection(false);
-                                } else if (selectedFromUpdatedFeatures !== selectedItem) {
-                                  setSelectedItem(selectedFromUpdatedFeatures);
                                 }
                               }
                               if (isFootprintOnlyDisplay(updatedFeatures)) {
