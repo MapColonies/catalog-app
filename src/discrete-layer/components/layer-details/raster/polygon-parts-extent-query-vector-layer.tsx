@@ -82,12 +82,18 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
   const intl = useIntl();
   const store = useStore();
   const activeRequestIdRef = useRef(0);
+  const hasEmittedInitialFeaturesRef = useRef(false);
   const ZOOM_LEVELS_TABLE = useZoomLevelsTable();
   const [polygonParts, setPolygonParts] = useState<Feature[]>([]);
 
   useEffect(() => {
+    if (!hasEmittedInitialFeaturesRef.current) {
+      hasEmittedInitialFeaturesRef.current = true;
+      return;
+    }
+
     onFeaturesChange?.(polygonParts);
-  }, [polygonParts]);
+  }, [onFeaturesChange, polygonParts]);
 
   useEffect(() => {
     const handleMoveEndEvent = (e: MapEvent): void => {

@@ -533,7 +533,10 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                                 const selectedFromUpdatedFeatures = updatedFeatures.find(
                                   (feature) => feature.properties?._key === currentSelectedKey
                                 );
-                                if (selectedFromUpdatedFeatures && selectedFromUpdatedFeatures !== selectedItem) {
+                                if (!selectedFromUpdatedFeatures) {
+                                  setSelectedItem(undefined);
+                                  setAutoScrollListToSelection(false);
+                                } else if (selectedFromUpdatedFeatures !== selectedItem) {
                                   setSelectedItem(selectedFromUpdatedFeatures);
                                 }
                               }
