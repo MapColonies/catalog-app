@@ -114,18 +114,6 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
     }
   }, [hasExceededFeatures, listFilterMode]);
 
-  const isFootprintOnlyDisplay = useCallback((features?: Feature[]): boolean => {
-    if (!features || features.length !== 1) {
-      return false;
-    }
-
-    const properties = features[0]?.properties;
-    return Boolean(
-      properties &&
-      typeof properties === 'object' &&
-      (properties as Record<string, unknown>)._showAsFootprint
-    );
-  }, []);
 
   const selectedLowResolutionPosition = useMemo(() => {
     if (!selectedLowResolutionFeatureKey) {
@@ -160,10 +148,12 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
     });
   }, [autoScrollListToSelection, selectedLowResolutionPosition]);
 
-  useEffect(() => {
-    selectedLowResolutionFeatureKeyRef.current = selectedLowResolutionFeatureKey;
+  const setSelectedLowResolutionItem = useCallback((feature?: Feature): void => {
+    const key = feature?.properties?._key as string | undefined;
+    selectedLowResolutionFeatureKeyRef.current = key;
     wasSelectedItemInExtentRef.current = false;
-  }, [selectedLowResolutionFeatureKey]);
+    setSelectedItem(feature);
+  }, []);
 
   const resolutionDegreeToZoomLevel = useMemo(() => {
     const table = Object.values(ZOOM_LEVELS_TABLE);
@@ -191,7 +181,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
 
     if (!reportUrl) {
       setLowResolutionCollections([]);
-      setSelectedItem(undefined);
+      setSelectedLowResolutionItem(undefined);
       setLowResolutionPartsError(intl.formatMessage({ id: 'resolutionConflict.error.missingUrl' }));
       return;
     }
@@ -234,11 +224,11 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
         ];
         setLowResolutionCollections(newCollections);
         setCollectionMountKeys(newCollections.map(() => 0));
-        setSelectedItem(undefined);
+        setSelectedLowResolutionItem(undefined);
       } catch (error) {
         const errorMessage = (error as Error)?.message;
         setLowResolutionCollections([]);
-        setSelectedItem(undefined);
+        setSelectedLowResolutionItem(undefined);
         setLowResolutionPartsError(`${intl.formatMessage({ id: 'resolutionConflict.error.fetchFailed' })}${errorMessage ? `: ${errorMessage}` : ''}`);
       } finally {
         setIsLoadingLowResolutionParts(false);
@@ -247,7 +237,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
 
     void loadLowResolutionParts();
 
-  }, [api]);
+  }, [api, setSelectedLowResolutionItem]);
 
   const closeDialog = useCallback((): void => {
     onSetIsOpen(false);
@@ -275,9 +265,9 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
   }, [approver]);
 
   const clearLowResolutionSelection = useCallback((): void => {
-    setSelectedItem(undefined);
+    setSelectedLowResolutionItem(undefined);
     setAutoScrollListToSelection(false);
-  }, []);
+  }, [setSelectedLowResolutionItem]);
 
   return (
     <Box id="resolutionConflictDialog">
@@ -303,7 +293,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                         setShowLowResolutionPolygonParts(isChecked);
                         if (!isChecked) {
                           setAutoScrollListToSelection(false);
-                          setSelectedItem(undefined);
+                          setSelectedLowResolutionItem(undefined);
                         }
                       }}
                     />
@@ -394,7 +384,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                                           setShowLowResolutionPolygonParts(true);
                                           setAutoScrollListToSelection(false);
                                           if (featureKey) {
-                                            setSelectedItem(lowResolutionFeatures.find((f) => f.properties?._key === featureKey) ?? feature);
+                                            setSelectedLowResolutionItem(lowResolutionFeatures.find((f) => f.properties?._key === featureKey) ?? feature);
                                           }
                                         }}
                                       >
@@ -491,7 +481,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                   onMapFeatureClick={(featureKey) => {
                     if (featureKey === undefined) {
                       // An existing (green) feature was clicked — clear list selection
-                      setSelectedItem(undefined);
+                      setSelectedLowResolutionItem(undefined);
                       setAutoScrollListToSelection(false);
                       return;
                     }
@@ -505,10 +495,10 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
 
                     setShowLowResolutionPolygonParts(true);
                     setAutoScrollListToSelection(true);
-                    setSelectedItem(clickedFeature);
+                    setSelectedLowResolutionItem(clickedFeature);
                   }}
                   onFeaturePropertiesPopupClose={(): void => {
-                    setSelectedItem(undefined);
+                    setSelectedLowResolutionItem(undefined);
                     setAutoScrollListToSelection(false);
                   }}
                 >
@@ -543,13 +533,9 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                                 if (selectedFromUpdatedFeatures) {
                                   wasSelectedItemInExtentRef.current = true;
                                 } else if (wasSelectedItemInExtentRef.current) {
-                                  setSelectedItem(undefined);
+                                  setSelectedLowResolutionItem(undefined);
                                   setAutoScrollListToSelection(false);
                                 }
-                              }
-                              if (isFootprintOnlyDisplay(updatedFeatures)) {
-                                setSelectedItem(undefined);
-                                setAutoScrollListToSelection(false);
                               }
                             }}
                             onQueryError={(errorMessage): void => {
