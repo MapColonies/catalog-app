@@ -230,7 +230,20 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
           const isSelectedByKey =
             selectedFeatureKey !== undefined && feat.properties?._key === selectedFeatureKey;
 
-          if (selectedFeature === feat || isSelectedByKey) {
+          const selectedFeatureProperties =
+            selectedFeature?.properties && typeof selectedFeature.properties === 'object'
+              ? selectedFeature.properties as Record<string, unknown>
+              : undefined;
+          const featProperties =
+            feat.properties && typeof feat.properties === 'object'
+              ? feat.properties as Record<string, unknown>
+              : undefined;
+          const selectedFeatureId = selectedFeature?.id ?? selectedFeatureProperties?.id;
+          const featureId = feat?.id ?? featProperties?.id;
+          const isSelectedById =
+            selectedFeatureId !== undefined && featureId !== undefined && selectedFeatureId === featureId;
+
+          if (selectedFeature === feat || isSelectedByKey || isSelectedById) {
             if (baseStroke) {
               const selectedStroke = baseStroke.clone();
               selectedStroke.setWidth(8);
