@@ -12,6 +12,7 @@ import { Mode } from '../../../common/models/mode.enum';
 import { ValidationsError } from '../../../common/components/error/validations.error-presentor';
 import { GraphQLError } from '../../../common/components/error/graphql.error-presentor';
 import { MetadataFile } from '../../../common/components/file-picker';
+import { Curtain } from '../../../common/components/curtain/curtain.component';
 // import useSessionStoreWatcherForm from '../../../common/hooks/useSessionStoreWatcherForm';
 import {
   EntityDescriptorModelType,
@@ -225,10 +226,10 @@ const InnerForm = (props: LayerDetailsFormCustomProps & FormikProps<FormValues>)
         <Box
           className={[
             mode === Mode.NEW ? 'content section' : 'content',
-            showCurtain && 'curtainVisible',
+            showCurtain && 'curtainContainer withoutScrolling',
           ].join(' ')}
         >
-          {showCurtain && <Box className="curtain"></Box>}
+          {showCurtain && <Curtain />}
           <LayersDetailsComponent
             entityDescriptors={entityDescriptors}
             layerRecord={layerRecord}
