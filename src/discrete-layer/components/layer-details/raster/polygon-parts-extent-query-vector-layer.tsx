@@ -38,7 +38,6 @@ interface PolygonPartsExtentQueryVectorLayerProps {
   queryExecutor: (bbox: BBox, startIndex: number) => Promise<IQueryExecutorResponse>;
   outerPerimeter?: Geometry;
   selectedFeature?: Feature;
-  selectedFeatureKey?: string;
   onFeaturesChange?: (features: Feature[]) => void;
   onQueryError?: (errorMessage: string) => void;
   textStyleFactory?: (feature: Feature) => Text | undefined;
@@ -74,7 +73,6 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
   queryExecutor,
   outerPerimeter,
   selectedFeature,
-  selectedFeatureKey,
   onFeaturesChange,
   onQueryError,
   textStyleFactory,
@@ -222,6 +220,7 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
             fill: baseFill,
           });
 
+          const selectedFeatureKey = selectedFeature?.properties?._key;
           const isSelectedByKey =
             selectedFeatureKey !== undefined && feat.properties?._key === selectedFeatureKey;
 

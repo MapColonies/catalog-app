@@ -47,7 +47,6 @@ interface GeoFeaturesPresentorProps {
   children?: JSX.Element | null;
   style?: CSSProperties | undefined;
   fitOptions?: FitOptions | undefined;
-  selectedFeatureKey?: string;
   showExistingPolygonParts?: boolean;
   layerRecord?: ILayerImage | null;
   enableFeaturePropertiesPopup?: boolean;
@@ -66,7 +65,6 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   style,
   fitOptions,
   children,
-  selectedFeatureKey,
   layerRecord,
   enableFeaturePropertiesPopup = false,
   onMapFeatureClick,
@@ -186,10 +184,14 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
 
   useEffect(() => {
     const selectedFeatureType = selectedFeature?.properties?._featureType;
-    if (!selectedFeatureKey && selectedFeatureType !== FeatureType.EXISTING_PP) {
+    const isManagedExternally =
+      selectedFeatureType === FeatureType.EXISTING_PP ||
+      (selectedFeatureType === FeatureType.LOW_RESOLUTION_PP && !!selectedItem);
+
+    if (!isManagedExternally) {
       setSelectedFeature(undefined);
     }
-  }, [selectedFeature, selectedFeatureKey]);
+  }, [selectedFeature, selectedItem]);
 
   useEffect(() => {
     const wasShown = previousShowExistingPolygonPartsRef.current;
