@@ -68,7 +68,6 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
   const [approver, setApprover] = useState('');
   const [listFilterMode, setListFilterMode] = useState<FilterMode>('all');
   const [selectedItem, setSelectedItem] = useState<Feature>();
-  const displayedLowResolutionFeaturesRef = useRef<Feature[]>([]);
   const selectedLowResolutionFeatureKey = selectedItem?.properties?._key as string | undefined;
   const reportUrl = state.context.job?.validationReport?.report?.url;
   const ingestionResolution = state.context.job?.details?.parameters?.ingestionResolution as string | undefined;
@@ -112,12 +111,6 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
       setListFilterMode('all');
     }
   }, [hasExceededFeatures, listFilterMode]);
-
-  useEffect(() => {
-    if (!showLowResolutionPolygonParts) {
-      displayedLowResolutionFeaturesRef.current = [];
-    }
-  }, [showLowResolutionPolygonParts]);
 
   const isFootprintOnlyDisplay = useCallback((features?: Feature[]): boolean => {
     if (!features || features.length !== 1) {
@@ -394,10 +387,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                                           setShowLowResolutionPolygonParts(true);
                                           setAutoScrollListToSelection(false);
                                           if (featureKey) {
-                                            const selectedFromMapLayer = displayedLowResolutionFeaturesRef.current.find(
-                                              (f) => f.properties?._key === featureKey
-                                            );
-                                            setSelectedItem(selectedFromMapLayer ?? lowResolutionFeatures.find((f) => f.properties?._key === featureKey) ?? feature);
+                                            setSelectedItem(lowResolutionFeatures.find((f) => f.properties?._key === featureKey) ?? feature);
                                           }
                                         }}
                                       >
@@ -499,9 +489,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                       return;
                     }
 
-                    const clickedFeature = displayedLowResolutionFeaturesRef.current.find(
-                      (feature) => feature.properties?._key === featureKey
-                    ) ?? lowResolutionFeatures.find(
+                    const clickedFeature = lowResolutionFeatures.find(
                       (feature) => feature.properties?._key === featureKey
                     );
                     if (listFilterMode === 'exceeded' && clickedFeature?.properties?.exceeded !== true) {
@@ -540,8 +528,6 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                             outerPerimeter={outerPerimeter?.geometry}
                             selectedFeature={selectedItem}
                             onFeaturesChange={(updatedFeatures): void => {
-                              displayedLowResolutionFeaturesRef.current = updatedFeatures;
-
                               const currentSelectedKey = selectedItem?.properties?._key;
                               if (currentSelectedKey !== undefined) {
                                 const selectedFromUpdatedFeatures = updatedFeatures.find(
@@ -551,7 +537,6 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                                   setSelectedItem(selectedFromUpdatedFeatures);
                                 }
                               }
-
                               if (isFootprintOnlyDisplay(updatedFeatures)) {
                                 setSelectedItem(undefined);
                                 setAutoScrollListToSelection(false);
