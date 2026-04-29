@@ -72,13 +72,8 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   const intl = useIntl();
   const ZOOM_LEVELS_TABLE = useZoomLevelsTable();
   const renderCount = useRef(0);
-  const existingPPFeaturesRef = useRef<Feature[]>([]);
-  const showExistingPolygonPartsRef = useRef(false);
-  const previousShowExistingPolygonPartsRef = useRef(false);
-  const previousGeoFeaturesLengthRef = useRef(geoFeatures?.length ?? 0);
   const [selectedFeature, setSelectedFeature] = useState<Feature | undefined>(undefined);
   const [showExistingPolygonParts, setShowExistingPolygonParts] = useState<boolean>(showPolygonParts);
-  showExistingPolygonPartsRef.current = showExistingPolygonParts;
 
   const isFootprintOnlyDisplay = useCallback((features?: Feature[]): boolean => {
     if (!features || features.length !== 1) {
@@ -97,6 +92,10 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
     setSelectedFeature(undefined);
     onMapFeatureClick?.(undefined);
   }, []);
+
+  useEffect(() => {
+    setShowExistingPolygonParts(showPolygonParts);
+  }, [showPolygonParts]);
 
   useEffect(() => {
     const definedElements = geoFeatures?.filter((feat) => feat !== undefined);
@@ -131,28 +130,6 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
       setSelectedFeature(undefined);
     }
   }, [selectedFeature, selectedItem]);
-
-  useEffect(() => {
-    const wasShown = previousShowExistingPolygonPartsRef.current;
-
-    if (wasShown && !showExistingPolygonParts) {
-      clearPreviewSelection();
-    }
-
-    previousShowExistingPolygonPartsRef.current = showExistingPolygonParts;
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showExistingPolygonParts]);
-
-  useEffect(() => {
-    const currentGeoFeaturesLength = geoFeatures?.length ?? 0;
-
-    if (previousGeoFeaturesLengthRef.current > 0 && currentGeoFeaturesLength === 0) {
-      clearPreviewSelection();
-    }
-
-    previousGeoFeaturesLengthRef.current = currentGeoFeaturesLength;
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [geoFeatures]);
 
   const previewBaseMap = useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-array-constructor
@@ -288,9 +265,8 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
               return { features, pageSize: CONFIG.POLYGON_PARTS.MAX.WFS_FEATURES };
             }}
             outerPerimeter={layerRecord?.footprint as Geometry | undefined}
-            selectedFeature={selectedFeature?.properties?._featureType === FeatureType.EXISTING_PP ? selectedFeature : undefined}
+            selectedFeature={selectedFeature}
             onFeaturesChange={(updatedFeatures: Feature[]): void => {
-              existingPPFeaturesRef.current = updatedFeatures;
               const selectedExistingFeature =
                 selectedFeature?.properties?._featureType === FeatureType.EXISTING_PP ? selectedFeature : undefined;
 
@@ -324,10 +300,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
           onMapFeatureClick={onMapFeatureClick}
           setSelectedFeature={setSelectedFeature}
         />
-        {
-          selectedFeature?.properties?._featureType === FeatureType.EXISTING_PP &&
-          <FeatureSelectionHandler feature={selectedFeature} />
-        }
+        <FeatureSelectionHandler feature={selectedFeature} />
         {
           enableFeaturePropertiesPopup &&
           <FeaturePropertiesPopupComponent

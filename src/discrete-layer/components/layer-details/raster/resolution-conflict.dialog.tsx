@@ -18,7 +18,6 @@ import {
   Typography,
 } from '@map-colonies/react-core';
 import { AutoDirectionBox } from '../../../../common/components/auto-direction-box/auto-direction-box.component';
-import { FeatureSelectionHandler } from '../../../../common/components/ol-map/feature-selection-handler';
 import { Domain } from '../../../../common/models/domain';
 import { Mode } from '../../../../common/models/mode.enum';
 import { EntityDescriptorModelType } from '../../../models';
@@ -162,7 +161,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
       return undefined;
     }
     return resolutionDegreeToZoomLevel[ingestionResolution];
-  }, [ingestionResolution]);
+  }, []);
 
   const collectionName = useMemo(() => {
     return intl.formatMessage(
@@ -496,90 +495,87 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                   >
                   {
                     showLowResolutionPolygonParts && lowResolutionFeatures !== undefined
-                      ? <>
-                          <FeatureSelectionHandler feature={selectedItem} />
-                          <PolygonPartsExtentQueryVectorLayer
-                            featureType={FeatureType.LOW_RESOLUTION_PP}
-                            queryExecutor={async (bbox, _startIndex): Promise<IQueryExecutorResponse> => {
-                              if (!api) {
-                                return { features: [], pageSize: -1 };
-                              }
-                              const result = await api.query.method({
-                                minX: bbox[0],
-                                minY: bbox[1],
-                                maxX: bbox[2],
-                                maxY: bbox[3],
-                              });
-                              const fetchedFeatures = get(result, 'features', []);
-                              const features = Array.isArray(fetchedFeatures) ? fetchedFeatures : [];
-                              return { features, pageSize: -1 };
-                            }}
-                            outerPerimeter={outerPerimeter?.geometry}
-                            selectedFeature={selectedItem}
-                            onFeaturesChange={(updatedFeatures): void => {
-                              const isFootprintOnly =
-                                updatedFeatures.length === 1 &&
-                                Boolean(updatedFeatures[0]?.properties?._showAsFootprint);
-                              if (isFootprintOnly) {
-                                return;
-                              }
-                              const currentSelectedKey = selectedItem?.properties?._key;
-                              if (currentSelectedKey !== undefined) {
-                                const selectedFromUpdatedFeatures = updatedFeatures.find(
-                                  (feature) => feature.properties?._key === currentSelectedKey
-                                );
+                      ? <PolygonPartsExtentQueryVectorLayer
+                          featureType={FeatureType.LOW_RESOLUTION_PP}
+                          queryExecutor={async (bbox, _startIndex): Promise<IQueryExecutorResponse> => {
+                            if (!api) {
+                              return { features: [], pageSize: -1 };
+                            }
+                            const result = await api.query.method({
+                              minX: bbox[0],
+                              minY: bbox[1],
+                              maxX: bbox[2],
+                              maxY: bbox[3],
+                            });
+                            const fetchedFeatures = get(result, 'features', []);
+                            const features = Array.isArray(fetchedFeatures) ? fetchedFeatures : [];
+                            return { features, pageSize: -1 };
+                          }}
+                          outerPerimeter={outerPerimeter?.geometry}
+                          selectedFeature={selectedItem}
+                          onFeaturesChange={(updatedFeatures): void => {
+                            const isFootprintOnly =
+                              updatedFeatures.length === 1 &&
+                              Boolean(updatedFeatures[0]?.properties?._showAsFootprint);
+                            if (isFootprintOnly) {
+                              return;
+                            }
+                            const currentSelectedKey = selectedItem?.properties?._key;
+                            if (currentSelectedKey !== undefined) {
+                              const selectedFromUpdatedFeatures = updatedFeatures.find(
+                                (feature) => feature.properties?._key === currentSelectedKey
+                              );
 
-                                if (selectedFromUpdatedFeatures) {
-                                  hasSelectedItemBeenVisibleInMapRef.current = true;
-                                  if (selectedFromUpdatedFeatures !== selectedItem) {
-                                    setSelectedItem(selectedFromUpdatedFeatures);
-                                  }
-                                } else if (hasSelectedItemBeenVisibleInMapRef.current) {
-                                  setSelectedItem(undefined);
-                                  setAutoScrollListToSelection(false);
+                              if (selectedFromUpdatedFeatures) {
+                                hasSelectedItemBeenVisibleInMapRef.current = true;
+                                if (selectedFromUpdatedFeatures !== selectedItem) {
+                                  setSelectedItem(selectedFromUpdatedFeatures);
                                 }
+                              } else if (hasSelectedItemBeenVisibleInMapRef.current) {
+                                setSelectedItem(undefined);
+                                setAutoScrollListToSelection(false);
                               }
-                            }}
-                            onQueryError={(errorMessage): void => {
-                              setLowResolutionPartsError(errorMessage);
-                            }}
-                            textStyleFactory={(feat) => {
-                              const isFootprint = Boolean(feat.properties?._showAsFootprint);
-                              if (isFootprint) {
-                                return undefined;
-                              }
+                            }
+                          }}
+                          onQueryError={(errorMessage): void => {
+                            setLowResolutionPartsError(errorMessage);
+                          }}
+                          textStyleFactory={(feat) => {
+                            const isFootprint = Boolean(feat.properties?._showAsFootprint);
+                            if (isFootprint) {
+                              return undefined;
+                            }
 
-                              const isExceeded = feat.properties?.exceeded === true;
+                            const isExceeded = feat.properties?.exceeded === true;
 
-                              const featureLabel = feat.properties?._featureLabel as string | undefined;
-                              const zoomLevel = feat.properties?._zoomLevel;
-                              const labelParts: string[] = [];
+                            const featureLabel = feat.properties?._featureLabel as string | undefined;
+                            const zoomLevel = feat.properties?._zoomLevel;
+                            const labelParts: string[] = [];
 
-                              if (featureLabel) {
-                                labelParts.push(featureLabel);
-                              }
-                              if (zoomLevel !== undefined && zoomLevel !== null) {
-                                labelParts.push(`(${String(zoomLevel)})`);
-                              }
+                            if (featureLabel) {
+                              labelParts.push(featureLabel);
+                            }
+                            if (zoomLevel !== undefined && zoomLevel !== null) {
+                              labelParts.push(`(${String(zoomLevel)})`);
+                            }
 
-                              if (labelParts.length === 0) {
-                                return undefined;
-                              }
+                            if (labelParts.length === 0) {
+                              return undefined;
+                            }
 
-                              return new Text({
-                                text: labelParts.join('\n'),
-                                textAlign: 'center',
-                                textBaseline: 'middle',
-                                font: 'bold 10px/1 Roboto',
-                                fill: new Fill({ color: isExceeded ? '#d32f2f' : '#ff7f00' }),
-                                stroke: new Stroke({ color: '#000', width: 3 }),
-                                placement: 'point',
-                                overflow: true,
-                              });
-                            }}
-                            options={{ zIndex: 2 }}
-                          />
-                        </>
+                            return new Text({
+                              text: labelParts.join('\n'),
+                              textAlign: 'center',
+                              textBaseline: 'middle',
+                              font: 'bold 10px/1 Roboto',
+                              fill: new Fill({ color: isExceeded ? '#d32f2f' : '#ff7f00' }),
+                              stroke: new Stroke({ color: '#000', width: 3 }),
+                              placement: 'point',
+                              overflow: true,
+                            });
+                          }}
+                          options={{ zIndex: 2 }}
+                        />
                       : null
                   }
                 </GeoFeaturesPresentorComponent>
