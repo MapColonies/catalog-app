@@ -291,7 +291,28 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
             selectedFeature={selectedFeature?.properties?._featureType === FeatureType.EXISTING_PP ? selectedFeature : undefined}
             onFeaturesChange={(updatedFeatures: Feature[]): void => {
               existingPPFeaturesRef.current = updatedFeatures;
+              const selectedExistingFeature =
+                selectedFeature?.properties?._featureType === FeatureType.EXISTING_PP ? selectedFeature : undefined;
+
               if (isFootprintOnlyDisplay(updatedFeatures)) {
+                clearPreviewSelection();
+                return;
+              }
+
+              if (!selectedExistingFeature) {
+                return;
+              }
+
+              const selectedId = selectedExistingFeature.properties?.id;
+              const isSelectedInExtent = updatedFeatures.some((feature) => {
+                const featureId = feature.properties?.id;
+                if (selectedId !== undefined && featureId !== undefined) {
+                  return featureId === selectedId;
+                }
+                return feature === selectedExistingFeature;
+              });
+
+              if (!isSelectedInExtent) {
                 clearPreviewSelection();
               }
             }}
