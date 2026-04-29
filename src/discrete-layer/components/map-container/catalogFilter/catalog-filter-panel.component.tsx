@@ -102,10 +102,7 @@ export const CatalogFilterPanel: React.FC<CatalogFilterPanelProps> = observer(
               raised
               type="submit"
               form="catalogFiltersForm"
-              onClick={
-                // add change here, to close the dialog after press the search button
-                formMethods.handleSubmit(handleSubmit)
-              }
+              onClick={formMethods.handleSubmit(handleSubmit)}
               disabled={isSubmitFiltersDisabled}
             >
               {intl.formatMessage({ id: 'catalog-filter.filterButton.text' })}
