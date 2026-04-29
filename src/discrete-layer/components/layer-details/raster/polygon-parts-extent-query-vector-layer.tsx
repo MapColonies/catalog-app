@@ -112,6 +112,15 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
       return;
     }
 
+    const selectedFeatureType =
+      selectedFeature?.properties && typeof selectedFeature.properties === 'object'
+        ? (selectedFeature.properties as Record<string, unknown>)._featureType
+        : undefined;
+
+    if (selectedFeatureType !== featureType) {
+      return;
+    }
+
     if (isFootprintModeRef.current) {
       onClearSelectedFeatureRef.current?.();
       return;
@@ -146,7 +155,7 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
     if (!isSelectedInCurrentExtent) {
       onClearSelectedFeatureRef.current?.();
     }
-  }, [polygonParts, selectedFeature]);
+  }, [featureType, polygonParts, selectedFeature]);
 
   useEffect(() => {
     let initialFetchTimer: number | undefined;

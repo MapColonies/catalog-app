@@ -512,6 +512,20 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                             setSelectedItem(undefined);
                             setAutoScrollListToSelection(false);
                           }}
+                          onFeaturesChange={(updatedFeatures): void => {
+                            const currentSelectedKey = selectedItem?.properties?._key;
+                            if (currentSelectedKey !== undefined) {
+                              const selectedFromUpdatedFeatures = updatedFeatures.find(
+                                (feature) => feature.properties?._key === currentSelectedKey
+                              );
+
+                              if (selectedFromUpdatedFeatures) {
+                                if (selectedFromUpdatedFeatures !== selectedItem) {
+                                  setSelectedItem(selectedFromUpdatedFeatures);
+                                }
+                              }
+                            }
+                          }}
                           onQueryError={(errorMessage): void => {
                             setLowResolutionPartsError(errorMessage);
                           }}
