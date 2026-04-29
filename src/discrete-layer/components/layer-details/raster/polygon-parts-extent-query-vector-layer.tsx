@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { BBox, Feature, GeoJsonProperties, Geometry } from 'geojson';
 import { debounce } from 'lodash';
-import { MapEvent } from 'ol';
 import GeoJSON from 'ol/format/GeoJSON';
 import { Options } from 'ol/layer/Base';
 import { Size } from 'ol/size';
@@ -101,17 +100,40 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
   }, [polygonParts]);
 
   useEffect(() => {
-    const handleMoveEndEvent = (e: MapEvent): void => {
-      void getPolygonParts(mapOl.getView().calculateExtent() as BBox, START);
+    let initialFetchTimer: number | undefined;
+
+    const requestPolygonPartsByCurrentExtent = (): boolean => {
+      const extent = getCurrentExtent();
+      if (!extent) {
+        return false;
+      }
+      void getPolygonParts(extent, START);
+      return true;
+    };
+
+    const scheduleInitialFetch = (attempt: number): void => {
+      if (requestPolygonPartsByCurrentExtent() || attempt >= 20) {
+        return;
+      }
+      initialFetchTimer = window.setTimeout(() => {
+        scheduleInitialFetch(attempt + 1);
+      }, 100);
+    };
+
+    const handleMoveEndEvent = (): void => {
+      requestPolygonPartsByCurrentExtent();
     };
 
     const debounceCall = debounce(handleMoveEndEvent, DEBOUNCE_MOUSE_INTERVAL);
     mapOl.on('moveend', debounceCall);
 
-    void getPolygonParts(mapOl.getView().calculateExtent() as BBox, START);
+    scheduleInitialFetch(0);
 
     return (): void => {
       try {
+        if (initialFetchTimer !== undefined) {
+          window.clearTimeout(initialFetchTimer);
+        }
         mapOl.un('moveend', debounceCall);
       } catch (e) {
         console.log('OL "moveEnd" remove listener failed', e);
@@ -119,10 +141,27 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
     };
   }, []);
 
+  const getCurrentExtent = (): BBox | undefined => {
+    const size = mapOl.getSize();
+    if (!size || size[0] <= 0 || size[1] <= 0) {
+      return undefined;
+    }
+    try {
+      return mapOl.getView().calculateExtent(size) as BBox;
+    } catch {
+      return undefined;
+    }
+  };
+
   const showLoadingSpinner = (isShown: boolean) => {
+    const targetElement = mapOl.getTargetElement();
+    if (!targetElement) {
+      return;
+    }
+
     isShown
-      ? mapOl.getTargetElement().classList.add('olSpinner')
-      : mapOl.getTargetElement().classList.remove('olSpinner');
+      ? targetElement.classList.add('olSpinner')
+      : targetElement.classList.remove('olSpinner');
   };
 
   const getPolygonParts = async (bbox: BBox, startIndex: number): Promise<void> => {
@@ -146,7 +185,10 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
       let nextStartIndex = startIndex;
 
       while (true) {
-        const extent = mapOl.getView().calculateExtent() as BBox;
+        const extent = getCurrentExtent();
+        if (!extent) {
+          break;
+        }
         const result = await queryExecutor(extent, nextStartIndex);
         const pageStartIndex = nextStartIndex;
 
