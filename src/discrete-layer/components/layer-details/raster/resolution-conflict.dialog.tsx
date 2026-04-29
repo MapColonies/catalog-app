@@ -46,6 +46,7 @@ interface ParsedFeatureCollection {
 }
 
 type FilterMode = 'all' | 'exceeded';
+const SHOW_PARTS_AFTER_INIT = true;
 
 const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps> = ({
   isOpen,
@@ -228,6 +229,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
         setLowResolutionPartsError(`${intl.formatMessage({ id: 'resolutionConflict.error.fetchFailed' })}${errorMessage ? `: ${errorMessage}` : ''}`);
       } finally {
         setIsLoadingLowResolutionParts(false);
+        setShowLowResolutionPolygonParts(SHOW_PARTS_AFTER_INIT);
       }
     };
 
@@ -490,7 +492,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                     setAutoScrollListToSelection(true);
                     setSelectedItem(clickedFeature);
                   }}
-                  showPolygonParts={true}
+                  showPolygonParts={SHOW_PARTS_AFTER_INIT}
                   >
                   {
                     showLowResolutionPolygonParts && lowResolutionFeatures !== undefined

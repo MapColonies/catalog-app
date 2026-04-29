@@ -103,31 +103,18 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
     let initialFetchTimer: number | undefined;
 
     const requestPolygonPartsByCurrentExtent = (): boolean => {
-      const extent = getCurrentExtent();
-      if (!extent) {
-        return false;
-      }
-      void getPolygonParts(extent, START);
+      void getPolygonParts(getCurrentExtent(), START);
       return true;
     };
 
-    const scheduleInitialFetch = (attempt: number): void => {
-      if (requestPolygonPartsByCurrentExtent() || attempt >= 20) {
-        return;
-      }
-      initialFetchTimer = window.setTimeout(() => {
-        scheduleInitialFetch(attempt + 1);
-      }, 100);
-    };
-
-    const handleMoveEndEvent = (): void => {
+    mapOl.once('postrender', () => {
       requestPolygonPartsByCurrentExtent();
-    };
+    });
 
-    const debounceCall = debounce(handleMoveEndEvent, DEBOUNCE_MOUSE_INTERVAL);
-    mapOl.on('moveend', debounceCall);
-
-    scheduleInitialFetch(0);
+    const debounceCall = debounce(requestPolygonPartsByCurrentExtent, DEBOUNCE_MOUSE_INTERVAL);
+    mapOl.on('moveend', () => {
+      debounceCall();
+    });
 
     return (): void => {
       try {
@@ -141,16 +128,8 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
     };
   }, []);
 
-  const getCurrentExtent = (): BBox | undefined => {
-    const size = mapOl.getSize();
-    if (!size || size[0] <= 0 || size[1] <= 0) {
-      return undefined;
-    }
-    try {
-      return mapOl.getView().calculateExtent(size) as BBox;
-    } catch {
-      return undefined;
-    }
+  const getCurrentExtent = (): BBox => {
+    return mapOl.getView().calculateExtent(mapOl.getSize()) as BBox;
   };
 
   const showLoadingSpinner = (isShown: boolean) => {
@@ -186,9 +165,6 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
 
       while (true) {
         const extent = getCurrentExtent();
-        if (!extent) {
-          break;
-        }
         const result = await queryExecutor(extent, nextStartIndex);
         const pageStartIndex = nextStartIndex;
 
