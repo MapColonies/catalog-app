@@ -247,7 +247,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
             id: 'f2a61783-6b16-4520-9b18-ae216e642d54',
             domain: Domain.RASTER,
             type: String(state.context.job?.details?.type ?? ''),
-            // allowedValidationrrors: 'resolution',
+            // allowedValidationErrors: 'resolution',
             // approver: approver.trim(),
           },
         });
@@ -326,8 +326,6 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                 }
                 {isLoadingLowResolutionParts ? (
                   <Curtain showProgress={true} />
-                ) : lowResolutionPartsError ? (
-                  <></>
                 ) : lowResolutionCollections.length === 0 || !hasFilteredFeatures ? (
                   <Typography tag="p" className="emptyList">
                     <FormattedMessage id="general.empty.text" />
