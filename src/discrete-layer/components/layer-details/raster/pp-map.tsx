@@ -24,6 +24,7 @@ import CONFIG from '../../../../common/config';
 import { useEnums } from '../../../../common/hooks/useEnum.hook';
 import { Mode } from '../../../../common/models/mode.enum';
 import { MapFeatureClickHandler } from '../../../../common/components/ol-map/map-feature-click-handler';
+import { FeatureSelectionHandler } from '../../../../common/components/ol-map/feature-selection-handler';
 import { MapLoadingIndicator } from '../../../../common/components/ol-map/map-loading-indicator';
 import { ZoomLevelIndicator } from '../../../../common/components/ol-map/zoom-level-indicator';
 import { LayerRasterRecordModelType } from '../../../models';
@@ -41,15 +42,14 @@ import './pp-map.css';
 interface GeoFeaturesPresentorProps {
   mode: Mode;
   geoFeatures?: Feature[];
-  children?: JSX.Element | null;
   style?: CSSProperties | undefined;
   fitOptions?: FitOptions | undefined;
-  showExistingPolygonParts?: boolean;
   layerRecord?: ILayerImage | null;
-  enableFeaturePropertiesPopup?: boolean;
   onMapFeatureClick?: (feature: Feature | undefined) => void;
-  onFeaturePropertiesPopupClose?: () => void;
+  enableFeaturePropertiesPopup?: boolean;
   selectedItem?: Feature;
+  showPolygonParts?: boolean;
+  children?: JSX.Element | null;
 }
 
 const DEFAULT_PROJECTION = 'EPSG:4326';
@@ -60,12 +60,12 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   geoFeatures,
   style,
   fitOptions,
-  children,
   layerRecord,
-  enableFeaturePropertiesPopup = false,
   onMapFeatureClick,
-  onFeaturePropertiesPopupClose,
+  enableFeaturePropertiesPopup = false,
   selectedItem,
+  showPolygonParts = false,
+  children,
 }) => {
   const store = useStore();
   const ENUMS = useEnums();
@@ -77,7 +77,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   const previousShowExistingPolygonPartsRef = useRef(false);
   const previousGeoFeaturesLengthRef = useRef(geoFeatures?.length ?? 0);
   const [selectedFeature, setSelectedFeature] = useState<Feature | undefined>(undefined);
-  const [showExistingPolygonParts, setShowExistingPolygonParts] = useState<boolean>(false);
+  const [showExistingPolygonParts, setShowExistingPolygonParts] = useState<boolean>(showPolygonParts);
   showExistingPolygonPartsRef.current = showExistingPolygonParts;
 
   const isFootprintOnlyDisplay = useCallback((features?: Feature[]): boolean => {
@@ -96,8 +96,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   const clearPreviewSelection = useCallback((): void => {
     setSelectedFeature(undefined);
     onMapFeatureClick?.(undefined);
-    onFeaturePropertiesPopupClose?.();
-  }, [onFeaturePropertiesPopupClose, onMapFeatureClick]);
+  }, []);
 
   useEffect(() => {
     const definedElements = geoFeatures?.filter((feat) => feat !== undefined);
@@ -304,6 +303,10 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
           onMapFeatureClick={onMapFeatureClick}
           setSelectedFeature={setSelectedFeature}
         />
+        {
+          selectedFeature?.properties?._featureType === FeatureType.EXISTING_PP &&
+          <FeatureSelectionHandler feature={selectedFeature} />
+        }
         {
           enableFeaturePropertiesPopup &&
           <FeaturePropertiesPopupComponent

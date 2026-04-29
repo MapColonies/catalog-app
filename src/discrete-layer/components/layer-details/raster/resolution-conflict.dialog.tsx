@@ -490,11 +490,8 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                     setAutoScrollListToSelection(true);
                     setSelectedItem(clickedFeature);
                   }}
-                  onFeaturePropertiesPopupClose={(): void => {
-                    setSelectedItem(undefined);
-                    setAutoScrollListToSelection(false);
-                  }}
-                >
+                  showPolygonParts={false}
+                  >
                   {
                     showLowResolutionPolygonParts && lowResolutionFeatures !== undefined
                       ? <>
