@@ -68,8 +68,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
   const [approver, setApprover] = useState('');
   const [listFilterMode, setListFilterMode] = useState<FilterMode>('all');
   const [selectedItem, setSelectedItem] = useState<Feature>();
-  const wasSelectedItemInExtentRef = useRef(false);
-  const selectedLowResolutionFeatureKeyRef = useRef<string | undefined>(undefined);
+  const hasSelectedItemBeenVisibleInMapRef = useRef(false);
   const selectedLowResolutionFeatureKey = selectedItem?.properties?._key as string | undefined;
   const reportUrl = state.context.job?.validationReport?.report?.url;
   const ingestionResolution = state.context.job?.details?.parameters?.ingestionResolution as string | undefined;
@@ -148,12 +147,9 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
     });
   }, [autoScrollListToSelection, selectedLowResolutionPosition]);
 
-  const setSelectedLowResolutionItem = useCallback((feature?: Feature): void => {
-    const key = feature?.properties?._key as string | undefined;
-    selectedLowResolutionFeatureKeyRef.current = key;
-    wasSelectedItemInExtentRef.current = false;
-    setSelectedItem(feature);
-  }, []);
+  useEffect(() => {
+    hasSelectedItemBeenVisibleInMapRef.current = false;
+  }, [selectedLowResolutionFeatureKey]);
 
   const resolutionDegreeToZoomLevel = useMemo(() => {
     const table = Object.values(ZOOM_LEVELS_TABLE);
@@ -181,7 +177,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
 
     if (!reportUrl) {
       setLowResolutionCollections([]);
-      setSelectedLowResolutionItem(undefined);
+      setSelectedItem(undefined);
       setLowResolutionPartsError(intl.formatMessage({ id: 'resolutionConflict.error.missingUrl' }));
       return;
     }
@@ -224,11 +220,11 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
         ];
         setLowResolutionCollections(newCollections);
         setCollectionMountKeys(newCollections.map(() => 0));
-        setSelectedLowResolutionItem(undefined);
+        setSelectedItem(undefined);
       } catch (error) {
         const errorMessage = (error as Error)?.message;
         setLowResolutionCollections([]);
-        setSelectedLowResolutionItem(undefined);
+        setSelectedItem(undefined);
         setLowResolutionPartsError(`${intl.formatMessage({ id: 'resolutionConflict.error.fetchFailed' })}${errorMessage ? `: ${errorMessage}` : ''}`);
       } finally {
         setIsLoadingLowResolutionParts(false);
@@ -237,7 +233,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
 
     void loadLowResolutionParts();
 
-  }, [api, setSelectedLowResolutionItem]);
+  }, [api]);
 
   const closeDialog = useCallback((): void => {
     onSetIsOpen(false);
@@ -265,9 +261,9 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
   }, [approver]);
 
   const clearLowResolutionSelection = useCallback((): void => {
-    setSelectedLowResolutionItem(undefined);
+    setSelectedItem(undefined);
     setAutoScrollListToSelection(false);
-  }, [setSelectedLowResolutionItem]);
+  }, []);
 
   return (
     <Box id="resolutionConflictDialog">
@@ -293,7 +289,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                         setShowLowResolutionPolygonParts(isChecked);
                         if (!isChecked) {
                           setAutoScrollListToSelection(false);
-                          setSelectedLowResolutionItem(undefined);
+                          setSelectedItem(undefined);
                         }
                       }}
                     />
@@ -384,7 +380,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                                           setShowLowResolutionPolygonParts(true);
                                           setAutoScrollListToSelection(false);
                                           if (featureKey) {
-                                            setSelectedLowResolutionItem(lowResolutionFeatures.find((f) => f.properties?._key === featureKey) ?? feature);
+                                            setSelectedItem(lowResolutionFeatures.find((f) => f.properties?._key === featureKey) ?? feature);
                                           }
                                         }}
                                       >
@@ -480,7 +476,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                   onMapFeatureClick={(feature) => {
                     if (feature?.properties?._key === undefined) {
                       // An existing (green) feature was clicked — clear list selection
-                      setSelectedLowResolutionItem(undefined);
+                      setSelectedItem(undefined);
                       setAutoScrollListToSelection(false);
                       return;
                     }
@@ -494,10 +490,10 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
 
                     setShowLowResolutionPolygonParts(true);
                     setAutoScrollListToSelection(true);
-                    setSelectedLowResolutionItem(clickedFeature);
+                    setSelectedItem(clickedFeature);
                   }}
                   onFeaturePropertiesPopupClose={(): void => {
-                    setSelectedLowResolutionItem(undefined);
+                    setSelectedItem(undefined);
                     setAutoScrollListToSelection(false);
                   }}
                 >
@@ -530,15 +526,19 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                               if (isFootprintOnly) {
                                 return;
                               }
-                              const currentSelectedKey = selectedLowResolutionFeatureKeyRef.current;
+                              const currentSelectedKey = selectedItem?.properties?._key;
                               if (currentSelectedKey !== undefined) {
                                 const selectedFromUpdatedFeatures = updatedFeatures.find(
                                   (feature) => feature.properties?._key === currentSelectedKey
                                 );
+
                                 if (selectedFromUpdatedFeatures) {
-                                  wasSelectedItemInExtentRef.current = true;
-                                } else if (wasSelectedItemInExtentRef.current) {
-                                  setSelectedLowResolutionItem(undefined);
+                                  hasSelectedItemBeenVisibleInMapRef.current = true;
+                                  if (selectedFromUpdatedFeatures !== selectedItem) {
+                                    setSelectedItem(selectedFromUpdatedFeatures);
+                                  }
+                                } else if (hasSelectedItemBeenVisibleInMapRef.current) {
+                                  setSelectedItem(undefined);
                                   setAutoScrollListToSelection(false);
                                 }
                               }
