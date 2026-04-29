@@ -113,7 +113,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
     }
   }, [selectedFeature, selectedItem]);
 
-  const clearPreviewSelection = useCallback((): void => {
+  const clearSelection = useCallback((): void => {
     setSelectedFeature(undefined);
     onMapFeatureClick?.(undefined);
   }, []);
@@ -214,7 +214,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
                 const isChecked = evt.currentTarget.checked;
                 setShowExistingPolygonParts(isChecked);
                 if (!isChecked) {
-                  clearPreviewSelection();
+                  clearSelection();
                 }
               }}
             />
@@ -253,34 +253,8 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
             }}
             outerPerimeter={layerRecord?.footprint as Geometry | undefined}
             selectedFeature={selectedFeature}
-            onFeaturesChange={(updatedFeatures: Feature[], isFootprintMode: boolean): void => {
-              const selectedExistingFeature =
-                selectedFeature?.properties?._featureType === FeatureType.EXISTING_PP ? selectedFeature : undefined;
-
-              if (isFootprintMode) {
-                clearPreviewSelection();
-                return;
-              }
-
-              if (!selectedExistingFeature) {
-                return;
-              }
-
-              const selectedId = selectedExistingFeature.properties?.id;
-              const isSelectedInExtent = updatedFeatures.some((feature) => {
-                const featureId = feature.properties?.id;
-                if (selectedId !== undefined && featureId !== undefined) {
-                  return featureId === selectedId;
-                }
-                return feature === selectedExistingFeature;
-              });
-
-              if (!isSelectedInExtent) {
-                clearPreviewSelection();
-              }
-            }}
-            // @ts-ignore
-            options={{ id: FeatureType.EXISTING_PP, zIndex: 1 }}
+            onClearSelectedFeature={clearSelection}
+            options={{ properties: { id: FeatureType.EXISTING_PP }, zIndex: 1 }}
           />
         }
         {children}
@@ -293,7 +267,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
           enableFeaturePropertiesPopup &&
           <FeaturePropertiesPopupComponent
             selectedFeature={selectedFeature}
-            onClose={clearPreviewSelection}
+            onClose={clearSelection}
           />
         }
       </Map>

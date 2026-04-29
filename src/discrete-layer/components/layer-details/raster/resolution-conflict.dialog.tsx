@@ -68,7 +68,6 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
   const [approver, setApprover] = useState('');
   const [listFilterMode, setListFilterMode] = useState<FilterMode>('all');
   const [selectedItem, setSelectedItem] = useState<Feature>();
-  const hasSelectedItemBeenVisibleInMapRef = useRef(false);
   const selectedLowResolutionFeatureKey = selectedItem?.properties?._key as string | undefined;
   const reportUrl = state.context.job?.validationReport?.report?.url;
   const ingestionResolution = state.context.job?.details?.parameters?.ingestionResolution as string | undefined;
@@ -146,10 +145,6 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
       return next;
     });
   }, [autoScrollListToSelection, selectedLowResolutionPosition]);
-
-  useEffect(() => {
-    hasSelectedItemBeenVisibleInMapRef.current = false;
-  }, [selectedLowResolutionFeatureKey]);
 
   const resolutionDegreeToZoomLevel = useMemo(() => {
     const table = Object.values(ZOOM_LEVELS_TABLE);
@@ -244,11 +239,11 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
     const resumeJob = async (): Promise<void> => {
       try {
         await state.context.store.mutateJobRetry({
-          jobRetryParams: { // bypass-validation-error
+          jobRetryParams: { // bypass-validation-errors
             id: 'f2a61783-6b16-4520-9b18-ae216e642d54',
             domain: Domain.RASTER,
             type: String(state.context.job?.details?.type ?? ''),
-            // allowedValidationErrors: 'resolution',
+            // allowedValidationErrors: ['resolution'],
             // approver: approver.trim(),
           },
         });
@@ -513,26 +508,9 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                           }}
                           outerPerimeter={outerPerimeter?.geometry}
                           selectedFeature={selectedItem}
-                          onFeaturesChange={(updatedFeatures, isFootprintMode): void => {
-                            if (isFootprintMode) {
-                              return;
-                            }
-                            const currentSelectedKey = selectedItem?.properties?._key;
-                            if (currentSelectedKey !== undefined) {
-                              const selectedFromUpdatedFeatures = updatedFeatures.find(
-                                (feature) => feature.properties?._key === currentSelectedKey
-                              );
-
-                              if (selectedFromUpdatedFeatures) {
-                                hasSelectedItemBeenVisibleInMapRef.current = true;
-                                if (selectedFromUpdatedFeatures !== selectedItem) {
-                                  setSelectedItem(selectedFromUpdatedFeatures);
-                                }
-                              } else if (hasSelectedItemBeenVisibleInMapRef.current) {
-                                setSelectedItem(undefined);
-                                setAutoScrollListToSelection(false);
-                              }
-                            }
+                          onClearSelectedFeature={() => {
+                            setSelectedItem(undefined);
+                            setAutoScrollListToSelection(false);
                           }}
                           onQueryError={(errorMessage): void => {
                             setLowResolutionPartsError(errorMessage);
@@ -571,8 +549,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                               overflow: true,
                             });
                           }}
-                          // @ts-ignore
-                          options={{ id: FeatureType.LOW_RESOLUTION_PP, zIndex: 2 }}
+                          options={{ properties: { id: FeatureType.LOW_RESOLUTION_PP }, zIndex: 2 }}
                         />
                       : null
                   }

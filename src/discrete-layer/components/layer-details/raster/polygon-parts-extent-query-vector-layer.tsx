@@ -37,7 +37,8 @@ interface PolygonPartsExtentQueryVectorLayerProps {
   queryExecutor: (bbox: BBox, startIndex: number) => Promise<IQueryExecutorResponse>;
   outerPerimeter?: Geometry;
   selectedFeature?: Feature;
-  onFeaturesChange?: (features: Feature[], isFootprintMode: boolean) => void;
+  onClearSelectedFeature?: () => void;
+  onFeaturesChange?: (features: Feature[]) => void;
   onQueryError?: (errorMessage: string) => void;
   textStyleFactory?: (feature: Feature) => Text | undefined;
   options?: Options;
@@ -72,6 +73,7 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
   queryExecutor,
   outerPerimeter,
   selectedFeature,
+  onClearSelectedFeature,
   onFeaturesChange,
   onQueryError,
   textStyleFactory,
@@ -81,8 +83,10 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
   const intl = useIntl();
   const store = useStore();
   const activeRequestIdRef = useRef(0);
+  const isQueryInProgressRef = useRef(false);
   const hasEmittedInitialFeaturesRef = useRef(false);
   const onFeaturesChangeRef = useRef<typeof onFeaturesChange>(onFeaturesChange);
+  const onClearSelectedFeatureRef = useRef<typeof onClearSelectedFeature>(onClearSelectedFeature);
   const isFootprintModeRef = useRef(false);
   const ZOOM_LEVELS_TABLE = useZoomLevelsTable();
   const [polygonParts, setPolygonParts] = useState<Feature[]>([]);
@@ -92,13 +96,57 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
   }, [onFeaturesChange]);
 
   useEffect(() => {
+    onClearSelectedFeatureRef.current = onClearSelectedFeature;
+  }, [onClearSelectedFeature]);
+
+  useEffect(() => {
     if (!hasEmittedInitialFeaturesRef.current) {
       hasEmittedInitialFeaturesRef.current = true;
       return;
     }
-
-    onFeaturesChangeRef.current?.(polygonParts, isFootprintModeRef.current);
+    onFeaturesChangeRef.current?.(polygonParts);
   }, [polygonParts]);
+
+  useEffect(() => {
+    if (!selectedFeature || !hasEmittedInitialFeaturesRef.current || isQueryInProgressRef.current) {
+      return;
+    }
+
+    if (isFootprintModeRef.current) {
+      onClearSelectedFeatureRef.current?.();
+      return;
+    }
+
+    const selectedFeatureProperties =
+      selectedFeature.properties && typeof selectedFeature.properties === 'object'
+        ? selectedFeature.properties as Record<string, unknown>
+        : undefined;
+    const selectedFeatureKey = selectedFeatureProperties?._key;
+    const selectedFeatureId = selectedFeature?.id ?? selectedFeatureProperties?.id;
+
+    const isSelectedInCurrentExtent = polygonParts.some((feature) => {
+      const featureProperties =
+        feature.properties && typeof feature.properties === 'object'
+          ? feature.properties as Record<string, unknown>
+          : undefined;
+
+      const featureKey = featureProperties?._key;
+      if (selectedFeatureKey !== undefined && featureKey !== undefined) {
+        return featureKey === selectedFeatureKey;
+      }
+
+      const featureId = feature?.id ?? featureProperties?.id;
+      if (selectedFeatureId !== undefined && featureId !== undefined) {
+        return selectedFeatureId === featureId;
+      }
+
+      return selectedFeature === feature;
+    });
+
+    if (!isSelectedInCurrentExtent) {
+      onClearSelectedFeatureRef.current?.();
+    }
+  }, [polygonParts, selectedFeature]);
 
   useEffect(() => {
     let initialFetchTimer: number | undefined;
@@ -152,6 +200,7 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
       currentZoomLevel < CONFIG.POLYGON_PARTS.MAX.SHOW_FOOTPRINT_ZOOM_LEVEL
     ) {
       showLoadingSpinner(false);
+      isQueryInProgressRef.current = false;
       isFootprintModeRef.current = true;
       const footprintFeature = createZoomedOutFootprintFeature(outerPerimeter, featureType);
       setPolygonParts(footprintFeature ? [footprintFeature] : []);
@@ -159,6 +208,7 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
     }
 
     isFootprintModeRef.current = false;
+    isQueryInProgressRef.current = true;
     const requestId = activeRequestIdRef.current + 1;
     activeRequestIdRef.current = requestId;
     showLoadingSpinner(true);
@@ -211,6 +261,7 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
       }
     } finally {
       if (activeRequestIdRef.current === requestId) {
+        isQueryInProgressRef.current = false;
         showLoadingSpinner(false);
       }
     }
