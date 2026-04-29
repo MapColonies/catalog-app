@@ -37,7 +37,7 @@ interface PolygonPartsExtentQueryVectorLayerProps {
   queryExecutor: (bbox: BBox, startIndex: number) => Promise<IQueryExecutorResponse>;
   outerPerimeter?: Geometry;
   selectedFeature?: Feature;
-  onFeaturesChange?: (features: Feature[]) => void;
+  onFeaturesChange?: (features: Feature[], isFootprintMode: boolean) => void;
   onQueryError?: (errorMessage: string) => void;
   textStyleFactory?: (feature: Feature) => Text | undefined;
   options?: Options;
@@ -83,6 +83,7 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
   const activeRequestIdRef = useRef(0);
   const hasEmittedInitialFeaturesRef = useRef(false);
   const onFeaturesChangeRef = useRef<typeof onFeaturesChange>(onFeaturesChange);
+  const isFootprintModeRef = useRef(false);
   const ZOOM_LEVELS_TABLE = useZoomLevelsTable();
   const [polygonParts, setPolygonParts] = useState<Feature[]>([]);
 
@@ -96,7 +97,7 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
       return;
     }
 
-    onFeaturesChangeRef.current?.(polygonParts);
+    onFeaturesChangeRef.current?.(polygonParts, isFootprintModeRef.current);
   }, [polygonParts]);
 
   useEffect(() => {
@@ -151,11 +152,13 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
       currentZoomLevel < CONFIG.POLYGON_PARTS.MAX.SHOW_FOOTPRINT_ZOOM_LEVEL
     ) {
       showLoadingSpinner(false);
+      isFootprintModeRef.current = true;
       const footprintFeature = createZoomedOutFootprintFeature(outerPerimeter, featureType);
       setPolygonParts(footprintFeature ? [footprintFeature] : []);
       return;
     }
 
+    isFootprintModeRef.current = false;
     const requestId = activeRequestIdRef.current + 1;
     activeRequestIdRef.current = requestId;
     showLoadingSpinner(true);

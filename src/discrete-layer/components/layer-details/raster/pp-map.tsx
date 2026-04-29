@@ -75,24 +75,6 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   const [selectedFeature, setSelectedFeature] = useState<Feature | undefined>(undefined);
   const [showExistingPolygonParts, setShowExistingPolygonParts] = useState<boolean>(showPolygonParts);
 
-  const isFootprintOnlyDisplay = useCallback((features?: Feature[]): boolean => {
-    if (!features || features.length !== 1) {
-      return false;
-    }
-
-    const properties = features[0]?.properties;
-    return Boolean(
-      properties &&
-      typeof properties === 'object' &&
-      (properties as Record<string, unknown>)._showAsFootprint
-    );
-  }, []);
-
-  const clearPreviewSelection = useCallback((): void => {
-    setSelectedFeature(undefined);
-    onMapFeatureClick?.(undefined);
-  }, []);
-
   useEffect(() => {
     setShowExistingPolygonParts(showPolygonParts);
   }, [showPolygonParts]);
@@ -130,6 +112,11 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
       setSelectedFeature(undefined);
     }
   }, [selectedFeature, selectedItem]);
+
+  const clearPreviewSelection = useCallback((): void => {
+    setSelectedFeature(undefined);
+    onMapFeatureClick?.(undefined);
+  }, []);
 
   const previewBaseMap = useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-array-constructor
@@ -266,11 +253,11 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
             }}
             outerPerimeter={layerRecord?.footprint as Geometry | undefined}
             selectedFeature={selectedFeature}
-            onFeaturesChange={(updatedFeatures: Feature[]): void => {
+            onFeaturesChange={(updatedFeatures: Feature[], isFootprintMode: boolean): void => {
               const selectedExistingFeature =
                 selectedFeature?.properties?._featureType === FeatureType.EXISTING_PP ? selectedFeature : undefined;
 
-              if (isFootprintOnlyDisplay(updatedFeatures)) {
+              if (isFootprintMode) {
                 clearPreviewSelection();
                 return;
               }

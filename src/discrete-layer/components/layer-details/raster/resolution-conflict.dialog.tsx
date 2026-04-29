@@ -513,11 +513,8 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                           }}
                           outerPerimeter={outerPerimeter?.geometry}
                           selectedFeature={selectedItem}
-                          onFeaturesChange={(updatedFeatures): void => {
-                            const isFootprintOnly =
-                              updatedFeatures.length === 1 &&
-                              Boolean(updatedFeatures[0]?.properties?._showAsFootprint);
-                            if (isFootprintOnly) {
+                          onFeaturesChange={(updatedFeatures, isFootprintMode): void => {
+                            if (isFootprintMode) {
                               return;
                             }
                             const currentSelectedKey = selectedItem?.properties?._key;

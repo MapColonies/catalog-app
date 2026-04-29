@@ -13,6 +13,7 @@ export enum FeatureType {
   SOURCE_EXTENT_MARKER = 'SOURCE_EXTENT_MARKER',
   EXISTING_PP = 'EXISTING_PP',
   LOW_RESOLUTION_PP = 'LOW_RESOLUTION_PP',
+  ILLEGAL_PP = 'ILLEGAL_PP',
 }
 
 export const PPMapStyles = new Map<FeatureType, Style | undefined>([
@@ -77,30 +78,18 @@ export const PPMapStyles = new Map<FeatureType, Style | undefined>([
         color: '#FF7F0066',
       }),
     }),
-    /*{
-      byProp: 'exceeded',
-      style: new Style({
-        stroke: new Stroke({
-          width: 2,
-          color: '#D32F2F',
-        }),
-        fill: new Fill({
-          color: '#D32F2F66',
-        }),
+  ],
+  [
+    FeatureType.ILLEGAL_PP,
+    new Style({
+      stroke: new Stroke({
+        width: 2,
+        color: '#E91E63',
       }),
-    },
-    {
-      default: true,
-      style: new Style({
-        stroke: new Stroke({
-          width: 2,
-          color: '#FF7F00',
-        }),
-        fill: new Fill({
-          color: '#FF7F0066',
-        }),
+      fill: new Fill({
+        color: '#E91E6366',
       }),
-    }*/
+    }),
   ],
 ]);
 
