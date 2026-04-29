@@ -574,7 +574,8 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                               overflow: true,
                             });
                           }}
-                          options={{ zIndex: 2 }}
+                          // @ts-ignore
+                          options={{ id: FeatureType.LOW_RESOLUTION_PP, zIndex: 2 }}
                         />
                       : null
                   }

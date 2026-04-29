@@ -292,7 +292,8 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
                 clearPreviewSelection();
               }
             }}
-            options={{ zIndex: 1 }}
+            // @ts-ignore
+            options={{ id: FeatureType.EXISTING_PP, zIndex: 1 }}
           />
         }
         {children}
