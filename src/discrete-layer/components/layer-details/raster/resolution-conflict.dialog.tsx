@@ -372,9 +372,17 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                                         style={style}
                                         onClick={(): void => {
                                           setShowLowResolutionPolygonParts(true);
-                                          setAutoScrollListToSelection(false);
+                                          setAutoScrollListToSelection(true);
                                           if (featureKey) {
-                                            setSelectedItem(lowResolutionFeatures.find((f) => f.properties?._key === featureKey) ?? feature);
+                                            // Use feature directly from collection, ensure it has all properties
+                                            const featureWithType = {
+                                              ...feature,
+                                              properties: {
+                                                ...feature.properties,
+                                                _featureType: FeatureType.LOW_RESOLUTION_PP,
+                                              },
+                                            };
+                                            setSelectedItem(featureWithType);
                                           }
                                         }}
                                       >

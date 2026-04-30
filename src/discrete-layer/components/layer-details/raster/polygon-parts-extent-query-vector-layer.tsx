@@ -88,6 +88,8 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
   const onFeaturesChangeRef = useRef<typeof onFeaturesChange>(onFeaturesChange);
   const onClearSelectedFeatureRef = useRef<typeof onClearSelectedFeature>(onClearSelectedFeature);
   const isFootprintModeRef = useRef(false);
+  const selectedFeatureSignatureRef = useRef<string | undefined>(undefined);
+  const hasSeenSelectedFeatureInExtentRef = useRef(false);
   const ZOOM_LEVELS_TABLE = useZoomLevelsTable();
   const [polygonParts, setPolygonParts] = useState<Feature[]>([]);
 
@@ -98,6 +100,32 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
   useEffect(() => {
     onClearSelectedFeatureRef.current = onClearSelectedFeature;
   }, [onClearSelectedFeature]);
+
+  useEffect(() => {
+    if (!selectedFeature) {
+      selectedFeatureSignatureRef.current = undefined;
+      hasSeenSelectedFeatureInExtentRef.current = false;
+      return;
+    }
+
+    const selectedFeatureProperties =
+      selectedFeature.properties && typeof selectedFeature.properties === 'object'
+        ? selectedFeature.properties as Record<string, unknown>
+        : undefined;
+    const selectedFeatureKey = selectedFeatureProperties?._key;
+    const selectedFeatureId = selectedFeature?.id ?? selectedFeatureProperties?.id;
+    const nextSignature =
+      selectedFeatureKey !== undefined
+        ? `key:${String(selectedFeatureKey)}`
+        : selectedFeatureId !== undefined
+          ? `id:${String(selectedFeatureId)}`
+          : `ref:${String(selectedFeature)}`;
+
+    if (selectedFeatureSignatureRef.current !== nextSignature) {
+      selectedFeatureSignatureRef.current = nextSignature;
+      hasSeenSelectedFeatureInExtentRef.current = false;
+    }
+  }, [selectedFeature]);
 
   useEffect(() => {
     if (!hasEmittedInitialFeaturesRef.current) {
@@ -152,7 +180,12 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
       return selectedFeature === feature;
     });
 
-    if (!isSelectedInCurrentExtent) {
+    if (isSelectedInCurrentExtent) {
+      hasSeenSelectedFeatureInExtentRef.current = true;
+      return;
+    }
+
+    if (hasSeenSelectedFeatureInExtentRef.current) {
       onClearSelectedFeatureRef.current?.();
     }
   }, [featureType, polygonParts, selectedFeature]);
