@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.7.0](https://github.com/MapColonies/catalog-app/compare/v4.6.0...v4.7.0) (2026-04-30)
+
+
+### Features
+
+* resolution conflict dialog ([#881](https://github.com/MapColonies/catalog-app/issues/881)) ([3f7ce8c](https://github.com/MapColonies/catalog-app/commit/3f7ce8cffda9011d4022c60492ad9c59fc196c66))
+
+
+### Bug Fixes
+
+* add ui curtain while fetching catalog data (MAPCO-6937) ([#879](https://github.com/MapColonies/catalog-app/issues/879)) ([5e14ed3](https://github.com/MapColonies/catalog-app/commit/5e14ed3600042d3e3023398a3d2bf3068fde5658))
+
 ## [4.6.0](https://github.com/MapColonies/catalog-app/compare/v4.5.1...v4.6.0) (2026-04-24)
 
 
