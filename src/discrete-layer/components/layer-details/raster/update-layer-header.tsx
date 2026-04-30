@@ -33,17 +33,16 @@ export const UpdateLayerHeader: React.FC<UpdateLayerHeaderProps> = ({
           mode={Mode.VIEW}
         />
       </Box>
-      {
-        state.context.selectionMode === 'restore' &&
+      {state.context.selectionMode === 'restore' &&
         state.context.flowType === Mode.UPDATE &&
         ![Status.Completed, Status.Aborted].includes(
           state.context.job?.details?.status as Status
         ) && (
-        <Box className="lockedIcon warning">
-          <Icon icon={{ icon: 'lock', size: 'xlarge' }} />
-          <Typography tag="span">{intl.formatMessage({ id: 'general.title.locked' })}</Typography>
-        </Box>
-      )}
+          <Box className="lockedIcon warning">
+            <Icon icon={{ icon: 'lock', size: 'xlarge' }} />
+            <Typography tag="span">{intl.formatMessage({ id: 'general.title.locked' })}</Typography>
+          </Box>
+        )}
     </Box>
   );
 };

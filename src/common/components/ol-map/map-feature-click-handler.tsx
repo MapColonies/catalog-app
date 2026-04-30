@@ -10,7 +10,10 @@ interface MapFeatureClickHandlerProps {
   setSelectedFeature: Dispatch<SetStateAction<Feature | undefined>>;
 }
 
-export const MapFeatureClickHandler: React.FC<MapFeatureClickHandlerProps> = ({ onMapFeatureClick, setSelectedFeature }) => {
+export const MapFeatureClickHandler: React.FC<MapFeatureClickHandlerProps> = ({
+  onMapFeatureClick,
+  setSelectedFeature,
+}) => {
   const map = useMap();
 
   useEffect(() => {

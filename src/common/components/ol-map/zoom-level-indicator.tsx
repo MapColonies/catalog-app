@@ -34,7 +34,9 @@ export const ZoomLevelIndicator: React.FC = () => {
     <Box className="zoomLevelIndicatorContainer">
       <Box className="zoomLevelIndicator">
         <Box className="zoomLevelIndicatorValue">{formatZoomLevelValue(zoomLevel)}</Box>
-        <Box className="zoomLevelIndicatorLabel"><FormattedMessage id="map.zoom.label" /></Box>
+        <Box className="zoomLevelIndicatorLabel">
+          <FormattedMessage id="map.zoom.label" />
+        </Box>
       </Box>
     </Box>
   );

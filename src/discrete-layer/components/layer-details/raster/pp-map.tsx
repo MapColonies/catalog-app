@@ -34,8 +34,17 @@ import { useStore } from '../../../models/RootStore';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
 import { FeaturePropertiesPopupComponent } from './feature-properties-popup.component';
 import { GeoFeaturesInnerComponent } from './geo-features-inner.component';
-import { IQueryExecutorResponse, PolygonPartsExtentQueryVectorLayer } from './polygon-parts-extent-query-vector-layer';
-import { FEATURE_LABEL_CONFIG, FeatureType, getText, getWFSFeatureTypeName, PPMapStyles } from './pp-map.utils';
+import {
+  IQueryExecutorResponse,
+  PolygonPartsExtentQueryVectorLayer,
+} from './polygon-parts-extent-query-vector-layer';
+import {
+  FEATURE_LABEL_CONFIG,
+  FeatureType,
+  getText,
+  getWFSFeatureTypeName,
+  PPMapStyles,
+} from './pp-map.utils';
 
 import './pp-map.css';
 
@@ -73,7 +82,8 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   const ZOOM_LEVELS_TABLE = useZoomLevelsTable();
   const renderCount = useRef(0);
   const [selectedFeature, setSelectedFeature] = useState<Feature | undefined>(undefined);
-  const [showExistingPolygonParts, setShowExistingPolygonParts] = useState<boolean>(showPolygonParts);
+  const [showExistingPolygonParts, setShowExistingPolygonParts] =
+    useState<boolean>(showPolygonParts);
 
   useEffect(() => {
     setShowExistingPolygonParts(showPolygonParts);
@@ -104,9 +114,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
 
   useEffect(() => {
     const selectedFeatureType = selectedFeature?.properties?._featureType;
-    const isManagedExternally =
-      selectedFeatureType === FeatureType.EXISTING_PP ||
-      !!selectedItem;
+    const isManagedExternally = selectedFeatureType === FeatureType.EXISTING_PP || !!selectedItem;
 
     if (!isManagedExternally) {
       setSelectedFeature(undefined);
@@ -201,8 +209,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
             />
           </VectorSource>
         </VectorLayer>
-        {
-          mode === Mode.UPDATE &&
+        {mode === Mode.UPDATE && (
           <Box className="checkbox">
             <Checkbox
               className="flexCheckItem showOnMapContainer"
@@ -219,9 +226,8 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
               }}
             />
           </Box>
-        }
-        {
-          showExistingPolygonParts &&
+        )}
+        {showExistingPolygonParts && (
           <PolygonPartsExtentQueryVectorLayer
             featureType={FeatureType.EXISTING_PP}
             queryExecutor={async (bbox, startIndex): Promise<IQueryExecutorResponse> => {
@@ -234,21 +240,23 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
                 },
               });
               const fetchedFeatures = get(result, 'getPolygonPartsFeature.features', []);
-              const features = (Array.isArray(fetchedFeatures) ? fetchedFeatures : []).map((feature) => {
-                return {
-                  ...feature,
-                  properties: {
-                    ...(feature?.properties ?? {}),
-                    _featureType: FeatureType.EXISTING_PP,
-                    _featureTitle: getText(
-                      feature,
-                      4,
-                      FEATURE_LABEL_CONFIG.polygons,
-                      ZOOM_LEVELS_TABLE
-                    ),
-                  },
-                };
-              });
+              const features = (Array.isArray(fetchedFeatures) ? fetchedFeatures : []).map(
+                (feature) => {
+                  return {
+                    ...feature,
+                    properties: {
+                      ...(feature?.properties ?? {}),
+                      _featureType: FeatureType.EXISTING_PP,
+                      _featureTitle: getText(
+                        feature,
+                        4,
+                        FEATURE_LABEL_CONFIG.polygons,
+                        ZOOM_LEVELS_TABLE
+                      ),
+                    },
+                  };
+                }
+              );
               return { features, pageSize: CONFIG.POLYGON_PARTS.MAX.WFS_FEATURES };
             }}
             outerPerimeter={layerRecord?.footprint as Geometry | undefined}
@@ -256,20 +264,19 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
             onClearSelectedFeature={clearSelection}
             options={{ properties: { id: FeatureType.EXISTING_PP }, zIndex: 1 }}
           />
-        }
+        )}
         {children}
         <MapFeatureClickHandler
           onMapFeatureClick={onMapFeatureClick}
           setSelectedFeature={setSelectedFeature}
         />
         <FeatureSelectionHandler feature={selectedFeature} />
-        {
-          enableFeaturePropertiesPopup &&
+        {enableFeaturePropertiesPopup && (
           <FeaturePropertiesPopupComponent
             selectedFeature={selectedFeature}
             onClose={clearSelection}
           />
-        }
+        )}
       </Map>
     </Box>
   );

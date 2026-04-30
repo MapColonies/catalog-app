@@ -43,23 +43,14 @@ const JobInfoComponent: React.FC<JobInfoProps> = ({ job }) => {
     if (!errorsCount) {
       return false;
     }
-    return Object.entries(errorsCount).some(
-      ([key, value]) => key !== 'resolution' && value > 0
-    );
+    return Object.entries(errorsCount).some(([key, value]) => key !== 'resolution' && value > 0);
   }, [errorsCount]);
 
   if (!displayJob) {
     return null;
   }
 
-  const {
-    taskId,
-    taskStatus,
-    taskReason,
-    taskPercentage,
-    details,
-    validationReport,
-  } = displayJob;
+  const { taskId, taskStatus, taskReason, taskPercentage, details, validationReport } = displayJob;
 
   const errorsSummary = validationReport?.errorsSummary;
 

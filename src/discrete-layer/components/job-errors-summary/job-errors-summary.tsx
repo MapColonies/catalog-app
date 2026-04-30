@@ -66,7 +66,8 @@ export const JobErrorsSummary = (
       color =
         value === 0
           ? theme.custom?.GC_SUCCESS
-          : (getRasterErrorCount(errorsSummary, key)?.exceeded === false || (options?.key === key && options?.isApproved === true))
+          : getRasterErrorCount(errorsSummary, key)?.exceeded === false ||
+            (options?.key === key && options?.isApproved === true)
           ? theme.custom?.GC_WARNING_HIGH
           : theme.custom?.GC_ERROR_HIGH;
     }

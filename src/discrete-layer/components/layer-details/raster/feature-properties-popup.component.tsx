@@ -7,7 +7,7 @@ import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
 import { FeatureType, PPMapStyles } from './pp-map.utils';
 
 const ISO_DATE_TIME_REGEX =
-/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:?\d{2})?$/;
+  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:?\d{2})?$/;
 const NO_PROPERTIES_MESSAGE_KEY = '__noPropertiesMessage';
 
 const toCssColor = (color: unknown): string | undefined => {
@@ -115,8 +115,7 @@ const FeaturePropertiesPopup: React.FC<FeaturePropertiesPopupProps> = ({
         />
       </Box>
       <Box className="featurePropertiesPopupRows">
-        {visibleProperties
-          .map(([key, value]) => {
+        {visibleProperties.map(([key, value]) => {
           if (key === NO_PROPERTIES_MESSAGE_KEY) {
             return (
               <Box className="featurePropertiesPopupRow" key={key}>

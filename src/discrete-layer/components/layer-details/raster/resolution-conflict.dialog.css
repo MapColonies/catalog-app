@@ -214,7 +214,9 @@
   height: max-content;
 }
 
-#resolutionConflictDialog .approverNameFieldContainer label.mdc-text-field.mdc-text-field--disabled {
+#resolutionConflictDialog
+  .approverNameFieldContainer
+  label.mdc-text-field.mdc-text-field--disabled {
   opacity: 1;
   background-color: transparent;
 }
@@ -223,27 +225,41 @@ body[dir='rtl'] #resolutionConflictDialog .approverNameFieldContainer {
   text-align: right;
 }
 
-
 #resolutionConflictDialog .approverNameFieldContainer input:disabled {
   background-color: transparent;
 }
 
-#resolutionConflictDialog .approverNameFieldContainer .mdc-text-field:not(.mdc-text-field--disabled) .mdc-floating-label {
+#resolutionConflictDialog
+  .approverNameFieldContainer
+  .mdc-text-field:not(.mdc-text-field--disabled)
+  .mdc-floating-label {
   color: var(--mdc-theme-text-icon-on-background);
   font-size: 14px;
 }
 
 #resolutionConflictDialog .approverNameFieldContainer .mdc-text-field--disabled .mdc-floating-label,
-#resolutionConflictDialog .approverNameFieldContainer .mdc-text-field--disabled .mdc-text-field__input,
-#resolutionConflictDialog .approverNameFieldContainer .mdc-text-field--disabled .mdc-text-field__input::placeholder {
+#resolutionConflictDialog
+  .approverNameFieldContainer
+  .mdc-text-field--disabled
+  .mdc-text-field__input,
+#resolutionConflictDialog
+  .approverNameFieldContainer
+  .mdc-text-field--disabled
+  .mdc-text-field__input::placeholder {
   color: var(--mdc-theme-text-icon-on-background) !important;
   font-size: 14px;
   opacity: 0.65;
   -webkit-text-fill-color: var(--mdc-theme-text-icon-on-background);
 }
 
-#resolutionConflictDialog .approverNameFieldContainer .mdc-text-field--disabled .mdc-line-ripple::before,
-#resolutionConflictDialog .approverNameFieldContainer .mdc-text-field--disabled .mdc-line-ripple::after {
+#resolutionConflictDialog
+  .approverNameFieldContainer
+  .mdc-text-field--disabled
+  .mdc-line-ripple::before,
+#resolutionConflictDialog
+  .approverNameFieldContainer
+  .mdc-text-field--disabled
+  .mdc-line-ripple::after {
   border-bottom-color: var(--mdc-theme-gc-selection-background);
 }
 

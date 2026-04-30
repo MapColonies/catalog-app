@@ -184,7 +184,10 @@ const EntityRasterDialogInner: React.FC<EntityRasterInnerProps> = observer(
         actorRef.send({
           type: 'RESTORE',
           job: { jobId: job.id },
-          updatedLayer: job.type === RasterIngestionJobType.UPDATE ? layerRecord as LayerRasterRecordModelType : undefined,
+          updatedLayer:
+            job.type === RasterIngestionJobType.UPDATE
+              ? (layerRecord as LayerRasterRecordModelType)
+              : undefined,
         } satisfies Events);
       } else if (mode === Mode.UPDATE) {
         actorRef.send({

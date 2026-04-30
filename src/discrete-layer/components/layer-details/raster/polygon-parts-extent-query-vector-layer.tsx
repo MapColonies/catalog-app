@@ -9,23 +9,13 @@ import { Style } from 'ol/style';
 import intersect from '@turf/intersect';
 import { polygon } from '@turf/helpers';
 import bboxPolygon from '@turf/bbox-polygon';
-import {
-  GeoJSONFeature,
-  useMap,
-  VectorLayer,
-  VectorSource,
-} from '@map-colonies/react-components';
+import { GeoJSONFeature, useMap, VectorLayer, VectorSource } from '@map-colonies/react-components';
 import CONFIG from '../../../../common/config';
 import { useStore } from '../../../models';
 import { IDispatchAction } from '../../../models/actionDispatcherStore';
 import { UserAction } from '../../../models/userStore';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
-import {
-  createTextStyle,
-  FeatureType,
-  FEATURE_LABEL_CONFIG,
-  PPMapStyles,
-} from './pp-map.utils';
+import { createTextStyle, FeatureType, FEATURE_LABEL_CONFIG, PPMapStyles } from './pp-map.utils';
 
 export interface IQueryExecutorResponse {
   features: Feature<Geometry, GeoJsonProperties>[];
@@ -67,7 +57,9 @@ const createZoomedOutFootprintFeature = (
   };
 };
 
-export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQueryVectorLayerProps> = ({
+export const PolygonPartsExtentQueryVectorLayer: React.FC<
+  PolygonPartsExtentQueryVectorLayerProps
+> = ({
   featureType,
   queryExecutor,
   outerPerimeter,
@@ -108,7 +100,7 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
 
     const selectedFeatureProperties =
       selectedFeature.properties && typeof selectedFeature.properties === 'object'
-        ? selectedFeature.properties as Record<string, unknown>
+        ? (selectedFeature.properties as Record<string, unknown>)
         : undefined;
     const selectedFeatureKey = selectedFeatureProperties?._key;
     const selectedFeatureId = selectedFeature?.id ?? selectedFeatureProperties?.id;
@@ -116,8 +108,8 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
       selectedFeatureKey !== undefined
         ? `key:${String(selectedFeatureKey)}`
         : selectedFeatureId !== undefined
-          ? `id:${String(selectedFeatureId)}`
-          : `ref:${String(selectedFeature)}`;
+        ? `id:${String(selectedFeatureId)}`
+        : `ref:${String(selectedFeature)}`;
 
     if (selectedFeatureSignatureRef.current !== nextSignature) {
       selectedFeatureSignatureRef.current = nextSignature;
@@ -154,7 +146,7 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
 
     const selectedFeatureProperties =
       selectedFeature.properties && typeof selectedFeature.properties === 'object'
-        ? selectedFeature.properties as Record<string, unknown>
+        ? (selectedFeature.properties as Record<string, unknown>)
         : undefined;
     const selectedFeatureKey = selectedFeatureProperties?._key;
     const selectedFeatureId = selectedFeature?.id ?? selectedFeatureProperties?.id;
@@ -162,7 +154,7 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
     const isSelectedInCurrentExtent = polygonParts.some((feature) => {
       const featureProperties =
         feature.properties && typeof feature.properties === 'object'
-          ? feature.properties as Record<string, unknown>
+          ? (feature.properties as Record<string, unknown>)
           : undefined;
 
       const featureKey = featureProperties?._key;
@@ -235,10 +227,7 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
   const getPolygonParts = async (bbox: BBox, startIndex: number): Promise<void> => {
     const currentZoomLevel = mapOl.getView().getZoom();
 
-    if (
-      currentZoomLevel &&
-      currentZoomLevel < CONFIG.POLYGON_PARTS.MAX.SHOW_FOOTPRINT_ZOOM_LEVEL
-    ) {
+    if (currentZoomLevel && currentZoomLevel < CONFIG.POLYGON_PARTS.MAX.SHOW_FOOTPRINT_ZOOM_LEVEL) {
       showLoadingSpinner(false);
       isQueryInProgressRef.current = false;
       isFootprintModeRef.current = true;
@@ -268,10 +257,7 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
         const { features, pageSize } = result;
 
         setPolygonParts((currentFeatures) => {
-          const baseFeatures =
-            pageStartIndex === START
-              ? []
-              : currentFeatures;
+          const baseFeatures = pageStartIndex === START ? [] : currentFeatures;
           if (pageStartIndex === START && features.length === 0) {
             return [];
           }
@@ -316,16 +302,19 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
           let ppStroke = ppStyle?.getStroke()?.clone();
           let ppFill = ppStyle?.getFill()?.clone();
           const featureStyle = new Style({
-            text:
-              createTextStyle(
-                feat,
-                4,
-                FEATURE_LABEL_CONFIG.polygons,
-                ZOOM_LEVELS_TABLE,
-                intl.formatMessage({ id: 'polygon-parts.map-preview.zoom-before-fetch' }),
-                featureType === FeatureType.LOW_RESOLUTION_PP ? feat.properties?._featureTitle : undefined,
-                featureType === FeatureType.LOW_RESOLUTION_PP ? ppStroke?.getColor()?.toString() : undefined
-              ),
+            text: createTextStyle(
+              feat,
+              4,
+              FEATURE_LABEL_CONFIG.polygons,
+              ZOOM_LEVELS_TABLE,
+              intl.formatMessage({ id: 'polygon-parts.map-preview.zoom-before-fetch' }),
+              featureType === FeatureType.LOW_RESOLUTION_PP
+                ? feat.properties?._featureTitle
+                : undefined,
+              featureType === FeatureType.LOW_RESOLUTION_PP
+                ? ppStroke?.getColor()?.toString()
+                : undefined
+            ),
             stroke: ppStroke,
             fill: ppFill,
           });
@@ -336,16 +325,18 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
 
           const selectedFeatureProperties =
             selectedFeature?.properties && typeof selectedFeature.properties === 'object'
-              ? selectedFeature.properties as Record<string, unknown>
+              ? (selectedFeature.properties as Record<string, unknown>)
               : undefined;
           const featProperties =
             feat.properties && typeof feat.properties === 'object'
-              ? feat.properties as Record<string, unknown>
+              ? (feat.properties as Record<string, unknown>)
               : undefined;
           const selectedFeatureId = selectedFeature?.id ?? selectedFeatureProperties?.id;
           const featureId = feat?.id ?? featProperties?.id;
           const isSelectedById =
-            selectedFeatureId !== undefined && featureId !== undefined && selectedFeatureId === featureId;
+            selectedFeatureId !== undefined &&
+            featureId !== undefined &&
+            selectedFeatureId === featureId;
 
           if (selectedFeature === feat || isSelectedByKey || isSelectedById) {
             if (ppStroke) {

@@ -224,7 +224,8 @@ export const createTextStyle = (
     textAlign: align === '' ? undefined : align,
     textBaseline: baseline,
     font: font,
-    text: overridingText ?? getText(feature, resolution, featureConfig, ZOOM_LEVELS_TABLE, defaultText),
+    text:
+      overridingText ?? getText(feature, resolution, featureConfig, ZOOM_LEVELS_TABLE, defaultText),
     fill: new Fill({ color: overridingColor ?? fillColor }),
     stroke: new Stroke({ color: outlineColor, width: outlineWidth }),
     offsetX: offsetX,
