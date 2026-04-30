@@ -1,22 +1,34 @@
-import { useEffect, useMemo, useState } from 'react';
+import { SetStateAction, useEffect, useMemo, useState } from 'react';
 import { wrap, Remote, proxy } from 'comlink';
-import type { BBoxObj, LoadOptions, WorkerAPI, WorkerMessage } from './worker.types';
 import { FeatureCollection, Geometry } from 'geojson';
+import { fakeProgress } from '../../../../../common/helpers/fake-progress';
+import {
+  BBoxObj,
+  StagesInfo,
+  LoadOptions,
+  Process,
+  Stage,
+  WorkerAPI,
+  WorkerMessage,
+  WorkerType,
+  WorkerError,
+} from './worker.types';
+import { buildMessageDetails } from './utils';
 
-export function useWorkerAPI(): {
+type WorkerService = {
   init: {
     method: () => Promise<void>;
   };
   load: {
-    method: (fc: FeatureCollection, options?: LoadOptions) => Promise<void>;
-    progress: string;
+    method: (fc: FeatureCollection, options?: LoadOptions) => Promise<WorkerError | void>;
+    progress: WorkerMessage[] | null;
   };
   loadFromShapeFile: {
-    method: (url: string, options?: LoadOptions) => Promise<void>;
-    progress: WorkerMessage | null;
+    method: (url: string, options?: LoadOptions) => Promise<WorkerError | void>;
+    progress: WorkerMessage[] | null;
   };
   updateAreas: {
-    method: () => Promise<void>;
+    method: () => Promise<WorkerError | void>;
     progress: WorkerMessage | null;
   };
   computeOuterGeometry: {
@@ -31,10 +43,14 @@ export function useWorkerAPI(): {
     method: (bbox: BBoxObj) => Promise<FeatureCollection>;
     progress: WorkerMessage | null;
   };
-} | null {
+};
+
+export function useWorkerAPI(): [WorkerService | null, StagesInfo] {
   const [workerApi, setWorkerApi] = useState<any>(null);
   const [progressComputeArea, setProgressComputeArea] = useState<WorkerMessage | null>(null);
-  const [progressLoadShapeFile, setProgressLoadShapeFile] = useState<WorkerMessage | null>(null);
+  const [progressComputeOuterGeometry, setProgressComputeOuterGeometry] =
+    useState<WorkerMessage | null>(null);
+  const [loadShapeFileProgress, setLoadShapeFileProgress] = useState<WorkerMessage[] | null>(null);
 
   useEffect(() => {
     const worker = new Worker(new URL('./feat-collection.worker-api.ts', import.meta.url), {
@@ -69,8 +85,34 @@ export function useWorkerAPI(): {
     };
   }, []);
 
-  const api = useMemo(() => {
-    if (!workerApi) return null;
+  const upsertWorkerMessageByStage = (
+    process: Process,
+    workerMessage: WorkerMessage,
+    setProgresses: (value: SetStateAction<WorkerMessage[] | null>) => void
+  ) => {
+    if (process !== workerMessage.process) {
+      return;
+    }
+
+    setProgresses((prev) => {
+      const current = prev ?? [];
+
+      const stageIndex = current.findIndex((msg) => msg.stage === workerMessage.stage);
+
+      if (stageIndex > -1) {
+        const newArr = [...current];
+        newArr[stageIndex] = workerMessage;
+        return newArr;
+      } else {
+        return [...current, workerMessage];
+      }
+    });
+  };
+
+  const api: WorkerService | null = useMemo(() => {
+    if (!workerApi) {
+      return null;
+    }
 
     return {
       init: {
@@ -82,49 +124,67 @@ export function useWorkerAPI(): {
         method: async (fc: FeatureCollection, options?: LoadOptions) => {
           return await workerApi.load(fc, options);
         },
-        progress: '-1',
+        progress: null,
       },
       loadFromShapeFile: {
         method: async (url: string, options?: LoadOptions) => {
-          setProgressLoadShapeFile(null);
+          setLoadShapeFileProgress(null);
           return await workerApi.loadFromShapeFile(
             url,
             options,
             proxy((p: WorkerMessage) => {
-              console.log('**** Progress LoadShape: ', p);
-              setProgressLoadShapeFile(p);
+              // console.log('**** Progress LoadShape: ', p);
+              upsertWorkerMessageByStage(Process.Load, p, setLoadShapeFileProgress);
             })
           );
         },
-        progress: progressLoadShapeFile,
+        progress: loadShapeFileProgress,
       },
       updateAreas: {
         method: async () => {
           setProgressComputeArea(null);
           return await workerApi.updateAreas(
             proxy((p: WorkerMessage) => {
-              console.log('**** Progress Area: ', p);
+              // console.log('**** Progress Area: ', p);
               setProgressComputeArea(p);
             })
           );
         },
         progress: progressComputeArea,
       },
+
       computeOuterGeometry: {
         method: async () => {
-          return await workerApi.computeOuterGeometry(
+          const t0 = performance.now();
+
+          const clear = fakeProgress(10000, (fakePercent: number) => {
+            const details = buildMessageDetails(`${fakePercent}`, t0);
+
+            setProgressComputeOuterGeometry({
+              process: Process.ComputeOuterGeometry,
+              stage: Stage.ComputeOuterGeometry,
+              type: WorkerType.Progress,
+              details,
+            });
+          });
+
+          const result = await workerApi.computeOuterGeometry(
             proxy((p: WorkerMessage) => {
-              console.log('**** Progress Outer Geometry: ', p);
+              // If the worker sends real pulses, they still work here
+              setProgressComputeOuterGeometry(p);
             })
           );
+
+          clear();
+          return result;
         },
-        progress: null,
+        progress: progressComputeOuterGeometry,
       },
       getFeatureCollection: {
         method: async (): Promise<FeatureCollection> => {
           return await workerApi.getFeatureCollection(
             proxy((p: WorkerMessage) => {
-              console.log('**** GET FEATURECOLLECTION: ', p);
+              // console.log('**** GET FEATURECOLLECTION: ', p);
             })
           );
         },
@@ -135,14 +195,59 @@ export function useWorkerAPI(): {
           return await workerApi.query(
             bbox,
             proxy((p: WorkerMessage) => {
-              console.log('**** QUERY by BBOX: ', p);
+              // console.log('**** QUERY by BBOX: ', p);
             })
           );
         },
         progress: null,
       },
     };
-  }, [workerApi, progressComputeArea, progressLoadShapeFile]);
+  }, [workerApi, progressComputeArea, progressComputeOuterGeometry, loadShapeFileProgress]);
 
-  return api;
+  const stagesInfo: StagesInfo = useMemo(() => {
+    return {
+      [Process.Init]: {
+        stages: {
+          [Stage.Init]: {
+            translationCode: 'progress.stage.init',
+            shouldShowProgress: false,
+          },
+        },
+      },
+      [Process.Load]: {
+        stages: {
+          [Stage.Download]: {
+            translationCode: 'progress.stage.load',
+            shouldShowProgress: true,
+          },
+          [Stage.Parsing]: {
+            translationCode: 'progress.stage.parsing',
+            shouldShowProgress: true,
+          },
+          [Stage.Cache]: {
+            translationCode: 'progress.stage.cache',
+            shouldShowProgress: false,
+          },
+        },
+      },
+      [Process.UpdateAreas]: {
+        stages: {
+          [Stage.UpdateAreas]: {
+            translationCode: 'progress.stage.updateAreas',
+            shouldShowProgress: true,
+          },
+        },
+      },
+      [Process.ComputeOuterGeometry]: {
+        stages: {
+          [Stage.ComputeOuterGeometry]: {
+            translationCode: 'progress.stage.computeOuterGeometry',
+            shouldShowProgress: true,
+          },
+        },
+      },
+    };
+  }, []);
+
+  return [api, stagesInfo];
 }
