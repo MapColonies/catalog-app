@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Box } from '@map-colonies/react-components';
 import { Typography, useTheme } from '@map-colonies/react-core';
@@ -7,64 +7,106 @@ import { AutoDirectionBox } from '../../../../common/components/auto-direction-b
 import { Status } from '../../../models';
 import { JobErrorsSummary } from '../../job-errors-summary/job-errors-summary';
 import { Progress } from './progress';
+import { ResolutionConflictDialog } from './resolution-conflict.dialog';
 import { isJobValid, isStatusFailed, isTaskValid } from './state-machine/helpers';
 import { IJob } from './state-machine/types';
 
 import './job-info.css';
 
 interface JobInfoProps {
-  job: IJob | undefined;
+  job?: IJob;
 }
 
-export const JobInfo: React.FC<JobInfoProps> = ({ job }) => {
+const JobInfoComponent: React.FC<JobInfoProps> = ({ job }) => {
   const theme = useTheme();
+  const [isResolutionConflictDialogOpen, setIsResolutionConflictDialogOpen] = useState(false);
+  const [isResolutionConflictApproved, setIsResolutionConflictApproved] = useState(false);
+  const latestJobRef = useRef<IJob | undefined>(job);
 
-  if (!job) {
+  if (job) {
+    latestJobRef.current = job;
+  }
+
+  const displayJob = latestJobRef.current;
+
+  const openResolutionConflictDialog = useCallback(() => {
+    setIsResolutionConflictDialogOpen(true);
+  }, []);
+
+  const approveResolutionConflictDialog = useCallback(() => {
+    setIsResolutionConflictApproved(true);
+  }, []);
+
+  const errorsCount = displayJob?.validationReport?.errorsSummary?.errorsCount;
+
+  const isResolutionConflictViewOnly = useMemo(() => {
+    if (!errorsCount) {
+      return false;
+    }
+    return Object.entries(errorsCount).some(([key, value]) => key !== 'resolution' && value > 0);
+  }, [errorsCount]);
+
+  if (!displayJob) {
     return null;
   }
+
+  const { taskId, taskStatus, taskReason, taskPercentage, details, validationReport } = displayJob;
+
+  const errorsSummary = validationReport?.errorsSummary;
+
+  const detailsStatus = details?.status as Status | undefined;
+  const detailsReason = details?.reason as string | undefined;
 
   return (
     <>
       <Box className="progressContainer">
         <Progress
           titleId="ingestion.job.validationTaskProgress"
-          show={!!job.taskId}
-          percentage={job.taskPercentage}
-          status={job.taskStatus}
-          reason={job.taskReason}
-          isFailed={isStatusFailed(job.taskStatus ?? undefined)}
-          isValid={isTaskValid(job)}
+          show={Boolean(taskId)}
+          percentage={taskPercentage}
+          status={taskStatus}
+          reason={taskReason}
+          isFailed={isStatusFailed(taskStatus)}
+          isValid={isTaskValid(displayJob)}
         />
+
         <Progress
           titleId="ingestion.job.progress"
-          show={!!job.details}
-          percentage={job.details?.percentage ?? undefined}
-          status={job.details?.status as Status | undefined}
-          reason={job.details?.reason as string | undefined}
-          isFailed={isStatusFailed(job.details?.status as Status | undefined)}
-          isValid={isJobValid(job.details?.status as Status | undefined)}
+          show={Boolean(details)}
+          percentage={details?.percentage ?? undefined}
+          status={detailsStatus}
+          reason={detailsReason}
+          isFailed={isStatusFailed(detailsStatus)}
+          isValid={isJobValid(detailsStatus)}
         />
       </Box>
+
       <Box className="section panel">
         <Box className="reportContainer">
           <Box className="title underline bold">
             <FormattedMessage id="ingestion.job.report" />
           </Box>
-          {job.taskId ? (
-            job.validationReport?.errorsSummary?.errorsCount ? (
+
+          {taskId ? (
+            errorsCount ? (
               <Box className="reportList bold">
                 {JobErrorsSummary(
                   theme,
-                  job.validationReport.errorsSummary,
+                  errorsSummary!,
                   'countWrapper',
-                  job.taskStatus === Status.Failed ? theme.custom?.GC_ERROR_HIGH : ''
+                  taskStatus === Status.Failed ? theme.custom?.GC_ERROR_HIGH : '',
+                  {
+                    key: 'resolution',
+                    action: openResolutionConflictDialog,
+                    isApproved: isResolutionConflictApproved,
+                  }
                 )}
               </Box>
             ) : (
               <Box className="reportError">
-                {job.taskReason ? (
+                {taskReason ? (
                   <Typography className="error" tag="span">
-                    <AutoDirectionBox>{job.taskReason}</AutoDirectionBox>
+                    <AutoDirectionBox>{taskReason}</AutoDirectionBox>
                   </Typography>
                 ) : (
                   <Box className="reportInProgress">
@@ -80,6 +122,19 @@ export const JobInfo: React.FC<JobInfoProps> = ({ job }) => {
           )}
         </Box>
       </Box>
+
+      {isResolutionConflictDialogOpen && (
+        <ResolutionConflictDialog
+          isOpen={isResolutionConflictDialogOpen}
+          onSetIsOpen={setIsResolutionConflictDialogOpen}
+          onApprove={approveResolutionConflictDialog}
+          viewOnly={isResolutionConflictViewOnly || isResolutionConflictApproved}
+        />
+      )}
     </>
   );
 };
+
+JobInfoComponent.displayName = 'JobInfo';
+
+export const JobInfo = React.memo(JobInfoComponent);

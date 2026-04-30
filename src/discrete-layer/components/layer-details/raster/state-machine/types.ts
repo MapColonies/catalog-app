@@ -107,7 +107,7 @@ export type Events =
   | { type: 'TICK' }
   | { type: 'SYNC' }
   | { type: 'STOP_POLLING' }
-  | { type: 'RESTORE'; job: IJob }
+  | { type: 'RESTORE'; job: IJob; updatedLayer: LayerRasterRecordModelType | undefined }
   | { type: 'RETRY' }
   | { type: 'CLEAN_ERRORS' }
   | { type: 'DONE' };

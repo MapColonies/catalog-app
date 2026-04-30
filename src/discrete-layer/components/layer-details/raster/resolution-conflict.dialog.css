@@ -1,0 +1,320 @@
+#resolutionConflictDialog {
+  --modal-height: calc(100vh);
+  --modal-width: calc(100vw - 96px);
+  --update-layer-header-height: 150px;
+}
+
+@media (min-width: 900px) {
+  #resolutionConflictDialog .mdc-dialog .mdc-dialog__surface {
+    width: var(--modal-width);
+    max-width: var(--modal-width);
+    height: var(--modal-height) !important;
+  }
+}
+
+#resolutionConflictDialog .dialogBody {
+  display: flex;
+  flex-direction: column;
+  overflow-y: hidden !important;
+  padding-top: 8px;
+  font-size: 14px;
+  line-height: 1.43;
+}
+
+#resolutionConflictDialog #updateLayerHeader {
+  padding-top: 12px;
+}
+
+#resolutionConflictDialog .content {
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+  gap: 12px;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  max-height: none !important;
+  overflow-y: hidden !important;
+}
+
+#resolutionConflictDialog .rightPane {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  gap: 8px;
+}
+
+#resolutionConflictDialog .lowResolutionPartsCheckboxContainer {
+  display: flex;
+  justify-content: center;
+}
+
+#resolutionConflictDialog .lowResolutionPartsCheckbox {
+  color: var(--mdc-theme-text-icon-on-dark);
+}
+
+#resolutionConflictDialog .lowResolutionPartsCheckbox .mdc-checkbox {
+  height: 12px;
+}
+
+#resolutionConflictDialog .filterContainer {
+  display: flex;
+  gap: 8px;
+  margin: 6px 0 8px;
+  justify-content: center;
+}
+
+#resolutionConflictDialog .filterButton {
+  min-width: 72px;
+  height: 28px;
+  border-color: var(--mdc-theme-gc-selection-background);
+  color: var(--mdc-theme-text-icon-on-dark);
+  font-weight: 600;
+}
+
+#resolutionConflictDialog .filterButton.active {
+  border-color: var(--mdc-theme-primary);
+  color: var(--mdc-theme-primary);
+  background-color: rgba(36, 174, 233, 0.1);
+}
+
+#resolutionConflictDialog .emptyList {
+  text-align: center;
+  opacity: 0.5;
+  cursor: default;
+}
+
+#resolutionConflictDialog .lowResolutionPartsList {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  border: 1px solid var(--mdc-theme-gc-selection-background);
+  border-radius: 8px;
+  padding: 8px;
+}
+
+#resolutionConflictDialog .virtualizedFeatureList {
+  width: 100%;
+  height: 66vh;
+}
+
+#resolutionConflictDialog .virtualizedFeatureItem {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  padding: 0 24px;
+  box-sizing: border-box;
+  border-bottom: 1px solid var(--mdc-theme-gc-selection-background);
+  cursor: pointer;
+  transition: background-color 120ms ease, box-shadow 120ms ease;
+}
+
+#resolutionConflictDialog .virtualizedFeatureItem:hover {
+  background-color: #ff7f0014;
+}
+
+#resolutionConflictDialog .virtualizedFeatureItem.selected {
+  background-color: #ff7f002e;
+  box-shadow: inset 4px 0 0 #ff7f00;
+}
+
+#resolutionConflictDialog .virtualizedFeatureItem.selected .featureArea,
+#resolutionConflictDialog .virtualizedFeatureItem.selected .featureId {
+  opacity: 0.9;
+}
+
+#resolutionConflictDialog .virtualizedFeatureItem.exceeded:hover {
+  background-color: #d32f2f14;
+}
+
+#resolutionConflictDialog .virtualizedFeatureItem.exceeded.selected {
+  background-color: #d32f2f2e;
+  box-shadow: inset 4px 0 0 #d32f2f;
+}
+
+#resolutionConflictDialog .virtualizedFeatureItem.exceeded .featureLabel,
+#resolutionConflictDialog .virtualizedFeatureItem.exceeded .featureArea,
+#resolutionConflictDialog .virtualizedFeatureItem.exceeded .featureId,
+#resolutionConflictDialog .virtualizedFeatureItem.exceeded .featureLabelType,
+#resolutionConflictDialog .virtualizedFeatureItem.exceeded .featureAreaUnits {
+  color: #d32f2f;
+  opacity: 1;
+}
+
+#resolutionConflictDialog .virtualizedFeatureItem .featureContent {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+#resolutionConflictDialog .virtualizedFeatureItem .featureTitleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+#resolutionConflictDialog .virtualizedFeatureItem .featureLabel {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: start;
+}
+
+#resolutionConflictDialog .virtualizedFeatureItem .featureLabelType {
+  font-size: 0.95em;
+  opacity: 0.65;
+}
+
+#resolutionConflictDialog .virtualizedFeatureItem .featureArea {
+  font-size: 0.95em;
+  flex-shrink: 0;
+  text-align: end;
+  opacity: 0.65;
+  padding-top: 2px;
+}
+
+#resolutionConflictDialog .virtualizedFeatureItem .featureAreaUnits {
+  font-size: 0.8em;
+}
+
+#resolutionConflictDialog .virtualizedFeatureItem .featureId {
+  font-size: 0.75em;
+  line-height: 1.2;
+  opacity: 0.65;
+  text-align: start;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#resolutionConflictDialog .rightPaneFooter {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+#resolutionConflictDialog .approverNameFieldContainer {
+  color: var(--mdc-theme-text-primary-on-dark);
+  width: 100%;
+  text-overflow: ellipsis;
+  word-break: break-all;
+  position: relative;
+  overflow: hidden;
+  padding: 0 1px;
+  margin: 0 2px;
+  text-align: left;
+}
+
+#resolutionConflictDialog .approverNameField {
+  width: 100%;
+  height: max-content;
+}
+
+#resolutionConflictDialog
+  .approverNameFieldContainer
+  label.mdc-text-field.mdc-text-field--disabled {
+  opacity: 1;
+  background-color: transparent;
+}
+
+body[dir='rtl'] #resolutionConflictDialog .approverNameFieldContainer {
+  text-align: right;
+}
+
+#resolutionConflictDialog .approverNameFieldContainer input:disabled {
+  background-color: transparent;
+}
+
+#resolutionConflictDialog
+  .approverNameFieldContainer
+  .mdc-text-field:not(.mdc-text-field--disabled)
+  .mdc-floating-label {
+  color: var(--mdc-theme-text-icon-on-background);
+  font-size: 14px;
+}
+
+#resolutionConflictDialog .approverNameFieldContainer .mdc-text-field--disabled .mdc-floating-label,
+#resolutionConflictDialog
+  .approverNameFieldContainer
+  .mdc-text-field--disabled
+  .mdc-text-field__input,
+#resolutionConflictDialog
+  .approverNameFieldContainer
+  .mdc-text-field--disabled
+  .mdc-text-field__input::placeholder {
+  color: var(--mdc-theme-text-icon-on-background) !important;
+  font-size: 14px;
+  opacity: 0.65;
+  -webkit-text-fill-color: var(--mdc-theme-text-icon-on-background);
+}
+
+#resolutionConflictDialog
+  .approverNameFieldContainer
+  .mdc-text-field--disabled
+  .mdc-line-ripple::before,
+#resolutionConflictDialog
+  .approverNameFieldContainer
+  .mdc-text-field--disabled
+  .mdc-line-ripple::after {
+  border-bottom-color: var(--mdc-theme-gc-selection-background);
+}
+
+#resolutionConflictDialog .approverNameFieldContainer .mdc-text-field__input {
+  color: var(--mdc-theme-text-primary-on-dark);
+  font-size: 14px;
+}
+
+#resolutionConflictDialog .actionsRow {
+  display: flex;
+  gap: 8px;
+}
+
+#resolutionConflictDialog .errorMessage {
+  padding-top: 8px;
+}
+
+#resolutionConflictDialog .leftPane {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+  overflow: visible;
+}
+
+#resolutionConflictDialog .polygonPartsMap {
+  flex: 1;
+  min-height: 0;
+}
+
+#resolutionConflictDialog .map + .checkbox {
+  left: 1013px;
+}
+
+body[dir='rtl'] #resolutionConflictDialog .map + .checkbox {
+  left: unset;
+  right: 1px;
+}
+
+@media (max-width: 900px) {
+  #resolutionConflictDialog {
+    --modal-height: calc(100vh - 2px);
+    --modal-width: calc(100vw - 24px);
+  }
+
+  #resolutionConflictDialog .dialogBody {
+    height: auto;
+  }
+
+  #resolutionConflictDialog .content {
+    grid-template-columns: 1fr;
+  }
+
+  #resolutionConflictDialog .rightPane,
+  #resolutionConflictDialog .leftPane {
+    min-height: 260px;
+  }
+}

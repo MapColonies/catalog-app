@@ -1,17 +1,93 @@
-#entityRasterDialog .map + .checkbox {
+#entityRasterDialog .geoFeaturesMapContainer .checkbox {
   display: inline-block;
-  position: relative;
-  top: -32px;
-  left: 293px;
+  position: absolute;
+  bottom: 1px;
+  right: 1px;
   height: 31px;
   background-color: #262626bf;
   direction: ltr;
   padding-right: 12px;
 }
 
-body[dir='rtl'] #entityRasterDialog .map + .checkbox {
+body[dir='rtl'] #entityRasterDialog .geoFeaturesMapContainer .checkbox {
   direction: rtl;
-  left: unset;
-  right: 1px;
+  padding-right: unset;
   padding-left: 12px;
+}
+
+.geoFeaturesMapContainer {
+  position: relative;
+}
+
+.geoFeaturesMapContainer .ol-zoom button,
+.geoFeaturesMapContainer .ol-legend button {
+  cursor: pointer;
+}
+
+.featurePropertiesPopup {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 3;
+  min-width: 280px;
+  max-width: 420px;
+  max-height: 55%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: var(--mdc-theme-text-icon-on-dark);
+  background-color: var(--mdc-theme-text-primary-on-light);
+  border: 1px solid var(--mdc-theme-text-primary-on-light);
+  border-radius: 6px;
+  padding: 8px 10px 10px;
+}
+
+.featurePropertiesPopupHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border-bottom: 1px solid var(--mdc-theme-gc-selection-background);
+  padding-bottom: 6px;
+  margin-bottom: 8px;
+}
+
+.featurePropertiesPopupClose {
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.featurePropertiesPopupRows {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.featurePropertiesPopupRow {
+  display: grid;
+  grid-template-columns: minmax(90px, 38%) 1fr;
+  gap: 8px;
+  align-items: start;
+}
+
+.featurePropertiesPopupKey {
+  opacity: 0.75;
+  font-weight: 600;
+  word-break: break-word;
+}
+
+.featurePropertiesPopupValue {
+  word-break: break-word;
+}
+
+.featurePropertiesPopupTitle {
+  font-weight: 700;
+  text-align: start;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

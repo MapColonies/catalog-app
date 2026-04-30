@@ -7,8 +7,7 @@ import { observer } from 'mobx-react';
 import { DraftResult } from 'vest/vestResult';
 import * as Yup from 'yup';
 import { DialogContent } from '@material-ui/core';
-import { Dialog, DialogTitle, Icon, IconButton, Typography } from '@map-colonies/react-core';
-import { Box } from '@map-colonies/react-components';
+import { Dialog, DialogTitle, IconButton } from '@map-colonies/react-core';
 import CONFIG from '../../../../common/config';
 import { emphasizeByHTML } from '../../../../common/helpers/formatters';
 import { getTextStyle } from '../../../../common/helpers/style';
@@ -23,7 +22,6 @@ import {
   ProductType,
   RecordStatus,
   RecordType,
-  Status,
   useStore,
   ValidationConfigModelType,
   ValidationValueType,
@@ -31,7 +29,6 @@ import {
 import { ILayerImage } from '../../../models/layerImage';
 import { LayerRasterRecordInput } from '../../../models/RootStore.base';
 import { LayerRasterRecordModelKeys, LayerRecordTypes } from '../entity-types-keys';
-import { LayersDetailsComponent } from '../layer-details';
 import { FieldInfoName } from '../layer-details.field-info';
 import {
   cleanUpEntityPayload,
@@ -46,8 +43,9 @@ import {
 } from '../utils';
 import suite from '../validate';
 import EntityRasterForm from './layer-details-form.raster';
-import { Events } from './state-machine/types';
 import { RasterWorkflowProvider, RasterWorkflowContext } from './state-machine/context';
+import { Events } from './state-machine/types';
+import { UpdateLayerHeader } from './update-layer-header';
 import { getUIIngestionFieldDescriptors } from './utils';
 
 import './entity.raster.dialog.css';
@@ -186,6 +184,10 @@ const EntityRasterDialogInner: React.FC<EntityRasterInnerProps> = observer(
         actorRef.send({
           type: 'RESTORE',
           job: { jobId: job.id },
+          updatedLayer:
+            job.type === RasterIngestionJobType.UPDATE
+              ? (layerRecord as LayerRasterRecordModelType)
+              : undefined,
         } satisfies Events);
       } else if (mode === Mode.UPDATE) {
         actorRef.send({
@@ -371,40 +373,6 @@ const EntityRasterDialogInner: React.FC<EntityRasterInnerProps> = observer(
       clearSyncWarnings();
     }, [onSetOpen, store.discreteLayersStore]);
 
-    const UpdateLayerHeader = useMemo(() => {
-      return (
-        <Box id="updateLayerHeader">
-          <Box id="updateLayerHeaderContent">
-            <LayersDetailsComponent
-              className="detailsPanelProductView"
-              entityDescriptors={entityDescriptors}
-              layerRecord={layerRecord}
-              isBrief={true}
-              mode={Mode.VIEW}
-            />
-          </Box>
-          {state.context.selectionMode === 'restore' &&
-            state.context.flowType === Mode.UPDATE &&
-            ![Status.Completed, Status.Aborted].includes(
-              state.context.job?.details?.status as Status
-            ) && (
-              <Box className="lockedIcon">
-                <Icon icon={{ icon: 'lock', size: 'xlarge' }} />
-                <Typography tag="span">
-                  {intl.formatMessage({ id: 'general.title.locked' })}
-                </Typography>
-              </Box>
-            )}
-        </Box>
-      );
-    }, [
-      entityDescriptors,
-      layerRecord,
-      state.context.selectionMode,
-      state.context.flowType,
-      state.context.job?.details?.status,
-    ]);
-
     return (
       <div id="entityRasterDialog" ref={dialogContainerRef}>
         <Dialog open={isOpen} preventOutsideDismiss={true}>
@@ -423,7 +391,12 @@ const EntityRasterDialogInner: React.FC<EntityRasterInnerProps> = observer(
             />
           </DialogTitle>
           <DialogContent className="dialogBody">
-            {mode === Mode.UPDATE && UpdateLayerHeader}
+            {state.context.updatedLayer && (
+              <UpdateLayerHeader
+                entityDescriptors={entityDescriptors}
+                layerRecord={state.context.updatedLayer}
+              />
+            )}
             {isAllInfoReady && (
               <EntityRasterForm
                 mode={mode}

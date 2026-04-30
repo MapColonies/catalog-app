@@ -25,6 +25,18 @@
   display: contents;
 }
 
+#layerDetailsFormRaster .resolutionConflictButton {
+  min-width: unset;
+  height: 22px;
+  padding: 0 6px;
+}
+
+#layerDetailsFormRaster .countValue {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 #layerDetailsFormRaster .reportError {
   height: 164px;
   margin: 0 8px;

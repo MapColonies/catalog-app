@@ -1,12 +1,12 @@
-import { CSSProperties, useEffect, useMemo, useRef, useState } from 'react';
+import { CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Feature } from 'geojson';
-import { get, isEmpty } from 'lodash';
+import { Feature, Geometry } from 'geojson';
+import { get } from 'lodash';
+import bboxPolygon from '@turf/bbox-polygon';
 import { FitOptions } from 'ol/View';
 import { Style } from 'ol/style';
 import {
   Box,
-  GeoJSONFeature,
   getWMTSOptions,
   getXYZOptions,
   IBaseMap,
@@ -16,18 +16,35 @@ import {
   TileLayer,
   TileWMTS,
   TileXYZ,
-  useMap,
-  useVectorSource,
   VectorLayer,
   VectorSource,
 } from '@map-colonies/react-components';
 import { Checkbox } from '@map-colonies/react-core';
+import CONFIG from '../../../../common/config';
+import { useEnums } from '../../../../common/hooks/useEnum.hook';
 import { Mode } from '../../../../common/models/mode.enum';
-import { MapLoadingIndicator } from '../../../../common/components/map/ol-map.loader';
+import { MapFeatureClickHandler } from '../../../../common/components/ol-map/map-feature-click-handler';
+import { FeatureSelectionHandler } from '../../../../common/components/ol-map/feature-selection-handler';
+import { MapLoadingIndicator } from '../../../../common/components/ol-map/map-loading-indicator';
+import { ZoomLevelIndicator } from '../../../../common/components/ol-map/zoom-level-indicator';
+import { LayerRasterRecordModelType } from '../../../models';
 import { ILayerImage } from '../../../models/layerImage';
+import { GeojsonFeatureInput } from '../../../models/RootStore.base';
 import { useStore } from '../../../models/RootStore';
-import { PolygonPartsVectorLayer as PolygonPartsExtentVectorLayer } from './pp-extent-vector-layer';
-import { PPMapStyles } from './pp-map.utils';
+import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
+import { FeaturePropertiesPopupComponent } from './feature-properties-popup.component';
+import { GeoFeaturesInnerComponent } from './geo-features-inner.component';
+import {
+  IQueryExecutorResponse,
+  PolygonPartsExtentQueryVectorLayer,
+} from './polygon-parts-extent-query-vector-layer';
+import {
+  FEATURE_LABEL_CONFIG,
+  FeatureType,
+  getText,
+  getWFSFeatureTypeName,
+  PPMapStyles,
+} from './pp-map.utils';
 
 import './pp-map.css';
 
@@ -36,29 +53,41 @@ interface GeoFeaturesPresentorProps {
   geoFeatures?: Feature[];
   style?: CSSProperties | undefined;
   fitOptions?: FitOptions | undefined;
-  selectedFeatureKey?: string;
-  selectionStyle?: Style;
-  showExistingPolygonParts?: boolean;
   layerRecord?: ILayerImage | null;
+  onMapFeatureClick?: (feature: Feature | undefined) => void;
+  enableFeaturePropertiesPopup?: boolean;
+  selectedItem?: Feature;
+  showPolygonParts?: boolean;
+  children?: JSX.Element | null;
 }
 
 const DEFAULT_PROJECTION = 'EPSG:4326';
 const MIN_FEATURES_NUMBER = 4; // minimal set of fetures (source, source_marker, perimeter, perimeter_marker)
-const RENDERS_TILL_FULL_FEATURES_SET = 1; // first render with source, second with PPs perimeter geometry
 
 export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> = ({
   mode,
   geoFeatures,
   style,
   fitOptions,
-  selectedFeatureKey,
-  selectionStyle,
   layerRecord,
+  onMapFeatureClick,
+  enableFeaturePropertiesPopup = false,
+  selectedItem,
+  showPolygonParts = false,
+  children,
 }) => {
   const store = useStore();
+  const ENUMS = useEnums();
   const intl = useIntl();
+  const ZOOM_LEVELS_TABLE = useZoomLevelsTable();
   const renderCount = useRef(0);
-  const [showExistingPolygonParts, setShowExistingPolygonParts] = useState<boolean>(false);
+  const [selectedFeature, setSelectedFeature] = useState<Feature | undefined>(undefined);
+  const [showExistingPolygonParts, setShowExistingPolygonParts] =
+    useState<boolean>(showPolygonParts);
+
+  useEffect(() => {
+    setShowExistingPolygonParts(showPolygonParts);
+  }, [showPolygonParts]);
 
   useEffect(() => {
     const definedElements = geoFeatures?.filter((feat) => feat !== undefined);
@@ -69,6 +98,33 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
       renderCount.current += 1;
     }
   });
+
+  useEffect(() => {
+    if (!enableFeaturePropertiesPopup) {
+      setSelectedFeature(undefined);
+    }
+  }, [enableFeaturePropertiesPopup]);
+
+  useEffect(() => {
+    if (!selectedItem) {
+      return;
+    }
+    setSelectedFeature(selectedItem);
+  }, [selectedItem]);
+
+  useEffect(() => {
+    const selectedFeatureType = selectedFeature?.properties?._featureType;
+    const isManagedExternally = selectedFeatureType === FeatureType.EXISTING_PP || !!selectedItem;
+
+    if (!isManagedExternally) {
+      setSelectedFeature(undefined);
+    }
+  }, [selectedFeature, selectedItem]);
+
+  const clearSelection = useCallback((): void => {
+    setSelectedFeature(undefined);
+    onMapFeatureClick?.(undefined);
+  }, []);
 
   const previewBaseMap = useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-array-constructor
@@ -134,46 +190,25 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
     return res;
   }, []);
 
-  const GeoFeaturesInnerComponent: React.FC = () => {
-    const source = useVectorSource();
-    const map = useMap();
-
-    if (renderCount.current < RENDERS_TILL_FULL_FEATURES_SET) {
-      source.once('change', () => {
-        if (source.getState() === 'ready') {
-          setTimeout(() => {
-            map.getView().fit(source.getExtent(), fitOptions);
-          }, 0);
-        }
-      });
-    }
-
-    return (
-      <>
-        {geoFeatures?.map((feat, idx) => {
-          let featureStyle = PPMapStyles.get(feat?.properties?.featureType);
-
-          if (selectedFeatureKey && feat?.properties?.key === selectedFeatureKey) {
-            featureStyle = selectionStyle;
-          }
-
-          return feat && !isEmpty(feat.geometry) ? (
-            <GeoJSONFeature
-              geometry={{ ...feat.geometry }}
-              fit={false}
-              key={feat.id ?? idx}
-              featureStyle={featureStyle}
-            />
-          ) : null;
-        })}
-      </>
-    );
-  };
-
   return (
-    <Box style={{ ...style }}>
+    <Box className="geoFeaturesMapContainer" style={{ ...style }}>
       <Map>
+        {previewBaseMap}
         <MapLoadingIndicator />
+        <ZoomLevelIndicator />
+        <Legend
+          legendItems={LegendsArray}
+          title={intl.formatMessage({ id: 'polygon-parts.map-preview-legend.title' })}
+        />
+        <VectorLayer>
+          <VectorSource>
+            <GeoFeaturesInnerComponent
+              geoFeatures={geoFeatures}
+              fitOptions={fitOptions}
+              renderCount={renderCount}
+            />
+          </VectorSource>
+        </VectorLayer>
         {mode === Mode.UPDATE && (
           <Box className="checkbox">
             <Checkbox
@@ -181,22 +216,67 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
               label={intl.formatMessage({ id: 'polygon-parts.show-exisitng-parts-on-map.label' })}
               checked={showExistingPolygonParts}
               onClick={(evt: React.MouseEvent<HTMLInputElement>): void => {
-                setShowExistingPolygonParts(evt.currentTarget.checked);
+                evt.preventDefault();
+                evt.stopPropagation();
+                const isChecked = evt.currentTarget.checked;
+                setShowExistingPolygonParts(isChecked);
+                if (!isChecked) {
+                  clearSelection();
+                }
               }}
             />
           </Box>
         )}
-        {previewBaseMap}
-        <VectorLayer>
-          <VectorSource>
-            <GeoFeaturesInnerComponent />
-          </VectorSource>
-        </VectorLayer>
-        {showExistingPolygonParts && <PolygonPartsExtentVectorLayer layerRecord={layerRecord} />}
-        <Legend
-          legendItems={LegendsArray}
-          title={intl.formatMessage({ id: 'polygon-parts.map-preview-legend.title' })}
+        {showExistingPolygonParts && (
+          <PolygonPartsExtentQueryVectorLayer
+            featureType={FeatureType.EXISTING_PP}
+            queryExecutor={async (bbox, startIndex): Promise<IQueryExecutorResponse> => {
+              const result = await store.queryGetPolygonPartsFeature({
+                data: {
+                  feature: bboxPolygon(bbox) as GeojsonFeatureInput,
+                  typeName: getWFSFeatureTypeName(layerRecord as LayerRasterRecordModelType, ENUMS),
+                  count: CONFIG.POLYGON_PARTS.MAX.WFS_FEATURES,
+                  startIndex,
+                },
+              });
+              const fetchedFeatures = get(result, 'getPolygonPartsFeature.features', []);
+              const features = (Array.isArray(fetchedFeatures) ? fetchedFeatures : []).map(
+                (feature) => {
+                  return {
+                    ...feature,
+                    properties: {
+                      ...(feature?.properties ?? {}),
+                      _featureType: FeatureType.EXISTING_PP,
+                      _featureTitle: getText(
+                        feature,
+                        4,
+                        FEATURE_LABEL_CONFIG.polygons,
+                        ZOOM_LEVELS_TABLE
+                      ),
+                    },
+                  };
+                }
+              );
+              return { features, pageSize: CONFIG.POLYGON_PARTS.MAX.WFS_FEATURES };
+            }}
+            outerPerimeter={layerRecord?.footprint as Geometry | undefined}
+            selectedFeature={selectedFeature}
+            onClearSelectedFeature={clearSelection}
+            options={{ properties: { id: FeatureType.EXISTING_PP }, zIndex: 1 }}
+          />
+        )}
+        {children}
+        <MapFeatureClickHandler
+          onMapFeatureClick={onMapFeatureClick}
+          setSelectedFeature={setSelectedFeature}
         />
+        <FeatureSelectionHandler feature={selectedFeature} />
+        {enableFeaturePropertiesPopup && (
+          <FeaturePropertiesPopupComponent
+            selectedFeature={selectedFeature}
+            onClose={clearSelection}
+          />
+        )}
       </Map>
     </Box>
   );

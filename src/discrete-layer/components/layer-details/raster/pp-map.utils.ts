@@ -12,6 +12,8 @@ export enum FeatureType {
   SOURCE_EXTENT = 'SOURCE_EXTENT',
   SOURCE_EXTENT_MARKER = 'SOURCE_EXTENT_MARKER',
   EXISTING_PP = 'EXISTING_PP',
+  LOW_RESOLUTION_PP = 'LOW_RESOLUTION_PP',
+  ILLEGAL_PP = 'ILLEGAL_PP',
 }
 
 export const PPMapStyles = new Map<FeatureType, Style | undefined>([
@@ -62,6 +64,30 @@ export const PPMapStyles = new Map<FeatureType, Style | undefined>([
       }),
       fill: new Fill({
         color: CONFIG.CONTEXT_MENUS.MAP.POLYGON_PARTS_FEATURE_CONFIG.color,
+      }),
+    }),
+  ],
+  [
+    FeatureType.LOW_RESOLUTION_PP,
+    new Style({
+      stroke: new Stroke({
+        width: 2,
+        color: '#FF7F00',
+      }),
+      fill: new Fill({
+        color: '#FF7F0066',
+      }),
+    }),
+  ],
+  [
+    FeatureType.ILLEGAL_PP,
+    new Style({
+      stroke: new Stroke({
+        width: 2,
+        color: CONFIG.POLYGON_PARTS.STYLE.lowResolutionColor,
+      }),
+      fill: new Fill({
+        color: CONFIG.POLYGON_PARTS.STYLE.lowResolutionColor + '66',
       }),
     }),
   ],
@@ -174,7 +200,9 @@ export const createTextStyle = (
   resolution: number,
   featureConfig: Record<string, string>,
   ZOOM_LEVELS_TABLE: Record<string, number>,
-  defaultText?: string
+  defaultText?: string,
+  overridingText?: string,
+  overridingColor?: string
 ) => {
   const align = featureConfig.align;
   const baseline = featureConfig.baseline;
@@ -196,8 +224,9 @@ export const createTextStyle = (
     textAlign: align === '' ? undefined : align,
     textBaseline: baseline,
     font: font,
-    text: getText(feature, resolution, featureConfig, ZOOM_LEVELS_TABLE, defaultText),
-    fill: new Fill({ color: fillColor }),
+    text:
+      overridingText ?? getText(feature, resolution, featureConfig, ZOOM_LEVELS_TABLE, defaultText),
+    fill: new Fill({ color: overridingColor ?? fillColor }),
     stroke: new Stroke({ color: outlineColor, width: outlineWidth }),
     offsetX: offsetX,
     offsetY: offsetY,

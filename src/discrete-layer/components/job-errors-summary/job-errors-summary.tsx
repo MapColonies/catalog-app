@@ -1,5 +1,5 @@
 import { FormattedMessage } from 'react-intl';
-import { IOptions } from '@map-colonies/react-core';
+import { Button, IOptions } from '@map-colonies/react-core';
 import { Box } from '@material-ui/core';
 import {
   RasterErrorCount,
@@ -11,15 +11,25 @@ interface ErrorCountProps {
   value: number;
   className: string;
   color?: string;
+  action?: JSX.Element;
 }
 
-const ErrorCount = ({ name, value, className, color }: ErrorCountProps): JSX.Element => {
+interface RasterErrorsSummaryOptions {
+  key?: string;
+  action?: (key: string) => void;
+  isApproved?: boolean;
+}
+
+const ErrorCount = ({ name, value, className, color, action }: ErrorCountProps): JSX.Element => {
   return (
     <Box className={className}>
       <Box style={{ color }}>
         <FormattedMessage id={`validationReport.${name}`} />
       </Box>
-      <Box style={{ color }}>{value}</Box>
+      <Box style={{ color }} className="countValue">
+        <Box>{value}</Box>
+        {action}
+      </Box>
     </Box>
   );
 };
@@ -43,21 +53,52 @@ export const JobErrorsSummary = (
   theme: IOptions,
   errorsSummary: RasterErrorsSummary | undefined,
   className: string,
-  overrideColor?: string
+  overrideColor?: string,
+  options?: RasterErrorsSummaryOptions
 ): JSX.Element[] | undefined => {
   if (!errorsSummary) {
     return;
   }
+
   return Object.entries(errorsSummary.errorsCount).map(([key, value]) => {
     let color = overrideColor;
     if (!overrideColor) {
       color =
         value === 0
           ? theme.custom?.GC_SUCCESS
-          : getRasterErrorCount(errorsSummary, key)?.exceeded === false
+          : getRasterErrorCount(errorsSummary, key)?.exceeded === false ||
+            (options?.key === key && options?.isApproved === true)
           ? theme.custom?.GC_WARNING_HIGH
           : theme.custom?.GC_ERROR_HIGH;
     }
-    return <ErrorCount key={key} name={key} value={value} className={className} color={color} />;
+
+    const showResolutionButton = key === options?.key && value > 0;
+
+    return (
+      <ErrorCount
+        key={key}
+        name={key}
+        value={value}
+        className={className}
+        color={color}
+        action={
+          showResolutionButton ? (
+            <Button
+              type="button"
+              outlined
+              className="resolutionConflictButton"
+              style={{ color: 'orange', borderColor: 'orange', fontWeight: 'bold' }}
+              onClick={(e): void => {
+                e.preventDefault();
+                e.stopPropagation();
+                options?.action?.(key);
+              }}
+            >
+              <FormattedMessage id="validationReport.button" />
+            </Button>
+          ) : undefined
+        }
+      />
+    );
   });
 };
