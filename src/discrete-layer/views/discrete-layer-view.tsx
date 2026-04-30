@@ -38,6 +38,7 @@ import { IMapLegend } from '@map-colonies/react-components/dist/cesium-map/legen
 import { AutoDirectionBox } from '../../common/components/auto-direction-box/auto-direction-box.component';
 // import { BrowserCompatibilityChecker } from '../../common/components/browser-compatibility-checker/browser-compatibility-checker';
 import GPUInsufficiencyDetector from '../../common/components/gpu-insufficiency-detector/gpu-insufficiency-detector';
+import { Curtain } from '../../common/components/curtain/curtain.component';
 import CONFIG from '../../common/config';
 import { currentSite } from '../../common/helpers/siteUrl';
 import { localStore } from '../../common/helpers/storage';
@@ -123,7 +124,7 @@ const noDrawing: IDrawingObject = {
 const getTimeStamp = (): string => new Date().getTime().toString();
 
 const DiscreteLayerView: React.FC = observer(() => {
-  const [searchLoading, setSearchLoading] = useState(false);
+  const [isFilterSearchLoading, setIsFilterSearchLoading] = useState(false);
   const [data, setData] = useState<LayerMetadataMixedUnion[] | undefined>();
   const store = useStore();
   const theme = useTheme();
@@ -170,8 +171,21 @@ const DiscreteLayerView: React.FC = observer(() => {
   const [whatsNewVisitedCount, setWhatsNewVisitedCount] = useState<number>(ZERO);
   const [taskNotificationCount, setTaskNotificationCount] = useState<number>(ZERO);
 
-  const isDrawingState = isDrawing || store.exportStore.drawingState?.drawing;
-  const disableOnDrawingClassName = isDrawingState ? 'interactionsDisabled' : '';
+  const [isUiDisabled, setIsUiDisabled] = useState(false);
+
+  useEffect(() => {
+    setIsUiDisabled(
+      store.exportStore.drawingState?.drawing ||
+        Boolean(store.catalogTreeStore.isLoading) ||
+        isDrawing ||
+        isFilterSearchLoading
+    );
+  }, [
+    store.catalogTreeStore.isLoading,
+    store.exportStore.drawingState?.drawing,
+    isDrawing,
+    isFilterSearchLoading,
+  ]);
 
   useEffect(() => {
     const visitedCount = localStore.get('whatsNewVisitedCount');
@@ -361,12 +375,12 @@ const DiscreteLayerView: React.FC = observer(() => {
 
   const fetchCatalog = async () => {
     try {
-      setSearchLoading(true);
+      setIsFilterSearchLoading(true);
       const catalog = await store.discreteLayersStore.fetchAllCatalog(buildFilters);
       setData(catalog);
-      setSearchLoading(false);
+      setIsFilterSearchLoading(false);
     } catch (error: any) {
-      setSearchLoading(false);
+      setIsFilterSearchLoading(false);
       setSearchResultsError(error);
     }
   };
@@ -1095,7 +1109,8 @@ const DiscreteLayerView: React.FC = observer(() => {
 
   return (
     <>
-      <Box className={`headerContainer ${disableOnDrawingClassName}`}>
+      <Box className={`headerContainer ${isUiDisabled ? 'curtainContainer' : ''}`}>
+        {isUiDisabled && <Curtain />}
         <Box className="headerViewsSwitcher">
           <Box>
             <AppTitle />
@@ -1103,12 +1118,6 @@ const DiscreteLayerView: React.FC = observer(() => {
           <TabViewsSwitcher
             handleTabViewChange={handleTabViewChange}
             activeTabView={activeTabView}
-            disabled={
-              isDrawing ||
-              store.exportStore.drawingState?.drawing ||
-              store.catalogTreeStore.isLoading ||
-              searchLoading
-            }
           />
         </Box>
         <Box className="headerSearchOptionsContainer">
@@ -1220,7 +1229,8 @@ const DiscreteLayerView: React.FC = observer(() => {
         </Box>
       </Box>
       <Box className="mainViewContainer">
-        <Box className={`sidePanelParentContainer ${disableOnDrawingClassName}`}>
+        <Box className={`sidePanelParentContainer ${isUiDisabled ? 'curtainContainer' : ''}`}>
+          {isUiDisabled && <Curtain />}
           {!tabsPanelExpanded ? (
             <Box
               className="sidePanelContainer"
@@ -1255,7 +1265,7 @@ const DiscreteLayerView: React.FC = observer(() => {
               <Box className="tabContentContainer">
                 {getActiveTabHeader(activeTabView, site)}
                 <LayersResults
-                  searchLoading={searchLoading}
+                  searchLoading={isFilterSearchLoading}
                   searchError={searchResultsError}
                   style={LayersResultsStyle}
                 />

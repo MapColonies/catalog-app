@@ -68,6 +68,7 @@ export const CatalogFilterPanel: React.FC<CatalogFilterPanelProps> = observer(
       const filters = getCatalogFilters(filterableFields ?? [], filterFormValues);
 
       onFiltersSubmit(filters);
+      closePanel();
     };
 
     const watchAllFields = formMethods.watch();

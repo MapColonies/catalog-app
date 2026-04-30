@@ -21,7 +21,7 @@ import {
   RasterIngestionFilesTypeConfig,
 } from '../../../models';
 import { FilePickerDialog } from '../../dialogs/file-picker.dialog';
-import { Curtain } from './curtain/curtain.component';
+import { Curtain } from '../../../../common/components/curtain/curtain.component';
 import { RasterWorkflowContext } from './state-machine/context';
 import {
   hasActiveJob,

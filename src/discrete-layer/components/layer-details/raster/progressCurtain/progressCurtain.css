@@ -1,7 +1,3 @@
-.relativePosition {
-  position: relative;
-}
-
 #progressCurtain {
   position: absolute;
   display: flex;

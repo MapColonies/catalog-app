@@ -27,7 +27,7 @@ import {
   prepareEntityForSubmit,
   transformEntityToFormFields,
 } from '../utils';
-import { Curtain } from './curtain/curtain.component';
+import { Curtain } from '../../../../common/components/curtain/curtain.component';
 import { IngestionFields } from './ingestion-fields.raster';
 import { JobInfo } from './job-info';
 import { GeoFeaturesPresentorComponent } from './pp-map';
