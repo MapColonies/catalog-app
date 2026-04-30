@@ -84,10 +84,10 @@ export const PPMapStyles = new Map<FeatureType, Style | undefined>([
     new Style({
       stroke: new Stroke({
         width: 2,
-        color: '#E91E63',
+        color: CONFIG.POLYGON_PARTS.STYLE.lowResolutionColor,
       }),
       fill: new Fill({
-        color: '#E91E6366',
+        color: CONFIG.POLYGON_PARTS.STYLE.lowResolutionColor + '66',
       }),
     }),
   ],
