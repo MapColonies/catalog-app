@@ -5,7 +5,7 @@ import { debounce } from 'lodash';
 import GeoJSON from 'ol/format/GeoJSON';
 import { Options } from 'ol/layer/Base';
 import { Size } from 'ol/size';
-import { Fill, Stroke, Style, Text } from 'ol/style';
+import { Style } from 'ol/style';
 import intersect from '@turf/intersect';
 import { polygon } from '@turf/helpers';
 import bboxPolygon from '@turf/bbox-polygon';
@@ -40,7 +40,6 @@ interface PolygonPartsExtentQueryVectorLayerProps {
   onClearSelectedFeature?: () => void;
   onFeaturesChange?: (features: Feature[]) => void;
   onQueryError?: (errorMessage: string) => void;
-  textStyleFactory?: (feature: Feature) => Text | undefined;
   options?: Options;
 }
 
@@ -76,7 +75,6 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
   onClearSelectedFeature,
   onFeaturesChange,
   onQueryError,
-  textStyleFactory,
   options,
 }) => {
   const mapOl = useMap();
@@ -314,35 +312,22 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
       <VectorSource>
         {polygonParts.map((feat, idx) => {
           const isExceeded = feat.properties?.exceeded === true;
-          const baseStyle = PPMapStyles.get(featureType);
-          let baseStroke = baseStyle?.getStroke()?.clone();
-          let baseFill = baseStyle?.getFill()?.clone();
-
-          if (featureType === FeatureType.LOW_RESOLUTION_PP) {
-            const strokeColor = isExceeded ? '#d32f2f' : '#ff7f00';
-            const fillColor = isExceeded ? '#d32f2f66' : '#ff7f0066';
-
-            baseStroke = new Stroke({
-              width: 2,
-              color: strokeColor,
-            });
-            baseFill = new Fill({
-              color: fillColor,
-            });
-          }
-
+          const ppStyle = PPMapStyles.get(isExceeded ? FeatureType.ILLEGAL_PP : featureType);
+          let ppStroke = ppStyle?.getStroke()?.clone();
+          let ppFill = ppStyle?.getFill()?.clone();
           const featureStyle = new Style({
             text:
-              textStyleFactory?.(feat) ??
               createTextStyle(
                 feat,
                 4,
                 FEATURE_LABEL_CONFIG.polygons,
                 ZOOM_LEVELS_TABLE,
-                intl.formatMessage({ id: 'polygon-parts.map-preview.zoom-before-fetch' })
+                intl.formatMessage({ id: 'polygon-parts.map-preview.zoom-before-fetch' }),
+                featureType === FeatureType.LOW_RESOLUTION_PP ? feat.properties?._featureTitle : undefined,
+                featureType === FeatureType.LOW_RESOLUTION_PP ? ppStroke?.getColor()?.toString() : undefined
               ),
-            stroke: baseStroke,
-            fill: baseFill,
+            stroke: ppStroke,
+            fill: ppFill,
           });
 
           const selectedFeatureKey = selectedFeature?.properties?._key;
@@ -363,8 +348,8 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<PolygonPartsExtentQuer
             selectedFeatureId !== undefined && featureId !== undefined && selectedFeatureId === featureId;
 
           if (selectedFeature === feat || isSelectedByKey || isSelectedById) {
-            if (baseStroke) {
-              const selectedStroke = baseStroke.clone();
+            if (ppStroke) {
+              const selectedStroke = ppStroke.clone();
               selectedStroke.setWidth(8);
               featureStyle.setStroke(selectedStroke);
             }

@@ -3,7 +3,6 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { AutoSizer, List, ListRowProps } from 'react-virtualized';
 import { Feature } from 'geojson';
 import { get } from 'lodash';
-import { Fill, Stroke, Text } from 'ol/style';
 import { Box } from '@map-colonies/react-components';
 import {
   Button,
@@ -536,40 +535,6 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                           }}
                           onQueryError={(errorMessage): void => {
                             setLowResolutionPartsError(errorMessage);
-                          }}
-                          textStyleFactory={(feat) => {
-                            const isFootprint = Boolean(feat.properties?._showAsFootprint);
-                            if (isFootprint) {
-                              return undefined;
-                            }
-
-                            const isExceeded = feat.properties?.exceeded === true;
-
-                            const featureLabel = feat.properties?._featureLabel as string | undefined;
-                            const zoomLevel = feat.properties?._zoomLevel;
-                            const labelParts: string[] = [];
-
-                            if (featureLabel) {
-                              labelParts.push(featureLabel);
-                            }
-                            if (zoomLevel !== undefined && zoomLevel !== null) {
-                              labelParts.push(`(${String(zoomLevel)})`);
-                            }
-
-                            if (labelParts.length === 0) {
-                              return undefined;
-                            }
-
-                            return new Text({
-                              text: labelParts.join('\n'),
-                              textAlign: 'center',
-                              textBaseline: 'middle',
-                              font: 'bold 10px/1 Roboto',
-                              fill: new Fill({ color: isExceeded ? '#d32f2f' : '#ff7f00' }),
-                              stroke: new Stroke({ color: '#000', width: 3 }),
-                              placement: 'point',
-                              overflow: true,
-                            });
                           }}
                           options={{ properties: { id: FeatureType.LOW_RESOLUTION_PP }, zIndex: 2 }}
                         />

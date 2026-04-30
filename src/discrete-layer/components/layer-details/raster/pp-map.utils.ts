@@ -200,7 +200,9 @@ export const createTextStyle = (
   resolution: number,
   featureConfig: Record<string, string>,
   ZOOM_LEVELS_TABLE: Record<string, number>,
-  defaultText?: string
+  defaultText?: string,
+  overridingText?: string,
+  overridingColor?: string
 ) => {
   const align = featureConfig.align;
   const baseline = featureConfig.baseline;
@@ -222,8 +224,8 @@ export const createTextStyle = (
     textAlign: align === '' ? undefined : align,
     textBaseline: baseline,
     font: font,
-    text: getText(feature, resolution, featureConfig, ZOOM_LEVELS_TABLE, defaultText),
-    fill: new Fill({ color: fillColor }),
+    text: overridingText ?? getText(feature, resolution, featureConfig, ZOOM_LEVELS_TABLE, defaultText),
+    fill: new Fill({ color: overridingColor ?? fillColor }),
     stroke: new Stroke({ color: outlineColor, width: outlineWidth }),
     offsetX: offsetX,
     offsetY: offsetY,
