@@ -17,11 +17,11 @@ import {
   Typography,
 } from '@map-colonies/react-core';
 import { AutoDirectionBox } from '../../../../common/components/auto-direction-box/auto-direction-box.component';
+import { Curtain } from '../../../../common/components/curtain/curtain.component';
 import { Domain } from '../../../../common/models/domain';
 import { Mode } from '../../../../common/models/mode.enum';
 import { EntityDescriptorModelType } from '../../../models';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
-import { Curtain } from './curtain/curtain.component';
 import { IQueryExecutorResponse, PolygonPartsExtentQueryVectorLayer } from './polygon-parts-extent-query-vector-layer';
 import { GeoFeaturesPresentorComponent } from './pp-map';
 import { FeatureType } from './pp-map.utils';
@@ -53,7 +53,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
   viewOnly = false,
 }) => {
   const intl = useIntl();
-  const api = useWorkerAPI();
+  const [api, stagesInfo] = useWorkerAPI();
   const hasLoadedRef = useRef(false);
   const ZOOM_LEVELS_TABLE = useZoomLevelsTable();
   const state = RasterWorkflowContext.useSelector((s) => s);
