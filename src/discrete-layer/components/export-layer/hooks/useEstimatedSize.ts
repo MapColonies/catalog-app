@@ -1,11 +1,12 @@
 import { useContext, useEffect, useState } from 'react';
 import { Feature, FeatureCollection } from 'geojson';
-import { EstimatedSizeModelType, RecordType, useQuery, useStore } from '../../../models';
+import { get, isEmpty } from 'lodash';
 import EnumsMapContext, {
   IEnumDescriptor,
   IEnumsMapType,
 } from '../../../../common/contexts/enumsMap.context';
-import { get, isEmpty } from 'lodash';
+import { getResponseErrorMesssage } from '../../../../common/helpers/server-error';
+import { EstimatedSizeModelType, RecordType, useQuery, useStore } from '../../../models';
 import { GeojsonFeatureCollectionInput } from '../../../models/RootStore.base';
 
 export const useEstimatedSize = (
@@ -66,6 +67,6 @@ export const useEstimatedSize = (
     data: data?.getEstimatedSize.estimatedSizeBytes,
     loading,
     refetch: query?.refetch,
-    error: get(query?.error, 'response.errors[0].message') as string,
+    error: getResponseErrorMesssage(query?.error?.response),
   };
 };

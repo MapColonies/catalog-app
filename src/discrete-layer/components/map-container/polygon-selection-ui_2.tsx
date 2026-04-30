@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useIntl } from 'react-intl';
 import { IconButton, Tooltip, useTheme } from '@map-colonies/react-core';
 import { Box, DrawType, IDrawingEvent } from '@map-colonies/react-components';
+import { Curtain } from '../../../common/components/curtain/curtain.component';
 import { useStore } from '../../models/RootStore';
 import { FilterField } from '../../models/RootStore.base';
 import { BBoxCorners, BBoxDialog } from './bbox.dialog';
@@ -103,14 +104,8 @@ export const PolygonSelectionUi: React.FC<PolygonSelectionUiProps> = (props) => 
 
   return (
     <>
-      <Box
-        id="searchContainer"
-        position="relative"
-        style={{
-          opacity: (disabled as boolean) ? '0.3' : '1',
-          pointerEvents: (disabled as boolean) ? 'none' : 'unset',
-        }}
-      >
+      <Box id="searchContainer" className={`${disabled ? 'curtainContainer' : ''}`}>
+        {disabled && <Curtain />}
         <Tooltip content={intl.formatMessage({ id: 'action.clear.tooltip' })}>
           <IconButton
             className="mc-icon-Delete"

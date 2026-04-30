@@ -66,6 +66,8 @@
   "general.more.text": "more...",
   "general.missing.translation": "##MISSING_TRANSLATION##",
   "general.search.placeholder": "Search...",
+  "general.invalid.geometry": "Invalid geometry {value}",
+  "general.http.empty-stream.error": "No data was received",
 
   "terrain-provider.access.error": "Unavailable terrain information",
 
@@ -887,5 +889,16 @@
   "export-layer.validations.relations.lower": "lower than-",
   "export-layer.validations.relations.lowerOrEqual": "lower or equal to-",
   "export-layer.validations.relations.equal": "equals to-",
-  "export-layer.validations.againstOtherField": "Value should be {relation} field {fieldName}"
+  "export-layer.validations.againstOtherField": "Value should be {relation} field {fieldName}",
+
+  "progress.titleProcess": "process",
+  "progress.titleProgress": "progress",
+  "progress.titleTime": "time (ms)",
+
+  "progress.stage.init": "Boot",
+  "progress.stage.load": "Loading",
+  "progress.stage.parsing": "Preparing info",
+  "progress.stage.cache": "Cache",
+  "progress.stage.updateAreas": "Calculating areas",
+  "progress.stage.computeOuterGeometry": "Calculating perimeter"
 }

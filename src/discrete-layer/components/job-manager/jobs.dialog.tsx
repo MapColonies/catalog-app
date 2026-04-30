@@ -13,6 +13,7 @@ import { LogicError } from '../../../common/components/error/logic.error-present
 import { GridApi } from '../../../common/components/grid';
 import CONFIG from '../../../common/config';
 import { dateFormatter } from '../../../common/helpers/formatters';
+import { getResponseErrorMesssage } from '../../../common/helpers/server-error';
 import useCountDown, { IActions } from '../../../common/hooks/countdown.hook';
 import { JobModelType } from '../../models';
 import { IDispatchAction } from '../../models/actionDispatcherStore';
@@ -195,14 +196,9 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
         suppressFlash: true,
         force: true,
       });
-      const NONE = 0;
-      const serverError = mutationQuery.error.response.errors[0];
-      const status = serverError.serverResponse?.status ?? NONE;
-      let message = serverError.serverResponse?.data.message
-        ? serverError.serverResponse.data.message
-        : serverError.serverResponse?.statusText
-        ? serverError.serverResponse?.statusText
-        : serverError.message.substring(+serverError.message.indexOf('; ') + 1);
+
+      const status = getResponseErrorStatus(mutationQuery.error.response);
+      const message = getResponseErrorMesssage(mutationQuery.error.response);
       newError = {
         code: 'error.server-error',
         message: `${status > NONE ? status + ' ' : ''}${message}`,
