@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.7.1](https://github.com/MapColonies/catalog-app/compare/v4.7.0...v4.7.1) (2026-05-03)
+
+
+### Bug Fixes
+
+* pp map styles by prop ([#882](https://github.com/MapColonies/catalog-app/issues/882)) ([1a30b1f](https://github.com/MapColonies/catalog-app/commit/1a30b1fe7413e1cb5eb67d344446c205eb591f93))
+* using Progress Curtain ([#883](https://github.com/MapColonies/catalog-app/issues/883)) ([b204348](https://github.com/MapColonies/catalog-app/commit/b204348d1eee4be8bc85dc52374b80c3da053f5c))
+
 ## [4.7.0](https://github.com/MapColonies/catalog-app/compare/v4.6.0...v4.7.0) (2026-04-30)
 
 
