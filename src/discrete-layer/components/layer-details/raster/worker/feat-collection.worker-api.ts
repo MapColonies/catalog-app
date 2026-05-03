@@ -457,7 +457,7 @@ const api: WorkerAPI = {
       process: Process.ComputeOuterGeometry,
       stage: Stage.ComputeOuterGeometry,
       type: WorkerType.Done,
-      details: details,
+      details,
     });
 
     return simplifiedOuterJSON;

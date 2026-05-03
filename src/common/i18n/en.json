@@ -290,7 +290,6 @@
   "resolutionConflict.units.km2": " km²",
   "resolutionConflict.approver.label": "Approver full name",
   "resolutionConflict.error.missingUrl": "Missing validation report URL",
-  "resolutionConflict.error.fetchFailed": "Failed to fetch polygon parts from file",
   "resolutionConflict.error.queryFailed": "Failed to query polygon parts by extent",
   "resolutionConflict.error.approveFailed": "Failed to resume job",
 

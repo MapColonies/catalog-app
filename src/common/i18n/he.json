@@ -290,7 +290,6 @@
   "resolutionConflict.units.km2": " קמ\"ר",
   "resolutionConflict.approver.label": "שם מלא של מאשר החריגה",
   "resolutionConflict.error.missingUrl": "חסר URL לדו\"ח ולידציה",
-  "resolutionConflict.error.fetchFailed": "נכשל בטעינת חלקי תיחום מקובץ",
   "resolutionConflict.error.queryFailed": "נכשל בהרצת שאילתת חלקי תיחום בתצוגה",
   "resolutionConflict.error.approveFailed": "נכשל באישור החריגה",
 

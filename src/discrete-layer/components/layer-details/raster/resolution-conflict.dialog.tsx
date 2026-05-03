@@ -17,7 +17,6 @@ import {
   Typography,
 } from '@map-colonies/react-core';
 import { AutoDirectionBox } from '../../../../common/components/auto-direction-box/auto-direction-box.component';
-import { Curtain } from '../../../../common/components/curtain/curtain.component';
 import { Domain } from '../../../../common/models/domain';
 import { Mode } from '../../../../common/models/mode.enum';
 import { EntityDescriptorModelType } from '../../../models';
@@ -26,10 +25,12 @@ import {
   IQueryExecutorResponse,
   PolygonPartsExtentQueryVectorLayer,
 } from './polygon-parts-extent-query-vector-layer';
+import { ProgressCurtain } from './progressCurtain/progressCurtain';
 import { GeoFeaturesPresentorComponent } from './pp-map';
 import { FeatureType } from './pp-map.utils';
 import { RasterWorkflowContext } from './state-machine/context';
 import { UpdateLayerHeader } from './update-layer-header';
+import { extractProgressArray } from './worker/utils';
 import { useWorkerAPI } from './worker/useWorkerAPI';
 
 import './resolution-conflict.dialog.css';
@@ -194,56 +195,52 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
       setIsLoadingLowResolutionParts(true);
       setLowResolutionPartsError(undefined);
 
-      try {
-        await api.init.method();
+      await api.init.method();
 
-        await api.loadFromShapeFile.method(reportUrl, {
-          customProperties: {
-            _key: '{index}-0',
-            _featureLabel: intl.formatMessage({ id: 'resolutionConflict.partName' }),
-            _zoomLevel: String(zoomLevelForIngestion),
-            _featureTitle: `${intl.formatMessage({ id: 'resolutionConflict.partName' })} (${String(
-              zoomLevelForIngestion
-            )})`,
-            _featureType: FeatureType.LOW_RESOLUTION_PP,
-          },
-        });
+      const downloadWorkerError = await api.loadFromShapeFile.method(reportUrl, {
+        customProperties: {
+          _key: '{index}-0',
+          _featureLabel: intl.formatMessage({ id: 'resolutionConflict.partName' }),
+          _zoomLevel: String(zoomLevelForIngestion),
+          _featureTitle: `${intl.formatMessage({ id: 'resolutionConflict.partName' })} (${String(
+            zoomLevelForIngestion
+          )})`,
+          _featureType: FeatureType.LOW_RESOLUTION_PP,
+        },
+      });
 
-        await api.updateAreas.method();
-
-        const outerGeometry = await api.computeOuterGeometry.method();
-        setOuterPerimeter({
-          type: 'Feature',
-          properties: {
-            _featureType: FeatureType.LOW_RESOLUTION_PP,
-          },
-          geometry: outerGeometry,
-        });
-
-        const featureCollection = await api.getFeatureCollection.method();
-
-        const newCollections = [
-          {
-            name: collectionName,
-            features: featureCollection.features,
-          },
-        ];
-        setLowResolutionCollections(newCollections);
-        setCollectionMountKeys(newCollections.map(() => 0));
-        setSelectedItem(undefined);
-      } catch (error) {
-        const errorMessage = (error as Error)?.message;
-        setLowResolutionCollections([]);
-        setSelectedItem(undefined);
-        setLowResolutionPartsError(
-          `${intl.formatMessage({ id: 'resolutionConflict.error.fetchFailed' })}${
-            errorMessage ? `: ${errorMessage}` : ''
-          }`
-        );
-      } finally {
-        setIsLoadingLowResolutionParts(false);
-        setShowLowResolutionPolygonParts(SHOW_PARTS_AFTER_INIT);
+      if (downloadWorkerError) {
+        return;
       }
+
+      const updateAreasError = await api.updateAreas.method();
+
+      if (updateAreasError) {
+        return;
+      }
+
+      const outerGeometry = await api.computeOuterGeometry.method();
+      setOuterPerimeter({
+        type: 'Feature',
+        properties: {
+          _featureType: FeatureType.LOW_RESOLUTION_PP,
+        },
+        geometry: outerGeometry,
+      });
+
+      const featureCollection = await api.getFeatureCollection.method();
+
+      const newCollections = [
+        {
+          name: collectionName,
+          features: featureCollection.features,
+        },
+      ];
+      setLowResolutionCollections(newCollections);
+      setCollectionMountKeys(newCollections.map(() => 0));
+      setSelectedItem(undefined);
+      setIsLoadingLowResolutionParts(false);
+      setShowLowResolutionPolygonParts(SHOW_PARTS_AFTER_INIT);
     };
 
     void loadLowResolutionParts();
@@ -277,6 +274,10 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
     void resumeJob();
   }, [approver]);
 
+  const progresses = useMemo(() => {
+    return extractProgressArray(api);
+  }, [api]);
+
   const clearLowResolutionSelection = useCallback((): void => {
     setSelectedItem(undefined);
     setAutoScrollListToSelection(false);
@@ -292,7 +293,11 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
         <DialogContent className="dialogBody">
           <Box className="content">
             <Box className="rightPane">
-              <Box className="lowResolutionPartsList curtainContainer">
+              <Box
+                className={`lowResolutionPartsList ${
+                  isLoadingLowResolutionParts ? 'curtainContainer' : 'padding'
+                }`}
+              >
                 <Box className="lowResolutionPartsCheckboxContainer">
                   {!isLoadingLowResolutionParts && (
                     <Checkbox
@@ -343,7 +348,10 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                   </Box>
                 )}
                 {isLoadingLowResolutionParts ? (
-                  <Curtain showProgress={true} />
+                  <ProgressCurtain
+                    stagesInfo={stagesInfo}
+                    workerMessages={progresses}
+                  ></ProgressCurtain>
                 ) : lowResolutionCollections.length === 0 || !hasFilteredFeatures ? (
                   <Typography tag="p" className="emptyList">
                     <FormattedMessage id="general.empty.text" />
