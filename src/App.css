@@ -220,6 +220,10 @@ input:disabled {
   animation: blinkSmooth 1s 6;
 }
 
+.blink-constantly {
+  animation: blinkSmooth 1s infinite;
+}
+
 @keyframes blinkSmooth {
   0% {
     opacity: 1; /* Fully visible */
