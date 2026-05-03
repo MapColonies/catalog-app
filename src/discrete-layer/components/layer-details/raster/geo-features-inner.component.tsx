@@ -3,7 +3,7 @@ import { Feature } from 'geojson';
 import { isEmpty } from 'lodash';
 import { FitOptions } from 'ol/View';
 import { GeoJSONFeature, useMap, useVectorSource } from '@map-colonies/react-components';
-import { PPMapStyles } from './pp-map.utils';
+import { getStyleByFeatureType } from './pp-map.utils';
 
 const RENDERS_TILL_FULL_FEATURES_SET = 1; // first render with source, second with PPs perimeter geometry
 
@@ -39,7 +39,7 @@ export const GeoFeaturesInnerComponent: React.FC<GeoFeaturesInnerProps> = ({
             geometry={{ ...feat.geometry }}
             fit={false}
             key={feat.id ?? idx}
-            featureStyle={PPMapStyles.get(feat?.properties?.featureType)}
+            featureStyle={getStyleByFeatureType(feat)}
           />
         ) : null;
       })}

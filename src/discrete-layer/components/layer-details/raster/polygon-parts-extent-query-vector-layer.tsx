@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import { BBox, Feature, GeoJsonProperties, Geometry } from 'geojson';
 import { debounce } from 'lodash';
@@ -15,7 +15,12 @@ import { useStore } from '../../../models';
 import { IDispatchAction } from '../../../models/actionDispatcherStore';
 import { UserAction } from '../../../models/userStore';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
-import { createTextStyle, FeatureType, FEATURE_LABEL_CONFIG, PPMapStyles } from './pp-map.utils';
+import {
+  createTextStyle,
+  FeatureType,
+  FEATURE_LABEL_CONFIG,
+  getStyleByFeatureType,
+} from './pp-map.utils';
 
 export interface IQueryExecutorResponse {
   features: Feature<Geometry, GeoJsonProperties>[];
@@ -140,7 +145,7 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<
     }
 
     if (isFootprintModeRef.current) {
-      onClearSelectedFeatureRef.current?.();
+      hasSeenSelectedFeatureInExtentRef.current = false;
       return;
     }
 
@@ -181,8 +186,6 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<
   }, [featureType, polygonParts, selectedFeature]);
 
   useEffect(() => {
-    let initialFetchTimer: number | undefined;
-
     const requestPolygonPartsByCurrentExtent = (): boolean => {
       void getPolygonParts(getCurrentExtent(), START);
       return true;
@@ -199,15 +202,14 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<
 
     return (): void => {
       try {
-        if (initialFetchTimer !== undefined) {
-          window.clearTimeout(initialFetchTimer);
-        }
         mapOl.un('moveend', debounceCall);
       } catch (e) {
         console.log('OL "moveEnd" remove listener failed', e);
       }
     };
   }, []);
+
+  const geoJsonFormat = useMemo(() => new GeoJSON(), []);
 
   const getCurrentExtent = (): BBox => {
     return mapOl.getView().calculateExtent(mapOl.getSize()) as BBox;
@@ -297,8 +299,7 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<
     <VectorLayer options={options}>
       <VectorSource>
         {polygonParts.map((feat, idx) => {
-          const isExceeded = feat.properties?.exceeded === true;
-          const ppStyle = PPMapStyles.get(isExceeded ? FeatureType.ILLEGAL_PP : featureType);
+          const ppStyle = getStyleByFeatureType(feat);
           let ppStroke = ppStyle?.getStroke()?.clone();
           let ppFill = ppStyle?.getFill()?.clone();
           const featureStyle = new Style({
@@ -307,13 +308,7 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<
               4,
               FEATURE_LABEL_CONFIG.polygons,
               ZOOM_LEVELS_TABLE,
-              intl.formatMessage({ id: 'polygon-parts.map-preview.zoom-before-fetch' }),
-              featureType === FeatureType.LOW_RESOLUTION_PP
-                ? feat.properties?._featureTitle
-                : undefined,
-              featureType === FeatureType.LOW_RESOLUTION_PP
-                ? ppStroke?.getColor()?.toString()
-                : undefined
+              intl.formatMessage({ id: 'polygon-parts.map-preview.zoom-before-fetch' })
             ),
             stroke: ppStroke,
             fill: ppFill,
@@ -354,12 +349,12 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<
           const extentPolygon = polygon(bbox.geometry.coordinates);
 
           try {
-            // There is some cases when turf.intersect() throws exception, then no need to change geometry
+            // There are some cases when turf.intersect() throws exception, then no need to change geometry
             // @ts-ignore
             const featureClippedPolygon = intersect(feat, extentPolygon);
 
             if (featureClippedPolygon) {
-              const geometry = new GeoJSON().readGeometry(featureClippedPolygon.geometry);
+              const geometry = geoJsonFormat.readGeometry(featureClippedPolygon.geometry);
               featureStyle.setGeometry(geometry);
             }
           } catch (e) {
