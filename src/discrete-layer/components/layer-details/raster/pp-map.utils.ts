@@ -16,7 +16,7 @@ export enum FeatureType {
   ILLEGAL_PP = 'ILLEGAL_PP',
 }
 
-interface IProp {
+interface IStyleByProp {
   prop: string;
   values: {
     value: string | number | boolean;
@@ -24,7 +24,7 @@ interface IProp {
   }[];
 }
 
-export const PPMapStyles = new Map<FeatureType, Style | IProp[]>([
+export const PPMapStyles = new Map<FeatureType, Style | IStyleByProp[]>([
   [
     FeatureType.PP_PERIMETER,
     new Style({
