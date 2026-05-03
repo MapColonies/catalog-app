@@ -19,7 +19,7 @@ import {
   createTextStyle,
   FeatureType,
   FEATURE_LABEL_CONFIG,
-  getStyleByFeatureType
+  getStyleByFeatureType,
 } from './pp-map.utils';
 
 export interface IQueryExecutorResponse {

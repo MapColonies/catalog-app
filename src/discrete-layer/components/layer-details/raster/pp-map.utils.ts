@@ -104,11 +104,11 @@ export const PPMapStyles = new Map<FeatureType, Style | IProp[]>([
                 color: CONFIG.POLYGON_PARTS.STYLE.lowResolutionColor + '66',
               }),
             }),
-          }
+          },
         ],
-      }
-    ]
-  ]
+      },
+    ],
+  ],
 ]);
 
 export const getStyleByFeatureType = (feature: Feature): Style | undefined => {
@@ -263,7 +263,8 @@ export const createTextStyle = (
     textBaseline: baseline,
     font: font,
     text:
-      feature.properties?._featureTitle ?? getText(feature, resolution, featureConfig, ZOOM_LEVELS_TABLE, defaultText),
+      feature.properties?._featureTitle ??
+      getText(feature, resolution, featureConfig, ZOOM_LEVELS_TABLE, defaultText),
     fill: new Fill({ color: fillColor }),
     stroke: new Stroke({ color: outlineColor, width: outlineWidth }),
     offsetX: offsetX,
