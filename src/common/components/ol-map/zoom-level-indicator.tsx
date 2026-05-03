@@ -15,7 +15,9 @@ interface ZoomLevelIndicatorProps {
   indicateTillZoomLevel?: number;
 }
 
-export const ZoomLevelIndicator: React.FC<ZoomLevelIndicatorProps> = ({ indicateTillZoomLevel }) => {
+export const ZoomLevelIndicator: React.FC<ZoomLevelIndicatorProps> = ({
+  indicateTillZoomLevel,
+}) => {
   const map = useMap();
   const [zoomLevel, setZoomLevel] = useState<number | undefined>(map.getView().getZoom());
 
@@ -35,8 +37,7 @@ export const ZoomLevelIndicator: React.FC<ZoomLevelIndicatorProps> = ({ indicate
   }, []);
 
   const blinkClass = useMemo(() => {
-    return indicateTillZoomLevel &&
-      (!zoomLevel || zoomLevel < indicateTillZoomLevel)
+    return indicateTillZoomLevel && (!zoomLevel || zoomLevel < indicateTillZoomLevel)
       ? 'blink-constantly'
       : '';
   }, [zoomLevel, indicateTillZoomLevel]);
