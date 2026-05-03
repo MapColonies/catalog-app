@@ -17,121 +17,120 @@ export enum FeatureType {
 }
 
 interface IStyleByProp {
-  prop: string;
-  values: {
+  style: Style;
+  prop?: string;
+  values?: {
     value: string | number | boolean;
     style: Style;
   }[];
 }
 
-export const PPMapStyles = new Map<FeatureType, Style | IStyleByProp[]>([
+export const PPMapStyles = new Map<FeatureType, IStyleByProp>([
   [
     FeatureType.PP_PERIMETER,
-    new Style({
-      stroke: new Stroke({
-        width: 4,
-        color: '#000000',
+    {
+      style: new Style({
+        stroke: new Stroke({
+          width: 4,
+          color: '#000000',
+        }),
       }),
-    }),
+    },
   ],
   [
     FeatureType.PP_PERIMETER_MARKER,
-    new Style({
-      image: new Icon({
-        scale: 0.2,
-        anchor: [0.5, 1],
-        src: 'assets/img/map-marker.gif',
+    {
+      style: new Style({
+        image: new Icon({
+          scale: 0.2,
+          anchor: [0.5, 1],
+          src: 'assets/img/map-marker.gif',
+        }),
       }),
-    }),
+    },
   ],
   [
     FeatureType.SOURCE_EXTENT,
-    new Style({
-      stroke: new Stroke({
-        width: 4,
-        color: '#7F00FF',
+    {
+      style: new Style({
+        stroke: new Stroke({
+          width: 4,
+          color: '#7F00FF',
+        }),
       }),
-    }),
+    },
   ],
   [
     FeatureType.SOURCE_EXTENT_MARKER,
-    new Style({
-      image: new Icon({
-        scale: 0.2,
-        anchor: [0.5, 1],
-        src: 'assets/img/map-marker.gif',
+    {
+      style: new Style({
+        image: new Icon({
+          scale: 0.2,
+          anchor: [0.5, 1],
+          src: 'assets/img/map-marker.gif',
+        }),
       }),
-    }),
+    },
   ],
   [
     FeatureType.EXISTING_PP,
-    new Style({
-      stroke: new Stroke({
-        width: 2,
-        color: CONFIG.CONTEXT_MENUS.MAP.POLYGON_PARTS_FEATURE_CONFIG.outlineColor,
+    {
+      style: new Style({
+        stroke: new Stroke({
+          width: 2,
+          color: CONFIG.CONTEXT_MENUS.MAP.POLYGON_PARTS_FEATURE_CONFIG.outlineColor,
+        }),
+        fill: new Fill({
+          color: CONFIG.CONTEXT_MENUS.MAP.POLYGON_PARTS_FEATURE_CONFIG.color,
+        }),
       }),
-      fill: new Fill({
-        color: CONFIG.CONTEXT_MENUS.MAP.POLYGON_PARTS_FEATURE_CONFIG.color,
-      }),
-    }),
+    },
   ],
   [
     FeatureType.LOW_RESOLUTION_PP,
-    [
-      {
-        prop: 'exceeded',
-        values: [
-          {
-            value: false,
-            style: new Style({
-              stroke: new Stroke({
-                width: 2,
-                color: '#FF7F00',
-              }),
-              fill: new Fill({
-                color: '#FF7F0066',
-              }),
+    {
+      style: new Style({
+        stroke: new Stroke({
+          width: 2,
+          color: '#FF7F00',
+        }),
+        fill: new Fill({
+          color: '#FF7F0066',
+        }),
+      }),
+      prop: 'exceeded',
+      values: [
+        {
+          value: true,
+          style: new Style({
+            stroke: new Stroke({
+              width: 2,
+              color: CONFIG.POLYGON_PARTS.STYLE.lowResolutionColor,
             }),
-          },
-          {
-            value: true,
-            style: new Style({
-              stroke: new Stroke({
-                width: 2,
-                color: CONFIG.POLYGON_PARTS.STYLE.lowResolutionColor,
-              }),
-              fill: new Fill({
-                color: CONFIG.POLYGON_PARTS.STYLE.lowResolutionColor + '66',
-              }),
+            fill: new Fill({
+              color: CONFIG.POLYGON_PARTS.STYLE.lowResolutionColor + '66',
             }),
-          },
-        ],
-      },
-    ],
+          }),
+        },
+      ],
+    },
   ],
 ]);
 
 export const getStyleByFeatureType = (feature: Feature): Style | undefined => {
-  const featureType = get(feature.properties, '_featureType') as FeatureType;
-  if (!featureType) {
-    return PPMapStyles.get(FeatureType.EXISTING_PP) as Style;
+  const defaultStyle = PPMapStyles.get(FeatureType.EXISTING_PP)?.style;
+  const featureType = get(feature.properties, '_featureType') as FeatureType | undefined;
+  const styleByProp = featureType ? PPMapStyles.get(featureType) : undefined;
+  if (!styleByProp) {
+    return defaultStyle;
   }
-
-  const styleOrProps = PPMapStyles.get(featureType);
-  if (!Array.isArray(styleOrProps)) {
-    return styleOrProps as Style | undefined;
+  const baseStyle = styleByProp.style ?? defaultStyle;
+  if (!styleByProp.prop || !styleByProp.values || styleByProp.values.length === 0) {
+    return baseStyle;
   }
-
-  for (const propConfig of styleOrProps) {
-    const propValue = get(feature.properties, propConfig.prop);
-    const targetValue = propValue === true;
-    const matchedStyle = propConfig.values.find((entry) => entry.value === targetValue)?.style;
-    if (matchedStyle) {
-      return matchedStyle;
-    }
-  }
-
-  return PPMapStyles.get(FeatureType.EXISTING_PP) as Style | undefined;
+  const propValue = get(feature.properties, styleByProp.prop);
+  const matchedStyle = styleByProp.values.find((entry) => entry.value === propValue)?.style;
+  return matchedStyle ?? baseStyle;
 };
 
 export const getWFSFeatureTypeName = (

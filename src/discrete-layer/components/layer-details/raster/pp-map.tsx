@@ -4,7 +4,6 @@ import { Feature, Geometry } from 'geojson';
 import { get } from 'lodash';
 import bboxPolygon from '@turf/bbox-polygon';
 import { FitOptions } from 'ol/View';
-import { Style } from 'ol/style';
 import {
   Box,
   getWMTSOptions,
@@ -183,7 +182,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
       if (!key.includes('MARKER')) {
         res.push({
           title: intl.formatMessage({ id: `polygon-parts.map-preview-legend.${key}` }) as string,
-          style: value as Style,
+          style: value.style,
         });
       }
     });
