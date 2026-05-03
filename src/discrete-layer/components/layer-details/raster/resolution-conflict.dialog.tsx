@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { AutoSizer, List, ListRowProps } from 'react-virtualized';
-import { Feature } from 'geojson';
+import { BBox, Feature } from 'geojson';
 import { get } from 'lodash';
 import { Box } from '@map-colonies/react-components';
 import {
@@ -284,6 +284,41 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
     setAutoScrollListToSelection(false);
   }, []);
 
+  const queryExecutor = useCallback(
+    async (bbox: BBox, _startIndex: number): Promise<IQueryExecutorResponse> => {
+      if (!api) {
+        return { features: [], pageSize: -1 };
+      }
+      const result = await api.query.method({
+        minX: bbox[0],
+        minY: bbox[1],
+        maxX: bbox[2],
+        maxY: bbox[3],
+      });
+      const fetchedFeatures = get(result, 'features', []);
+      const features = Array.isArray(fetchedFeatures) ? fetchedFeatures : [];
+      return { features, pageSize: -1 };
+    },
+    []
+  );
+
+  const onFeaturesChange = useCallback(
+    (updatedFeatures: Feature[]): void => {
+      const currentSelectedKey = selectedItem?.properties?._key;
+      if (currentSelectedKey !== undefined) {
+        const selectedFromUpdatedFeatures = updatedFeatures.find(
+          (feature) => feature.properties?._key === currentSelectedKey
+        );
+        if (selectedFromUpdatedFeatures) {
+          if (selectedFromUpdatedFeatures !== selectedItem) {
+            setSelectedItem(selectedFromUpdatedFeatures);
+          }
+        }
+      }
+    },
+    [selectedItem]
+  );
+
   return (
     <Box id="resolutionConflictDialog">
       <Dialog open={isOpen} preventOutsideDismiss={true}>
@@ -550,43 +585,14 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                     <>
                       <PolygonPartsExtentQueryVectorLayer
                         featureType={FeatureType.LOW_RESOLUTION_PP}
-                        queryExecutor={async (
-                          bbox,
-                          _startIndex
-                        ): Promise<IQueryExecutorResponse> => {
-                          if (!api) {
-                            return { features: [], pageSize: -1 };
-                          }
-                          const result = await api.query.method({
-                            minX: bbox[0],
-                            minY: bbox[1],
-                            maxX: bbox[2],
-                            maxY: bbox[3],
-                          });
-                          const fetchedFeatures = get(result, 'features', []);
-                          const features = Array.isArray(fetchedFeatures) ? fetchedFeatures : [];
-                          return { features, pageSize: -1 };
-                        }}
+                        queryExecutor={queryExecutor}
                         outerPerimeter={outerPerimeter?.geometry}
                         selectedFeature={selectedItem}
                         onClearSelectedFeature={() => {
                           setSelectedItem(undefined);
                           setAutoScrollListToSelection(false);
                         }}
-                        onFeaturesChange={(updatedFeatures): void => {
-                          const currentSelectedKey = selectedItem?.properties?._key;
-                          if (currentSelectedKey !== undefined) {
-                            const selectedFromUpdatedFeatures = updatedFeatures.find(
-                              (feature) => feature.properties?._key === currentSelectedKey
-                            );
-
-                            if (selectedFromUpdatedFeatures) {
-                              if (selectedFromUpdatedFeatures !== selectedItem) {
-                                setSelectedItem(selectedFromUpdatedFeatures);
-                              }
-                            }
-                          }
-                        }}
+                        onFeaturesChange={onFeaturesChange}
                         onQueryError={(errorMessage): void => {
                           setLowResolutionPartsError(errorMessage);
                         }}

@@ -1,6 +1,6 @@
 import React, { CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Feature, Geometry } from 'geojson';
+import { BBox, Feature, Geometry } from 'geojson';
 import { get } from 'lodash';
 import bboxPolygon from '@turf/bbox-polygon';
 import { FitOptions } from 'ol/View';
@@ -197,6 +197,30 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
     return getStyleByFeatureType(selectedFeature);
   }, [selectedFeature]);
 
+  const queryExecutor = useCallback(
+    async (bbox: BBox, startIndex: number): Promise<IQueryExecutorResponse> => {
+      const result = await store.queryGetPolygonPartsFeature({
+        data: {
+          feature: bboxPolygon(bbox) as GeojsonFeatureInput,
+          typeName: getWFSFeatureTypeName(layerRecord as LayerRasterRecordModelType, ENUMS),
+          count: CONFIG.POLYGON_PARTS.MAX.WFS_FEATURES,
+          startIndex,
+        },
+      });
+      const fetchedFeatures = get(result, 'getPolygonPartsFeature.features', []);
+      const features = (Array.isArray(fetchedFeatures) ? fetchedFeatures : []).map((feature) => ({
+        ...feature,
+        properties: {
+          ...(feature?.properties ?? {}),
+          _featureType: FeatureType.EXISTING_PP,
+          _featureTitle: getText(feature, 4, FEATURE_LABEL_CONFIG.polygons, ZOOM_LEVELS_TABLE),
+        },
+      }));
+      return { features, pageSize: CONFIG.POLYGON_PARTS.MAX.WFS_FEATURES };
+    },
+    []
+  );
+
   return (
     <Box className="geoFeaturesMapContainer" style={{ ...style }}>
       <Map>
@@ -237,35 +261,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
         {showExistingPolygonParts && (
           <PolygonPartsExtentQueryVectorLayer
             featureType={FeatureType.EXISTING_PP}
-            queryExecutor={async (bbox, startIndex): Promise<IQueryExecutorResponse> => {
-              const result = await store.queryGetPolygonPartsFeature({
-                data: {
-                  feature: bboxPolygon(bbox) as GeojsonFeatureInput,
-                  typeName: getWFSFeatureTypeName(layerRecord as LayerRasterRecordModelType, ENUMS),
-                  count: CONFIG.POLYGON_PARTS.MAX.WFS_FEATURES,
-                  startIndex,
-                },
-              });
-              const fetchedFeatures = get(result, 'getPolygonPartsFeature.features', []);
-              const features = (Array.isArray(fetchedFeatures) ? fetchedFeatures : []).map(
-                (feature) => {
-                  return {
-                    ...feature,
-                    properties: {
-                      ...(feature?.properties ?? {}),
-                      _featureType: FeatureType.EXISTING_PP,
-                      _featureTitle: getText(
-                        feature,
-                        4,
-                        FEATURE_LABEL_CONFIG.polygons,
-                        ZOOM_LEVELS_TABLE
-                      ),
-                    },
-                  };
-                }
-              );
-              return { features, pageSize: CONFIG.POLYGON_PARTS.MAX.WFS_FEATURES };
-            }}
+            queryExecutor={queryExecutor}
             outerPerimeter={layerRecord?.footprint as Geometry | undefined}
             selectedFeature={selectedFeature}
             onClearSelectedFeature={clearSelection}
