@@ -1,11 +1,13 @@
-import { Color } from "ol/color";
-import { ColorLike } from "ol/colorlike";
+import { Color } from 'ol/color';
+import { ColorLike } from 'ol/colorlike';
 
 export const olColorToCss = (color: Color | ColorLike | undefined): string => {
-  if (!color) { return ''; }
+  if (!color) {
+    return '';
+  }
 
   // Already a CSS color string
-  if (typeof color === "string") {
+  if (typeof color === 'string') {
     return color;
   }
 
@@ -14,8 +16,7 @@ export const olColorToCss = (color: Color | ColorLike | undefined): string => {
     const [r, g, b, a] = color;
 
     // Clamp values just in case
-    const clamp = (v: number, min: number, max: number) =>
-      Math.min(Math.max(v, min), max);
+    const clamp = (v: number, min: number, max: number) => Math.min(Math.max(v, min), max);
 
     const rr = clamp(r, 0, 255);
     const gg = clamp(g, 0, 255);
@@ -30,4 +31,4 @@ export const olColorToCss = (color: Color | ColorLike | undefined): string => {
   }
 
   return '';
-}
+};
