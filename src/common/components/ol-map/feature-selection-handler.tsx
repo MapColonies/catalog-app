@@ -7,7 +7,7 @@ interface FeatureSelectionHandlerProps {
   feature?: Feature;
 }
 
-export const FeatureSelectionHandler: React.FC<FeatureSelectionHandlerProps> = ({ feature }) => {
+export const FlyTo: React.FC<FeatureSelectionHandlerProps> = ({ feature }) => {
   const map = useMap();
 
   useEffect(() => {

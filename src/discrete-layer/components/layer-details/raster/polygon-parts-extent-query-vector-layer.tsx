@@ -314,33 +314,6 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<
             fill: ppFill,
           });
 
-          const selectedFeatureKey = selectedFeature?.properties?._key;
-          const isSelectedByKey =
-            selectedFeatureKey !== undefined && feat.properties?._key === selectedFeatureKey;
-
-          const selectedFeatureProperties =
-            selectedFeature?.properties && typeof selectedFeature.properties === 'object'
-              ? (selectedFeature.properties as Record<string, unknown>)
-              : undefined;
-          const featProperties =
-            feat.properties && typeof feat.properties === 'object'
-              ? (feat.properties as Record<string, unknown>)
-              : undefined;
-          const selectedFeatureId = selectedFeature?.id ?? selectedFeatureProperties?.id;
-          const featureId = feat?.id ?? featProperties?.id;
-          const isSelectedById =
-            selectedFeatureId !== undefined &&
-            featureId !== undefined &&
-            selectedFeatureId === featureId;
-
-          if (selectedFeature === feat || isSelectedByKey || isSelectedById) {
-            if (ppStroke) {
-              const selectedStroke = ppStroke.clone();
-              selectedStroke.setWidth(8);
-              featureStyle.setStroke(selectedStroke);
-            }
-          }
-
           const BUFFER = 2; // Add extra pixels to perimeter around the OL extent in order to discard new geometry boundaries
           const size = mapOl.getSize() as Size;
           const bbox = bboxPolygon(

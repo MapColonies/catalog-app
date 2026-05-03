@@ -1,4 +1,4 @@
-import { CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Feature, Geometry } from 'geojson';
 import { get } from 'lodash';
@@ -23,13 +23,13 @@ import CONFIG from '../../../../common/config';
 import { useEnums } from '../../../../common/hooks/useEnum.hook';
 import { Mode } from '../../../../common/models/mode.enum';
 import { MapFeatureClickHandler } from '../../../../common/components/ol-map/map-feature-click-handler';
-import { FeatureSelectionHandler } from '../../../../common/components/ol-map/feature-selection-handler';
 import { MapLoadingIndicator } from '../../../../common/components/ol-map/map-loading-indicator';
+import { SelectedFeatureVectorLayer } from '../../../../common/components/ol-map/selected-feature-vector-layer';
 import { ZoomLevelIndicator } from '../../../../common/components/ol-map/zoom-level-indicator';
 import { LayerRasterRecordModelType } from '../../../models';
 import { ILayerImage } from '../../../models/layerImage';
-import { GeojsonFeatureInput } from '../../../models/RootStore.base';
 import { useStore } from '../../../models/RootStore';
+import { GeojsonFeatureInput } from '../../../models/RootStore.base';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
 import { FeaturePropertiesPopupComponent } from './feature-properties-popup.component';
 import { GeoFeaturesInnerComponent } from './geo-features-inner.component';
@@ -40,6 +40,7 @@ import {
 import {
   FEATURE_LABEL_CONFIG,
   FeatureType,
+  getStyleByFeatureType,
   getText,
   getWFSFeatureTypeName,
   PPMapStyles,
@@ -189,6 +190,13 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
     return res;
   }, []);
 
+  const selectedFeatureStyle = useMemo(() => {
+    if (!selectedFeature) {
+      return undefined;
+    }
+    return getStyleByFeatureType(selectedFeature);
+  }, [selectedFeature]);
+
   return (
     <Box className="geoFeaturesMapContainer" style={{ ...style }}>
       <Map>
@@ -269,7 +277,11 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
           onMapFeatureClick={onMapFeatureClick}
           setSelectedFeature={setSelectedFeature}
         />
-        <FeatureSelectionHandler feature={selectedFeature} />
+        <SelectedFeatureVectorLayer
+          feature={selectedFeature}
+          featureStyle={selectedFeatureStyle}
+          options={{ properties: { id: 'SELECTED_PP' }, zIndex: 3 }}
+        />
         {enableFeaturePropertiesPopup && (
           <FeaturePropertiesPopupComponent
             selectedFeature={selectedFeature}

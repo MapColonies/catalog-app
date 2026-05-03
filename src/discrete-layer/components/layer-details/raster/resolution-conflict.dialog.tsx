@@ -17,6 +17,7 @@ import {
   Typography,
 } from '@map-colonies/react-core';
 import { AutoDirectionBox } from '../../../../common/components/auto-direction-box/auto-direction-box.component';
+import { FlyTo } from '../../../../common/components/ol-map/feature-selection-handler';
 import { Domain } from '../../../../common/models/domain';
 import { Mode } from '../../../../common/models/mode.enum';
 import { EntityDescriptorModelType } from '../../../models';
@@ -86,7 +87,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
     [lowResolutionCollections]
   );
 
-  const totalFeaturesCount = lowResolutionFeatures.length;
+  const totalFeaturesCount = useMemo(() => lowResolutionFeatures.length, [lowResolutionFeatures]);
 
   const hasExceededFeatures = useMemo(
     () => lowResolutionFeatures.some((feature) => feature.properties?.exceeded === true),
@@ -546,47 +547,53 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                   showPolygonParts={SHOW_PARTS_AFTER_INIT}
                 >
                   {showLowResolutionPolygonParts && lowResolutionFeatures !== undefined ? (
-                    <PolygonPartsExtentQueryVectorLayer
-                      featureType={FeatureType.LOW_RESOLUTION_PP}
-                      queryExecutor={async (bbox, _startIndex): Promise<IQueryExecutorResponse> => {
-                        if (!api) {
-                          return { features: [], pageSize: -1 };
-                        }
-                        const result = await api.query.method({
-                          minX: bbox[0],
-                          minY: bbox[1],
-                          maxX: bbox[2],
-                          maxY: bbox[3],
-                        });
-                        const fetchedFeatures = get(result, 'features', []);
-                        const features = Array.isArray(fetchedFeatures) ? fetchedFeatures : [];
-                        return { features, pageSize: -1 };
-                      }}
-                      outerPerimeter={outerPerimeter?.geometry}
-                      selectedFeature={selectedItem}
-                      onClearSelectedFeature={() => {
-                        setSelectedItem(undefined);
-                        setAutoScrollListToSelection(false);
-                      }}
-                      onFeaturesChange={(updatedFeatures): void => {
-                        const currentSelectedKey = selectedItem?.properties?._key;
-                        if (currentSelectedKey !== undefined) {
-                          const selectedFromUpdatedFeatures = updatedFeatures.find(
-                            (feature) => feature.properties?._key === currentSelectedKey
-                          );
+                    <>
+                      <PolygonPartsExtentQueryVectorLayer
+                        featureType={FeatureType.LOW_RESOLUTION_PP}
+                        queryExecutor={async (
+                          bbox,
+                          _startIndex
+                        ): Promise<IQueryExecutorResponse> => {
+                          if (!api) {
+                            return { features: [], pageSize: -1 };
+                          }
+                          const result = await api.query.method({
+                            minX: bbox[0],
+                            minY: bbox[1],
+                            maxX: bbox[2],
+                            maxY: bbox[3],
+                          });
+                          const fetchedFeatures = get(result, 'features', []);
+                          const features = Array.isArray(fetchedFeatures) ? fetchedFeatures : [];
+                          return { features, pageSize: -1 };
+                        }}
+                        outerPerimeter={outerPerimeter?.geometry}
+                        selectedFeature={selectedItem}
+                        onClearSelectedFeature={() => {
+                          setSelectedItem(undefined);
+                          setAutoScrollListToSelection(false);
+                        }}
+                        onFeaturesChange={(updatedFeatures): void => {
+                          const currentSelectedKey = selectedItem?.properties?._key;
+                          if (currentSelectedKey !== undefined) {
+                            const selectedFromUpdatedFeatures = updatedFeatures.find(
+                              (feature) => feature.properties?._key === currentSelectedKey
+                            );
 
-                          if (selectedFromUpdatedFeatures) {
-                            if (selectedFromUpdatedFeatures !== selectedItem) {
-                              setSelectedItem(selectedFromUpdatedFeatures);
+                            if (selectedFromUpdatedFeatures) {
+                              if (selectedFromUpdatedFeatures !== selectedItem) {
+                                setSelectedItem(selectedFromUpdatedFeatures);
+                              }
                             }
                           }
-                        }
-                      }}
-                      onQueryError={(errorMessage): void => {
-                        setLowResolutionPartsError(errorMessage);
-                      }}
-                      options={{ properties: { id: FeatureType.LOW_RESOLUTION_PP }, zIndex: 2 }}
-                    />
+                        }}
+                        onQueryError={(errorMessage): void => {
+                          setLowResolutionPartsError(errorMessage);
+                        }}
+                        options={{ properties: { id: FeatureType.LOW_RESOLUTION_PP }, zIndex: 2 }}
+                      />
+                      <FlyTo feature={outerPerimeter} />
+                    </>
                   ) : null}
                 </GeoFeaturesPresentorComponent>
               </Box>
