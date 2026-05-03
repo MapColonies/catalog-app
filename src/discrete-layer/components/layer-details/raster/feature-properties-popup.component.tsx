@@ -4,7 +4,7 @@ import { Box } from '@map-colonies/react-components';
 import { IconButton, Typography } from '@map-colonies/react-core';
 import { dateFormatter } from '../../../../common/helpers/formatters';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
-import { FeatureType, PPMapStyles } from './pp-map.utils';
+import { getStyleByFeatureType } from './pp-map.utils';
 
 const ISO_DATE_TIME_REGEX =
   /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:?\d{2})?$/;
@@ -76,17 +76,7 @@ const FeaturePropertiesPopup: React.FC<FeaturePropertiesPopupProps> = ({
     if (!selectedFeature?.properties) {
       return undefined;
     }
-
-    if (selectedFeature?.properties?._featureType === FeatureType.LOW_RESOLUTION_PP) {
-      return toCssColor(PPMapStyles.get(FeatureType.LOW_RESOLUTION_PP)?.getStroke()?.getColor());
-    }
-    if (selectedFeature?.properties?.exceeded === true) {
-      return '#d32f2f';
-    }
-    if (selectedFeature?.properties?._featureType === FeatureType.EXISTING_PP) {
-      return toCssColor(PPMapStyles.get(FeatureType.EXISTING_PP)?.getStroke()?.getColor());
-    }
-    return undefined;
+    return toCssColor(getStyleByFeatureType(selectedFeature)?.getStroke()?.getColor());
   }, [selectedFeature?.properties]);
 
   const visibleProperties = useMemo(() => {

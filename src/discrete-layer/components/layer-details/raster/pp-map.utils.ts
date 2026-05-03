@@ -16,7 +16,15 @@ export enum FeatureType {
   ILLEGAL_PP = 'ILLEGAL_PP',
 }
 
-export const PPMapStyles = new Map<FeatureType, Style | undefined>([
+interface IProp {
+  prop: string;
+  values: {
+    value: string | number | boolean;
+    style: Style;
+  }[];
+}
+
+export const PPMapStyles = new Map<FeatureType, Style | IProp[]>([
   [
     FeatureType.PP_PERIMETER,
     new Style({
@@ -69,29 +77,62 @@ export const PPMapStyles = new Map<FeatureType, Style | undefined>([
   ],
   [
     FeatureType.LOW_RESOLUTION_PP,
-    new Style({
-      stroke: new Stroke({
-        width: 2,
-        color: '#FF7F00',
-      }),
-      fill: new Fill({
-        color: '#FF7F0066',
-      }),
-    }),
-  ],
-  [
-    FeatureType.ILLEGAL_PP,
-    new Style({
-      stroke: new Stroke({
-        width: 2,
-        color: CONFIG.POLYGON_PARTS.STYLE.lowResolutionColor,
-      }),
-      fill: new Fill({
-        color: CONFIG.POLYGON_PARTS.STYLE.lowResolutionColor + '66',
-      }),
-    }),
-  ],
+    [
+      {
+        prop: 'exceeded',
+        values: [
+          {
+            value: false,
+            style: new Style({
+              stroke: new Stroke({
+                width: 2,
+                color: '#FF7F00',
+              }),
+              fill: new Fill({
+                color: '#FF7F0066',
+              }),
+            }),
+          },
+          {
+            value: true,
+            style: new Style({
+              stroke: new Stroke({
+                width: 2,
+                color: CONFIG.POLYGON_PARTS.STYLE.lowResolutionColor,
+              }),
+              fill: new Fill({
+                color: CONFIG.POLYGON_PARTS.STYLE.lowResolutionColor + '66',
+              }),
+            }),
+          }
+        ],
+      }
+    ]
+  ]
 ]);
+
+export const getStyleByFeatureType = (feature: Feature): Style | undefined => {
+  const featureType = get(feature.properties, '_featureType') as FeatureType;
+  if (!featureType) {
+    return PPMapStyles.get(FeatureType.EXISTING_PP) as Style;
+  }
+
+  const styleOrProps = PPMapStyles.get(featureType);
+  if (!Array.isArray(styleOrProps)) {
+    return styleOrProps as Style | undefined;
+  }
+
+  for (const propConfig of styleOrProps) {
+    const propValue = get(feature.properties, propConfig.prop);
+    const targetValue = propValue === true;
+    const matchedStyle = propConfig.values.find((entry) => entry.value === targetValue)?.style;
+    if (matchedStyle) {
+      return matchedStyle;
+    }
+  }
+
+  return PPMapStyles.get(FeatureType.EXISTING_PP) as Style | undefined;
+};
 
 export const getWFSFeatureTypeName = (
   layerRecord: LayerRasterRecordModelType | null,
@@ -189,7 +230,6 @@ export const FEATURE_LABEL_CONFIG = {
     offsetX: '0',
     offsetY: '0',
     color: '#00ff00',
-    // outline: '#ffffff',
     outlineWidth: '3',
     maxreso: '1200',
   },
@@ -200,9 +240,7 @@ export const createTextStyle = (
   resolution: number,
   featureConfig: Record<string, string>,
   ZOOM_LEVELS_TABLE: Record<string, number>,
-  defaultText?: string,
-  overridingText?: string,
-  overridingColor?: string
+  defaultText?: string
 ) => {
   const align = featureConfig.align;
   const baseline = featureConfig.baseline;
@@ -216,7 +254,7 @@ export const createTextStyle = (
   const overflow = featureConfig.overflow ? featureConfig.overflow === 'true' : undefined;
   const rotation = parseFloat(featureConfig.rotation);
   const font = weight + ' ' + size + '/' + height + ' ' + featureConfig.font;
-  const fillColor = featureConfig.color;
+  const fillColor = getStyleByFeatureType(feature)?.getStroke()?.getColor() ?? featureConfig.color;
   const outlineColor = featureConfig.outline;
   const outlineWidth = parseInt(featureConfig.outlineWidth, 10);
 
@@ -225,8 +263,8 @@ export const createTextStyle = (
     textBaseline: baseline,
     font: font,
     text:
-      overridingText ?? getText(feature, resolution, featureConfig, ZOOM_LEVELS_TABLE, defaultText),
-    fill: new Fill({ color: overridingColor ?? fillColor }),
+      feature.properties?._featureTitle ?? getText(feature, resolution, featureConfig, ZOOM_LEVELS_TABLE, defaultText),
+    fill: new Fill({ color: fillColor }),
     stroke: new Stroke({ color: outlineColor, width: outlineWidth }),
     offsetX: offsetX,
     offsetY: offsetY,
