@@ -89,6 +89,9 @@
   overflow-y: auto;
   border: 1px solid var(--mdc-theme-gc-selection-background);
   border-radius: 8px;
+}
+
+#resolutionConflictDialog .lowResolutionPartsList.padding {
   padding: 8px;
 }
 

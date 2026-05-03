@@ -23,19 +23,19 @@ export const ProgressCurtain: React.FC<CurtainProps> = (props) => {
   );
 
   const getIconByType = (type: WorkerMessage['type'] | undefined): JSX.Element => {
-    const defaultIcon = <Icon className="mc-icon-Ellipse icon" />;
+    const defaultIcon = <Icon className="mc-icon-Ellipse" />;
 
     const iconMap = {
       [WorkerType.Error]: (
         <Icon
-          className="mc-icon-Close error icon"
+          className="mc-icon-Close error"
           style={{
             textAlign: 'start',
             fontWeight: 'bold',
           }}
         />
       ),
-      [WorkerType.Done]: <Icon className="mc-icon-Ok success icon" />,
+      [WorkerType.Done]: <Icon className="mc-icon-Ok success" />,
       [WorkerType.Progress]: defaultIcon,
     };
 
@@ -117,36 +117,30 @@ export const ProgressCurtain: React.FC<CurtainProps> = (props) => {
 
   return (
     <Box id="progressCurtain">
-      <Box className="titles">
-        <Typography tag="span" className="titleIconSpacer"></Typography>
-        <Typography tag="span" className="titleProcess">
-          {intl.formatMessage({ id: 'progress.titleProcess' })}
-        </Typography>
-        <Box className="info">
-          <Typography tag="span" className="titleProgress">
-            {intl.formatMessage({ id: 'progress.titleProgress' })}
-          </Typography>
-          <Typography tag="span" className="titleTime">
-            {intl.formatMessage({ id: 'progress.titleTime' })}
-          </Typography>
-        </Box>
-      </Box>
-      <Box className="rows">
-        {rows.map((row) => {
-          return (
-            <Box key={row.key} className={`curtainRow ${row.state}`}>
-              {getIconByType(row.type)}
-              <Typography tag="span" className="processName">
-                {intl.formatMessage({ id: row.label })}
-              </Typography>
-              <Box className="info">
-                <AutoDirectionBox className="progress">{row.progress}</AutoDirectionBox>
-                <AutoDirectionBox className="elapsedTime">{row.elapsedTime}</AutoDirectionBox>
-              </Box>
-            </Box>
-          );
-        })}
-      </Box>
+      <table className="progressTable">
+        <thead>
+          <tr>
+            <th className="colIcon" />
+            <th className="colProcess">{intl.formatMessage({ id: 'progress.titleProcess' })}</th>
+            <th className="colProgress">{intl.formatMessage({ id: 'progress.titleProgress' })}</th>
+            <th className="colTime">{intl.formatMessage({ id: 'progress.titleTime' })}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <tr key={row.key} className={`${row.state}`}>
+              <td className="colIcon">{getIconByType(row.type)}</td>
+              <td className="colProcess">{intl.formatMessage({ id: row.label })}</td>
+              <td className="colProgress">
+                <AutoDirectionBox>{row.progress}</AutoDirectionBox>
+              </td>
+              <td className="colTime">
+                <AutoDirectionBox>{row.elapsedTime}</AutoDirectionBox>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
       <Box className="errorsContainer error">
         {errors.length > 0 && (
           <>
