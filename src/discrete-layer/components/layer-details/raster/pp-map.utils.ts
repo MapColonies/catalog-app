@@ -121,8 +121,7 @@ export const getStyleByFeatureType = (feature?: Feature): Style | undefined => {
   if (!feature) {
     return defaultStyle;
   }
-  const featureType =
-    get(feature.properties, '_featureType') ?? get(feature.properties, 'featureType');
+  const featureType = get(feature.properties, '_featureType');
   const styleByProp = featureType ? PPMapStyles.get(featureType) : undefined;
   if (!styleByProp) {
     return defaultStyle;

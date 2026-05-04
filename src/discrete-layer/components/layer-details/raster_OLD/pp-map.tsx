@@ -149,7 +149,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
     return (
       <>
         {geoFeatures?.map((feat, idx) => {
-          let featureStyle = PPMapStyles.get(feat?.properties?.featureType);
+          let featureStyle = PPMapStyles.get(feat?.properties?._featureType);
 
           if (selectedFeatureKey && feat?.properties?.key === selectedFeatureKey) {
             featureStyle = selectionStyle;
@@ -183,10 +183,10 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
           <PolygonPartsByPolygonVectorLayer
             layerRecord={layerRecord}
             maskFeature={geoFeatures?.find((feat) => {
-              return get(feat, 'properties.featureType') === FeatureType.PP_PERIMETER;
+              return get(feat, 'properties._featureType') === FeatureType.PP_PERIMETER;
             })}
             partsToCheck={geoFeatures?.filter((part) =>
-              [FeatureType.DEFAULT, undefined].includes(part?.properties?.featureType)
+              [FeatureType.DEFAULT, undefined].includes(part?.properties?._featureType)
             )}
             ingestionResolutionMeter={ingestionResolutionMeter}
           />

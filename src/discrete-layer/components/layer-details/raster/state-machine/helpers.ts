@@ -59,14 +59,14 @@ export const getFeatureAndMarker = (
   const feature: Feature<Geometry, GeoJsonProperties> = {
     type: 'Feature',
     properties: {
-      featureType: featureFeatureType,
+      _featureType: featureFeatureType,
     },
     geometry,
   };
   const marker: Feature<Geometry, GeoJsonProperties> = {
     type: 'Feature',
     properties: {
-      featureType: markerFeatureType,
+      _featureType: markerFeatureType,
     },
     geometry: {
       coordinates: getFirstPoint(geometry),
