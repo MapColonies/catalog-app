@@ -114,7 +114,10 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
 
   useEffect(() => {
     const selectedFeatureType = selectedFeature?.properties?._featureType;
-    const isManagedExternally = selectedFeatureType === FeatureType.EXISTING_PP || !!selectedItem;
+    const isManagedExternally =
+      selectedFeatureType === FeatureType.EXISTING_PP ||
+      selectedFeatureType === FeatureType.LOW_RESOLUTION_PP ||
+      !!selectedItem;
 
     if (!isManagedExternally) {
       setSelectedFeature(undefined);
