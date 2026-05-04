@@ -4,7 +4,7 @@ import { FeatureCollection, Geometry } from 'geojson';
 import { fakeProgress } from '../../../../../common/helpers/fake-progress';
 import {
   BBoxObj,
-  StagesInfo,
+  ProcessInfo,
   LoadOptions,
   Process,
   Stage,
@@ -32,7 +32,7 @@ type WorkerService = {
     progress: WorkerMessage | null;
   };
   computeOuterGeometry: {
-    method: () => Promise<Geometry>;
+    method: (predicate?: (properties: Record<string, unknown>) => boolean) => Promise<Geometry>;
     progress: WorkerMessage | null;
   };
   getFeatureCollection: {
@@ -45,7 +45,9 @@ type WorkerService = {
   };
 };
 
-export function useWorkerAPI(): [WorkerService | null, StagesInfo] {
+export function useWorkerAPI(
+  processRunCounts?: Partial<Record<Process, number>>
+): [WorkerService | null, ProcessInfo] {
   const [workerApi, setWorkerApi] = useState<any>(null);
   const [progressComputeArea, setProgressComputeArea] = useState<WorkerMessage | null>(null);
   const [progressComputeOuterGeometry, setProgressComputeOuterGeometry] =
@@ -69,8 +71,10 @@ export function useWorkerAPI(): [WorkerService | null, StagesInfo] {
       ) => await wrapped.loadFromShapeFile(url, options, onProgress),
       updateAreas: async (onProgress?: (p: WorkerMessage | null) => void) =>
         await wrapped.updateAreas(onProgress),
-      computeOuterGeometry: async (onProgress?: (p: WorkerMessage | null) => void) =>
-        await wrapped.computeOuterGeometry(onProgress),
+      computeOuterGeometry: async (
+        onProgress?: (p: WorkerMessage | null) => void,
+        predicate?: (properties: Record<string, unknown>) => boolean
+      ) => await wrapped.computeOuterGeometry(onProgress, predicate),
       getFeatureCollection: async (onProgress?: (p: WorkerMessage | null) => void) =>
         await wrapped.getFeatureCollection(onProgress),
       query: async (
@@ -154,7 +158,7 @@ export function useWorkerAPI(): [WorkerService | null, StagesInfo] {
       },
 
       computeOuterGeometry: {
-        method: async () => {
+        method: async (predicate?: (properties: Record<string, unknown>) => boolean) => {
           const t0 = performance.now();
 
           const clear = fakeProgress(10000, (fakePercent: number) => {
@@ -172,7 +176,11 @@ export function useWorkerAPI(): [WorkerService | null, StagesInfo] {
             proxy((p: WorkerMessage) => {
               // If the worker sends real pulses, they still work here
               setProgressComputeOuterGeometry(p);
-            })
+            }),
+            predicate &&
+              proxy((properties: Record<string, unknown>) => {
+                return predicate(properties);
+              })
           );
 
           clear();
@@ -204,9 +212,12 @@ export function useWorkerAPI(): [WorkerService | null, StagesInfo] {
     };
   }, [workerApi, progressComputeArea, progressComputeOuterGeometry, loadShapeFileProgress]);
 
-  const stagesInfo: StagesInfo = useMemo(() => {
+  const DEFAULT_RUN_COUNT = 1;
+
+  const stagesInfo: ProcessInfo = useMemo(() => {
     return {
       [Process.Init]: {
+        runCount: processRunCounts?.[Process.Init] ?? DEFAULT_RUN_COUNT,
         stages: {
           [Stage.Init]: {
             translationCode: 'progress.stage.init',
@@ -215,6 +226,7 @@ export function useWorkerAPI(): [WorkerService | null, StagesInfo] {
         },
       },
       [Process.Load]: {
+        runCount: processRunCounts?.[Process.Load] ?? DEFAULT_RUN_COUNT,
         stages: {
           [Stage.Download]: {
             translationCode: 'progress.stage.load',
@@ -231,6 +243,7 @@ export function useWorkerAPI(): [WorkerService | null, StagesInfo] {
         },
       },
       [Process.UpdateAreas]: {
+        runCount: processRunCounts?.[Process.UpdateAreas] ?? DEFAULT_RUN_COUNT,
         stages: {
           [Stage.UpdateAreas]: {
             translationCode: 'progress.stage.updateAreas',
@@ -239,6 +252,7 @@ export function useWorkerAPI(): [WorkerService | null, StagesInfo] {
         },
       },
       [Process.ComputeOuterGeometry]: {
+        runCount: processRunCounts?.[Process.ComputeOuterGeometry] ?? DEFAULT_RUN_COUNT,
         stages: {
           [Stage.ComputeOuterGeometry]: {
             translationCode: 'progress.stage.computeOuterGeometry',

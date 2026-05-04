@@ -394,7 +394,10 @@ const api: WorkerAPI = {
     });
   },
 
-  computeOuterGeometry(onProgress?: (p: WorkerMessage | null) => void): Geometry {
+  async computeOuterGeometry(
+    onProgress?: (p: WorkerMessage | null) => void,
+    predicate?: (properties: Record<string, unknown>) => boolean
+  ): Promise<Geometry> {
     const t0 = performance.now();
     let details: MessageDetails;
 
@@ -404,13 +407,23 @@ const api: WorkerAPI = {
       process: Process.ComputeOuterGeometry,
       stage: Stage.ComputeOuterGeometry,
       type: WorkerType.Progress,
-      details: details,
+      details,
     });
 
-    const count = _geoms.length;
+    let filteredGeoms = _geoms;
 
-    // 1. Create a TypedArray of the pointers
-    const geomPtrs = new Int32Array(_geoms);
+    if (predicate) {
+      const results = await Promise.all(_geoms.map((_, i) => predicate?.(_properties[i])));
+      filteredGeoms = _geoms.filter((_, i) => results[i]);
+    }
+
+    const count = filteredGeoms.length;
+
+    // 1. Clone geometries so that destroying the collection later does not free the originals in _geoms
+    const clonedGeoms = filteredGeoms.map((ptr) => _geos.GEOSGeom_clone(ptr));
+
+    // 2. Create a TypedArray of the cloned pointers
+    const geomPtrs = new Int32Array(clonedGeoms);
 
     // 2. Allocate space on the WASM heap (4 bytes per pointer)
     const bytesPerElement = geomPtrs.BYTES_PER_ELEMENT;
@@ -434,7 +447,7 @@ const api: WorkerAPI = {
       process: Process.ComputeOuterGeometry,
       stage: Stage.ComputeOuterGeometry,
       type: WorkerType.Progress,
-      details: details,
+      details,
     });
 
     // 5. Calculate the merged geometry (Unary Union)
@@ -445,8 +458,7 @@ const api: WorkerAPI = {
     const simplifiedOuterJSON = _GEOSGeomToGeoJSON(simplified);
 
     // 7. Cleanup
-    // Important: GEOSGeom_destroy(collection) also destroys members
-    // If you want to keep originals, you might need to clone them first
+    // Safe to destroy: collection was built from clones, so originals in _geoms are unaffected
     _geos.GEOSGeom_destroy(collection);
     _geos.Module._free(bufferPtr);
     _geos.GEOSGeom_destroy(simplified);

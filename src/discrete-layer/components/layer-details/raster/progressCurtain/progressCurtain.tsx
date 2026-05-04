@@ -1,26 +1,80 @@
+import { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Icon, Typography } from '@map-colonies/react-core';
 import { Box } from '@material-ui/core';
 import { AutoDirectionBox } from '../../../../../common/components/auto-direction-box/auto-direction-box.component';
-import { StagesInfo, WorkerError, WorkerMessage, WorkerType } from '../worker/worker.types';
+import {
+  Process,
+  Stage,
+  ProcessInfo,
+  WorkerError,
+  WorkerMessage,
+  WorkerType,
+} from '../worker/worker.types';
 
 import './progressCurtain.css';
 
 interface CurtainProps {
-  stagesInfo: StagesInfo;
+  stagesInfo: ProcessInfo;
   workerMessages?: WorkerMessage[] | null;
 }
+
+type RunProcess = {
+  isDone: boolean;
+  messages: Partial<Record<Stage, WorkerMessage>>;
+};
+
+type ProcessData = Record<Process, RunProcess[]>;
+
+const initData = (stagesInfo: ProcessInfo): ProcessData =>
+  Object.fromEntries(
+    Object.entries(stagesInfo).map(([processKey, processVal]) => [
+      processKey,
+      Array.from({ length: processVal.runCount }, () => ({ isDone: false, messages: {} })),
+    ])
+  ) as ProcessData;
 
 export const ProgressCurtain: React.FC<CurtainProps> = (props) => {
   const intl = useIntl();
 
-  const getProcessStageKey = (processKey: string, stageKey: string) => {
-    return `${processKey}-${stageKey}`;
-  };
+  const [data, setData] = useState<ProcessData>(() => initData(props.stagesInfo));
 
-  const messageMap = new Map(
-    props.workerMessages?.map((m) => [getProcessStageKey(m.process, m.stage), m]) ?? []
-  );
+  useEffect(() => {
+    if (!props.workerMessages || props.workerMessages.length === 0) {
+      return;
+    }
+
+    setData((prev) => {
+      const newData = { ...prev };
+
+      props.workerMessages!.forEach((message) => {
+        const runningProcessesOfCertainType = newData[message.process];
+        const activeIndex = runningProcessesOfCertainType.findIndex((entry) => !entry.isDone);
+        if (activeIndex === -1) {
+          return;
+        }
+
+        const processStages = Object.keys(props.stagesInfo[message.process].stages) as Stage[];
+
+        // If it's the last stage, the Process will be marked as done.
+        const isLastStage = processStages[processStages.length - 1] === message.stage;
+
+        const runningProcess = runningProcessesOfCertainType[activeIndex];
+        const newRunningProcesses = [...runningProcessesOfCertainType];
+        newRunningProcesses[activeIndex] = {
+          isDone: message.type === WorkerType.Done && isLastStage,
+          messages: {
+            ...runningProcess.messages,
+            [message.stage]: message,
+          },
+        };
+
+        newData[message.process] = newRunningProcesses;
+      });
+
+      return newData;
+    });
+  }, [props.workerMessages]);
 
   const getIconByType = (type: WorkerMessage['type'] | undefined): JSX.Element => {
     const defaultIcon = <Icon className="mc-icon-Ellipse" />;
@@ -69,46 +123,51 @@ export const ProgressCurtain: React.FC<CurtainProps> = (props) => {
   const buildRows = () => {
     const errors: string[] = [];
 
-    const rows = Object.entries(props.stagesInfo)
-      .flatMap(([processKey, processVal]) =>
-        Object.entries(processVal.stages).map(([stageKey, stageVal]) => {
-          const key = getProcessStageKey(processKey, stageKey);
-          const message = messageMap.get(key);
+    const rows = (Object.entries(props.stagesInfo) as [Process, ProcessInfo[Process]][]).flatMap(
+      ([processKey, processVal]) => {
+        const runEntries = data[processKey] ?? [];
 
-          if (!stageVal.shouldShowProgress) {
-            return undefined;
-          }
+        return runEntries.flatMap((entry, runIndex) =>
+          (
+            Object.entries(processVal.stages) as [
+              Stage,
+              { translationCode: string; shouldShowProgress: boolean }
+            ][]
+          )
+            .filter(([, stageVal]) => stageVal?.shouldShowProgress)
+            .map(([stageKey, stageVal]) => {
+              const message = entry.messages[stageKey];
+              const type = message?.type;
+              const state = getStateByType(type);
 
-          let state = '';
-          const type = message?.type;
+              let progress: string | undefined = '—';
+              let elapsedTime: number | undefined = 0;
 
-          state = getStateByType(type);
+              if (message?.details) {
+                progress = message.details.progress;
+                elapsedTime = message.details.elapsedTime;
 
-          let progress: string | undefined = '—';
-          let elapsedTime: number | undefined = 0;
+                if (message.details.error) {
+                  collectErrors(message.details.error, errors);
+                }
+              }
 
-          const rawMessage = message?.details;
+              const runCount = runEntries.length;
+              const runSuffix = runCount > 1 ? ` (${runIndex + 1}/${runCount})` : '';
 
-          if (rawMessage) {
-            progress = rawMessage.progress;
-            elapsedTime = rawMessage.elapsedTime;
-
-            if (rawMessage.error) {
-              collectErrors(rawMessage.error, errors);
-            }
-          }
-
-          return {
-            key,
-            type,
-            state,
-            label: stageVal.translationCode,
-            progress,
-            elapsedTime,
-          };
-        })
-      )
-      .filter((row) => row !== undefined);
+              return {
+                key: `${processKey}-${stageKey}-run-${runIndex}`,
+                type,
+                state,
+                label: stageVal.translationCode,
+                runSuffix,
+                progress,
+                elapsedTime,
+              };
+            })
+        );
+      }
+    );
 
     return { rows, errors };
   };
@@ -130,7 +189,10 @@ export const ProgressCurtain: React.FC<CurtainProps> = (props) => {
           {rows.map((row) => (
             <tr key={row.key} className={`${row.state}`}>
               <td className="colIcon">{getIconByType(row.type)}</td>
-              <td className="colProcess">{intl.formatMessage({ id: row.label })}</td>
+              <td className="colProcess">
+                {intl.formatMessage({ id: row.label })}
+                {row.runSuffix}
+              </td>
               <td className="colProgress">
                 <AutoDirectionBox>{row.progress}</AutoDirectionBox>
               </td>

@@ -33,7 +33,10 @@ export interface WorkerAPI {
     onProgress?: (p: WorkerMessage | null) => void
   ): Promise<WorkerError | void>;
   updateAreas(onProgress?: (p: WorkerMessage | null) => void): WorkerError | void;
-  computeOuterGeometry(onProgress?: (p: WorkerMessage | null) => void): Geometry;
+  computeOuterGeometry(
+    onProgress?: (p: WorkerMessage | null) => void,
+    predicate?: (property: Record<string, unknown>) => boolean
+  ): Promise<Geometry>;
   getFeatureCollection(onProgress?: (p: WorkerMessage | null) => void): FeatureCollection;
   query(bbox: BBoxObj, onProgress?: (p: WorkerMessage | null) => void): FeatureCollection;
 }
@@ -52,7 +55,14 @@ export enum Stage {
   Cache = 'Cache',
   UpdateAreas = 'UpdateAreas',
   ComputeOuterGeometry = 'ComputeOuterGeometry',
+  // ComputeProblematicOuterGeometry = 'ComputeProblematicOuterGeometry',
+  // ...ComputeOuterGeometryStage,
   GetFeatureCollection = 'GetFeatureCollection',
+}
+
+const enum ComputeOuterGeometryStage {
+  ComputeOuterGeometry = 'ComputeOuterGeometry',
+  ComputeProblematicOuterGeometry = 'ComputeProblematicOuterGeometry',
 }
 
 export enum WorkerType {
@@ -88,8 +98,9 @@ export type ProcessStagesMap = {
 
 export type StagesFor<P extends Process> = Partial<Record<ProcessStagesMap[P], StageProp>>;
 
-export type StagesInfo = {
+export type ProcessInfo = {
   [P in Process]: {
+    runCount: number;
     stages: StagesFor<P>;
   };
 };
