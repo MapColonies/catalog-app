@@ -298,22 +298,19 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
     return { features, pageSize: -1 };
   };
 
-  const onFeaturesChange = useCallback(
-    (updatedFeatures: Feature[]): void => {
-      const currentSelectedKey = selectedItem?.properties?._key;
-      if (currentSelectedKey !== undefined) {
-        const selectedFromUpdatedFeatures = updatedFeatures.find(
-          (feature) => feature.properties?._key === currentSelectedKey
-        );
-        if (selectedFromUpdatedFeatures) {
-          if (selectedFromUpdatedFeatures !== selectedItem) {
-            setSelectedItem(selectedFromUpdatedFeatures);
-          }
+  const onFeaturesChange = (updatedFeatures: Feature[]): void => {
+    const currentSelectedKey = selectedItem?.properties?._key;
+    if (currentSelectedKey !== undefined) {
+      const selectedFromUpdatedFeatures = updatedFeatures.find(
+        (feature) => feature.properties?._key === currentSelectedKey
+      );
+      if (selectedFromUpdatedFeatures) {
+        if (selectedFromUpdatedFeatures !== selectedItem) {
+          setSelectedItem(selectedFromUpdatedFeatures);
         }
       }
-    },
-    [selectedItem]
-  );
+    }
+  };
 
   return (
     <Box id="resolutionConflictDialog">
