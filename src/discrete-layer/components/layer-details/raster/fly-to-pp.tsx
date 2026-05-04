@@ -32,7 +32,7 @@ export const FlyToPP: React.FC<FlyToPPProps> = ({ feature }) => {
     return null;
   }
 
-  return (feature.properties?._flyTo === true || isOutsideExtent)
-    ? <FlyTo feature={feature} />
-    : null;
+  return feature.properties?._flyTo === true || isOutsideExtent ? (
+    <FlyTo feature={feature} />
+  ) : null;
 };

@@ -14,7 +14,9 @@ export const SelectedFeatureVectorLayer: React.FC<SelectedFeatureVectorLayerProp
   feature,
   options,
 }) => {
-  const [featureGeometry, setFeatureGeometry] = useState<Feature['geometry'] | undefined>(undefined);
+  const [featureGeometry, setFeatureGeometry] = useState<Feature['geometry'] | undefined>(
+    undefined
+  );
   const [featureStyle, setFeatureStyle] = useState<Style | undefined>(undefined);
 
   useEffect(() => {
@@ -40,9 +42,9 @@ export const SelectedFeatureVectorLayer: React.FC<SelectedFeatureVectorLayerProp
   return (
     <VectorLayer options={options}>
       <VectorSource>
-        {featureGeometry
-          ? <GeoJSONFeature geometry={featureGeometry} featureStyle={featureStyle} />
-          : null}
+        {featureGeometry ? (
+          <GeoJSONFeature geometry={featureGeometry} featureStyle={featureStyle} />
+        ) : null}
       </VectorSource>
     </VectorLayer>
   );

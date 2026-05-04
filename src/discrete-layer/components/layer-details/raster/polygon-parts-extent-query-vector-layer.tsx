@@ -61,14 +61,7 @@ const createZoomedOutFootprintFeature = (
 
 export const PolygonPartsExtentQueryVectorLayer: React.FC<
   PolygonPartsExtentQueryVectorLayerProps
-> = ({
-  featureType,
-  queryExecutor,
-  outerPerimeter,
-  onFeaturesChange,
-  onQueryError,
-  options,
-}) => {
+> = ({ featureType, queryExecutor, outerPerimeter, onFeaturesChange, onQueryError, options }) => {
   const mapOl = useMap();
   const intl = useIntl();
   const store = useStore();
