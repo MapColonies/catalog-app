@@ -311,20 +311,6 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
     return { features, pageSize: -1 };
   };
 
-  const onFeaturesChange = (updatedFeatures: Feature[]): void => {
-    const currentSelectedId = getFeatureIdentifier(selectedItem);
-    if (currentSelectedId !== undefined) {
-      const selectedFromUpdatedFeatures = updatedFeatures.find(
-        (feature) => getFeatureIdentifier(feature) === currentSelectedId
-      );
-      if (selectedFromUpdatedFeatures) {
-        if (selectedFromUpdatedFeatures !== selectedItem) {
-          setSelectedItem(selectedFromUpdatedFeatures);
-        }
-      }
-    }
-  };
-
   const shouldScrollToFeature = useCallback(
     (feature?: Feature): boolean => {
       const featureId = getFeatureIdentifier(feature);
@@ -626,7 +612,6 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                         featureType={FeatureType.LOW_RESOLUTION_PP}
                         queryExecutor={queryExecutor}
                         outerPerimeter={outerPerimeter?.geometry}
-                        onFeaturesChange={onFeaturesChange}
                         onQueryError={(errorMessage): void => {
                           setLowResolutionPartsError(errorMessage);
                         }}

@@ -31,7 +31,6 @@ interface PolygonPartsExtentQueryVectorLayerProps {
   featureType: FeatureType;
   queryExecutor: (bbox: BBox, startIndex: number) => Promise<IQueryExecutorResponse>;
   outerPerimeter?: Geometry;
-  onFeaturesChange?: (features: Feature[]) => void;
   onQueryError?: (errorMessage: string) => void;
   options?: Options;
 }
@@ -61,7 +60,7 @@ const createZoomedOutFootprintFeature = (
 
 export const PolygonPartsExtentQueryVectorLayer: React.FC<
   PolygonPartsExtentQueryVectorLayerProps
-> = ({ featureType, queryExecutor, outerPerimeter, onFeaturesChange, onQueryError, options }) => {
+> = ({ featureType, queryExecutor, outerPerimeter, onQueryError, options }) => {
   const mapOl = useMap();
   const intl = useIntl();
   const store = useStore();
@@ -69,10 +68,6 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<
   const isQueryInProgressRef = useRef(false);
   const ZOOM_LEVELS_TABLE = useZoomLevelsTable();
   const [polygonParts, setPolygonParts] = useState<Feature[]>([]);
-
-  useEffect(() => {
-    onFeaturesChange?.(polygonParts);
-  }, [polygonParts]);
 
   useEffect(() => {
     const requestPolygonPartsByCurrentExtent = (): boolean => {
@@ -85,12 +80,12 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<
     });
 
     const debounceCall = debounce(requestPolygonPartsByCurrentExtent, DEBOUNCE_MOUSE_INTERVAL);
-    mapOl.on('moveend', () => {
-      debounceCall();
-    });
+
+    mapOl.on('moveend', debounceCall);
 
     return (): void => {
       try {
+        debounceCall.cancel();
         mapOl.un('moveend', debounceCall);
       } catch (e) {
         console.log('OL "moveEnd" remove listener failed', e);
@@ -109,7 +104,6 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<
     if (!targetElement) {
       return;
     }
-
     isShown
       ? targetElement.classList.add('olSpinner')
       : targetElement.classList.remove('olSpinner');
@@ -136,6 +130,9 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<
 
       while (true) {
         const extent = getCurrentExtent();
+        if (!extent) {
+          break;
+        }
         const result = await queryExecutor(extent, nextStartIndex);
         const pageStartIndex = nextStartIndex;
 
