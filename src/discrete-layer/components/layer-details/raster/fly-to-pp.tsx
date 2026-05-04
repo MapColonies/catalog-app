@@ -20,12 +20,7 @@ export const FlyToPP: React.FC<FlyToPPProps> = ({ feature }) => {
     }
     try {
       const geometry = new GeoJSON().readGeometry(feature.geometry);
-      const mapSize = map.getSize();
-      if (!mapSize) {
-        setIsOutsideExtent(true);
-        return;
-      }
-      const currentExtent = map.getView().calculateExtent(mapSize);
+      const currentExtent = map.getView().calculateExtent(map.getSize());
       const selectedExtent = geometry.getExtent();
       setIsOutsideExtent(!containsExtent(currentExtent, selectedExtent));
     } catch {

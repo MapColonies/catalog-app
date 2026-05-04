@@ -48,7 +48,6 @@ const createZoomedOutFootprintFeature = (
   if (!outerPerimeter) {
     return undefined;
   }
-
   return {
     type: 'Feature',
     geometry: {
@@ -68,8 +67,6 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<
   featureType,
   queryExecutor,
   outerPerimeter,
-  selectedFeature,
-  onClearSelectedFeature,
   onFeaturesChange,
   onQueryError,
   options,
@@ -79,111 +76,12 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<
   const store = useStore();
   const activeRequestIdRef = useRef(0);
   const isQueryInProgressRef = useRef(false);
-  const hasEmittedInitialFeaturesRef = useRef(false);
-  const onFeaturesChangeRef = useRef<typeof onFeaturesChange>(onFeaturesChange);
-  const onClearSelectedFeatureRef = useRef<typeof onClearSelectedFeature>(onClearSelectedFeature);
-  const isFootprintModeRef = useRef(false);
-  const selectedFeatureSignatureRef = useRef<string | undefined>(undefined);
-  const hasSeenSelectedFeatureInExtentRef = useRef(false);
   const ZOOM_LEVELS_TABLE = useZoomLevelsTable();
   const [polygonParts, setPolygonParts] = useState<Feature[]>([]);
 
   useEffect(() => {
-    onFeaturesChangeRef.current = onFeaturesChange;
-  }, [onFeaturesChange]);
-
-  useEffect(() => {
-    onClearSelectedFeatureRef.current = onClearSelectedFeature;
-  }, [onClearSelectedFeature]);
-
-  useEffect(() => {
-    if (!selectedFeature) {
-      selectedFeatureSignatureRef.current = undefined;
-      hasSeenSelectedFeatureInExtentRef.current = false;
-      return;
-    }
-
-    const selectedFeatureProperties =
-      selectedFeature.properties && typeof selectedFeature.properties === 'object'
-        ? (selectedFeature.properties as Record<string, unknown>)
-        : undefined;
-    const selectedFeatureKey = selectedFeatureProperties?._key;
-    const selectedFeatureId = selectedFeature?.id ?? selectedFeatureProperties?.id;
-    const nextSignature =
-      selectedFeatureKey !== undefined
-        ? `key:${String(selectedFeatureKey)}`
-        : selectedFeatureId !== undefined
-        ? `id:${String(selectedFeatureId)}`
-        : `ref:${String(selectedFeature)}`;
-
-    if (selectedFeatureSignatureRef.current !== nextSignature) {
-      selectedFeatureSignatureRef.current = nextSignature;
-      hasSeenSelectedFeatureInExtentRef.current = false;
-    }
-  }, [selectedFeature]);
-
-  useEffect(() => {
-    if (!hasEmittedInitialFeaturesRef.current) {
-      hasEmittedInitialFeaturesRef.current = true;
-      return;
-    }
-    onFeaturesChangeRef.current?.(polygonParts);
+    onFeaturesChange?.(polygonParts);
   }, [polygonParts]);
-
-  useEffect(() => {
-    if (!selectedFeature || !hasEmittedInitialFeaturesRef.current || isQueryInProgressRef.current) {
-      return;
-    }
-
-    const selectedFeatureType =
-      selectedFeature?.properties && typeof selectedFeature.properties === 'object'
-        ? (selectedFeature.properties as Record<string, unknown>)._featureType
-        : undefined;
-
-    if (selectedFeatureType !== featureType) {
-      return;
-    }
-
-    if (isFootprintModeRef.current) {
-      hasSeenSelectedFeatureInExtentRef.current = false;
-      return;
-    }
-
-    const selectedFeatureProperties =
-      selectedFeature.properties && typeof selectedFeature.properties === 'object'
-        ? (selectedFeature.properties as Record<string, unknown>)
-        : undefined;
-    const selectedFeatureKey = selectedFeatureProperties?._key;
-    const selectedFeatureId = selectedFeature?.id ?? selectedFeatureProperties?.id;
-
-    const isSelectedInCurrentExtent = polygonParts.some((feature) => {
-      const featureProperties =
-        feature.properties && typeof feature.properties === 'object'
-          ? (feature.properties as Record<string, unknown>)
-          : undefined;
-
-      const featureKey = featureProperties?._key;
-      if (selectedFeatureKey !== undefined && featureKey !== undefined) {
-        return featureKey === selectedFeatureKey;
-      }
-
-      const featureId = feature?.id ?? featureProperties?.id;
-      if (selectedFeatureId !== undefined && featureId !== undefined) {
-        return selectedFeatureId === featureId;
-      }
-
-      return selectedFeature === feature;
-    });
-
-    if (isSelectedInCurrentExtent) {
-      hasSeenSelectedFeatureInExtentRef.current = true;
-      return;
-    }
-
-    if (hasSeenSelectedFeatureInExtentRef.current) {
-      onClearSelectedFeatureRef.current?.();
-    }
-  }, [featureType, polygonParts, selectedFeature]);
 
   useEffect(() => {
     const requestPolygonPartsByCurrentExtent = (): boolean => {
@@ -232,13 +130,11 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<
     if (currentZoomLevel && currentZoomLevel < CONFIG.POLYGON_PARTS.MAX.SHOW_FOOTPRINT_ZOOM_LEVEL) {
       showLoadingSpinner(false);
       isQueryInProgressRef.current = false;
-      isFootprintModeRef.current = true;
       const footprintFeature = createZoomedOutFootprintFeature(outerPerimeter, featureType);
       setPolygonParts(footprintFeature ? [footprintFeature] : []);
       return;
     }
 
-    isFootprintModeRef.current = false;
     isQueryInProgressRef.current = true;
     const requestId = activeRequestIdRef.current + 1;
     activeRequestIdRef.current = requestId;

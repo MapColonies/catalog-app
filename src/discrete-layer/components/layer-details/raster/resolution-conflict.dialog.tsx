@@ -59,6 +59,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
   const intl = useIntl();
   const [api, stagesInfo] = useWorkerAPI();
   const hasLoadedRef = useRef(false);
+  const visibleRowRangesRef = useRef<Record<number, { startIndex: number; stopIndex: number }>>({});
   const ZOOM_LEVELS_TABLE = useZoomLevelsTable();
   const state = RasterWorkflowContext.useSelector((s) => s);
   const [showLowResolutionPolygonParts, setShowLowResolutionPolygonParts] = useState(false);
@@ -312,6 +313,34 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
     }
   };
 
+  const shouldScrollToFeature = useCallback(
+    (feature?: Feature): boolean => {
+      const featureKey = feature?.properties?._key;
+      if (!featureKey) {
+        return false;
+      }
+      for (
+        let collectionIndex = 0;
+        collectionIndex < filteredLowResolutionCollections.length;
+        collectionIndex += 1
+      ) {
+        const featureIndex = filteredLowResolutionCollections[collectionIndex].features.findIndex(
+          (collectionFeature) => collectionFeature.properties?._key === featureKey
+        );
+        if (featureIndex === -1) {
+          continue;
+        }
+        const visibleRange = visibleRowRangesRef.current[collectionIndex];
+        if (!visibleRange) {
+          return true;
+        }
+        return featureIndex < visibleRange.startIndex || featureIndex > visibleRange.stopIndex;
+      }
+      return true;
+    },
+    [filteredLowResolutionCollections]
+  );
+
   return (
     <Box id="resolutionConflictDialog">
       <Dialog open={isOpen} preventOutsideDismiss={true}>
@@ -410,6 +439,12 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                                   rowCount={collection.features.length}
                                   rowHeight={32}
                                   overscanRowCount={8}
+                                  onRowsRendered={({ startIndex, stopIndex }): void => {
+                                    visibleRowRangesRef.current[collectionIndex] = {
+                                      startIndex,
+                                      stopIndex,
+                                    };
+                                  }}
                                   scrollToIndex={
                                     autoScrollListToSelection &&
                                     collectionIndex ===
@@ -562,15 +597,17 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                     const clickedFeature = lowResolutionFeatures.find(
                       (feat) => feat.properties?._key === feature?.properties?._key
                     );
-                    if (
-                      listFilterMode === 'exceeded' &&
-                      clickedFeature?.properties?.exceeded !== true
-                    ) {
+                    const shouldSwitchToAllFilter =
+                      listFilterMode === 'exceeded' && clickedFeature?.properties?.exceeded !== true;
+
+                    if (shouldSwitchToAllFilter) {
                       setListFilterMode('all');
                     }
 
                     setShowLowResolutionPolygonParts(true);
-                    setAutoScrollListToSelection(true);
+                    setAutoScrollListToSelection(
+                      shouldSwitchToAllFilter ? true : shouldScrollToFeature(clickedFeature)
+                    );
                     setSelectedItem(clickedFeature);
                   }}
                   showPolygonParts={SHOW_PARTS_AFTER_INIT}
