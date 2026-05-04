@@ -282,8 +282,6 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
             featureType={FeatureType.EXISTING_PP}
             queryExecutor={queryExecutor}
             outerPerimeter={layerRecord?.footprint as Geometry | undefined}
-            selectedFeature={selectedFeature}
-            onClearSelectedFeature={clearSelection}
             options={{ properties: { id: FeatureType.EXISTING_PP }, zIndex: 1 }}
           />
         )}

@@ -618,11 +618,6 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                         featureType={FeatureType.LOW_RESOLUTION_PP}
                         queryExecutor={queryExecutor}
                         outerPerimeter={outerPerimeter?.geometry}
-                        selectedFeature={selectedItem}
-                        onClearSelectedFeature={() => {
-                          setSelectedItem(undefined);
-                          setAutoScrollListToSelection(false);
-                        }}
                         onFeaturesChange={onFeaturesChange}
                         onQueryError={(errorMessage): void => {
                           setLowResolutionPartsError(errorMessage);

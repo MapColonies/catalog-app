@@ -26,7 +26,7 @@ export const FlyToPP: React.FC<FlyToPPProps> = ({ feature }) => {
     } catch {
       setIsOutsideExtent(false);
     }
-  }, [feature]);
+  }, [feature?.properties?.id]);
 
   if (!feature) {
     return null;

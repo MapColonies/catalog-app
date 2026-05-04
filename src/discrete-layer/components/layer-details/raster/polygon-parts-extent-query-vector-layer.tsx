@@ -31,8 +31,6 @@ interface PolygonPartsExtentQueryVectorLayerProps {
   featureType: FeatureType;
   queryExecutor: (bbox: BBox, startIndex: number) => Promise<IQueryExecutorResponse>;
   outerPerimeter?: Geometry;
-  selectedFeature?: Feature;
-  onClearSelectedFeature?: () => void;
   onFeaturesChange?: (features: Feature[]) => void;
   onQueryError?: (errorMessage: string) => void;
   options?: Options;
@@ -238,7 +236,7 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<
 
           return feat ? (
             <GeoJSONFeature
-              key={(feat.properties?._key as string | undefined) ?? `feature-${idx}`}
+              key={feat.properties?.id}
               // geometry={{ ...feat.geometry }}
               // @ts-ignore
               geometry={{ ...feat }}
