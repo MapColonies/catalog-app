@@ -1,10 +1,17 @@
-import { CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  CSSProperties,
+  JSXElementConstructor,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useIntl } from 'react-intl';
 import { Feature, Geometry } from 'geojson';
 import { get } from 'lodash';
 import bboxPolygon from '@turf/bbox-polygon';
 import { FitOptions } from 'ol/View';
-import { Style } from 'ol/style';
 import {
   Box,
   getWMTSOptions,
@@ -63,6 +70,7 @@ interface GeoFeaturesPresentorProps {
 
 const DEFAULT_PROJECTION = 'EPSG:4326';
 const MIN_FEATURES_NUMBER = 4; // minimal set of fetures (source, source_marker, perimeter, perimeter_marker)
+const CHILDREN_WITH_ZOOM_INDICATION = ['PolygonPartsExtentQueryVectorLayer'];
 
 export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> = ({
   mode,
@@ -84,6 +92,17 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   const [selectedFeature, setSelectedFeature] = useState<Feature | undefined>(undefined);
   const [showExistingPolygonParts, setShowExistingPolygonParts] =
     useState<boolean>(showPolygonParts);
+  const [childrenWithZoomIndication, setChildrenWithZoomIndication] = useState<boolean>(false);
+
+  useEffect(() => {
+    const childWithZoomIndication = React.Children.toArray(children).find((child) => {
+      return (
+        React.isValidElement(child) &&
+        CHILDREN_WITH_ZOOM_INDICATION.includes((child.type as JSXElementConstructor<any>).name)
+      );
+    });
+    setChildrenWithZoomIndication(childWithZoomIndication ? true : false);
+  }, [children]);
 
   useEffect(() => {
     setShowExistingPolygonParts(showPolygonParts);
@@ -183,7 +202,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
       if (!key.includes('MARKER')) {
         res.push({
           title: intl.formatMessage({ id: `polygon-parts.map-preview-legend.${key}` }) as string,
-          style: value as Style,
+          style: value.style,
         });
       }
     });
@@ -195,7 +214,13 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
       <Map>
         {previewBaseMap}
         <MapLoadingIndicator />
-        <ZoomLevelIndicator />
+        <ZoomLevelIndicator
+          indicateTillZoomLevel={
+            showExistingPolygonParts || childrenWithZoomIndication
+              ? CONFIG.POLYGON_PARTS.MAX.SHOW_FOOTPRINT_ZOOM_LEVEL
+              : undefined
+          }
+        />
         <Legend
           legendItems={LegendsArray}
           title={intl.formatMessage({ id: 'polygon-parts.map-preview-legend.title' })}
