@@ -21,6 +21,9 @@ import { Domain } from '../../../../common/models/domain';
 import { Mode } from '../../../../common/models/mode.enum';
 import { EntityDescriptorModelType } from '../../../models';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
+import { Process } from './worker/worker.types';
+import { extractProgressArray } from './worker/utils';
+import { useWorkerAPI } from './worker/useWorkerAPI';
 import {
   IQueryExecutorResponse,
   PolygonPartsExtentQueryVectorLayer,
@@ -30,8 +33,6 @@ import { GeoFeaturesPresentorComponent } from './pp-map';
 import { FeatureType } from './pp-map.utils';
 import { RasterWorkflowContext } from './state-machine/context';
 import { UpdateLayerHeader } from './update-layer-header';
-import { extractProgressArray } from './worker/utils';
-import { useWorkerAPI } from './worker/useWorkerAPI';
 
 import './resolution-conflict.dialog.css';
 
@@ -57,7 +58,9 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
   viewOnly = false,
 }) => {
   const intl = useIntl();
-  const [api, stagesInfo] = useWorkerAPI();
+  const [api, stagesInfo] = useWorkerAPI({
+    [Process.ComputeOuterGeometry]: 2,
+  });
   const hasLoadedRef = useRef(false);
   const visibleRowRangesRef = useRef<Record<number, { startIndex: number; stopIndex: number }>>({});
   const ZOOM_LEVELS_TABLE = useZoomLevelsTable();
@@ -228,6 +231,10 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
         },
         geometry: outerGeometry,
       });
+
+      const outerExceededGeometry = await api.computeOuterGeometry.method(
+        (properties) => properties.exceeded === true
+      );
 
       const featureCollection = await api.getFeatureCollection.method();
 
