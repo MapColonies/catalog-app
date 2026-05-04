@@ -55,14 +55,7 @@ export enum Stage {
   Cache = 'Cache',
   UpdateAreas = 'UpdateAreas',
   ComputeOuterGeometry = 'ComputeOuterGeometry',
-  // ComputeProblematicOuterGeometry = 'ComputeProblematicOuterGeometry',
-  // ...ComputeOuterGeometryStage,
   GetFeatureCollection = 'GetFeatureCollection',
-}
-
-const enum ComputeOuterGeometryStage {
-  ComputeOuterGeometry = 'ComputeOuterGeometry',
-  ComputeProblematicOuterGeometry = 'ComputeProblematicOuterGeometry',
 }
 
 export enum WorkerType {
