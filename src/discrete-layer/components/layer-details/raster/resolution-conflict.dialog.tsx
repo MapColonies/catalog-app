@@ -253,11 +253,11 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
   const approveDialog = useCallback((): void => {
     const resumeJob = async (): Promise<void> => {
       try {
-        await state.context.store.mutateJobResume({
+        await state.context.store.mutateJobApproveAndResume({
           data: {
             approver: approver.trim(),
           },
-          jobResumeParams: {
+          jobApproveAndResumeParams: {
             id: String(state.context.job?.jobId),
             domain: Domain.RASTER,
             type: String(state.context.job?.details?.type ?? ''),

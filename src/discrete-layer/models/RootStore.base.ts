@@ -438,7 +438,7 @@ export type JobActionParams = {
   domain: string
   type: string
 }
-export type JobResumeData = {
+export type JobApproveAndResumeData = {
   approver: string
 }
 /* The TypeScript type that explicits the refs to other models in order to prevent a circular refs issue */
@@ -502,7 +502,7 @@ mutateDeleteLayer="mutateDeleteLayer",
 mutateUpdateJob="mutateUpdateJob",
 mutateJobAbort="mutateJobAbort",
 mutateJobRetry="mutateJobRetry",
-mutateJobResume="mutateJobResume"
+mutateJobApproveAndResume="mutateJobApproveAndResume"
 }
 
 /**
@@ -718,7 +718,7 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     mutateJobRetry(variables: { jobRetryParams: JobActionParams }, optimisticUpdate?: () => void) {
       return self.mutate<{ jobRetry: string }>(`mutation jobRetry($jobRetryParams: JobActionParams!) { jobRetry(jobRetryParams: $jobRetryParams) }`, variables, optimisticUpdate)
     },
-    mutateJobResume(variables: { data: JobResumeData, jobResumeParams: JobActionParams }, optimisticUpdate?: () => void) {
-      return self.mutate<{ jobResume: string }>(`mutation jobResume($data: JobResumeData!, $jobResumeParams: JobActionParams!) { jobResume(data: $data, jobResumeParams: $jobResumeParams) }`, variables, optimisticUpdate)
+    mutateJobApproveAndResume(variables: { data: JobApproveAndResumeData, jobApproveAndResumeParams: JobActionParams }, optimisticUpdate?: () => void) {
+      return self.mutate<{ jobApproveAndResume: string }>(`mutation jobApproveAndResume($data: JobApproveAndResumeData!, $jobApproveAndResumeParams: JobActionParams!) { jobApproveAndResume(data: $data, jobApproveAndResumeParams: $jobApproveAndResumeParams) }`, variables, optimisticUpdate)
     },
   })))
