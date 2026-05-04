@@ -48,7 +48,6 @@ import {
 import {
   FEATURE_LABEL_CONFIG,
   FeatureType,
-  getStyleByFeatureType,
   getText,
   getWFSFeatureTypeName,
   PPMapStyles,
@@ -213,13 +212,6 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
     return res;
   }, []);
 
-  const selectedFeatureStyle = useMemo(() => {
-    if (!selectedFeature) {
-      return undefined;
-    }
-    return getStyleByFeatureType(selectedFeature);
-  }, [selectedFeature]);
-
   const queryExecutor = useCallback(
     async (bbox: BBox, startIndex: number): Promise<IQueryExecutorResponse> => {
       const result = await store.queryGetPolygonPartsFeature({
@@ -304,7 +296,6 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
         />
         <SelectedFeatureVectorLayer
           feature={selectedFeature}
-          featureStyle={selectedFeatureStyle}
           options={{ properties: { id: 'SELECTED_PP' }, zIndex: 3 }}
         />
         {enableFeaturePropertiesPopup && (

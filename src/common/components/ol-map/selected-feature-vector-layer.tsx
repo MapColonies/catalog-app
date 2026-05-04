@@ -1,90 +1,45 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { Feature } from 'geojson';
 import { Options } from 'ol/layer/Base';
 import { Style } from 'ol/style';
-import { VectorLayer, VectorSource, GeoJSONFeature, useMap } from '@map-colonies/react-components';
-import { FlyTo } from './fly-to';
-
-const fittedFeatureSignaturesByMap = new WeakMap<object, Set<string>>();
-
-const getFeatureSignature = (feature?: Feature): string | undefined => {
-  if (!feature) {
-    return undefined;
-  }
-  return feature.geometry ? `geom:${JSON.stringify(feature.geometry)}` : undefined;
-};
-
-const getOrCreateFittedSignatures = (cacheKey: object): Set<string> => {
-  const existing = fittedFeatureSignaturesByMap.get(cacheKey);
-  if (existing) {
-    return existing;
-  }
-  const created = new Set<string>();
-  fittedFeatureSignaturesByMap.set(cacheKey, created);
-  return created;
-};
-
-const getSelectedStyle = (featureStyle?: Style): Style | undefined => {
-  if (!featureStyle) {
-    return undefined;
-  }
-  const style = featureStyle.clone();
-  const stroke = style.getStroke();
-  if (stroke) {
-    const selectedStroke = stroke.clone();
-    selectedStroke.setWidth((stroke.getWidth() ?? 0) + 4);
-    style.setStroke(selectedStroke);
-  }
-  return style;
-};
+import { VectorLayer, VectorSource, GeoJSONFeature } from '@map-colonies/react-components';
+import { getStyleByFeatureType } from '../../../discrete-layer/components/layer-details/raster/pp-map.utils';
 
 interface SelectedFeatureVectorLayerProps {
   feature?: Feature;
-  featureStyle?: Style;
   options?: Options;
 }
 
 export const SelectedFeatureVectorLayer: React.FC<SelectedFeatureVectorLayerProps> = ({
   feature,
-  featureStyle,
   options,
 }) => {
-  const mapOl = useMap();
-  const mapCacheKey = mapOl.getTargetElement() ?? mapOl;
-
-  const selectedGeometry = useMemo(() => {
-    return feature?.geometry ? { ...feature.geometry } : undefined;
-  }, [feature]);
-
-  const selectedFeatureSignature = useMemo(() => getFeatureSignature(feature), [feature]);
-
-  const fittedFeatureSignatures = useMemo(
-    () => getOrCreateFittedSignatures(mapCacheKey),
-    [mapCacheKey]
-  );
-
-  const shouldFitSelectedFeature =
-    selectedFeatureSignature !== undefined &&
-    !fittedFeatureSignatures.has(selectedFeatureSignature);
+  const [featureGeometry, setFeatureGeometry] = useState<Feature['geometry'] | undefined>(undefined);
+  const [featureStyle, setFeatureStyle] = useState<Style | undefined>(undefined);
 
   useEffect(() => {
-    if (!selectedFeatureSignature || !shouldFitSelectedFeature) {
+    if (!feature) {
+      setFeatureGeometry(undefined);
+      setFeatureStyle(undefined);
       return;
     }
-    fittedFeatureSignatures.add(selectedFeatureSignature);
-  }, [fittedFeatureSignatures, selectedFeatureSignature, shouldFitSelectedFeature]);
-
-  const selectedFeatureStyle = useMemo(() => getSelectedStyle(featureStyle), [featureStyle]);
-
-  if (!selectedGeometry) {
-    return null;
-  }
+    const style = getStyleByFeatureType(feature)?.clone();
+    const stroke = style?.getStroke();
+    if (stroke) {
+      const selectedStroke = stroke.clone();
+      selectedStroke.setWidth((stroke.getWidth() ?? 0) + 4);
+      style?.setStroke(selectedStroke);
+    }
+    setFeatureStyle(style);
+    setFeatureGeometry(feature?.geometry ? { ...feature.geometry } : undefined);
+  }, [feature]);
 
   return (
     <VectorLayer options={options}>
       <VectorSource>
-        <GeoJSONFeature geometry={selectedGeometry} featureStyle={selectedFeatureStyle} />
-        {shouldFitSelectedFeature && feature && <FlyTo feature={feature} />}
+        {featureGeometry
+          ? <GeoJSONFeature geometry={featureGeometry} featureStyle={featureStyle} />
+          : null}
       </VectorSource>
     </VectorLayer>
   );

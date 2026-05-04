@@ -17,7 +17,6 @@ import {
   Typography,
 } from '@map-colonies/react-core';
 import { AutoDirectionBox } from '../../../../common/components/auto-direction-box/auto-direction-box.component';
-import { FlyTo } from '../../../../common/components/ol-map/fly-to';
 import { Domain } from '../../../../common/models/domain';
 import { Mode } from '../../../../common/models/mode.enum';
 import { EntityDescriptorModelType } from '../../../models';
@@ -284,23 +283,20 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
     setAutoScrollListToSelection(false);
   }, []);
 
-  const queryExecutor = useCallback(
-    async (bbox: BBox, _startIndex: number): Promise<IQueryExecutorResponse> => {
-      if (!api) {
-        return { features: [], pageSize: -1 };
-      }
-      const result = await api.query.method({
-        minX: bbox[0],
-        minY: bbox[1],
-        maxX: bbox[2],
-        maxY: bbox[3],
-      });
-      const fetchedFeatures = get(result, 'features', []);
-      const features = Array.isArray(fetchedFeatures) ? fetchedFeatures : [];
-      return { features, pageSize: -1 };
-    },
-    []
-  );
+  const queryExecutor = async (bbox: BBox, _startIndex: number): Promise<IQueryExecutorResponse> => {
+    if (!api) {
+      return { features: [], pageSize: -1 };
+    }
+    const result = await api.query.method({
+      minX: bbox[0],
+      minY: bbox[1],
+      maxX: bbox[2],
+      maxY: bbox[3],
+    });
+    const fetchedFeatures = get(result, 'features', []);
+    const features = Array.isArray(fetchedFeatures) ? fetchedFeatures : [];
+    return { features, pageSize: -1 };
+  };
 
   const onFeaturesChange = useCallback(
     (updatedFeatures: Feature[]): void => {
@@ -598,7 +594,6 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                         }}
                         options={{ properties: { id: FeatureType.LOW_RESOLUTION_PP }, zIndex: 2 }}
                       />
-                      <FlyTo feature={outerPerimeter} />
                     </>
                   ) : null}
                 </GeoFeaturesPresentorComponent>
