@@ -454,6 +454,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                                               properties: {
                                                 ...feature.properties,
                                                 _featureType: FeatureType.LOW_RESOLUTION_PP,
+                                                _flyTo: true,
                                               },
                                             };
                                             setSelectedItem(featureWithType);

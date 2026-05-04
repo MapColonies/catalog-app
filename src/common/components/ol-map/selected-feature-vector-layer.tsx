@@ -23,6 +23,9 @@ export const SelectedFeatureVectorLayer: React.FC<SelectedFeatureVectorLayerProp
       setFeatureStyle(undefined);
       return;
     }
+    if (feature.properties?._showAsFootprint) {
+      return;
+    }
     const style = getStyleByFeatureType(feature)?.clone();
     const stroke = style?.getStroke();
     if (stroke) {

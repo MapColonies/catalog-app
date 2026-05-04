@@ -40,6 +40,7 @@ import { useStore } from '../../../models/RootStore';
 import { GeojsonFeatureInput } from '../../../models/RootStore.base';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
 import { FeaturePropertiesPopupComponent } from './feature-properties-popup.component';
+import { FlyToPP } from './fly-to-pp';
 import { GeoFeaturesInnerComponent } from './geo-features-inner.component';
 import {
   IQueryExecutorResponse,
@@ -298,6 +299,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
           feature={selectedFeature}
           options={{ properties: { id: 'SELECTED_PP' }, zIndex: 3 }}
         />
+        <FlyToPP feature={selectedFeature} />
         {enableFeaturePropertiesPopup && (
           <FeaturePropertiesPopupComponent
             selectedFeature={selectedFeature}
