@@ -17,7 +17,7 @@ import {
   Typography,
 } from '@map-colonies/react-core';
 import { AutoDirectionBox } from '../../../../common/components/auto-direction-box/auto-direction-box.component';
-import { FlyTo } from '../../../../common/components/ol-map/feature-selection-handler';
+import { FlyTo } from '../../../../common/components/ol-map/fly-to';
 import { Domain } from '../../../../common/models/domain';
 import { Mode } from '../../../../common/models/mode.enum';
 import { EntityDescriptorModelType } from '../../../models';

@@ -3,11 +3,11 @@ import { Feature } from 'geojson';
 import GeoJSON from 'ol/format/GeoJSON';
 import { useMap } from '@map-colonies/react-components';
 
-interface FeatureSelectionHandlerProps {
+interface FlyToProps {
   feature?: Feature;
 }
 
-export const FlyTo: React.FC<FeatureSelectionHandlerProps> = ({ feature }) => {
+export const FlyTo: React.FC<FlyToProps> = ({ feature }) => {
   const map = useMap();
 
   useEffect(() => {

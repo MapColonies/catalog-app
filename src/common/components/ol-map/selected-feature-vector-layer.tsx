@@ -3,7 +3,7 @@ import { Feature } from 'geojson';
 import { Options } from 'ol/layer/Base';
 import { Style } from 'ol/style';
 import { VectorLayer, VectorSource, GeoJSONFeature, useMap } from '@map-colonies/react-components';
-import { FlyTo } from './feature-selection-handler';
+import { FlyTo } from './fly-to';
 
 const fittedFeatureSignaturesByMap = new WeakMap<object, Set<string>>();
 
