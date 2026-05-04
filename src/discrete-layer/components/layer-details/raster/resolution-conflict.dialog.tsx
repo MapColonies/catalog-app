@@ -607,17 +607,15 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                   showPolygonParts={SHOW_PARTS_AFTER_INIT}
                 >
                   {showLowResolutionPolygonParts && lowResolutionFeatures !== undefined ? (
-                    <>
-                      <PolygonPartsExtentQueryVectorLayer
-                        featureType={FeatureType.LOW_RESOLUTION_PP}
-                        queryExecutor={queryExecutor}
-                        outerPerimeter={outerPerimeter?.geometry}
-                        onQueryError={(errorMessage): void => {
-                          setLowResolutionPartsError(errorMessage);
-                        }}
-                        options={{ properties: { id: FeatureType.LOW_RESOLUTION_PP }, zIndex: 2 }}
-                      />
-                    </>
+                    <PolygonPartsExtentQueryVectorLayer
+                      featureType={FeatureType.LOW_RESOLUTION_PP}
+                      queryExecutor={queryExecutor}
+                      outerPerimeter={outerPerimeter?.geometry}
+                      onQueryError={(errorMessage): void => {
+                        setLowResolutionPartsError(errorMessage);
+                      }}
+                      options={{ properties: { id: FeatureType.LOW_RESOLUTION_PP }, zIndex: 2 }}
+                    />
                   ) : null}
                 </GeoFeaturesPresentorComponent>
               </Box>
