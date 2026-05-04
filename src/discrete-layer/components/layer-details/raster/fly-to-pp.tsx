@@ -14,7 +14,7 @@ export const FlyToPP: React.FC<FlyToPPProps> = ({ feature }) => {
   const [isOutsideExtent, setIsOutsideExtent] = useState(false);
 
   useEffect(() => {
-    if (!feature?.geometry) {
+    if (!feature?.geometry || feature?.properties?._showAsFootprint === true) {
       setIsOutsideExtent(false);
       return;
     }
