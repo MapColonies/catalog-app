@@ -74,11 +74,11 @@ const FeaturePropertiesPopup: React.FC<FeaturePropertiesPopupProps> = ({
       return [] as Array<[string, unknown]>;
     }
     return Object.entries(selectedFeature?.properties).filter(([key]) => {
-      return !key.startsWith('_');
+      return !key.startsWith('_') && key !== 'text';
     });
   }, [selectedFeature?.properties]);
 
-  if (!selectedFeature?.properties) {
+  if (!selectedFeature?.properties || visibleProperties.length === 0) {
     return null;
   }
 
