@@ -253,14 +253,14 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
   const approveDialog = useCallback((): void => {
     const resumeJob = async (): Promise<void> => {
       try {
-        await state.context.store.mutateJobRetry({
-          jobRetryParams: {
-            // bypass-validation-errors
-            id: 'f2a61783-6b16-4520-9b18-ae216e642d54',
+        await state.context.store.mutateJobResume({
+          data: {
+            approver: approver.trim(),
+          },
+          jobResumeParams: {
+            id: String(state.context.job?.jobId),
             domain: Domain.RASTER,
             type: String(state.context.job?.details?.type ?? ''),
-            // allowedValidationErrors: ['resolution'],
-            // approver: approver.trim(),
           },
         });
         onApprove?.();

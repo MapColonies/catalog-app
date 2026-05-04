@@ -438,6 +438,9 @@ export type JobActionParams = {
   domain: string
   type: string
 }
+export type JobResumeData = {
+  approver: string
+}
 /* The TypeScript type that explicits the refs to other models in order to prevent a circular refs issue */
 type Refs = {
   layerRasterRecords: ObservableMap<string, LayerRasterRecordModelType>,
@@ -497,8 +500,9 @@ mutateStart3DIngestion="mutateStart3DIngestion",
 mutateStartDemIngestion="mutateStartDemIngestion",
 mutateDeleteLayer="mutateDeleteLayer",
 mutateUpdateJob="mutateUpdateJob",
+mutateJobAbort="mutateJobAbort",
 mutateJobRetry="mutateJobRetry",
-mutateJobAbort="mutateJobAbort"
+mutateJobResume="mutateJobResume"
 }
 
 /**
@@ -708,10 +712,13 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     mutateUpdateJob(variables: { data: JobUpdateData, id: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ updateJob: string }>(`mutation updateJob($data: JobUpdateData!, $id: String!) { updateJob(data: $data, id: $id) }`, variables, optimisticUpdate)
     },
+    mutateJobAbort(variables: { jobAbortParams: JobActionParams }, optimisticUpdate?: () => void) {
+      return self.mutate<{ jobAbort: string }>(`mutation jobAbort($jobAbortParams: JobActionParams!) { jobAbort(jobAbortParams: $jobAbortParams) }`, variables, optimisticUpdate)
+    },
     mutateJobRetry(variables: { jobRetryParams: JobActionParams }, optimisticUpdate?: () => void) {
       return self.mutate<{ jobRetry: string }>(`mutation jobRetry($jobRetryParams: JobActionParams!) { jobRetry(jobRetryParams: $jobRetryParams) }`, variables, optimisticUpdate)
     },
-    mutateJobAbort(variables: { jobAbortParams: JobActionParams }, optimisticUpdate?: () => void) {
-      return self.mutate<{ jobAbort: string }>(`mutation jobAbort($jobAbortParams: JobActionParams!) { jobAbort(jobAbortParams: $jobAbortParams) }`, variables, optimisticUpdate)
+    mutateJobResume(variables: { data: JobResumeData, jobResumeParams: JobActionParams }, optimisticUpdate?: () => void) {
+      return self.mutate<{ jobResume: string }>(`mutation jobResume($data: JobResumeData!, $jobResumeParams: JobActionParams!) { jobResume(data: $data, jobResumeParams: $jobResumeParams) }`, variables, optimisticUpdate)
     },
   })))
