@@ -17,6 +17,7 @@ import {
   Typography,
 } from '@map-colonies/react-core';
 import { AutoDirectionBox } from '../../../../common/components/auto-direction-box/auto-direction-box.component';
+import { FlyTo } from '../../../../common/components/ol-map/fly-to';
 import { ValidationsError } from '../../../../common/components/error/validations.error-presentor';
 import { Domain } from '../../../../common/models/domain';
 import { Mode } from '../../../../common/models/mode.enum';
@@ -612,13 +613,16 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                   style={{ height: '100%', minHeight: '300px' }}
                 >
                   {showLowResolutionPolygonParts && lowResolutionFeatures !== undefined ? (
-                    <PolygonPartsExtentQueryVectorLayer
-                      featureType={FeatureType.LOW_RESOLUTION_PP}
-                      queryExecutor={queryExecutor}
-                      outerPerimeter={outerPerimeter?.geometry}
-                      onQueryError={onQueryError}
-                      options={{ properties: { id: FeatureType.LOW_RESOLUTION_PP }, zIndex: 2 }}
-                    />
+                    <>
+                      <PolygonPartsExtentQueryVectorLayer
+                        featureType={FeatureType.LOW_RESOLUTION_PP}
+                        queryExecutor={queryExecutor}
+                        outerPerimeter={outerPerimeter?.geometry}
+                        onQueryError={onQueryError}
+                        options={{ properties: { id: FeatureType.LOW_RESOLUTION_PP }, zIndex: 2 }}
+                      />
+                      <FlyTo feature={outerPerimeter} flyOnce={true} />
+                    </>
                   ) : null}
                 </GeoFeaturesPresentorComponent>
               </Box>

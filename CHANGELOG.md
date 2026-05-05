@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.8.1](https://github.com/MapColonies/catalog-app/compare/v4.8.0...v4.8.1) (2026-05-05)
+
+
+### Bug Fixes
+
+* fly to res collisions perimeter once after load ([#895](https://github.com/MapColonies/catalog-app/issues/895)) ([16c7664](https://github.com/MapColonies/catalog-app/commit/16c7664f408d7e4752f8f8ed1f21f0afa253dd3f))
+
 ## [4.8.0](https://github.com/MapColonies/catalog-app/compare/v4.7.0...v4.8.0) (2026-05-05)
 
 
