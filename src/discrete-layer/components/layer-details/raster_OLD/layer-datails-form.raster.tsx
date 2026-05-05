@@ -494,12 +494,12 @@ export const InnerRasterForm = (
         const outlinedPolygon = getOutlinedFeature(
           definedPPGeometries as Feature<Polygon | MultiPolygon, Properties>[]
         );
-        set(outlinedPolygon, 'properties.featureType', FeatureType.PP_PERIMETER);
+        set(outlinedPolygon, 'properties._featureType', FeatureType.PP_PERIMETER);
         setOutlinedPerimeter(outlinedPolygon as Feature<Geometry, GeoJsonProperties>);
         setOutlinedPerimeterMarker({
           type: 'Feature',
           properties: {
-            featureType: FeatureType.PP_PERIMETER_MARKER,
+            _featureType: FeatureType.PP_PERIMETER_MARKER,
           },
           geometry: {
             coordinates: getFirstPoint((outlinedPolygon as Feature).geometry),
@@ -747,7 +747,7 @@ export const InnerRasterForm = (
     setSourceExtent({
       type: 'Feature',
       properties: {
-        featureType: FeatureType.SOURCE_EXTENT,
+        _featureType: FeatureType.SOURCE_EXTENT,
       },
       geometry: validationResults.extentPolygon,
     });
@@ -756,7 +756,7 @@ export const InnerRasterForm = (
       setSourceExtentMarker({
         type: 'Feature',
         properties: {
-          featureType: FeatureType.SOURCE_EXTENT_MARKER,
+          _featureType: FeatureType.SOURCE_EXTENT_MARKER,
         },
         geometry: {
           coordinates: getFirstPoint(validationResults.extentPolygon),
@@ -906,12 +906,12 @@ export const InnerRasterForm = (
                   Properties
                 >[]
               );
-              set(outlinedPolygon, 'properties.featureType', FeatureType.PP_PERIMETER);
+              set(outlinedPolygon, 'properties._featureType', FeatureType.PP_PERIMETER);
               setOutlinedPerimeter(outlinedPolygon as Feature<Geometry, GeoJsonProperties>);
               setOutlinedPerimeterMarker({
                 type: 'Feature',
                 properties: {
-                  featureType: FeatureType.PP_PERIMETER_MARKER,
+                  _featureType: FeatureType.PP_PERIMETER_MARKER,
                 },
                 geometry: {
                   coordinates: getFirstPoint((outlinedPolygon as Feature).geometry),

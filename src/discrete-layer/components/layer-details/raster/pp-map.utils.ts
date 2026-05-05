@@ -13,7 +13,6 @@ export enum FeatureType {
   SOURCE_EXTENT_MARKER = 'SOURCE_EXTENT_MARKER',
   EXISTING_PP = 'EXISTING_PP',
   LOW_RESOLUTION_PP = 'LOW_RESOLUTION_PP',
-  ILLEGAL_PP = 'ILLEGAL_PP',
 }
 
 interface IStyleByProp {
@@ -117,10 +116,12 @@ export const PPMapStyles = new Map<FeatureType, IStyleByProp>([
   ],
 ]);
 
-export const getStyleByFeatureType = (feature: Feature): Style | undefined => {
+export const getStyleByFeatureType = (feature?: Feature): Style | undefined => {
   const defaultStyle = PPMapStyles.get(FeatureType.EXISTING_PP)?.style;
-  const featureType =
-    get(feature.properties, '_featureType') ?? get(feature.properties, 'featureType');
+  if (!feature) {
+    return defaultStyle;
+  }
+  const featureType = get(feature.properties, '_featureType');
   const styleByProp = featureType ? PPMapStyles.get(featureType) : undefined;
   if (!styleByProp) {
     return defaultStyle;
