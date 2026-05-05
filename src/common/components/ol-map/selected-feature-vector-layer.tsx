@@ -28,6 +28,8 @@ export const SelectedFeatureVectorLayer: React.FC<SelectedFeatureVectorLayerProp
     if (feature.properties?._showAsFootprint) {
       return;
     }
+    setFeatureGeometry(feature?.geometry ? { ...feature.geometry } : undefined);
+
     const style = getStyleByFeatureType(feature)?.clone();
     const stroke = style?.getStroke();
     if (stroke) {
@@ -36,7 +38,6 @@ export const SelectedFeatureVectorLayer: React.FC<SelectedFeatureVectorLayerProp
       style?.setStroke(selectedStroke);
     }
     setFeatureStyle(style);
-    setFeatureGeometry(feature?.geometry ? { ...feature.geometry } : undefined);
   }, [feature]);
 
   return (
