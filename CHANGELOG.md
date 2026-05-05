@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.8.0](https://github.com/MapColonies/catalog-app/compare/v4.7.0...v4.8.0) (2026-05-05)
+
+
+### Features
+
+* add support for repeatable processes ([#891](https://github.com/MapColonies/catalog-app/issues/891)) ([b94b915](https://github.com/MapColonies/catalog-app/commit/b94b915d4b35ef4e1b830bcb713b42fbdec78032))
+* raster job resume ([#888](https://github.com/MapColonies/catalog-app/issues/888)) ([f05f8f1](https://github.com/MapColonies/catalog-app/commit/f05f8f1d4e5489399c20d42a83b76357bf5c46c1))
+* selected feature layer ([#887](https://github.com/MapColonies/catalog-app/issues/887)) ([8af54ee](https://github.com/MapColonies/catalog-app/commit/8af54eecee49aeac6654b0e74de906733c443fab))
+
+
+### Bug Fixes
+
+* ol zoom blinking indication ([#885](https://github.com/MapColonies/catalog-app/issues/885)) ([8451576](https://github.com/MapColonies/catalog-app/commit/84515766f9a729c80ea52d4dfc481b26c4fe00bd))
+* pp map styles by prop ([#882](https://github.com/MapColonies/catalog-app/issues/882)) ([1a30b1f](https://github.com/MapColonies/catalog-app/commit/1a30b1fe7413e1cb5eb67d344446c205eb591f93))
+* using Progress Curtain ([#883](https://github.com/MapColonies/catalog-app/issues/883)) ([b204348](https://github.com/MapColonies/catalog-app/commit/b204348d1eee4be8bc85dc52374b80c3da053f5c))
+
 ## [4.7.0](https://github.com/MapColonies/catalog-app/compare/v4.6.0...v4.7.0) (2026-04-30)
 
 
