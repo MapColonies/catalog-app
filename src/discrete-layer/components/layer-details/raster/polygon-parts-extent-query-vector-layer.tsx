@@ -65,7 +65,6 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<
   const intl = useIntl();
   const store = useStore();
   const activeRequestIdRef = useRef(0);
-  const isQueryInProgressRef = useRef(false);
   const ZOOM_LEVELS_TABLE = useZoomLevelsTable();
   const [polygonParts, setPolygonParts] = useState<Feature[]>([]);
 
@@ -114,13 +113,11 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<
 
     if (currentZoomLevel && currentZoomLevel < CONFIG.POLYGON_PARTS.MAX.SHOW_FOOTPRINT_ZOOM_LEVEL) {
       showLoadingSpinner(false);
-      isQueryInProgressRef.current = false;
       const footprintFeature = createZoomedOutFootprintFeature(outerPerimeter, featureType);
       setPolygonParts(footprintFeature ? [footprintFeature] : []);
       return;
     }
 
-    isQueryInProgressRef.current = true;
     const requestId = activeRequestIdRef.current + 1;
     activeRequestIdRef.current = requestId;
     showLoadingSpinner(true);
@@ -173,7 +170,6 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<
       }
     } finally {
       if (activeRequestIdRef.current === requestId) {
-        isQueryInProgressRef.current = false;
         showLoadingSpinner(false);
       }
     }
