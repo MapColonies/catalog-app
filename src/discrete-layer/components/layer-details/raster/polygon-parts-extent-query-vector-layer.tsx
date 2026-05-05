@@ -155,14 +155,13 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<
         const errorMessage = intl.formatMessage({ id: 'resolutionConflict.error.queryFailed' });
         if (onQueryError) {
           onQueryError(errorMessage);
-        } else {
-          store.actionDispatcherStore.dispatchAction({
-            action: UserAction.SYSTEM_CALLBACK_SHOW_PPERROR_ON_UPDATE,
-            data: {
-              error: [errorMessage],
-            },
-          } as IDispatchAction);
         }
+        store.actionDispatcherStore.dispatchAction({
+          action: UserAction.SYSTEM_CALLBACK_SHOW_PPERROR_ON_UPDATE,
+          data: {
+            error: [errorMessage],
+          },
+        } as IDispatchAction);
       }
     } finally {
       if (activeRequestIdRef.current === requestId) {
