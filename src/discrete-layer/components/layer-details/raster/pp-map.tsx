@@ -99,13 +99,23 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   const [isOpenProperties, setIsOpenProperties] = useState<boolean>(true);
 
   useEffect(() => {
-    const childWithZoomIndication = React.Children.toArray(children).find((child) => {
-      return (
-        React.isValidElement(child) &&
-        CHILDREN_WITH_ZOOM_INDICATION.includes((child.type as JSXElementConstructor<any>).name)
-      );
-    });
-    setChildrenWithZoomIndication(childWithZoomIndication ? true : false);
+    const hasZoomIndicationChild = (nodes: React.ReactNode): boolean => {
+      return React.Children.toArray(nodes).some((child) => {
+        if (!React.isValidElement(child)) return false;
+
+        const typeName =
+          typeof child.type === 'string'
+            ? child.type
+            : (child.type as JSXElementConstructor<any>).name;
+
+        if (CHILDREN_WITH_ZOOM_INDICATION.includes(typeName)) {
+          return true;
+        }
+
+        return hasZoomIndicationChild(child.props?.children);
+      });
+    };
+    setChildrenWithZoomIndication(hasZoomIndicationChild(children));
   }, [children]);
 
   useEffect(() => {
