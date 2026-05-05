@@ -1,17 +1,19 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Feature } from 'geojson';
 import GeoJSON from 'ol/format/GeoJSON';
 import { useMap } from '@map-colonies/react-components';
 
 interface FlyToProps {
   feature?: Feature;
+  flyOnce?: boolean;
 }
 
-export const FlyTo: React.FC<FlyToProps> = ({ feature }) => {
+export const FlyTo: React.FC<FlyToProps> = ({ feature, flyOnce = false }) => {
   const map = useMap();
+  const hasFlownRef = useRef(false);
 
   useEffect(() => {
-    if (!feature) {
+    if (!feature || (flyOnce && hasFlownRef.current)) {
       return;
     }
     try {
@@ -22,6 +24,7 @@ export const FlyTo: React.FC<FlyToProps> = ({ feature }) => {
         maxZoom: view.getMaxZoom() ?? 18,
         padding: [32, 32, 32, 32],
       });
+      hasFlownRef.current = true;
     } catch {
       return;
     }
