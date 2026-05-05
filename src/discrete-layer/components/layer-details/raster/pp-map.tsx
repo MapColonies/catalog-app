@@ -58,14 +58,14 @@ import './pp-map.css';
 
 interface GeoFeaturesPresentorProps {
   mode: Mode;
-  geoFeatures?: Feature[];
-  style?: CSSProperties | undefined;
-  fitOptions?: FitOptions | undefined;
   layerRecord?: ILayerImage | null;
-  onMapFeatureClick?: (feature: Feature | undefined) => void;
-  enableFeaturePropertiesPopup?: boolean;
+  geoFeatures?: Feature[];
   selectedItem?: Feature;
+  onMapFeatureClick?: (feature: Feature | undefined) => void;
+  showFeaturePropertiesPopup?: boolean;
   showPolygonParts?: boolean;
+  fitOptions?: FitOptions | undefined;
+  style?: CSSProperties | undefined;
   children?: JSX.Element | null;
 }
 
@@ -75,14 +75,14 @@ const CHILDREN_WITH_ZOOM_INDICATION = ['PolygonPartsExtentQueryVectorLayer'];
 
 export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> = ({
   mode,
-  geoFeatures,
-  style,
-  fitOptions,
   layerRecord,
-  onMapFeatureClick,
-  enableFeaturePropertiesPopup = false,
+  geoFeatures,
   selectedItem,
+  onMapFeatureClick,
+  showFeaturePropertiesPopup = false,
   showPolygonParts = false,
+  fitOptions,
+  style,
   children,
 }) => {
   const store = useStore();
@@ -119,13 +119,6 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
       renderCount.current += 1;
     }
   });
-
-  useEffect(() => {
-    if (!enableFeaturePropertiesPopup) {
-      setSelectedFeature(undefined);
-      setIsOpenProperties(false);
-    }
-  }, [enableFeaturePropertiesPopup]);
 
   useEffect(() => {
     if (selectedFeature) {
@@ -307,7 +300,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
           options={{ properties: { id: 'SELECTED_PP' }, zIndex: 3 }}
         />
         <FlyToPP feature={selectedFeature} />
-        {enableFeaturePropertiesPopup && isOpenProperties && (
+        {showFeaturePropertiesPopup && isOpenProperties && (
           <FeaturePropertiesPopupComponent
             selectedFeature={selectedFeature}
             onClose={closePropertiesPopup}

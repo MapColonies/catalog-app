@@ -293,24 +293,6 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
     setAutoScrollListToSelection(false);
   }, []);
 
-  const queryExecutor = async (
-    bbox: BBox,
-    _startIndex: number
-  ): Promise<IQueryExecutorResponse> => {
-    if (!api) {
-      return { features: [], pageSize: -1 };
-    }
-    const result = await api.query.method({
-      minX: bbox[0],
-      minY: bbox[1],
-      maxX: bbox[2],
-      maxY: bbox[3],
-    });
-    const fetchedFeatures = get(result, 'features', []);
-    const features = Array.isArray(fetchedFeatures) ? fetchedFeatures : [];
-    return { features, pageSize: -1 };
-  };
-
   const shouldScrollToFeature = useCallback(
     (feature?: Feature): boolean => {
       const featureId = getFeatureIdentifier(feature);
@@ -338,6 +320,50 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
     },
     [filteredLowResolutionCollections]
   );
+
+  const onMapFeatureClick = (feature?: Feature) => {
+    if (feature?.properties?._featureType !== FeatureType.LOW_RESOLUTION_PP) {
+      setSelectedItem(undefined);
+      setAutoScrollListToSelection(false);
+      return;
+    }
+    const clickedFeatureId = getFeatureIdentifier(feature);
+    const clickedFeature = lowResolutionFeatures.find(
+      (feat) => getFeatureIdentifier(feat) === clickedFeatureId
+    );
+    const shouldSwitchToAllFilter =
+      listFilterMode === 'exceeded' &&
+      clickedFeature?.properties?.exceeded !== true;
+    if (shouldSwitchToAllFilter) {
+      setListFilterMode('all');
+    }
+    setAutoScrollListToSelection(
+      shouldSwitchToAllFilter ? true : shouldScrollToFeature(clickedFeature)
+    );
+    setSelectedItem(clickedFeature);
+  };
+
+  const queryExecutor = async (
+    bbox: BBox,
+    _startIndex: number
+  ): Promise<IQueryExecutorResponse> => {
+    if (!api) {
+      return { features: [], pageSize: -1 };
+    }
+    const result = await api.query.method({
+      minX: bbox[0],
+      minY: bbox[1],
+      maxX: bbox[2],
+      maxY: bbox[3],
+    });
+    const fetchedFeatures = get(result, 'features', []);
+    const features = Array.isArray(fetchedFeatures) ? fetchedFeatures : [];
+    return { features, pageSize: -1 };
+  };
+
+  const onQueryError = (errorMessage: string): void => {
+    setLowResolutionPartsError(errorMessage);
+  };
 
   return (
     <Box id="resolutionConflictDialog">
@@ -580,40 +606,18 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                 <GeoFeaturesPresentorComponent
                   mode={Mode.UPDATE}
                   layerRecord={state.context.updatedLayer}
-                  enableFeaturePropertiesPopup={true}
-                  style={{ height: '100%', minHeight: '300px' }}
                   selectedItem={selectedItem}
-                  onMapFeatureClick={(feature) => {
-                    if (feature?.properties?._featureType !== FeatureType.LOW_RESOLUTION_PP) {
-                      setSelectedItem(undefined);
-                      setAutoScrollListToSelection(false);
-                      return;
-                    }
-                    const clickedFeatureId = getFeatureIdentifier(feature);
-                    const clickedFeature = lowResolutionFeatures.find(
-                      (feat) => getFeatureIdentifier(feat) === clickedFeatureId
-                    );
-                    const shouldSwitchToAllFilter =
-                      listFilterMode === 'exceeded' &&
-                      clickedFeature?.properties?.exceeded !== true;
-                    if (shouldSwitchToAllFilter) {
-                      setListFilterMode('all');
-                    }
-                    setAutoScrollListToSelection(
-                      shouldSwitchToAllFilter ? true : shouldScrollToFeature(clickedFeature)
-                    );
-                    setSelectedItem(clickedFeature);
-                  }}
+                  onMapFeatureClick={onMapFeatureClick}
+                  showFeaturePropertiesPopup={true}
                   showPolygonParts={SHOW_PARTS_AFTER_INIT}
+                  style={{ height: '100%', minHeight: '300px' }}
                 >
                   {showLowResolutionPolygonParts && lowResolutionFeatures !== undefined ? (
                     <PolygonPartsExtentQueryVectorLayer
                       featureType={FeatureType.LOW_RESOLUTION_PP}
                       queryExecutor={queryExecutor}
                       outerPerimeter={outerPerimeter?.geometry}
-                      onQueryError={(errorMessage): void => {
-                        setLowResolutionPartsError(errorMessage);
-                      }}
+                      onQueryError={onQueryError}
                       options={{ properties: { id: FeatureType.LOW_RESOLUTION_PP }, zIndex: 2 }}
                     />
                   ) : null}
