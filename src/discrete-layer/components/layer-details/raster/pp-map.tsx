@@ -62,6 +62,7 @@ interface GeoFeaturesPresentorProps {
   geoFeatures?: Feature[];
   selectedItem?: Feature;
   onMapFeatureClick?: (feature: Feature | undefined) => void;
+  onError?: (errorMessage: string) => void;
   showFeaturePropertiesPopup?: boolean;
   showPolygonParts?: boolean;
   fitOptions?: FitOptions | undefined;
@@ -79,6 +80,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   geoFeatures,
   selectedItem,
   onMapFeatureClick,
+  onError,
   showFeaturePropertiesPopup = false,
   showPolygonParts = false,
   fitOptions,
@@ -297,6 +299,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
             featureType={FeatureType.EXISTING_PP}
             queryExecutor={queryExecutor}
             outerPerimeter={layerRecord?.footprint as Geometry | undefined}
+            onQueryError={onError}
             options={{ properties: { id: FeatureType.EXISTING_PP }, zIndex: 1 }}
           />
         )}
