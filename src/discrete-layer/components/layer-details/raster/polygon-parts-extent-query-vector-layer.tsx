@@ -126,11 +126,7 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<
       let nextStartIndex = startIndex;
 
       while (true) {
-        const extent = getCurrentExtent();
-        if (!extent) {
-          break;
-        }
-        const result = await queryExecutor(extent, nextStartIndex);
+        const result = await queryExecutor(bbox, nextStartIndex);
         const pageStartIndex = nextStartIndex;
 
         if (activeRequestIdRef.current !== requestId) {
