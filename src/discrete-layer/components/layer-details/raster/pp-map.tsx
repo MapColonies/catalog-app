@@ -94,6 +94,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   const [showExistingPolygonParts, setShowExistingPolygonParts] =
     useState<boolean>(showPolygonParts);
   const [childrenWithZoomIndication, setChildrenWithZoomIndication] = useState<boolean>(false);
+  const [isOpenProperties, setIsOpenProperties] = useState<boolean>(true);
 
   useEffect(() => {
     const childWithZoomIndication = React.Children.toArray(children).find((child) => {
@@ -122,8 +123,15 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   useEffect(() => {
     if (!enableFeaturePropertiesPopup) {
       setSelectedFeature(undefined);
+      setIsOpenProperties(false);
     }
   }, [enableFeaturePropertiesPopup]);
+
+  useEffect(() => {
+    if (selectedFeature) {
+      setIsOpenProperties(true);
+    }
+  }, [selectedFeature]);
 
   useEffect(() => {
     if (!selectedItem) {
@@ -147,6 +155,10 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   const clearSelection = useCallback((): void => {
     setSelectedFeature(undefined);
     onMapFeatureClick?.(undefined);
+  }, []);
+
+  const closePropertiesPopup = useCallback((): void => {
+    setIsOpenProperties(false);
   }, []);
 
   const previewBaseMap = useMemo(() => {
@@ -295,10 +307,10 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
           options={{ properties: { id: 'SELECTED_PP' }, zIndex: 3 }}
         />
         <FlyToPP feature={selectedFeature} />
-        {enableFeaturePropertiesPopup && (
+        {enableFeaturePropertiesPopup && isOpenProperties && (
           <FeaturePropertiesPopupComponent
             selectedFeature={selectedFeature}
-            onClose={clearSelection}
+            onClose={closePropertiesPopup}
           />
         )}
       </Map>
