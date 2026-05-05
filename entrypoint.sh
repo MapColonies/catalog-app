@@ -21,7 +21,8 @@ echo "Done with confd"
 
 echo "Running SED command -->" 's/{PUBLIC_URL_PLACEHOLDER}/'"$(echo "$CONFIGURATION_PUBLIC_URL" | sed 's/[^a-zA-Z0-9.]/\\&/g')"'/g'
 
-sed -i 's/{PUBLIC_URL_PLACEHOLDER}/'"$(echo "$CONFIGURATION_PUBLIC_URL" | sed 's/[^a-zA-Z0-9.]/\\&/g')"'/g' ./static/js/main.*.js
+find ./static/js -name '*.js' -exec \
+  sed -i 's/{PUBLIC_URL_PLACEHOLDER}/'"$(echo "$CONFIGURATION_PUBLIC_URL" | sed 's/[^a-zA-Z0-9.]/\\&/g')"'/g' {} +
 
 echo "Done with SED command"
 
