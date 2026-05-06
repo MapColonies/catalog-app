@@ -99,12 +99,18 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
   const totalFeaturesCount = useMemo(() => lowResolutionFeatures.length, [lowResolutionFeatures]);
 
   const hasExceededFeatures = useMemo(
-    () => lowResolutionFeatures.some((feature) => feature.properties?.[EXCEEDED_PROPERTY_NAME] === EXCEEDED_PROPERTY_VALUE),
+    () =>
+      lowResolutionFeatures.some(
+        (feature) => feature.properties?.[EXCEEDED_PROPERTY_NAME] === EXCEEDED_PROPERTY_VALUE
+      ),
     [lowResolutionFeatures]
   );
 
   const exceededFeaturesCount = useMemo(
-    () => lowResolutionFeatures.filter((feature) => feature.properties?.[EXCEEDED_PROPERTY_NAME] === EXCEEDED_PROPERTY_VALUE).length,
+    () =>
+      lowResolutionFeatures.filter(
+        (feature) => feature.properties?.[EXCEEDED_PROPERTY_NAME] === EXCEEDED_PROPERTY_VALUE
+      ).length,
     [lowResolutionFeatures]
   );
 
@@ -115,7 +121,9 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
 
     return lowResolutionCollections.map((collection) => ({
       ...collection,
-      features: collection.features.filter((feature) => feature.properties?.[EXCEEDED_PROPERTY_NAME] === EXCEEDED_PROPERTY_VALUE),
+      features: collection.features.filter(
+        (feature) => feature.properties?.[EXCEEDED_PROPERTY_NAME] === EXCEEDED_PROPERTY_VALUE
+      ),
     }));
   }, [lowResolutionCollections, listFilterMode]);
 
@@ -332,7 +340,8 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
       (feat) => getFeatureIdentifier(feat) === clickedFeatureId
     );
     const shouldSwitchToAllFilter =
-      listFilterMode === 'exceeded' && clickedFeature?.properties?.[EXCEEDED_PROPERTY_NAME] !== EXCEEDED_PROPERTY_VALUE;
+      listFilterMode === 'exceeded' &&
+      clickedFeature?.properties?.[EXCEEDED_PROPERTY_NAME] !== EXCEEDED_PROPERTY_VALUE;
     if (shouldSwitchToAllFilter) {
       setListFilterMode('all');
     }
@@ -491,7 +500,9 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                                     const isSelected =
                                       getFeatureIdentifier(feature) ===
                                       selectedLowResolutionFeatureId;
-                                    const isExceeded = feature.properties?.[EXCEEDED_PROPERTY_NAME] === EXCEEDED_PROPERTY_VALUE;
+                                    const isExceeded =
+                                      feature.properties?.[EXCEEDED_PROPERTY_NAME] ===
+                                      EXCEEDED_PROPERTY_VALUE;
                                     return (
                                       <Box
                                         className={`virtualizedFeatureItem${
