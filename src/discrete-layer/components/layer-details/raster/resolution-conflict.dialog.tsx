@@ -508,7 +508,6 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                                         key={key}
                                         style={style}
                                         onClick={(): void => {
-                                          setShowLowResolutionPolygonParts(true);
                                           setAutoScrollListToSelection(false);
                                           const selectedFeatureId = getFeatureIdentifier(feature);
                                           if (selectedFeatureId) {
