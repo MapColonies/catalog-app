@@ -646,44 +646,46 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                   showPolygonParts={SHOW_PARTS_AFTER_INIT}
                   style={{ height: '100%', minHeight: '300px' }}
                 >
-                  {showLowResolutionPolygonParts && lowResolutionFeatures !== undefined ? (
-                    <>
-                      <PolygonPartsExtentQueryVectorLayer
-                        featureType={FeatureType.LOW_RESOLUTION_PP}
-                        queryExecutor={queryExecutor}
-                        outerPerimeter={outerPerimeter?.geometry}
-                        onQueryError={onQueryError}
-                        options={{
-                          properties: { id: FeatureType.LOW_RESOLUTION_PP },
-                          zIndex: GeometryZIndex.LOW_RESOLUTION_GEOMETRY_ZINDEX,
-                        }}
-                      />
-                      <FlyTo
-                        feature={
-                          isGeometryEmpty(outerExceededPerimeter?.geometry)
-                            ? outerPerimeter
-                            : outerExceededPerimeter
-                        }
-                        flyOnce={true}
-                      />
-                      <VectorLayer
-                        options={{
-                          maxZoom: CONFIG.POLYGON_PARTS.MAX.SHOW_FOOTPRINT_ZOOM_LEVEL,
-                          zIndex: GeometryZIndex.EXCEEDED_GEOMETRY_ZINDEX,
-                        }}
-                      >
-                        <VectorSource>
-                          <GeoFeaturesInnerComponent
-                            geoFeatures={[
-                              ...(outerExceededPerimeter ? [outerExceededPerimeter] : []),
-                              ...(exceededGeometryMarkers?.features as Feature[]),
-                            ]}
-                            renderCount={{ current: 1 }}
-                          />
-                        </VectorSource>
-                      </VectorLayer>
-                    </>
-                  ) : null}
+                  <>
+                    {showLowResolutionPolygonParts && lowResolutionFeatures !== undefined ? (
+                      <>
+                        <PolygonPartsExtentQueryVectorLayer
+                          featureType={FeatureType.LOW_RESOLUTION_PP}
+                          queryExecutor={queryExecutor}
+                          outerPerimeter={outerPerimeter?.geometry}
+                          onQueryError={onQueryError}
+                          options={{
+                            properties: { id: FeatureType.LOW_RESOLUTION_PP },
+                            zIndex: GeometryZIndex.LOW_RESOLUTION_GEOMETRY_ZINDEX,
+                          }}
+                        />
+                        <VectorLayer
+                          options={{
+                            maxZoom: CONFIG.POLYGON_PARTS.MAX.SHOW_FOOTPRINT_ZOOM_LEVEL,
+                            zIndex: GeometryZIndex.EXCEEDED_GEOMETRY_ZINDEX,
+                          }}
+                        >
+                          <VectorSource>
+                            <GeoFeaturesInnerComponent
+                              geoFeatures={[
+                                ...(outerExceededPerimeter ? [outerExceededPerimeter] : []),
+                                ...(exceededGeometryMarkers?.features as Feature[]),
+                              ]}
+                              renderCount={{ current: 1 }}
+                            />
+                          </VectorSource>
+                        </VectorLayer>
+                      </>
+                    ) : null}
+                    <FlyTo
+                      feature={
+                        isGeometryEmpty(outerExceededPerimeter?.geometry)
+                          ? outerPerimeter
+                          : outerExceededPerimeter
+                      }
+                      flyOnce={true}
+                    />
+                  </>
                 </GeoFeaturesPresentorComponent>
               </Box>
             </Box>
