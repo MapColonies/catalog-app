@@ -16,15 +16,17 @@ import {
   TextField,
   Typography,
 } from '@map-colonies/react-core';
-import { isGeometryEmpty } from '../../../../common/utils/geo.tools';
 import { AutoDirectionBox } from '../../../../common/components/auto-direction-box/auto-direction-box.component';
 import { ValidationsError } from '../../../../common/components/error/validations.error-presentor';
 import { FlyTo } from '../../../../common/components/ol-map/fly-to';
+import CONFIG from '../../../../common/config';
 import { Domain } from '../../../../common/models/domain';
 import { Mode } from '../../../../common/models/mode.enum';
-import CONFIG from '../../../../common/config';
+import { isGeometryEmpty } from '../../../../common/utils/geo.tools';
 import { EntityDescriptorModelType } from '../../../models';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
+import { FeatureType } from './feature-type.enum';
+import { GeoFeaturesInnerComponent } from './geo-features-inner.component';
 import {
   IQueryExecutorResponse,
   PolygonPartsExtentQueryVectorLayer,
@@ -37,8 +39,6 @@ import { UpdateLayerHeader } from './update-layer-header';
 import { useWorkerAPI } from './worker/useWorkerAPI';
 import { extractProgressArray } from './worker/utils';
 import { Process } from './worker/worker.types';
-import { GeoFeaturesInnerComponent } from './geo-features-inner.component';
-import { FeatureType } from './feature-type.enum';
 
 import './resolution-conflict.dialog.css';
 
@@ -207,6 +207,15 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
     return intl.formatMessage({ id: 'resolutionConflict.partName' });
   }, []);
 
+  const initialFlyToFeature = useMemo(() => {
+    if (isLoadingLowResolutionParts) {
+      return undefined;
+    }
+    return isGeometryEmpty(outerExceededPerimeter?.geometry)
+      ? outerPerimeter
+      : outerExceededPerimeter;
+  }, [isLoadingLowResolutionParts, outerExceededPerimeter, outerPerimeter]);
+
   useEffect(() => {
     if (!api || hasLoadedRef.current) {
       return;
@@ -247,6 +256,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
       }
 
       const outerGeometry = await api.computeOuterGeometry.method();
+
       setOuterPerimeter({
         type: 'Feature',
         properties: {
@@ -673,14 +683,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                         </VectorLayer>
                       </>
                     ) : null}
-                    <FlyTo
-                      feature={
-                        isGeometryEmpty(outerExceededPerimeter?.geometry)
-                          ? outerPerimeter
-                          : outerExceededPerimeter
-                      }
-                      flyOnce={true}
-                    />
+                    <FlyTo feature={initialFlyToFeature} flyOnce={true} />
                   </>
                 </GeoFeaturesPresentorComponent>
               </Box>
