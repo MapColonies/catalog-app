@@ -69,7 +69,6 @@ export enum UserAction {
   SYSTEM_CALLBACK_SHOWFOOTPRINT = 'system_callback.showFootprint',
   SYSTEM_CALLBACK_SHOWLAYERIMAGE = 'system_callback.showLayerImage',
   SYSTEM_CALLBACK_SHOWPOLYGONPARTS = 'system_callback.showPolygonParts',
-  SYSTEM_CALLBACK_SHOW_PPERROR_ON_UPDATE = 'system_callback.showPPErrorOnUpdate',
 
   SYSTEM_CALLBACK_OPEN_JOB_MANAGER = 'system_callback.openJobManager',
 }
@@ -108,7 +107,6 @@ const ROLES: IRole[] = [
       [UserAction.SYSTEM_ACTION_FILTER]: {enabled: false},
       [UserAction.SYSTEM_ACTION_FREETEXTSEARCH]: {enabled: true},
       [UserAction.SYSTEM_ACTION_SIDEBARCOLLAPSEEXPAND]: {enabled: true},
-      [UserAction.SYSTEM_CALLBACK_SHOW_PPERROR_ON_UPDATE]: {enabled: true},
       [UserAction.ENTITY_ACTION_LAYERRASTERRECORD_CREATE]: {enabled: true},
       [UserAction.ENTITY_ACTION_LAYER3DRECORD_CREATE]: {enabled: true},
       [UserAction.ENTITY_ACTION_LAYERDEMRECORD_CREATE]: {enabled: false},
@@ -165,7 +163,6 @@ const ROLES: IRole[] = [
       [UserAction.SYSTEM_ACTION_FILTER]: {enabled: false},
       [UserAction.SYSTEM_ACTION_FREETEXTSEARCH]: {enabled: true},
       [UserAction.SYSTEM_ACTION_SIDEBARCOLLAPSEEXPAND]: {enabled: true},
-      [UserAction.SYSTEM_CALLBACK_SHOW_PPERROR_ON_UPDATE]: {enabled: false},
       [UserAction.ENTITY_ACTION_LAYERRASTERRECORD_CREATE]: {enabled: false},
       [UserAction.ENTITY_ACTION_LAYER3DRECORD_CREATE]: {enabled: false},
       [UserAction.ENTITY_ACTION_LAYERDEMRECORD_CREATE]: {enabled: false},

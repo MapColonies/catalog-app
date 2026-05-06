@@ -221,6 +221,8 @@
   "context-menu.title.tooltip": "Actions on topmost layer: ",
   "context-menu.sub-title.tooltip": "overlapping layers",
 
+  "update-layer-header.error.emptyLayerRecord": "Unavailable data",
+
   "details-panel.no-selection": "No selection",
 
   "polygon-parts.button.load-from-shapeFile": "Load SHP",
@@ -228,10 +230,11 @@
   "polygon-parts.show-exisitng-parts-on-map.label": "Show existing polygon parts",
   "polygon-parts.show-low-resolution-parts-on-map.label": "Show low resolution polygon parts",
   "polygon-parts.map-preview-legend.title": "Legend",
-  "polygon-parts.map-preview-legend.PP_PERIMETER": "Polygon parts Perimeter",
   "polygon-parts.map-preview-legend.SOURCE_EXTENT": "Source Extent",
+  "polygon-parts.map-preview-legend.PP_PERIMETER": "Polygon parts Perimeter",
   "polygon-parts.map-preview-legend.EXISTING_PP": "Existing polygon parts",
   "polygon-parts.map-preview-legend.LOW_RESOLUTION_PP": "Low resolution polygon parts",
+  "polygon-parts.map-preview-legend.LOW_RESOLUTION_PP_EXCEEDED": "Exceeded polygon parts",
   "polygon-parts.map-preview.zoom-before-fetch": "Zoom in to see the parts",
   "polygon-parts.map-preview.no-feature-properties": "No properties available",
 

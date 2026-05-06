@@ -221,6 +221,8 @@
   "context-menu.title.tooltip": "פעולות על השכבה העליונה: ",
   "context-menu.sub-title.tooltip": "שכבות חופפות בנקודה שנבחרה",
 
+  "update-layer-header.error.emptyLayerRecord": "מידע אינו זמין",
+
   "details-panel.no-selection": "לא נבחר פריט",
 
   "polygon-parts.button.load-from-shapeFile": "טען Shape",
@@ -228,10 +230,11 @@
   "polygon-parts.show-exisitng-parts-on-map.label": "הצג חלקי תיחום הקיימים",
   "polygon-parts.show-low-resolution-parts-on-map.label": "הצג חלקי תיחום עם רזולוציה נמוכה",
   "polygon-parts.map-preview-legend.title": "מקרא",
-  "polygon-parts.map-preview-legend.PP_PERIMETER": "היקף של חלקי התיחום",
   "polygon-parts.map-preview-legend.SOURCE_EXTENT": "שטח המקור",
+  "polygon-parts.map-preview-legend.PP_PERIMETER": "היקף של חלקי התיחום",
   "polygon-parts.map-preview-legend.EXISTING_PP": "חלקי תיחום הקיימים",
   "polygon-parts.map-preview-legend.LOW_RESOLUTION_PP": "חלקי תיחום עם רזולוציה נמוכה",
+  "polygon-parts.map-preview-legend.LOW_RESOLUTION_PP_EXCEEDED": "חלקי תיחום חורגים",
   "polygon-parts.map-preview.zoom-before-fetch": "התקרב כדי לראות את חלקי התיחום",
   "polygon-parts.map-preview.no-feature-properties": "אין מאפיינים להצגה",
 
