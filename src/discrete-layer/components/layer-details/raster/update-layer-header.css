@@ -18,6 +18,14 @@
   overflow-y: auto;
 }
 
+#updateLayerHeader .emptyLayerRecordError {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  font-weight: bold;
+}
+
 #updateLayerHeader .lockedIcon {
   position: absolute;
   right: 50px;

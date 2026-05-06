@@ -221,6 +221,8 @@
   "context-menu.title.tooltip": "פעולות על השכבה העליונה: ",
   "context-menu.sub-title.tooltip": "שכבות חופפות בנקודה שנבחרה",
 
+  "update-layer-header.error.emptyLayerRecord": "מידע אינו זמין",
+
   "details-panel.no-selection": "לא נבחר פריט",
 
   "polygon-parts.button.load-from-shapeFile": "טען Shape",

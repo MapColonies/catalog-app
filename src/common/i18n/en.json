@@ -221,6 +221,8 @@
   "context-menu.title.tooltip": "Actions on topmost layer: ",
   "context-menu.sub-title.tooltip": "overlapping layers",
 
+  "update-layer-header.error.emptyLayerRecord": "Unavailable data",
+
   "details-panel.no-selection": "No selection",
 
   "polygon-parts.button.load-from-shapeFile": "Load SHP",

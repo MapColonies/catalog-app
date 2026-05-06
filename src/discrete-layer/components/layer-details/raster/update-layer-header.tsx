@@ -15,23 +15,39 @@ interface UpdateLayerHeaderProps {
   layerRecord?: ILayerImage | null;
 }
 
+const isLayerRecordEmpty = (record?: ILayerImage | null): boolean => {
+  if (!record) {
+    return true;
+  }
+  return record.id === 'DEFAULT_UI_ID';
+};
+
 export const UpdateLayerHeader: React.FC<UpdateLayerHeaderProps> = ({
   entityDescriptors,
   layerRecord,
 }) => {
   const intl = useIntl();
   const state = RasterWorkflowContext.useSelector((s) => s);
+  const isEmpty = isLayerRecordEmpty(layerRecord);
 
   return (
     <Box id="updateLayerHeader">
       <Box className="updateLayer">
-        <LayersDetailsComponent
-          className="detailsPanelProductView"
-          entityDescriptors={entityDescriptors}
-          layerRecord={layerRecord}
-          isBrief={true}
-          mode={Mode.VIEW}
-        />
+        {isEmpty ? (
+          <Box className="emptyLayerRecordError error">
+            <Typography tag="span">
+              {intl.formatMessage({ id: 'update-layer-header.error.emptyLayerRecord' })}
+            </Typography>
+          </Box>
+        ) : (
+          <LayersDetailsComponent
+            className="detailsPanelProductView"
+            entityDescriptors={entityDescriptors}
+            layerRecord={layerRecord}
+            isBrief={true}
+            mode={Mode.VIEW}
+          />
+        )}
       </Box>
       {state.context.selectionMode === 'restore' &&
         state.context.flowType === Mode.UPDATE &&
