@@ -8,9 +8,15 @@ import {
   GeoJsonProperties,
   Polygon,
   MultiPolygon,
+  Point,
+  Position,
 } from 'geojson';
 import RBush from 'rbush';
-import { DEGREES_PER_METER, ONE_DEGREE_KM } from '../../../../../common/utils/geo.tools';
+import {
+  DEGREES_PER_METER,
+  getFirstPoint,
+  ONE_DEGREE_KM,
+} from '../../../../../common/utils/geo.tools';
 import { abortableFetch, safeRead } from '../../../../../common/helpers/http';
 import {
   WorkerAPI,
@@ -26,6 +32,7 @@ import {
   WorkerError,
 } from './worker.types';
 import { createMessageDetails } from './utils';
+import { FeatureType } from '../feature-type.enum';
 
 type ShpJsParser = (buffer: ArrayBuffer) => Promise<unknown>;
 
@@ -157,7 +164,24 @@ const _downloadFile = async (
   }
 };
 
-const isFeatureCollection = (
+const _getFirstPointsFromRings = (geojson: Geometry) => {
+  // @ts-ignore
+  const { type, coordinates } = geojson;
+
+  let pos: Position[];
+
+  if (type === 'MultiPolygon') {
+    pos = coordinates.map((poly) => poly?.[0]?.[0]).filter(Boolean);
+  } else if (type === 'GeometryCollection') {
+    pos = geojson.geometries.map((geom) => getFirstPoint(geom));
+  } else {
+    pos = [getFirstPoint(geojson)];
+  }
+
+  return pos;
+};
+
+const _isFeatureCollection = (
   value: unknown
 ): value is FeatureCollection<Geometry, GeoJsonProperties> => {
   return (
@@ -169,14 +193,14 @@ const isFeatureCollection = (
 };
 
 const toFeatureCollection = (parsed: unknown): FeatureCollection<Geometry, GeoJsonProperties> => {
-  if (isFeatureCollection(parsed)) {
+  if (_isFeatureCollection(parsed)) {
     return parsed;
   }
 
   if (Array.isArray(parsed)) {
     const features: Array<Feature<Geometry, GeoJsonProperties>> = [];
     parsed.forEach((item) => {
-      if (isFeatureCollection(item)) {
+      if (_isFeatureCollection(item)) {
         features.push(...item.features);
       }
     });
@@ -393,7 +417,6 @@ const api: WorkerAPI = {
       details: details,
     });
   },
-
   async computeOuterGeometry(
     onProgress?: (p: WorkerMessage | null) => void,
     predicate?: (properties: Record<string, unknown>) => boolean
@@ -496,6 +519,27 @@ const api: WorkerAPI = {
     return {
       type: 'FeatureCollection',
       features: featuresArray,
+    };
+  },
+  getMarkersFromGeometry(geometry: Geometry) {
+    const positions = _getFirstPointsFromRings(geometry);
+
+    const prop = {
+      _featureType: FeatureType.PP_PERIMETER_MARKER,
+    };
+
+    const features: Feature<Point>[] = positions.map((coord) => ({
+      type: 'Feature',
+      geometry: {
+        type: 'Point',
+        coordinates: coord,
+      },
+      properties: prop,
+    }));
+
+    return {
+      type: 'FeatureCollection',
+      features,
     };
   },
   query(bbox: BBoxObj, onProgress?: (p: WorkerMessage | null) => void): FeatureCollection {

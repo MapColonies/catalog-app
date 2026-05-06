@@ -4,19 +4,18 @@ import { Style, Stroke, Fill, Text, Icon } from 'ol/style';
 import CONFIG from '../../../../common/config';
 import { IEnumsMapType } from '../../../../common/contexts/enumsMap.context';
 import { dateFormatter } from '../../../../common/helpers/formatters';
-import { LayerRasterRecordModelType } from '../../../models';
-
-export enum FeatureType {
-  PP_PERIMETER = 'PP_PERIMETER',
-  PP_PERIMETER_MARKER = 'PP_PERIMETER_MARKER',
-  SOURCE_EXTENT = 'SOURCE_EXTENT',
-  SOURCE_EXTENT_MARKER = 'SOURCE_EXTENT_MARKER',
-  EXISTING_PP = 'EXISTING_PP',
-  LOW_RESOLUTION_PP = 'LOW_RESOLUTION_PP',
-}
+import { LayerRasterRecordModelType } from '../../../models/LayerRasterRecordModel';
+import { FeatureType } from './feature-type.enum';
 
 export const EXCEEDED_PROPERTY_NAME = 'res_exceed';
 export const EXCEEDED_PROPERTY_VALUE = 'true';
+
+export enum GeometryZIndex {
+  EXISTING_GEOMETRY_ZINDEX = 1,
+  LOW_RESOLUTION_GEOMETRY_ZINDEX = 2,
+  EXCEEDED_GEOMETRY_ZINDEX = 3,
+  SELECTED_GEOMETRY_ZINDEX = 4,
+}
 
 interface IStyleByProp {
   style: Style;

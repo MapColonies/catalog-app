@@ -1,5 +1,5 @@
 import { FeatureCollection, Geometry } from 'geojson';
-import { FeatureType } from '../pp-map.utils';
+import { FeatureType } from '../feature-type.enum';
 
 export type BBoxObj = {
   minX: number;
@@ -38,6 +38,7 @@ export interface WorkerAPI {
     predicate?: (property: Record<string, unknown>) => boolean
   ): Promise<Geometry>;
   getFeatureCollection(onProgress?: (p: WorkerMessage | null) => void): FeatureCollection;
+  getMarkersFromGeometry(geometry: Geometry): FeatureCollection;
   query(bbox: BBoxObj, onProgress?: (p: WorkerMessage | null) => void): FeatureCollection;
 }
 

@@ -39,6 +39,9 @@ type WorkerService = {
     method: () => Promise<FeatureCollection>;
     progress: WorkerMessage | null;
   };
+  getMarkersFromGeometry: {
+    method: (geometry: Geometry) => Promise<FeatureCollection>;
+  };
   query: {
     method: (bbox: BBoxObj) => Promise<FeatureCollection>;
     progress: WorkerMessage | null;
@@ -77,6 +80,8 @@ export function useWorkerAPI(
       ) => await wrapped.computeOuterGeometry(onProgress, predicate),
       getFeatureCollection: async (onProgress?: (p: WorkerMessage | null) => void) =>
         await wrapped.getFeatureCollection(onProgress),
+      getMarkersFromGeometry: async (geometry: Geometry) =>
+        await wrapped.getMarkersFromGeometry(geometry),
       query: async (
         bbox: BBoxObj,
         onProgress?: (p: WorkerMessage | null) => void
@@ -156,7 +161,6 @@ export function useWorkerAPI(
         },
         progress: progressComputeArea,
       },
-
       computeOuterGeometry: {
         method: async (predicate?: (properties: Record<string, unknown>) => boolean) => {
           const t0 = performance.now();
@@ -195,6 +199,12 @@ export function useWorkerAPI(
               // console.log('**** GET FEATURECOLLECTION: ', p);
             })
           );
+        },
+        progress: null,
+      },
+      getMarkersFromGeometry: {
+        method: async (geometry: Geometry): Promise<FeatureCollection> => {
+          return await workerApi.getMarkersFromGeometry(geometry);
         },
         progress: null,
       },
