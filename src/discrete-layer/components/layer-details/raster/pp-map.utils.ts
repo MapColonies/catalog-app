@@ -15,6 +15,9 @@ export enum FeatureType {
   LOW_RESOLUTION_PP = 'LOW_RESOLUTION_PP',
 }
 
+export const EXCEEDED_PROPERTY_NAME = 'res_exceed';
+export const EXCEEDED_PROPERTY_VALUE = 'true';
+
 interface IStyleByProp {
   style: Style;
   prop?: string;
@@ -97,10 +100,10 @@ export const PPMapStyles = new Map<FeatureType, IStyleByProp>([
           color: '#FF7F0066',
         }),
       }),
-      prop: 'exceeded',
+      prop: EXCEEDED_PROPERTY_NAME,
       values: [
         {
-          value: true,
+          value: EXCEEDED_PROPERTY_VALUE,
           style: new Style({
             stroke: new Stroke({
               width: 2,
