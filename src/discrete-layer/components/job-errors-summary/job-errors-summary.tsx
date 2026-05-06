@@ -17,6 +17,7 @@ interface ErrorCountProps {
 interface RasterErrorsSummaryOptions {
   key?: string;
   action?: (key: string) => void;
+  isEnabled?: boolean;
   isApproved?: boolean;
 }
 
@@ -87,6 +88,7 @@ export const JobErrorsSummary = (
               type="button"
               outlined
               className="resolutionConflictButton"
+              disabled={options?.isEnabled === false}
               style={{ color: 'orange', borderColor: 'orange', fontWeight: 'bold' }}
               onClick={(e): void => {
                 e.preventDefault();
