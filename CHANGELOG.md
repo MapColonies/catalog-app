@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.9.1](https://github.com/MapColonies/catalog-app/compare/v4.9.0...v4.9.1) (2026-05-06)
+
+
+### Bug Fixes
+
+* exceeded perimeter blinks on click ([c7b7fab](https://github.com/MapColonies/catalog-app/commit/c7b7fabd240c9397167e9e07dbd96b85d6466384))
+* filter by e_res ([#912](https://github.com/MapColonies/catalog-app/issues/912)) ([35f7839](https://github.com/MapColonies/catalog-app/commit/35f783903b9c62e11c2717687e2925bf00e7052a))
+
 ## [4.9.0](https://github.com/MapColonies/catalog-app/compare/v4.8.4...v4.9.0) (2026-05-06)
 
 
