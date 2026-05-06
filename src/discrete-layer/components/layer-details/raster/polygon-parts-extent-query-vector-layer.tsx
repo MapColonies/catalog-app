@@ -113,11 +113,6 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<
 
     const requestId = activeRequestIdRef.current + 1;
     activeRequestIdRef.current = requestId;
-
-    if (startIndex === START) {
-      setPolygonParts([]);
-    }
-
     showLoadingSpinner(true);
 
     try {
