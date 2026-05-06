@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.9.0](https://github.com/MapColonies/catalog-app/compare/v4.8.4...v4.9.0) (2026-05-06)
+
+
+### Features
+
+* outer exceeded geometry markers ([#905](https://github.com/MapColonies/catalog-app/issues/905)) ([49f6fc8](https://github.com/MapColonies/catalog-app/commit/49f6fc8355270591cb480245b6f08899f2558765))
+
+
+### Bug Fixes
+
+* error handling ([#901](https://github.com/MapColonies/catalog-app/issues/901)) ([5e710eb](https://github.com/MapColonies/catalog-app/commit/5e710eb3780aa1bfe738c0b5c036487c718ee36b))
+* flyto once is permanent child ([#902](https://github.com/MapColonies/catalog-app/issues/902)) ([62e1ee4](https://github.com/MapColonies/catalog-app/commit/62e1ee488fdea2905435edd77e7c39258399d9cd))
+* initial fly to ([#907](https://github.com/MapColonies/catalog-app/issues/907)) ([f75e419](https://github.com/MapColonies/catalog-app/commit/f75e419fd9e7b4f540dc9b9c48404377e91372ae))
+* revert ([ffc287a](https://github.com/MapColonies/catalog-app/commit/ffc287a33f6ca1830ca97649a6d13e8d7d9e6e5b))
+* stale green geometries ([1438d13](https://github.com/MapColonies/catalog-app/commit/1438d13e43d4ea8711fcee656a8fd8e2a7f54a7c))
+
 ## [4.8.4](https://github.com/MapColonies/catalog-app/compare/v4.8.3...v4.8.4) (2026-05-06)
 
 
