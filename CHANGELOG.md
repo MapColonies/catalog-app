@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.8.5](https://github.com/MapColonies/catalog-app/compare/v4.8.4...v4.8.5) (2026-05-06)
+
+
+### Bug Fixes
+
+* flyto once is permanent child ([#902](https://github.com/MapColonies/catalog-app/issues/902)) ([62e1ee4](https://github.com/MapColonies/catalog-app/commit/62e1ee488fdea2905435edd77e7c39258399d9cd))
+
 ## [4.8.4](https://github.com/MapColonies/catalog-app/compare/v4.8.3...v4.8.4) (2026-05-06)
 
 
