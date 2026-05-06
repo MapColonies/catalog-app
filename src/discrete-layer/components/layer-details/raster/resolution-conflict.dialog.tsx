@@ -623,8 +623,8 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                   showPolygonParts={SHOW_PARTS_AFTER_INIT}
                   style={{ height: '100%', minHeight: '300px' }}
                 >
-                  {showLowResolutionPolygonParts && lowResolutionFeatures !== undefined ? (
-                    <>
+                  <>
+                    {showLowResolutionPolygonParts && lowResolutionFeatures !== undefined ? (
                       <PolygonPartsExtentQueryVectorLayer
                         featureType={FeatureType.LOW_RESOLUTION_PP}
                         queryExecutor={queryExecutor}
@@ -632,9 +632,9 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                         onQueryError={onQueryError}
                         options={{ properties: { id: FeatureType.LOW_RESOLUTION_PP }, zIndex: 2 }}
                       />
-                      <FlyTo feature={outerPerimeter} flyOnce={true} />
-                    </>
-                  ) : null}
+                    ) : null}
+                    <FlyTo feature={outerPerimeter} flyOnce={true} />
+                  </>
                 </GeoFeaturesPresentorComponent>
               </Box>
             </Box>
