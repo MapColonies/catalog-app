@@ -28,7 +28,7 @@ import {
   PolygonPartsExtentQueryVectorLayer,
 } from './polygon-parts-extent-query-vector-layer';
 import { GeoFeaturesPresentorComponent } from './pp-map';
-import { FeatureType } from './pp-map.utils';
+import { EXCEEDED_PROPERTY_NAME, EXCEEDED_PROPERTY_VALUE, FeatureType } from './pp-map.utils';
 import { ProgressCurtain } from './progressCurtain/progressCurtain';
 import { RasterWorkflowContext } from './state-machine/context';
 import { UpdateLayerHeader } from './update-layer-header';
@@ -99,12 +99,18 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
   const totalFeaturesCount = useMemo(() => lowResolutionFeatures.length, [lowResolutionFeatures]);
 
   const hasExceededFeatures = useMemo(
-    () => lowResolutionFeatures.some((feature) => feature.properties?.exceeded === true),
+    () =>
+      lowResolutionFeatures.some(
+        (feature) => feature.properties?.[EXCEEDED_PROPERTY_NAME] === EXCEEDED_PROPERTY_VALUE
+      ),
     [lowResolutionFeatures]
   );
 
   const exceededFeaturesCount = useMemo(
-    () => lowResolutionFeatures.filter((feature) => feature.properties?.exceeded === true).length,
+    () =>
+      lowResolutionFeatures.filter(
+        (feature) => feature.properties?.[EXCEEDED_PROPERTY_NAME] === EXCEEDED_PROPERTY_VALUE
+      ).length,
     [lowResolutionFeatures]
   );
 
@@ -115,7 +121,9 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
 
     return lowResolutionCollections.map((collection) => ({
       ...collection,
-      features: collection.features.filter((feature) => feature.properties?.exceeded === true),
+      features: collection.features.filter(
+        (feature) => feature.properties?.[EXCEEDED_PROPERTY_NAME] === EXCEEDED_PROPERTY_VALUE
+      ),
     }));
   }, [lowResolutionCollections, listFilterMode]);
 
@@ -237,7 +245,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
       });
 
       const outerExceededGeometry = await api.computeOuterGeometry.method(
-        (properties) => properties.exceeded === true
+        (properties) => properties[EXCEEDED_PROPERTY_NAME] === EXCEEDED_PROPERTY_VALUE
       );
 
       const featureCollection = await api.getFeatureCollection.method();
@@ -332,7 +340,8 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
       (feat) => getFeatureIdentifier(feat) === clickedFeatureId
     );
     const shouldSwitchToAllFilter =
-      listFilterMode === 'exceeded' && clickedFeature?.properties?.exceeded !== true;
+      listFilterMode === 'exceeded' &&
+      clickedFeature?.properties?.[EXCEEDED_PROPERTY_NAME] !== EXCEEDED_PROPERTY_VALUE;
     if (shouldSwitchToAllFilter) {
       setListFilterMode('all');
     }
@@ -491,7 +500,9 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                                     const isSelected =
                                       getFeatureIdentifier(feature) ===
                                       selectedLowResolutionFeatureId;
-                                    const isExceeded = feature.properties?.exceeded === true;
+                                    const isExceeded =
+                                      feature.properties?.[EXCEEDED_PROPERTY_NAME] ===
+                                      EXCEEDED_PROPERTY_VALUE;
                                     return (
                                       <Box
                                         className={`virtualizedFeatureItem${
