@@ -83,8 +83,8 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
   const [listFilterMode, setListFilterMode] = useState<FilterMode>('all');
   const [selectedItem, setSelectedItem] = useState<Feature>();
   const [polygonPartsErrors, setPolygonPartsErrors] = useState<string[] | undefined>();
-  const storePolygonPartsErrors = state.context.store.discreteLayersStore.customValidationError
-    ?.error;
+  const storePolygonPartsErrors =
+    state.context.store.discreteLayersStore.customValidationError?.error;
   const displayedPolygonPartsErrors = polygonPartsErrors ?? storePolygonPartsErrors;
   const selectedLowResolutionFeatureId = getFeatureIdentifier(selectedItem);
   const reportUrl = state.context.job?.validationReport?.report?.url;
@@ -602,7 +602,9 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                   </Button>
                   {displayedPolygonPartsErrors && (
                     <Box className="errorMessage">
-                      <ValidationsError errors={{ polygonPartsErrors: displayedPolygonPartsErrors }} />
+                      <ValidationsError
+                        errors={{ polygonPartsErrors: displayedPolygonPartsErrors }}
+                      />
                     </Box>
                   )}
                 </Box>
