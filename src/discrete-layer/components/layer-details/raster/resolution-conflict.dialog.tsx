@@ -83,6 +83,9 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
   const [listFilterMode, setListFilterMode] = useState<FilterMode>('all');
   const [selectedItem, setSelectedItem] = useState<Feature>();
   const [polygonPartsErrors, setPolygonPartsErrors] = useState<string[] | undefined>();
+  const storePolygonPartsErrors = state.context.store.discreteLayersStore.customValidationError
+    ?.error;
+  const displayedPolygonPartsErrors = polygonPartsErrors ?? storePolygonPartsErrors;
   const selectedLowResolutionFeatureId = getFeatureIdentifier(selectedItem);
   const reportUrl = state.context.job?.validationReport?.report?.url;
   const ingestionResolution = state.context.job?.details?.parameters?.ingestionResolution as
@@ -90,11 +93,6 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
     | undefined;
   const entityDescriptors = state.context.store.discreteLayersStore
     ?.entityDescriptors as EntityDescriptorModelType[];
-
-  useEffect(() => {
-    const errors = state.context.store.discreteLayersStore.customValidationError?.error;
-    setPolygonPartsErrors(errors);
-  }, [state.context.store.discreteLayersStore.customValidationError]);
 
   const lowResolutionFeatures = useMemo(
     () => lowResolutionCollections.flatMap((c) => c.features),
@@ -602,9 +600,9 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                   <Button type="button" onClick={closeDialog}>
                     <FormattedMessage id="general.close-btn.text" />
                   </Button>
-                  {polygonPartsErrors && (
+                  {displayedPolygonPartsErrors && (
                     <Box className="errorMessage">
-                      <ValidationsError errors={{ polygonPartsErrors }} />
+                      <ValidationsError errors={{ polygonPartsErrors: displayedPolygonPartsErrors }} />
                     </Box>
                   )}
                 </Box>
