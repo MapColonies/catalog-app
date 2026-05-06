@@ -234,7 +234,7 @@
   "polygon-parts.map-preview-legend.PP_PERIMETER": "Polygon parts Perimeter",
   "polygon-parts.map-preview-legend.EXISTING_PP": "Existing polygon parts",
   "polygon-parts.map-preview-legend.LOW_RESOLUTION_PP": "Low resolution polygon parts",
-  "polygon-parts.map-preview-legend.LOW_RESOLUTION_PP_EXCEEDED": "Exceeded low resolution",
+  "polygon-parts.map-preview-legend.LOW_RESOLUTION_PP_EXCEEDED": "Exceeded polygon parts",
   "polygon-parts.map-preview.zoom-before-fetch": "Zoom in to see the parts",
   "polygon-parts.map-preview.no-feature-properties": "No properties available",
 
