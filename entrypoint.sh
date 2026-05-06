@@ -19,21 +19,16 @@ fi
 echo "Done with confd"
 
 
-# Normalize public URL used by CRA chunks.
-# Webpack appends /static/js itself for chunk loading, so if the env value is
-# already '/static/js' worker chunks may try to load '/static/js/static/js/...'.
 PUBLIC_URL_NORMALIZED="${CONFIGURATION_PUBLIC_URL:-}"
 
 if [ "$PUBLIC_URL_NORMALIZED" = "." ]; then
   PUBLIC_URL_NORMALIZED=""
 fi
 
-# Remove trailing slash (except when empty)
 if [ -n "$PUBLIC_URL_NORMALIZED" ]; then
   PUBLIC_URL_NORMALIZED="${PUBLIC_URL_NORMALIZED%/}"
 fi
 
-# Guard against accidental '/static/js' suffix in deployment values
 case "$PUBLIC_URL_NORMALIZED" in
   */static/js)
     PUBLIC_URL_NORMALIZED="${PUBLIC_URL_NORMALIZED%/static/js}"

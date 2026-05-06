@@ -63,7 +63,6 @@ interface GeoFeaturesPresentorProps {
   geoFeatures?: Feature[];
   selectedItem?: Feature;
   onMapFeatureClick?: (feature: Feature | undefined) => void;
-  onError?: (errorMessage: string) => void;
   showFeaturePropertiesPopup?: boolean;
   showPolygonParts?: boolean;
   fitOptions?: FitOptions | undefined;
@@ -81,7 +80,6 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   geoFeatures,
   selectedItem,
   onMapFeatureClick,
-  onError,
   showFeaturePropertiesPopup = false,
   showPolygonParts = false,
   fitOptions,
@@ -136,14 +134,22 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   useEffect(() => {
     if (selectedFeature) {
       setIsOpenProperties(true);
+    } else {
+      setIsOpenProperties(false);
     }
   }, [selectedFeature]);
 
   useEffect(() => {
-    if (!selectedItem) {
+    if (selectedItem) {
+      setSelectedFeature(selectedItem);
       return;
     }
-    setSelectedFeature(selectedItem);
+    setSelectedFeature((prev) => {
+      if (prev?.properties?._featureType === FeatureType.LOW_RESOLUTION_PP) {
+        return undefined;
+      }
+      return prev;
+    });
   }, [selectedItem]);
 
   useEffect(() => {
@@ -152,16 +158,10 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
       selectedFeatureType === FeatureType.EXISTING_PP ||
       selectedFeatureType === FeatureType.LOW_RESOLUTION_PP ||
       !!selectedItem;
-
     if (!isManagedExternally) {
       setSelectedFeature(undefined);
     }
   }, [selectedFeature, selectedItem]);
-
-  const clearSelection = useCallback((): void => {
-    setSelectedFeature(undefined);
-    onMapFeatureClick?.(undefined);
-  }, []);
 
   const closePropertiesPopup = useCallback((): void => {
     setIsOpenProperties(false);
@@ -228,6 +228,15 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
         });
       }
     });
+    const exceededStyle = PPMapStyles.get(FeatureType.LOW_RESOLUTION_PP)?.values?.[0]?.style;
+    if (exceededStyle) {
+      res.push({
+        title: intl.formatMessage({
+          id: 'polygon-parts.map-preview-legend.LOW_RESOLUTION_PP_EXCEEDED',
+        }) as string,
+        style: exceededStyle,
+      });
+    }
     return res;
   }, []);
 
@@ -288,9 +297,6 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
                 evt.stopPropagation();
                 const isChecked = evt.currentTarget.checked;
                 setShowExistingPolygonParts(isChecked);
-                if (!isChecked) {
-                  clearSelection();
-                }
               }}
             />
           </Box>
@@ -300,7 +306,6 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
             featureType={FeatureType.EXISTING_PP}
             queryExecutor={queryExecutor}
             outerPerimeter={layerRecord?.footprint as Geometry | undefined}
-            onQueryError={onError}
             options={{
               properties: { id: FeatureType.EXISTING_PP },
               zIndex: GeometryZIndex.EXISTING_GEOMETRY_ZINDEX,

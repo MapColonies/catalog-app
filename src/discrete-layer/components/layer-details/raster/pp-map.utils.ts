@@ -28,29 +28,6 @@ interface IStyleByProp {
 
 export const PPMapStyles = new Map<FeatureType, IStyleByProp>([
   [
-    FeatureType.PP_PERIMETER,
-    {
-      style: new Style({
-        stroke: new Stroke({
-          width: 4,
-          color: '#000000',
-        }),
-      }),
-    },
-  ],
-  [
-    FeatureType.PP_PERIMETER_MARKER,
-    {
-      style: new Style({
-        image: new Icon({
-          scale: 0.2,
-          anchor: [0.5, 1],
-          src: 'assets/img/map-marker.gif',
-        }),
-      }),
-    },
-  ],
-  [
     FeatureType.SOURCE_EXTENT,
     {
       style: new Style({
@@ -63,6 +40,29 @@ export const PPMapStyles = new Map<FeatureType, IStyleByProp>([
   ],
   [
     FeatureType.SOURCE_EXTENT_MARKER,
+    {
+      style: new Style({
+        image: new Icon({
+          scale: 0.2,
+          anchor: [0.5, 1],
+          src: 'assets/img/map-marker.gif',
+        }),
+      }),
+    },
+  ],
+  [
+    FeatureType.PP_PERIMETER,
+    {
+      style: new Style({
+        stroke: new Stroke({
+          width: 4,
+          color: '#000000',
+        }),
+      }),
+    },
+  ],
+  [
+    FeatureType.PP_PERIMETER_MARKER,
     {
       style: new Style({
         image: new Icon({

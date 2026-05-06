@@ -98,6 +98,7 @@ const JobInfoComponent: React.FC<JobInfoProps> = ({ job }) => {
                   {
                     key: 'resolution',
                     action: openResolutionConflictDialog,
+                    isEnabled: taskStatus === Status.Completed,
                     isApproved: isResolutionConflictApproved,
                   }
                 )}

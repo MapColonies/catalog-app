@@ -18,8 +18,8 @@ import {
 } from '@map-colonies/react-core';
 import { isGeometryEmpty } from '../../../../common/utils/geo.tools';
 import { AutoDirectionBox } from '../../../../common/components/auto-direction-box/auto-direction-box.component';
-import { FlyTo } from '../../../../common/components/ol-map/fly-to';
 import { ValidationsError } from '../../../../common/components/error/validations.error-presentor';
+import { FlyTo } from '../../../../common/components/ol-map/fly-to';
 import { Domain } from '../../../../common/models/domain';
 import { Mode } from '../../../../common/models/mode.enum';
 import CONFIG from '../../../../common/config';
@@ -90,7 +90,10 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
   const [approver, setApprover] = useState('');
   const [listFilterMode, setListFilterMode] = useState<FilterMode>('all');
   const [selectedItem, setSelectedItem] = useState<Feature>();
-  const [polygonPartsError, setPolygonPartsError] = useState<string | undefined>();
+  const [polygonPartsErrors, setPolygonPartsErrors] = useState<string[] | undefined>();
+  const storePolygonPartsErrors =
+    state.context.store.discreteLayersStore.customValidationError?.error;
+  const displayedPolygonPartsErrors = polygonPartsErrors ?? storePolygonPartsErrors;
   const selectedLowResolutionFeatureId = getFeatureIdentifier(selectedItem);
   const reportUrl = state.context.job?.validationReport?.report?.url;
   const ingestionResolution = state.context.job?.details?.parameters?.ingestionResolution as
@@ -214,12 +217,12 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
     if (!reportUrl) {
       setLowResolutionCollections([]);
       setSelectedItem(undefined);
-      setPolygonPartsError(intl.formatMessage({ id: 'resolutionConflict.error.missingUrl' }));
+      setPolygonPartsErrors([intl.formatMessage({ id: 'resolutionConflict.error.missingUrl' })]);
       return;
     }
 
     const loadLowResolutionParts = async (): Promise<void> => {
-      setPolygonPartsError(undefined);
+      setPolygonPartsErrors(undefined);
       setIsLoadingLowResolutionParts(true);
 
       await api.init.method();
@@ -309,7 +312,9 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
         onApprove?.();
         closeDialog();
       } catch (error) {
-        setPolygonPartsError(intl.formatMessage({ id: 'resolutionConflict.error.approveFailed' }));
+        setPolygonPartsErrors([
+          intl.formatMessage({ id: 'resolutionConflict.error.approveFailed' }),
+        ]);
       }
     };
     void resumeJob();
@@ -392,10 +397,6 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
     return { features, pageSize: -1 };
   };
 
-  const onQueryError = (errorMessage: string): void => {
-    setPolygonPartsError(errorMessage);
-  };
-
   return (
     <Box id="resolutionConflictDialog">
       <Dialog open={isOpen} preventOutsideDismiss={true}>
@@ -423,10 +424,6 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                       onClick={(evt: React.MouseEvent<HTMLInputElement>): void => {
                         const isChecked = evt.currentTarget.checked;
                         setShowLowResolutionPolygonParts(isChecked);
-                        if (!isChecked) {
-                          setAutoScrollListToSelection(false);
-                          setSelectedItem(undefined);
-                        }
                       }}
                     />
                   )}
@@ -534,7 +531,6 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                                         key={key}
                                         style={style}
                                         onClick={(): void => {
-                                          setShowLowResolutionPolygonParts(true);
                                           setAutoScrollListToSelection(false);
                                           const selectedFeatureId = getFeatureIdentifier(feature);
                                           if (selectedFeatureId) {
@@ -622,9 +618,11 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                   <Button type="button" onClick={closeDialog}>
                     <FormattedMessage id="general.close-btn.text" />
                   </Button>
-                  {polygonPartsError && (
+                  {displayedPolygonPartsErrors && (
                     <Box className="errorMessage">
-                      <ValidationsError errors={{ polygonPartsError: [polygonPartsError] }} />
+                      <ValidationsError
+                        errors={{ polygonPartsErrors: displayedPolygonPartsErrors }}
+                      />
                     </Box>
                   )}
                 </Box>
@@ -641,7 +639,6 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                   layerRecord={state.context.updatedLayer}
                   selectedItem={selectedItem}
                   onMapFeatureClick={onMapFeatureClick}
-                  onError={onQueryError}
                   showFeaturePropertiesPopup={true}
                   showPolygonParts={SHOW_PARTS_AFTER_INIT}
                   style={{ height: '100%', minHeight: '300px' }}
@@ -653,7 +650,6 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                           featureType={FeatureType.LOW_RESOLUTION_PP}
                           queryExecutor={queryExecutor}
                           outerPerimeter={outerPerimeter?.geometry}
-                          onQueryError={onQueryError}
                           options={{
                             properties: { id: FeatureType.LOW_RESOLUTION_PP },
                             zIndex: GeometryZIndex.LOW_RESOLUTION_GEOMETRY_ZINDEX,

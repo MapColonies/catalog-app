@@ -186,13 +186,6 @@ export const ActionResolver: React.FC<ActionResolverProps> = observer((props) =>
     ]
   );
 
-  const basePPUpdateErrorShow = useCallback(
-    (ppResolutionsUpdateError: Record<string, string[]>) => {
-      store.discreteLayersStore.setCustomValidationError(ppResolutionsUpdateError);
-    },
-    []
-  );
-
   useEffect(() => {
     if (store.actionDispatcherStore.action !== undefined) {
       const { action, data } = store.actionDispatcherStore.action as IDispatchAction;
@@ -553,10 +546,6 @@ export const ActionResolver: React.FC<ActionResolverProps> = observer((props) =>
           } else {
             store.discreteLayersStore.resetPolygonParts();
           }
-          break;
-        }
-        case UserAction.SYSTEM_CALLBACK_SHOW_PPERROR_ON_UPDATE: {
-          basePPUpdateErrorShow(data as Record<string, string[]>);
           break;
         }
         case UserAction.SYSTEM_CALLBACK_OPEN_JOB_MANAGER: {
