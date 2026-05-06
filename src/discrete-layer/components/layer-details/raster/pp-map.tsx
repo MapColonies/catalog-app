@@ -139,7 +139,16 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   }, [selectedFeature]);
 
   useEffect(() => {
-    setSelectedFeature(selectedItem);
+    if (selectedItem) {
+      setSelectedFeature(selectedItem);
+      return;
+    }
+    setSelectedFeature((prev) => {
+      if (prev?.properties?._featureType === FeatureType.LOW_RESOLUTION_PP) {
+        return undefined;
+      }
+      return prev;
+    });
   }, [selectedItem]);
 
   useEffect(() => {
