@@ -17,8 +17,8 @@ import {
   Typography,
 } from '@map-colonies/react-core';
 import { AutoDirectionBox } from '../../../../common/components/auto-direction-box/auto-direction-box.component';
-import { FlyTo } from '../../../../common/components/ol-map/fly-to';
 import { ValidationsError } from '../../../../common/components/error/validations.error-presentor';
+import { FlyTo } from '../../../../common/components/ol-map/fly-to';
 import { Domain } from '../../../../common/models/domain';
 import { Mode } from '../../../../common/models/mode.enum';
 import { EntityDescriptorModelType } from '../../../models';
@@ -28,7 +28,7 @@ import {
   PolygonPartsExtentQueryVectorLayer,
 } from './polygon-parts-extent-query-vector-layer';
 import { GeoFeaturesPresentorComponent } from './pp-map';
-import { EXCEEDED_PROPERTY_NAME, EXCEEDED_PROPERTY_VALUE, FeatureType } from './pp-map.utils';
+import { FeatureType } from './pp-map.utils';
 import { ProgressCurtain } from './progressCurtain/progressCurtain';
 import { RasterWorkflowContext } from './state-machine/context';
 import { UpdateLayerHeader } from './update-layer-header';
@@ -82,7 +82,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
   const [approver, setApprover] = useState('');
   const [listFilterMode, setListFilterMode] = useState<FilterMode>('all');
   const [selectedItem, setSelectedItem] = useState<Feature>();
-  const [polygonPartsError, setPolygonPartsError] = useState<string | undefined>();
+  const [polygonPartsErrors, setPolygonPartsErrors] = useState<string[] | undefined>();
   const selectedLowResolutionFeatureId = getFeatureIdentifier(selectedItem);
   const reportUrl = state.context.job?.validationReport?.report?.url;
   const ingestionResolution = state.context.job?.details?.parameters?.ingestionResolution as
@@ -90,6 +90,11 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
     | undefined;
   const entityDescriptors = state.context.store.discreteLayersStore
     ?.entityDescriptors as EntityDescriptorModelType[];
+
+  useEffect(() => {
+    const errors = state.context.store.discreteLayersStore.customValidationError?.error;
+    setPolygonPartsErrors(errors);
+  }, [state.context.store.discreteLayersStore.customValidationError]);
 
   const lowResolutionFeatures = useMemo(
     () => lowResolutionCollections.flatMap((c) => c.features),
@@ -99,18 +104,12 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
   const totalFeaturesCount = useMemo(() => lowResolutionFeatures.length, [lowResolutionFeatures]);
 
   const hasExceededFeatures = useMemo(
-    () =>
-      lowResolutionFeatures.some(
-        (feature) => feature.properties?.[EXCEEDED_PROPERTY_NAME] === EXCEEDED_PROPERTY_VALUE
-      ),
+    () => lowResolutionFeatures.some((feature) => feature.properties?.exceeded === true),
     [lowResolutionFeatures]
   );
 
   const exceededFeaturesCount = useMemo(
-    () =>
-      lowResolutionFeatures.filter(
-        (feature) => feature.properties?.[EXCEEDED_PROPERTY_NAME] === EXCEEDED_PROPERTY_VALUE
-      ).length,
+    () => lowResolutionFeatures.filter((feature) => feature.properties?.exceeded === true).length,
     [lowResolutionFeatures]
   );
 
@@ -121,9 +120,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
 
     return lowResolutionCollections.map((collection) => ({
       ...collection,
-      features: collection.features.filter(
-        (feature) => feature.properties?.[EXCEEDED_PROPERTY_NAME] === EXCEEDED_PROPERTY_VALUE
-      ),
+      features: collection.features.filter((feature) => feature.properties?.exceeded === true),
     }));
   }, [lowResolutionCollections, listFilterMode]);
 
@@ -206,12 +203,12 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
     if (!reportUrl) {
       setLowResolutionCollections([]);
       setSelectedItem(undefined);
-      setPolygonPartsError(intl.formatMessage({ id: 'resolutionConflict.error.missingUrl' }));
+      setPolygonPartsErrors([intl.formatMessage({ id: 'resolutionConflict.error.missingUrl' })]);
       return;
     }
 
     const loadLowResolutionParts = async (): Promise<void> => {
-      setPolygonPartsError(undefined);
+      setPolygonPartsErrors(undefined);
       setIsLoadingLowResolutionParts(true);
 
       await api.init.method();
@@ -245,7 +242,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
       });
 
       const outerExceededGeometry = await api.computeOuterGeometry.method(
-        (properties) => properties[EXCEEDED_PROPERTY_NAME] === EXCEEDED_PROPERTY_VALUE
+        (properties) => properties.exceeded === true
       );
 
       const featureCollection = await api.getFeatureCollection.method();
@@ -286,7 +283,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
         onApprove?.();
         closeDialog();
       } catch (error) {
-        setPolygonPartsError(intl.formatMessage({ id: 'resolutionConflict.error.approveFailed' }));
+        setPolygonPartsErrors([intl.formatMessage({ id: 'resolutionConflict.error.approveFailed' })]);
       }
     };
     void resumeJob();
@@ -340,8 +337,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
       (feat) => getFeatureIdentifier(feat) === clickedFeatureId
     );
     const shouldSwitchToAllFilter =
-      listFilterMode === 'exceeded' &&
-      clickedFeature?.properties?.[EXCEEDED_PROPERTY_NAME] !== EXCEEDED_PROPERTY_VALUE;
+      listFilterMode === 'exceeded' && clickedFeature?.properties?.exceeded !== true;
     if (shouldSwitchToAllFilter) {
       setListFilterMode('all');
     }
@@ -367,10 +363,6 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
     const fetchedFeatures = get(result, 'features', []);
     const features = Array.isArray(fetchedFeatures) ? fetchedFeatures : [];
     return { features, pageSize: -1 };
-  };
-
-  const onQueryError = (errorMessage: string): void => {
-    setPolygonPartsError(errorMessage);
   };
 
   return (
@@ -401,8 +393,8 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                         const isChecked = evt.currentTarget.checked;
                         setShowLowResolutionPolygonParts(isChecked);
                         if (!isChecked) {
-                          setAutoScrollListToSelection(false);
                           setSelectedItem(undefined);
+                          setAutoScrollListToSelection(false);
                         }
                       }}
                     />
@@ -500,9 +492,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                                     const isSelected =
                                       getFeatureIdentifier(feature) ===
                                       selectedLowResolutionFeatureId;
-                                    const isExceeded =
-                                      feature.properties?.[EXCEEDED_PROPERTY_NAME] ===
-                                      EXCEEDED_PROPERTY_VALUE;
+                                    const isExceeded = feature.properties?.exceeded === true;
                                     return (
                                       <Box
                                         className={`virtualizedFeatureItem${
@@ -599,9 +589,9 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                   <Button type="button" onClick={closeDialog}>
                     <FormattedMessage id="general.close-btn.text" />
                   </Button>
-                  {polygonPartsError && (
+                  {polygonPartsErrors && (
                     <Box className="errorMessage">
-                      <ValidationsError errors={{ polygonPartsError: [polygonPartsError] }} />
+                      <ValidationsError errors={{ polygonPartsErrors }} />
                     </Box>
                   )}
                 </Box>
@@ -618,7 +608,6 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                   layerRecord={state.context.updatedLayer}
                   selectedItem={selectedItem}
                   onMapFeatureClick={onMapFeatureClick}
-                  onError={onQueryError}
                   showFeaturePropertiesPopup={true}
                   showPolygonParts={SHOW_PARTS_AFTER_INIT}
                   style={{ height: '100%', minHeight: '300px' }}
@@ -629,7 +618,6 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                         featureType={FeatureType.LOW_RESOLUTION_PP}
                         queryExecutor={queryExecutor}
                         outerPerimeter={outerPerimeter?.geometry}
-                        onQueryError={onQueryError}
                         options={{ properties: { id: FeatureType.LOW_RESOLUTION_PP }, zIndex: 2 }}
                       />
                       <FlyTo feature={outerPerimeter} flyOnce={true} />

@@ -31,7 +31,6 @@ interface PolygonPartsExtentQueryVectorLayerProps {
   featureType: FeatureType;
   queryExecutor: (bbox: BBox, startIndex: number) => Promise<IQueryExecutorResponse>;
   outerPerimeter?: Geometry;
-  onQueryError?: (errorMessage: string) => void;
   options?: Options;
 }
 
@@ -60,7 +59,7 @@ const createZoomedOutFootprintFeature = (
 
 export const PolygonPartsExtentQueryVectorLayer: React.FC<
   PolygonPartsExtentQueryVectorLayerProps
-> = ({ featureType, queryExecutor, outerPerimeter, onQueryError, options }) => {
+> = ({ featureType, queryExecutor, outerPerimeter, options }) => {
   const mapOl = useMap();
   const intl = useIntl();
   const store = useStore();
@@ -153,9 +152,6 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<
     } catch {
       if (activeRequestIdRef.current === requestId) {
         const errorMessage = intl.formatMessage({ id: 'resolutionConflict.error.queryFailed' });
-        if (onQueryError) {
-          onQueryError(errorMessage);
-        }
         store.actionDispatcherStore.dispatchAction({
           action: UserAction.SYSTEM_CALLBACK_SHOW_PPERROR_ON_UPDATE,
           data: {

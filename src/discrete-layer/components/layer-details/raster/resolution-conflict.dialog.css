@@ -280,6 +280,10 @@ body[dir='rtl'] #resolutionConflictDialog .approverNameFieldContainer {
   padding-top: 8px;
 }
 
+#resolutionConflictDialog .errorsList {
+  min-width: unset;
+}
+
 #resolutionConflictDialog .leftPane {
   display: flex;
   flex-direction: column;
