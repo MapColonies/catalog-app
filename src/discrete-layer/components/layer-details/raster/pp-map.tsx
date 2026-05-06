@@ -287,11 +287,6 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
                 evt.stopPropagation();
                 const isChecked = evt.currentTarget.checked;
                 setShowExistingPolygonParts(isChecked);
-                if (!isChecked) {
-                  if (selectedFeature?.properties?._featureType === FeatureType.EXISTING_PP) {
-                    setSelectedFeature(undefined);
-                  }
-                }
               }}
             />
           </Box>
