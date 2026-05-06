@@ -234,6 +234,7 @@
   "polygon-parts.map-preview-legend.SOURCE_EXTENT": "שטח המקור",
   "polygon-parts.map-preview-legend.EXISTING_PP": "חלקי תיחום הקיימים",
   "polygon-parts.map-preview-legend.LOW_RESOLUTION_PP": "חלקי תיחום עם רזולוציה נמוכה",
+  "polygon-parts.map-preview-legend.LOW_RESOLUTION_PP_EXCEEDED": "חלקי תיחום חורגים עם רזולוציה נמוכה",
   "polygon-parts.map-preview.zoom-before-fetch": "התקרב כדי לראות את חלקי התיחום",
   "polygon-parts.map-preview.no-feature-properties": "אין מאפיינים להצגה",
 

@@ -218,6 +218,15 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
         });
       }
     });
+    const exceededStyle = PPMapStyles.get(FeatureType.LOW_RESOLUTION_PP)?.values?.[0]?.style;
+    if (exceededStyle) {
+      res.push({
+        title: intl.formatMessage({
+          id: 'polygon-parts.map-preview-legend.LOW_RESOLUTION_PP_EXCEEDED',
+        }) as string,
+        style: exceededStyle,
+      });
+    }
     return res;
   }, []);
 
