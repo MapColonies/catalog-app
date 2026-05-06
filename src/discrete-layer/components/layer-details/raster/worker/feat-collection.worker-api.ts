@@ -36,6 +36,8 @@ import { FeatureType } from '../feature-type.enum';
 
 type ShpJsParser = (buffer: ArrayBuffer) => Promise<unknown>;
 
+const REQUIRED_REPORT_PROPERTY = 'e_res';
+
 let _geos: geos;
 let _fc: FeatureCollection;
 let _geoms: number[] = [];
@@ -224,6 +226,28 @@ const parseShpFileContent = async (buffer: ArrayBuffer): Promise<FeatureCollecti
   return collection;
 };
 
+const hasNonEmptyReportProperty = (
+  feature: Feature<Geometry, GeoJsonProperties>
+): boolean => {
+  const value = feature.properties?.[REQUIRED_REPORT_PROPERTY];
+  if (value === undefined || value === null) {
+    return false;
+  }
+  if (typeof value === 'string') {
+    return value.trim().length > 0;
+  }
+  return true;
+};
+
+const filterReportFeatures = (
+  featureCollection: FeatureCollection<Geometry, GeoJsonProperties>
+): FeatureCollection<Geometry, GeoJsonProperties> => {
+  return {
+    ...featureCollection,
+    features: featureCollection.features.filter(hasNonEmptyReportProperty),
+  };
+};
+
 function _getCustomProps<T extends CustomProperties>(templates: T, replacement: string): T {
   if (!templates) return {} as T;
   return Object.fromEntries(
@@ -344,7 +368,7 @@ const api: WorkerAPI = {
     try {
       api.dispose();
       const buffer = await _downloadFile(url, onProgress);
-      const fc = await parseShpFileContent(buffer);
+      const fc = filterReportFeatures(await parseShpFileContent(buffer));
       _fc = fc; //cloneDeep(fc);
       _prepareGEOSData(options?.customProperties, onProgress);
     } catch (error) {
