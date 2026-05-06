@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.8.4](https://github.com/MapColonies/catalog-app/compare/v4.8.3...v4.8.4) (2026-05-06)
+
+
+### Bug Fixes
+
+* exceeded prop name and value ([#899](https://github.com/MapColonies/catalog-app/issues/899)) ([f64727a](https://github.com/MapColonies/catalog-app/commit/f64727a7b7dfcee57ce70b2aa91aa03b3cbf64d6))
+
 ## [4.8.3](https://github.com/MapColonies/catalog-app/compare/v4.8.2...v4.8.3) (2026-05-05)
 
 
