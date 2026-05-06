@@ -12,8 +12,6 @@ import bboxPolygon from '@turf/bbox-polygon';
 import { GeoJSONFeature, useMap, VectorLayer, VectorSource } from '@map-colonies/react-components';
 import CONFIG from '../../../../common/config';
 import { useStore } from '../../../models';
-import { IDispatchAction } from '../../../models/actionDispatcherStore';
-import { UserAction } from '../../../models/userStore';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
 import {
   createTextStyle,
@@ -123,9 +121,11 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<
 
     try {
       let nextStartIndex = startIndex;
+      let hasSuccessfulQuery = false;
 
       while (true) {
         const result = await queryExecutor(bbox, nextStartIndex);
+        hasSuccessfulQuery = true;
         const pageStartIndex = nextStartIndex;
 
         if (activeRequestIdRef.current !== requestId) {
@@ -149,15 +149,14 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<
 
         nextStartIndex += CONFIG.POLYGON_PARTS.MAX.WFS_FEATURES;
       }
+
+      if (activeRequestIdRef.current === requestId && hasSuccessfulQuery) {
+        store.discreteLayersStore.clearCustomValidationError();
+      }
     } catch {
       if (activeRequestIdRef.current === requestId) {
         const errorMessage = intl.formatMessage({ id: 'resolutionConflict.error.queryFailed' });
-        store.actionDispatcherStore.dispatchAction({
-          action: UserAction.SYSTEM_CALLBACK_SHOW_PPERROR_ON_UPDATE,
-          data: {
-            error: [errorMessage],
-          },
-        } as IDispatchAction);
+        store.discreteLayersStore.setCustomValidationError({ error: [errorMessage] });
       }
     } finally {
       if (activeRequestIdRef.current === requestId) {
