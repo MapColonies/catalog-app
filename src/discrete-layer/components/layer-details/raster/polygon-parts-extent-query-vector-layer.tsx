@@ -15,12 +15,8 @@ import { useStore } from '../../../models';
 import { IDispatchAction } from '../../../models/actionDispatcherStore';
 import { UserAction } from '../../../models/userStore';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
-import {
-  createTextStyle,
-  FeatureType,
-  FEATURE_LABEL_CONFIG,
-  getStyleByFeatureType,
-} from './pp-map.utils';
+import { createTextStyle, FEATURE_LABEL_CONFIG, getStyleByFeatureType } from './pp-map.utils';
+import { FeatureType } from './feature-type.enum';
 
 export interface IQueryExecutorResponse {
   features: Feature<Geometry, GeoJsonProperties>[];

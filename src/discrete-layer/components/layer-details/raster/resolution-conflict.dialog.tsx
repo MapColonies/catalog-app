@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { AutoSizer, List, ListRowProps } from 'react-virtualized';
-import { BBox, Feature } from 'geojson';
+import { BBox, Feature, FeatureCollection } from 'geojson';
 import { get } from 'lodash';
-import { Box } from '@map-colonies/react-components';
+import { Box, VectorLayer, VectorSource } from '@map-colonies/react-components';
 import {
   Button,
   Checkbox,
@@ -16,11 +16,13 @@ import {
   TextField,
   Typography,
 } from '@map-colonies/react-core';
+import { isGeometryEmpty } from '../../../../common/utils/geo.tools';
 import { AutoDirectionBox } from '../../../../common/components/auto-direction-box/auto-direction-box.component';
 import { FlyTo } from '../../../../common/components/ol-map/fly-to';
 import { ValidationsError } from '../../../../common/components/error/validations.error-presentor';
 import { Domain } from '../../../../common/models/domain';
 import { Mode } from '../../../../common/models/mode.enum';
+import CONFIG from '../../../../common/config';
 import { EntityDescriptorModelType } from '../../../models';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
 import {
@@ -28,13 +30,15 @@ import {
   PolygonPartsExtentQueryVectorLayer,
 } from './polygon-parts-extent-query-vector-layer';
 import { GeoFeaturesPresentorComponent } from './pp-map';
-import { EXCEEDED_PROPERTY_NAME, EXCEEDED_PROPERTY_VALUE, FeatureType } from './pp-map.utils';
+import { EXCEEDED_PROPERTY_NAME, EXCEEDED_PROPERTY_VALUE, GeometryZIndex } from './pp-map.utils';
 import { ProgressCurtain } from './progressCurtain/progressCurtain';
 import { RasterWorkflowContext } from './state-machine/context';
 import { UpdateLayerHeader } from './update-layer-header';
 import { useWorkerAPI } from './worker/useWorkerAPI';
 import { extractProgressArray } from './worker/utils';
 import { Process } from './worker/worker.types';
+import { GeoFeaturesInnerComponent } from './geo-features-inner.component';
+import { FeatureType } from './feature-type.enum';
 
 import './resolution-conflict.dialog.css';
 
@@ -78,6 +82,10 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
     ParsedFeatureCollection[]
   >([]);
   const [outerPerimeter, setOuterPerimeter] = useState<Feature | undefined>();
+  const [outerExceededPerimeter, setOuterExceededPerimeter] = useState<Feature | undefined>();
+  const [exceededGeometryMarkers, setExceededGeometryMarkers] = useState<
+    FeatureCollection | undefined
+  >();
   const [collectionMountKeys, setCollectionMountKeys] = useState<number[]>([]);
   const [approver, setApprover] = useState('');
   const [listFilterMode, setListFilterMode] = useState<FilterMode>('all');
@@ -247,6 +255,21 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
       const outerExceededGeometry = await api.computeOuterGeometry.method(
         (properties) => properties[EXCEEDED_PROPERTY_NAME] === EXCEEDED_PROPERTY_VALUE
       );
+
+      setOuterExceededPerimeter({
+        type: 'Feature',
+        properties: {
+          _featureType: FeatureType.LOW_RESOLUTION_PP,
+          [EXCEEDED_PROPERTY_NAME]: EXCEEDED_PROPERTY_VALUE,
+        },
+        geometry: outerExceededGeometry,
+      });
+
+      const pointsFeatureCollection = await api.getMarkersFromGeometry.method(
+        outerExceededGeometry
+      );
+
+      setExceededGeometryMarkers(pointsFeatureCollection);
 
       const featureCollection = await api.getFeatureCollection.method();
 
@@ -630,9 +653,35 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                         queryExecutor={queryExecutor}
                         outerPerimeter={outerPerimeter?.geometry}
                         onQueryError={onQueryError}
-                        options={{ properties: { id: FeatureType.LOW_RESOLUTION_PP }, zIndex: 2 }}
+                        options={{
+                          properties: { id: FeatureType.LOW_RESOLUTION_PP },
+                          zIndex: GeometryZIndex.LOW_RESOLUTION_GEOMETRY_ZINDEX,
+                        }}
                       />
-                      <FlyTo feature={outerPerimeter} flyOnce={true} />
+                      <FlyTo
+                        feature={
+                          isGeometryEmpty(outerExceededPerimeter?.geometry)
+                            ? outerPerimeter
+                            : outerExceededPerimeter
+                        }
+                        flyOnce={true}
+                      />
+                      <VectorLayer
+                        options={{
+                          maxZoom: CONFIG.POLYGON_PARTS.MAX.SHOW_FOOTPRINT_ZOOM_LEVEL,
+                          zIndex: GeometryZIndex.EXCEEDED_GEOMETRY_ZINDEX,
+                        }}
+                      >
+                        <VectorSource>
+                          <GeoFeaturesInnerComponent
+                            geoFeatures={[
+                              ...(outerExceededPerimeter ? [outerExceededPerimeter] : []),
+                              ...(exceededGeometryMarkers?.features as Feature[]),
+                            ]}
+                            renderCount={{ current: 1 }}
+                          />
+                        </VectorSource>
+                      </VectorLayer>
                     </>
                   ) : null}
                 </GeoFeaturesPresentorComponent>

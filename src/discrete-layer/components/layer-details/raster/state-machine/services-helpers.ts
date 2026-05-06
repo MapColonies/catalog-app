@@ -16,7 +16,7 @@ import {
 import { LayerRasterRecordInput } from '../../../../models/RootStore.base';
 import { filterByKeys } from '../../entity-types-keys';
 import { jobType2Mode, transformEntityToFormFields } from '../../utils';
-import { FeatureType } from '../pp-map.utils';
+import { FeatureType } from '../feature-type.enum';
 import { buildError, getFeatureAndMarker, getPath, getPathWithSlash } from './helpers';
 import { queryExecutor } from './query-executor';
 import {

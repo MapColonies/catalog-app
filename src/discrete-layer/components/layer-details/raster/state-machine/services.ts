@@ -5,7 +5,7 @@ import { relativeDateFormatter } from '../../../../../common/helpers/formatters'
 import { Mode } from '../../../../../common/models/mode.enum';
 import { ProductType, RecordType, Status } from '../../../../models';
 import { LayerRasterRecordInput } from '../../../../models/RootStore.base';
-import { FeatureType } from '../pp-map.utils';
+import { FeatureType } from '../feature-type.enum';
 import {
   buildError,
   getFeatureAndMarker,

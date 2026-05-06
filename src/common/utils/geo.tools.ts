@@ -9,7 +9,7 @@ import polygonToLine from '@turf/polygon-to-line';
 import simplify from '@turf/simplify';
 import * as turf from '@turf/turf';
 import { Feature, MultiPolygon, Polygon, Position, Geometry } from 'geojson';
-import { PolygonPartRecordModelType } from '../../discrete-layer/models';
+import { PolygonPartRecordModelType } from '../../discrete-layer/models/PolygonPartRecordModel';
 import { geoJSONValidation } from './geojson.validation';
 
 export const DEGREES_PER_METER = 0.00001;
@@ -136,6 +136,18 @@ export const isPolygonContainsPolygon = (polygon: Feature, polygonToCheck: Featu
   const polygonToCheckBBox = bbox(polygonToCheck);
   const polygonToCheckBBoxPolygon = bboxPolygon(polygonToCheckBBox);
   return booleanContains(polygonBBoxPolygon, polygonToCheckBBoxPolygon);
+};
+
+export const isGeometryEmpty = (geom: Geometry | undefined) => {
+  if (!geom) {
+    return true;
+  }
+
+  if (geom.type === 'GeometryCollection') {
+    return !geom.geometries || geom.geometries.length === 0;
+  }
+
+  return !geom.coordinates || geom.coordinates.length === 0;
 };
 
 export const getFirstPoint = (geojson: Geometry): Position => {

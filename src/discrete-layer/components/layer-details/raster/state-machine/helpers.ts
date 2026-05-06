@@ -8,7 +8,7 @@ import CONFIG from '../../../../../common/config';
 import { getFirstPoint } from '../../../../../common/utils/geo.tools';
 import { ErrorLevel } from '../../../helpers/errorUtils';
 import { Status } from '../../../../models';
-import { FeatureType } from '../pp-map.utils';
+import { FeatureType } from '../feature-type.enum';
 import { workflowMachine } from './state-machine';
 import {
   AddPolicy,
