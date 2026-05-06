@@ -291,7 +291,9 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
         onApprove?.();
         closeDialog();
       } catch (error) {
-        setPolygonPartsErrors([intl.formatMessage({ id: 'resolutionConflict.error.approveFailed' })]);
+        setPolygonPartsErrors([
+          intl.formatMessage({ id: 'resolutionConflict.error.approveFailed' }),
+        ]);
       }
     };
     void resumeJob();
