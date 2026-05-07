@@ -223,9 +223,7 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<
               fit={false}
               featureStyle={featureStyle}
             />
-          ) : (
-            null
-          );
+          ) : null;
         })}
       </VectorSource>
     </VectorLayer>
