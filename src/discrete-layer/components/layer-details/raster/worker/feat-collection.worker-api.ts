@@ -231,10 +231,12 @@ const _filterReportFeatures = (
 ): FeatureCollection<Geometry, GeoJsonProperties> => {
   return {
     ...featureCollection,
-    features: featureCollection.features.filter((feature: Feature<Geometry, GeoJsonProperties>): boolean => {
-      const value = feature.properties?.[RESOLUTION_CONFLICT_PROPERTY];
-      return !isEmpty(value);
-    }),
+    features: featureCollection.features.filter(
+      (feature: Feature<Geometry, GeoJsonProperties>): boolean => {
+        const value = feature.properties?.[RESOLUTION_CONFLICT_PROPERTY];
+        return !isEmpty(value);
+      }
+    ),
   };
 };
 
