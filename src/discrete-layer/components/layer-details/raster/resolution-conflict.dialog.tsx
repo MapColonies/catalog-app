@@ -369,6 +369,8 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
 
   const onMapFeatureClick = (feature?: Feature) => {
     if (feature?.properties?._featureType !== FeatureType.LOW_RESOLUTION_PP) {
+      setSelectedItem(undefined);
+      setAutoScrollListToSelection(false);
       return;
     }
     const clickedFeatureId = getFeatureIdentifier(feature);
