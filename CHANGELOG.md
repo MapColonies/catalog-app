@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [5.1.0](https://github.com/MapColonies/catalog-app/compare/v5.0.1...v5.1.0) (2026-05-07)
+
+
+### Features
+
+* add GetFeatureCollection progress ([#924](https://github.com/MapColonies/catalog-app/issues/924)) ([3ac5bb6](https://github.com/MapColonies/catalog-app/commit/3ac5bb62a0c781e803fb3ec8f81a20cd3e219bbd))
+
 ## [5.0.1](https://github.com/MapColonies/catalog-app/compare/v5.0.0...v5.0.1) (2026-05-07)
 
 
