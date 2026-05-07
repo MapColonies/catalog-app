@@ -38,13 +38,19 @@ const JobInfoComponent: React.FC<JobInfoProps> = ({ job }) => {
   }, []);
 
   const errorsCount = displayJob?.validationReport?.errorsSummary?.errorsCount;
+  const jobStatus = displayJob?.details?.status as Status | undefined;
 
   const isResolutionConflictViewOnly = useMemo(() => {
+    const isStatusReadOnly = jobStatus === Status.Failed || jobStatus === Status.Aborted;
+
     if (!errorsCount) {
-      return false;
+      return isStatusReadOnly;
     }
-    return Object.entries(errorsCount).some(([key, value]) => key !== 'resolution' && value > 0);
-  }, [errorsCount]);
+    const hasOtherErrors = Object.entries(errorsCount).some(
+      ([key, value]) => key !== 'resolution' && value > 0
+    );
+    return isStatusReadOnly || hasOtherErrors;
+  }, [errorsCount, jobStatus]);
 
   if (!displayJob) {
     return null;
