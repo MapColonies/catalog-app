@@ -1,6 +1,6 @@
 import { expose } from 'comlink';
 import initGeos, { geos } from 'geos-wasm';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, isEmpty } from 'lodash';
 import {
   FeatureCollection,
   Feature,
@@ -18,6 +18,7 @@ import {
   ONE_DEGREE_KM,
 } from '../../../../../common/utils/geo.tools';
 import { abortableFetch, safeRead } from '../../../../../common/helpers/http';
+import { FeatureType } from '../feature-type.enum';
 import {
   WorkerAPI,
   WorkerMessage,
@@ -32,11 +33,10 @@ import {
   WorkerError,
 } from './worker.types';
 import { createMessageDetails } from './utils';
-import { FeatureType } from '../feature-type.enum';
 
 type ShpJsParser = (buffer: ArrayBuffer) => Promise<unknown>;
 
-const REQUIRED_REPORT_PROPERTY = 'e_res';
+const RESOLUTION_CONFLICT_PROPERTY = 'e_res';
 
 let _geos: geos;
 let _fc: FeatureCollection;
@@ -194,7 +194,7 @@ const _isFeatureCollection = (
   );
 };
 
-const toFeatureCollection = (parsed: unknown): FeatureCollection<Geometry, GeoJsonProperties> => {
+const _toFeatureCollection = (parsed: unknown): FeatureCollection<Geometry, GeoJsonProperties> => {
   if (_isFeatureCollection(parsed)) {
     return parsed;
   }
@@ -212,7 +212,7 @@ const toFeatureCollection = (parsed: unknown): FeatureCollection<Geometry, GeoJs
   return { type: 'FeatureCollection', features: [] };
 };
 
-const parseShpFileContent = async (buffer: ArrayBuffer): Promise<FeatureCollection> => {
+const _parseShpFileContent = async (buffer: ArrayBuffer): Promise<FeatureCollection> => {
   const shpjsModule = (await import('shpjs')) as unknown as {
     default?: ShpJsParser;
   };
@@ -222,27 +222,19 @@ const parseShpFileContent = async (buffer: ArrayBuffer): Promise<FeatureCollecti
     throw new Error('shpjs parser is not available');
   }
   const parsed = await parser(buffer);
-  const collection = toFeatureCollection(parsed);
+  const collection = _toFeatureCollection(parsed);
   return collection;
 };
 
-const hasNonEmptyReportProperty = (feature: Feature<Geometry, GeoJsonProperties>): boolean => {
-  const value = feature.properties?.[REQUIRED_REPORT_PROPERTY];
-  if (value === undefined || value === null) {
-    return false;
-  }
-  if (typeof value === 'string') {
-    return value.trim().length > 0;
-  }
-  return true;
-};
-
-const filterReportFeatures = (
+const _filterReportFeatures = (
   featureCollection: FeatureCollection<Geometry, GeoJsonProperties>
 ): FeatureCollection<Geometry, GeoJsonProperties> => {
   return {
     ...featureCollection,
-    features: featureCollection.features.filter(hasNonEmptyReportProperty),
+    features: featureCollection.features.filter((feature: Feature<Geometry, GeoJsonProperties>): boolean => {
+      const value = feature.properties?.[RESOLUTION_CONFLICT_PROPERTY];
+      return !isEmpty(value);
+    }),
   };
 };
 
@@ -366,7 +358,7 @@ const api: WorkerAPI = {
     try {
       api.dispose();
       const buffer = await _downloadFile(url, onProgress);
-      const fc = filterReportFeatures(await parseShpFileContent(buffer));
+      const fc = _filterReportFeatures(await _parseShpFileContent(buffer));
       _fc = fc; //cloneDeep(fc);
       _prepareGEOSData(options?.customProperties, onProgress);
     } catch (error) {
