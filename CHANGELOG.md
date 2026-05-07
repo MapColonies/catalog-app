@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [5.0.1](https://github.com/MapColonies/catalog-app/compare/v5.0.0...v5.0.1) (2026-05-07)
+
+
+### Bug Fixes
+
+* destroy mergedGeomPtr in computeOuterGeometry ([#919](https://github.com/MapColonies/catalog-app/issues/919)) ([a0cc899](https://github.com/MapColonies/catalog-app/commit/a0cc89954c6384073b896c764461aab15dcf2c27))
+* invalidate outdated polygon-parts requests when switching to footprint mode ([#921](https://github.com/MapColonies/catalog-app/issues/921)) ([b117f48](https://github.com/MapColonies/catalog-app/commit/b117f48e1befaf81b00b48dde01897755d5ef008))
+
 ## [5.0.0](https://github.com/MapColonies/catalog-app/compare/v4.9.1...v5.0.0) (2026-05-07)
 
 
