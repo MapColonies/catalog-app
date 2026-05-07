@@ -210,7 +210,7 @@ export function useWorkerAPI(
               details,
             });
           });
-          
+
           const result = await workerApi.getFeatureCollection(
             proxy((p: WorkerMessage) => {
               setProgressGetFeatureCollection(p);
@@ -240,7 +240,13 @@ export function useWorkerAPI(
         progress: null,
       },
     };
-  }, [workerApi, progressComputeArea, progressComputeOuterGeometry, progressGetFeatureCollection, loadShapeFileProgress]);
+  }, [
+    workerApi,
+    progressComputeArea,
+    progressComputeOuterGeometry,
+    progressGetFeatureCollection,
+    loadShapeFileProgress,
+  ]);
 
   const DEFAULT_RUN_COUNT = 1;
 
