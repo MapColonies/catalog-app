@@ -170,6 +170,9 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<
     <VectorLayer options={options}>
       <VectorSource>
         {polygonParts.map((feat, idx) => {
+          const featureKey =
+            feat.properties?.id ??
+            `${featureType}-${feat.properties?._showAsFootprint ? 'footprint' : 'feature'}-${idx}`;
           const ppStyle = getStyleByFeatureType(feat);
           let ppStroke = ppStyle?.getStroke()?.clone();
           let ppFill = ppStyle?.getFill()?.clone();
@@ -213,7 +216,7 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<
 
           return feat ? (
             <GeoJSONFeature
-              key={feat.properties?.id}
+              key={featureKey}
               // geometry={{ ...feat.geometry }}
               // @ts-ignore
               geometry={{ ...feat }}
@@ -221,7 +224,7 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<
               featureStyle={featureStyle}
             />
           ) : (
-            <></>
+            null
           );
         })}
       </VectorSource>
