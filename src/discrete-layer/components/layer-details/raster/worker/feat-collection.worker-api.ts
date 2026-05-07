@@ -500,6 +500,7 @@ const api: WorkerAPI = {
     // Safe to destroy: collection was built from clones, so originals in _geoms are unaffected
     _geos.GEOSGeom_destroy(collection);
     _geos.Module._free(bufferPtr);
+    _geos.GEOSGeom_destroy(mergedGeomPtr);
     _geos.GEOSGeom_destroy(simplified);
 
     details = createMessageDetails(10, 10, t0);
