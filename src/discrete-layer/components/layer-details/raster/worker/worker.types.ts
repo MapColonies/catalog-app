@@ -47,6 +47,7 @@ export enum Process {
   Load = 'Load',
   UpdateAreas = 'UpdateAreas',
   ComputeOuterGeometry = 'ComputeOuterGeometry',
+  GetFeatureCollection = 'GetFeatureCollection',
 }
 
 export enum Stage {
@@ -88,6 +89,7 @@ export type ProcessStagesMap = {
   [Process.Load]: Stage.Download | Stage.Parsing | Stage.Cache;
   [Process.UpdateAreas]: Stage.UpdateAreas;
   [Process.ComputeOuterGeometry]: Stage.ComputeOuterGeometry;
+  [Process.GetFeatureCollection]: Stage.GetFeatureCollection;
 };
 
 export type StagesFor<P extends Process> = Partial<Record<ProcessStagesMap[P], StageProp>>;
