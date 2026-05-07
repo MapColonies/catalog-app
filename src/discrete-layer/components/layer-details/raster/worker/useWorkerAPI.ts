@@ -242,10 +242,10 @@ export function useWorkerAPI(
     };
   }, [
     workerApi,
-    progressComputeArea,
-    progressComputeOuterGeometry,
-    progressGetFeatureCollection,
     loadShapeFileProgress,
+    progressComputeOuterGeometry,
+    progressComputeArea,
+    progressGetFeatureCollection,
   ]);
 
   const DEFAULT_RUN_COUNT = 1;
