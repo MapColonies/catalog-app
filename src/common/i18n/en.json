@@ -902,5 +902,6 @@
   "progress.stage.parsing": "Preparing info",
   "progress.stage.cache": "Cache",
   "progress.stage.updateAreas": "Calculating areas",
-  "progress.stage.computeOuterGeometry": "Calculating perimeter"
+  "progress.stage.computeOuterGeometry": "Calculating perimeter",
+  "progress.stage.getFeatureCollection": "Prepare data for UI"
 }

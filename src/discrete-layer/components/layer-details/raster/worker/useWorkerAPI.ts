@@ -48,12 +48,16 @@ type WorkerService = {
   };
 };
 
+const FAKE_PROGRESS_TIME = 10000;
+
 export function useWorkerAPI(
   processRunCounts?: Partial<Record<Process, number>>
 ): [WorkerService | null, ProcessInfo] {
   const [workerApi, setWorkerApi] = useState<any>(null);
   const [progressComputeArea, setProgressComputeArea] = useState<WorkerMessage | null>(null);
   const [progressComputeOuterGeometry, setProgressComputeOuterGeometry] =
+    useState<WorkerMessage | null>(null);
+  const [progressGetFeatureCollection, setProgressGetFeatureCollection] =
     useState<WorkerMessage | null>(null);
   const [loadShapeFileProgress, setLoadShapeFileProgress] = useState<WorkerMessage[] | null>(null);
 
@@ -165,7 +169,7 @@ export function useWorkerAPI(
         method: async (predicate?: (properties: Record<string, unknown>) => boolean) => {
           const t0 = performance.now();
 
-          const clear = fakeProgress(10000, (fakePercent: number) => {
+          const clear = fakeProgress(FAKE_PROGRESS_TIME, (fakePercent: number) => {
             const details = buildMessageDetails(`${fakePercent}`, t0);
 
             setProgressComputeOuterGeometry({
@@ -194,13 +198,29 @@ export function useWorkerAPI(
       },
       getFeatureCollection: {
         method: async (): Promise<FeatureCollection> => {
-          return await workerApi.getFeatureCollection(
+          const startTime = performance.now();
+
+          const clear = fakeProgress(FAKE_PROGRESS_TIME, (fakePercent: number) => {
+            const details = buildMessageDetails(`${fakePercent}`, startTime);
+
+            setProgressGetFeatureCollection({
+              process: Process.GetFeatureCollection,
+              stage: Stage.GetFeatureCollection,
+              type: WorkerType.Progress,
+              details,
+            });
+          });
+          
+          const result = await workerApi.getFeatureCollection(
             proxy((p: WorkerMessage) => {
-              // console.log('**** GET FEATURECOLLECTION: ', p);
+              setProgressGetFeatureCollection(p);
             })
           );
+
+          clear();
+          return result;
         },
-        progress: null,
+        progress: progressGetFeatureCollection,
       },
       getMarkersFromGeometry: {
         method: async (geometry: Geometry): Promise<FeatureCollection> => {
@@ -220,7 +240,7 @@ export function useWorkerAPI(
         progress: null,
       },
     };
-  }, [workerApi, progressComputeArea, progressComputeOuterGeometry, loadShapeFileProgress]);
+  }, [workerApi, progressComputeArea, progressComputeOuterGeometry, progressGetFeatureCollection, loadShapeFileProgress]);
 
   const DEFAULT_RUN_COUNT = 1;
 
@@ -266,6 +286,15 @@ export function useWorkerAPI(
         stages: {
           [Stage.ComputeOuterGeometry]: {
             translationCode: 'progress.stage.computeOuterGeometry',
+            shouldShowProgress: true,
+          },
+        },
+      },
+      [Process.GetFeatureCollection]: {
+        runCount: processRunCounts?.[Process.GetFeatureCollection] ?? DEFAULT_RUN_COUNT,
+        stages: {
+          [Stage.GetFeatureCollection]: {
+            translationCode: 'progress.stage.getFeatureCollection',
             shouldShowProgress: true,
           },
         },

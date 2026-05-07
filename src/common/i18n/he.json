@@ -902,5 +902,6 @@
   "progress.stage.parsing": "הכנת המידע",
   "progress.stage.cache": "מטמון",
   "progress.stage.updateAreas": "חישוב השטחים",
-  "progress.stage.computeOuterGeometry": "חישוב ההיקף"
+  "progress.stage.computeOuterGeometry": "חישוב ההיקף",
+  "progress.stage.getFeatureCollection": "הכנת המידע ל-UI"
 }
