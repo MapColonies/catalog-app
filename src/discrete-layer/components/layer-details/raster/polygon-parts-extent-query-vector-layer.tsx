@@ -63,7 +63,8 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<
 
   useEffect(() => {
     const requestPolygonPartsByCurrentExtent = (): boolean => {
-      void getPolygonParts(getCurrentExtent(), START);
+      const extent = getCurrentExtent();
+      void getPolygonParts(extent, START);
       return true;
     };
 
@@ -105,6 +106,8 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<
     const currentZoomLevel = mapOl.getView().getZoom();
 
     if (currentZoomLevel && currentZoomLevel < CONFIG.POLYGON_PARTS.MAX.SHOW_FOOTPRINT_ZOOM_LEVEL) {
+      const invalidatedRequestId = activeRequestIdRef.current + 1;
+      activeRequestIdRef.current = invalidatedRequestId;
       showLoadingSpinner(false);
       const footprintFeature = createZoomedOutFootprintFeature(outerPerimeter, featureType);
       setPolygonParts(footprintFeature ? [footprintFeature] : []);
@@ -113,10 +116,6 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<
 
     const requestId = activeRequestIdRef.current + 1;
     activeRequestIdRef.current = requestId;
-
-    if (startIndex === START) {
-      setPolygonParts([]);
-    }
 
     showLoadingSpinner(true);
 
@@ -128,12 +127,11 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<
         const result = await queryExecutor(bbox, nextStartIndex);
         hasSuccessfulQuery = true;
         const pageStartIndex = nextStartIndex;
+        const { features, pageSize } = result;
 
         if (activeRequestIdRef.current !== requestId) {
           return;
         }
-
-        const { features, pageSize } = result;
 
         setPolygonParts((currentFeatures) => {
           const baseFeatures = pageStartIndex === START ? [] : currentFeatures;
@@ -154,7 +152,7 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<
       if (activeRequestIdRef.current === requestId && hasSuccessfulQuery) {
         store.discreteLayersStore.clearCustomValidationError();
       }
-    } catch {
+    } catch (error) {
       if (activeRequestIdRef.current === requestId) {
         const errorMessage = intl.formatMessage({ id: 'resolutionConflict.error.queryFailed' });
         store.discreteLayersStore.setCustomValidationError({ error: [errorMessage] });
