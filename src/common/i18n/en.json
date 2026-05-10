@@ -221,7 +221,7 @@
   "context-menu.title.tooltip": "Actions on topmost layer: ",
   "context-menu.sub-title.tooltip": "overlapping layers",
 
-  "update-layer-header.error.emptyLayerRecord": "Unavailable data",
+  "update-layer-header.error.emptyLayerRecord": "Item not found in selected catalog",
 
   "details-panel.no-selection": "No selection",
 
