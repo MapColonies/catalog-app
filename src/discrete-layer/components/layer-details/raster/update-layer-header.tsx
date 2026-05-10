@@ -53,7 +53,8 @@ export const UpdateLayerHeader: React.FC<UpdateLayerHeaderProps> = ({
         state.context.flowType === Mode.UPDATE &&
         ![Status.Completed, Status.Aborted].includes(
           state.context.job?.details?.status as Status
-        ) && (
+        ) &&
+        !isEmpty && (
           <Box className="lockedIcon warning">
             <Icon icon={{ icon: 'lock', size: 'xlarge' }} />
             <Typography tag="span">{intl.formatMessage({ id: 'general.title.locked' })}</Typography>

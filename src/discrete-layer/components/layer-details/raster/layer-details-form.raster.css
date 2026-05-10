@@ -37,6 +37,10 @@ body[dir='rtl'] #layerDetailsFormRaster .footer {
   margin-left: auto;
 }
 
+#layerDetailsFormRaster .buttons button {
+  white-space: nowrap;
+}
+
 body[dir='rtl'] #layerDetailsFormRaster .buttons {
   margin-left: unset;
   margin-right: auto;

@@ -221,7 +221,7 @@
   "context-menu.title.tooltip": "פעולות על השכבה העליונה: ",
   "context-menu.sub-title.tooltip": "שכבות חופפות בנקודה שנבחרה",
 
-  "update-layer-header.error.emptyLayerRecord": "מידע אינו זמין",
+  "update-layer-header.error.emptyLayerRecord": "פריט לא נמצא בקטלוג הנבחר",
 
   "details-panel.no-selection": "לא נבחר פריט",
 
