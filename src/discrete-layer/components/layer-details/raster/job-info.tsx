@@ -41,7 +41,8 @@ const JobInfoComponent: React.FC<JobInfoProps> = ({ job }) => {
   const jobStatus = displayJob?.details?.status as Status | undefined;
 
   const isResolutionConflictViewOnly = useMemo(() => {
-    const isStatusReadOnly = jobStatus === Status.Completed || jobStatus === Status.Failed || jobStatus === Status.Aborted;
+    const isStatusReadOnly =
+      jobStatus === Status.Completed || jobStatus === Status.Failed || jobStatus === Status.Aborted;
 
     if (!errorsCount) {
       return isStatusReadOnly;
