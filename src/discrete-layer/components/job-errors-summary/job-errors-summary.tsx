@@ -64,11 +64,15 @@ export const JobErrorsSummary = (
   return Object.entries(errorsSummary.errorsCount).map(([key, value]) => {
     let color = overrideColor;
     if (!overrideColor) {
+      const isResolutionConflict = options?.key === key;
+      const isResolved = isResolutionConflict
+        ? options?.isApproved === true
+        : getRasterErrorCount(errorsSummary, key)?.exceeded === false;
+
       color =
         value === 0
           ? theme.custom?.GC_SUCCESS
-          : getRasterErrorCount(errorsSummary, key)?.exceeded === false ||
-            (options?.key === key && options?.isApproved === true)
+          : isResolved
           ? theme.custom?.GC_WARNING_HIGH
           : theme.custom?.GC_ERROR_HIGH;
     }

@@ -8,7 +8,7 @@ import { DraftResult } from 'vest/vestResult';
 import * as Yup from 'yup';
 import { OptionalObjectSchema, TypeOfShape } from 'yup/lib/object';
 import { AnyObject } from 'yup/lib/types';
-import { Button } from '@map-colonies/react-core';
+import { Button, IconButton } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
 import { ValidationsError } from '../../../../common/components/error/validations.error-presentor';
 import { mergeRecursive } from '../../../../common/helpers/object';
@@ -279,7 +279,17 @@ export const InnerRasterForm = (
         <Box className="content section">
           <Box className="previewAndJobContainer">
             <Box className="jobData section">
-              <Box className="remainingTime">{state.context.remainingTime}</Box>
+              {state.context.job && (
+                <Box
+                  className="remainingTime refreshContainer"
+                  onClick={(): void => {
+                    actorRef.send({ type: 'SYNC' } satisfies Events);
+                  }}
+                >
+                  <IconButton className="refreshIcon mc-icon-Refresh" />
+                  <Box className="refreshSecs">{state.context.remainingTime}</Box>
+                </Box>
+              )}
               <JobInfo job={state.context.job} />
             </Box>
             <GeoFeaturesPresentorComponent

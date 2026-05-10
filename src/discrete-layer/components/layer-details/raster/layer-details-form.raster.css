@@ -136,7 +136,7 @@ body[dir='rtl'] #layerDetailsFormRaster .enumOptions .mdc-select__dropdown-icon 
 }
 
 #layerDetailsFormRaster .remainingTime {
-  width: 20px;
+  width: auto;
   position: absolute;
   right: 4px;
   top: 0;
@@ -149,4 +149,28 @@ body[dir='rtl'] #layerDetailsFormRaster .enumOptions .mdc-select__dropdown-icon 
 body[dir='rtl'] #layerDetailsFormRaster .remainingTime {
   right: unset;
   left: 4px;
+}
+
+#layerDetailsFormRaster .refreshContainer {
+  display: flex;
+  align-items: center;
+}
+
+#layerDetailsFormRaster .refreshContainer .refreshIcon {
+  font-size: 24px;
+}
+
+#layerDetailsFormRaster .refreshContainer .refreshSecs {
+  cursor: pointer;
+  position: relative;
+  text-align: center;
+  font-size: 8px;
+  width: 10px;
+  top: 1px;
+  right: 23px;
+}
+
+body[dir='rtl'] #layerDetailsFormRaster .refreshContainer .refreshSecs {
+  right: unset;
+  left: 24px;
 }

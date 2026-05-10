@@ -41,7 +41,7 @@ const JobInfoComponent: React.FC<JobInfoProps> = ({ job }) => {
   const jobStatus = displayJob?.details?.status as Status | undefined;
 
   const isResolutionConflictViewOnly = useMemo(() => {
-    const isStatusReadOnly = jobStatus === Status.Failed || jobStatus === Status.Aborted;
+    const isStatusReadOnly = jobStatus === Status.Completed || jobStatus === Status.Failed || jobStatus === Status.Aborted;
 
     if (!errorsCount) {
       return isStatusReadOnly;
@@ -59,9 +59,7 @@ const JobInfoComponent: React.FC<JobInfoProps> = ({ job }) => {
   const { taskId, taskStatus, taskReason, taskPercentage, details, validationReport } = displayJob;
 
   const errorsSummary = validationReport?.errorsSummary;
-
-  const detailsStatus = details?.status as Status | undefined;
-  const detailsReason = details?.reason as string | undefined;
+  const jobReason = details?.reason as string | undefined;
 
   return (
     <>
@@ -80,10 +78,10 @@ const JobInfoComponent: React.FC<JobInfoProps> = ({ job }) => {
           titleId="ingestion.job.progress"
           show={Boolean(details)}
           percentage={details?.percentage ?? undefined}
-          status={detailsStatus}
-          reason={detailsReason}
-          isFailed={isStatusFailed(detailsStatus)}
-          isValid={isJobValid(detailsStatus)}
+          status={jobStatus}
+          reason={jobReason}
+          isFailed={isStatusFailed(jobStatus)}
+          isValid={isJobValid(jobStatus)}
         />
       </Box>
 
@@ -105,7 +103,7 @@ const JobInfoComponent: React.FC<JobInfoProps> = ({ job }) => {
                     key: 'resolution',
                     action: openResolutionConflictDialog,
                     isEnabled: taskStatus === Status.Completed,
-                    isApproved: isResolutionConflictApproved,
+                    isApproved: isResolutionConflictApproved || jobStatus === Status.Completed,
                   }
                 )}
               </Box>
