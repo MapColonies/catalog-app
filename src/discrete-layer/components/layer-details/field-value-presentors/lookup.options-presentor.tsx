@@ -151,12 +151,14 @@ export const LookupOptionsPresentorComponent: React.FC<LookupTablesPresentorProp
         ? (filteredOptions[0] as ILookupOption).translationCode
         : value;
 
-      return intl.formatMessage({
-        id:
-          typeof displayValue === 'string' || 'undefined'
-            ? (displayValue as string | undefined)
-            : (displayValue as string[]).toString(),
-      });
+      const messageId =
+        typeof displayValue === 'string'
+          ? displayValue
+          : Array.isArray(displayValue)
+          ? (displayValue as string[]).toString()
+          : undefined;
+
+      return messageId ? intl.formatMessage({ id: messageId }) : '';
     }
   }, [innerValue]);
 
