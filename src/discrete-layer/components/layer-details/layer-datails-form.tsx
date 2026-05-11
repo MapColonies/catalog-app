@@ -184,14 +184,14 @@ const InnerForm = (props: LayerDetailsFormCustomProps & FormikProps<FormValues>)
 
     delete (metadata.recordModel as unknown as Record<string, unknown>)['__typename'];
 
-    // Check update related fields in metadata obj
-    const updateFields = extractDescriptorRelatedFieldNames(
-      'updateRules',
+    // Lifecycle envolved fields should receive default values when used in 'New' mode
+    const fields = extractDescriptorRelatedFieldNames(
+      'isLifecycleEnvolved',
       getFlatEntityDescriptors(layerRecord.__typename, entityDescriptors)
     );
 
     for (const [key, val] of Object.entries(metadata.recordModel)) {
-      if (val === null || (updateFields.includes(key) && mode === Mode.UPDATE)) {
+      if (val === null || fields.includes(key)) {
         delete (metadata.recordModel as unknown as Record<string, unknown>)[key];
       }
     }
