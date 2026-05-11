@@ -31,7 +31,6 @@ export const StatusRenderer: React.FC<ICellRendererParams> = (props) => {
       const lowerCasedStatus = finalStatus.toLowerCase();
       const statusSum = get(jobData, `${lowerCasedStatus}Tasks`) as number;
       const nextSum: number = sum + (isNaN(statusSum) ? NO_DATA : statusSum);
-
       return nextSum;
     }, SUM_INIT);
 
@@ -87,9 +86,9 @@ export const StatusRenderer: React.FC<ICellRendererParams> = (props) => {
   const getProgressbarSections = (): JSX.Element | null => {
     const { completedTasks, inProgressTasks, failedTasks, expiredTasks, status } = jobData;
 
-    const jobStatusFinal = FINAL_STATUSES.find((finalStatus) => finalStatus === status);
+    const jobStatusFinal = [...FINAL_STATUSES, Status.Suspended].find((finalStatus) => finalStatus === status);
 
-    // If job status is a final status - we should return a full bar with its color.
+    // If job status is a final status - we should return a full bar with its color
     if (typeof jobStatusFinal !== 'undefined') {
       return getSectionComponent(jobStatusFinal, STATUS_BAR_WIDTH);
     }

@@ -6,7 +6,7 @@ import { Skeleton } from '../../../../common/components/skeleton/skeleton';
 import { AutoDirectionBox } from '../../../../common/components/auto-direction-box/auto-direction-box.component';
 import { Status } from '../../../models';
 import { JobErrorsSummary } from '../../job-errors-summary/job-errors-summary';
-import { NON_RESUMABLE_STATUSES } from '../../job-manager/job.types';
+import { FINAL_STATUSES } from '../../job-manager/job.types';
 import { Progress } from './progress';
 import { ResolutionConflictDialog } from './resolution-conflict.dialog';
 import { isJobValid, isStatusFailed, isTaskValid } from './state-machine/helpers';
@@ -42,7 +42,7 @@ const JobInfoComponent: React.FC<JobInfoProps> = ({ job }) => {
   const jobStatus = displayJob?.details?.status as Status | undefined;
 
   const isResolutionConflictViewOnly = useMemo(() => {
-    const isStatusReadOnly = jobStatus != null && NON_RESUMABLE_STATUSES.includes(jobStatus);
+    const isStatusReadOnly = jobStatus != null && FINAL_STATUSES.includes(jobStatus);
 
     if (!errorsCount) {
       return isStatusReadOnly;
