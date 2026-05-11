@@ -35,6 +35,7 @@ import { GeoFeaturesPresentorComponent } from './pp-map';
 import { EXCEEDED_PROPERTY_NAME, EXCEEDED_PROPERTY_VALUE, GeometryZIndex } from './pp-map.utils';
 import { ProgressCurtain } from './progressCurtain/progressCurtain';
 import { RasterWorkflowContext } from './state-machine/context';
+import { Events } from './state-machine/types';
 import { UpdateLayerHeader } from './update-layer-header';
 import { useWorkerAPI } from './worker/useWorkerAPI';
 import { extractProgressArray } from './worker/utils';
@@ -74,6 +75,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
   const hasLoadedRef = useRef(false);
   const visibleRowRangesRef = useRef<Record<number, { startIndex: number; stopIndex: number }>>({});
   const ZOOM_LEVELS_TABLE = useZoomLevelsTable();
+  const actorRef = RasterWorkflowContext.useActorRef();
   const state = RasterWorkflowContext.useSelector((s) => s);
   const [showLowResolutionPolygonParts, setShowLowResolutionPolygonParts] = useState(false);
   const [autoScrollListToSelection, setAutoScrollListToSelection] = useState(false);
@@ -95,12 +97,12 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
     state.context.store.discreteLayersStore.customValidationError?.error;
   const displayedPolygonPartsErrors = polygonPartsErrors ?? storePolygonPartsErrors;
   const selectedLowResolutionFeatureId = getFeatureIdentifier(selectedItem);
+  const entityDescriptors = state.context.store.discreteLayersStore
+    ?.entityDescriptors as EntityDescriptorModelType[];
   const reportUrl = state.context.job?.validationReport?.report?.url;
   const ingestionResolution = state.context.job?.details?.parameters?.ingestionResolution as
     | string
     | undefined;
-  const entityDescriptors = state.context.store.discreteLayersStore
-    ?.entityDescriptors as EntityDescriptorModelType[];
 
   const lowResolutionFeatures = useMemo(
     () => lowResolutionCollections.flatMap((c) => c.features),
@@ -306,7 +308,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
     onSetIsOpen(false);
   }, []);
 
-  const approveDialog = useCallback((): void => {
+  const approve = useCallback((): void => {
     const resumeJob = async (): Promise<void> => {
       try {
         await state.context.store.mutateJobApproveAndResume({
@@ -320,6 +322,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
           },
         });
         onApprove?.();
+        actorRef?.send({ type: 'SYNC' } satisfies Events);
         closeDialog();
       } catch (error) {
         setPolygonPartsErrors([
@@ -615,7 +618,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                     <Button
                       raised
                       type="button"
-                      onClick={approveDialog}
+                      onClick={approve}
                       disabled={
                         isLoadingLowResolutionParts ||
                         lowResolutionCollections.length === 0 ||
