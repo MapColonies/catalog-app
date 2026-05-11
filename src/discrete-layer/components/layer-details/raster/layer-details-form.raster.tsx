@@ -279,7 +279,7 @@ export const InnerRasterForm = (
         <Box className="content section">
           <Box className="previewAndJobContainer">
             <Box className="jobData section">
-              {state.context.job && (
+              {state.context.remainingTime && (
                 <Box
                   className="remainingTime refreshContainer"
                   onClick={(): void => {
