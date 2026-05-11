@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [5.1.1](https://github.com/MapColonies/catalog-app/compare/v5.1.0...v5.1.1) (2026-05-11)
+
+
+### Bug Fixes
+
+* 3d uploading metadata from file sets Published instead of Unpublished ([#931](https://github.com/MapColonies/catalog-app/issues/931)) ([a58f4e5](https://github.com/MapColonies/catalog-app/commit/a58f4e58c563670ff95cd0e3d4d5bc6c6525cdd7))
+
 ## [5.1.0](https://github.com/MapColonies/catalog-app/compare/v5.0.1...v5.1.0) (2026-05-11)
 
 
