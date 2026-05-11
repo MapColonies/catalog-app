@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [5.1.0](https://github.com/MapColonies/catalog-app/compare/v5.0.1...v5.1.0) (2026-05-11)
+
+
+### Features
+
+* add GetFeatureCollection progress ([#924](https://github.com/MapColonies/catalog-app/issues/924)) ([3ac5bb6](https://github.com/MapColonies/catalog-app/commit/3ac5bb62a0c781e803fb3ec8f81a20cd3e219bbd))
+
+
+### Bug Fixes
+
+* call job polling when resolution conflict is approved (MAPCO-10603) ([#928](https://github.com/MapColonies/catalog-app/issues/928)) ([72b3a7d](https://github.com/MapColonies/catalog-app/commit/72b3a7d63dd811cfa82307047a614a50ab633a37))
+* message when item not found in catalog ([#926](https://github.com/MapColonies/catalog-app/issues/926)) ([1384a51](https://github.com/MapColonies/catalog-app/commit/1384a51c15c0fb64c57bca6ef501e00c2ab05cf4))
+
 ## [5.0.1](https://github.com/MapColonies/catalog-app/compare/v5.0.0...v5.0.1) (2026-05-07)
 
 
