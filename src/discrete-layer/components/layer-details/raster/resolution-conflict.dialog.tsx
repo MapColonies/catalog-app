@@ -75,6 +75,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
   const hasLoadedRef = useRef(false);
   const visibleRowRangesRef = useRef<Record<number, { startIndex: number; stopIndex: number }>>({});
   const ZOOM_LEVELS_TABLE = useZoomLevelsTable();
+  const actorRef = RasterWorkflowContext.useActorRef();
   const state = RasterWorkflowContext.useSelector((s) => s);
   const [showLowResolutionPolygonParts, setShowLowResolutionPolygonParts] = useState(false);
   const [autoScrollListToSelection, setAutoScrollListToSelection] = useState(false);
@@ -102,7 +103,6 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
   const ingestionResolution = state.context.job?.details?.parameters?.ingestionResolution as
     | string
     | undefined;
-  const actorRef = RasterWorkflowContext.useActorRef();
 
   const lowResolutionFeatures = useMemo(
     () => lowResolutionCollections.flatMap((c) => c.features),
