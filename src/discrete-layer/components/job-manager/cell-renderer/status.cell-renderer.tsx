@@ -86,7 +86,9 @@ export const StatusRenderer: React.FC<ICellRendererParams> = (props) => {
   const getProgressbarSections = (): JSX.Element | null => {
     const { completedTasks, inProgressTasks, failedTasks, expiredTasks, status } = jobData;
 
-    const jobStatusFinal = [...FINAL_STATUSES, Status.Suspended].find((finalStatus) => finalStatus === status);
+    const jobStatusFinal = [...FINAL_STATUSES, Status.Suspended].find(
+      (finalStatus) => finalStatus === status
+    );
 
     // If job status is a final status - we should return a full bar with its color
     if (typeof jobStatusFinal !== 'undefined') {
