@@ -416,7 +416,7 @@ export const InnerRasterForm = (
                 closeDialog();
               }}
             >
-              <FormattedMessage id="general.cancel-btn.text" />
+              <FormattedMessage id="general.close-btn.text" />
             </Button>
           </Box>
         </Box>
