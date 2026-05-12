@@ -95,6 +95,11 @@
   padding: 8px;
 }
 
+#resolutionConflictDialog .rmwc-collapsible-list .rmwc-collapsible-list__handle,
+#resolutionConflictDialog .rmwc-collapsible-list__children-inner {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
 #resolutionConflictDialog .virtualizedFeatureList {
   width: 100%;
   height: 61vh;
