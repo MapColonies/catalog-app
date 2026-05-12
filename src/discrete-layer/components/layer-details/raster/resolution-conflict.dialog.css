@@ -240,6 +240,11 @@ body[dir='rtl'] #resolutionConflictDialog .approverNameFieldContainer {
   font-size: 14px;
 }
 
+#resolutionConflictDialog .approverNameFieldContainer .mdc-floating-label::after {
+  content: ' *';
+  color: var(--mdc-theme-gc-error-high);
+}
+
 #resolutionConflictDialog .approverNameFieldContainer .mdc-text-field--disabled .mdc-floating-label,
 #resolutionConflictDialog
   .approverNameFieldContainer
