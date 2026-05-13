@@ -24,6 +24,7 @@ export type WorkerError = {
 };
 
 export interface WorkerAPI {
+  ready: boolean;
   init(): Promise<void>;
   dispose(): void;
   load(fc: FeatureCollection, options?: LoadOptions): Promise<WorkerError | void>;

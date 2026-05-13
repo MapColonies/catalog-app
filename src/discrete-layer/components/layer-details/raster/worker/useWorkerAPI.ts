@@ -13,9 +13,11 @@ import {
   WorkerType,
   WorkerError,
 } from './worker.types';
+import { WorkerBase } from './worker-hook.types';
 import { buildMessageDetails } from './utils';
 
-type WorkerService = {
+interface WorkerService extends WorkerBase {
+  ready: boolean;
   init: {
     method: () => Promise<void>;
   };
@@ -46,14 +48,23 @@ type WorkerService = {
     method: (bbox: BBoxObj) => Promise<FeatureCollection>;
     progress: WorkerMessage | null;
   };
-};
+}
 
 const FAKE_PROGRESS_TIME = 10000;
+
+const createRasterWorker = (): [Worker, Remote<WorkerAPI>] => {
+  const worker = new Worker(new URL('./feat-collection.worker-api.ts', import.meta.url), {
+    type: 'module',
+  });
+
+  return [worker, wrap(worker)];
+};
 
 export function useWorkerAPI(
   processRunCounts?: Partial<Record<Process, number>>
 ): [WorkerService | null, ProcessInfo] {
   const [workerApi, setWorkerApi] = useState<any>(null);
+  const [isWorkerReady, setIsWorkerReady] = useState(false);
   const [progressComputeArea, setProgressComputeArea] = useState<WorkerMessage | null>(null);
   const [progressComputeOuterGeometry, setProgressComputeOuterGeometry] =
     useState<WorkerMessage | null>(null);
@@ -62,11 +73,12 @@ export function useWorkerAPI(
   const [loadShapeFileProgress, setLoadShapeFileProgress] = useState<WorkerMessage[] | null>(null);
 
   useEffect(() => {
-    const worker = new Worker(new URL('./feat-collection.worker-api.ts', import.meta.url), {
-      type: 'module',
+    const [worker, wrapped]: [Worker, Remote<WorkerAPI>] = createRasterWorker();
+
+    void wrapped.ready.then((isReady) => {
+      setIsWorkerReady(isReady);
     });
 
-    const wrapped: Remote<WorkerAPI> = wrap(worker);
     setWorkerApi({
       init: async () => await wrapped.init(),
       dispose: async () => await wrapped.dispose(),
@@ -128,6 +140,7 @@ export function useWorkerAPI(
     }
 
     return {
+      ready: isWorkerReady,
       init: {
         method: async () => {
           return await workerApi.init();
@@ -242,6 +255,7 @@ export function useWorkerAPI(
     };
   }, [
     workerApi,
+    isWorkerReady,
     loadShapeFileProgress,
     progressComputeOuterGeometry,
     progressComputeArea,
