@@ -1,3 +1,4 @@
+import shpjs from 'shpjs';
 import { expose } from 'comlink';
 import initGeos, { geos } from 'geos-wasm';
 import { cloneDeep, isEmpty } from 'lodash';
@@ -95,6 +96,14 @@ const _downloadFile = async (
   let received = 0;
 
   try {
+    details = createMessageDetails(total, received, t0);
+    onProgress?.({
+      process: Process.Load,
+      stage: Stage.Download,
+      type: WorkerType.Progress,
+      details,
+    });
+
     const response = await abortableFetch(url);
 
     if (!response.ok || !response.body) {
@@ -213,7 +222,7 @@ const _toFeatureCollection = (parsed: unknown): FeatureCollection<Geometry, GeoJ
 };
 
 const _parseShpFileContent = async (buffer: ArrayBuffer): Promise<FeatureCollection> => {
-  const shpjsModule = (await import('shpjs')) as unknown as {
+  const shpjsModule = shpjs as unknown as {
     default?: ShpJsParser;
   };
 
@@ -328,6 +337,7 @@ const api: WorkerAPI = {
   async init(): Promise<void> {
     _geos = await initGeos();
   },
+  ready: true,
   dispose() {
     if (!_geoms) return;
 
