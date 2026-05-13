@@ -638,7 +638,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                     <FormattedMessage id="general.close-btn.text" />
                   </Button>
                   {displayedPolygonPartsErrors && (
-                    <Box className="errorMessage">
+                    <Box>
                       <ValidationsError
                         errors={{ polygonPartsErrors: displayedPolygonPartsErrors }}
                       />

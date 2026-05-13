@@ -281,12 +281,9 @@ body[dir='rtl'] #resolutionConflictDialog .approverNameFieldContainer {
   gap: 8px;
 }
 
-#resolutionConflictDialog .errorMessage {
-  padding-top: 8px;
-}
-
 #resolutionConflictDialog .errorsList {
   min-width: unset;
+  height: 40px;
 }
 
 #resolutionConflictDialog .leftPane {
