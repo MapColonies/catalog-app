@@ -78,7 +78,11 @@ const FeaturePropertiesPopup: React.FC<FeaturePropertiesPopupProps> = ({
     });
   }, [selectedFeature?.properties]);
 
-  if (!selectedFeature?.properties || visibleProperties.length === 0 || selectedFeature.properties._showAsFootprint) {
+  if (
+    !selectedFeature?.properties ||
+    visibleProperties.length === 0 ||
+    selectedFeature.properties._showAsFootprint
+  ) {
     return null;
   }
 
