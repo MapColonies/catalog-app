@@ -602,15 +602,23 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
               <Box className="rightPaneFooter">
                 <Box className="detailsFieldValue approverNameFieldContainer">
                   {!viewOnly && (
-                    <TextField
-                      className="approverNameField"
-                      disabled={isLoadingLowResolutionParts || hasExceededFeatures}
-                      value={approver}
-                      onChange={(event): void => {
-                        setApprover(event.currentTarget.value);
-                      }}
-                      label={intl.formatMessage({ id: 'resolutionConflict.approver.label' })}
-                    />
+                    <Box>
+                      <Typography tag="span">
+                        {intl.formatMessage({ id: 'resolutionConflict.approver.label' })}
+                        <span className={approver.trim().length === 0 ? 'error' : ''}> * </span>
+                      </Typography>
+                      <TextField
+                        className="approverNameField"
+                        disabled={isLoadingLowResolutionParts || hasExceededFeatures}
+                        value={approver}
+                        onChange={(event): void => {
+                          setApprover(event.currentTarget.value);
+                        }}
+                        placeholder={intl.formatMessage({
+                          id: 'resolutionConflict.approver.placeholder',
+                        })}
+                      />
+                    </Box>
                   )}
                 </Box>
                 <Box className="actionsRow">
@@ -625,18 +633,18 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                         approver.trim().length === 0
                       }
                     >
-                      <FormattedMessage id="general.ok-btn.text" />
+                      <FormattedMessage id="general.confirm-btn.text" />
                     </Button>
                   )}
                   <Button type="button" onClick={closeDialog}>
                     <FormattedMessage id="general.close-btn.text" />
                   </Button>
+                </Box>
+                <Box className="errorMessage">
                   {displayedPolygonPartsErrors && (
-                    <Box className="errorMessage">
-                      <ValidationsError
-                        errors={{ polygonPartsErrors: displayedPolygonPartsErrors }}
-                      />
-                    </Box>
+                    <ValidationsError
+                      errors={{ polygonPartsErrors: displayedPolygonPartsErrors }}
+                    />
                   )}
                 </Box>
               </Box>
