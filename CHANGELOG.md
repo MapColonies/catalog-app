@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [6.0.2](https://github.com/MapColonies/catalog-app/compare/v6.0.1...v6.0.2) (2026-05-13)
+
+
+### Bug Fixes
+
+* red outer perimeter should not be selectable ([#940](https://github.com/MapColonies/catalog-app/issues/940)) ([ebec55e](https://github.com/MapColonies/catalog-app/commit/ebec55ed271b7c4b1427cc061a53d20cd5cb4901))
+
 ## [6.0.1](https://github.com/MapColonies/catalog-app/compare/v6.0.0...v6.0.1) (2026-05-13)
 
 
