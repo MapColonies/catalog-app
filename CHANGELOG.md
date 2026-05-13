@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [6.0.1](https://github.com/MapColonies/catalog-app/compare/v6.0.0...v6.0.1) (2026-05-13)
+
+
+### Bug Fixes
+
+* bump shared-components and fix colors and text field ([#937](https://github.com/MapColonies/catalog-app/issues/937)) ([0cc5f77](https://github.com/MapColonies/catalog-app/commit/0cc5f77ee8867278cf238b74506e60984d9821d7))
+
 ## [6.0.0](https://github.com/MapColonies/catalog-app/compare/v5.1.1...v6.0.0) (2026-05-11)
 
 
