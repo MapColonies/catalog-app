@@ -281,6 +281,10 @@ body[dir='rtl'] #resolutionConflictDialog .approverNameFieldContainer {
   gap: 8px;
 }
 
+#resolutionConflictDialog .errorMessage {
+  min-height: 40px;
+}
+
 #resolutionConflictDialog .errorsList {
   min-width: unset;
   height: 40px;

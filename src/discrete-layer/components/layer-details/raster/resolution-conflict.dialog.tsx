@@ -639,12 +639,12 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                   <Button type="button" onClick={closeDialog}>
                     <FormattedMessage id="general.close-btn.text" />
                   </Button>
+                </Box>
+                <Box className="errorMessage">
                   {displayedPolygonPartsErrors && (
-                    <Box>
-                      <ValidationsError
-                        errors={{ polygonPartsErrors: displayedPolygonPartsErrors }}
-                      />
-                    </Box>
+                    <ValidationsError
+                      errors={{ polygonPartsErrors: displayedPolygonPartsErrors }}
+                    />
                   )}
                 </Box>
               </Box>
