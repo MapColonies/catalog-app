@@ -1,6 +1,6 @@
 # Catalog App
 
-React app created with typescript that defines manages and displays discrete layers image catalog
+React app created with typescript that manages CSW catalogs (RASTER, 3D and DEM[in feture])
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app)
 
