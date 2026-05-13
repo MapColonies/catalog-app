@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { FormattedMessage, useIntl } from 'react-intl';
 import { AutoSizer, List, ListRowProps } from 'react-virtualized';
 import { BBox, Feature, FeatureCollection } from 'geojson';
-import { get } from 'lodash';
+import { get, isEmpty } from 'lodash';
 import { Box, VectorLayer, VectorSource } from '@map-colonies/react-components';
 import {
   Button,
@@ -37,6 +37,7 @@ import { ProgressCurtain } from './progressCurtain/progressCurtain';
 import { RasterWorkflowContext } from './state-machine/context';
 import { Events } from './state-machine/types';
 import { UpdateLayerHeader } from './update-layer-header';
+import { isEmptyLayerRecord } from './utils';
 import { useWorkerAPI } from './worker/useWorkerAPI';
 import { extractProgressArray } from './worker/utils';
 import { Process } from './worker/worker.types';
@@ -151,6 +152,14 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
     }
   }, [hasExceededFeatures, listFilterMode]);
 
+  useEffect(() => {
+    if (storePolygonPartsErrors) {
+      setPolygonPartsErrors(storePolygonPartsErrors);
+    } else {
+      setPolygonPartsErrors(undefined);
+    }
+  }, [storePolygonPartsErrors]);
+
   const selectedLowResolutionPosition = useMemo(() => {
     if (!selectedLowResolutionFeatureId) {
       return undefined;
@@ -225,20 +234,13 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
 
     hasLoadedRef.current = true;
 
-    if (!reportUrl) {
-      setLowResolutionCollections([]);
-      setSelectedItem(undefined);
-      setPolygonPartsErrors([intl.formatMessage({ id: 'resolutionConflict.error.missingUrl' })]);
-      return;
-    }
-
     const loadLowResolutionParts = async (): Promise<void> => {
       setPolygonPartsErrors(undefined);
       setIsLoadingLowResolutionParts(true);
 
       await api.init.method();
 
-      const downloadWorkerError = await api.loadFromShapeFile.method(reportUrl, {
+      const downloadWorkerError = await api.loadFromShapeFile.method(reportUrl as string, {
         customProperties: {
           _featureLabel: lowResolutionPartLabel,
           _zoomLevel: String(zoomLevelForIngestion),
@@ -410,6 +412,12 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
     const features = Array.isArray(fetchedFeatures) ? fetchedFeatures : [];
     return { features, pageSize: -1 };
   };
+
+  const isApproverFieldDisabled =
+    isLoadingLowResolutionParts ||
+    hasExceededFeatures ||
+    isEmptyLayerRecord(state.context.updatedLayer) ||
+    !isEmpty(displayedPolygonPartsErrors);
 
   return (
     <Box id="resolutionConflictDialog">
@@ -604,13 +612,24 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                 <Box className="detailsFieldValue approverNameFieldContainer">
                   {!viewOnly && (
                     <Box>
-                      <Typography tag="span">
+                      <Typography
+                        tag="span"
+                        className={`approverLabel ${isApproverFieldDisabled ? 'disabled' : ''}`}
+                      >
                         {intl.formatMessage({ id: 'resolutionConflict.approver.label' })}
-                        <span className={approver.trim().length === 0 ? 'error' : ''}> * </span>
+                        <Typography
+                          tag="span"
+                          className={
+                            !isApproverFieldDisabled && approver.trim().length === 0 ? 'error' : ''
+                          }
+                        >
+                          {' '}
+                          *
+                        </Typography>
                       </Typography>
                       <TextField
                         className="approverNameField"
-                        disabled={isLoadingLowResolutionParts || hasExceededFeatures}
+                        disabled={isApproverFieldDisabled}
                         value={approver}
                         onChange={(event): void => {
                           setApprover(event.currentTarget.value);
@@ -620,6 +639,11 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                         })}
                       />
                     </Box>
+                  )}
+                </Box>
+                <Box className="errorMessage">
+                  {displayedPolygonPartsErrors && (
+                    <ValidationsError errors={{ errors: [...displayedPolygonPartsErrors] }} />
                   )}
                 </Box>
                 <Box className="actionsRow">
@@ -640,13 +664,6 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                   <Button type="button" onClick={closeDialog}>
                     <FormattedMessage id="general.close-btn.text" />
                   </Button>
-                </Box>
-                <Box className="errorMessage">
-                  {displayedPolygonPartsErrors && (
-                    <ValidationsError
-                      errors={{ polygonPartsErrors: displayedPolygonPartsErrors }}
-                    />
-                  )}
                 </Box>
               </Box>
             </Box>

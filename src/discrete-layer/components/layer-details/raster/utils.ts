@@ -1,5 +1,7 @@
+import { isEmpty } from 'lodash';
 import { resolutionDegree } from '../../../../common/ui-descriptors/resolution/resolutionDegree';
 import { resolutionMeter } from '../../../../common/ui-descriptors/resolution/resolutionMeter';
+import { ILayerImage } from '../../../models/layerImage';
 
 export const getUIIngestionFieldDescriptors = () => {
   const ingestionUiDescriptorFieldNames = [resolutionDegree, resolutionMeter];
@@ -12,4 +14,11 @@ export const getUIIngestionFieldDescriptors = () => {
       infoMsgCode: ['info-general-tooltip.required'],
     };
   });
+};
+
+export const isEmptyLayerRecord = (record?: ILayerImage | null): boolean => {
+  if (isEmpty(record)) {
+    return true;
+  }
+  return record?.id === 'DEFAULT_UI_ID';
 };

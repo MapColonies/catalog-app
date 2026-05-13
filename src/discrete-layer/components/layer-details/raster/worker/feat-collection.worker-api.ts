@@ -339,7 +339,6 @@ const api: WorkerAPI = {
     _geoms = [];
 
     _tree.clear();
-    console.log('******** WORKER DISPOSED');
   },
   async load(fc: FeatureCollection, options?: LoadOptions): Promise<void | WorkerError> {
     try {
