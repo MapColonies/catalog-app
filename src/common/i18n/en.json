@@ -292,7 +292,7 @@
   "resolutionConflict.partName": "Polygon {index}",
   "resolutionConflict.units.km2": " km²",
   "resolutionConflict.approver.label": "Approver full name",
-  "resolutionConflict.approver.placeholder": "Enter name to approve the exception...",
+  "resolutionConflict.approver.placeholder": "Enter name to continue to approval...",
   "resolutionConflict.error.missingUrl": "Missing validation report URL",
   "resolutionConflict.error.queryFailed": "Failed to query polygon parts by extent",
   "resolutionConflict.error.approveFailed": "Failed to resume job",

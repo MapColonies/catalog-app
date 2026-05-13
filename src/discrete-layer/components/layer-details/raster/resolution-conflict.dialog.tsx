@@ -603,9 +603,9 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                 <Box className="detailsFieldValue approverNameFieldContainer">
                   {!viewOnly && (
                     <Box>
-                      <Typography tag="span" className="approverNameFieldLabel">
+                      <Typography tag="span">
                         {intl.formatMessage({ id: 'resolutionConflict.approver.label' })}
-                        <span className="error"> * </span>
+                        <span className={approver.trim().length === 0 ? 'error' : ''}> * </span>
                       </Typography>
                       <TextField
                         className="approverNameField"
@@ -631,7 +631,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                         approver.trim().length === 0
                       }
                     >
-                      <FormattedMessage id="general.ok-btn.text" />
+                      <FormattedMessage id="general.confirm-btn.text" />
                     </Button>
                   )}
                   <Button type="button" onClick={closeDialog}>
