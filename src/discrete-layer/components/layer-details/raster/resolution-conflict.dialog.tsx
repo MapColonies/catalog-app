@@ -274,8 +274,9 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
       setOuterExceededPerimeter({
         type: 'Feature',
         properties: {
-          _featureType: FeatureType.LOW_RESOLUTION_PP,
           [EXCEEDED_PROPERTY_NAME]: EXCEEDED_PROPERTY_VALUE,
+          _featureType: FeatureType.LOW_RESOLUTION_PP,
+          _showAsFootprint: true,
         },
         geometry: outerExceededGeometry,
       });
