@@ -217,9 +217,17 @@
   text-align: left;
 }
 
+body[dir='rtl'] #resolutionConflictDialog .approverNameFieldContainer {
+  text-align: right;
+}
+
+#resolutionConflictDialog .approverNameLabel {
+  padding: 8px 0 4px;
+}
+
 #resolutionConflictDialog .approverNameField {
   width: 100%;
-  height: max-content;
+  height: 40px;
 }
 
 #resolutionConflictDialog
@@ -227,10 +235,6 @@
   label.mdc-text-field.mdc-text-field--disabled {
   opacity: 1;
   background-color: transparent;
-}
-
-body[dir='rtl'] #resolutionConflictDialog .approverNameFieldContainer {
-  text-align: right;
 }
 
 #resolutionConflictDialog .approverNameFieldContainer input:disabled {
@@ -243,11 +247,6 @@ body[dir='rtl'] #resolutionConflictDialog .approverNameFieldContainer {
   .mdc-floating-label {
   color: var(--mdc-theme-text-icon-on-background);
   font-size: 14px;
-}
-
-#resolutionConflictDialog .approverNameFieldContainer .mdc-floating-label::after {
-  content: ' *';
-  color: var(--mdc-theme-gc-error-high);
 }
 
 #resolutionConflictDialog .approverNameFieldContainer .mdc-text-field--disabled .mdc-floating-label,
