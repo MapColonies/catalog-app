@@ -614,7 +614,9 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                         onChange={(event): void => {
                           setApprover(event.currentTarget.value);
                         }}
-                        placeholder={intl.formatMessage({ id: 'resolutionConflict.approver.placeholder' })}
+                        placeholder={intl.formatMessage({
+                          id: 'resolutionConflict.approver.placeholder',
+                        })}
                       />
                     </Box>
                   )}
