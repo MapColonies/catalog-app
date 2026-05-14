@@ -111,6 +111,8 @@ import { UserLoginModel, UserLoginModelType } from "./UserLoginModel"
 import { userLoginModelPrimitives, UserLoginModelSelector } from "./UserLoginModel.base"
 import { SourceValidationModel, SourceValidationModelType } from "./SourceValidationModel"
 import { sourceValidationModelPrimitives, SourceValidationModelSelector } from "./SourceValidationModel.base"
+import { DummyForTypesOnClientModel, DummyForTypesOnClientModelType } from "./DummyForTypesOnClientModel"
+import { dummyForTypesOnClientModelPrimitives, DummyForTypesOnClientModelSelector } from "./DummyForTypesOnClientModel.base"
 import { RasterIngestionModel, RasterIngestionModelType } from "./RasterIngestionModel"
 import { rasterIngestionModelPrimitives, RasterIngestionModelSelector } from "./RasterIngestionModel.base"
 
@@ -134,6 +136,7 @@ import { ProviderType } from "./ProviderTypeEnum"
 import { ServiceType } from "./ServiceTypeEnum"
 import { Status } from "./StatusEnum"
 import { RasterIngestionFilesTypeConfig } from "./RasterIngestionFilesTypeConfigEnum"
+import { RasterJobType } from "./RasterJobTypeEnum"
 
 export type CapabilitiesLayersSearchParams = {
   data: CapabilitiesLayersSearchParam[]
@@ -489,7 +492,8 @@ queryServicesAvailability="queryServicesAvailability",
 queryGetPolygonPartsFeature="queryGetPolygonPartsFeature",
 queryLogin="queryLogin",
 queryValidateSource="queryValidateSource",
-queryValidateGPKGSource="queryValidateGPKGSource"
+queryValidateGPKGSource="queryValidateGPKGSource",
+queryDummyForTypesOnClient="queryDummyForTypesOnClient"
 }
 export enum RootStoreBaseMutations {
 mutateUpdateStatus="mutateUpdateStatus",
@@ -510,7 +514,7 @@ mutateJobApproveAndResume="mutateJobApproveAndResume"
 */
 export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
   .named("RootStore")
-  .extend(configureStoreMixin([['Capability', () => CapabilityModel], ['Style', () => StyleModel], ['TileMatrixSet', () => TileMatrixSetModel], ['ResourceURL', () => ResourceUrlModel], ['CSWCatalogs', () => CswCatalogsModel], ['CSWCatalog', () => CswCatalogModel], ['Layer3DRecord', () => Layer3DRecordModel], ['Link', () => LinkModel], ['LayerRasterRecord', () => LayerRasterRecordModel], ['LayerDemRecord', () => LayerDemRecordModel], ['VectorBestRecord', () => VectorBestRecordModel], ['VectorFeatureTypeStructure', () => VectorFeatureTypeStructureModel], ['FieldFeatureType', () => FieldFeatureTypeModel], ['QuantizedMeshBestRecord', () => QuantizedMeshBestRecordModel], ['CSWQuerySummary', () => CswQuerySummaryModel], ['StringArrayObjectType', () => StringArrayObjectTypeModel], ['EntityDescriptor', () => EntityDescriptorModel], ['CategoryConfig', () => CategoryConfigModel], ['FieldConfig', () => FieldConfigModel], ['FilterableFieldConfig', () => FilterableFieldConfigModel], ['FilterFieldValidation', () => FilterFieldValidationModel], ['BriefFieldConfig', () => BriefFieldConfigModel], ['Autocompletion', () => AutocompletionModel], ['ValidationConfig', () => ValidationConfigModel], ['EnumAspects', () => EnumAspectsModel], ['UpdateRules', () => UpdateRulesModel], ['UpdateRulesValue', () => UpdateRulesValueModel], ['UpdateRulesOperation', () => UpdateRulesOperationModel], ['LookupTableBinding', () => LookupTableBindingModel], ['DependentField', () => DependentFieldModel], ['ShapeMapping', () => ShapeMappingModel], ['MCEnums', () => McEnumsModel], ['PolygonPartRecord', () => PolygonPartRecordModel], ['EstimatedSize', () => EstimatedSizeModel], ['FreeDiskSpace', () => FreeDiskSpaceModel], ['TriggerExportTask', () => TriggerExportTaskModel], ['ExternalService', () => ExternalServiceModel], ['Job', () => JobModel], ['AvailableActions', () => AvailableActionsModel], ['LookupTableData', () => LookupTableDataModel], ['DeploymentWithServices', () => DeploymentWithServicesModel], ['K8sService', () => K8SServiceModel], ['File', () => FileModel], ['DecryptedId', () => DecryptedIdModel], ['TasksGroup', () => TasksGroupModel], ['Task', () => TaskModel], ['GetFeature', () => GetFeatureModel], ['WfsFeature', () => WfsFeatureModel], ['GetFeatureTypes', () => GetFeatureTypesModel], ['PositionsWithHeights', () => PositionsWithHeightsModel], ['PositionWithHeight', () => PositionWithHeightModel], ['UserLogin', () => UserLoginModel], ['SourceValidation', () => SourceValidationModel], ['RasterIngestion', () => RasterIngestionModel]], ['LayerRasterRecord', 'Layer3DRecord', 'LayerDemRecord', 'EntityDescriptor', 'VectorBestRecord', 'QuantizedMeshBestRecord', 'PolygonPartRecord'], "js"))
+  .extend(configureStoreMixin([['Capability', () => CapabilityModel], ['Style', () => StyleModel], ['TileMatrixSet', () => TileMatrixSetModel], ['ResourceURL', () => ResourceUrlModel], ['CSWCatalogs', () => CswCatalogsModel], ['CSWCatalog', () => CswCatalogModel], ['Layer3DRecord', () => Layer3DRecordModel], ['Link', () => LinkModel], ['LayerRasterRecord', () => LayerRasterRecordModel], ['LayerDemRecord', () => LayerDemRecordModel], ['VectorBestRecord', () => VectorBestRecordModel], ['VectorFeatureTypeStructure', () => VectorFeatureTypeStructureModel], ['FieldFeatureType', () => FieldFeatureTypeModel], ['QuantizedMeshBestRecord', () => QuantizedMeshBestRecordModel], ['CSWQuerySummary', () => CswQuerySummaryModel], ['StringArrayObjectType', () => StringArrayObjectTypeModel], ['EntityDescriptor', () => EntityDescriptorModel], ['CategoryConfig', () => CategoryConfigModel], ['FieldConfig', () => FieldConfigModel], ['FilterableFieldConfig', () => FilterableFieldConfigModel], ['FilterFieldValidation', () => FilterFieldValidationModel], ['BriefFieldConfig', () => BriefFieldConfigModel], ['Autocompletion', () => AutocompletionModel], ['ValidationConfig', () => ValidationConfigModel], ['EnumAspects', () => EnumAspectsModel], ['UpdateRules', () => UpdateRulesModel], ['UpdateRulesValue', () => UpdateRulesValueModel], ['UpdateRulesOperation', () => UpdateRulesOperationModel], ['LookupTableBinding', () => LookupTableBindingModel], ['DependentField', () => DependentFieldModel], ['ShapeMapping', () => ShapeMappingModel], ['MCEnums', () => McEnumsModel], ['PolygonPartRecord', () => PolygonPartRecordModel], ['EstimatedSize', () => EstimatedSizeModel], ['FreeDiskSpace', () => FreeDiskSpaceModel], ['TriggerExportTask', () => TriggerExportTaskModel], ['ExternalService', () => ExternalServiceModel], ['Job', () => JobModel], ['AvailableActions', () => AvailableActionsModel], ['LookupTableData', () => LookupTableDataModel], ['DeploymentWithServices', () => DeploymentWithServicesModel], ['K8sService', () => K8SServiceModel], ['File', () => FileModel], ['DecryptedId', () => DecryptedIdModel], ['TasksGroup', () => TasksGroupModel], ['Task', () => TaskModel], ['GetFeature', () => GetFeatureModel], ['WfsFeature', () => WfsFeatureModel], ['GetFeatureTypes', () => GetFeatureTypesModel], ['PositionsWithHeights', () => PositionsWithHeightsModel], ['PositionWithHeight', () => PositionWithHeightModel], ['UserLogin', () => UserLoginModel], ['SourceValidation', () => SourceValidationModel], ['DummyForTypesOnClient', () => DummyForTypesOnClientModel], ['RasterIngestion', () => RasterIngestionModel]], ['LayerRasterRecord', 'Layer3DRecord', 'LayerDemRecord', 'EntityDescriptor', 'VectorBestRecord', 'QuantizedMeshBestRecord', 'PolygonPartRecord'], "js"))
   .props({
     layerRasterRecords: types.optional(types.map(types.late((): any => LayerRasterRecordModel)), {}),
     layer3DRecords: types.optional(types.map(types.late((): any => Layer3DRecordModel)), {}),
@@ -682,6 +686,11 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     queryValidateGPKGSource(variables: { data: SourceGpkgValidationParams }, resultSelector: string | ((qb: SourceValidationModelSelector) => SourceValidationModelSelector) = sourceValidationModelPrimitives.toString(), options: QueryOptions = {}) {
       return self.query<{ validateGPKGSource: SourceValidationModelType[]}>(`query validateGPKGSource($data: SourceGPKGValidationParams!) { validateGPKGSource(data: $data) {
         ${typeof resultSelector === "function" ? resultSelector(new SourceValidationModelSelector()).toString() : resultSelector}
+      } }`, variables, options)
+    },
+    queryDummyForTypesOnClient(variables?: {  }, resultSelector: string | ((qb: DummyForTypesOnClientModelSelector) => DummyForTypesOnClientModelSelector) = dummyForTypesOnClientModelPrimitives.toString(), options: QueryOptions = {}) {
+      return self.query<{ dummyForTypesOnClient: DummyForTypesOnClientModelType}>(`query dummyForTypesOnClient { dummyForTypesOnClient {
+        ${typeof resultSelector === "function" ? resultSelector(new DummyForTypesOnClientModelSelector()).toString() : resultSelector}
       } }`, variables, options)
     },
     mutateUpdateStatus(variables: { data: RecordUpdatePartial }, optimisticUpdate?: () => void) {
