@@ -13,6 +13,7 @@ import { Box } from '@map-colonies/react-components';
 import { emphasizeByHTML } from '../../../common/helpers/formatters';
 import { getTextStyle } from '../../../common/helpers/style';
 import { Mode } from '../../../common/models/mode.enum';
+import { DEFAULT_ID } from '../../../common/utils/layer';
 import {
   EntityDescriptorModelType,
   Layer3DRecordModel,
@@ -56,7 +57,6 @@ import suite from './validate';
 import './entity.dialog.css';
 
 const IS_EDITABLE = 'isManuallyEditable';
-export const DEFAULT_ID = 'DEFAULT_UI_ID';
 const NONE = 0;
 const START = 0;
 

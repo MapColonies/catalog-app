@@ -13,6 +13,7 @@ import { emphasizeByHTML } from '../../../../common/helpers/formatters';
 import { getTextStyle } from '../../../../common/helpers/style';
 import { Mode } from '../../../../common/models/mode.enum';
 import { RasterIngestionJobType } from '../../../../common/models/raster-job';
+import { DEFAULT_ID } from '../../../../common/utils/layer';
 import {
   EntityDescriptorModelType,
   FieldConfigModelType,
@@ -50,7 +51,6 @@ import { getUIIngestionFieldDescriptors } from './utils';
 
 import './entity.raster.dialog.css';
 
-const DEFAULT_ID = 'DEFAULT_UI_ID';
 const DEFAULT_TYPE_NAME = 'DEFAULT_TYPE_NAME';
 const NONE = 0;
 const START = 0;
