@@ -6,6 +6,7 @@ import { Mode } from '../../../../common/models/mode.enum';
 import { EntityDescriptorModelType, Status } from '../../../models';
 import { ILayerImage } from '../../../models/layerImage';
 import { LayersDetailsComponent } from '../layer-details';
+import { isEmptyLayerRecord } from '../utils';
 import { RasterWorkflowContext } from './state-machine/context';
 
 import './update-layer-header.css';
@@ -15,20 +16,13 @@ interface UpdateLayerHeaderProps {
   layerRecord?: ILayerImage | null;
 }
 
-const isLayerRecordEmpty = (record?: ILayerImage | null): boolean => {
-  if (!record) {
-    return true;
-  }
-  return record.id === 'DEFAULT_UI_ID';
-};
-
 export const UpdateLayerHeader: React.FC<UpdateLayerHeaderProps> = ({
   entityDescriptors,
   layerRecord,
 }) => {
   const intl = useIntl();
   const state = RasterWorkflowContext.useSelector((s) => s);
-  const isEmpty = isLayerRecordEmpty(layerRecord);
+  const isEmpty = isEmptyLayerRecord(layerRecord);
 
   return (
     <Box id="updateLayerHeader">

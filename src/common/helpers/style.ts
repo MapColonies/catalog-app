@@ -1,6 +1,6 @@
 import { get } from 'lodash';
+import { DEFAULT_ID } from '../../discrete-layer/components/layer-details/utils';
 import { LayerMetadataMixedUnion, RecordStatus } from '../../discrete-layer/models';
-import { DEFAULT_ID } from '../../discrete-layer/components/layer-details/entity.dialog';
 import CONFIG from '../config';
 import { isValidLayerMetadata } from './layer-url';
 

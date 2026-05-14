@@ -293,7 +293,6 @@
   "resolutionConflict.units.km2": " קמ\"ר",
   "resolutionConflict.approver.label": "שם מאשר החריגה",
   "resolutionConflict.approver.placeholder": "יש להזין שם כדי לאשר את החריגה...",
-  "resolutionConflict.error.missingUrl": "חסר URL לדו\"ח ולידציה",
   "resolutionConflict.error.queryFailed": "נכשל בהרצת שאילתת חלקי תיחום בתצוגה",
   "resolutionConflict.error.approveFailed": "נכשל באישור החריגה",
 
