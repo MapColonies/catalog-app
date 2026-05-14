@@ -26,7 +26,6 @@ keys = [
   "/configuration/map/center",
   "/configuration/map/zoom",
   "/configuration/map/mapmode2d",
-  "/configuration/map/use/optimized/tile/requests",
   "/configuration/map/show/debugger/tool",
   "/configuration/map/show/active/layers/tool",
   "/configuration/map/show/geocoder/tool",
