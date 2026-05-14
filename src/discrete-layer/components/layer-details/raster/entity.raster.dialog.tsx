@@ -185,7 +185,8 @@ const EntityRasterDialogInner: React.FC<EntityRasterInnerProps> = observer(
           type: 'RESTORE',
           job: { jobId: job.id },
           updatedLayer:
-            job.type === RasterIngestionJobType.UPDATE
+            job.type === RasterIngestionJobType.UPDATE ||
+            job.type === RasterIngestionJobType.SWAP_UPDATE
               ? (layerRecord as LayerRasterRecordModelType)
               : undefined,
         } satisfies Events);
