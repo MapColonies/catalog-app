@@ -11,7 +11,6 @@
   "license": "MIT",
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged",
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
     }
   },
@@ -40,11 +39,6 @@
     "helm-assets": "npm run helm-update && tar -xzvf ./helm/charts/helm-common*.tgz --strip-components=1 helm-common/schemas",
     "helm-install": "npm run helm-update && helm install -f 'helm/global.yaml' -f 'helm/values.yaml' catalog-app helm",
     "helm-uninstall": "helm uninstall catalog-app"
-  },
-  "lint-staged": {
-    "*.{js,jsx,ts,tsx,json,css,scss,md,yml,yaml}": [
-      "prettier --write"
-    ]
   },
   "jest": {
     "transformIgnorePatterns": [
