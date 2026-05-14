@@ -13,7 +13,6 @@ import { emphasizeByHTML } from '../../../../common/helpers/formatters';
 import { getTextStyle } from '../../../../common/helpers/style';
 import { Mode } from '../../../../common/models/mode.enum';
 import { RasterIngestionJobType } from '../../../../common/models/raster-job';
-import { DEFAULT_ID } from '../../../../common/utils/layer';
 import {
   EntityDescriptorModelType,
   FieldConfigModelType,
@@ -41,6 +40,8 @@ import {
   getBasicType,
   isEnumType,
   jobType2Mode,
+  DEFAULT_ID,
+  DEFAULT_TYPE_NAME,
 } from '../utils';
 import suite from '../validate';
 import EntityRasterForm from './layer-details-form.raster';
@@ -51,7 +52,6 @@ import { getUIIngestionFieldDescriptors } from './utils';
 
 import './entity.raster.dialog.css';
 
-const DEFAULT_TYPE_NAME = 'DEFAULT_TYPE_NAME';
 const NONE = 0;
 const START = 0;
 

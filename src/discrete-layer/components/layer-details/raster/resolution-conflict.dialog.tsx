@@ -23,9 +23,9 @@ import CONFIG from '../../../../common/config';
 import { Domain } from '../../../../common/models/domain';
 import { Mode } from '../../../../common/models/mode.enum';
 import { isGeometryEmpty } from '../../../../common/utils/geo.tools';
-import { isEmptyLayerRecord } from '../../../../common/utils/layer';
 import { EntityDescriptorModelType } from '../../../models';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
+import { isEmptyLayerRecord } from '../utils';
 import { FeatureType } from './feature-type.enum';
 import { GeoFeaturesInnerComponent } from './geo-features-inner.component';
 import {

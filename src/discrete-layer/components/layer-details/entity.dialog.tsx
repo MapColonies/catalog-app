@@ -13,7 +13,6 @@ import { Box } from '@map-colonies/react-components';
 import { emphasizeByHTML } from '../../../common/helpers/formatters';
 import { getTextStyle } from '../../../common/helpers/style';
 import { Mode } from '../../../common/models/mode.enum';
-import { DEFAULT_ID } from '../../../common/utils/layer';
 import {
   EntityDescriptorModelType,
   Layer3DRecordModel,
@@ -47,6 +46,7 @@ import EntityForm from './layer-datails-form';
 import {
   cleanUpEntityPayload,
   clearSyncWarnings,
+  DEFAULT_ID,
   getFlatEntityDescriptors,
   getPartialRecord,
   getValidationType,

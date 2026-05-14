@@ -50,13 +50,13 @@ import {
   getYupFieldConfig,
   getBasicType,
   isEnumType,
+  DEFAULT_TYPE_NAME,
 } from '../utils';
 import suite from '../validate';
 import { getUIIngestionFieldDescriptors } from './utils';
 
 import './entity.raster.dialog.css';
 
-const DEFAULT_TYPE_NAME = 'DEFAULT_TYPE_NAME';
 const NONE = 0;
 const START = 0;
 

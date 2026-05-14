@@ -68,6 +68,10 @@ const JSON_INDENTATION = 4;
 
 export const DEFAULT_ENUM = 'DEFAULT_ENUM';
 
+export const DEFAULT_ID = 'DEFAULT_UI_ID';
+
+export const DEFAULT_TYPE_NAME = 'DEFAULT_TYPE_NAME';
+
 export const ENUM_TYPES = [
   'DemDataType',
   'DemDataType',
@@ -94,6 +98,13 @@ export const GEOMETRY_ERRORS_THRESHOLD = {
 
 export const isEnumType = (typeName: string) => {
   return ENUM_TYPES.some((enumType) => enumType === typeName);
+};
+
+export const isEmptyLayerRecord = (record?: ILayerImage | null): boolean => {
+  if (isEmpty(record)) {
+    return true;
+  }
+  return record?.id === DEFAULT_ID;
 };
 
 export const getEntityDescriptors = (

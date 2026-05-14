@@ -3,10 +3,10 @@ import { useIntl } from 'react-intl';
 import { Box } from '@map-colonies/react-components';
 import { Icon, Typography } from '@map-colonies/react-core';
 import { Mode } from '../../../../common/models/mode.enum';
-import { isEmptyLayerRecord } from '../../../../common/utils/layer';
 import { EntityDescriptorModelType, Status } from '../../../models';
 import { ILayerImage } from '../../../models/layerImage';
 import { LayersDetailsComponent } from '../layer-details';
+import { isEmptyLayerRecord } from '../utils';
 import { RasterWorkflowContext } from './state-machine/context';
 
 import './update-layer-header.css';
