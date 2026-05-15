@@ -3,7 +3,6 @@ import path from 'path';
 import { get, merge } from 'lodash';
 import shp from 'shpjs';
 import { FileData } from '@map-colonies/react-components';
-import { RasterIngestionJobType } from '../../../../../common/models/raster-job';
 import CONFIG from '../../../../../common/config';
 import { dateFormatter, relativeDateFormatter } from '../../../../../common/helpers/formatters';
 import {
@@ -197,7 +196,7 @@ export const getRestoreData = async (context: IContext): Promise<IPartialContext
   const job = await getJob(context);
   try {
     return {
-      flowType: jobType2Mode[job.type || RasterIngestionJobType.NEW] as IPartialContext['flowType'],
+      flowType: jobType2Mode[job.type as string] as IPartialContext['flowType'],
       selectionMode: 'restore',
       files: {
         data: {

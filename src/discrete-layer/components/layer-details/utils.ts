@@ -15,7 +15,6 @@ import { IEnumsMapType } from '../../../common/contexts/enumsMap.context';
 import { emphasizeByHTML } from '../../../common/helpers/formatters';
 import { sessionStore } from '../../../common/helpers/storage';
 import { Mode } from '../../../common/models/mode.enum';
-import { RasterIngestionJobType } from '../../../common/models/raster-job';
 import { ValidationTypeName } from '../../../common/models/validation.enum';
 import { UiDescriptorsType, UiDescriptorsTypeName } from '../../../common/ui-descriptors/type';
 import {
@@ -46,6 +45,7 @@ import {
   ProductType,
   ProviderType,
   QuantizedMeshBestRecordModel,
+  RasterJobType,
   RecordType,
   UpdateRulesModelType,
   UpdateRulesOperationModelType,
@@ -1072,8 +1072,24 @@ export const filterModeDescriptors = (
   });
 };
 
-export const jobType2Mode: { [key: string]: Mode } = {
-  [RasterIngestionJobType.NEW]: Mode.NEW,
-  [RasterIngestionJobType.UPDATE]: Mode.UPDATE,
-  [RasterIngestionJobType.SWAP_UPDATE]: Mode.UPDATE,
+const formatRasterJobTypeRealValue = (jobType: RasterJobType): string => {
+  return `Ingestion_${jobType
+    .split('_')
+    .map((part) => `${part.charAt(0)}${part.slice(1).toLowerCase()}`)
+    .join('_')}`;
+};
+
+export const jobType2Mode: { [key: string]: Mode } = Object.values(RasterJobType).reduce(
+  (jobTypesMap, jobType) => {
+    jobTypesMap[formatRasterJobTypeRealValue(jobType)] =
+      jobType === RasterJobType.NEW ? Mode.NEW : Mode.UPDATE;
+    return jobTypesMap;
+  },
+  {} as { [key: string]: Mode }
+);
+
+export const getUpdateJobTypes = (): string[] => {
+  return Object.entries(jobType2Mode)
+    .filter(([_, mode]) => mode === Mode.UPDATE)
+    .map(([jobType]) => jobType);
 };

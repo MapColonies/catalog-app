@@ -181,7 +181,7 @@ export const InnerRasterForm = (
   const ppConfig = CONFIG.POLYGON_PARTS;
 
   const intl = useIntl();
-  const enumsMap = useEnums();
+  const ENUMS = useEnums();
   const ZOOM_LEVELS = useZoomLevels();
   const [graphQLError, setGraphQLError] = useState<unknown>(mutationQueryError);
   const [isSelectedFiles, setIsSelectedFiles] = useState<boolean>(false);
@@ -573,7 +573,7 @@ export const InnerRasterForm = (
   }, [firstPhaseErrors, vestValidationResults, graphQLPayloadObjectErrors]);
 
   const shapeFileProviders = useMemo(() => {
-    return getEnumKeys(enumsMap, 'ProviderType').map((key) => {
+    return getEnumKeys(ENUMS, 'ProviderType').map((key) => {
       const value = key as keyof typeof ProviderType;
       return {
         label: intl.formatMessage({
