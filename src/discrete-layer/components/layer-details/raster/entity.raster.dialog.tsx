@@ -11,8 +11,8 @@ import { Dialog, DialogTitle, IconButton } from '@map-colonies/react-core';
 import CONFIG from '../../../../common/config';
 import { emphasizeByHTML } from '../../../../common/helpers/formatters';
 import { getTextStyle } from '../../../../common/helpers/style';
+import { useEnums } from '../../../../common/hooks/useEnum.hook';
 import { Mode } from '../../../../common/models/mode.enum';
-import { RasterIngestionJobType } from '../../../../common/models/raster-job';
 import {
   EntityDescriptorModelType,
   FieldConfigModelType,
@@ -35,6 +35,7 @@ import {
   clearSyncWarnings,
   filterModeDescriptors,
   getFlatEntityDescriptors,
+  getUpdateJobTypes,
   getValidationType,
   getYupFieldConfig,
   getBasicType,
@@ -108,12 +109,13 @@ export const buildRasterRecord = (descriptors: EntityDescriptorModelType[]): ILa
 export const EntityRasterDialog: React.FC<EntityRasterDialogProps> = observer(
   (props: EntityRasterDialogProps) => {
     const store = useStore();
+    const ENUMS = useEnums();
 
     const { job } = props;
 
     const isUpdateMode = (jobRecord: JobModelType | undefined): boolean => {
       if (jobRecord) {
-        const type = jobRecord.type || RasterIngestionJobType.NEW;
+        const type = jobRecord.type || ENUMS.NEW.realValue;
         return jobType2Mode[type] === Mode.UPDATE;
       }
 
@@ -184,10 +186,9 @@ const EntityRasterDialogInner: React.FC<EntityRasterInnerProps> = observer(
         actorRef.send({
           type: 'RESTORE',
           job: { jobId: job.id },
-          updatedLayer:
-            job.type === RasterIngestionJobType.UPDATE
-              ? (layerRecord as LayerRasterRecordModelType)
-              : undefined,
+          updatedLayer: getUpdateJobTypes().includes(job.type as string)
+            ? (layerRecord as LayerRasterRecordModelType)
+            : undefined,
         } satisfies Events);
       } else if (mode === Mode.UPDATE) {
         actorRef.send({
