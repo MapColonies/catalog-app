@@ -1084,16 +1084,9 @@ export const filterModeDescriptors = (
   });
 };
 
-const formatRasterJobTypeRealValue = (jobType: RasterJobType): string => {
-  return `Ingestion_${jobType
-    .split('_')
-    .map((part) => `${part.charAt(0)}${part.slice(1).toLowerCase()}`)
-    .join('_')}`;
-};
-
 export const jobType2Mode: { [key: string]: Mode } = Object.values(RasterJobType).reduce(
   (jobTypesMap, jobType) => {
-    jobTypesMap[formatRasterJobTypeRealValue(jobType)] =
+    jobTypesMap[getEnumValues(enumsMap, 'RasterJobType')[jobType]] =
       jobType === RasterJobType.NEW ? Mode.NEW : Mode.UPDATE;
     return jobTypesMap;
   },
