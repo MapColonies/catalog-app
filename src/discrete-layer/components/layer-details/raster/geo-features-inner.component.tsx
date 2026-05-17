@@ -36,10 +36,10 @@ export const GeoFeaturesInnerComponent: React.FC<GeoFeaturesInnerProps> = ({
       {geoFeatures?.map((feat, idx) => {
         return feat && !isEmpty(feat.geometry) ? (
           <GeoJSONFeature
-            geometry={{ ...feat.geometry }}
-            fit={false}
             key={feat.id ?? idx}
+            geometry={feat}
             featureStyle={getStyleByFeatureType(feat)}
+            fit={false}
           />
         ) : null;
       })}

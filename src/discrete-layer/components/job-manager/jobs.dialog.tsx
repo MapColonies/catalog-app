@@ -13,7 +13,10 @@ import { LogicError } from '../../../common/components/error/logic.error-present
 import { GridApi } from '../../../common/components/grid';
 import CONFIG from '../../../common/config';
 import { dateFormatter } from '../../../common/helpers/formatters';
-import { getResponseErrorMesssage } from '../../../common/helpers/server-error';
+import {
+  getResponseErrorMesssage,
+  getResponseErrorStatus,
+} from '../../../common/helpers/server-error';
 import useCountDown, { IActions } from '../../../common/hooks/countdown.hook';
 import { JobModelType } from '../../models';
 import { IDispatchAction } from '../../models/actionDispatcherStore';
@@ -201,7 +204,7 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
       const message = getResponseErrorMesssage(mutationQuery.error.response);
       newError = {
         code: 'error.server-error',
-        message: `${status > NONE ? status + ' ' : ''}${message}`,
+        message: `${Number(status) > 0 ? status + ' ' : ''}${message}`,
         level: 'error',
       };
     }

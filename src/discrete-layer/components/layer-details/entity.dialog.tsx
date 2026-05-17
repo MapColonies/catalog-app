@@ -46,6 +46,7 @@ import EntityForm from './layer-datails-form';
 import {
   cleanUpEntityPayload,
   clearSyncWarnings,
+  DEFAULT_ID,
   getFlatEntityDescriptors,
   getPartialRecord,
   getValidationType,
@@ -56,7 +57,6 @@ import suite from './validate';
 import './entity.dialog.css';
 
 const IS_EDITABLE = 'isManuallyEditable';
-export const DEFAULT_ID = 'DEFAULT_UI_ID';
 const NONE = 0;
 const START = 0;
 

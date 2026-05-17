@@ -29,8 +29,6 @@ import { LayersDetailsComponent } from './layer-details';
 
 import './entity.delete-dialog.css';
 
-export const DEFAULT_ID = 'DEFAULT_UI_ID';
-
 interface EntityDeleteDialogProps {
   isOpen: boolean;
   onSetOpen: (open: boolean) => void;

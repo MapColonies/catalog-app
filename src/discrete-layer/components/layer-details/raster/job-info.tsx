@@ -43,7 +43,6 @@ const JobInfoComponent: React.FC<JobInfoProps> = ({ job }) => {
 
   const isResolutionConflictViewOnly = useMemo(() => {
     const isStatusReadOnly = jobStatus != null && FINAL_STATUSES.includes(jobStatus);
-
     if (!errorsCount) {
       return isStatusReadOnly;
     }
@@ -142,5 +141,4 @@ const JobInfoComponent: React.FC<JobInfoProps> = ({ job }) => {
 };
 
 JobInfoComponent.displayName = 'JobInfo';
-
 export const JobInfo = React.memo(JobInfoComponent);
