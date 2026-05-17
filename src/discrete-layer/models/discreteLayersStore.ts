@@ -67,6 +67,7 @@ const INITIAL_STATE = {
   polygonPartsLayer: undefined,
   polygonPartsInfo: [],
   isActiveLayersImages: false,
+  enumsMap: {},
 };
 
 export type PolygonPartsWfsFeatureInfo = GetFeatureModelType & Pick<WfsPolygonPartsGetFeatureParams, 'feature'>;
@@ -93,6 +94,7 @@ export const discreteLayersStore = ModelBase
     polygonPartsLayer: types.maybe(types.frozen<ILayerImage>(INITIAL_STATE.polygonPartsLayer as unknown as ILayerImage)),
     polygonPartsInfo: types.maybe(types.frozen<Feature<Geometry, GeoJsonProperties>[]>(INITIAL_STATE.polygonPartsInfo)),
     isActiveLayersImages: types.maybe(types.frozen<boolean>(INITIAL_STATE.isActiveLayersImages)),
+    enumsMap: types.maybe(types.frozen<Record<string, unknown>>(INITIAL_STATE.enumsMap)),
     
     // Don't forget to update INITIAL_STATE as well when adding new state value.
   })
@@ -643,6 +645,23 @@ export const discreteLayersStore = ModelBase
       return extractLayerImagesFromCswQueries([...initialCatalogResults, ...fetchedRecords]);
     };
 
+    function setEnumsMap(enumsMap: Record<string, unknown>): void {
+      self.enumsMap = enumsMap;
+    }
+
+    function getEnumValues(enumName: string): Record<string, string> {
+      if (!self.enumsMap) {
+        return {};
+      }
+      return Object.keys(self.enumsMap ?? {}).reduce((acc, key) => {
+        const enumItem = (self.enumsMap ?? {})[key] as Record<string, unknown>;
+        if (enumItem.enumName === enumName) {
+          acc[key] = enumItem.realValue as string;
+        }
+        return acc;
+      }, {} as Record<string, string>);
+    }
+
     return {
       getLayersImages,
       getPreparedLayersImages,
@@ -685,7 +704,9 @@ export const discreteLayersStore = ModelBase
       addPolygonPartsInfo,
       resetPolygonPartsInfo,
       resetPolygonParts,
-      fetchAllCatalog
+      fetchAllCatalog,
+      setEnumsMap,
+      getEnumValues,
     };
   });
 

@@ -45,7 +45,6 @@ import {
   ProductType,
   ProviderType,
   QuantizedMeshBestRecordModel,
-  RasterJobType,
   RecordType,
   UpdateRulesModelType,
   UpdateRulesOperationModelType,
@@ -1084,14 +1083,13 @@ export const filterModeDescriptors = (
   });
 };
 
-export const jobType2Mode: { [key: string]: Mode } = Object.values(RasterJobType).reduce(
-  (jobTypesMap, jobType) => {
-    jobTypesMap[getEnumValues(enumsMap, 'RasterJobType')[jobType]] =
-      jobType === RasterJobType.NEW ? Mode.NEW : Mode.UPDATE;
-    return jobTypesMap;
-  },
-  {} as { [key: string]: Mode }
-);
+export const rasterJobTypeEnumValues = store.discreteLayersStore.getEnumValues('RasterJobType');
+
+export const jobType2Mode: { [key: string]: Mode } = {
+  [rasterJobTypeEnumValues.NEW]: Mode.NEW,
+  [rasterJobTypeEnumValues.UPDATE]: Mode.UPDATE,
+  [rasterJobTypeEnumValues.SWAP_UPDATE]: Mode.UPDATE,
+};
 
 export const getUpdateJobTypes = (): string[] => {
   return Object.entries(jobType2Mode)

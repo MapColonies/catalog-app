@@ -211,6 +211,8 @@ export const MCEnumsFetcher: React.FC = observer(() => {
       enums[UNPUBLISHED] = { ...enums[UNPUBLISHED], internal: true };
 
       setEnumsMap(enums);
+
+      store.discreteLayersStore.setEnumsMap(enums);
     }
   }, [mcEnumsQuery.data, mcEnumsQuery.loading, store.discreteLayersStore]);
 
