@@ -140,7 +140,9 @@ export function useRasterWorkerAPI(
             options,
             proxy((p: WorkerMessage | null) => {
               // console.log('**** Progress LoadShape: ', p);
-              if (p) upsertWorkerMessageByStage(Process.Load, p, setProgressLoadShapeFile);
+              if (p) {
+                upsertWorkerMessageByStage(Process.Load, p, setProgressLoadShapeFile);
+              }
             })
           )) as WorkerError | void;
         },
