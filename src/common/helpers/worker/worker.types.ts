@@ -3,7 +3,7 @@ export interface IWorkerHookBase {
   init: {
     method: () => Promise<void>;
   };
-  //["dispose"] will be called internally
+  //["cleanup"] will be called internally
 }
 
 export interface IWorkerBase {
