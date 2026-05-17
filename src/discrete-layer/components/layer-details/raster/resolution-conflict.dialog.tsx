@@ -153,6 +153,12 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
   }, [hasExceededFeatures, listFilterMode]);
 
   useEffect(() => {
+    if (hasExceededFeatures && !viewOnly) {
+      setPolygonPartsErrors([intl.formatMessage({ id: 'resolutionConflict.error.exceededParts' })]);
+    }
+  }, [hasExceededFeatures]);
+
+  useEffect(() => {
     if (storePolygonPartsErrors) {
       setPolygonPartsErrors(storePolygonPartsErrors);
     } else {
