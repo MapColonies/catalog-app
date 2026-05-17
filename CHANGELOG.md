@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [6.0.3](https://github.com/MapColonies/catalog-app/compare/v6.0.2...v6.0.3) (2026-05-17)
+
+
+### Bug Fixes
+
+* workers bootstrapper ([#939](https://github.com/MapColonies/catalog-app/issues/939)) ([3813813](https://github.com/MapColonies/catalog-app/commit/3813813994f9406bb1f3d90901317d0d01725721))
+
 ## [6.0.2](https://github.com/MapColonies/catalog-app/compare/v6.0.1...v6.0.2) (2026-05-14)
 
 
