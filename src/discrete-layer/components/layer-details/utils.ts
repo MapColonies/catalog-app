@@ -1026,6 +1026,18 @@ export const getEnumKeys = (
   });
 };
 
+export const getEnumValues = (
+  enumsMap: IEnumsMapType,
+  enumName: string
+): Record<string, string> => {
+  return Object.keys(enumsMap).reduce((acc, key) => {
+    if (enumsMap[key].enumName === enumName) {
+      acc[key] = enumsMap[key].realValue as string;
+    }
+    return acc;
+  }, {} as Record<string, string>);
+};
+
 export const getProductDomain = (productType: ProductType, enumsMap?: IEnumsMapType): string => {
   return enumsMap?.[productType as string]?.parentDomain as string;
 };

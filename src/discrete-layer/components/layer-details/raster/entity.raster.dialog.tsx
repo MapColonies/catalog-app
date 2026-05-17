@@ -43,6 +43,7 @@ import {
   jobType2Mode,
   DEFAULT_ID,
   DEFAULT_TYPE_NAME,
+  getEnumValues,
 } from '../utils';
 import suite from '../validate';
 import EntityRasterForm from './layer-details-form.raster';
@@ -115,7 +116,8 @@ export const EntityRasterDialog: React.FC<EntityRasterDialogProps> = observer(
 
     const isUpdateMode = (jobRecord: JobModelType | undefined): boolean => {
       if (jobRecord) {
-        const type = jobRecord.type || ENUMS.NEW.realValue;
+        const rasterJobTypeEnum = getEnumValues(ENUMS, 'RasterJobType');
+        const type = jobRecord.type || rasterJobTypeEnum.NEW;
         return jobType2Mode[type] === Mode.UPDATE;
       }
 
