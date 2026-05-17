@@ -46,9 +46,9 @@ import MESSAGES from './common/i18n';
 import CONFIG from './common/config';
 import { camelize } from './common/helpers/string';
 import { CustomTheme } from './theming/custom.theme';
+import { WorkersBootstrapper } from './common/helpers/worker/workers-bootstrapper';
 import EnumsMapContext, { IEnumsMapType } from './common/contexts/enumsMap.context';
 import LookupTablesContext, { ILookupTableData } from './common/contexts/lookupTables.context';
-import { WorkersBootstrapper } from './discrete-layer/views/components/workers-bootstrapper';
 import WebSocketNotifications from './discrete-layer/views/components/notifications/web-socket-notifications';
 import { PasswordAutofillDisabler } from './discrete-layer/views/components/password-autofill-disabler.component';
 

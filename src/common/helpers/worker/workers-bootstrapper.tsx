@@ -1,9 +1,5 @@
 import { useState } from 'react';
-import { RasterWarmupWorker } from '../../components/layer-details/raster/worker/worker-warmup';
-
-export interface WorkerWarmup {
-  onReady: () => void;
-}
+import { RasterWarmupWorker } from '../../../discrete-layer/components/layer-details/raster/worker/raster-worker.warmup.hook';
 
 export const WorkersBootstrapper: React.FC = () => {
   const [isRasterWorkerAlive, setIsRasterWorkerAlive] = useState(true);

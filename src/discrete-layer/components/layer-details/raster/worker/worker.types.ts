@@ -1,5 +1,6 @@
 import { FeatureCollection, Geometry } from 'geojson';
 import { FeatureType } from '../feature-type.enum';
+import { IWorkerBase } from '../../../../../common/helpers/worker/worker.types';
 
 export type BBoxObj = {
   minX: number;
@@ -23,24 +24,22 @@ export type WorkerError = {
   codeParam?: string;
 };
 
-export interface WorkerAPI {
-  ready: boolean;
+export interface IWorkerAPI extends IWorkerBase {
   init(): Promise<void>;
-  dispose(): void;
   load(fc: FeatureCollection, options?: LoadOptions): Promise<WorkerError | void>;
   loadFromShapeFile(
     url: string,
     options?: LoadOptions,
     onProgress?: (p: WorkerMessage | null) => void
   ): Promise<WorkerError | void>;
-  updateAreas(onProgress?: (p: WorkerMessage | null) => void): WorkerError | void;
+  updateAreas(onProgress?: (p: WorkerMessage | null) => void): Promise<WorkerError | void>;
   computeOuterGeometry(
     onProgress?: (p: WorkerMessage | null) => void,
     predicate?: (property: Record<string, unknown>) => boolean
   ): Promise<Geometry>;
-  getFeatureCollection(onProgress?: (p: WorkerMessage | null) => void): FeatureCollection;
-  getMarkersFromGeometry(geometry: Geometry): FeatureCollection;
-  query(bbox: BBoxObj, onProgress?: (p: WorkerMessage | null) => void): FeatureCollection;
+  getFeatureCollection(onProgress?: (p: WorkerMessage | null) => void): Promise<FeatureCollection>;
+  getMarkersFromGeometry(geometry: Geometry): Promise<FeatureCollection>;
+  query(bbox: BBoxObj, onProgress?: (p: WorkerMessage | null) => void): Promise<FeatureCollection>;
 }
 
 export enum Process {

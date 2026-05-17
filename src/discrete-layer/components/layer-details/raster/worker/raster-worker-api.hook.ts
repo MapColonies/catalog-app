@@ -1,6 +1,8 @@
-import { SetStateAction, useEffect, useMemo, useState } from 'react';
-import { wrap, Remote, proxy } from 'comlink';
+import { SetStateAction, useMemo, useState } from 'react';
+import { proxy } from 'comlink';
 import { FeatureCollection, Geometry } from 'geojson';
+import { IWorkerBase, IWorkerHookBase } from '../../../../../common/helpers/worker/worker.types';
+import { useComlinkWorker } from '../../../../../common/helpers/worker/worker.hook';
 import { fakeProgress } from '../../../../../common/helpers/fake-progress';
 import {
   BBoxObj,
@@ -8,16 +10,13 @@ import {
   LoadOptions,
   Process,
   Stage,
-  WorkerAPI,
   WorkerMessage,
   WorkerType,
   WorkerError,
 } from './worker.types';
-import { WorkerBase } from './worker-hook.types';
 import { buildMessageDetails } from './utils';
 
-interface WorkerService extends WorkerBase {
-  ready: boolean;
+export interface IWorkerHookService extends IWorkerHookBase {
   init: {
     method: () => Promise<void>;
   };
@@ -50,65 +49,46 @@ interface WorkerService extends WorkerBase {
   };
 }
 
+export interface IRasterWorkerApi extends IWorkerBase {
+  init(): Promise<unknown>;
+  load(fc: FeatureCollection, options?: LoadOptions): Promise<unknown>;
+  loadFromShapeFile(
+    url: string,
+    options?: LoadOptions,
+    onProgress?: (p: WorkerMessage | null) => void
+  ): Promise<unknown>;
+  updateAreas(onProgress?: (p: WorkerMessage | null) => void): Promise<unknown>;
+  computeOuterGeometry(
+    onProgress?: (p: WorkerMessage | null) => void,
+    predicate?: (properties: Record<string, unknown>) => boolean
+  ): Promise<unknown>;
+  getFeatureCollection(onProgress?: (p: WorkerMessage | null) => void): Promise<unknown>;
+  getMarkersFromGeometry(geometry: Geometry): Promise<unknown>;
+  query(bbox: BBoxObj, onProgress?: (p: WorkerMessage | null) => void): Promise<FeatureCollection>;
+}
+
 const FAKE_PROGRESS_TIME = 10000;
+const DEFAULT_RUN_COUNT = 1;
 
-const createRasterWorker = (): [Worker, Remote<WorkerAPI>] => {
-  const worker = new Worker(new URL('./feat-collection.worker-api.ts', import.meta.url), {
-    type: 'module',
-  });
-
-  return [worker, wrap(worker)];
-};
-
-export function useWorkerAPI(
+export function useRasterWorkerAPI(
   processRunCounts?: Partial<Record<Process, number>>
-): [WorkerService | null, ProcessInfo] {
-  const [workerApi, setWorkerApi] = useState<any>(null);
-  const [isWorkerReady, setIsWorkerReady] = useState(false);
+): [IWorkerHookService | null, ProcessInfo] {
+  const worker = useMemo(() => {
+    const worker = new Worker(new URL('./feat-collection.worker-api.ts', import.meta.url), {
+      type: 'module',
+    });
+
+    return worker;
+  }, []);
+
+  const [comlinkWorker, isWorkerReady] = useComlinkWorker<IRasterWorkerApi>(worker);
+
   const [progressComputeArea, setProgressComputeArea] = useState<WorkerMessage | null>(null);
   const [progressComputeOuterGeometry, setProgressComputeOuterGeometry] =
     useState<WorkerMessage | null>(null);
   const [progressGetFeatureCollection, setProgressGetFeatureCollection] =
     useState<WorkerMessage | null>(null);
-  const [loadShapeFileProgress, setLoadShapeFileProgress] = useState<WorkerMessage[] | null>(null);
-
-  useEffect(() => {
-    const [worker, wrapped]: [Worker, Remote<WorkerAPI>] = createRasterWorker();
-
-    void wrapped.ready.then((isReady) => {
-      setIsWorkerReady(isReady);
-    });
-
-    setWorkerApi({
-      init: async () => await wrapped.init(),
-      dispose: async () => await wrapped.dispose(),
-      load: async (fc: FeatureCollection, options?: LoadOptions) => await wrapped.load(fc, options),
-      loadFromShapeFile: async (
-        url: string,
-        options?: LoadOptions,
-        onProgress?: (p: WorkerMessage | null) => void
-      ) => await wrapped.loadFromShapeFile(url, options, onProgress),
-      updateAreas: async (onProgress?: (p: WorkerMessage | null) => void) =>
-        await wrapped.updateAreas(onProgress),
-      computeOuterGeometry: async (
-        onProgress?: (p: WorkerMessage | null) => void,
-        predicate?: (properties: Record<string, unknown>) => boolean
-      ) => await wrapped.computeOuterGeometry(onProgress, predicate),
-      getFeatureCollection: async (onProgress?: (p: WorkerMessage | null) => void) =>
-        await wrapped.getFeatureCollection(onProgress),
-      getMarkersFromGeometry: async (geometry: Geometry) =>
-        await wrapped.getMarkersFromGeometry(geometry),
-      query: async (
-        bbox: BBoxObj,
-        onProgress?: (p: WorkerMessage | null) => void
-      ): Promise<FeatureCollection> => await wrapped.query(bbox, onProgress),
-    });
-
-    return () => {
-      wrapped.dispose();
-      worker.terminate();
-    };
-  }, []);
+  const [progressLoadShapeFile, setProgressLoadShapeFile] = useState<WorkerMessage[] | null>(null);
 
   const upsertWorkerMessageByStage = (
     process: Process,
@@ -134,8 +114,8 @@ export function useWorkerAPI(
     });
   };
 
-  const api: WorkerService | null = useMemo(() => {
-    if (!workerApi) {
+  const api: IWorkerHookService | null = useMemo(() => {
+    if (!comlinkWorker) {
       return null;
     }
 
@@ -143,38 +123,38 @@ export function useWorkerAPI(
       ready: isWorkerReady,
       init: {
         method: async () => {
-          return await workerApi.init();
+          await comlinkWorker.init();
         },
       },
       load: {
         method: async (fc: FeatureCollection, options?: LoadOptions) => {
-          return await workerApi.load(fc, options);
+          return (await comlinkWorker.load(fc, options)) as WorkerError | void;
         },
         progress: null,
       },
       loadFromShapeFile: {
         method: async (url: string, options?: LoadOptions) => {
-          setLoadShapeFileProgress(null);
-          return await workerApi.loadFromShapeFile(
+          setProgressLoadShapeFile(null);
+          return (await comlinkWorker.loadFromShapeFile(
             url,
             options,
-            proxy((p: WorkerMessage) => {
+            proxy((p: WorkerMessage | null) => {
               // console.log('**** Progress LoadShape: ', p);
-              upsertWorkerMessageByStage(Process.Load, p, setLoadShapeFileProgress);
+              if (p) upsertWorkerMessageByStage(Process.Load, p, setProgressLoadShapeFile);
             })
-          );
+          )) as WorkerError | void;
         },
-        progress: loadShapeFileProgress,
+        progress: progressLoadShapeFile,
       },
       updateAreas: {
         method: async () => {
           setProgressComputeArea(null);
-          return await workerApi.updateAreas(
-            proxy((p: WorkerMessage) => {
+          return (await comlinkWorker.updateAreas(
+            proxy((p: WorkerMessage | null) => {
               // console.log('**** Progress Area: ', p);
               setProgressComputeArea(p);
             })
-          );
+          )) as WorkerError | void;
         },
         progress: progressComputeArea,
       },
@@ -193,8 +173,8 @@ export function useWorkerAPI(
             });
           });
 
-          const result = await workerApi.computeOuterGeometry(
-            proxy((p: WorkerMessage) => {
+          const result = await comlinkWorker.computeOuterGeometry(
+            proxy((p: WorkerMessage | null) => {
               // If the worker sends real pulses, they still work here
               setProgressComputeOuterGeometry(p);
             }),
@@ -205,7 +185,7 @@ export function useWorkerAPI(
           );
 
           clear();
-          return result;
+          return result as Geometry;
         },
         progress: progressComputeOuterGeometry,
       },
@@ -224,28 +204,28 @@ export function useWorkerAPI(
             });
           });
 
-          const result = await workerApi.getFeatureCollection(
-            proxy((p: WorkerMessage) => {
+          const result = await comlinkWorker.getFeatureCollection(
+            proxy((p: WorkerMessage | null) => {
               setProgressGetFeatureCollection(p);
             })
           );
 
           clear();
-          return result;
+          return result as FeatureCollection;
         },
         progress: progressGetFeatureCollection,
       },
       getMarkersFromGeometry: {
         method: async (geometry: Geometry): Promise<FeatureCollection> => {
-          return await workerApi.getMarkersFromGeometry(geometry);
+          return (await comlinkWorker.getMarkersFromGeometry(geometry)) as FeatureCollection;
         },
         progress: null,
       },
       query: {
         method: async (bbox: BBoxObj): Promise<FeatureCollection> => {
-          return await workerApi.query(
+          return await comlinkWorker.query(
             bbox,
-            proxy((p: WorkerMessage) => {
+            proxy((p: WorkerMessage | null) => {
               // console.log('**** QUERY by BBOX: ', p);
             })
           );
@@ -254,15 +234,13 @@ export function useWorkerAPI(
       },
     };
   }, [
-    workerApi,
+    comlinkWorker,
     isWorkerReady,
-    loadShapeFileProgress,
+    progressLoadShapeFile,
     progressComputeOuterGeometry,
     progressComputeArea,
     progressGetFeatureCollection,
   ]);
-
-  const DEFAULT_RUN_COUNT = 1;
 
   const stagesInfo: ProcessInfo = useMemo(() => {
     return {
