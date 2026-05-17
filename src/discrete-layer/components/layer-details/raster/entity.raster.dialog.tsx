@@ -20,6 +20,7 @@ import {
   LayerRasterRecordModel,
   LayerRasterRecordModelType,
   ProductType,
+  RasterJobType,
   RecordStatus,
   RecordType,
   useStore,
@@ -116,8 +117,8 @@ export const EntityRasterDialog: React.FC<EntityRasterDialogProps> = observer(
 
     const isUpdateMode = (jobRecord: JobModelType | undefined): boolean => {
       if (jobRecord) {
-        const rasterJobTypeEnum = getEnumValues(ENUMS, 'RasterJobType');
-        const type = jobRecord.type || rasterJobTypeEnum.NEW;
+        const rasterJobTypeEnumValues = getEnumValues(ENUMS, 'RasterJobType');
+        const type = jobRecord.type || rasterJobTypeEnumValues[RasterJobType.NEW];
         return jobType2Mode[type] === Mode.UPDATE;
       }
 
