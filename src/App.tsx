@@ -108,10 +108,10 @@ const App: React.FC = () => {
           >
             <PasswordAutofillDisabler />
             <CssBaseline />
+            <WorkersBootstrapper />
             <LookupTablesContext.Provider value={{ lookupTablesData, setLookupTablesData }}>
               <EnumsMapContext.Provider value={{ enumsMap, setEnumsMap }}>
                 <StaticDataFetcher />
-                <WorkersBootstrapper />
                 <DiscreteLayerView />
               </EnumsMapContext.Provider>
             </LookupTablesContext.Provider>
