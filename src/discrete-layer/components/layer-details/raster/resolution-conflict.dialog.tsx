@@ -38,7 +38,7 @@ import { ProgressCurtain } from './progressCurtain/progressCurtain';
 import { RasterWorkflowContext } from './state-machine/context';
 import { Events } from './state-machine/types';
 import { UpdateLayerHeader } from './update-layer-header';
-import { useWorkerAPI } from './worker/useWorkerAPI';
+import { useRasterWorkerAPI } from './worker/raster-worker-api.hook';
 import { extractProgressArray } from './worker/utils';
 import { Process } from './worker/worker.types';
 
@@ -70,7 +70,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
   viewOnly = false,
 }) => {
   const intl = useIntl();
-  const [api, stagesInfo] = useWorkerAPI({
+  const [api, stagesInfo] = useRasterWorkerAPI({
     [Process.ComputeOuterGeometry]: 2,
   });
   const hasLoadedRef = useRef(false);

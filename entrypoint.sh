@@ -42,6 +42,9 @@ echo "Running SED command -->" 's/{PUBLIC_URL_PLACEHOLDER}/'"$ESCAPED_PUBLIC_URL
 find ./static/js -name '*.js' -exec \
   sed -i 's/{PUBLIC_URL_PLACEHOLDER}/'"$ESCAPED_PUBLIC_URL"'/g' {} +
 
+find ./static/js -type f -name "*.js" ! -name "main*" -exec \
+  sed -i 's|static/js/||g' {} +
+
 echo "Done with SED command"
 
 
