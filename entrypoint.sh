@@ -19,7 +19,7 @@ fi
 echo "Done with confd"
 
 
-PUBLIC_URL_NORMALIZED="${CONFIGURATION_PUBLIC_URL}"
+PUBLIC_URL_NORMALIZED="${CONFIGURATION_PUBLIC_URL:-}"
 
 if [ "$PUBLIC_URL_NORMALIZED" = "/" ]; then
   PUBLIC_URL_NORMALIZED=""
@@ -30,7 +30,7 @@ ESCAPED_PUBLIC_URL="$(printf '%s' "$PUBLIC_URL_NORMALIZED" | sed 's/[^a-zA-Z0-9.
 echo "Running SED command -->" 's/{PUBLIC_URL_PLACEHOLDER}/'"$ESCAPED_PUBLIC_URL"'/g'
 
 find ./static/js -name '*.js' -exec \
-  sed -i 's/{PUBLIC_URL_PLACEHOLDER}/'s/{PUBLIC_URL_PLACEHOLDER}/'"$ESCAPED_PUBLIC_URL"'/g' {} +
+  sed -i 's/{PUBLIC_URL_PLACEHOLDER}/'"$ESCAPED_PUBLIC_URL"'/g' {} +
 
 echo "Done with SED command"
 
