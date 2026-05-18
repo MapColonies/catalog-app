@@ -1083,16 +1083,15 @@ export const filterModeDescriptors = (
   });
 };
 
-export const rasterJobTypeEnumValues = store.discreteLayersStore.getEnumValues('RasterJobType');
-
-export const jobType2Mode: { [key: string]: Mode } = {
-  [rasterJobTypeEnumValues.NEW]: Mode.NEW,
-  [rasterJobTypeEnumValues.UPDATE]: Mode.UPDATE,
-  [rasterJobTypeEnumValues.SWAP_UPDATE]: Mode.UPDATE,
+export const jobType2Mode = (enumsMap: IEnumsMapType, jobType: string): Mode => {
+  const enumValues = getEnumValues(enumsMap, 'RasterJobType');
+  const enumKey = Object.keys(enumValues).find((k) => enumValues[k] === jobType);
+  return enumKey === 'NEW' ? Mode.NEW : Mode.UPDATE;
 };
 
-export const getUpdateJobTypes = (): string[] => {
-  return Object.entries(jobType2Mode)
-    .filter(([_, mode]) => mode === Mode.UPDATE)
-    .map(([jobType]) => jobType);
+export const getUpdateJobTypes = (enumsMap: IEnumsMapType): string[] => {
+  const enumValues = getEnumValues(enumsMap, 'RasterJobType');
+  return Object.entries(enumValues)
+    .filter(([key]) => key !== 'NEW')
+    .map(([_, realValue]) => realValue);
 };

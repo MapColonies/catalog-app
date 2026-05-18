@@ -119,7 +119,7 @@ export const EntityRasterDialog: React.FC<EntityRasterDialogProps> = observer(
       if (jobRecord) {
         const rasterJobTypeEnumValues = getEnumValues(ENUMS, 'RasterJobType');
         const type = jobRecord.type || rasterJobTypeEnumValues[RasterJobType.NEW];
-        return jobType2Mode[type] === Mode.UPDATE;
+        return jobType2Mode(ENUMS, type) === Mode.UPDATE;
       }
 
       return store.discreteLayersStore.selectedLayerOperationMode === Mode.UPDATE;
@@ -175,6 +175,7 @@ export const EntityRasterDialog: React.FC<EntityRasterDialogProps> = observer(
 const EntityRasterDialogInner: React.FC<EntityRasterInnerProps> = observer(
   (props: EntityRasterInnerProps) => {
     //#region STATE MACHINE
+    const ENUMS = useEnums();
     const actorRef = RasterWorkflowContext.useActorRef();
 
     // Subscribe to state using a selector
@@ -189,7 +190,7 @@ const EntityRasterDialogInner: React.FC<EntityRasterInnerProps> = observer(
         actorRef.send({
           type: 'RESTORE',
           job: { jobId: job.id },
-          updatedLayer: getUpdateJobTypes().includes(job.type as string)
+          updatedLayer: getUpdateJobTypes(ENUMS).includes(job.type as string)
             ? (layerRecord as LayerRasterRecordModelType)
             : undefined,
         } satisfies Events);

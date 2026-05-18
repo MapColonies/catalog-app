@@ -649,19 +649,6 @@ export const discreteLayersStore = ModelBase
       self.enumsMap = enumsMap;
     }
 
-    function getEnumValues(enumName: string): Record<string, string> {
-      if (!self.enumsMap) {
-        return {};
-      }
-      return Object.keys(self.enumsMap ?? {}).reduce((acc, key) => {
-        const enumItem = (self.enumsMap ?? {})[key] as Record<string, unknown>;
-        if (enumItem.enumName === enumName) {
-          acc[key] = enumItem.realValue as string;
-        }
-        return acc;
-      }, {} as Record<string, string>);
-    }
-
     return {
       getLayersImages,
       getPreparedLayersImages,
@@ -706,7 +693,6 @@ export const discreteLayersStore = ModelBase
       resetPolygonParts,
       fetchAllCatalog,
       setEnumsMap,
-      getEnumValues,
     };
   });
 
