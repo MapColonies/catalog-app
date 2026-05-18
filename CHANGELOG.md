@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [6.0.4](https://github.com/MapColonies/catalog-app/compare/v6.0.3...v6.0.4) (2026-05-18)
+
+
+### Bug Fixes
+
+* cannot approve low resolution polygon parts exceeded 4 ([#946](https://github.com/MapColonies/catalog-app/issues/946)) ([759016c](https://github.com/MapColonies/catalog-app/commit/759016cb61fba5d3614e892c3de53961dff7c64c))
+
 ## [6.0.3](https://github.com/MapColonies/catalog-app/compare/v6.0.2...v6.0.3) (2026-05-17)
 
 
