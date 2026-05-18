@@ -21,6 +21,10 @@ echo "Done with confd"
 
 PUBLIC_URL_NORMALIZED="${CONFIGURATION_PUBLIC_URL:-}"
 
+if [ "$PUBLIC_URL_NORMALIZED" = "/" ]; then
+  PUBLIC_URL_NORMALIZED=""
+fi
+
 ESCAPED_PUBLIC_URL="$(printf '%s' "$PUBLIC_URL_NORMALIZED" | sed 's/[^a-zA-Z0-9.]/\\&/g')"
 
 echo "Running SED command -->" 's/{PUBLIC_URL_PLACEHOLDER}/'"$ESCAPED_PUBLIC_URL"'/g'
