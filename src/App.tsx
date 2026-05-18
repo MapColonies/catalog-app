@@ -46,6 +46,7 @@ import MESSAGES from './common/i18n';
 import CONFIG from './common/config';
 import { camelize } from './common/helpers/string';
 import { CustomTheme } from './theming/custom.theme';
+import { WorkersBootstrapper } from './common/helpers/worker/workers-bootstrapper';
 import EnumsMapContext, { IEnumsMapType } from './common/contexts/enumsMap.context';
 import LookupTablesContext, { ILookupTableData } from './common/contexts/lookupTables.context';
 import WebSocketNotifications from './discrete-layer/views/components/notifications/web-socket-notifications';
@@ -107,6 +108,7 @@ const App: React.FC = () => {
           >
             <PasswordAutofillDisabler />
             <CssBaseline />
+            <WorkersBootstrapper />
             <LookupTablesContext.Provider value={{ lookupTablesData, setLookupTablesData }}>
               <EnumsMapContext.Provider value={{ enumsMap, setEnumsMap }}>
                 <StaticDataFetcher />
