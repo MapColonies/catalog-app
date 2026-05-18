@@ -293,6 +293,7 @@
   "resolutionConflict.units.km2": " קמ\"ר",
   "resolutionConflict.approver.label": "שם מאשר החריגה",
   "resolutionConflict.approver.placeholder": "יש להזין שם כדי לאשר את החריגה...",
+  "resolutionConflict.error.exceededParts": "לא ניתן לאשר חלקי תיחום עם חריגה מעל ל-4",
   "resolutionConflict.error.queryFailed": "נכשל בהרצת שאילתת חלקי תיחום בתצוגה",
   "resolutionConflict.error.approveFailed": "נכשל באישור החריגה",
 

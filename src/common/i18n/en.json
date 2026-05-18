@@ -293,6 +293,7 @@
   "resolutionConflict.units.km2": " km²",
   "resolutionConflict.approver.label": "Approver full name",
   "resolutionConflict.approver.placeholder": "Enter name to continue to approval...",
+  "resolutionConflict.error.exceededParts": "Low resolution polygon parts cannot be approved if exceeded 4",
   "resolutionConflict.error.queryFailed": "Failed to query polygon parts by extent",
   "resolutionConflict.error.approveFailed": "Failed to resume job",
 
