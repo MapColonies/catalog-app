@@ -103,7 +103,7 @@ env:
   logPrettyPrintEnabled: false
   responseCompressionEnabled: true
   requestPayloadLimit: 1mb
-  publicUrl: ''
+  publicUrl: '/'
   wsProtocol: wss://
   serviceProtocol: https://
   serviceName: ''

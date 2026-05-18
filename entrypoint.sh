@@ -2,6 +2,14 @@
 
 set -e
 
+PUBLIC_URL_NORMALIZED="${CONFIGURATION_PUBLIC_URL:-}"
+
+if [ "$PUBLIC_URL_NORMALIZED" = "/" ]; then
+  PUBLIC_URL_NORMALIZED=""
+fi
+
+export CONFIGURATION_PUBLIC_URL="$PUBLIC_URL_NORMALIZED"
+
 node ../confd/generate-config.js --indocker
 
 # Check if env-config.js contains "{{" or has size 0
@@ -18,8 +26,6 @@ fi
 
 echo "Done with confd"
 
-
-PUBLIC_URL_NORMALIZED="${CONFIGURATION_PUBLIC_URL:-}"
 
 ESCAPED_PUBLIC_URL="$(printf '%s' "$PUBLIC_URL_NORMALIZED" | sed 's/[^a-zA-Z0-9.]/\\&/g')"
 

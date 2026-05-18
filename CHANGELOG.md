@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [6.0.10](https://github.com/MapColonies/catalog-app/compare/v6.0.9...v6.0.10) (2026-05-18)
+
+
+### Bug Fixes
+
+* use slash as default ([#962](https://github.com/MapColonies/catalog-app/issues/962)) ([a57ff31](https://github.com/MapColonies/catalog-app/commit/a57ff319bee53780e9539a0a4cd9510bb0de3388))
+
+## [6.0.9](https://github.com/MapColonies/catalog-app/compare/v6.0.8...v6.0.9) (2026-05-18)
+
+
+### Bug Fixes
+
+* remove default dot at public url ([#960](https://github.com/MapColonies/catalog-app/issues/960)) ([8e59125](https://github.com/MapColonies/catalog-app/commit/8e591255e216609772982e24fb60f7a176ac90fb))
+
+## [6.0.8](https://github.com/MapColonies/catalog-app/compare/v6.0.7...v6.0.8) (2026-05-18)
+
+
+### Bug Fixes
+
+* dot ([#954](https://github.com/MapColonies/catalog-app/issues/954)) ([05a9310](https://github.com/MapColonies/catalog-app/commit/05a93105803a959a746c7c5fac74cac3cc0464c1))
+* revert dot ([#956](https://github.com/MapColonies/catalog-app/issues/956)) ([6088db9](https://github.com/MapColonies/catalog-app/commit/6088db9e54106c16c702da214875b87d424c830b))
+* slash does not work as public url ([#958](https://github.com/MapColonies/catalog-app/issues/958)) ([29599d0](https://github.com/MapColonies/catalog-app/commit/29599d0a3d6a5e36fbed1de476a01c91654f81b4))
+
 ## [6.0.7](https://github.com/MapColonies/catalog-app/compare/v6.0.6...v6.0.7) (2026-05-18)
 
 
