@@ -125,7 +125,7 @@ const replacePlaceHolders = () => {
   return copyFile(indexTmplPath, indexTmplPath, (content) => {
     console.log('**** Replace PLACEHOLDERS by CONFD syntax ****');
     return content
-      .replace(/{PUBLIC_URL_PLACEHOLDER}/g, '{{ getv "/configuration/public/url" "/" }}')
+      .replace(/{PUBLIC_URL_PLACEHOLDER}/g, '{{ getv "/configuration/public/url" "." }}')
       .replace(/{APP_VERSION_PLACEHOLDER}/g, '{{ getv "/configuration/image/tag" "{APP_VERSION_PLACEHOLDER}" }}');
   });
 };
