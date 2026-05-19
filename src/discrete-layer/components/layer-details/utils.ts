@@ -1085,14 +1085,14 @@ export const filterModeDescriptors = (
 };
 
 export const jobType2Mode = (enumsMap: IEnumsMapType, enumName: string, jobType: string): Mode => {
-  const enumValues = getEnumWithRealValues(enumsMap, enumName);
-  const enumKey = Object.keys(enumValues).find((k) => enumValues[k] === jobType);
+  const enumWithRealValues = getEnumWithRealValues(enumsMap, enumName);
+  const enumKey = Object.keys(enumWithRealValues).find((k) => enumWithRealValues[k] === jobType);
   return enumKey === RasterIngestionJobType.NEW ? Mode.NEW : Mode.UPDATE;
 };
 
 export const getUpdateJobTypes = (enumsMap: IEnumsMapType, enumName: string): string[] => {
-  const enumValues = getEnumWithRealValues(enumsMap, enumName);
-  return Object.entries(enumValues)
+  const enumWithRealValues = getEnumWithRealValues(enumsMap, enumName);
+  return Object.entries(enumWithRealValues)
     .filter(([key]) => key !== RasterIngestionJobType.NEW)
     .map(([_, realValue]) => realValue);
 };
