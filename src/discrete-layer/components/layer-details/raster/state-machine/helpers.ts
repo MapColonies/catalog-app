@@ -5,6 +5,7 @@ import { assign, SnapshotFrom } from 'xstate';
 import { get } from 'lodash';
 import { FileData } from '@map-colonies/react-components';
 import CONFIG from '../../../../../common/config';
+import { NO_THRESHOLD_ERROR_TYPES } from '../../../../../common/models/job-errors-summary.raster';
 import { getFirstPoint } from '../../../../../common/utils/geo.tools';
 import { ErrorLevel } from '../../../helpers/errorUtils';
 import { Status } from '../../../../models';
@@ -267,15 +268,9 @@ export const isJobValid = (status: Status | undefined): boolean => {
 export const isTaskValid = (job: IJob | undefined): boolean => {
   const taskPercentage = job?.taskPercentage;
   const validationReport = job?.validationReport;
-  const errorsSummary = validationReport?.errorsSummary;
   return (
     taskPercentage === 0 ||
-    (validationReport?.isValid === true &&
-      Object.values(errorsSummary?.errorsCount || {}).every(
-        (value) => typeof value !== 'number' || value === 0
-      ) &&
-      errorsSummary?.thresholds?.smallHoles?.exceeded === false &&
-      errorsSummary?.thresholds?.smallGeometries?.exceeded === false)
+    validationReport?.isValid === true
   );
 };
 
