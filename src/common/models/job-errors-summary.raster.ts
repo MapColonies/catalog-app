@@ -43,6 +43,9 @@ export type RasterErrorsSummary = {
     smallGeometries: {
       exceeded: boolean;
     };
+    resolution: {
+      exceeded: boolean;
+    };
   };
 };
 // #endregion to be removed

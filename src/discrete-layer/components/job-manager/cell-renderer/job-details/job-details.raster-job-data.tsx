@@ -20,8 +20,8 @@ import { JobModelType, Status, TaskModelType, useStore } from '../../../../model
 import useZoomLevelsTable from '../../../export-layer/hooks/useZoomLevelsTable';
 import {
   getRasterErrorCount,
-  JobErrorsSummary,
-} from '../../../job-errors-summary/job-errors-summary';
+  JobErrorsSummaryRasterJobData,
+} from './job-errors-summary.raster-job-data';
 
 import './info-area.css';
 import './job-details.raster-job-data.css';
@@ -150,7 +150,7 @@ export const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = (
               <Tooltip
                 content={
                   <Box>
-                    {JobErrorsSummary(theme, task?.parameters?.errorsSummary, 'reportItem')}
+                    {JobErrorsSummaryRasterJobData(theme, task?.parameters?.errorsSummary, 'reportItem')}
                   </Box>
                 }
               >
@@ -180,7 +180,7 @@ export const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = (
             <Tooltip
               content={
                 <Box>
-                  {JobErrorsSummary(
+                  {JobErrorsSummaryRasterJobData(
                     theme,
                     task?.parameters?.errorsSummary,
                     'reportItem',

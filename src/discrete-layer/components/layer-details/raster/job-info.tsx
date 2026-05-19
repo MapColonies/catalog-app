@@ -5,7 +5,7 @@ import { Typography, useTheme } from '@map-colonies/react-core';
 import { Skeleton } from '../../../../common/components/skeleton/skeleton';
 import { AutoDirectionBox } from '../../../../common/components/auto-direction-box/auto-direction-box.component';
 import { Status } from '../../../models';
-import { JobErrorsSummary } from '../../job-errors-summary/job-errors-summary';
+import { JobErrorsSummaryRasterJobData } from '../../job-manager/cell-renderer/job-details/job-errors-summary.raster-job-data';
 import { FINAL_STATUSES } from '../../job-manager/job.types';
 import { Progress } from './progress';
 import { ResolutionConflictDialog } from './resolution-conflict.dialog';
@@ -94,7 +94,7 @@ const JobInfoComponent: React.FC<JobInfoProps> = ({ job }) => {
           {taskId ? (
             errorsCount ? (
               <Box className="reportList bold">
-                {JobErrorsSummary(
+                {JobErrorsSummaryRasterJobData(
                   theme,
                   errorsSummary!,
                   'countWrapper',

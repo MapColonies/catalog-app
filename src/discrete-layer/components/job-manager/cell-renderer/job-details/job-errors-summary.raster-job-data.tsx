@@ -4,7 +4,7 @@ import { Box } from '@material-ui/core';
 import {
   RasterErrorCount,
   RasterErrorsSummary,
-} from '../../../common/models/job-errors-summary.raster';
+} from '../../../../../common/models/job-errors-summary.raster';
 
 interface ErrorCountProps {
   name: string;
@@ -50,7 +50,7 @@ export const getRasterErrorCount = (
   };
 };
 
-export const JobErrorsSummary = (
+export const JobErrorsSummaryRasterJobData = (
   theme: IOptions,
   errorsSummary: RasterErrorsSummary | undefined,
   className: string,
@@ -62,13 +62,13 @@ export const JobErrorsSummary = (
   }
 
   return Object.entries(errorsSummary.errorsCount).map(([key, value]) => {
+    const isConflictItem = options?.key === key;
     let color = overrideColor;
+
     if (!overrideColor) {
-      const isResolutionConflict = options?.key === key;
-      const isResolved = isResolutionConflict
+      const isResolved = isConflictItem
         ? options?.isApproved === true
         : getRasterErrorCount(errorsSummary, key)?.exceeded === false;
-
       color =
         value === 0
           ? theme.custom?.GC_SUCCESS
@@ -77,7 +77,7 @@ export const JobErrorsSummary = (
           : theme.custom?.GC_ERROR_HIGH;
     }
 
-    const showResolutionButton = key === options?.key && value > 0;
+    const showButton = isConflictItem && value > 0;
 
     return (
       <ErrorCount
@@ -87,11 +87,11 @@ export const JobErrorsSummary = (
         className={className}
         color={color}
         action={
-          showResolutionButton ? (
+          showButton ? (
             <Button
               type="button"
               outlined
-              className="resolutionConflictButton"
+              className="reportButton"
               disabled={options?.isEnabled === false}
               style={{ color: 'orange', borderColor: 'orange', fontWeight: 'bold' }}
               onClick={(e): void => {
