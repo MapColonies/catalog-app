@@ -5,7 +5,6 @@ import { assign, SnapshotFrom } from 'xstate';
 import { get } from 'lodash';
 import { FileData } from '@map-colonies/react-components';
 import CONFIG from '../../../../../common/config';
-import { NO_THRESHOLD_ERROR_TYPES } from '../../../../../common/models/job-errors-summary.raster';
 import { getFirstPoint } from '../../../../../common/utils/geo.tools';
 import { ErrorLevel } from '../../../helpers/errorUtils';
 import { Status } from '../../../../models';
