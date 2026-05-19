@@ -115,7 +115,9 @@ export const EntityRasterDialog: React.FC<EntityRasterDialogProps> = observer(
 
     const isUpdateMode = (jobRecord: JobModelType | undefined): boolean => {
       if (jobRecord) {
-        return jobType2Mode(ENUMS, 'RasterIngestionJobType', jobRecord.type as string) === Mode.UPDATE;
+        return (
+          jobType2Mode(ENUMS, 'RasterIngestionJobType', jobRecord.type as string) === Mode.UPDATE
+        );
       }
 
       return store.discreteLayersStore.selectedLayerOperationMode === Mode.UPDATE;
@@ -186,7 +188,9 @@ const EntityRasterDialogInner: React.FC<EntityRasterInnerProps> = observer(
         actorRef.send({
           type: 'RESTORE',
           job: { jobId: job.id },
-          updatedLayer: getUpdateJobTypes(ENUMS, 'RasterIngestionJobType').includes(job.type as string)
+          updatedLayer: getUpdateJobTypes(ENUMS, 'RasterIngestionJobType').includes(
+            job.type as string
+          )
             ? (layerRecord as LayerRasterRecordModelType)
             : undefined,
         } satisfies Events);

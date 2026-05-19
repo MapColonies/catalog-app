@@ -198,7 +198,11 @@ export const getRestoreData = async (context: IContext): Promise<IPartialContext
   try {
     const enumsMap = context.store.discreteLayersStore.enumsMap as IEnumsMapType;
     return {
-      flowType: jobType2Mode(enumsMap, 'RasterIngestionJobType', job.type as string) as IPartialContext['flowType'],
+      flowType: jobType2Mode(
+        enumsMap,
+        'RasterIngestionJobType',
+        job.type as string
+      ) as IPartialContext['flowType'],
       selectionMode: 'restore',
       files: {
         data: {
