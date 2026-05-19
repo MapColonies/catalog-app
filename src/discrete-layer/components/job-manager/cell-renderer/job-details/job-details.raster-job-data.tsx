@@ -150,7 +150,11 @@ export const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = (
               <Tooltip
                 content={
                   <Box>
-                    {JobErrorsSummaryRasterJobData(theme, task?.parameters?.errorsSummary, 'reportItem')}
+                    {JobErrorsSummaryRasterJobData(
+                      theme,
+                      task?.parameters?.errorsSummary,
+                      'reportItem'
+                    )}
                   </Box>
                 }
               >
