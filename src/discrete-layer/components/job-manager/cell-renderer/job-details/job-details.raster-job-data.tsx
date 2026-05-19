@@ -14,7 +14,11 @@ import { AutoDirectionBox } from '../../../../../common/components/auto-directio
 import { DETAILS_ROW_ID_SUFFIX } from '../../../../../common/components/grid';
 import { Hyperlink } from '../../../../../common/components/hyperlink/hyperlink';
 import { Domain } from '../../../../../common/models/domain';
-import { RasterErrorsSummary } from '../../../../../common/models/job-errors-summary.raster';
+import {
+  NO_THRESHOLD_ERROR_TYPES,
+  RasterErrorsCountKey,
+  RasterErrorsSummary,
+} from '../../../../../common/models/job-errors-summary.raster';
 import { RasterIngestionJobType } from '../../../../../common/models/raster-job';
 import { JobModelType, Status, TaskModelType, useStore } from '../../../../models';
 import useZoomLevelsTable from '../../../export-layer/hooks/useZoomLevelsTable';
@@ -50,7 +54,11 @@ export const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = (
     let count = 0;
     Object.keys(errors.errorsCount).forEach((key) => {
       const errorCount = getRasterErrorCount(errors, key);
-      if (errorCount.exceeded === true || typeof errorCount.exceeded === 'undefined') {
+      if (
+        NO_THRESHOLD_ERROR_TYPES.includes(key as RasterErrorsCountKey) ||
+        errorCount.exceeded === true ||
+        typeof errorCount.exceeded === 'undefined'
+      ) {
         count += errorCount.count ?? 0;
       }
     });
