@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [6.0.12](https://github.com/MapColonies/catalog-app/compare/v6.0.11...v6.0.12) (2026-05-19)
+
+
+### Bug Fixes
+
+* raster errors report in job manager dialog ([#964](https://github.com/MapColonies/catalog-app/issues/964)) ([e81a846](https://github.com/MapColonies/catalog-app/commit/e81a8461a35e3ccd937b8c26e33caa8df839fdc3))
+
 ## [6.0.11](https://github.com/MapColonies/catalog-app/compare/v6.0.10...v6.0.11) (2026-05-19)
 
 
