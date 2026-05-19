@@ -43,14 +43,14 @@ export const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = (
   const [zoomLevel, setZoomLevel] = useState<number | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(true);
 
-  const rasterIngestionJobTypes = useMemo(() => {
-    return getEnumKeys(ENUMS, 'RasterJobType').map((key) => ENUMS[key]?.realValue);
+  const rasterIngestionJobTypeRealValues = useMemo(() => {
+    return getEnumKeys(ENUMS, 'RasterIngestionJobType').map((key) => ENUMS[key]?.realValue);
   }, []);
 
   const isRasterJob =
     jobData.domain === Domain.RASTER &&
     jobData.type &&
-    rasterIngestionJobTypes.includes(jobData.type as string);
+    rasterIngestionJobTypeRealValues.includes(jobData.type as string);
 
   const calculateErrorsCount = (errors: RasterErrorsSummary): number => {
     let count = 0;

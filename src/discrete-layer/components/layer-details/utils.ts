@@ -1025,7 +1025,7 @@ export const getEnumKeys = (
   });
 };
 
-export const getEnumValues = (
+export const getEnumWithRealValues = (
   enumsMap: IEnumsMapType,
   enumName: string
 ): Record<string, string> => {
@@ -1083,14 +1083,14 @@ export const filterModeDescriptors = (
   });
 };
 
-export const jobType2Mode = (enumsMap: IEnumsMapType, jobType: string): Mode => {
-  const enumValues = getEnumValues(enumsMap, 'RasterJobType');
+export const jobType2Mode = (enumsMap: IEnumsMapType, enumName: string, jobType: string): Mode => {
+  const enumValues = getEnumWithRealValues(enumsMap, enumName);
   const enumKey = Object.keys(enumValues).find((k) => enumValues[k] === jobType);
   return enumKey === 'NEW' ? Mode.NEW : Mode.UPDATE;
 };
 
-export const getUpdateJobTypes = (enumsMap: IEnumsMapType): string[] => {
-  const enumValues = getEnumValues(enumsMap, 'RasterJobType');
+export const getUpdateJobTypes = (enumsMap: IEnumsMapType, enumName: string): string[] => {
+  const enumValues = getEnumWithRealValues(enumsMap, enumName);
   return Object.entries(enumValues)
     .filter(([key]) => key !== 'NEW')
     .map(([_, realValue]) => realValue);

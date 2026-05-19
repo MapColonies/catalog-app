@@ -20,7 +20,6 @@ import {
   LayerRasterRecordModel,
   LayerRasterRecordModelType,
   ProductType,
-  RasterJobType,
   RecordStatus,
   RecordType,
   useStore,
@@ -44,7 +43,6 @@ import {
   jobType2Mode,
   DEFAULT_ID,
   DEFAULT_TYPE_NAME,
-  getEnumValues,
 } from '../utils';
 import suite from '../validate';
 import EntityRasterForm from './layer-details-form.raster';
@@ -117,9 +115,7 @@ export const EntityRasterDialog: React.FC<EntityRasterDialogProps> = observer(
 
     const isUpdateMode = (jobRecord: JobModelType | undefined): boolean => {
       if (jobRecord) {
-        const rasterJobTypeEnumValues = getEnumValues(ENUMS, 'RasterJobType');
-        const type = jobRecord.type || rasterJobTypeEnumValues[RasterJobType.NEW];
-        return jobType2Mode(ENUMS, type) === Mode.UPDATE;
+        return jobType2Mode(ENUMS, 'RasterIngestionJobType', jobRecord.type as string) === Mode.UPDATE;
       }
 
       return store.discreteLayersStore.selectedLayerOperationMode === Mode.UPDATE;
@@ -190,7 +186,7 @@ const EntityRasterDialogInner: React.FC<EntityRasterInnerProps> = observer(
         actorRef.send({
           type: 'RESTORE',
           job: { jobId: job.id },
-          updatedLayer: getUpdateJobTypes(ENUMS).includes(job.type as string)
+          updatedLayer: getUpdateJobTypes(ENUMS, 'RasterIngestionJobType').includes(job.type as string)
             ? (layerRecord as LayerRasterRecordModelType)
             : undefined,
         } satisfies Events);

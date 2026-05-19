@@ -5,7 +5,7 @@
 import { types } from "mobx-state-tree"
 import { QueryBuilder } from "mst-gql"
 import { ModelBase } from "./ModelBase"
-import { RasterJobTypeEnumType } from "./RasterJobTypeEnum"
+import { RasterIngestionJobTypeEnumType } from "./RasterIngestionJobTypeEnum"
 import { RootStoreType } from "./index"
 
 
@@ -17,7 +17,7 @@ export const DummyForTypesOnClientModelBase = ModelBase
   .named('DummyForTypesOnClient')
   .props({
     __typename: types.optional(types.literal("DummyForTypesOnClient"), "DummyForTypesOnClient"),
-    dummy1: types.union(types.undefined, types.null, RasterJobTypeEnumType),
+    dummy1: types.union(types.undefined, types.null, RasterIngestionJobTypeEnumType),
   })
   .views(self => ({
     get store() {
