@@ -10,7 +10,9 @@ import { types } from "mobx-state-tree"
 export enum RasterJobType {
   NEW="NEW",
 UPDATE="UPDATE",
-SWAP_UPDATE="SWAP_UPDATE"
+SWAP_UPDATE="SWAP_UPDATE",
+TILES_SEEDING="TILES_SEEDING",
+EXPORT="EXPORT"
 }
 
 /**
@@ -20,4 +22,6 @@ export const RasterJobTypeEnumType = types.enumeration("RasterJobType", [
         "NEW",
   "UPDATE",
   "SWAP_UPDATE",
+  "TILES_SEEDING",
+  "EXPORT",
       ])

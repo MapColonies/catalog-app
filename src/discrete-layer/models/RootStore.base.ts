@@ -137,6 +137,7 @@ import { ServiceType } from "./ServiceTypeEnum"
 import { Status } from "./StatusEnum"
 import { RasterIngestionFilesTypeConfig } from "./RasterIngestionFilesTypeConfigEnum"
 import { RasterIngestionJobType } from "./RasterIngestionJobTypeEnum"
+import { RasterJobType } from "./RasterJobTypeEnum"
 
 export type CapabilitiesLayersSearchParams = {
   data: CapabilitiesLayersSearchParam[]
