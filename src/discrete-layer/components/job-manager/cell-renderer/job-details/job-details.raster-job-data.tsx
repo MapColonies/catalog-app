@@ -22,7 +22,7 @@ import {
   getRasterErrorCount,
   JobErrorsSummary,
 } from '../../../job-errors-summary/job-errors-summary';
-import { getEnumKeys } from '../../../layer-details/utils';
+import { getEnumWithRealValues } from '../../../layer-details/utils';
 
 import './info-area.css';
 import './job-details.raster-job-data.css';
@@ -44,7 +44,7 @@ export const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = (
   const [isLoading, setIsLoading] = useState(true);
 
   const rasterIngestionJobTypeRealValues = useMemo(() => {
-    return getEnumKeys(ENUMS, 'RasterIngestionJobType').map((key) => ENUMS[key]?.realValue);
+    return Object.values(getEnumWithRealValues(ENUMS, 'RasterIngestionJobType'));
   }, []);
 
   const isRasterJob =
