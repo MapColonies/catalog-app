@@ -16,11 +16,10 @@ import { Hyperlink } from '../../../../../common/components/hyperlink/hyperlink'
 import { useEnums } from '../../../../../common/hooks/useEnum.hook';
 import { Domain } from '../../../../../common/models/domain';
 import {
-  NO_THRESHOLD_ERROR_TYPES,
+  APPROVAL_REQUIRED_ERRORS,
   RasterErrorsCountKey,
   RasterErrorsSummary,
 } from '../../../../../common/models/job-errors-summary.raster';
-import { RasterIngestionJobType } from '../../../../../common/models/raster-job';
 import { JobModelType, Status, TaskModelType, useStore } from '../../../../models';
 import useZoomLevelsTable from '../../../export-layer/hooks/useZoomLevelsTable';
 import {
@@ -62,7 +61,7 @@ export const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = (
     Object.keys(errors.errorsCount).forEach((key) => {
       const errorCount = getRasterErrorCount(errors, key);
       if (
-        NO_THRESHOLD_ERROR_TYPES.includes(key as RasterErrorsCountKey) ||
+        APPROVAL_REQUIRED_ERRORS.includes(key as RasterErrorsCountKey) ||
         errorCount.exceeded === true ||
         typeof errorCount.exceeded === 'undefined'
       ) {

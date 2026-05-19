@@ -57,4 +57,4 @@ export type RasterErrorCount = {
 
 export type RasterErrorsCountKey = keyof RasterErrorsSummary['errorsCount'];
 
-export const NO_THRESHOLD_ERROR_TYPES: readonly RasterErrorsCountKey[] = ['resolution'];
+export const APPROVAL_REQUIRED_ERRORS: readonly RasterErrorsCountKey[] = ['resolution'];
