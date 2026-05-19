@@ -15,13 +15,17 @@ import { DETAILS_ROW_ID_SUFFIX } from '../../../../../common/components/grid';
 import { Hyperlink } from '../../../../../common/components/hyperlink/hyperlink';
 import { useEnums } from '../../../../../common/hooks/useEnum.hook';
 import { Domain } from '../../../../../common/models/domain';
-import { RasterErrorsSummary } from '../../../../../common/models/job-errors-summary.raster';
+import {
+  APPROVAL_REQUIRED_ERRORS,
+  RasterErrorsCountKey,
+  RasterErrorsSummary,
+} from '../../../../../common/models/job-errors-summary.raster';
 import { JobModelType, Status, TaskModelType, useStore } from '../../../../models';
 import useZoomLevelsTable from '../../../export-layer/hooks/useZoomLevelsTable';
 import {
   getRasterErrorCount,
-  JobErrorsSummary,
-} from '../../../job-errors-summary/job-errors-summary';
+  JobErrorsSummaryRasterJobData,
+} from './job-errors-summary.raster-job-data';
 import { getEnumWithRealValues } from '../../../layer-details/utils';
 
 import './info-area.css';
@@ -56,7 +60,11 @@ export const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = (
     let count = 0;
     Object.keys(errors.errorsCount).forEach((key) => {
       const errorCount = getRasterErrorCount(errors, key);
-      if (errorCount.exceeded === true || typeof errorCount.exceeded === 'undefined') {
+      if (
+        APPROVAL_REQUIRED_ERRORS.includes(key as RasterErrorsCountKey) ||
+        errorCount.exceeded === true ||
+        typeof errorCount.exceeded === 'undefined'
+      ) {
         count += errorCount.count ?? 0;
       }
     });
@@ -156,7 +164,11 @@ export const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = (
               <Tooltip
                 content={
                   <Box>
-                    {JobErrorsSummary(theme, task?.parameters?.errorsSummary, 'reportItem')}
+                    {JobErrorsSummaryRasterJobData(
+                      theme,
+                      task?.parameters?.errorsSummary,
+                      'reportItem'
+                    )}
                   </Box>
                 }
               >
@@ -186,7 +198,7 @@ export const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = (
             <Tooltip
               content={
                 <Box>
-                  {JobErrorsSummary(
+                  {JobErrorsSummaryRasterJobData(
                     theme,
                     task?.parameters?.errorsSummary,
                     'reportItem',
