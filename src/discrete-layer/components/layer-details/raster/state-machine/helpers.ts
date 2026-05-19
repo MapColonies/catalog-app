@@ -267,10 +267,7 @@ export const isJobValid = (status: Status | undefined): boolean => {
 export const isTaskValid = (job: IJob | undefined): boolean => {
   const taskPercentage = job?.taskPercentage;
   const validationReport = job?.validationReport;
-  return (
-    taskPercentage === 0 ||
-    validationReport?.isValid === true
-  );
+  return taskPercentage === 0 || validationReport?.isValid === true;
 };
 
 export const isModified = (modDate: Date | string) => {
