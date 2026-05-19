@@ -1,6 +1,6 @@
 import { ICellRendererParams } from 'ag-grid-community';
 import { get } from 'lodash';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { Box } from '@map-colonies/react-components';
 import {
@@ -13,6 +13,7 @@ import {
 import { AutoDirectionBox } from '../../../../../common/components/auto-direction-box/auto-direction-box.component';
 import { DETAILS_ROW_ID_SUFFIX } from '../../../../../common/components/grid';
 import { Hyperlink } from '../../../../../common/components/hyperlink/hyperlink';
+import { useEnums } from '../../../../../common/hooks/useEnum.hook';
 import { Domain } from '../../../../../common/models/domain';
 import {
   NO_THRESHOLD_ERROR_TYPES,
@@ -26,6 +27,7 @@ import {
   getRasterErrorCount,
   JobErrorsSummaryRasterJobData,
 } from './job-errors-summary.raster-job-data';
+import { getEnumWithRealValues } from '../../../layer-details/utils';
 
 import './info-area.css';
 import './job-details.raster-job-data.css';
@@ -36,19 +38,24 @@ const MAX_ERRORS_SHOWN = 99;
 
 export const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = ({ data }) => {
   const jobData = data as JobModelType;
-  const store = useStore();
   const intl = useIntl();
   const theme = useTheme();
+  const store = useStore();
+  const ENUMS = useEnums();
   const ZOOM_LEVELS_TABLE = useZoomLevelsTable();
   const [task, setTask] = useState<TaskModelType>();
   const [errorsCount, setErrorsCount] = useState(0);
   const [zoomLevel, setZoomLevel] = useState<number | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(true);
 
+  const rasterIngestionJobTypeRealValues = useMemo(() => {
+    return Object.values(getEnumWithRealValues(ENUMS, 'RasterIngestionJobType'));
+  }, []);
+
   const isRasterJob =
     jobData.domain === Domain.RASTER &&
     jobData.type &&
-    Object.values(RasterIngestionJobType).includes(jobData.type as RasterIngestionJobType);
+    rasterIngestionJobTypeRealValues.includes(jobData.type as string);
 
   const calculateErrorsCount = (errors: RasterErrorsSummary): number => {
     let count = 0;

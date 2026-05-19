@@ -3,8 +3,8 @@ import path from 'path';
 import { get, merge } from 'lodash';
 import shp from 'shpjs';
 import { FileData } from '@map-colonies/react-components';
-import { RasterIngestionJobType } from '../../../../../common/models/raster-job';
 import CONFIG from '../../../../../common/config';
+import { IEnumsMapType } from '../../../../../common/contexts/enumsMap.context';
 import { dateFormatter, relativeDateFormatter } from '../../../../../common/helpers/formatters';
 import {
   JobModelType,
@@ -196,8 +196,13 @@ export const getRestoreData = async (context: IContext): Promise<IPartialContext
 
   const job = await getJob(context);
   try {
+    const enumsMap = context.store.discreteLayersStore.enumsMap as IEnumsMapType;
     return {
-      flowType: jobType2Mode[job.type || RasterIngestionJobType.NEW] as IPartialContext['flowType'],
+      flowType: jobType2Mode(
+        enumsMap,
+        'RasterIngestionJobType',
+        job.type as string
+      ) as IPartialContext['flowType'],
       selectionMode: 'restore',
       files: {
         data: {
