@@ -291,7 +291,9 @@ const DiscreteLayerView: React.FC = observer(() => {
       KILOMETERS_UNIT: intl.formatMessage({ id: 'map.scale.units.kilometers' }),
       ZOOM_LABEL: intl.formatMessage({ id: 'map.zoom.label' }),
       DEBUG_PANEL_TITLE: intl.formatMessage({ id: 'debug-panel.title' }),
-      TILE_REQUESTS_OPTIMIZATION_CHECKBOX: intl.formatMessage({ id: 'debug-panel.tile-requests-optimization' }),
+      TILE_REQUESTS_OPTIMIZATION_CHECKBOX: intl.formatMessage({
+        id: 'debug-panel.tile-requests-optimization',
+      }),
       CESIUM_INSPECTOR_CHECKBOX: intl.formatMessage({ id: 'debug-panel.cesium-inspector' }),
       WFS_TITLE: intl.formatMessage({ id: 'debug-panel.wfs.title' }),
       WFS_CACHE: intl.formatMessage({ id: 'debug-panel.wfs.cache' }),
