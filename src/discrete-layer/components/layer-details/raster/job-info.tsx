@@ -1,9 +1,14 @@
+import { get } from 'lodash';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Box } from '@map-colonies/react-components';
 import { Typography, useTheme } from '@map-colonies/react-core';
 import { Skeleton } from '../../../../common/components/skeleton/skeleton';
 import { AutoDirectionBox } from '../../../../common/components/auto-direction-box/auto-direction-box.component';
+import {
+  APPROVAL_REQUIRED_ERRORS,
+  RasterErrorsCountKey,
+} from '../../../../common/models/job-errors-summary.raster';
 import { Status } from '../../../models';
 import { JobErrorsSummaryRasterJobData } from '../../job-manager/cell-renderer/job-details/job-errors-summary.raster-job-data';
 import { FINAL_STATUSES } from '../../job-manager/job.types';
@@ -39,6 +44,7 @@ const JobInfoComponent: React.FC<JobInfoProps> = ({ job }) => {
   }, []);
 
   const errorsCount = displayJob?.validationReport?.errorsSummary?.errorsCount;
+  const thresholds = displayJob?.validationReport?.errorsSummary?.thresholds;
   const jobStatus = displayJob?.details?.status as Status | undefined;
 
   const isViewOnly = useMemo(() => {
@@ -46,11 +52,17 @@ const JobInfoComponent: React.FC<JobInfoProps> = ({ job }) => {
     if (!errorsCount) {
       return isStatusReadOnly;
     }
-    const hasOtherErrors = Object.entries(errorsCount).some(
-      ([key, value]) => key !== 'resolution' && value > 0
-    );
+    const hasOtherErrors = Object.entries(errorsCount).some(([key, value]) => {
+      if (!APPROVAL_REQUIRED_ERRORS.includes(key as RasterErrorsCountKey)) {
+        if (value > 0) {
+          const isExceeded = get(thresholds, `${key}.exceeded`);
+          return isExceeded === undefined ? true : isExceeded;
+        }
+      }
+      return false;
+    });
     return isStatusReadOnly || hasOtherErrors;
-  }, [errorsCount, jobStatus]);
+  }, [errorsCount, thresholds, jobStatus]);
 
   if (!displayJob) {
     return null;
