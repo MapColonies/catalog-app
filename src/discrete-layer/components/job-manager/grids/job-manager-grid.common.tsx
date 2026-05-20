@@ -3,6 +3,7 @@ import React, { useCallback, useContext, useEffect, useMemo, useState } from 're
 import { useIntl } from 'react-intl';
 import CONFIG from '../../../../common/config';
 import {
+  GridApi,
   GridComponent,
   GridComponentOptions,
   GridReadyEvent,
@@ -71,6 +72,7 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
 
   const store = useStore();
   const intl = useIntl();
+  const [gridApi, setGridApi] = useState<GridApi>();
   const { enumsMap } = useContext(EnumsMapContext);
   const [focusJobId, setFocusJobId] = useState<string | undefined>(undefined);
   const [isRowFound, setIsRowFound] = useState<boolean>(false);
@@ -92,6 +94,8 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
   const onGridReady = (params: GridReadyEvent): void => {
     onGridReadyCB(params);
 
+    setGridApi(params.api);
+
     params.api.applyColumnState({
       state: [{ colId: 'updated', sort: 'desc' }],
     });
@@ -100,6 +104,10 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
 
   useEffect(() => {
     rowDataChangeCB();
+    gridApi?.refreshCells({
+      suppressFlash: true,
+      force: true,
+    });
     store.jobsStore.updateReloadDataCounter();
   }, [rowData]);
 
