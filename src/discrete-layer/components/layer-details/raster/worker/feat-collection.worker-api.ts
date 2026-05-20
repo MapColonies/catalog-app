@@ -1,3 +1,4 @@
+import shpjs from 'shpjs';
 import { expose } from 'comlink';
 import initGeos, { geos } from 'geos-wasm';
 import { cloneDeep, isEmpty } from 'lodash';
@@ -20,7 +21,7 @@ import {
 import { abortableFetch, safeRead } from '../../../../../common/helpers/http';
 import { FeatureType } from '../feature-type.enum';
 import {
-  WorkerAPI,
+  IWorkerAPI,
   WorkerMessage,
   IndexedItem,
   BBoxObj,
@@ -95,6 +96,14 @@ const _downloadFile = async (
   let received = 0;
 
   try {
+    details = createMessageDetails(total, received, t0);
+    onProgress?.({
+      process: Process.Load,
+      stage: Stage.Download,
+      type: WorkerType.Progress,
+      details,
+    });
+
     const response = await abortableFetch(url);
 
     if (!response.ok || !response.body) {
@@ -213,7 +222,7 @@ const _toFeatureCollection = (parsed: unknown): FeatureCollection<Geometry, GeoJ
 };
 
 const _parseShpFileContent = async (buffer: ArrayBuffer): Promise<FeatureCollection> => {
-  const shpjsModule = (await import('shpjs')) as unknown as {
+  const shpjsModule = shpjs as unknown as {
     default?: ShpJsParser;
   };
 
@@ -324,11 +333,12 @@ const _prepareGEOSData = (
   // console.log('******* initQueryCache', performance.now()-t1, '(ms)'); // ~12K --> 17ms
 };
 
-const api: WorkerAPI = {
+const api: IWorkerAPI = {
   async init(): Promise<void> {
     _geos = await initGeos();
   },
-  dispose() {
+  ready: true,
+  cleanup() {
     if (!_geoms) return;
 
     for (const g of _geoms) {
@@ -339,11 +349,11 @@ const api: WorkerAPI = {
     _geoms = [];
 
     _tree.clear();
-    console.log('******** WORKER DISPOSED');
+    console.log('******** WORKER CLEANUP');
   },
   async load(fc: FeatureCollection, options?: LoadOptions): Promise<void | WorkerError> {
     try {
-      api.dispose();
+      api.cleanup();
       _fc = fc; //cloneDeep(fc);
       _prepareGEOSData(options?.customProperties);
     } catch (error) {
@@ -358,7 +368,7 @@ const api: WorkerAPI = {
     onProgress?: (p: WorkerMessage | null) => void
   ): Promise<void | WorkerError> {
     try {
-      api.dispose();
+      api.cleanup();
       const buffer = await _downloadFile(url, onProgress);
       const fc = _filterReportFeatures(await _parseShpFileContent(buffer));
       _fc = fc; //cloneDeep(fc);
@@ -369,7 +379,7 @@ const api: WorkerAPI = {
       };
     }
   },
-  updateAreas(onProgress?: (p: WorkerMessage | null) => void): WorkerError | void {
+  async updateAreas(onProgress?: (p: WorkerMessage | null) => void): Promise<WorkerError | void> {
     const total = _geoms.length;
     const t0 = performance.now();
     let details: MessageDetails;
@@ -514,7 +524,9 @@ const api: WorkerAPI = {
 
     return simplifiedOuterJSON;
   },
-  getFeatureCollection(onProgress?: (p: WorkerMessage | null) => void): FeatureCollection {
+  async getFeatureCollection(
+    onProgress?: (p: WorkerMessage | null) => void
+  ): Promise<FeatureCollection> {
     // const t0 = performance.now();
     const featuresArray = cloneDeep(
       _featureTemplate.map((item, idx) => {
@@ -538,7 +550,7 @@ const api: WorkerAPI = {
       features: featuresArray,
     };
   },
-  getMarkersFromGeometry(geometry: Geometry) {
+  async getMarkersFromGeometry(geometry: Geometry): Promise<FeatureCollection> {
     const positions = _getFirstPointsFromRings(geometry);
 
     const prop = {
@@ -559,7 +571,10 @@ const api: WorkerAPI = {
       features,
     };
   },
-  query(bbox: BBoxObj, onProgress?: (p: WorkerMessage | null) => void): FeatureCollection {
+  async query(
+    bbox: BBoxObj,
+    onProgress?: (p: WorkerMessage | null) => void
+  ): Promise<FeatureCollection> {
     // const t0 = performance.now();
     const matches = _tree.search(bbox);
     // console.log('query took:', matches.length, '    ', performance.now() - t0, 'ms');

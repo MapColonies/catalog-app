@@ -7,6 +7,7 @@ import { Box, VectorLayer, VectorSource } from '@map-colonies/react-components';
 import {
   Button,
   Checkbox,
+  CircularProgress,
   CollapsibleList,
   Dialog,
   DialogContent,
@@ -38,7 +39,7 @@ import { ProgressCurtain } from './progressCurtain/progressCurtain';
 import { RasterWorkflowContext } from './state-machine/context';
 import { Events } from './state-machine/types';
 import { UpdateLayerHeader } from './update-layer-header';
-import { useWorkerAPI } from './worker/useWorkerAPI';
+import { useRasterWorkerAPI } from './worker/raster-worker-api.hook';
 import { extractProgressArray } from './worker/utils';
 import { Process } from './worker/worker.types';
 
@@ -70,7 +71,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
   viewOnly = false,
 }) => {
   const intl = useIntl();
-  const [api, stagesInfo] = useWorkerAPI({
+  const [api, stagesInfo] = useRasterWorkerAPI({
     [Process.ComputeOuterGeometry]: 2,
   });
   const hasLoadedRef = useRef(false);
@@ -91,6 +92,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
   >();
   const [collectionMountKeys, setCollectionMountKeys] = useState<number[]>([]);
   const [approver, setApprover] = useState('');
+  const [isApproving, setIsApproving] = useState(false);
   const [listFilterMode, setListFilterMode] = useState<FilterMode>('all');
   const [selectedItem, setSelectedItem] = useState<Feature>();
   const [polygonPartsErrors, setPolygonPartsErrors] = useState<string[] | undefined>();
@@ -151,6 +153,20 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
       setListFilterMode('all');
     }
   }, [hasExceededFeatures, listFilterMode]);
+
+  useEffect(() => {
+    if (hasExceededFeatures) {
+      const exceededPartsError = intl.formatMessage({
+        id: 'resolutionConflict.error.exceededParts',
+      });
+      setPolygonPartsErrors((prev) => {
+        if (!prev || prev.length === 0) {
+          return [exceededPartsError];
+        }
+        return prev.includes(exceededPartsError) ? prev : [...prev, exceededPartsError];
+      });
+    }
+  }, [hasExceededFeatures]);
 
   useEffect(() => {
     if (storePolygonPartsErrors) {
@@ -312,7 +328,12 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
   }, []);
 
   const approve = useCallback((): void => {
+    if (isApproving) {
+      return;
+    }
+
     const resumeJob = async (): Promise<void> => {
+      setIsApproving(true);
       try {
         await state.context.store.mutateJobApproveAndResume({
           data: {
@@ -331,10 +352,12 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
         setPolygonPartsErrors([
           intl.formatMessage({ id: 'resolutionConflict.error.approveFailed' }),
         ]);
+      } finally {
+        setIsApproving(false);
       }
     };
     void resumeJob();
-  }, [approver]);
+  }, [approver, isApproving]);
 
   const progresses = useMemo(() => {
     return extractProgressArray(api);
@@ -614,7 +637,9 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                     <Box>
                       <Typography
                         tag="span"
-                        className={`approverLabel ${isApproverFieldDisabled ? 'disabled' : ''}`}
+                        className={`approverLabel ${
+                          isApproverFieldDisabled || isApproving ? 'disabled' : ''
+                        }`}
                       >
                         {intl.formatMessage({ id: 'resolutionConflict.approver.label' })}
                         <Typography
@@ -629,7 +654,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                       </Typography>
                       <TextField
                         className="approverNameField"
-                        disabled={isApproverFieldDisabled}
+                        disabled={isApproverFieldDisabled || isApproving}
                         value={approver}
                         onChange={(event): void => {
                           setApprover(event.currentTarget.value);
@@ -653,15 +678,20 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                       type="button"
                       onClick={approve}
                       disabled={
+                        isApproving ||
                         isLoadingLowResolutionParts ||
                         lowResolutionCollections.length === 0 ||
                         approver.trim().length === 0
                       }
                     >
-                      <FormattedMessage id="general.confirm-btn.text" />
+                      {isApproving ? (
+                        <CircularProgress className="loading" />
+                      ) : (
+                        <FormattedMessage id="general.confirm-btn.text" />
+                      )}
                     </Button>
                   )}
-                  <Button type="button" onClick={closeDialog}>
+                  <Button type="button" onClick={closeDialog} disabled={isApproving}>
                     <FormattedMessage id="general.close-btn.text" />
                   </Button>
                 </Box>

@@ -5,7 +5,7 @@ import { Typography, useTheme } from '@map-colonies/react-core';
 import { Skeleton } from '../../../../common/components/skeleton/skeleton';
 import { AutoDirectionBox } from '../../../../common/components/auto-direction-box/auto-direction-box.component';
 import { Status } from '../../../models';
-import { JobErrorsSummary } from '../../job-errors-summary/job-errors-summary';
+import { JobErrorsSummaryRasterJobData } from '../../job-manager/cell-renderer/job-details/job-errors-summary.raster-job-data';
 import { FINAL_STATUSES } from '../../job-manager/job.types';
 import { Progress } from './progress';
 import { ResolutionConflictDialog } from './resolution-conflict.dialog';
@@ -21,7 +21,7 @@ interface JobInfoProps {
 const JobInfoComponent: React.FC<JobInfoProps> = ({ job }) => {
   const theme = useTheme();
   const [isResolutionConflictDialogOpen, setIsResolutionConflictDialogOpen] = useState(false);
-  const [isResolutionConflictApproved, setIsResolutionConflictApproved] = useState(false);
+  const [isApproved, setIsApproved] = useState(false);
   const latestJobRef = useRef<IJob | undefined>(job);
 
   if (job) {
@@ -35,13 +35,13 @@ const JobInfoComponent: React.FC<JobInfoProps> = ({ job }) => {
   }, []);
 
   const approveResolutionConflictDialog = useCallback(() => {
-    setIsResolutionConflictApproved(true);
+    setIsApproved(true);
   }, []);
 
   const errorsCount = displayJob?.validationReport?.errorsSummary?.errorsCount;
   const jobStatus = displayJob?.details?.status as Status | undefined;
 
-  const isResolutionConflictViewOnly = useMemo(() => {
+  const isViewOnly = useMemo(() => {
     const isStatusReadOnly = jobStatus != null && FINAL_STATUSES.includes(jobStatus);
     if (!errorsCount) {
       return isStatusReadOnly;
@@ -94,7 +94,7 @@ const JobInfoComponent: React.FC<JobInfoProps> = ({ job }) => {
           {taskId ? (
             errorsCount ? (
               <Box className="reportList bold">
-                {JobErrorsSummary(
+                {JobErrorsSummaryRasterJobData(
                   theme,
                   errorsSummary!,
                   'countWrapper',
@@ -103,7 +103,7 @@ const JobInfoComponent: React.FC<JobInfoProps> = ({ job }) => {
                     key: 'resolution',
                     action: openResolutionConflictDialog,
                     isEnabled: taskStatus === Status.Completed,
-                    isApproved: isResolutionConflictApproved || jobStatus === Status.Completed,
+                    isApproved: isApproved || jobStatus === Status.Completed,
                   }
                 )}
               </Box>
@@ -133,7 +133,7 @@ const JobInfoComponent: React.FC<JobInfoProps> = ({ job }) => {
           isOpen={isResolutionConflictDialogOpen}
           onSetIsOpen={setIsResolutionConflictDialogOpen}
           onApprove={approveResolutionConflictDialog}
-          viewOnly={isResolutionConflictViewOnly || isResolutionConflictApproved}
+          viewOnly={isViewOnly || isApproved}
         />
       )}
     </>

@@ -10,6 +10,7 @@ import {
   RecordType,
   UndulationModel,
   Transparency,
+  RasterIngestionJobType,
 } from '../../../models';
 import { useQuery, useStore } from '../../../models/RootStore';
 
@@ -20,11 +21,12 @@ export const MCEnumsFetcher: React.FC = observer(() => {
   const enumUnion = {
     DemDataType,
     NoDataValue,
-    UndulationModel,
     ProductType,
+    RasterIngestionJobType,
     RecordStatus,
     RecordType,
     Transparency,
+    UndulationModel,
   };
 
   useEffect(() => {
@@ -209,6 +211,8 @@ export const MCEnumsFetcher: React.FC = observer(() => {
       enums[UNPUBLISHED] = { ...enums[UNPUBLISHED], internal: true };
 
       setEnumsMap(enums);
+
+      store.discreteLayersStore.setEnumsMap(enums);
     }
   }, [mcEnumsQuery.data, mcEnumsQuery.loading, store.discreteLayersStore]);
 

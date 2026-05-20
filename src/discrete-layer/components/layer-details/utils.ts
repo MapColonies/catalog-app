@@ -15,7 +15,6 @@ import { IEnumsMapType } from '../../../common/contexts/enumsMap.context';
 import { emphasizeByHTML } from '../../../common/helpers/formatters';
 import { sessionStore } from '../../../common/helpers/storage';
 import { Mode } from '../../../common/models/mode.enum';
-import { RasterIngestionJobType } from '../../../common/models/raster-job';
 import { ValidationTypeName } from '../../../common/models/validation.enum';
 import { UiDescriptorsType, UiDescriptorsTypeName } from '../../../common/ui-descriptors/type';
 import {
@@ -46,6 +45,7 @@ import {
   ProductType,
   ProviderType,
   QuantizedMeshBestRecordModel,
+  RasterIngestionJobType,
   RecordType,
   UpdateRulesModelType,
   UpdateRulesOperationModelType,
@@ -1026,6 +1026,18 @@ export const getEnumKeys = (
   });
 };
 
+export const getEnumWithRealValues = (
+  enumsMap: IEnumsMapType,
+  enumName: string
+): Record<string, string> => {
+  return Object.keys(enumsMap).reduce((acc, key) => {
+    if (enumsMap[key].enumName === enumName) {
+      acc[key] = enumsMap[key].realValue as string;
+    }
+    return acc;
+  }, {} as Record<string, string>);
+};
+
 export const getProductDomain = (productType: ProductType, enumsMap?: IEnumsMapType): string => {
   return enumsMap?.[productType as string]?.parentDomain as string;
 };
@@ -1072,8 +1084,15 @@ export const filterModeDescriptors = (
   });
 };
 
-export const jobType2Mode: { [key: string]: Mode } = {
-  [RasterIngestionJobType.NEW]: Mode.NEW,
-  [RasterIngestionJobType.UPDATE]: Mode.UPDATE,
-  [RasterIngestionJobType.SWAP_UPDATE]: Mode.UPDATE,
+export const jobType2Mode = (enumsMap: IEnumsMapType, enumName: string, jobType: string): Mode => {
+  const enumWithRealValues = getEnumWithRealValues(enumsMap, enumName);
+  const enumKey = Object.keys(enumWithRealValues).find((k) => enumWithRealValues[k] === jobType);
+  return enumKey === RasterIngestionJobType.NEW ? Mode.NEW : Mode.UPDATE;
+};
+
+export const getUpdateJobTypes = (enumsMap: IEnumsMapType, enumName: string): string[] => {
+  const enumWithRealValues = getEnumWithRealValues(enumsMap, enumName);
+  return Object.entries(enumWithRealValues)
+    .filter(([key]) => key !== RasterIngestionJobType.NEW)
+    .map(([_, realValue]) => realValue);
 };

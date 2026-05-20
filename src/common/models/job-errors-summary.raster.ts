@@ -1,5 +1,3 @@
-// #region to be removed
-// TODO: should be taken from @map-colonies/types
 import { Status } from '../../discrete-layer/models';
 
 export type CallBack<T> = {
@@ -25,29 +23,33 @@ export type RasterTaskParams = {
   };
 };
 
-export type RasterErrorsSummary = {
-  errorsCount: {
-    geometryValidity: number;
-    vertices: number;
-    metadata: number;
-    resolution: number;
-    smallGeometries: number;
-    smallHoles: number;
-    unknown: number;
-  };
-  thresholds: {
-    smallHoles: {
-      exceeded: boolean;
-      count: number;
-    };
-    smallGeometries: {
-      exceeded: boolean;
-    };
-  };
+type ErrorsCount = {
+  geometryValidity: number;
+  vertices: number;
+  metadata: number;
+  resolution: number;
+  smallGeometries: number;
+  smallHoles: number;
+  unknown: number;
 };
-// #endregion to be removed
+
+type Threshold = {
+  exceeded: boolean;
+};
+
+export type RasterErrorsSummary = {
+  errorsCount: ErrorsCount;
+
+  thresholds: Partial<{
+    [K in keyof ErrorsCount]: Threshold;
+  }>;
+};
 
 export type RasterErrorCount = {
   count?: number;
   exceeded?: boolean;
 };
+
+export type RasterErrorsCountKey = keyof RasterErrorsSummary['errorsCount'];
+
+export const APPROVAL_REQUIRED_ERRORS: readonly RasterErrorsCountKey[] = ['resolution'];

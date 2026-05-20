@@ -2,6 +2,85 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [6.0.13](https://github.com/MapColonies/catalog-app/compare/v6.0.12...v6.0.13) (2026-05-20)
+
+
+### Bug Fixes
+
+* bypass api circular progress ([#967](https://github.com/MapColonies/catalog-app/issues/967)) ([4f60fd5](https://github.com/MapColonies/catalog-app/commit/4f60fd5ec01f3a2bdb70ad91da2dbc44f35ce496))
+
+## [6.0.12](https://github.com/MapColonies/catalog-app/compare/v6.0.11...v6.0.12) (2026-05-19)
+
+
+### Bug Fixes
+
+* raster errors report in job manager dialog ([#964](https://github.com/MapColonies/catalog-app/issues/964)) ([e81a846](https://github.com/MapColonies/catalog-app/commit/e81a8461a35e3ccd937b8c26e33caa8df839fdc3))
+
+## [6.0.11](https://github.com/MapColonies/catalog-app/compare/v6.0.10...v6.0.11) (2026-05-19)
+
+
+### Bug Fixes
+
+* swap update ([#944](https://github.com/MapColonies/catalog-app/issues/944)) ([e4b46ac](https://github.com/MapColonies/catalog-app/commit/e4b46ac0eafec8995812c4f47524e3949a31a65d))
+
+## [6.0.10](https://github.com/MapColonies/catalog-app/compare/v6.0.9...v6.0.10) (2026-05-18)
+
+
+### Bug Fixes
+
+* use slash as default ([#962](https://github.com/MapColonies/catalog-app/issues/962)) ([a57ff31](https://github.com/MapColonies/catalog-app/commit/a57ff319bee53780e9539a0a4cd9510bb0de3388))
+
+## [6.0.9](https://github.com/MapColonies/catalog-app/compare/v6.0.8...v6.0.9) (2026-05-18)
+
+
+### Bug Fixes
+
+* remove default dot at public url ([#960](https://github.com/MapColonies/catalog-app/issues/960)) ([8e59125](https://github.com/MapColonies/catalog-app/commit/8e591255e216609772982e24fb60f7a176ac90fb))
+
+## [6.0.8](https://github.com/MapColonies/catalog-app/compare/v6.0.7...v6.0.8) (2026-05-18)
+
+
+### Bug Fixes
+
+* dot ([#954](https://github.com/MapColonies/catalog-app/issues/954)) ([05a9310](https://github.com/MapColonies/catalog-app/commit/05a93105803a959a746c7c5fac74cac3cc0464c1))
+* revert dot ([#956](https://github.com/MapColonies/catalog-app/issues/956)) ([6088db9](https://github.com/MapColonies/catalog-app/commit/6088db9e54106c16c702da214875b87d424c830b))
+* slash does not work as public url ([#958](https://github.com/MapColonies/catalog-app/issues/958)) ([29599d0](https://github.com/MapColonies/catalog-app/commit/29599d0a3d6a5e36fbed1de476a01c91654f81b4))
+
+## [6.0.7](https://github.com/MapColonies/catalog-app/compare/v6.0.6...v6.0.7) (2026-05-18)
+
+
+### Bug Fixes
+
+* default public url ([#952](https://github.com/MapColonies/catalog-app/issues/952)) ([652a014](https://github.com/MapColonies/catalog-app/commit/652a014e316d164d45291c2e9b20d30db518303a))
+
+## [6.0.6](https://github.com/MapColonies/catalog-app/compare/v6.0.5...v6.0.6) (2026-05-18)
+
+
+### Bug Fixes
+
+* do not use point in public url only slash ([#950](https://github.com/MapColonies/catalog-app/issues/950)) ([322faf0](https://github.com/MapColonies/catalog-app/commit/322faf08698e1d106ee4ee4736d434e771e9f724))
+
+## [6.0.5](https://github.com/MapColonies/catalog-app/compare/v6.0.4...v6.0.5) (2026-05-18)
+
+
+### Bug Fixes
+
+* revert ([#948](https://github.com/MapColonies/catalog-app/issues/948)) ([69f1f4e](https://github.com/MapColonies/catalog-app/commit/69f1f4e1bcb6b9cfa72b7df2e0eda36c1d2791f9))
+
+## [6.0.4](https://github.com/MapColonies/catalog-app/compare/v6.0.3...v6.0.4) (2026-05-18)
+
+
+### Bug Fixes
+
+* cannot approve low resolution polygon parts exceeded 4 ([#946](https://github.com/MapColonies/catalog-app/issues/946)) ([759016c](https://github.com/MapColonies/catalog-app/commit/759016cb61fba5d3614e892c3de53961dff7c64c))
+
+## [6.0.3](https://github.com/MapColonies/catalog-app/compare/v6.0.2...v6.0.3) (2026-05-17)
+
+
+### Bug Fixes
+
+* workers bootstrapper ([#939](https://github.com/MapColonies/catalog-app/issues/939)) ([3813813](https://github.com/MapColonies/catalog-app/commit/3813813994f9406bb1f3d90901317d0d01725721))
+
 ## [6.0.2](https://github.com/MapColonies/catalog-app/compare/v6.0.1...v6.0.2) (2026-05-14)
 
 
