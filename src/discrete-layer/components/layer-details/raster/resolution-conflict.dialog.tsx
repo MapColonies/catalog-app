@@ -637,13 +637,15 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                     <Box>
                       <Typography
                         tag="span"
-                        className={`approverLabel ${(isApproverFieldDisabled || isApproving) ? 'disabled' : ''}`}
+                        className={`approverLabel ${
+                          isApproverFieldDisabled || isApproving ? 'disabled' : ''
+                        }`}
                       >
                         {intl.formatMessage({ id: 'resolutionConflict.approver.label' })}
                         <Typography
                           tag="span"
                           className={
-                            (!isApproverFieldDisabled && approver.trim().length === 0) ? 'error' : ''
+                            !isApproverFieldDisabled && approver.trim().length === 0 ? 'error' : ''
                           }
                         >
                           {' '}
