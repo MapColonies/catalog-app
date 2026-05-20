@@ -7,6 +7,7 @@ import { Box, VectorLayer, VectorSource } from '@map-colonies/react-components';
 import {
   Button,
   Checkbox,
+  CircularProgress,
   CollapsibleList,
   Dialog,
   DialogContent,
@@ -91,6 +92,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
   >();
   const [collectionMountKeys, setCollectionMountKeys] = useState<number[]>([]);
   const [approver, setApprover] = useState('');
+  const [isApproving, setIsApproving] = useState(false);
   const [listFilterMode, setListFilterMode] = useState<FilterMode>('all');
   const [selectedItem, setSelectedItem] = useState<Feature>();
   const [polygonPartsErrors, setPolygonPartsErrors] = useState<string[] | undefined>();
@@ -326,7 +328,12 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
   }, []);
 
   const approve = useCallback((): void => {
+    if (isApproving) {
+      return;
+    }
+
     const resumeJob = async (): Promise<void> => {
+      setIsApproving(true);
       try {
         await state.context.store.mutateJobApproveAndResume({
           data: {
@@ -345,10 +352,12 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
         setPolygonPartsErrors([
           intl.formatMessage({ id: 'resolutionConflict.error.approveFailed' }),
         ]);
+      } finally {
+        setIsApproving(false);
       }
     };
     void resumeJob();
-  }, [approver]);
+  }, [approver, isApproving]);
 
   const progresses = useMemo(() => {
     return extractProgressArray(api);
@@ -628,7 +637,9 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                     <Box>
                       <Typography
                         tag="span"
-                        className={`approverLabel ${isApproverFieldDisabled ? 'disabled' : ''}`}
+                        className={`approverLabel ${
+                          isApproverFieldDisabled || isApproving ? 'disabled' : ''
+                        }`}
                       >
                         {intl.formatMessage({ id: 'resolutionConflict.approver.label' })}
                         <Typography
@@ -643,7 +654,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                       </Typography>
                       <TextField
                         className="approverNameField"
-                        disabled={isApproverFieldDisabled}
+                        disabled={isApproverFieldDisabled || isApproving}
                         value={approver}
                         onChange={(event): void => {
                           setApprover(event.currentTarget.value);
@@ -667,15 +678,20 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                       type="button"
                       onClick={approve}
                       disabled={
+                        isApproving ||
                         isLoadingLowResolutionParts ||
                         lowResolutionCollections.length === 0 ||
                         approver.trim().length === 0
                       }
                     >
-                      <FormattedMessage id="general.confirm-btn.text" />
+                      {isApproving ? (
+                        <CircularProgress className="loading" />
+                      ) : (
+                        <FormattedMessage id="general.confirm-btn.text" />
+                      )}
                     </Button>
                   )}
-                  <Button type="button" onClick={closeDialog}>
+                  <Button type="button" onClick={closeDialog} disabled={isApproving}>
                     <FormattedMessage id="general.close-btn.text" />
                   </Button>
                 </Box>
