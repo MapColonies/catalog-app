@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [6.0.15](https://github.com/MapColonies/catalog-app/compare/v6.0.14...v6.0.15) (2026-05-20)
+
+
+### Bug Fixes
+
+* refresh grid cells after rawdata changed ([#972](https://github.com/MapColonies/catalog-app/issues/972)) ([4ec2999](https://github.com/MapColonies/catalog-app/commit/4ec2999a2ac3e4787f1c4cf63f6cf6edea49c81a))
+
 ## [6.0.14](https://github.com/MapColonies/catalog-app/compare/v6.0.13...v6.0.14) (2026-05-20)
 
 
