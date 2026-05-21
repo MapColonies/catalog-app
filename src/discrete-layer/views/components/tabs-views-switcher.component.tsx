@@ -8,6 +8,7 @@ import { useStore } from '../../models/RootStore';
 import { TabViews } from '../tab-views';
 
 import './tabs-views-switcher.component.css';
+import { isRtl } from '../../../common/i18n/helper';
 
 interface TabViewsSwitcherComponentProps {
   handleTabViewChange: (tabView: TabViews) => void;
@@ -44,7 +45,7 @@ export const TabViewsSwitcher: React.FC<TabViewsSwitcherComponentProps> = observ
       {
         idx: TabViews.EXPORT_LAYER,
         title: 'tab-views.export-layer',
-        iconClassName: intl.locale === 'en' ? 'mc-icon-Export' : 'mc-icon-Export-Left',
+        iconClassName: !isRtl(intl.locale) ? 'mc-icon-Export' : 'mc-icon-Export-Left',
         dependentValue: store.exportStore.layerToExport,
       },
     ],

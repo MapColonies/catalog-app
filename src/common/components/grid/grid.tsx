@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { CSSProperties, useCallback, useEffect, useState } from 'react';
+import React, { CSSProperties, ReactElement, useCallback, useEffect, useMemo, useState } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import {
   GridReadyEvent as AgGridReadyEvent,
@@ -43,17 +43,23 @@ interface GridComponentProps {
   focusByRowId?: string;
   setIsRowFound?: (val: boolean) => void;
   handleFocusError?: (error: IError | undefined) => void;
+  customPagination?: {
+    renderPaginationBar: (data: any) => ReactElement;
+    filteredData: any[];
+    getPageByProperty: (key: string, value: unknown) => { page: number, index: number } | null;
+    paginate: (page: number) => void;
+  }
 }
 
-export interface GridApi extends AgGridApi {}
-export interface GridReadyEvent extends AgGridReadyEvent {}
-export interface GridCellMouseOutEvent extends CellMouseOutEvent {}
-export interface GridCellMouseOverEvent extends CellMouseOverEvent {}
-export interface GridRowDragEnterEvent extends RowDragEnterEvent {}
-export interface GridRowDragEndEvent extends RowDragEndEvent {}
-export interface GridRowSelectedEvent extends RowSelectedEvent {}
-export interface GridRowClickedEvent extends RowClickedEvent {}
-export interface GridValueFormatterParams extends ValueFormatterParams {}
+export interface GridApi extends AgGridApi { }
+export interface GridReadyEvent extends AgGridReadyEvent { }
+export interface GridCellMouseOutEvent extends CellMouseOutEvent { }
+export interface GridCellMouseOverEvent extends CellMouseOverEvent { }
+export interface GridRowDragEnterEvent extends RowDragEnterEvent { }
+export interface GridRowDragEndEvent extends RowDragEndEvent { }
+export interface GridRowSelectedEvent extends RowSelectedEvent { }
+export interface GridRowClickedEvent extends RowClickedEvent { }
+export interface GridValueFormatterParams extends ValueFormatterParams { }
 export interface GridComponentOptions extends GridOptions {
   detailsRowCellRenderer?: string;
   detailsRowHeight?: number;
@@ -74,10 +80,10 @@ export interface IRowPosition {
   rowIndex: number;
 }
 
-export interface GridRowNode extends IRowNode {}
+export interface GridRowNode extends IRowNode { }
 
 export const GridComponent: React.FC<GridComponentProps> = (props) => {
-  const [rowData, setRowData] = useState<any[]>();
+  const [allRowsData, setAllRowsData] = useState<any[]>();
   const theme = useTheme();
   const [gridApi, setGridApi] = useState<GridApi>();
 
@@ -94,60 +100,60 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
         hide: true,
       },
       props.gridOptions?.detailsRowExpanderPosition === 'start' &&
-      props.gridOptions.detailsRowCellRenderer !== undefined
+        props.gridOptions.detailsRowCellRenderer !== undefined
         ? {
-            headerName: '',
-            width: EXPANDER_COLUMN_WIDTH,
-            cellRenderer: 'detailsExpanderRenderer',
-            suppressMovable: true,
-            sortable: false,
-            cellRendererParams: {
-              detailsRowCellRendererPresencePredicate:
-                props.gridOptions.context?.detailsRowCellRendererPresencePredicate,
-            },
-          }
-        : {
-            hide: true,
+          headerName: '',
+          width: EXPANDER_COLUMN_WIDTH,
+          cellRenderer: 'detailsExpanderRenderer',
+          suppressMovable: true,
+          sortable: false,
+          cellRendererParams: {
+            detailsRowCellRendererPresencePredicate:
+              props.gridOptions.context?.detailsRowCellRendererPresencePredicate,
           },
+        }
+        : {
+          hide: true,
+        },
       ...(props.gridOptions?.columnDefs as []),
       props.gridOptions?.detailsRowExpanderPosition !== 'start' &&
-      props.gridOptions?.detailsRowCellRenderer !== undefined
+        props.gridOptions?.detailsRowCellRenderer !== undefined
         ? {
-            headerName: '',
-            width: EXPANDER_COLUMN_WIDTH,
-            cellRenderer: 'detailsExpanderRenderer',
-            suppressMovable: true,
-            sortable: false,
-            cellRendererParams: {
-              detailsRowCellRendererPresencePredicate:
-                props.gridOptions.context?.detailsRowCellRendererPresencePredicate,
-            },
-          }
-        : {
-            hide: true,
+          headerName: '',
+          width: EXPANDER_COLUMN_WIDTH,
+          cellRenderer: 'detailsExpanderRenderer',
+          suppressMovable: true,
+          sortable: false,
+          cellRendererParams: {
+            detailsRowCellRendererPresencePredicate:
+              props.gridOptions.context?.detailsRowCellRendererPresencePredicate,
           },
+        }
+        : {
+          hide: true,
+        },
     ],
     getRowHeight:
       props.gridOptions?.detailsRowCellRenderer !== undefined
         ? (params: RowHeightParams): number => {
-            return (params.data as IGridRowDataDetailsExt).rowHeight;
-          }
+          return (params.data as IGridRowDataDetailsExt).rowHeight;
+        }
         : undefined,
     isExternalFilterPresent:
       props.gridOptions?.detailsRowCellRenderer !== undefined ? (): boolean => true : undefined,
     doesExternalFilterPass:
       props.gridOptions?.detailsRowCellRenderer !== undefined
         ? (node): boolean => {
-            return (node.data as IGridRowDataDetailsExt).isVisible;
-            //return gridOptions.api.getValue("isVisible", node.rowNode);
-          }
+          return (node.data as IGridRowDataDetailsExt).isVisible;
+          //return gridOptions.api.getValue("isVisible", node.rowNode);
+        }
         : undefined,
     isFullWidthRow:
       props.gridOptions?.detailsRowCellRenderer !== undefined
         ? (params: IsFullWidthRowParams): boolean => {
-            // checked the fullWidth attribute that was set while creating the data
-            return (params.rowNode.data as IGridRowDataDetailsExt).fullWidth;
-          }
+          // checked the fullWidth attribute that was set while creating the data
+          return (params.rowNode.data as IGridRowDataDetailsExt).fullWidth;
+        }
         : undefined,
     fullWidthCellRenderer: props.gridOptions?.detailsRowCellRenderer ?? undefined,
 
@@ -202,7 +208,7 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
       result.push(...(props.rowData as []));
     }
     if (typeof props.isLoading === 'undefined' || props.isLoading === false) {
-      setRowData(result);
+      setAllRowsData(result);
       if (result) {
         gridApi?.setGridOption('loading', false);
       }
@@ -217,9 +223,9 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
     }
 
     focusAndExpandRow(gridApi, focusByRowId);
-  }, [rowData]);
+  }, [allRowsData, props.customPagination?.filteredData]);
 
-  const getRowPosition = (gridApi: GridApi, id: string): IRowPosition | undefined => {
+  const getNativeRowPosition = (gridApi: GridApi, id: string): IRowPosition | undefined => {
     const node = gridApi.getRowNode(id);
 
     if (!node || node.rowIndex == null) {
@@ -236,8 +242,20 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
     };
   };
 
+  const getRowPosition = (gridApi: GridApi, id: string): IRowPosition | undefined => {
+    const nativePagination = getNativeRowPosition(gridApi, id);
+    const customPagination = props.customPagination?.getPageByProperty('id', id);
+    const row: IRowPosition | undefined = customPagination ? {
+      pageNumber: customPagination.page,
+      rowIndex: customPagination.index
+    } : nativePagination;
+
+    return row;
+  }
+
   const goToRowAndFocus = (gridApi: GridApi, row: IRowPosition) => {
-    gridApi.paginationGoToPage(row.pageNumber);
+    props.customPagination?.paginate(row.pageNumber);
+    gridApi?.paginationGoToPage(row.pageNumber);
     gridApi.ensureIndexVisible(row.rowIndex, 'middle');
     gridApi.getDisplayedRowAtIndex(row.rowIndex)?.setSelected(true);
   };
@@ -266,15 +284,32 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
 
   const agGridThemeOverrides = GridThemes.getTheme(theme);
 
+  const containerStyle = useMemo(() => {
+    return {
+      ...props.style,
+      display: 'flex' as const,
+      flexDirection: 'column' as const,
+    };
+  }, [props.style]);
+
+  const gridStyle = useMemo(() => {
+    return {
+      ...agGridThemeOverrides,
+      flex: 1,
+      minHeight: 0,
+      overflow: 'hidden',
+    };
+  }, [agGridThemeOverrides]);
+
   return (
-    <Box
-      className={theme.type === 'dark' ? 'ag-theme-alpine-dark' : 'ag-theme-alpine'}
-      style={{
-        ...props.style,
-        ...agGridThemeOverrides,
-      }}
-    >
-      <AgGridReact gridOptions={gridOptions} rowData={rowData} />
+    <Box style={containerStyle}>
+      <Box
+        className={theme.type === 'dark' ? 'ag-theme-alpine-dark' : 'ag-theme-alpine'}
+        style={gridStyle}
+      >
+        <AgGridReact gridOptions={gridOptions} rowData={props.customPagination?.filteredData ?? allRowsData} />
+      </Box>
+      {gridApi && props.customPagination?.renderPaginationBar?.(allRowsData)}
     </Box>
   );
 };

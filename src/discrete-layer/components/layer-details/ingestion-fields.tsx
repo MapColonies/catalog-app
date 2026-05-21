@@ -200,6 +200,7 @@ export const IngestionFields: React.FC<PropsWithChildren<IngestionFieldsProps>> 
 
     useEffect(() => {
       if (chosenMetadataFile !== null) {
+        // console.log('chosenMetadataFile', chosenMetadataFile)
         queryResolveMetadataAsModel.setQuery(
           store.queryResolveMetadataAsModel({
             data: {

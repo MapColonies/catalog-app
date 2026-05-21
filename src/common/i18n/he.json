@@ -894,6 +894,9 @@
   "export-layer.validations.relations.equal": "שווה ל-",
   "export-layer.validations.againstOtherField": "הערך צריך להיות {relation} שדה {fieldName}",
 
+  "job.pagination.pages-count": "דף {pageNumber} מ{totalPages}",
+  "job.pagination.rows-count": "{rowNumber} עד {totalPageRows} מתוך {totalRows} רשומות",
+
   "progress.titleProcess": "תהליך",
   "progress.titleProgress": "התקדמות",
   "progress.titleTime": "זמן (ms)",
