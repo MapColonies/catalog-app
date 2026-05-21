@@ -7,6 +7,7 @@ import './details-expander.cell-renderer.css';
 
 interface DetailsExpanderRendererProps extends ICellRendererParams {
   detailsRowCellRendererPresencePredicate?: (data: any) => boolean;
+  // setPageSize: (val: number) => void;
 }
 
 export const DetailsExpanderRenderer: React.FC<DetailsExpanderRendererProps> = (
@@ -19,6 +20,11 @@ export const DetailsExpanderRenderer: React.FC<DetailsExpanderRendererProps> = (
     const rowNode = props.api.getRowNode(`${props.data?.id as string}${DETAILS_ROW_ID_SUFFIX}`);
     const isVisible = (rowNode?.data as IGridRowDataDetailsExt).isVisible;
     rowNode?.setDataValue('isVisible', !isVisible);
+    // if (!isVisible) {
+    //   props.setPageSize(1)
+    // } else {
+    //   props.setPageSize(-1)
+    // }
     props.api.onFilterChanged();
   };
   if (shouldRenderBtn) return <CollapseButton onClick={handleCollapseExpand} />;

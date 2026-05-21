@@ -1,0 +1,15 @@
+/* .paginationIcon.mdc-icon-button button {
+  font-size: 14px !important;
+} */
+
+.paginationIcon .material-icons {
+  font-size: 18px;
+}
+
+.navigateBar {
+  position: relative;
+  flex-shrink: 0;
+  color: #afbfda;
+  display: flex;
+  align-items: center;
+}

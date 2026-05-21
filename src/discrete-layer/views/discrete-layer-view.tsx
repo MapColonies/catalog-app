@@ -93,6 +93,7 @@ import '@material/tab-scroller/dist/mdc.tab-scroller.css';
 import '@material/tab-indicator/dist/mdc.tab-indicator.css';
 
 import './discrete-layer-view.css';
+import { isRtl } from '../../common/i18n/helper';
 
 const ZERO = 0;
 const EXPANDED_PANEL_WIDTH = '28%';
@@ -286,7 +287,7 @@ const DiscreteLayerView: React.FC = observer(() => {
   /* eslint-disable */
   const mapSettingsLocale = useMemo(
     () => ({
-      DIRECTION: intl.locale === 'he' ? 'rtl' : 'ltr',
+      DIRECTION: isRtl(intl.locale) ? 'rtl' : 'ltr',
       METERS_UNIT: intl.formatMessage({ id: 'map.scale.units.meters' }),
       KILOMETERS_UNIT: intl.formatMessage({ id: 'map.scale.units.kilometers' }),
       ZOOM_LABEL: intl.formatMessage({ id: 'map.zoom.label' }),
@@ -633,7 +634,7 @@ const DiscreteLayerView: React.FC = observer(() => {
     {
       idx: TabViews.EXPORT_LAYER,
       title: 'tab-views.export-layer',
-      iconClassName: intl.locale === 'en' ? 'mc-icon-Export' : 'mc-icon-Export-Left',
+      iconClassName: !isRtl(intl.locale) ? 'mc-icon-Export' : 'mc-icon-Export-Left',
     },
   ];
 
@@ -673,9 +674,9 @@ const DiscreteLayerView: React.FC = observer(() => {
   }, []);
 
   const PanelExpanderButton: React.FC = () => {
-    const isRtl = intl.locale === 'he';
-    const iconClassExpand = isRtl ? 'mc-icon-Arrows-Left' : 'mc-icon-Arrows-Right';
-    const iconClassCollapse = isRtl ? 'mc-icon-Arrows-Right' : 'mc-icon-Arrows-Left';
+    const isRtlVal = isRtl(intl.locale);
+    const iconClassExpand = isRtlVal ? 'mc-icon-Arrows-Left' : 'mc-icon-Arrows-Right';
+    const iconClassCollapse = isRtlVal ? 'mc-icon-Arrows-Right' : 'mc-icon-Arrows-Left';
     const className = `${tabsPanelExpanded ? iconClassCollapse : iconClassExpand}`;
 
     return (

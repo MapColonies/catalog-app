@@ -1,5 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { CSSProperties, useCallback, useEffect, useState } from 'react';
+import React, {
+  CSSProperties,
+  ReactElement,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import {
   GridReadyEvent as AgGridReadyEvent,
@@ -43,6 +50,12 @@ interface GridComponentProps {
   focusByRowId?: string;
   setIsRowFound?: (val: boolean) => void;
   handleFocusError?: (error: IError | undefined) => void;
+  customPagination?: {
+    renderPaginationBar: (data: any) => ReactElement;
+    filteredData: any[];
+    getPageByProperty: (key: string, value: unknown) => { page: number; index: number } | null;
+    paginate: (page: number) => void;
+  };
 }
 
 export interface GridApi extends AgGridApi {}
@@ -77,7 +90,7 @@ export interface IRowPosition {
 export interface GridRowNode extends IRowNode {}
 
 export const GridComponent: React.FC<GridComponentProps> = (props) => {
-  const [rowData, setRowData] = useState<any[]>();
+  const [allRowsData, setAllRowsData] = useState<any[]>();
   const theme = useTheme();
   const [gridApi, setGridApi] = useState<GridApi>();
 
@@ -202,7 +215,7 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
       result.push(...(props.rowData as []));
     }
     if (typeof props.isLoading === 'undefined' || props.isLoading === false) {
-      setRowData(result);
+      setAllRowsData(result);
       if (result) {
         gridApi?.setGridOption('loading', false);
       }
@@ -217,9 +230,9 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
     }
 
     focusAndExpandRow(gridApi, focusByRowId);
-  }, [rowData]);
+  }, [allRowsData, props.customPagination?.filteredData]);
 
-  const getRowPosition = (gridApi: GridApi, id: string): IRowPosition | undefined => {
+  const getNativeRowPosition = (gridApi: GridApi, id: string): IRowPosition | undefined => {
     const node = gridApi.getRowNode(id);
 
     if (!node || node.rowIndex == null) {
@@ -236,8 +249,22 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
     };
   };
 
+  const getRowPosition = (gridApi: GridApi, id: string): IRowPosition | undefined => {
+    const nativePagination = getNativeRowPosition(gridApi, id);
+    const customPagination = props.customPagination?.getPageByProperty('id', id);
+    const row: IRowPosition | undefined = customPagination
+      ? {
+          pageNumber: customPagination.page,
+          rowIndex: customPagination.index,
+        }
+      : nativePagination;
+
+    return row;
+  };
+
   const goToRowAndFocus = (gridApi: GridApi, row: IRowPosition) => {
-    gridApi.paginationGoToPage(row.pageNumber);
+    props.customPagination?.paginate(row.pageNumber);
+    gridApi?.paginationGoToPage(row.pageNumber);
     gridApi.ensureIndexVisible(row.rowIndex, 'middle');
     gridApi.getDisplayedRowAtIndex(row.rowIndex)?.setSelected(true);
   };
@@ -266,15 +293,35 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
 
   const agGridThemeOverrides = GridThemes.getTheme(theme);
 
+  const containerStyle = useMemo(() => {
+    return {
+      ...props.style,
+      display: 'flex' as const,
+      flexDirection: 'column' as const,
+    };
+  }, [props.style]);
+
+  const gridStyle = useMemo(() => {
+    return {
+      ...agGridThemeOverrides,
+      flex: 1,
+      minHeight: 0,
+      overflow: 'hidden',
+    };
+  }, [agGridThemeOverrides]);
+
   return (
-    <Box
-      className={theme.type === 'dark' ? 'ag-theme-alpine-dark' : 'ag-theme-alpine'}
-      style={{
-        ...props.style,
-        ...agGridThemeOverrides,
-      }}
-    >
-      <AgGridReact gridOptions={gridOptions} rowData={rowData} />
+    <Box style={containerStyle}>
+      <Box
+        className={theme.type === 'dark' ? 'ag-theme-alpine-dark' : 'ag-theme-alpine'}
+        style={gridStyle}
+      >
+        <AgGridReact
+          gridOptions={gridOptions}
+          rowData={props.customPagination?.filteredData ?? allRowsData}
+        />
+      </Box>
+      {gridApi && props.customPagination?.renderPaginationBar?.(allRowsData)}
     </Box>
   );
 };

@@ -168,6 +168,10 @@ body[dir='rtl'] .jobsBody .ag-pinned-right-cols-container {
   overflow-y: overlay;
 }
 
+/* .MuiBox-root.MuiBox-root-23932.ag-theme-alpine-dark {
+  height: 95% !important;
+} */
+
 #jobsDialog .rmwc-collapsible-list__children-inner {
   height: 500px;
 }

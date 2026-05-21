@@ -22,6 +22,7 @@ import { FEATURE_LABEL_CONFIG, getText } from '../../layer-details/raster/pp-map
 import { CesiumInfoBoxContainer } from './cesium-infoBox-container';
 import { GeojsonFeature, GeojsonFeatureProps } from './geojson-feature.component';
 import GenericInfoBoxContainer from './generic-infoBox-container.component';
+import { isRtl } from '../../../../common/i18n/helper';
 
 interface GeojsonFeatureWithInfoBoxProps extends GeojsonFeatureProps {
   noInfoMessage: string;
@@ -153,7 +154,7 @@ export const GeojsonFeatureWithInfoBox: React.FC<GeojsonFeatureWithInfoBoxProps>
                 color: (theme.custom as unknown as Record<string, string>).GC_WARNING_HIGH,
                 textAlign: 'center',
               }}
-              dir={intl.locale === 'he' ? 'rtl' : 'ltr'}
+              dir={isRtl(intl.locale) ? 'rtl' : 'ltr'}
             >
               {intl.formatMessage({ id: 'polygonParts-info.part-to-large.message' })}
             </Typography>
@@ -176,7 +177,7 @@ export const GeojsonFeatureWithInfoBox: React.FC<GeojsonFeatureWithInfoBoxProps>
           <Typography
             tag="h3"
             style={{ color: theme.textPrimaryOnDark }}
-            dir={intl.locale === 'he' ? 'rtl' : 'ltr'}
+            dir={isRtl(intl.locale) ? 'rtl' : 'ltr'}
           >
             {noInfoMessage}
           </Typography>

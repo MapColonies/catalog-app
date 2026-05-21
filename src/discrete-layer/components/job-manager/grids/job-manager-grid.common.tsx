@@ -1,6 +1,13 @@
-import { ColDef, ColGroupDef, GetRowIdParams } from 'ag-grid-community';
+import {
+  ColDef,
+  ColGroupDef,
+  ColumnState,
+  GetRowIdParams,
+  GridApi,
+  SortChangedEvent,
+} from 'ag-grid-community';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import CONFIG from '../../../../common/config';
 import {
   GridApi,
@@ -25,6 +32,12 @@ import PlaceholderCellRenderer from '../cell-renderer/placeholder.cell-renderer'
 import { StatusRenderer } from '../cell-renderer/status.cell-renderer';
 import { TooltippedCellRenderer } from '../cell-renderer/tool-tipped.cell-renderer';
 import { JOB_ENTITY } from '../job.types';
+import { IconButton } from '@map-colonies/react-core';
+import { Box } from '@material-ui/core';
+import { usePagination } from './pagination.hook';
+import { isRtl } from '../../../../common/i18n/helper';
+
+import './job-manager-grid.common.css';
 
 export interface ICommonJobManagerGridProps {
   rowData: unknown[];
@@ -45,7 +58,7 @@ export interface ICommonJobManagerGridProps {
   handleFocusError?: (error: IError | undefined) => void;
 }
 
-const pagination = true;
+const pagination = false;
 const pageSize = 10;
 
 const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
@@ -76,6 +89,11 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
   const { enumsMap } = useContext(EnumsMapContext);
   const [focusJobId, setFocusJobId] = useState<string | undefined>(undefined);
   const [isRowFound, setIsRowFound] = useState<boolean>(false);
+  const [sortState, setSortState] = useState<{
+    colId: string;
+    field: string;
+    sort: 'asc' | 'desc';
+  } | null>(null);
 
   useEffect(() => {
     if (!focusOnJob?.id) {
@@ -230,8 +248,8 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
         },
         valueFormatter: primitiveValueFormatter,
         sortable: true,
-        // @ts-ignore
-        comparator: (valueA, valueB, nodeA, nodeB, isInverted): number => valueA - valueB,
+        comparator: (valueA: any, valueB: any, nodeA: any, nodeB: any, isInverted: any): number =>
+          valueA - valueB,
       },
       // {
       //   headerName: intl.formatMessage({
@@ -347,6 +365,7 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
     enableFilterHandlers: true,
     suppressRowTransform: true,
     pagination: pagination,
+    suppressPaginationPanel: true,
     paginationPageSize: pageSize,
     paginationPageSizeSelector: false, //[pageSize, 20, 50, 100],
     getRowId: (params: GetRowIdParams): string => {
@@ -385,6 +404,17 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
       unSortIcon: true,
     },
     onGridReady,
+    onSortChanged: (event: SortChangedEvent) => {
+      const sortedCol: ColumnState | undefined = event.api
+        .getColumnState()
+        .find((col) => col.sort !== null);
+      if (sortedCol) {
+        const field = event.api.getColumn(sortedCol.colId)?.getColDef().field ?? sortedCol.colId;
+        setSortState({ colId: sortedCol.colId, field, sort: sortedCol.sort as 'asc' | 'desc' });
+      } else {
+        setSortState(null);
+      }
+    },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     context: {
       detailsRowCellRendererPresencePredicate: (rowData: any) => {
@@ -405,16 +435,115 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
     padding: '12px',
   };
 
+  const [dataWithDetails, setDataWithDetails] = useState<Record<string, unknown>[] | null>(null);
+
+  const sortedDataWithDetails = useMemo(() => {
+    if (!dataWithDetails || !sortState?.sort) return dataWithDetails ?? [];
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const colDef = (defaultColDef as any[]).find((col) => col.field === sortState.field);
+
+    // Data is interleaved [master, detail, master, detail, ...]; sort master+detail pairs together
+    const pairs: [Record<string, unknown>, Record<string, unknown>][] = [];
+    for (let i = 0; i < dataWithDetails.length; i += 2) {
+      pairs.push([dataWithDetails[i], dataWithDetails[i + 1] ?? {}]);
+    }
+
+    const sorted = pairs.sort((pairA, pairB) => {
+      const aVal = pairA[0][sortState.field];
+      const bVal = pairB[0][sortState.field];
+      let result: number;
+      if (colDef?.comparator) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+        result = colDef.comparator(aVal, bVal, null, null, false) as number;
+      } else {
+        result = String(aVal ?? '').localeCompare(String(bVal ?? ''));
+      }
+      return sortState.sort === 'desc' ? -result : result;
+    });
+
+    return sorted.flatMap((pair) => [...pair]);
+  }, [dataWithDetails, sortState]);
+
+  const customPagination = usePagination<Record<string, unknown>>({
+    data: sortedDataWithDetails,
+    itemsPerPage: 20,
+  });
+
+  const renderPaginationBar = (rowsAndTheirDetails: any) => {
+    setDataWithDetails(rowsAndTheirDetails);
+    const masterRows = 10;
+    const rowsWithDetails = 20;
+
+    const startRow = (customPagination.currentPage - 1) * masterRows + 1;
+
+    const endRow =
+      Math.min(
+        customPagination.currentPage * rowsWithDetails,
+        rowsAndTheirDetails?.length ?? Infinity
+      ) / 2;
+
+    const isRtlVal = isRtl(intl.locale);
+
+    const backIcon = isRtlVal ? 'mc-icon-Arrow-Right' : 'mc-icon-Arrow-Left';
+    const nextIcon = isRtlVal ? 'mc-icon-Arrow-Left' : 'mc-icon-Arrow-Right';
+    const arrowsBackIcon = isRtlVal ? 'mc-icon-Arrows-Right' : 'mc-icon-Arrows-Left';
+    const arrowsNextIcon = isRtlVal ? 'mc-icon-Arrows-Left' : 'mc-icon-Arrows-Right';
+
+    return (
+      <Box className="navigateBar paginationIcon">
+        <IconButton className={arrowsBackIcon} onClick={() => customPagination.paginate(1)}>
+          prev page
+        </IconButton>
+        <IconButton className={backIcon} onClick={() => customPagination.prevPage()}>
+          prev page
+        </IconButton>
+        <FormattedMessage
+          id="job.pagination.pages-count"
+          values={{
+            pageNumber: customPagination.currentPage,
+            totalPages: customPagination.totalPages,
+          }}
+        />
+        <IconButton className={nextIcon} onClick={() => customPagination.nextPage()}>
+          next page
+        </IconButton>
+        <IconButton
+          className={arrowsNextIcon}
+          onClick={() => customPagination.paginate(customPagination.totalPages)}
+        >
+          next page
+        </IconButton>
+        <FormattedMessage
+          id="job.pagination.rows-count"
+          values={{
+            rowNumber: startRow,
+            totalPageRows: endRow,
+            totalRows: (rowsAndTheirDetails?.length ?? 0) / 2,
+          }}
+        />
+      </Box>
+    );
+  };
+
   return (
-    <GridComponent
-      gridOptions={gridOptions}
-      rowData={rowData}
-      style={{ ...defaultGridStyle, ...gridStyleOverride }}
-      isLoading={areJobsLoading}
-      focusByRowId={focusJobId}
-      setIsRowFound={setIsRowFound}
-      handleFocusError={handleFocusError}
-    />
+    <>
+      <GridComponent
+        gridOptions={gridOptions}
+        rowData={rowData}
+        style={{ ...defaultGridStyle, ...gridStyleOverride }}
+        isLoading={areJobsLoading}
+        focusByRowId={focusJobId}
+        setIsRowFound={setIsRowFound}
+        handleFocusError={handleFocusError}
+        customPagination={{
+          renderPaginationBar,
+          filteredData: customPagination.data,
+          getPageByProperty: customPagination.getPageByProperty,
+          paginate: customPagination.paginate,
+        }}
+      ></GridComponent>
+    </>
   );
 };
 

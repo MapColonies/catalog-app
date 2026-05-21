@@ -673,6 +673,9 @@
 
   "system-status.job.filter.status.all": "All",
 
+  "job.pagination.pages-count": "Page {pageNumber} of {totalPages}",
+  "job.pagination.rows-count": "{rowNumber} to {totalPageRows} of {totalRows}",
+
   "system-status.job-priority-lowest": "Lowest",
   "system-status.job-priority-low": "Low",
   "system-status.job-priority-normal": "Normal",
