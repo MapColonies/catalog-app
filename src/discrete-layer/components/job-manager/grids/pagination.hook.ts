@@ -1,14 +1,11 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState } from 'react';
 
 type UsePaginationProps<T> = {
   data: T[];
   itemsPerPage?: number;
 };
 
-export function usePagination<T>({
-  data,
-  itemsPerPage = 10,
-}: UsePaginationProps<T>) {
+export function usePagination<T>({ data, itemsPerPage = 10 }: UsePaginationProps<T>) {
   const [currentPage, setCurrentPage] = useState(1);
 
   const totalPages = Math.ceil(data.length / itemsPerPage);
@@ -26,12 +23,10 @@ export function usePagination<T>({
     setCurrentPage(page);
   };
 
-  const getPageByProperty = <
-    K extends keyof T
-  >(
+  const getPageByProperty = <K extends keyof T>(
     key: K,
     value: T[K]
-  ): { page: number, index: number } | null => {
+  ): { page: number; index: number } | null => {
     const index = data.findIndex((item) => item[key] === value);
 
     if (index === -1) {
@@ -41,7 +36,7 @@ export function usePagination<T>({
     const page = Math.floor(index / itemsPerPage) + 1;
     return {
       page,
-      index
+      index,
     };
   };
 

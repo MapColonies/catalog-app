@@ -1,4 +1,11 @@
-import { ColDef, ColGroupDef, ColumnState, GetRowIdParams, GridApi, SortChangedEvent } from 'ag-grid-community';
+import {
+  ColDef,
+  ColGroupDef,
+  ColumnState,
+  GetRowIdParams,
+  GridApi,
+  SortChangedEvent,
+} from 'ag-grid-community';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import CONFIG from '../../../../common/config';
@@ -80,7 +87,11 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
   const { enumsMap } = useContext(EnumsMapContext);
   const [focusJobId, setFocusJobId] = useState<string | undefined>(undefined);
   const [isRowFound, setIsRowFound] = useState<boolean>(false);
-  const [sortState, setSortState] = useState<{ colId: string; field: string; sort: 'asc' | 'desc' } | null>(null);
+  const [sortState, setSortState] = useState<{
+    colId: string;
+    field: string;
+    sort: 'asc' | 'desc';
+  } | null>(null);
 
   useEffect(() => {
     if (!focusOnJob?.id) {
@@ -229,7 +240,8 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
         },
         valueFormatter: primitiveValueFormatter,
         sortable: true,
-        comparator: (valueA: any, valueB: any, nodeA: any, nodeB: any, isInverted: any): number => valueA - valueB,
+        comparator: (valueA: any, valueB: any, nodeA: any, nodeB: any, isInverted: any): number =>
+          valueA - valueB,
       },
       // {
       //   headerName: intl.formatMessage({
@@ -385,7 +397,9 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
     },
     onGridReady,
     onSortChanged: (event: SortChangedEvent) => {
-      const sortedCol: ColumnState | undefined = event.api.getColumnState().find(col => col.sort !== null);
+      const sortedCol: ColumnState | undefined = event.api
+        .getColumnState()
+        .find((col) => col.sort !== null);
       if (sortedCol) {
         const field = event.api.getColumn(sortedCol.colId)?.getColDef().field ?? sortedCol.colId;
         setSortState({ colId: sortedCol.colId, field, sort: sortedCol.sort as 'asc' | 'desc' });
@@ -419,7 +433,7 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
     if (!dataWithDetails || !sortState?.sort) return dataWithDetails ?? [];
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const colDef = (defaultColDef as any[]).find(col => col.field === sortState.field);
+    const colDef = (defaultColDef as any[]).find((col) => col.field === sortState.field);
 
     // Data is interleaved [master, detail, master, detail, ...]; sort master+detail pairs together
     const pairs: [Record<string, unknown>, Record<string, unknown>][] = [];
@@ -440,10 +454,13 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
       return sortState.sort === 'desc' ? -result : result;
     });
 
-    return sorted.flatMap(pair => [...pair]);
+    return sorted.flatMap((pair) => [...pair]);
   }, [dataWithDetails, sortState]);
 
-  const customPagination = usePagination<Record<string, unknown>>({ data: sortedDataWithDetails, itemsPerPage: 20 });
+  const customPagination = usePagination<Record<string, unknown>>({
+    data: sortedDataWithDetails,
+    itemsPerPage: 20,
+  });
 
   const renderPaginationBar = (rowsAndTheirDetails: any) => {
     setDataWithDetails(rowsAndTheirDetails);
@@ -452,10 +469,11 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
 
     const startRow = (customPagination.currentPage - 1) * masterRows + 1;
 
-    const endRow = Math.min(
-      customPagination.currentPage * rowsWithDetails,
-      rowsAndTheirDetails?.length ?? Infinity
-    ) / 2;
+    const endRow =
+      Math.min(
+        customPagination.currentPage * rowsWithDetails,
+        rowsAndTheirDetails?.length ?? Infinity
+      ) / 2;
 
     const isRtlVal = isRtl(intl.locale);
 
@@ -465,23 +483,40 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
     const arrowsNextIcon = isRtlVal ? 'mc-icon-Arrows-Left' : 'mc-icon-Arrows-Right';
 
     return (
-      <Box className='navigateBar paginationIcon'>
-        <IconButton className={arrowsBackIcon} onClick={() => customPagination.paginate(1)}>prev page</IconButton>
-        <IconButton className={backIcon} onClick={() => customPagination.prevPage()}>prev page</IconButton>
-        <FormattedMessage id='job.pagination.pages-count' values={{
-          pageNumber: customPagination.currentPage,
-          totalPages: customPagination.totalPages
-        }} />
-        <IconButton className={nextIcon} onClick={() => customPagination.nextPage()}>next page</IconButton>
-        <IconButton className={arrowsNextIcon} onClick={() => customPagination.paginate(customPagination.totalPages)}>next page</IconButton>
-        <FormattedMessage id='job.pagination.rows-count' values={{
-          rowNumber: startRow,
-          totalPageRows: endRow,
-          totalRows: (rowsAndTheirDetails?.length ?? 0) / 2
-        }} />
+      <Box className="navigateBar paginationIcon">
+        <IconButton className={arrowsBackIcon} onClick={() => customPagination.paginate(1)}>
+          prev page
+        </IconButton>
+        <IconButton className={backIcon} onClick={() => customPagination.prevPage()}>
+          prev page
+        </IconButton>
+        <FormattedMessage
+          id="job.pagination.pages-count"
+          values={{
+            pageNumber: customPagination.currentPage,
+            totalPages: customPagination.totalPages,
+          }}
+        />
+        <IconButton className={nextIcon} onClick={() => customPagination.nextPage()}>
+          next page
+        </IconButton>
+        <IconButton
+          className={arrowsNextIcon}
+          onClick={() => customPagination.paginate(customPagination.totalPages)}
+        >
+          next page
+        </IconButton>
+        <FormattedMessage
+          id="job.pagination.rows-count"
+          values={{
+            rowNumber: startRow,
+            totalPageRows: endRow,
+            totalRows: (rowsAndTheirDetails?.length ?? 0) / 2,
+          }}
+        />
       </Box>
-    )
-  }
+    );
+  };
 
   return (
     <>
@@ -497,10 +532,9 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
           renderPaginationBar,
           filteredData: customPagination.data,
           getPageByProperty: customPagination.getPageByProperty,
-          paginate: customPagination.paginate
+          paginate: customPagination.paginate,
         }}
-      >
-      </GridComponent>
+      ></GridComponent>
     </>
   );
 };

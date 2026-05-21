@@ -9,7 +9,7 @@
 .navigateBar {
   position: relative;
   flex-shrink: 0;
-  color: #AFBFDA;
+  color: #afbfda;
   display: flex;
   align-items: center;
 }
