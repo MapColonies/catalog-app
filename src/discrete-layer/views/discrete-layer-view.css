@@ -258,11 +258,16 @@ body[dir='rtl'] .tabHeaderContainer .filterByCatalogEntitySelect {
   margin-right: 0;
 }
 
+/***** Cesium Map *****/
 .cesium-viewer .bottomToolsContainer > div {
   height: 28px;
 }
 
-/****** BADGE *****/
+.cesium-viewer .cesium-cesiumInspector-button {
+  line-height: initial;
+}
+
+/***** BADGE *****/
 /* inspired by https://codepen.io/codepenicillin/pen/eYjYmpO */
 .position {
   position: relative;
@@ -298,6 +303,7 @@ body[dir='rtl'] .MuiBox-root .resultsContainer {
   direction: ltr;
 }
 
+/***** COLORS *****/
 .success {
   color: var(--mdc-theme-gc-success) !important;
 }
