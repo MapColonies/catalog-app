@@ -16,7 +16,6 @@ import {
   RowClickedEvent,
   AllCommunityModule,
   ModuleRegistry,
-  IsFullWidthRowParams,
 } from 'ag-grid-community';
 import { useTheme } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
@@ -31,9 +30,9 @@ import 'ag-grid-community/styles/ag-theme-alpine.css';
 // All Community Features
 ModuleRegistry.registerModules([AllCommunityModule]);
 
-const DEFAULT_DETAILS_ROW_HEIGHT = 150;
+const DEFAULT_DETAILS_ROW_HEIGHT = 230;
+const DEFAULT_NORMAL_ROW_HEIGHT = 42;
 const EXPANDER_COLUMN_WIDTH = 60;
-export const DETAILS_ROW_ID_SUFFIX = '_details';
 
 interface GridComponentProps {
   gridOptions?: GridComponentOptions;
@@ -64,9 +63,7 @@ export interface GridComponentOptions extends GridOptions {
 }
 
 export interface IGridRowDataDetailsExt {
-  rowHeight: number;
-  fullWidth: boolean;
-  isVisible: boolean;
+  isDetailsExpanded: boolean;
 }
 
 export interface IRowPosition {
@@ -86,71 +83,59 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
   const { detailsRowExpanderPosition, ...restGridOptions } =
     props.gridOptions as GridComponentOptions;
 
+  const detailsRowCellRenderer = props.gridOptions?.detailsRowCellRenderer;
+
+  const detailsComponent = detailsRowCellRenderer
+    ? (props.gridOptions?.components as Record<string, any>)?.[detailsRowCellRenderer]
+    : undefined;
+  const normalRowHeight = restGridOptions.rowHeight ?? DEFAULT_NORMAL_ROW_HEIGHT;
+  const detailsRowHeight = props.gridOptions?.detailsRowHeight ?? DEFAULT_DETAILS_ROW_HEIGHT;
+
+  const expanderColumnDef = {
+    headerName: '',
+    width: EXPANDER_COLUMN_WIDTH,
+    cellRenderer: 'detailsExpanderRenderer',
+    suppressMovable: true,
+    sortable: false,
+    cellStyle: { overflow: 'visible' },
+    cellRendererParams: {
+      detailsRowCellRendererPresencePredicate:
+        props.gridOptions?.context?.detailsRowCellRendererPresencePredicate,
+      detailsComponent,
+      normalRowHeight,
+      detailsRowHeight,
+    },
+  };
+
   const gridOptionsFromProps: GridComponentOptions = {
     ...restGridOptions,
     columnDefs: [
       {
-        field: 'isVisible',
+        field: 'isDetailsExpanded',
         hide: true,
       },
       props.gridOptions?.detailsRowExpanderPosition === 'start' &&
       props.gridOptions.detailsRowCellRenderer !== undefined
-        ? {
-            headerName: '',
-            width: EXPANDER_COLUMN_WIDTH,
-            cellRenderer: 'detailsExpanderRenderer',
-            suppressMovable: true,
-            sortable: false,
-            cellRendererParams: {
-              detailsRowCellRendererPresencePredicate:
-                props.gridOptions.context?.detailsRowCellRendererPresencePredicate,
-            },
-          }
+        ? expanderColumnDef
         : {
             hide: true,
           },
       ...(props.gridOptions?.columnDefs as []),
       props.gridOptions?.detailsRowExpanderPosition !== 'start' &&
       props.gridOptions?.detailsRowCellRenderer !== undefined
-        ? {
-            headerName: '',
-            width: EXPANDER_COLUMN_WIDTH,
-            cellRenderer: 'detailsExpanderRenderer',
-            suppressMovable: true,
-            sortable: false,
-            cellRendererParams: {
-              detailsRowCellRendererPresencePredicate:
-                props.gridOptions.context?.detailsRowCellRendererPresencePredicate,
-            },
-          }
+        ? expanderColumnDef
         : {
             hide: true,
           },
     ],
     getRowHeight:
-      props.gridOptions?.detailsRowCellRenderer !== undefined
-        ? (params: RowHeightParams): number => {
-            return (params.data as IGridRowDataDetailsExt).rowHeight;
+      detailsRowCellRenderer !== undefined
+        ? (params: RowHeightParams): number | undefined => {
+            return (params.data as IGridRowDataDetailsExt).isDetailsExpanded
+              ? normalRowHeight + detailsRowHeight
+              : restGridOptions.rowHeight;
           }
         : undefined,
-    isExternalFilterPresent:
-      props.gridOptions?.detailsRowCellRenderer !== undefined ? (): boolean => true : undefined,
-    doesExternalFilterPass:
-      props.gridOptions?.detailsRowCellRenderer !== undefined
-        ? (node): boolean => {
-            return (node.data as IGridRowDataDetailsExt).isVisible;
-            //return gridOptions.api.getValue("isVisible", node.rowNode);
-          }
-        : undefined,
-    isFullWidthRow:
-      props.gridOptions?.detailsRowCellRenderer !== undefined
-        ? (params: IsFullWidthRowParams): boolean => {
-            // checked the fullWidth attribute that was set while creating the data
-            return (params.rowNode.data as IGridRowDataDetailsExt).fullWidth;
-          }
-        : undefined,
-    fullWidthCellRenderer: props.gridOptions?.detailsRowCellRenderer ?? undefined,
-
     components: {
       ...(props.gridOptions?.components as { [key: string]: any }),
       detailsExpanderRenderer: useCallback(DetailsExpanderRenderer, []),
@@ -165,15 +150,21 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
     },
   };
 
-  const { detailsRowCellRenderer, detailsRowHeight, ...gridOptions } = gridOptionsFromProps;
+  // Strip custom props before passing to ag-Grid (which doesn't know about them)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const {
+    detailsRowCellRenderer: _drcr,
+    detailsRowHeight: _drh,
+    ...gridOptions
+  } = gridOptionsFromProps;
 
-  const getIsVisible = (id: string): boolean => {
+  const getIsDetailsExpanded = (id: string): boolean => {
     let res = false;
 
     gridApi?.forEachNode((node) => {
       const nodeData = node.data as Record<string, any>;
       if (nodeData.id === id) {
-        res = nodeData.isVisible as boolean;
+        res = nodeData.isDetailsExpanded as boolean;
       }
     });
     return res;
@@ -182,20 +173,11 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
   useEffect(() => {
     const result: any[] = [];
     if (props.gridOptions?.detailsRowCellRenderer !== undefined) {
-      props.rowData?.forEach((element, idx) => {
+      props.rowData?.forEach((element) => {
         const rowElement: Record<string, unknown> = element as Record<string, unknown>;
-
         result.push({
           ...rowElement,
-          isVisible: true,
-        });
-        result.push({
-          ...rowElement,
-          fullWidth: true,
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-          id: `${rowElement.id as string}${DETAILS_ROW_ID_SUFFIX}`,
-          isVisible: getIsVisible(`${rowElement.id as string}${DETAILS_ROW_ID_SUFFIX}`),
-          rowHeight: props.gridOptions?.detailsRowHeight ?? DEFAULT_DETAILS_ROW_HEIGHT,
+          isDetailsExpanded: getIsDetailsExpanded(rowElement.id as string),
         });
       });
     } else {
@@ -259,9 +241,12 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
     setIsRowFound?.(true);
     goToRowAndFocus(gridApi, row);
 
-    const rowNode = gridApi.getRowNode(`${id as unknown as string}${DETAILS_ROW_ID_SUFFIX}`);
-    rowNode?.setDataValue('isVisible', true);
-    gridApi.onFilterChanged();
+    const rowNode = gridApi.getRowNode(id);
+    if (rowNode) {
+      rowNode.setDataValue('isDetailsExpanded', true);
+      gridApi.refreshCells({ rowNodes: [rowNode], force: true });
+    }
+    gridApi.resetRowHeights();
   };
 
   const agGridThemeOverrides = GridThemes.getTheme(theme);

@@ -12,7 +12,7 @@
   overflow-y: auto;
   height: 230px;
   width: 1300px;
-  margin: 0px 35px;
+  margin: 0px 35px 0px 0px;
   background: var(--ag-selected-details-row-background);
   padding-left: 20px;
 }
