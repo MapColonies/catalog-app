@@ -30,7 +30,7 @@ import 'ag-grid-community/styles/ag-theme-alpine.css';
 // All Community Features
 ModuleRegistry.registerModules([AllCommunityModule]);
 
-const DEFAULT_DETAILS_ROW_HEIGHT = 230;
+const DEFAULT_DETAILS_ROW_HEIGHT = 234;
 const DEFAULT_NORMAL_ROW_HEIGHT = 42;
 const EXPANDER_COLUMN_WIDTH = 60;
 

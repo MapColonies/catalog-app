@@ -1,6 +1,6 @@
 #exportJobData.jobDataContainer {
   flex-direction: column;
-  gap: 10px;
+  height: 40%;
 }
 
 #exportJobData.jobDataContainer .jobDescription {

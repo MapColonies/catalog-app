@@ -10,7 +10,6 @@ import {
 } from 'ag-grid-community';
 // eslint-disable-next-line
 import '../../../../__mocks__/confEnvShim';
-import { DETAILS_ROW_ID_SUFFIX } from '../grid';
 import { DetailsExpanderRenderer } from './details-expander.cell-renderer';
 
 const ID = '1';
@@ -22,15 +21,18 @@ const mockDataBase: ICellRendererParams = {
   setValue: () => {},
   formatValue: () => {},
   data: {
-    isVisible: true,
+    isDetailsExpanded: false,
     id: ID,
   },
-  node: new RowNode(),
+  node: {
+    ...new RowNode(),
+    setDataValue: (propName: string, val: any) => {},
+  } as any,
   colDef: {},
   $scope: null,
   rowIndex: 1,
   api: {
-    onFilterChanged: () => {},
+    resetRowHeights: () => {},
     getRowNode: (id: string): IRowNode<any> | undefined => {
       return undefined;
     },
@@ -54,27 +56,21 @@ describe('AgGrid DetailsExpanderRenderer component', () => {
     expect(wrapper).toMatchSnapshot();
   });
 
-  it('when component clicked detail row was found in grid rowdata', () => {
+  it('when component clicked, isDetailsExpanded is toggled on the current node', () => {
     const mockData = {
       ...mockDataBase,
     };
 
-    // eslint-disable-next-line
-    jest.spyOn(mockData.api, 'onFilterChanged').mockImplementation(() => {});
-    const spyGetRonNode = jest.spyOn(mockData.api, 'getRowNode').mockImplementation(() => {
-      const val = new RowNode();
-      // eslint-disable-next-line
-      val.setDataValue = (propName, val) => {};
-      val.data = {
-        isVisible: false,
-      };
-      return val;
-    });
+    const spySetDataValue = jest.spyOn(mockData.node, 'setDataValue').mockImplementation(() => {});
+    const spyResetRowHeights = jest
+      .spyOn(mockData.api, 'resetRowHeights')
+      .mockImplementation(() => {});
 
     const wrapper = shallow(<DetailsExpanderRenderer {...mockData} />);
 
     const iconContainer = wrapper.find('CollapseButton');
     iconContainer.simulate('click');
-    expect(spyGetRonNode).toHaveBeenCalledWith(`${ID}${DETAILS_ROW_ID_SUFFIX}`);
+    expect(spySetDataValue).toHaveBeenCalledWith('isDetailsExpanded', true);
+    expect(spyResetRowHeights).toHaveBeenCalledTimes(1);
   });
 });

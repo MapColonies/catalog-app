@@ -1,5 +1,6 @@
-import React, { useLayoutEffect, useRef, useState } from 'react';
+import React, { useLayoutEffect, useState } from 'react';
 import { ICellRendererParams } from 'ag-grid-community';
+import { Box } from '@map-colonies/react-components';
 import { CollapseButton } from '../../collapse-button/collapse.button';
 import { IGridRowDataDetailsExt } from '../grid';
 
@@ -23,7 +24,6 @@ export const DetailsExpanderRenderer: React.FC<DetailsExpanderRendererProps> = (
     ...rendererParams
   } = props;
 
-  const containerRef = useRef<HTMLDivElement>(null);
   const [overlayStyle, setOverlayStyle] = useState<React.CSSProperties | null>(null);
   const [isDetailsExpanded, setIsDetailsExpanded] = useState<boolean>(
     (props.data as IGridRowDataDetailsExt).isDetailsExpanded ?? false
@@ -39,24 +39,21 @@ export const DetailsExpanderRenderer: React.FC<DetailsExpanderRendererProps> = (
   };
 
   useLayoutEffect(() => {
-    if (!isDetailsExpanded || !containerRef.current) {
+    if (!isDetailsExpanded) {
       setOverlayStyle(null);
       return;
     }
 
-    // TODO: ag-grid maybe fragile
-    const cell = containerRef.current.closest('.ag-cell') as HTMLElement | null;
-    const row = cell?.closest('.ag-row') as HTMLElement | null;
-    if (cell && row) {
-      // TODO: maybe take the css from somewhere else
+    const cell = props.eGridCell as HTMLElement;
+    const row = cell.parentElement as HTMLElement | null;
+    if (row) {
       setOverlayStyle({
         position: 'absolute',
         top: normalRowHeight,
         left: -cell.offsetLeft,
         width: row.offsetWidth,
         height: detailsRowHeight,
-        overflowY: 'auto',
-        overflowX: 'hidden',
+        overflow: 'hidden',
         zIndex: 2,
         display: 'flex',
         backgroundColor: 'var(--ag-background-color)',
@@ -65,13 +62,13 @@ export const DetailsExpanderRenderer: React.FC<DetailsExpanderRendererProps> = (
   }, [isDetailsExpanded, normalRowHeight, detailsRowHeight]);
 
   return (
-    <div ref={containerRef} className="expanderContainer">
+    <Box className="expanderContainer">
       {shouldRenderBtn && <CollapseButton onClick={handleCollapseExpand} />}
       {isDetailsExpanded && DetailsComponent && overlayStyle && (
-        <div style={overlayStyle}>
+        <Box style={overlayStyle}>
           <DetailsComponent {...rendererParams} data={props.data} />
-        </div>
+        </Box>
       )}
-    </div>
+    </Box>
   );
 };
