@@ -488,6 +488,9 @@ const DiscreteLayerView: React.FC = observer(() => {
       [Mode.NEW]: setIsDemIngestDialogOpen,
       [Mode.VIEW]: setIsEntityDialogOpen,
     },
+    [RecordType.RECORD_VECTOR]: {
+      [Mode.VIEW]: setIsEntityDialogOpen,
+    },
   };
 
   const handleEntityDialogOpen = (recordType: RecordType, open: boolean) => {
