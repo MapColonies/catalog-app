@@ -1,13 +1,5 @@
-import React from 'react';
 import { shallow } from 'enzyme';
-import {
-  ICellRendererParams,
-  Column,
-  RowNode,
-  GridApi,
-  ColumnApi,
-  IRowNode,
-} from 'ag-grid-community';
+import { ICellRendererParams, RowNode } from 'ag-grid-community';
 // eslint-disable-next-line
 import '../../../../__mocks__/confEnvShim';
 import { DetailsExpanderRenderer } from './details-expander.cell-renderer';
@@ -33,9 +25,6 @@ const mockDataBase: ICellRendererParams = {
   rowIndex: 1,
   api: {
     resetRowHeights: () => {},
-    getRowNode: (id: string): IRowNode<any> | undefined => {
-      return undefined;
-    },
   },
   context: null,
   refreshCell: () => {},
