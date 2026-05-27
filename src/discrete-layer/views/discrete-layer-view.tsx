@@ -35,6 +35,7 @@ import {
 } from '@map-colonies/react-components';
 import { GeocoderOptions } from '@map-colonies/react-components/dist/cesium-map/geocoder/geocoder-panel';
 import { IMapLegend } from '@map-colonies/react-components/dist/cesium-map/legend';
+import { getTextDirection, isRtl } from '../../common/i18n/helpers';
 import { AutoDirectionBox } from '../../common/components/auto-direction-box/auto-direction-box.component';
 // import { BrowserCompatibilityChecker } from '../../common/components/browser-compatibility-checker/browser-compatibility-checker';
 import GPUInsufficiencyDetector from '../../common/components/gpu-insufficiency-detector/gpu-insufficiency-detector';
@@ -286,7 +287,7 @@ const DiscreteLayerView: React.FC = observer(() => {
   /* eslint-disable */
   const mapSettingsLocale = useMemo(
     () => ({
-      DIRECTION: intl.locale === 'he' ? 'rtl' : 'ltr',
+      DIRECTION: getTextDirection(intl.locale),
       METERS_UNIT: intl.formatMessage({ id: 'map.scale.units.meters' }),
       KILOMETERS_UNIT: intl.formatMessage({ id: 'map.scale.units.kilometers' }),
       ZOOM_LABEL: intl.formatMessage({ id: 'map.zoom.label' }),
@@ -633,7 +634,7 @@ const DiscreteLayerView: React.FC = observer(() => {
     {
       idx: TabViews.EXPORT_LAYER,
       title: 'tab-views.export-layer',
-      iconClassName: intl.locale === 'en' ? 'mc-icon-Export' : 'mc-icon-Export-Left',
+      iconClassName: isRtl(intl.locale) ? 'mc-icon-Export-Left' : 'mc-icon-Export',
     },
   ];
 
@@ -673,9 +674,9 @@ const DiscreteLayerView: React.FC = observer(() => {
   }, []);
 
   const PanelExpanderButton: React.FC = () => {
-    const isRtl = intl.locale === 'he';
-    const iconClassExpand = isRtl ? 'mc-icon-Arrows-Left' : 'mc-icon-Arrows-Right';
-    const iconClassCollapse = isRtl ? 'mc-icon-Arrows-Right' : 'mc-icon-Arrows-Left';
+    const isRtlVal = isRtl(intl.locale);
+    const iconClassExpand = isRtlVal ? 'mc-icon-Arrows-Left' : 'mc-icon-Arrows-Right';
+    const iconClassCollapse = isRtlVal ? 'mc-icon-Arrows-Right' : 'mc-icon-Arrows-Left';
     const className = `${tabsPanelExpanded ? iconClassCollapse : iconClassExpand}`;
 
     return (

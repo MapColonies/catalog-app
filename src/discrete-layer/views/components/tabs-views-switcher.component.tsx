@@ -4,6 +4,7 @@ import { observer } from 'mobx-react-lite';
 import { useIntl } from 'react-intl';
 import { Box } from '@map-colonies/react-components';
 import { IconButton, Tooltip, useTheme } from '@map-colonies/react-core';
+import { isRtl } from '../../../common/i18n/helpers';
 import { useStore } from '../../models/RootStore';
 import { TabViews } from '../tab-views';
 
@@ -44,7 +45,7 @@ export const TabViewsSwitcher: React.FC<TabViewsSwitcherComponentProps> = observ
       {
         idx: TabViews.EXPORT_LAYER,
         title: 'tab-views.export-layer',
-        iconClassName: intl.locale === 'en' ? 'mc-icon-Export' : 'mc-icon-Export-Left',
+        iconClassName: isRtl(intl.locale) ? 'mc-icon-Export-Left' : 'mc-icon-Export',
         dependentValue: store.exportStore.layerToExport,
       },
     ],

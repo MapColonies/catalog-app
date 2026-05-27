@@ -1,6 +1,7 @@
 import { ColDef, ColGroupDef, GetRowIdParams } from 'ag-grid-community';
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
+import { isRtl } from '../../../../common/i18n/helpers';
 import CONFIG from '../../../../common/config';
 import {
   GridApi,
@@ -343,7 +344,7 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
   };
 
   const baseGridOption: GridComponentOptions = {
-    enableRtl: CONFIG.I18N.DEFAULT_LANGUAGE.toUpperCase() === 'HE',
+    enableRtl: isRtl(CONFIG.I18N.DEFAULT_LANGUAGE),
     enableFilterHandlers: true,
     suppressRowTransform: true,
     pagination: pagination,

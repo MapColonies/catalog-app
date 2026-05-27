@@ -3,10 +3,11 @@ import React from 'react';
 import { default as RLSkeleton, SkeletonProps as RLSkeletonProps } from 'react-loading-skeleton';
 import { useTheme } from '@map-colonies/react-core';
 import CONFIG from '../../../common/config';
+import { getTextDirection } from '../../i18n/helpers';
 
 import 'react-loading-skeleton/dist/skeleton.css';
 
-const direction = CONFIG.I18N.DEFAULT_LANGUAGE.toUpperCase() === 'HE' ? 'rtl' : 'ltr';
+const direction = getTextDirection(CONFIG.I18N.DEFAULT_LANGUAGE);
 
 interface SkeletonProps extends RLSkeletonProps {}
 

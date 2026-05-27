@@ -8,6 +8,7 @@ import {
   rootStore,
 } from './discrete-layer/models/RootStore';
 import { SearchResponse } from './discrete-layer/models/discreteLayersStore';
+import { isRtl } from './common/i18n/helpers';
 import CONFIG from './common/config';
 import { syncHttpClientGql } from './syncHttpClientGql';
 
@@ -41,7 +42,7 @@ const store = rootStore.create(
 
   document.documentElement.lang = lang;
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  if (lang === 'he') {
+  if (isRtl(lang)) {
     document.body.dir = 'rtl';
   }
 })();
