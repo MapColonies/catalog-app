@@ -12,6 +12,8 @@
   overflow-y: auto;
   height: 228px;
   width: 100%;
+  margin: unset;
+  margin-right: 2px;
   background: var(--ag-selected-details-row-background);
 }
 
