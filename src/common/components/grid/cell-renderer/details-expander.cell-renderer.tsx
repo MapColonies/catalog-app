@@ -2,7 +2,11 @@ import React, { useLayoutEffect, useState } from 'react';
 import { ICellRendererParams } from 'ag-grid-community';
 import { Box } from '@map-colonies/react-components';
 import { CollapseButton } from '../../collapse-button/collapse.button';
-import { DEFAULT_DETAILS_ROW_HEIGHT, DEFAULT_NORMAL_ROW_HEIGHT, IGridRowDataDetailsExt } from '../grid';
+import {
+  DEFAULT_DETAILS_ROW_HEIGHT,
+  DEFAULT_NORMAL_ROW_HEIGHT,
+  IGridRowDataDetailsExt,
+} from '../grid';
 
 import './details-expander.cell-renderer.css';
 
