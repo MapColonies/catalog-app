@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [6.0.16](https://github.com/MapColonies/catalog-app/compare/v6.0.15...v6.0.16) (2026-05-28)
+
+
+### Bug Fixes
+
+* add view dialog to vector ([#976](https://github.com/MapColonies/catalog-app/issues/976)) ([5703c91](https://github.com/MapColonies/catalog-app/commit/5703c914d155a3939a4b424e2195a372ebec2ad2))
+
 ## [6.0.15](https://github.com/MapColonies/catalog-app/compare/v6.0.14...v6.0.15) (2026-05-20)
 
 
