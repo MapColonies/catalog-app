@@ -25,6 +25,7 @@
     "eslint:fix": "npx eslint --fix",
     "eslint:check": "npx eslint . --ext .ts,.tsx",
     "prettier:fix": "prettier --write .",
+    "prettier:fix:file": "prettier --write",
     "prettier:check": "prettier --check .",
     "confd": "node ./confd/generate-config.js",
     "confd:prod": "node ./confd/generate-config.js --environment production",

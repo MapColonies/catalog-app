@@ -125,12 +125,12 @@
 }
 
 .dark-theme .ag-theme-alpine-dark .ag-row-selected {
-  border-radius: 100px;
-  color: var(--mdc-theme-text-primary-on-dark, #fff);
+  border-radius: 10px;
+  color: var(--mdc-theme-text-primary-on-background);
 }
 
 .dark-theme .ag-theme-alpine-dark .ag-row-hover {
-  border-radius: 100px;
+  border-radius: 10px;
   background-color: var(--ag-row-hover-color);
 }
 

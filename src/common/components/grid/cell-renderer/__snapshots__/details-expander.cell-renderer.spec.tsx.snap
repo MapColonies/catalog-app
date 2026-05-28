@@ -1,7 +1,11 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`AgGrid DetailsExpanderRenderer component renders correctly 1`] = `
-<CollapseButton
-  onClick={[Function]}
-/>
+<Q
+  className="expanderContainer"
+>
+  <CollapseButton
+    onClick={[Function]}
+  />
+</Q>
 `;
