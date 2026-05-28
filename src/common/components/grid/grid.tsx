@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { CSSProperties, useCallback, useEffect, useState } from 'react';
+import { omit } from 'lodash';
 import { AgGridReact } from 'ag-grid-react';
 import {
   GridReadyEvent as AgGridReadyEvent,
@@ -53,6 +54,13 @@ export interface GridRowDragEndEvent extends RowDragEndEvent {}
 export interface GridRowSelectedEvent extends RowSelectedEvent {}
 export interface GridRowClickedEvent extends RowClickedEvent {}
 export interface GridValueFormatterParams extends ValueFormatterParams {}
+export const ADDITIONAL_GRID_OPTIONS_KEYS = [
+  'detailsRowCellRenderer', 
+  'detailsRowHeight', 
+  'detailsRowExpanderPosition', 
+  'context.detailsRowCellRendererPresencePredicate'
+] as const;
+
 export interface GridComponentOptions extends GridOptions {
   detailsRowCellRenderer?: string;
   detailsRowHeight?: number;
@@ -149,16 +157,12 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
       setGridApi(params.api);
     },
   };
-
+  
   // Strip custom props before passing to ag-Grid (which doesn't know about them)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const {
-    detailsRowCellRenderer: _drcr,
-    detailsRowHeight: _drh,
-    context: _ctx,
-    detailsRowExpanderPosition: _drep,
-    ...gridOptions
-  } = gridOptionsFromProps;
+  const gridOptions = omit(
+    gridOptionsFromProps,
+    ADDITIONAL_GRID_OPTIONS_KEYS
+  );
 
   const getIsDetailsExpanded = (id: string): boolean => {
     let res = false;
