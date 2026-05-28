@@ -54,12 +54,6 @@ export interface GridRowDragEndEvent extends RowDragEndEvent {}
 export interface GridRowSelectedEvent extends RowSelectedEvent {}
 export interface GridRowClickedEvent extends RowClickedEvent {}
 export interface GridValueFormatterParams extends ValueFormatterParams {}
-export const ADDITIONAL_GRID_OPTIONS_KEYS = [
-  'detailsRowCellRenderer',
-  'detailsRowHeight',
-  'detailsRowExpanderPosition',
-  'context.detailsRowCellRendererPresencePredicate',
-] as const;
 
 export interface GridComponentOptions extends GridOptions {
   detailsRowCellRenderer?: string;
@@ -69,6 +63,13 @@ export interface GridComponentOptions extends GridOptions {
     detailsRowCellRendererPresencePredicate?: (data: any) => boolean;
   };
 }
+
+export const GRID_COMPONENT_OPTIONS_OWNED_KEYS = [
+  'detailsRowCellRenderer',
+  'detailsRowHeight',
+  'detailsRowExpanderPosition',
+  'context.detailsRowCellRendererPresencePredicate',
+] as const;
 
 export interface IGridRowDataDetailsExt {
   isDetailsExpanded: boolean;
@@ -159,7 +160,7 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
   };
 
   // Strip custom props before passing to ag-Grid (which doesn't know about them)
-  const gridOptions = omit(gridOptionsFromProps, ADDITIONAL_GRID_OPTIONS_KEYS);
+  const gridOptions = omit(gridOptionsFromProps, GRID_COMPONENT_OPTIONS_OWNED_KEYS);
 
   const getIsDetailsExpanded = (id: string): boolean => {
     let res = false;
