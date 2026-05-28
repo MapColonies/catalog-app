@@ -30,8 +30,8 @@ import 'ag-grid-community/styles/ag-theme-alpine.css';
 // All Community Features
 ModuleRegistry.registerModules([AllCommunityModule]);
 
-const DEFAULT_DETAILS_ROW_HEIGHT = 234;
-const DEFAULT_NORMAL_ROW_HEIGHT = 42;
+export const DEFAULT_DETAILS_ROW_HEIGHT = 234;
+export const DEFAULT_NORMAL_ROW_HEIGHT = 42;
 const EXPANDER_COLUMN_WIDTH = 60;
 
 interface GridComponentProps {
@@ -99,9 +99,9 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
     sortable: false,
     cellStyle: { overflow: 'visible' },
     cellRendererParams: {
+      detailsComponent,
       detailsRowCellRendererPresencePredicate:
         props.gridOptions?.context?.detailsRowCellRendererPresencePredicate,
-      detailsComponent,
       normalRowHeight,
       detailsRowHeight,
     },
@@ -155,6 +155,8 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
   const {
     detailsRowCellRenderer: _drcr,
     detailsRowHeight: _drh,
+    context: _ctx,
+    detailsRowExpanderPosition: _drep,
     ...gridOptions
   } = gridOptionsFromProps;
 

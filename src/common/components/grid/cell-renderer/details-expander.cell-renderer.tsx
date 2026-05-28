@@ -2,13 +2,13 @@ import React, { useLayoutEffect, useState } from 'react';
 import { ICellRendererParams } from 'ag-grid-community';
 import { Box } from '@map-colonies/react-components';
 import { CollapseButton } from '../../collapse-button/collapse.button';
-import { IGridRowDataDetailsExt } from '../grid';
+import { DEFAULT_DETAILS_ROW_HEIGHT, DEFAULT_NORMAL_ROW_HEIGHT, IGridRowDataDetailsExt } from '../grid';
 
 import './details-expander.cell-renderer.css';
 
 interface DetailsExpanderRendererProps extends ICellRendererParams {
+  detailsComponent: React.ComponentType<ICellRendererParams>;
   detailsRowCellRendererPresencePredicate?: (data: any) => boolean;
-  detailsComponent?: React.ComponentType<ICellRendererParams>;
   normalRowHeight?: number;
   detailsRowHeight?: number;
 }
@@ -18,9 +18,9 @@ export const DetailsExpanderRenderer: React.FC<DetailsExpanderRendererProps> = (
 ): JSX.Element | null => {
   const {
     detailsRowCellRendererPresencePredicate,
-    detailsComponent: DetailsComponent,
-    normalRowHeight = 42,
-    detailsRowHeight = 230,
+    detailsComponent,
+    normalRowHeight = DEFAULT_NORMAL_ROW_HEIGHT,
+    detailsRowHeight = DEFAULT_DETAILS_ROW_HEIGHT,
     ...rendererParams
   } = props;
 
@@ -64,9 +64,9 @@ export const DetailsExpanderRenderer: React.FC<DetailsExpanderRendererProps> = (
   return (
     <Box className="expanderContainer">
       {shouldRenderBtn && <CollapseButton onClick={handleCollapseExpand} />}
-      {isDetailsExpanded && DetailsComponent && overlayStyle && (
+      {isDetailsExpanded && overlayStyle && (
         <Box style={overlayStyle}>
-          <DetailsComponent {...rendererParams} data={props.data} />
+          <props.detailsComponent {...rendererParams} data={props.data} />
         </Box>
       )}
     </Box>
