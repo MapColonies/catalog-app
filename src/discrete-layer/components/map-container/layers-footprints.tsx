@@ -18,6 +18,7 @@ import {
   CesiumConstantPositionProperty,
   CesiumConstantProperty,
 } from '@map-colonies/react-components';
+import { isRtl } from '../../../common/i18n/helpers';
 import CONFIG from '../../../common/config';
 import { usePrevious } from '../../../common/hooks/previous.hook';
 import { useStore } from '../../models/RootStore';
@@ -49,7 +50,7 @@ function upperRight(points: CesiumCartesian3[]): CesiumCartesian3 {
 
 function getLabelPosition(points: CesiumCartesian3[]): CesiumConstantPositionProperty {
   //**********  https://sandcastle.cesium.com/index.html?src=GeoJSON%20and%20TopoJSON.html
-  const center = CONFIG.I18N.DEFAULT_LANGUAGE == 'he' ? upperRight(points) : upperLeft(points);
+  const center = isRtl(CONFIG.I18N.DEFAULT_LANGUAGE) ? upperRight(points) : upperLeft(points);
   // **** Get center of "polygon" points ****
   // const center = CesiumBoundingSphere.fromPoints(points).center;
   // CesiumEllipsoid.WGS84.scaleToGeodeticSurface(center, center);

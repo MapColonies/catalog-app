@@ -13,6 +13,7 @@ import { Box, IContextMenuData } from '@map-colonies/react-components';
 import CONFIG from '../../../../common/config';
 import './context-menu.css';
 import { useIntl } from 'react-intl';
+import { getTextDirection } from '../../../../common/i18n/helpers';
 import {
   ActionSpreadPreference,
   SeparatorPosition,
@@ -60,7 +61,7 @@ export const ContextMenu: React.FC<PropsWithChildren<IMapContextMenuData>> = ({
   const intl = useIntl();
   const imageryContextMenuRef = useRef(null);
   const [isContextMenuVisible, setIsContextMenuVisible] = useState(false);
-  const direction = CONFIG.I18N.DEFAULT_LANGUAGE.toUpperCase() === 'HE' ? 'rtl' : 'ltr';
+  const direction = getTextDirection(CONFIG.I18N.DEFAULT_LANGUAGE);
 
   const { show, hideAll } = useContextMenu({
     id: contextMenuId,

@@ -5,6 +5,7 @@ import { observer } from 'mobx-react';
 import { Box, Autocomplete } from '@map-colonies/react-components';
 import { TextField } from '@map-colonies/react-core';
 import { Mode } from '../../../../common/models/mode.enum';
+import { getTextDirection } from '../../../../common/i18n/helpers';
 import CONFIG from '../../../../common/config';
 import TooltippedValue from '../../../../common/components/form/tooltipped.value';
 import { RecordType, useQuery } from '../../../models';
@@ -32,7 +33,7 @@ export const AutocompleteValuePresentorComponent: React.FC<AutocompleteValuePres
     );
     const [autocompleteValues, setAutocompleteValues] = useState<string[]>([]);
 
-    const direction = CONFIG.I18N.DEFAULT_LANGUAGE.toUpperCase() === 'HE' ? 'rtl' : 'ltr';
+    const direction = getTextDirection(CONFIG.I18N.DEFAULT_LANGUAGE);
     const required = {
       required: fieldInfo.isRequired === true ? true : false,
     };
