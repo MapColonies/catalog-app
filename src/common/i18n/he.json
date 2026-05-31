@@ -741,7 +741,7 @@
 
   "map.zoom.label": "זום",
 
-  "debug-panel.title": "דיבאגר",
+  "debug-panel.title": "Debug",
   "debug-panel.tile-requests-optimization": "אופטימיזציית בקשות אריחים",
   "debug-panel.cesium-inspector": "כלי בדיקה של סזיום",
   "debug-panel.wfs.title": "שכבות מידע",

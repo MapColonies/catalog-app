@@ -741,7 +741,7 @@
 
   "map.zoom.label": "zoom",
 
-  "debug-panel.title": "Debugger Tool",
+  "debug-panel.title": "Debug",
   "debug-panel.tile-requests-optimization": "Tile Requests Optimization",
   "debug-panel.cesium-inspector": "Cesium Inspector",
   "debug-panel.wfs.title": "Data Layers",
