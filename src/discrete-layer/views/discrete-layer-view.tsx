@@ -1319,7 +1319,7 @@ const DiscreteLayerView: React.FC = observer(() => {
               imageryProvider={false}
               locale={mapSettingsLocale}
               baseMaps={store.discreteLayersStore.baseMaps}
-              useOptimizedTileRequests={CONFIG.MAP.USE_OPTIMIZED_TILE_REQUESTS}
+              // useOptimizedTileRequests={CONFIG.MAP.USE_OPTIMIZED_TILE_REQUESTS}
               layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
               // @ts-ignore
               imageryContextMenu={<ContextMenuByTab />}
