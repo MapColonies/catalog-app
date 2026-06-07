@@ -599,7 +599,7 @@ export const PolygonParts: React.FC = observer(() => {
                 labelRect
               );
               if (intersectionRatio > LABEL_INTERSECTION_RATIO) {
-                labelPos.push(featureClippedPolygonCenter);
+                labelPos.push(featureClippedPolygonCenter as Feature<Point>);
               }
             }
           }
