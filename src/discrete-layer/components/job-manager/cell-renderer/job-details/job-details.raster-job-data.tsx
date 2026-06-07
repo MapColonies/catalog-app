@@ -11,7 +11,6 @@ import {
   useTheme,
 } from '@map-colonies/react-core';
 import { AutoDirectionBox } from '../../../../../common/components/auto-direction-box/auto-direction-box.component';
-import { DETAILS_ROW_ID_SUFFIX } from '../../../../../common/components/grid';
 import { Hyperlink } from '../../../../../common/components/hyperlink/hyperlink';
 import { useEnums } from '../../../../../common/hooks/useEnum.hook';
 import { Domain } from '../../../../../common/models/domain';
@@ -75,7 +74,7 @@ export const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = (
     try {
       const result = await store.queryFindTasks({
         params: {
-          jobId: jobData.id.replace(DETAILS_ROW_ID_SUFFIX, ''),
+          jobId: jobData.id,
           type: 'validation',
         },
       });
