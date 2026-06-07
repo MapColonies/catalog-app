@@ -113,9 +113,9 @@ export const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = (
     return !!getGpkgFilesPath();
   };
 
-  const getJobIssueIndication = ():string => {
-    return (jobData.parameters?.allowedValidationErrors) ? 'warning' : 'error';
-  }
+  const getJobIssueIndication = (): string => {
+    return jobData.parameters?.allowedValidationErrors ? 'warning' : 'error';
+  };
 
   const errorsMessage = intl.formatMessage({ id: 'general.errors.text' });
 
@@ -190,7 +190,9 @@ export const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = (
                   errorsCount > MAX_ERRORS_SHOWN ? `+${MAX_ERRORS_SHOWN}` : errorsCount
                 } ${errorsMessage}`}
               >
-                <IconButton className={`mc-icon-Download downloadIcon ${getJobIssueIndication()} statusIcon`} />
+                <IconButton
+                  className={`mc-icon-Download downloadIcon ${getJobIssueIndication()} statusIcon`}
+                />
               </Hyperlink>
             </Box>
           )}
