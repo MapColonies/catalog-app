@@ -113,6 +113,10 @@ export const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = (
     return !!getGpkgFilesPath();
   };
 
+  const getJobIssueIndication = ():string => {
+    return (jobData.parameters?.allowedValidationErrors) ? 'warning' : 'error';
+  }
+
   const errorsMessage = intl.formatMessage({ id: 'general.errors.text' });
 
   const zoomLabel = zoomLevel !== undefined ? `(${zoomLevel})` : '';
@@ -154,7 +158,7 @@ export const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = (
           {!isTaskFailed && hasErrors && (
             <Box className="errorsSummaryContainer">
               <IconButton
-                className="mc-icon-Status-Warnings error statusIcon"
+                className={`mc-icon-Status-Warnings ${getJobIssueIndication()} statusIcon`}
                 onClick={(e): void => {
                   e.preventDefault();
                   e.stopPropagation();
@@ -172,7 +176,7 @@ export const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = (
                 }
               >
                 <Hyperlink
-                  className="error"
+                  className={getJobIssueIndication()}
                   url={task?.parameters?.report?.url ?? ''}
                   label={`${
                     errorsCount > MAX_ERRORS_SHOWN ? `+${MAX_ERRORS_SHOWN}` : errorsCount
@@ -180,13 +184,13 @@ export const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = (
                 ></Hyperlink>
               </Tooltip>
               <Hyperlink
-                className="error"
+                className={getJobIssueIndication()}
                 url={task?.parameters?.report?.url ?? ''}
                 label={`${
                   errorsCount > MAX_ERRORS_SHOWN ? `+${MAX_ERRORS_SHOWN}` : errorsCount
                 } ${errorsMessage}`}
               >
-                <IconButton className="mc-icon-Download downloadIcon error statusIcon" />
+                <IconButton className={`mc-icon-Download downloadIcon ${getJobIssueIndication()} statusIcon`} />
               </Hyperlink>
             </Box>
           )}
