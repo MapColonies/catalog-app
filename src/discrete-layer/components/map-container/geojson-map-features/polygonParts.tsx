@@ -1,14 +1,16 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Feature, Polygon, BBox, Point } from 'geojson';
-import { isEmpty } from 'lodash';
+import { Feature, Polygon, BBox, Point, Position } from 'geojson';
+import { debounce, get, isEmpty } from 'lodash';
 import { observer } from 'mobx-react-lite';
 import { Properties, Geometry } from '@turf/helpers';
 import area from '@turf/area';
 import intersect from '@turf/intersect';
-import centroid from '@turf/centroid';
+// import centerOfMass from '@turf/center-of-mass';
+import polylabel from 'polylabel';
 import bboxPolygon from '@turf/bbox-polygon';
+import { ScreenSpaceEventHandler, ScreenSpaceEventType } from 'cesium';
 import {
   CesiumWFSLayer,
   CesiumMath,
@@ -34,25 +36,38 @@ import {
   CesiumViewer,
   useCesiumMapViewstate,
   CesiumGeojsonLayer,
+  useCesiumMap,
+  AlternativePayload,
 } from '@map-colonies/react-components';
 import CONFIG from '../../../../common/config';
 import { useEnums } from '../../../../common/hooks/useEnum.hook';
 import { shrinkExtremeCoordinatesInOuterRing } from '../../../../common/utils/geo.tools';
-import { EntityDescriptorModelType, LayerRasterRecordModelType, useStore } from '../../../models';
+import {
+  EntityDescriptorModelType,
+  getFeatureModelPrimitives,
+  LayerRasterRecordModelType,
+  useStore,
+} from '../../../models';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
 import { getFlatEntityDescriptors } from '../../layer-details/utils';
 import { ILayerImage } from '../../../models/layerImage';
+
+const DEBOUNCE_ENTITY_HOVER_PERIOD = 300;
+const DEFAULT_HEIGHT = 500;
+const DEFAULT_LABEL_BLINKING_PERIOD = 1000;
+const LABEL_BLINKING_SCALE = 1.5;
 
 export const PolygonParts: React.FC = observer(() => {
   const store = useStore();
   const intl = useIntl();
   const ENUMS = useEnums();
-  // const cesiumViewer = useCesiumMap();
+  const cesiumViewer = useCesiumMap();
   const { viewState: mapViewState } = useCesiumMapViewstate();
   const ZOOM_LEVELS_TABLE = useZoomLevelsTable();
   const [zoomLevel, setZoomLevel] = useState(mapViewState.currentZoomLevel);
   const [activeLayer, setActiveLayer] = useState(store.discreteLayersStore.polygonPartsLayer);
   const [showParts, setShowParts] = useState(false);
+  const labelsCollectionNameRef = useRef('');
 
   useEffect(() => {
     if (
@@ -72,6 +87,65 @@ export const PolygonParts: React.FC = observer(() => {
       setShowParts(true);
     }
   }, [zoomLevel]);
+
+  useEffect(() => {
+    let hoveredEntity: any = null;
+    const handleMouseHover = (handler: ScreenSpaceEventHandler): void => {
+      const blinkBillboard = (entity: any, duration = DEFAULT_LABEL_BLINKING_PERIOD) => {
+        if (!entity?.billboard || entity._isBlinking) return;
+        entity._isBlinking = true;
+        const billboard = entity.billboard;
+        const originalScale = billboard.scale;
+        let enlarged = false;
+        const interval = setInterval(() => {
+          enlarged = !enlarged;
+          billboard.scale = enlarged ? LABEL_BLINKING_SCALE : originalScale;
+        }, 100);
+
+        setTimeout(() => {
+          clearInterval(interval);
+          billboard.scale = originalScale;
+          entity._isBlinking = false;
+        }, duration);
+      };
+
+      const handleHoverEntity = debounce((hoveredEntity) => {
+        const ds = cesiumViewer.dataSources.getByName(labelsCollectionNameRef.current)[0];
+        ds?.entities.values.forEach((labelEntity: CesiumCesiumEntity) => {
+          if (labelEntity.properties?.featureId.getValue() === hoveredEntity.id) {
+            blinkBillboard(labelEntity);
+          }
+        });
+      }, DEBOUNCE_ENTITY_HOVER_PERIOD);
+
+      handler.setInputAction((movement: { endPosition: CesiumCartesian2 }): void => {
+        const is2D = cesiumViewer.scene.mode === CesiumSceneMode.SCENE2D;
+        if (is2D) {
+          const pickedObject = cesiumViewer.scene.pick(movement.endPosition);
+          if (
+            pickedObject &&
+            pickedObject.id &&
+            (pickedObject.id.polygon || pickedObject.id.polyline)
+          ) {
+            if (get(hoveredEntity, 'id') !== get(pickedObject.id, 'id')) {
+              hoveredEntity = pickedObject.id;
+              handleHoverEntity(hoveredEntity);
+            }
+          } else {
+            // No entity was picked thus the mouse is outside of any entity
+            if (hoveredEntity) {
+              // Resetting previous entity
+              hoveredEntity = null;
+            }
+          }
+        } else {
+          // 3D or Columbus mode NOT IMPLEMENTED
+        }
+      }, ScreenSpaceEventType.MOUSE_MOVE);
+    };
+    const handler = new ScreenSpaceEventHandler(cesiumViewer.scene.canvas);
+    handleMouseHover(handler);
+  }, [cesiumViewer, labelsCollectionNameRef.current]);
 
   const polygonPartsFieldLabels = useMemo(() => {
     const partialLabels = getFlatEntityDescriptors(
@@ -214,21 +288,21 @@ export const PolygonParts: React.FC = observer(() => {
     return optionsPolygonParts.url !== NOT_VALID && optionsPolygonParts.featureType !== NOT_VALID;
   };
 
-  const buildWFSUrl = (layer: ILayerImage) => {
-    const token = CONFIG.ACCESS_TOKEN.TOKEN_VALUE;
-    if (layer) {
-      const url = layer.links?.find((link) => link.protocol === 'WFS')?.url?.split(/[?#]/)[0];
-      if (!url) {
-        console.log(
-          `[<PolygonParts>][buildWFSUrl] Layer ${layer.productName} does not have a WFS link`
-        );
-        return NOT_VALID;
-      }
-      return `${url}?token=${token}`;
-    } else {
-      return NOT_VALID;
-    }
-  };
+  // const buildWFSUrl = (layer: ILayerImage) => {
+  //   const token = CONFIG.ACCESS_TOKEN.TOKEN_VALUE;
+  //   if (layer) {
+  //     const url = layer.links?.find((link) => link.protocol === 'WFS')?.url?.split(/[?#]/)[0];
+  //     if (!url) {
+  //       console.log(
+  //         `[<PolygonParts>][buildWFSUrl] Layer ${layer.productName} does not have a WFS link`
+  //       );
+  //       return NOT_VALID;
+  //     }
+  //     return `${url}?token=${token}`;
+  //   } else {
+  //     return NOT_VALID;
+  //   }
+  // };
 
   const buildFeatureType = (layer: ILayerImage) => {
     if (layer) {
@@ -245,13 +319,39 @@ export const PolygonParts: React.FC = observer(() => {
   };
 
   const optionsPolygonParts = {
-    url: buildWFSUrl(activeLayer as ILayerImage),
+    // url: buildWFSUrl(activeLayer as ILayerImage), //DIRECT WFS service URL
+    url: `${CONFIG.SERVICE_PROTOCOL}${CONFIG.SERVICE_NAME}/graphql`,
+    pageSize: CONFIG.WFS.MAX.PAGE_SIZE,
     featureType: buildFeatureType(activeLayer as ILayerImage),
+    alternativePayload: {
+      type: 'gql',
+      gql: {
+        query: `query getPolygonPartsFeature($data: WfsPolygonPartsGetFeatureParams!) {
+              getPolygonPartsFeature(data: $data) {
+                ${getFeatureModelPrimitives.toString()}
+              }
+            }`,
+        variablesDescriptor: {
+          featureProp: 'feature',
+          startIndexProp: 'startIndex',
+          countProp: 'count',
+          typeNameProp: 'typeName',
+        },
+        variables: {
+          data: {
+            // as template object, values will be injected in <CesiumWFSLayer>
+            count: -1,
+            feature: null,
+            startIndex: -1,
+            typeName: 'DUMMY',
+          },
+        },
+      },
+    } as AlternativePayload,
     style: {
       color: BRIGHT_GREEN,
       hover: LIGHT_BLUE,
     },
-    pageSize: CONFIG.WFS.MAX.PAGE_SIZE, //300,
     zoomLevel: SHOW_PP_ZOOM_LEVEL, //7
     maxCacheSize: CONFIG.WFS.MAX.CACHE_SIZE, //6000
     labeling: {
@@ -296,27 +396,62 @@ export const PolygonParts: React.FC = observer(() => {
   ): void => {
     const is2D = mapViewer.scene.mode === CesiumSceneMode.SCENE2D;
 
-    const getGeoJsonFromEntity = (entity: CesiumCesiumEntity): Polygon | undefined => {
-      if (entity.polygon) {
-        // Polygon
-        const polygonData = entity.polygon.hierarchy?.getValue(
-          CesiumJulianDate.now()
-        ) as CesiumPolygonHierarchy;
-        const positions = polygonData.positions.map((position) => {
-          const worlPosCartographic = CesiumCartographic.fromCartesian(position);
-          const correctedCarto = new CesiumCartographic(
-            CesiumMath.toDegrees(worlPosCartographic.longitude),
-            CesiumMath.toDegrees(worlPosCartographic.latitude),
-            is2D ? 500 : undefined
-          );
-          return [correctedCarto.longitude, correctedCarto.latitude, correctedCarto.height];
-        });
+    const cartesianArrayToRing = (
+      positions: CesiumCartesian3[]
+    ): [number, number, number | undefined][] => {
+      const height = is2D ? DEFAULT_HEIGHT : undefined;
+      const ring: [number, number, number | undefined][] = positions.map((cartesian) => {
+        const cartographic = CesiumCartographic.fromCartesian(cartesian);
+        return [
+          CesiumMath.toDegrees(cartographic.longitude),
+          CesiumMath.toDegrees(cartographic.latitude),
+          height,
+        ];
+      });
 
-        return {
-          type: 'Polygon',
-          coordinates: [positions],
-        };
+      // Ensure the ring is closed for valid GeoJSON
+      if (ring.length > 0) {
+        const first = ring[0];
+        const last = ring[ring.length - 1];
+        if (first[0] !== last[0] || first[1] !== last[1]) {
+          ring.push([first[0], first[1], height]);
+        }
       }
+      return ring;
+    };
+
+    const getGeoJsonFromEntity = (entity: CesiumCesiumEntity): Polygon | undefined => {
+      if (!entity.polygon || !entity.polygon.hierarchy) {
+        return undefined;
+      }
+
+      const hierarchy: CesiumPolygonHierarchy = entity.polygon.hierarchy.getValue(
+        CesiumJulianDate.now()
+      );
+      if (!hierarchy) return undefined;
+
+      const geoJsonCoordinates: [number, number, number | undefined][][] = [];
+
+      // 1. Process the exterior ring (always the first element in GeoJSON coordinates)
+      if (hierarchy.positions && hierarchy.positions.length > 0) {
+        geoJsonCoordinates.push(cartesianArrayToRing(hierarchy.positions));
+      }
+
+      // 2. Process interior holes recursively if they exist
+      if (hierarchy.holes && hierarchy.holes.length > 0) {
+        hierarchy.holes.forEach((holeHierarchy) => {
+          if (holeHierarchy.positions && holeHierarchy.positions.length > 0) {
+            geoJsonCoordinates.push(cartesianArrayToRing(holeHierarchy.positions));
+          }
+        });
+      }
+
+      if (geoJsonCoordinates.length === 0) return undefined;
+
+      return {
+        type: 'Polygon',
+        coordinates: geoJsonCoordinates as Position[][],
+      };
     };
 
     const pixelSizeInMeters = (
@@ -425,15 +560,27 @@ export const PolygonParts: React.FC = observer(() => {
           ) as Feature<Polygon, Properties>;
           if (featureClippedPolygon) {
             const labelValue = entity.properties?.label.getValue(CesiumJulianDate.now());
-            const featureClippedPolygonCenter = centroid(
-              featureClippedPolygon as unknown as Polygon,
-              {
-                properties: {
-                  label: labelValue,
-                },
-              }
-            );
-
+            // const featureClippedPolygonCenter = centerOfMass(
+            //   featureClippedPolygon as unknown as Polygon,
+            //   {
+            //     properties: {
+            //       label: labelValue,
+            //       featureId: entity.id,
+            //     },
+            //   }
+            // );
+            const labelCoordinates = polylabel(featureClippedPolygon.geometry.coordinates, 0.00001);
+            const featureClippedPolygonCenter = {
+              type: 'Feature',
+              properties: {
+                label: labelValue,
+                featureId: entity.id,
+              },
+              geometry: {
+                type: 'Point',
+                coordinates: labelCoordinates,
+              },
+            };
             const labelPixelSize = { width: labelValue.width, height: labelValue.height };
             const [longitude, latitude, height = 0] =
               featureClippedPolygonCenter.geometry.coordinates;
@@ -462,7 +609,7 @@ export const PolygonParts: React.FC = observer(() => {
                 labelRect
               );
               if (intersectionRatio > LABEL_INTERSECTION_RATIO) {
-                labelPos.push(featureClippedPolygonCenter);
+                labelPos.push(featureClippedPolygonCenter as Feature<Point>);
               }
             }
           }
@@ -511,7 +658,9 @@ export const PolygonParts: React.FC = observer(() => {
         const correctedCarto = new CesiumCartographic(
           worlPosCartographic.longitude,
           worlPosCartographic.latitude,
-          is2D ? 500 : mapViewer.scene.sampleHeight(CesiumCartographic.fromCartesian(worldPos))
+          is2D
+            ? DEFAULT_HEIGHT
+            : mapViewer.scene.sampleHeight(CesiumCartographic.fromCartesian(worldPos))
         );
 
         // Convert back to Cartesian3
@@ -539,21 +688,24 @@ export const PolygonParts: React.FC = observer(() => {
       }
     });
 
-    const labelsCollectionName = `labels_${dataSource.name}`;
+    labelsCollectionNameRef.current = `labels_${dataSource.name}`;
+
     const deselectLabelEntities = (entity: CesiumCesiumEntity) => {
       if (
         !isEmpty(entity?.entityCollection) &&
         // @ts-ignore
-        entity.entityCollection.owner.name === labelsCollectionName
+        entity.entityCollection.owner.name === labelsCollectionNameRef.current
       ) {
         mapViewer.selectedEntity = undefined;
       }
     };
 
-    mapViewer.dataSources.remove(mapViewer.dataSources.getByName(labelsCollectionName)[0]);
+    mapViewer.dataSources.remove(
+      mapViewer.dataSources.getByName(labelsCollectionNameRef.current)[0]
+    );
     mapViewer.selectedEntityChanged.removeEventListener(deselectLabelEntities);
     if (is2D) {
-      const labelsGeoJsonDataSource = new CesiumGeoJsonDataSource(labelsCollectionName);
+      const labelsGeoJsonDataSource = new CesiumGeoJsonDataSource(labelsCollectionNameRef.current);
       mapViewer.dataSources.add(labelsGeoJsonDataSource);
 
       // Disable click on labels
@@ -571,7 +723,9 @@ export const PolygonParts: React.FC = observer(() => {
             const correctedCarto = new CesiumCartographic(
               worlPosCartographic.longitude,
               worlPosCartographic.latitude,
-              is2D ? 500 : mapViewer.scene.sampleHeight(CesiumCartographic.fromCartesian(worldPos))
+              is2D
+                ? DEFAULT_HEIGHT
+                : mapViewer.scene.sampleHeight(CesiumCartographic.fromCartesian(worldPos))
             );
 
             const correctedCartesian = CesiumCartesian3.fromRadians(

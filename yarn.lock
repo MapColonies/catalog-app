@@ -2553,7 +2553,7 @@
     lodash "^4.17.21"
     ngeohash "^0.6.3"
 
-"@map-colonies/react-components@^4.14.1":
+"@map-colonies/react-components@4.14.1":
   version "4.14.1"
   resolved "https://registry.yarnpkg.com/@map-colonies/react-components/-/react-components-4.14.1.tgz#e6ad3d4bc0abaf786092457b37a1cc21cc8db92b"
   integrity sha512-Z42EjvJFq2TTmaI0Q6u9bPWqbS1Cc2auv2lqifqF+UGi55jnvcDrN/LZ5RQHZRnp9RQZwOC0V4ukuAPiFpcLjQ==
@@ -4644,6 +4644,19 @@
     "@turf/invariant" "^6.5.0"
     "@turf/meta" "^6.5.0"
 
+"@turf/center-of-mass@^7.3.5":
+  version "7.3.5"
+  resolved "https://registry.yarnpkg.com/@turf/center-of-mass/-/center-of-mass-7.3.5.tgz#6048d17303850618840e727ee0f0c5d290dd9aab"
+  integrity sha512-eEzx4YKxUP55Apdjt7XXuQ906KKx4uSQWLxJw5OHE0rKOSN/qYTSdu0s7nQBAmGgAqeSC2538vuN7wEqMfYMvQ==
+  dependencies:
+    "@turf/centroid" "7.3.5"
+    "@turf/convex" "7.3.5"
+    "@turf/helpers" "7.3.5"
+    "@turf/invariant" "7.3.5"
+    "@turf/meta" "7.3.5"
+    "@types/geojson" "^7946.0.10"
+    tslib "^2.8.1"
+
 "@turf/center@^6.5.0":
   version "6.5.0"
   resolved "https://registry.yarnpkg.com/@turf/center/-/center-6.5.0.tgz#3bcb6bffcb8ba147430cfea84aabaed5dbdd4f07"
@@ -4651,6 +4664,16 @@
   dependencies:
     "@turf/bbox" "^6.5.0"
     "@turf/helpers" "^6.5.0"
+
+"@turf/centroid@7.3.5":
+  version "7.3.5"
+  resolved "https://registry.yarnpkg.com/@turf/centroid/-/centroid-7.3.5.tgz#181a4cafa282467b4623cead4a7db1c036b8ee5d"
+  integrity sha512-hkWaqwGFdOn6Tf0EWfn2yn1XZ1FWE1h2C5ZWstDMu/FxYO5DB+YjlmOFPl4K6SmSOEgdV07eK2vDCyPeTHqKGA==
+  dependencies:
+    "@turf/helpers" "7.3.5"
+    "@turf/meta" "7.3.5"
+    "@types/geojson" "^7946.0.10"
+    tslib "^2.8.1"
 
 "@turf/centroid@^6.5.0":
   version "6.5.0"
@@ -4770,6 +4793,17 @@
     "@turf/tin" "^6.5.0"
     topojson-client "3.x"
     topojson-server "3.x"
+
+"@turf/convex@7.3.5":
+  version "7.3.5"
+  resolved "https://registry.yarnpkg.com/@turf/convex/-/convex-7.3.5.tgz#8781b7a53855195224f02e003df6205c3ad3afc2"
+  integrity sha512-d/pq86he+/GB/2ObuBHapeT15QFsCPhhGab3uE4YjogLMbD8qtu0sRGF+cvvPRDNuCLycOBL/xgFLnf9SteYlA==
+  dependencies:
+    "@turf/helpers" "7.3.5"
+    "@turf/meta" "7.3.5"
+    "@types/geojson" "^7946.0.10"
+    concaveman "^1.2.1"
+    tslib "^2.8.1"
 
 "@turf/convex@^6.0.3", "@turf/convex@^6.5.0":
   version "6.5.0"
@@ -4916,6 +4950,14 @@
   resolved "https://registry.yarnpkg.com/@turf/helpers/-/helpers-6.5.0.tgz#f79af094bd6b8ce7ed2bd3e089a8493ee6cae82e"
   integrity sha512-VbI1dV5bLFzohYYdgqwikdMVpe7pJ9X3E+dlr425wa2/sMJqYDhTO++ec38/pcPvPE6oD9WEEeU3Xu3gza+VPw==
 
+"@turf/helpers@7.3.5":
+  version "7.3.5"
+  resolved "https://registry.yarnpkg.com/@turf/helpers/-/helpers-7.3.5.tgz#051928c03cdf9ffcc7ae36581c317afc49bfd999"
+  integrity sha512-E/NMGV5MwbjjP7AJXBtsanC3yY8N2MQ87IGdIgkB2ji5AtBpwnH4L3gEqpYN4RlCJJWbLbzO91BbKv2waUd0eg==
+  dependencies:
+    "@types/geojson" "^7946.0.10"
+    tslib "^2.8.1"
+
 "@turf/helpers@^5.1.5":
   version "5.1.5"
   resolved "https://registry.yarnpkg.com/@turf/helpers/-/helpers-5.1.5.tgz#153405227ab933d004a5bb9641a9ed999fcbe0cf"
@@ -4969,6 +5011,15 @@
   version "5.0.0"
   resolved "https://registry.yarnpkg.com/@turf/invariant/-/invariant-5.0.0.tgz#da9b4d7b044cffa300d654b3e0444969fc19d850"
   integrity sha512-Bh1m9teKFPIKC1WF/Z0Q8fE1qgXryoYtv15Tn0hZkgQgYRzEerMH7RHKDQ6Q6JYHtPK61UPN8VorL4JQLZX2YQ==
+
+"@turf/invariant@7.3.5":
+  version "7.3.5"
+  resolved "https://registry.yarnpkg.com/@turf/invariant/-/invariant-7.3.5.tgz#5619d0e0ef3755e2be69855bad47e10158a1820b"
+  integrity sha512-ZVIvsBvjr8lO7WxC5zYNjRsjSDvyGvWkJMjuWaJjTU8x+1tmfNnw3gDX/TI2Sit83gcRYLYkNo23lB/udqx/Hg==
+  dependencies:
+    "@turf/helpers" "7.3.5"
+    "@types/geojson" "^7946.0.10"
+    tslib "^2.8.1"
 
 "@turf/invariant@^5.1.5":
   version "5.2.0"
@@ -5206,6 +5257,15 @@
   integrity sha512-RrArvtsV0vdsCBegoBtOalgdSOfkBrTJ07VkpiCnq/491W67hnMWmDu7e6Ztw0C3WldRYTXkg3SumfdzZxLBHA==
   dependencies:
     "@turf/helpers" "^6.5.0"
+
+"@turf/meta@7.3.5":
+  version "7.3.5"
+  resolved "https://registry.yarnpkg.com/@turf/meta/-/meta-7.3.5.tgz#c498a6f1e8603e014e8bfbc9a4b2760b6219edb9"
+  integrity sha512-r+ohqxoyqeigFB0oFrQx/YEHIkOKqcKpCjvZkvZs7Tkv+IFco5MezAd2zd4rzK+0DfFgDP3KpJc7HqrYjvEjhg==
+  dependencies:
+    "@turf/helpers" "7.3.5"
+    "@types/geojson" "^7946.0.10"
+    tslib "^2.8.1"
 
 "@turf/meta@^5.1.5":
   version "5.2.0"
@@ -6155,6 +6215,11 @@
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/@types/parse-json/-/parse-json-4.0.0.tgz#2f8bb441434d163b35fb8ffdccd7138927ffb8c0"
   integrity sha512-//oorEZjL6sbPcKUaCdIGlIUeH26mgzimjBB77G6XRgnDl/L5wOnpyBGRe/Mmf5CVW3PwEBE1NjiMZ/ssFh4wA==
+
+"@types/polylabel@^1.1.3":
+  version "1.1.3"
+  resolved "https://registry.yarnpkg.com/@types/polylabel/-/polylabel-1.1.3.tgz#15aba4277b03ac0ab60a0dea75a13bde45dcfc01"
+  integrity sha512-9Zw2KoDpi+T4PZz2G6pO2xArE0m/GSMTW1MIxF2s8ZY8x9XDO6fv9um0ydRGvcbkFLlaq8yNK6eZxnmMZtDgWQ==
 
 "@types/prettier@^2.1.5":
   version "2.7.3"
@@ -8645,7 +8710,7 @@ concat-map@0.0.1:
   resolved "https://registry.yarnpkg.com/concat-map/-/concat-map-0.0.1.tgz#d8a96bd77fd68df7793a73036a3ba0d5405d477b"
   integrity sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==
 
-concaveman@*:
+concaveman@*, concaveman@^1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/concaveman/-/concaveman-1.2.1.tgz#47d20b4521125c15fabf453653c2696d9ee41e0b"
   integrity sha512-PwZYKaM/ckQSa8peP5JpVr7IMJ4Nn/MHIaWUjP4be+KoZ7Botgs8seAZGpmaOM+UZXawcdYRao/px9ycrCihHw==
@@ -15574,6 +15639,13 @@ polygon-clipping@^0.15.3:
   dependencies:
     splaytree "^3.1.0"
 
+polylabel@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/polylabel/-/polylabel-2.0.1.tgz#7c2f02b96bd50331a81990dcb9e134c05f996419"
+  integrity sha512-B6Yu+Bdl/8SGtjVhyUfZzD3DwciCS9SPVtHiNdt8idHHatvTHp5Ss8XGDRmQFtfF1ZQnfK+Cj5dXdpkUXBbXgA==
+  dependencies:
+    tinyqueue "^3.0.0"
+
 popper.js@1.16.1-lts:
   version "1.16.1-lts"
   resolved "https://registry.yarnpkg.com/popper.js/-/popper.js-1.16.1-lts.tgz#cf6847b807da3799d80ee3d6d2f90df8a3f50b05"
@@ -18819,6 +18891,11 @@ tinyqueue@^2.0.0, tinyqueue@^2.0.3:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/tinyqueue/-/tinyqueue-2.0.3.tgz#64d8492ebf39e7801d7bd34062e29b45b2035f08"
   integrity sha512-ppJZNDuKGgxzkHihX8v9v9G5f+18gzaTfrukGrq6ueg0lmH4nqVnA2IPG0AEH3jKEk2GRJCUhDoqpoiw3PHLBA==
+
+tinyqueue@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/tinyqueue/-/tinyqueue-3.0.0.tgz#101ea761ccc81f979e29200929e78f1556e3661e"
+  integrity sha512-gRa9gwYU3ECmQYv3lslts5hxuIa90veaEcxDYuu3QGOIAEM2mOZkVHp48ANJuu1CURtRdHKUBY5Lm1tHV+sD4g==
 
 tmp@^0.0.33:
   version "0.0.33"

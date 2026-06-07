@@ -19,6 +19,7 @@ export const GetFeatureModelBase = ModelBase
   .props({
     __typename: types.optional(types.literal("GetFeature"), "GetFeature"),
     type: types.union(types.undefined, types.null, types.string),
+    bbox: types.union(types.undefined, types.null, types.array(types.number)),
     features: types.union(types.undefined, types.null, types.array(types.late((): any => WfsFeatureModel))),
     totalFeatures: types.union(types.undefined, types.null, types.number),
     numberMatched: types.union(types.undefined, types.null, types.number),
@@ -34,6 +35,7 @@ export const GetFeatureModelBase = ModelBase
 
 export class GetFeatureModelSelector extends QueryBuilder {
   get type() { return this.__attr(`type`) }
+  get bbox() { return this.__attr(`bbox`) }
   get totalFeatures() { return this.__attr(`totalFeatures`) }
   get numberMatched() { return this.__attr(`numberMatched`) }
   get numberReturned() { return this.__attr(`numberReturned`) }
@@ -45,4 +47,4 @@ export function selectFromGetFeature() {
   return new GetFeatureModelSelector()
 }
 
-export const getFeatureModelPrimitives = selectFromGetFeature().features(selector => selector.geometry.id.properties.type).type.totalFeatures.numberMatched.numberReturned.timeStamp.crs
+export const getFeatureModelPrimitives = selectFromGetFeature().features(selector => selector.geometry.id.properties.type).type.bbox.totalFeatures.numberMatched.numberReturned.timeStamp.crs
