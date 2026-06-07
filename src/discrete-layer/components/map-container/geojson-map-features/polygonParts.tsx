@@ -288,21 +288,21 @@ export const PolygonParts: React.FC = observer(() => {
     return optionsPolygonParts.url !== NOT_VALID && optionsPolygonParts.featureType !== NOT_VALID;
   };
 
-  const buildWFSUrl = (layer: ILayerImage) => {
-    const token = CONFIG.ACCESS_TOKEN.TOKEN_VALUE;
-    if (layer) {
-      const url = layer.links?.find((link) => link.protocol === 'WFS')?.url?.split(/[?#]/)[0];
-      if (!url) {
-        console.log(
-          `[<PolygonParts>][buildWFSUrl] Layer ${layer.productName} does not have a WFS link`
-        );
-        return NOT_VALID;
-      }
-      return `${url}?token=${token}`;
-    } else {
-      return NOT_VALID;
-    }
-  };
+  // const buildWFSUrl = (layer: ILayerImage) => {
+  //   const token = CONFIG.ACCESS_TOKEN.TOKEN_VALUE;
+  //   if (layer) {
+  //     const url = layer.links?.find((link) => link.protocol === 'WFS')?.url?.split(/[?#]/)[0];
+  //     if (!url) {
+  //       console.log(
+  //         `[<PolygonParts>][buildWFSUrl] Layer ${layer.productName} does not have a WFS link`
+  //       );
+  //       return NOT_VALID;
+  //     }
+  //     return `${url}?token=${token}`;
+  //   } else {
+  //     return NOT_VALID;
+  //   }
+  // };
 
   const buildFeatureType = (layer: ILayerImage) => {
     if (layer) {
