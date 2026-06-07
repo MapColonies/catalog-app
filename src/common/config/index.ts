@@ -148,7 +148,6 @@ const APP_CONFIG = {
     CENTER: MAP.center as [number, number],
     ZOOM: MAP.zoom as number,
     MAPMODE2D: MAP.mapMode2D,
-    USE_OPTIMIZED_TILE_REQUESTS: MAP.useOptimizedTileRequests as boolean,
     SHOW_DEBUGGER_TOOL: MAP.showDebuggerTool,
     SHOW_ACTIVE_LAYERS_TOOL: MAP.showActiveLayersTool,
     SHOW_GEOCODER_TOOL: MAP.showGeocoderTool,

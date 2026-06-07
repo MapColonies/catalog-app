@@ -45,7 +45,6 @@
   CONFIGURATION_MAP_CENTER: {{ quote .Values.env.map.center }}
   CONFIGURATION_MAP_ZOOM: {{ quote .Values.env.map.zoom }}
   CONFIGURATION_MAP_MAPMODE2D: {{ quote .Values.env.map.mapMode2D }}
-  CONFIGURATION_MAP_USE_OPTIMIZED_TILE_REQUESTS: {{ quote .Values.env.map.useOptimizedTileRequests }}
   CONFIGURATION_MAP_SHOW_DEBUGGER_TOOL: {{ quote .Values.env.map.showDebuggerTool }}
   CONFIGURATION_MAP_SHOW_ACTIVE_LAYERS_TOOL: {{ quote .Values.env.map.showActiveLayersTool }}
   CONFIGURATION_MAP_SHOW_GEOCODER_TOOL: {{ quote .Values.env.map.showGeocoderTool }}

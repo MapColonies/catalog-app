@@ -291,6 +291,19 @@ const DiscreteLayerView: React.FC = observer(() => {
       KILOMETERS_UNIT: intl.formatMessage({ id: 'map.scale.units.kilometers' }),
       ZOOM_LABEL: intl.formatMessage({ id: 'map.zoom.label' }),
       DEBUG_PANEL_TITLE: intl.formatMessage({ id: 'debug-panel.title' }),
+      DEBUG_SECTION_DATA: intl.formatMessage({ id: 'debug-panel.section.data' }),
+      DEBUG_SECTION_LAYERS: intl.formatMessage({ id: 'debug-panel.section.layers' }),
+      DEBUG_SECTION_TOOLS: intl.formatMessage({ id: 'debug-panel.section.tools' }),
+      TILE_REQUESTS_OPTIMIZATION_CHECKBOX: intl.formatMessage({
+        id: 'debug-panel.tile-requests-optimization',
+      }),
+      CESIUM_INSPECTOR_CHECKBOX: intl.formatMessage({ id: 'debug-panel.cesium-inspector' }),
+      WITH_TRANSPARENCY_TOOLTIP: intl.formatMessage({
+        id: 'debug-panel.with-transparency.tooltip',
+      }),
+      WITHOUT_TRANSPARENCY_TOOLTIP: intl.formatMessage({
+        id: 'debug-panel.without-transparency.tooltip',
+      }),
       WFS_TITLE: intl.formatMessage({ id: 'debug-panel.wfs.title' }),
       WFS_CACHE: intl.formatMessage({ id: 'debug-panel.wfs.cache' }),
       WFS_EXTENT: intl.formatMessage({ id: 'debug-panel.wfs.extent' }),
@@ -674,6 +687,8 @@ const DiscreteLayerView: React.FC = observer(() => {
       };
     });
   }, []);
+
+  const isAdminUser = store.userStore.user?.role === UserRole.ADMIN;
 
   const PanelExpanderButton: React.FC = () => {
     const isRtl = intl.locale === 'he';
@@ -1311,6 +1326,7 @@ const DiscreteLayerView: React.FC = observer(() => {
             value={{ actionsMenuDimensions, setActionsMenuDimensions }}
           >
             <CesiumMap
+              key={`cesium-map-${isAdminUser ? 'admin' : 'user'}`}
               mapMode2D={mapMode2D}
               projection={CONFIG.MAP.PROJECTION}
               center={CONFIG.MAP.CENTER}
@@ -1319,7 +1335,6 @@ const DiscreteLayerView: React.FC = observer(() => {
               imageryProvider={false}
               locale={mapSettingsLocale}
               baseMaps={store.discreteLayersStore.baseMaps}
-              useOptimizedTileRequests={CONFIG.MAP.USE_OPTIMIZED_TILE_REQUESTS}
               layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
               // @ts-ignore
               imageryContextMenu={<ContextMenuByTab />}
@@ -1333,7 +1348,7 @@ const DiscreteLayerView: React.FC = observer(() => {
                   imgText: intl.formatMessage({ id: 'map-legends.actions.img' }),
                 },
               }}
-              showDebuggerTool={CONFIG.MAP.SHOW_DEBUGGER_TOOL}
+              showDebuggerTool={CONFIG.MAP.SHOW_DEBUGGER_TOOL === true && isAdminUser}
               showActiveLayersTool={CONFIG.MAP.SHOW_ACTIVE_LAYERS_TOOL}
               {...(CONFIG.MAP.SHOW_GEOCODER_TOOL ? { geocoderPanel: GEOCODER_OPTIONS } : {})}
             >
