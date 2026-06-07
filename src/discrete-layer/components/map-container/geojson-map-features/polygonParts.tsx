@@ -688,7 +688,6 @@ export const PolygonParts: React.FC = observer(() => {
       }
     });
 
-    // const labelsCollectionName = `labels_${dataSource.name}`;
     labelsCollectionNameRef.current = `labels_${dataSource.name}`;
 
     const deselectLabelEntities = (entity: CesiumCesiumEntity) => {
