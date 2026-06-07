@@ -8,12 +8,9 @@ import { Properties, Geometry } from '@turf/helpers';
 import area from '@turf/area';
 import intersect from '@turf/intersect';
 // import centerOfMass from '@turf/center-of-mass';
-import polylabel from "polylabel";
+import polylabel from 'polylabel';
 import bboxPolygon from '@turf/bbox-polygon';
-import {
-  ScreenSpaceEventHandler,
-  ScreenSpaceEventType,
-} from 'cesium';
+import { ScreenSpaceEventHandler, ScreenSpaceEventType } from 'cesium';
 import {
   CesiumWFSLayer,
   CesiumMath,
@@ -45,7 +42,12 @@ import {
 import CONFIG from '../../../../common/config';
 import { useEnums } from '../../../../common/hooks/useEnum.hook';
 import { shrinkExtremeCoordinatesInOuterRing } from '../../../../common/utils/geo.tools';
-import { EntityDescriptorModelType, getFeatureModelPrimitives, LayerRasterRecordModelType, useStore } from '../../../models';
+import {
+  EntityDescriptorModelType,
+  getFeatureModelPrimitives,
+  LayerRasterRecordModelType,
+  useStore,
+} from '../../../models';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
 import { getFlatEntityDescriptors } from '../../layer-details/utils';
 import { ILayerImage } from '../../../models/layerImage';
@@ -120,7 +122,11 @@ export const PolygonParts: React.FC = observer(() => {
         const is2D = cesiumViewer.scene.mode === CesiumSceneMode.SCENE2D;
         if (is2D) {
           const pickedObject = cesiumViewer.scene.pick(movement.endPosition);
-          if (pickedObject && pickedObject.id && (pickedObject.id.polygon || pickedObject.id.polyline)) {
+          if (
+            pickedObject &&
+            pickedObject.id &&
+            (pickedObject.id.polygon || pickedObject.id.polyline)
+          ) {
             if (get(hoveredEntity, 'id') !== get(pickedObject.id, 'id')) {
               hoveredEntity = pickedObject.id;
               handleHoverEntity(hoveredEntity);
@@ -136,7 +142,6 @@ export const PolygonParts: React.FC = observer(() => {
           // 3D or Columbus mode NOT IMPLEMENTED
         }
       }, ScreenSpaceEventType.MOUSE_MOVE);
-
     };
     const handler = new ScreenSpaceEventHandler(cesiumViewer.scene.canvas);
     handleMouseHover(handler);
@@ -333,12 +338,13 @@ export const PolygonParts: React.FC = observer(() => {
           typeNameProp: 'typeName',
         },
         variables: {
-          data: { // as template object, values will be injected in <CesiumWFSLayer>
+          data: {
+            // as template object, values will be injected in <CesiumWFSLayer>
             count: -1,
             feature: null,
             startIndex: -1,
             typeName: 'DUMMY',
-          }
+          },
         },
       },
     } as AlternativePayload,
@@ -390,14 +396,16 @@ export const PolygonParts: React.FC = observer(() => {
   ): void => {
     const is2D = mapViewer.scene.mode === CesiumSceneMode.SCENE2D;
 
-    const cartesianArrayToRing = (positions: CesiumCartesian3[]): [number, number, number | undefined][] => {
+    const cartesianArrayToRing = (
+      positions: CesiumCartesian3[]
+    ): [number, number, number | undefined][] => {
       const height = is2D ? DEFAULT_HEIGHT : undefined;
       const ring: [number, number, number | undefined][] = positions.map((cartesian) => {
         const cartographic = CesiumCartographic.fromCartesian(cartesian);
         return [
           CesiumMath.toDegrees(cartographic.longitude),
           CesiumMath.toDegrees(cartographic.latitude),
-          height
+          height,
         ];
       });
 
@@ -410,14 +418,16 @@ export const PolygonParts: React.FC = observer(() => {
         }
       }
       return ring;
-    }
+    };
 
     const getGeoJsonFromEntity = (entity: CesiumCesiumEntity): Polygon | undefined => {
       if (!entity.polygon || !entity.polygon.hierarchy) {
         return undefined;
       }
 
-      const hierarchy: CesiumPolygonHierarchy = entity.polygon.hierarchy.getValue(CesiumJulianDate.now());
+      const hierarchy: CesiumPolygonHierarchy = entity.polygon.hierarchy.getValue(
+        CesiumJulianDate.now()
+      );
       if (!hierarchy) return undefined;
 
       const geoJsonCoordinates: [number, number, number | undefined][][] = [];
@@ -439,10 +449,10 @@ export const PolygonParts: React.FC = observer(() => {
       if (geoJsonCoordinates.length === 0) return undefined;
 
       return {
-          type: 'Polygon',
-          coordinates: geoJsonCoordinates as Position[][],
+        type: 'Polygon',
+        coordinates: geoJsonCoordinates as Position[][],
       };
-    }
+    };
 
     const pixelSizeInMeters = (
       scene: CesiumScene,
@@ -561,15 +571,15 @@ export const PolygonParts: React.FC = observer(() => {
             // );
             const labelCoordinates = polylabel(featureClippedPolygon.geometry.coordinates, 0.00001);
             const featureClippedPolygonCenter = {
-              "type": "Feature",
-              "properties": {
+              type: 'Feature',
+              properties: {
                 label: labelValue,
                 featureId: entity.id,
               },
-              "geometry": {
-                "type": "Point",
-                "coordinates": labelCoordinates
-              }
+              geometry: {
+                type: 'Point',
+                coordinates: labelCoordinates,
+              },
             };
             const labelPixelSize = { width: labelValue.width, height: labelValue.height };
             const [longitude, latitude, height = 0] =
@@ -648,7 +658,9 @@ export const PolygonParts: React.FC = observer(() => {
         const correctedCarto = new CesiumCartographic(
           worlPosCartographic.longitude,
           worlPosCartographic.latitude,
-          is2D ? DEFAULT_HEIGHT : mapViewer.scene.sampleHeight(CesiumCartographic.fromCartesian(worldPos))
+          is2D
+            ? DEFAULT_HEIGHT
+            : mapViewer.scene.sampleHeight(CesiumCartographic.fromCartesian(worldPos))
         );
 
         // Convert back to Cartesian3
@@ -689,7 +701,9 @@ export const PolygonParts: React.FC = observer(() => {
       }
     };
 
-    mapViewer.dataSources.remove(mapViewer.dataSources.getByName(labelsCollectionNameRef.current)[0]);
+    mapViewer.dataSources.remove(
+      mapViewer.dataSources.getByName(labelsCollectionNameRef.current)[0]
+    );
     mapViewer.selectedEntityChanged.removeEventListener(deselectLabelEntities);
     if (is2D) {
       const labelsGeoJsonDataSource = new CesiumGeoJsonDataSource(labelsCollectionNameRef.current);
@@ -710,7 +724,9 @@ export const PolygonParts: React.FC = observer(() => {
             const correctedCarto = new CesiumCartographic(
               worlPosCartographic.longitude,
               worlPosCartographic.latitude,
-              is2D ? DEFAULT_HEIGHT : mapViewer.scene.sampleHeight(CesiumCartographic.fromCartesian(worldPos))
+              is2D
+                ? DEFAULT_HEIGHT
+                : mapViewer.scene.sampleHeight(CesiumCartographic.fromCartesian(worldPos))
             );
 
             const correctedCartesian = CesiumCartesian3.fromRadians(
