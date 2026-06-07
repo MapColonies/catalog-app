@@ -741,11 +741,18 @@
 
   "map.zoom.label": "זום",
 
-  "debug-panel.title": "דיבאגר",
+  "debug-panel.title": "Debug",
+  "debug-panel.section.data": "מידע",
+  "debug-panel.section.layers": "שכבות",
+  "debug-panel.section.tools": "כלים",
+  "debug-panel.tile-requests-optimization": "אופטימיזצית בקשות אריחים",
+  "debug-panel.cesium-inspector": "כלי בדיקה של סזיום",
+  "debug-panel.with-transparency.tooltip": "שכבה זו מכילה אריחים עם שקיפות",
+  "debug-panel.without-transparency.tooltip": "שכבה זו מכילה אריחים ללא שקיפות",
   "debug-panel.wfs.title": "שכבות מידע",
   "debug-panel.wfs.cache": "בזכרון",
   "debug-panel.wfs.extent": "בתצוגה",
-  "debug-panel.empty": "לא נמצאו שכבות",
+  "debug-panel.empty": "לא נמצאו שכבות מידע בתצוגה",
 
   "active-layers.title": "שכבות פעילות",
   "active-layers.imagery": "ראסטר",

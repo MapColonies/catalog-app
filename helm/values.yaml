@@ -138,7 +138,6 @@ env:
     center: '[34.811, 31.908]'
     zoom: 7
     mapMode2D: INFINITE_SCROLL
-    useOptimizedTileRequests: false
     showDebuggerTool: false
     showActiveLayersTool: true
     showGeocoderTool: true

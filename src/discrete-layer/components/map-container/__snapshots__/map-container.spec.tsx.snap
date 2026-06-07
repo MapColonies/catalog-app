@@ -50,7 +50,7 @@ exports[`MapContainer component renders correctly 1`] = `
       </div>
     </div>
   </div>
-  <fo
+  <To
     center={
       Array [
         34.811,
@@ -68,7 +68,7 @@ exports[`MapContainer component renders correctly 1`] = `
     <Memo(observerComponent) />
     <Memo(observerComponent) />
     <Memo(observerComponent) />
-    <Do
+    <Bo
       drawState={
         Object {
           "drawing": false,
@@ -95,6 +95,6 @@ exports[`MapContainer component renders correctly 1`] = `
         ]
       }
     />
-  </fo>
+  </To>
 </div>
 `;
