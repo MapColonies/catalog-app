@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [6.1.0](https://github.com/MapColonies/catalog-app/compare/v6.0.17...v6.1.0) (2026-06-08)
+
+
+### Features
+
+* tiles optimization plus cesium inspector checkboxes ([#971](https://github.com/MapColonies/catalog-app/issues/971)) ([81e6ed9](https://github.com/MapColonies/catalog-app/commit/81e6ed94c1065b014f6652b477d41d1a214f7fb3))
+
+
+### Bug Fixes
+
+* job errors indication ( MAPCO-10757 ) ([#982](https://github.com/MapColonies/catalog-app/issues/982)) ([3fadbec](https://github.com/MapColonies/catalog-app/commit/3fadbec8be31e964b2663bd40310b71e05e60431))
+* polygon parts labeling placement ( MAPCO-10751 ) ([#980](https://github.com/MapColonies/catalog-app/issues/980)) ([95a607a](https://github.com/MapColonies/catalog-app/commit/95a607af14c6d27bc94c2a20c2be539ea51a9306))
+* unify approved res errors behavior ([#983](https://github.com/MapColonies/catalog-app/issues/983)) ([4a386f6](https://github.com/MapColonies/catalog-app/commit/4a386f6c93485450f583b3237edeb6f5f70bbb96))
+
 ## [6.0.17](https://github.com/MapColonies/catalog-app/compare/v6.0.16...v6.0.17) (2026-05-28)
 
 
