@@ -115,9 +115,7 @@ const JobInfoComponent: React.FC<JobInfoProps> = ({ job }) => {
                     key: 'resolution',
                     action: openResolutionConflictDialog,
                     isEnabled: taskStatus === Status.Completed,
-                    isApproved:
-                      isApproved ||
-                      !isEmpty(latestJobRef.current?.details?.parameters.allowedValidationErrors),
+                    isApproved: isApproved || !isEmpty(details?.parameters.allowedValidationErrors),
                   }
                 )}
               </Box>

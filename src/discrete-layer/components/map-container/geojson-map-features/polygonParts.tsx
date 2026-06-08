@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Feature, Polygon, BBox, Point, Position } from 'geojson';
+import { Feature, Polygon, BBox, Point, Position, MultiPolygon } from 'geojson';
 import { debounce, get, isEmpty } from 'lodash';
 import { observer } from 'mobx-react-lite';
 import { Properties, Geometry } from '@turf/helpers';
 import area from '@turf/area';
 import intersect from '@turf/intersect';
+import flatten from '@turf/flatten';
 // import centerOfMass from '@turf/center-of-mass';
 import polylabel from 'polylabel';
 import bboxPolygon from '@turf/bbox-polygon';
@@ -554,11 +555,11 @@ export const PolygonParts: React.FC = observer(() => {
       if (extent && is2D) {
         try {
           const extentPolygon = bboxPolygon(extent);
-          const featureClippedPolygon = intersect(
+          const featureClipped = intersect(
             getGeoJsonFromEntity(entity) as Polygon,
             extentPolygon
-          ) as Feature<Polygon, Properties>;
-          if (featureClippedPolygon) {
+          ) as Feature<Polygon | MultiPolygon, Properties>;
+          if (featureClipped) {
             const labelValue = entity.properties?.label.getValue(CesiumJulianDate.now());
             // const featureClippedPolygonCenter = centerOfMass(
             //   featureClippedPolygon as unknown as Polygon,
@@ -569,49 +570,59 @@ export const PolygonParts: React.FC = observer(() => {
             //     },
             //   }
             // );
-            const labelCoordinates = polylabel(featureClippedPolygon.geometry.coordinates, 0.00001);
-            const featureClippedPolygonCenter = {
-              type: 'Feature',
-              properties: {
-                label: labelValue,
-                featureId: entity.id,
-              },
-              geometry: {
-                type: 'Point',
-                coordinates: labelCoordinates,
-              },
-            };
-            const labelPixelSize = { width: labelValue.width, height: labelValue.height };
-            const [longitude, latitude, height = 0] =
-              featureClippedPolygonCenter.geometry.coordinates;
-            const cartesian = CesiumCartesian3.fromDegrees(longitude, latitude, height);
-            const sizeMeters = pixelSizeInMeters(
-              mapViewer.scene,
-              cartesian,
-              labelPixelSize.width,
-              labelPixelSize.height
-            );
 
-            if (sizeMeters) {
-              const labelRect = createRectangleAround(
-                { longitude, latitude },
-                sizeMeters.widthMeters,
-                sizeMeters.heightMeters
+            const polygons =
+              featureClipped.geometry.type === 'MultiPolygon'
+                ? flatten(featureClipped).features
+                : [featureClipped];
+            polygons.forEach((featureClippedPolygon) => {
+              const labelCoordinates = polylabel(
+                featureClippedPolygon.geometry.coordinates as Position[][],
+                0.00001
               );
-
-              const labelIntersection = intersect(featureClippedPolygon, {
+              const featureClippedPolygonCenter = {
                 type: 'Feature',
-                properties: {},
-                geometry: labelRect,
-              });
-              const intersectionRatio = calcIntersectionRation(
-                labelIntersection?.geometry as Geometry,
-                labelRect
+                properties: {
+                  label: labelValue,
+                  featureId: entity.id,
+                },
+                geometry: {
+                  type: 'Point',
+                  coordinates: labelCoordinates,
+                },
+              };
+              const labelPixelSize = { width: labelValue.width, height: labelValue.height };
+              const [longitude, latitude, height = 0] =
+                featureClippedPolygonCenter.geometry.coordinates;
+              const cartesian = CesiumCartesian3.fromDegrees(longitude, latitude, height);
+              const sizeMeters = pixelSizeInMeters(
+                mapViewer.scene,
+                cartesian,
+                labelPixelSize.width,
+                labelPixelSize.height
               );
-              if (intersectionRatio > LABEL_INTERSECTION_RATIO) {
-                labelPos.push(featureClippedPolygonCenter as Feature<Point>);
+
+              if (sizeMeters) {
+                const labelRect = createRectangleAround(
+                  { longitude, latitude },
+                  sizeMeters.widthMeters,
+                  sizeMeters.heightMeters
+                );
+
+                const labelIntersection = intersect(featureClippedPolygon, {
+                  type: 'Feature',
+                  properties: {},
+                  geometry: labelRect,
+                });
+                const intersectionRatio = calcIntersectionRation(
+                  labelIntersection?.geometry as Geometry,
+                  labelRect
+                );
+                if (intersectionRatio > LABEL_INTERSECTION_RATIO) {
+                  labelPos.push(featureClippedPolygonCenter as Feature<Point>);
+                }
               }
-            }
+            });
           }
         } catch (e) {
           console.log(
