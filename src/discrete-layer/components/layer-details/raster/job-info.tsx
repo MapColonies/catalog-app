@@ -1,4 +1,4 @@
-import { get } from 'lodash';
+import { get, isEmpty } from 'lodash';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Box } from '@map-colonies/react-components';
@@ -115,7 +115,9 @@ const JobInfoComponent: React.FC<JobInfoProps> = ({ job }) => {
                     key: 'resolution',
                     action: openResolutionConflictDialog,
                     isEnabled: taskStatus === Status.Completed,
-                    isApproved: isApproved || jobStatus === Status.Completed,
+                    isApproved:
+                      isApproved ||
+                      !isEmpty(latestJobRef.current?.details?.parameters.allowedValidationErrors),
                   }
                 )}
               </Box>
