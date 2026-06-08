@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [6.1.1](https://github.com/MapColonies/catalog-app/compare/v6.1.0...v6.1.1) (2026-06-08)
+
+
+### Bug Fixes
+
+* pp as multipolygon in a result of extent intersection ( MAPCO-10751 ) ([#984](https://github.com/MapColonies/catalog-app/issues/984)) ([56ca549](https://github.com/MapColonies/catalog-app/commit/56ca549ddbbcf2728d2ce853040129311586369d))
+
 ## [6.1.0](https://github.com/MapColonies/catalog-app/compare/v6.0.17...v6.1.0) (2026-06-08)
 
 
