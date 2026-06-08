@@ -4912,6 +4912,16 @@
     "@turf/helpers" "^6.5.0"
     "@turf/meta" "^6.5.0"
 
+"@turf/flatten@^7.3.5":
+  version "7.3.5"
+  resolved "https://registry.yarnpkg.com/@turf/flatten/-/flatten-7.3.5.tgz#9dee1d42a566904ab50bbac3b453d3336d7520fd"
+  integrity sha512-4dDAyoY8wf4UCIJ2lH3JbypmEeqyuRFExHEPu6eJeaOybdpOV9kn3LqB0lsWArizFjJWQNS+0qpv08jD85jSPg==
+  dependencies:
+    "@turf/helpers" "7.3.5"
+    "@turf/meta" "7.3.5"
+    "@types/geojson" "^7946.0.10"
+    tslib "^2.8.1"
+
 "@turf/flip@^6.5.0":
   version "6.5.0"
   resolved "https://registry.yarnpkg.com/@turf/flip/-/flip-6.5.0.tgz#04b38eae8a78f2cf9240140b25401b16b37d20e2"

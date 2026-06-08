@@ -117,7 +117,7 @@ const JobInfoComponent: React.FC<JobInfoProps> = ({ job }) => {
                     isEnabled: taskStatus === Status.Completed,
                     isApproved:
                       isApproved ||
-                      !isEmpty(latestJobRef.current?.details?.parameters.allowedValidationErrors),
+                      !isEmpty(details?.parameters.allowedValidationErrors),
                   }
                 )}
               </Box>
