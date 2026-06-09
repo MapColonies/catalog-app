@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import React, { useEffect } from 'react';
 import { observer } from 'mobx-react';
+import CONFIG from '../../../../common/config';
+import { RecordType } from '../../../models/RecordTypeEnum';
 import { useQuery, useStore } from '../../../models/RootStore';
 
 export interface IFeatureConfig {
@@ -20,6 +22,12 @@ export interface IFeatureConfigs {
 
 export const WfsFeaturesFetcher: React.FC = observer(() => {
   const store = useStore();
+  const isRecordVectorServed = CONFIG.SERVED_ENTITY_TYPES.includes(RecordType.RECORD_VECTOR);
+
+  if (!isRecordVectorServed) {
+    return null;
+  }
+
   const wfsGetFeatureTypesQuery = useQuery((store) => store.queryGetFeatureTypes());
 
   useEffect(() => {
