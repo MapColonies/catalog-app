@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [6.1.3](https://github.com/MapColonies/catalog-app/compare/v6.1.2...v6.1.3) (2026-06-09)
+
+
+### Bug Fixes
+
+* when vector catalog is not served do not call getFeatureTypes and hide it in catalog tree ([#988](https://github.com/MapColonies/catalog-app/issues/988)) ([a8a539b](https://github.com/MapColonies/catalog-app/commit/a8a539b40d292b1468cd91608ef5dda8deeb0ee0))
+
 ## [6.1.2](https://github.com/MapColonies/catalog-app/compare/v6.1.1...v6.1.2) (2026-06-08)
 
 
