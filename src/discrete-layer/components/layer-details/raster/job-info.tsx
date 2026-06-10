@@ -11,7 +11,6 @@ import {
 } from '../../../../common/models/job-errors-summary.raster';
 import { Status } from '../../../models';
 import { JobErrorsSummaryRasterJobData } from '../../job-manager/cell-renderer/job-details/job-errors-summary.raster-job-data';
-import { FINAL_STATUSES } from '../../job-manager/job.types';
 import { Progress } from './progress';
 import { ResolutionConflictDialog } from './resolution-conflict.dialog';
 import { isJobValid, isStatusFailed, isTaskValid } from './state-machine/helpers';
@@ -34,6 +33,15 @@ const JobInfoComponent: React.FC<JobInfoProps> = ({ job }) => {
   }
 
   const displayJob = latestJobRef.current;
+  if (!displayJob) {
+    return null;
+  }
+
+  const { taskId, taskStatus, taskReason, taskPercentage, details, validationReport } = displayJob;
+  const errorsCount = validationReport?.errorsSummary?.errorsCount;
+  const thresholds = validationReport?.errorsSummary?.thresholds;
+  const jobStatus = details?.status as Status | undefined;
+  const isAlreadyApproved = !isEmpty(details?.parameters.allowedValidationErrors);
 
   const openResolutionConflictDialog = useCallback(() => {
     setIsResolutionConflictDialogOpen(true);
@@ -43,12 +51,9 @@ const JobInfoComponent: React.FC<JobInfoProps> = ({ job }) => {
     setIsApproved(true);
   }, []);
 
-  const errorsCount = displayJob?.validationReport?.errorsSummary?.errorsCount;
-  const thresholds = displayJob?.validationReport?.errorsSummary?.thresholds;
-  const jobStatus = displayJob?.details?.status as Status | undefined;
-
   const isViewOnly = useMemo(() => {
-    const isStatusReadOnly = jobStatus != null && FINAL_STATUSES.includes(jobStatus);
+    const isStatusReadOnly =
+      jobStatus != null && (jobStatus !== Status.Suspended || isAlreadyApproved);
     if (!errorsCount) {
       return isStatusReadOnly;
     }
@@ -63,12 +68,6 @@ const JobInfoComponent: React.FC<JobInfoProps> = ({ job }) => {
     });
     return isStatusReadOnly || hasOtherErrors;
   }, [errorsCount, thresholds, jobStatus]);
-
-  if (!displayJob) {
-    return null;
-  }
-
-  const { taskId, taskStatus, taskReason, taskPercentage, details, validationReport } = displayJob;
 
   const errorsSummary = validationReport?.errorsSummary;
   const jobReason = details?.reason as string | undefined;
@@ -115,7 +114,7 @@ const JobInfoComponent: React.FC<JobInfoProps> = ({ job }) => {
                     key: 'resolution',
                     action: openResolutionConflictDialog,
                     isEnabled: taskStatus === Status.Completed,
-                    isApproved: isApproved || !isEmpty(details?.parameters.allowedValidationErrors),
+                    isApproved: isApproved || isAlreadyApproved,
                   }
                 )}
               </Box>
