@@ -33,15 +33,6 @@ const JobInfoComponent: React.FC<JobInfoProps> = ({ job }) => {
   }
 
   const displayJob = latestJobRef.current;
-  if (!displayJob) {
-    return null;
-  }
-
-  const { taskId, taskStatus, taskReason, taskPercentage, details, validationReport } = displayJob;
-  const errorsCount = validationReport?.errorsSummary?.errorsCount;
-  const thresholds = validationReport?.errorsSummary?.thresholds;
-  const jobStatus = details?.status as Status | undefined;
-  const isAlreadyApproved = !isEmpty(details?.parameters.allowedValidationErrors);
 
   const openResolutionConflictDialog = useCallback(() => {
     setIsResolutionConflictDialogOpen(true);
@@ -50,6 +41,11 @@ const JobInfoComponent: React.FC<JobInfoProps> = ({ job }) => {
   const approveResolutionConflictDialog = useCallback(() => {
     setIsApproved(true);
   }, []);
+
+  const errorsCount = displayJob?.validationReport?.errorsSummary?.errorsCount;
+  const thresholds = displayJob?.validationReport?.errorsSummary?.thresholds;
+  const jobStatus = displayJob?.details?.status as Status | undefined;
+  const isAlreadyApproved = !isEmpty(displayJob?.details?.parameters.allowedValidationErrors);
 
   const isViewOnly = useMemo(() => {
     const isStatusReadOnly =
@@ -67,7 +63,13 @@ const JobInfoComponent: React.FC<JobInfoProps> = ({ job }) => {
       return false;
     });
     return isStatusReadOnly || hasOtherErrors;
-  }, [errorsCount, thresholds, jobStatus]);
+  }, [errorsCount, thresholds, jobStatus, isAlreadyApproved]);
+
+  if (!displayJob) {
+    return null;
+  }
+
+  const { taskId, taskStatus, taskReason, taskPercentage, details, validationReport } = displayJob;
 
   const errorsSummary = validationReport?.errorsSummary;
   const jobReason = details?.reason as string | undefined;
