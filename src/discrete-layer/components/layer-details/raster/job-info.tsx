@@ -48,8 +48,7 @@ const JobInfoComponent: React.FC<JobInfoProps> = ({ job }) => {
   const isAlreadyApproved = !isEmpty(displayJob?.details?.parameters.allowedValidationErrors);
 
   const isViewOnly = useMemo(() => {
-    const isStatusReadOnly =
-      jobStatus != null && (jobStatus !== Status.Suspended || isAlreadyApproved);
+    const isStatusReadOnly = jobStatus != null && jobStatus !== Status.Suspended;
     if (!errorsCount) {
       return isStatusReadOnly;
     }
@@ -62,7 +61,7 @@ const JobInfoComponent: React.FC<JobInfoProps> = ({ job }) => {
       }
       return false;
     });
-    return isStatusReadOnly || hasOtherErrors;
+    return isStatusReadOnly || hasOtherErrors || isAlreadyApproved;
   }, [errorsCount, thresholds, jobStatus, isAlreadyApproved]);
 
   if (!displayJob) {
