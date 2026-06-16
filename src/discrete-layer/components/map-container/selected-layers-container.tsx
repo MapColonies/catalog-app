@@ -37,6 +37,13 @@ export const SelectedLayersContainer: React.FC = observer(() => {
   const cacheRef = useRef({} as CacheMap);
   const mapViewer = useCesiumMap();
 
+  const getUrlWithoutQueryParams = (url?: string): string | undefined => {
+    if (!url) {
+      return undefined;
+    }
+    return url.split('?')[0];
+  };
+
   useEffect(() => {
     if (store.discreteLayersStore.layersImages) {
       setlayersImages(
@@ -69,11 +76,14 @@ export const SelectedLayersContainer: React.FC = observer(() => {
                 const correctLinkByProtocol = (layer.links as LinkModelType[]).find(
                   (link) => link.protocol === layerLink.protocol
                 );
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                return (
-                  correctLinkByProtocol?.url ===
-                  (cesiumLayer as any)._imageryProvider._resource._url
+                const linkUrl = getUrlWithoutQueryParams(correctLinkByProtocol?.url);
+                const cesiumLayerLinkUrl = getUrlWithoutQueryParams(
+                  get(cesiumLayer, '_imageryProvider._resource._url') as string | undefined
                 );
+                if (!linkUrl || !cesiumLayerLinkUrl) {
+                  return false;
+                }
+                return linkUrl === cesiumLayerLinkUrl;
               }) as SearchLayerPredicate,
               layerRecord: {
                 ...layer,
@@ -120,14 +130,17 @@ export const SelectedLayersContainer: React.FC = observer(() => {
             meta={{
               id: layer.id,
               searchLayerPredicate: ((cesiumLayer, idx) => {
-                const linkUrl = (optionsWMTS.url as Record<string, any>)._url as string;
-                const cesiumLayerLinkUrl = get(
-                  cesiumLayer,
-                  '_imageryProvider._resource._url'
-                ) as string;
+                const linkUrl = getUrlWithoutQueryParams(
+                  get(optionsWMTS, 'url._url') as string | undefined
+                );
+                const cesiumLayerLinkUrl = getUrlWithoutQueryParams(
+                  get(cesiumLayer, '_imageryProvider._resource._url') as string | undefined
+                );
                 const isBaseLayer = get(cesiumLayer, 'meta.parentBasetMapId') as string;
-                const isLayerFound =
-                  linkUrl.split('?')[0] === cesiumLayerLinkUrl.split('?')[0] && !isBaseLayer;
+                if (!linkUrl || !cesiumLayerLinkUrl) {
+                  return false;
+                }
+                const isLayerFound = linkUrl === cesiumLayerLinkUrl && !isBaseLayer;
                 return isLayerFound;
               }) as SearchLayerPredicate,
               layerRecord: {
