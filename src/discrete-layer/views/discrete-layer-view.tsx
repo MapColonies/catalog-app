@@ -312,6 +312,7 @@ const DiscreteLayerView: React.FC = observer(() => {
       IMAGERY: intl.formatMessage({ id: 'active-layers.imagery' }),
       SERVICE: intl.formatMessage({ id: 'active-layers.service' }),
       DATA: intl.formatMessage({ id: 'active-layers.data' }),
+      '3D': intl.formatMessage({ id: 'active-layers.3d' }),
       FLY_TO: intl.formatMessage({ id: 'action.flyTo.tooltip' }),
       REMOVE: intl.formatMessage({ id: 'active-layers.remove' }),
       BASE_MAP_TITLE: intl.formatMessage({ id: 'map-settings.base-map.title' }),

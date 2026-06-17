@@ -758,6 +758,7 @@
   "active-layers.imagery": "Imagery",
   "active-layers.service": "Service",
   "active-layers.data": "Data",
+  "active-layers.3d": "3D",
   "active-layers.remove": "Remove",
 
   "geocoder-panel.show-feature-on-map": "Show on map",
