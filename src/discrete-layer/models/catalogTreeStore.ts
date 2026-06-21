@@ -280,11 +280,12 @@ export const catalogTreeStore = ModelBase.props({
       );
 
       const isUserAdmin = store.userStore.isUserAdmin();
+      const isRecordVectorServed = CONFIG.SERVED_ENTITY_TYPES.includes(RecordType.RECORD_VECTOR);
 
       setCatalogTreeData([
         parentCatalog,
         parentBests,
-        vectorCatalog,
+        ...(isRecordVectorServed ? [vectorCatalog] : []),
         ...(isUserAdmin ? [parentUnpublished] : [])
       ]);
 

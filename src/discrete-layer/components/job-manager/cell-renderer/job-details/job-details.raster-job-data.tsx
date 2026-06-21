@@ -11,7 +11,6 @@ import {
   useTheme,
 } from '@map-colonies/react-core';
 import { AutoDirectionBox } from '../../../../../common/components/auto-direction-box/auto-direction-box.component';
-import { DETAILS_ROW_ID_SUFFIX } from '../../../../../common/components/grid';
 import { Hyperlink } from '../../../../../common/components/hyperlink/hyperlink';
 import { useEnums } from '../../../../../common/hooks/useEnum.hook';
 import { Domain } from '../../../../../common/models/domain';
@@ -75,7 +74,7 @@ export const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = (
     try {
       const result = await store.queryFindTasks({
         params: {
-          jobId: jobData.id.replace(DETAILS_ROW_ID_SUFFIX, ''),
+          jobId: jobData.id,
           type: 'validation',
         },
       });
@@ -112,6 +111,10 @@ export const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = (
 
   const hasGpkgPath = () => {
     return !!getGpkgFilesPath();
+  };
+
+  const getJobIssueIndication = (): string => {
+    return jobData.parameters?.allowedValidationErrors ? 'warning' : 'error';
   };
 
   const errorsMessage = intl.formatMessage({ id: 'general.errors.text' });
@@ -155,7 +158,7 @@ export const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = (
           {!isTaskFailed && hasErrors && (
             <Box className="errorsSummaryContainer">
               <IconButton
-                className="mc-icon-Status-Warnings error statusIcon"
+                className={`mc-icon-Status-Warnings ${getJobIssueIndication()} statusIcon`}
                 onClick={(e): void => {
                   e.preventDefault();
                   e.stopPropagation();
@@ -173,7 +176,7 @@ export const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = (
                 }
               >
                 <Hyperlink
-                  className="error"
+                  className={getJobIssueIndication()}
                   url={task?.parameters?.report?.url ?? ''}
                   label={`${
                     errorsCount > MAX_ERRORS_SHOWN ? `+${MAX_ERRORS_SHOWN}` : errorsCount
@@ -181,13 +184,15 @@ export const JobDetailsRasterJobData: React.FC<JobDetailsRasterJobDataProps> = (
                 ></Hyperlink>
               </Tooltip>
               <Hyperlink
-                className="error"
+                className={getJobIssueIndication()}
                 url={task?.parameters?.report?.url ?? ''}
                 label={`${
                   errorsCount > MAX_ERRORS_SHOWN ? `+${MAX_ERRORS_SHOWN}` : errorsCount
                 } ${errorsMessage}`}
               >
-                <IconButton className="mc-icon-Download downloadIcon error statusIcon" />
+                <IconButton
+                  className={`mc-icon-Download downloadIcon ${getJobIssueIndication()} statusIcon`}
+                />
               </Hyperlink>
             </Box>
           )}

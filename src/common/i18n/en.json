@@ -741,11 +741,18 @@
 
   "map.zoom.label": "zoom",
 
-  "debug-panel.title": "Debugger Tool",
+  "debug-panel.title": "Debug",
+  "debug-panel.section.data": "Data",
+  "debug-panel.section.layers": "Layers",
+  "debug-panel.section.tools": "Tools",
+  "debug-panel.tile-requests-optimization": "Tile Requests Optimization",
+  "debug-panel.cesium-inspector": "Cesium Inspector",
+  "debug-panel.with-transparency.tooltip": "This layer has tiles with transparency",
+  "debug-panel.without-transparency.tooltip": "This layer has tiles WITHOUT transparency",
   "debug-panel.wfs.title": "Data Layers",
   "debug-panel.wfs.cache": "Cache",
   "debug-panel.wfs.extent": "Extent",
-  "debug-panel.empty": "No layers found",
+  "debug-panel.empty": "No DATA layers found",
 
   "active-layers.title": "Active Layers",
   "active-layers.imagery": "Imagery",

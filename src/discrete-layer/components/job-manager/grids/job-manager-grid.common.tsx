@@ -354,7 +354,8 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
       return (params.data as JobModelType).id;
     },
     detailsRowCellRenderer: 'detailsRenderer',
-    detailsRowHeight: 230,
+    detailsRowHeight: 234,
+    rowHeight: 42,
     detailsRowExpanderPosition: 'start',
     overlayNoRowsTemplate: intl.formatMessage({
       id: 'results.nodata',

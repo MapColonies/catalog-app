@@ -2,6 +2,62 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [6.1.4](https://github.com/MapColonies/catalog-app/compare/v6.1.3...v6.1.4) (2026-06-10)
+
+
+### Bug Fixes
+
+* approve enabled for inprogress job ( MAPCO-10794 ) ([#990](https://github.com/MapColonies/catalog-app/issues/990)) ([585e04a](https://github.com/MapColonies/catalog-app/commit/585e04a798a750d148863fa8f35ec2fcf1a8cc0c))
+
+## [6.1.3](https://github.com/MapColonies/catalog-app/compare/v6.1.2...v6.1.3) (2026-06-09)
+
+
+### Bug Fixes
+
+* when vector catalog is not served do not call getFeatureTypes and hide it in catalog tree ([#988](https://github.com/MapColonies/catalog-app/issues/988)) ([a8a539b](https://github.com/MapColonies/catalog-app/commit/a8a539b40d292b1468cd91608ef5dda8deeb0ee0))
+
+## [6.1.2](https://github.com/MapColonies/catalog-app/compare/v6.1.1...v6.1.2) (2026-06-08)
+
+
+### Bug Fixes
+
+* show debugger tool default value ([#986](https://github.com/MapColonies/catalog-app/issues/986)) ([03a3a9a](https://github.com/MapColonies/catalog-app/commit/03a3a9a32f171fa75eee1af0be2daf4df124965e))
+
+## [6.1.1](https://github.com/MapColonies/catalog-app/compare/v6.1.0...v6.1.1) (2026-06-08)
+
+
+### Bug Fixes
+
+* pp as multipolygon in a result of extent intersection ( MAPCO-10751 ) ([#984](https://github.com/MapColonies/catalog-app/issues/984)) ([56ca549](https://github.com/MapColonies/catalog-app/commit/56ca549ddbbcf2728d2ce853040129311586369d))
+
+## [6.1.0](https://github.com/MapColonies/catalog-app/compare/v6.0.17...v6.1.0) (2026-06-08)
+
+
+### Features
+
+* tiles optimization plus cesium inspector checkboxes ([#971](https://github.com/MapColonies/catalog-app/issues/971)) ([81e6ed9](https://github.com/MapColonies/catalog-app/commit/81e6ed94c1065b014f6652b477d41d1a214f7fb3))
+
+
+### Bug Fixes
+
+* job errors indication ( MAPCO-10757 ) ([#982](https://github.com/MapColonies/catalog-app/issues/982)) ([3fadbec](https://github.com/MapColonies/catalog-app/commit/3fadbec8be31e964b2663bd40310b71e05e60431))
+* polygon parts labeling placement ( MAPCO-10751 ) ([#980](https://github.com/MapColonies/catalog-app/issues/980)) ([95a607a](https://github.com/MapColonies/catalog-app/commit/95a607af14c6d27bc94c2a20c2be539ea51a9306))
+* unify approved res errors behavior ([#983](https://github.com/MapColonies/catalog-app/issues/983)) ([4a386f6](https://github.com/MapColonies/catalog-app/commit/4a386f6c93485450f583b3237edeb6f5f70bbb96))
+
+## [6.0.17](https://github.com/MapColonies/catalog-app/compare/v6.0.16...v6.0.17) (2026-05-28)
+
+
+### Bug Fixes
+
+* job manager details of the last row presented in next page (MAPCO-10671) ([#975](https://github.com/MapColonies/catalog-app/issues/975)) ([59d498c](https://github.com/MapColonies/catalog-app/commit/59d498c2746cd700fd0bf492c51a19c35e6c1334))
+
+## [6.0.16](https://github.com/MapColonies/catalog-app/compare/v6.0.15...v6.0.16) (2026-05-28)
+
+
+### Bug Fixes
+
+* add view dialog to vector ([#976](https://github.com/MapColonies/catalog-app/issues/976)) ([5703c91](https://github.com/MapColonies/catalog-app/commit/5703c914d155a3939a4b424e2195a372ebec2ad2))
+
 ## [6.0.15](https://github.com/MapColonies/catalog-app/compare/v6.0.14...v6.0.15) (2026-05-20)
 
 

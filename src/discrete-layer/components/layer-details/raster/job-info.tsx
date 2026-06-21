@@ -1,4 +1,4 @@
-import { get } from 'lodash';
+import { get, isEmpty } from 'lodash';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Box } from '@map-colonies/react-components';
@@ -11,7 +11,6 @@ import {
 } from '../../../../common/models/job-errors-summary.raster';
 import { Status } from '../../../models';
 import { JobErrorsSummaryRasterJobData } from '../../job-manager/cell-renderer/job-details/job-errors-summary.raster-job-data';
-import { FINAL_STATUSES } from '../../job-manager/job.types';
 import { Progress } from './progress';
 import { ResolutionConflictDialog } from './resolution-conflict.dialog';
 import { isJobValid, isStatusFailed, isTaskValid } from './state-machine/helpers';
@@ -46,9 +45,10 @@ const JobInfoComponent: React.FC<JobInfoProps> = ({ job }) => {
   const errorsCount = displayJob?.validationReport?.errorsSummary?.errorsCount;
   const thresholds = displayJob?.validationReport?.errorsSummary?.thresholds;
   const jobStatus = displayJob?.details?.status as Status | undefined;
+  const isAlreadyApproved = !isEmpty(displayJob?.details?.parameters.allowedValidationErrors);
 
   const isViewOnly = useMemo(() => {
-    const isStatusReadOnly = jobStatus != null && FINAL_STATUSES.includes(jobStatus);
+    const isStatusReadOnly = jobStatus != null && jobStatus !== Status.Suspended;
     if (!errorsCount) {
       return isStatusReadOnly;
     }
@@ -61,8 +61,8 @@ const JobInfoComponent: React.FC<JobInfoProps> = ({ job }) => {
       }
       return false;
     });
-    return isStatusReadOnly || hasOtherErrors;
-  }, [errorsCount, thresholds, jobStatus]);
+    return isStatusReadOnly || hasOtherErrors || isAlreadyApproved;
+  }, [errorsCount, thresholds, jobStatus, isAlreadyApproved]);
 
   if (!displayJob) {
     return null;
@@ -115,7 +115,7 @@ const JobInfoComponent: React.FC<JobInfoProps> = ({ job }) => {
                     key: 'resolution',
                     action: openResolutionConflictDialog,
                     isEnabled: taskStatus === Status.Completed,
-                    isApproved: isApproved || jobStatus === Status.Completed,
+                    isApproved: isApproved || isAlreadyApproved,
                   }
                 )}
               </Box>

@@ -8,7 +8,6 @@ import { IconButton, Tooltip, Typography } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
 import { Copy } from '../../../../../common/components/copy/copy';
 import { AutoDirectionBox } from '../../../../../common/components/auto-direction-box/auto-direction-box.component';
-import { DETAILS_ROW_ID_SUFFIX } from '../../../../../common/components/grid';
 import { Loading } from '../../../../../common/components/tree/statuses/loading';
 import { relativeDateFormatter, dateFormatter } from '../../../../../common/helpers/formatters';
 import {
@@ -207,7 +206,7 @@ export const JobDetailsRenderer: React.FC<ICellRendererParams> = observer((props
   const store = useStore();
 
   const [propsWithJobParams, setPropsWithJobParams] = useState(props);
-  const jobId = (props.data as JobModelType).id.replace(DETAILS_ROW_ID_SUFFIX, '');
+  const jobId = (props.data as JobModelType).id;
 
   const { data } = useQuery((store) =>
     store.queryJob({
