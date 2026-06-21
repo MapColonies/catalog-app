@@ -112,7 +112,11 @@ export const SelectedLayersContainer: React.FC = observer(() => {
             )}
             onReady={(tileset) => {
               const primitive = tileset as unknown as Record<string, unknown>;
-              primitive.properties = { name: layer.productName };
+              primitive.meta = {
+                layerRecord: {
+                  productName: layer.productName,
+                },
+              };
             }}
           />
         );
