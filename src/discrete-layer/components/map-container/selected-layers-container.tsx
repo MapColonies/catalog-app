@@ -110,13 +110,9 @@ export const SelectedLayersContainer: React.FC = observer(() => {
               layerLink.url as string,
               (layer as Layer3DRecordModelType).productVersion as string
             )}
-            onReady={(tileset) => {
-              const primitive = tileset as unknown as Record<string, unknown>;
-              primitive.meta = {
-                layerRecord: {
-                  productName: layer.productName,
-                },
-              };
+            meta={{
+              id: layer.id,
+              layerRecord: { ...layer },
             }}
           />
         );
