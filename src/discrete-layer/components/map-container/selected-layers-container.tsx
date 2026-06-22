@@ -7,6 +7,7 @@ import {
   CesiumWFSLayer,
   CesiumWMTSLayer,
   CesiumXYZLayer,
+  getImageryProviderUrl,
   ICesiumImageryLayer,
   isBaseMapLayer,
   useCesiumMap,
@@ -79,7 +80,7 @@ export const SelectedLayersContainer: React.FC = observer(() => {
                 );
                 const linkUrl = getUrlWithoutQueryParams(correctLinkByProtocol?.url);
                 const cesiumLayerLinkUrl = getUrlWithoutQueryParams(
-                  get(cesiumLayer, '_imageryProvider._resource._url') as string | undefined
+                  getImageryProviderUrl(cesiumLayer)
                 );
                 if (!linkUrl || !cesiumLayerLinkUrl) {
                   return false;
@@ -136,10 +137,10 @@ export const SelectedLayersContainer: React.FC = observer(() => {
               id: layer.id,
               searchLayerPredicate: ((cesiumLayer, idx) => {
                 const linkUrl = getUrlWithoutQueryParams(
-                  get(optionsWMTS, 'url._url') as string | undefined
+                  get(optionsWMTS, 'url.url') as string | undefined
                 );
                 const cesiumLayerLinkUrl = getUrlWithoutQueryParams(
-                  get(cesiumLayer, '_imageryProvider._resource._url') as string | undefined
+                  getImageryProviderUrl(cesiumLayer)
                 );
                 if (!linkUrl || !cesiumLayerLinkUrl) {
                   return false;
