@@ -8,6 +8,7 @@ import {
   CesiumWMTSLayer,
   CesiumXYZLayer,
   ICesiumImageryLayer,
+  isBaseMapLayer,
   useCesiumMap,
 } from '@map-colonies/react-components';
 import CONFIG from '../../../common/config';
@@ -140,11 +141,11 @@ export const SelectedLayersContainer: React.FC = observer(() => {
                 const cesiumLayerLinkUrl = getUrlWithoutQueryParams(
                   get(cesiumLayer, '_imageryProvider._resource._url') as string | undefined
                 );
-                const isBaseLayer = get(cesiumLayer, 'meta.parentBasetMapId') as string;
                 if (!linkUrl || !cesiumLayerLinkUrl) {
                   return false;
                 }
-                const isLayerFound = linkUrl === cesiumLayerLinkUrl && !isBaseLayer;
+                const isLayerFound =
+                  linkUrl === cesiumLayerLinkUrl && !isBaseMapLayer(cesiumLayer.meta);
                 return isLayerFound;
               }) as SearchLayerPredicate,
               layerRecord: {
