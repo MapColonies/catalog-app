@@ -4,6 +4,7 @@ import { ColDef, RowDataUpdatedEvent, ValueGetterParams } from 'ag-grid-communit
 import { observer } from 'mobx-react-lite';
 import { isEmpty } from 'lodash';
 import { Box } from '@map-colonies/react-components';
+import { isRtl } from '../../../common/i18n/helpers';
 import {
   GridComponent,
   GridComponentOptions,
@@ -266,7 +267,7 @@ export const LayersResults: React.FC<LayersResultsProps> = observer((props) => {
   ];
 
   const gridOptions: GridComponentOptions = {
-    enableRtl: CONFIG.I18N.DEFAULT_LANGUAGE.toUpperCase() === 'HE',
+    enableRtl: isRtl(CONFIG.I18N.DEFAULT_LANGUAGE),
     pagination: PAGINATION,
     paginationPageSize: PAGE_SIZE,
     paginationPageSizeSelector: false, //[PAGE_SIZE, 20, 50, 100],

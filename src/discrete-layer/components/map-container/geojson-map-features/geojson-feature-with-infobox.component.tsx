@@ -13,6 +13,7 @@ import {
   CesiumVerticalOrigin,
 } from '@map-colonies/react-components';
 import { Typography, useTheme } from '@map-colonies/react-core';
+import { getTextDirection } from '../../../../common/i18n/helpers';
 import { useForceEntitySelection } from '../../../../common/hooks/useForceEntitySelection.hook';
 import { IPosition, useHeightFromTerrain } from '../../../../common/hooks/useHeightFromTerrain';
 import useStaticHTML from '../../../../common/hooks/useStaticHtml';
@@ -153,7 +154,7 @@ export const GeojsonFeatureWithInfoBox: React.FC<GeojsonFeatureWithInfoBoxProps>
                 color: (theme.custom as unknown as Record<string, string>).GC_WARNING_HIGH,
                 textAlign: 'center',
               }}
-              dir={intl.locale === 'he' ? 'rtl' : 'ltr'}
+              dir={getTextDirection(intl.locale)}
             >
               {intl.formatMessage({ id: 'polygonParts-info.part-to-large.message' })}
             </Typography>
@@ -176,7 +177,7 @@ export const GeojsonFeatureWithInfoBox: React.FC<GeojsonFeatureWithInfoBoxProps>
           <Typography
             tag="h3"
             style={{ color: theme.textPrimaryOnDark }}
-            dir={intl.locale === 'he' ? 'rtl' : 'ltr'}
+            dir={getTextDirection(intl.locale)}
           >
             {noInfoMessage}
           </Typography>
