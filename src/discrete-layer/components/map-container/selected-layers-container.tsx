@@ -137,7 +137,7 @@ export const SelectedLayersContainer: React.FC = observer(() => {
               id: layer.id,
               searchLayerPredicate: ((cesiumLayer, idx) => {
                 const linkUrl = getUrlWithoutQueryParams(
-                  get(optionsWMTS, 'url.url') as string | undefined
+                  get(optionsWMTS, 'url._url') as string | undefined
                 );
                 const cesiumLayerLinkUrl = getUrlWithoutQueryParams(
                   getImageryProviderUrl(cesiumLayer)
