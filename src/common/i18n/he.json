@@ -53,7 +53,7 @@
   "general.title.edit": "עריכת מידע של מוצר {value}",
   "general.title.update": "עדכון מוצר {value}",
   "general.title.locked": "בתהליך - נעול לעדכון",
-  "general.title.delete": "מחיקת מוצר {value}",
+  "general.title.Delete": "מחיקת מוצר {value}",
   "general.title.view": "צפייה במוצר {value}",
   "general.title.choose": "בחירת קבצים",
   "general.dialog.exit.title": "בטוח שברצונך להמשיך?",
@@ -178,6 +178,9 @@
   "delete.dialog.message": "הפעולה תוביל ל{action} המוצר וכל חומריו ועלולה להשפיע על מערכות הצורכות את המוצר",
   "delete.dialog.action": "מחיקת",
   "delete.dialog.checkbox": "אישור מחיקה",
+
+  "delete.approver-name": "שם מבצע:",
+  "delete.approver-code": "קוד מאשר:",
 
   "snack.message.success": "הצלחה",
   "snack.message.failed": "כשלון",

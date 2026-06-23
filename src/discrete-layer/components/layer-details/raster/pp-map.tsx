@@ -262,7 +262,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   };
 
   return (
-    <Box className="geoFeaturesMapContainer" style={{ ...style }}>
+    <Box id="geoFeaturesMapContainer" style={{ ...style }}>
       <Map>
         {previewBaseMap}
         <MapLoadingIndicator />
@@ -286,10 +286,10 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
             />
           </VectorSource>
         </VectorLayer>
-        {mode === Mode.UPDATE && (
+        {mode !== Mode.NEW && (
           <Box className="checkbox">
             <Checkbox
-              className="flexCheckItem showOnMapContainer"
+              className="showOnMapContainer"
               label={intl.formatMessage({ id: 'polygon-parts.show-exisitng-parts-on-map.label' })}
               checked={showExistingPolygonParts}
               onClick={(evt: React.MouseEvent<HTMLInputElement>): void => {

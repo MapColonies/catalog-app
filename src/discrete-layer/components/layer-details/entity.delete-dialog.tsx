@@ -34,9 +34,38 @@ interface EntityDeleteDialogProps {
   onSetOpen: (open: boolean) => void;
   recordType?: RecordType;
   layerRecord: ILayerImage;
+  // recordType?: RecordType;
 }
 
 const VALID = 'ok';
+
+
+interface DeleteTitleProps {
+  domain: string;
+  action: Mode;
+  onClose: () => void;
+}
+
+export const DialogsTitle: React.FC<DeleteTitleProps> = (props) => {
+  const intl = useIntl();
+  const title = intl.formatMessage(
+    { id: `general.title.${props.action}` },
+    { value: props.domain }
+  );
+
+  return (
+    <DialogTitle>
+      {title}
+      <IconButton
+        className="closeIcon mc-icon-Close"
+        label="CLOSE"
+        onClick={(): void => {
+          props.onClose();
+        }}
+      />
+    </DialogTitle>
+  );
+}
 
 export const EntityDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
   (props: EntityDeleteDialogProps) => {
@@ -54,11 +83,6 @@ export const EntityDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
     const dialogTitleParamTranslation = intl.formatMessage({
       id: `record-type.${(dialogTitleParam as string).toLowerCase()}.label`,
     });
-
-    const dialogTitle = intl.formatMessage(
-      { id: `general.title.delete` },
-      { value: dialogTitleParamTranslation }
-    );
 
     const closeDialog = useCallback(() => {
       onSetOpen(false);
@@ -100,7 +124,7 @@ export const EntityDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
       );
     };
 
-    const deleteMessage = useMemo((): string => {
+    const warningMessage = useMemo((): string => {
       return intl.formatMessage(
         { id: 'delete.dialog.message' },
         { action: emphasizeByHTML(`${intl.formatMessage({ id: 'delete.dialog.action' })}`) }
@@ -108,26 +132,15 @@ export const EntityDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
     }, []);
 
     return (
-      <div id="entityDeleteDialog">
+      <Box id="entityDeleteDialog">
         <Dialog open={isOpen} preventOutsideDismiss={true}>
-          <DialogTitle>
-            {dialogTitle}
-            <IconButton
-              className="closeIcon mc-icon-Close"
-              label="CLOSE"
-              onClick={(): void => {
-                closeDialog();
-              }}
-            />
-          </DialogTitle>
+          <DialogsTitle domain={dialogTitleParamTranslation} action={Mode.DELETE} onClose={closeDialog}/>
           <DialogContent>
             <Box className="headerWarning">
-              <Tooltip content={intl.formatMessage({ id: 'general.warning.text' })}>
                 <Icon className="icon" icon={{ icon: 'info', size: 'xsmall' }} />
-              </Tooltip>
               <Typography
                 tag="div"
-                dangerouslySetInnerHTML={{ __html: deleteMessage }}
+                dangerouslySetInnerHTML={{ __html: warningMessage }}
               ></Typography>
             </Box>
             <Box id="deleteLayerDetailsContainer">
@@ -147,11 +160,10 @@ export const EntityDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
               mode={Mode.VIEW}
               jsonValue={JSON.stringify(props.layerRecord?.footprint)}
               fitOptions={{ padding: [80, 160, 80, 160] }}
-              style={{ width: '100%', height: '480px' }}
+              style={{ width: '100%', height: 'var(--map-height)' }}
             />
 
             <Box className="footer">
-              <Box className="messages"></Box>
               <Checkbox
                 checked={allowDeleting}
                 label={intl.formatMessage({ id: 'delete.dialog.checkbox' })}
@@ -187,7 +199,7 @@ export const EntityDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
             </Box>
           </DialogContent>
         </Dialog>
-      </div>
+      </Box>
     );
   }
 );
