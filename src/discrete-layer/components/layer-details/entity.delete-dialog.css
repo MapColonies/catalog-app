@@ -5,7 +5,10 @@
   --footer-offset: 40px;
   --modal-height: 100vh;
   --modal-width: 888px;
-  --map-height: calc(100% - var(--footer-offset) - var(--header-height) - var(--footer-height) - var(--warning-message-height) - var(--footer-offset));
+  --map-height: calc(
+    100% - var(--footer-offset) - var(--header-height) - var(--footer-height) -
+      var(--warning-message-height) - var(--footer-offset)
+  );
 }
 
 #entityDeleteDialog .icon {

@@ -287,13 +287,16 @@ export const ActionResolver: React.FC<ActionResolverProps> = observer((props) =>
           handleFlyTo();
           break;
         case 'LayerRasterRecord.update':
-          store.discreteLayersStore.selectLayer(cleanUpEntity(data, LayerRasterRecordModelKeys) as unknown as LayerMetadataMixedUnion);
+          store.discreteLayersStore.selectLayer(
+            cleanUpEntity(data, LayerRasterRecordModelKeys) as unknown as LayerMetadataMixedUnion
+          );
           store.discreteLayersStore.setSelectedLayerOperationMode(Mode.UPDATE);
           handleOpenEntityDialog(RecordType.RECORD_RASTER, true);
           break;
         case 'LayerRasterRecord.delete':
           store.discreteLayersStore.selectLayer(
-            cleanUpEntity(data, LayerRasterRecordModelKeys) as unknown as LayerMetadataMixedUnion);
+            cleanUpEntity(data, LayerRasterRecordModelKeys) as unknown as LayerMetadataMixedUnion
+          );
           store.discreteLayersStore.setSelectedLayerOperationMode(Mode.DELETE);
           handleOpenEntityDialog(RecordType.RECORD_RASTER, true);
           break;

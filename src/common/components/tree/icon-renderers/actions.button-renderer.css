@@ -65,3 +65,8 @@ body[dir='rtl'] .actionMenuItemTitle {
   padding-left: unset;
   padding-right: 8px;
 }
+
+.actionsContainer .disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}

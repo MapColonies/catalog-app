@@ -1,23 +1,11 @@
-import React, { useCallback, useState, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { observer } from 'mobx-react';
-import {
-  Button,
-  Checkbox,
-  CircularProgress,
-  DialogActions,
-  DialogContent,
-  TextField,
-  Tooltip,
-} from '@map-colonies/react-core';
-import { Dialog, DialogTitle, Icon, IconButton, Typography } from '@map-colonies/react-core';
+import { Button, CircularProgress, DialogContent, TextField } from '@map-colonies/react-core';
+import { Dialog, Icon, Typography } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
 import { GraphQLError } from '../../../common/components/error/graphql.error-presentor';
-import { emphasizeByHTML } from '../../../common/helpers/formatters';
 import { Mode } from '../../../common/models/mode.enum';
-import { ILayerImage } from '../../models/layerImage';
-import { IDispatchAction } from '../../models/actionDispatcherStore';
-import { UserAction } from '../../models/userStore';
 import {
   EntityDescriptorModelType,
   RecordStatus,
@@ -26,50 +14,29 @@ import {
   useStore,
 } from '../../models';
 import { LayersDetailsComponent } from './layer-details';
+import { useDeleteLayerDialog, VALID } from './delete-dialog/delete.hook';
 
 import './raster.delete-dialog.css';
-import { DialogsTitle } from './entity.delete-dialog';
+import { DialogsTitle, EntityDeleteDialogProps } from './entity.delete-dialog';
 import { GeoFeaturesPresentorComponent } from './raster/pp-map';
 import { Formik, FormikProps } from 'formik';
 import { FieldLabelComponent } from '../../../common/components/form/field-label';
-
-interface EntityDeleteDialogProps {
-  isOpen: boolean;
-  onSetOpen: (open: boolean) => void;
-  recordType?: RecordType;
-  layerRecord: ILayerImage;
-  // recordType?: RecordType;
-}
-
-const VALID = 'ok';
+import { UserAction } from '../../models/userStore';
 
 export const RasterDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
   (props: EntityDeleteDialogProps) => {
     const { isOpen, onSetOpen, layerRecord } = props;
     const store = useStore();
-    const mutationQuery = useQuery();
     const intl = useIntl();
+    const mutationQuery = useQuery();
     const [allowDeleting, setAllowDeleting] = useState(false);
 
-    const [recordType] = useState<RecordType>(
-      props.recordType ?? (layerRecord?.type as RecordType)
-    );
-
-    const dialogTitleParam = recordType;
-    const dialogTitleParamTranslation = intl.formatMessage({
-      id: `record-type.${(dialogTitleParam as string).toLowerCase()}.label`,
-    });
-
-    const closeDialog = useCallback(() => {
-      onSetOpen(false);
-    }, [onSetOpen, store.discreteLayersStore]);
-
-    const dispatchAction = (action: Record<string, unknown>): void => {
-      store.actionDispatcherStore.dispatchAction({
-        action: action.action,
-        data: action.data,
-      } as IDispatchAction);
-    };
+    const {
+      dialogTitleParamTranslation,
+      closeDialog,
+      dispatchAction,
+      warningMessage,
+    } = useDeleteLayerDialog({ onSetOpen, layerRecord, recordType: props.recordType });
 
     useEffect(() => {
       if (
@@ -79,10 +46,7 @@ export const RasterDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
         onSetOpen(false);
         const payload = {
           action: UserAction.SYSTEM_CALLBACK_DELETE,
-          data: {
-            ...layerRecord,
-            productStatus: RecordStatus.BEING_DELETED,
-          },
+          data: { ...layerRecord },
         };
 
         dispatchAction(payload);
@@ -100,28 +64,18 @@ export const RasterDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
       );
     };
 
-    const warningMessage = useMemo((): string => {
-      return intl.formatMessage(
-        { id: 'delete.dialog.message' },
-        { action: emphasizeByHTML(`${intl.formatMessage({ id: 'delete.dialog.action' })}`) }
-      );
-    }, []);
-
-    const formRef = useRef<HTMLFormElement>(null);
-
     let formikRef = useRef<FormikProps<any>>() as any;
 
-    useEffect(() => {
-      console.log('formikRef.isVaild', formikRef.isVaild)
-    }, [formikRef.isVaild])
-
-
-    const [filterValues, setFilterValues] = React.useState<any>({ approverCode: '', approverName: '' });
+    const [initialDeleteValues, _] = React.useState<any>({ approverCode: '', approverName: '' });
 
     return (
       <Box id="rasterDeleteDialog">
         <Dialog open={isOpen} preventOutsideDismiss={true}>
-          <DialogsTitle domain={dialogTitleParamTranslation} action={Mode.DELETE} onClose={closeDialog} />
+          <DialogsTitle
+            domain={dialogTitleParamTranslation}
+            action={Mode.DELETE}
+            onClose={closeDialog}
+          />
           <DialogContent>
             <Box className="deleteWarning">
               <Icon className="icon" icon={{ icon: 'info', size: 'xsmall' }} />
@@ -151,7 +105,7 @@ export const RasterDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
             />
 
             <Formik
-              initialValues={filterValues}
+              initialValues={initialDeleteValues}
               enableReinitialize={true}
               innerRef={(instance) => {
                 if (instance) {
@@ -173,14 +127,15 @@ export const RasterDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
                 return errors;
               }}
               onSubmit={(values, actions) => {
-                setAllowDeleting(formRef.current?.checkValidity() ?? false);
-                deleteLayer();
+                if (formikRef.current?.isValid) {
+                  deleteLayer();
+                }
               }}
             >
               {(props) => (
                 <form onSubmit={props.handleSubmit}>
-                  <Box className='fields'>
-                    <Box className='field'>
+                  <Box className="fields">
+                    <Box className="field">
                       <FieldLabelComponent
                         value={intl.formatMessage({
                           id: 'delete.approver-name',
@@ -188,15 +143,15 @@ export const RasterDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
                         isRequired={true}
                       />
                       <TextField
-                        name='approverName'
+                        name="approverName"
                         value={props.values.approverName}
-                        type='text'
+                        type="text"
                         required
-                        autoComplete='off'
+                        autoComplete="off"
                         onChange={props.handleChange}
                       />
                     </Box>
-                    <Box className='field'>
+                    <Box className="field">
                       <FieldLabelComponent
                         value={intl.formatMessage({
                           id: 'delete.approver-code',
@@ -204,11 +159,11 @@ export const RasterDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
                         isRequired={true}
                       />
                       <TextField
-                        name='approverCode'
+                        name="approverCode"
                         value={props.values.approverCode}
-                        type='password'
+                        type="password"
                         required
-                        autoComplete='off'
+                        autoComplete="off"
                         onChange={props.handleChange}
                       />
                     </Box>
@@ -217,7 +172,7 @@ export const RasterDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
                     <Box className="errors">
                       <GraphQLError error={mutationQuery.error ?? {}} />
                     </Box>
-                    <Box className='buttons'>
+                    <Box className="buttons">
                       <Button
                         raised
                         type="submit"

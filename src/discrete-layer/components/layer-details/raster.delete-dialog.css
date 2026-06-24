@@ -7,7 +7,10 @@
   --footer-height: 80px;
   --modal-height: 100vh;
   --modal-width: 888px;
-  --map-height: calc(100% - var(--header-height) - var(--warning-message-height) - var(--fields-height) - var(--fields-offset) - var(--footer-height));
+  --map-height: calc(
+    100% - var(--header-height) - var(--warning-message-height) - var(--fields-height) -
+      var(--fields-offset) - var(--footer-height)
+  );
 }
 
 #rasterDeleteDialog .detailsPanelProductView {

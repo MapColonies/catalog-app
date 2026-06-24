@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useMemo, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { observer } from 'mobx-react';
 import {
@@ -7,16 +7,12 @@ import {
   CircularProgress,
   DialogActions,
   DialogContent,
-  Tooltip,
 } from '@map-colonies/react-core';
 import { Dialog, DialogTitle, Icon, IconButton, Typography } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
 import { GraphQLError } from '../../../common/components/error/graphql.error-presentor';
-import { emphasizeByHTML } from '../../../common/helpers/formatters';
 import { Mode } from '../../../common/models/mode.enum';
 import { ILayerImage } from '../../models/layerImage';
-import { IDispatchAction } from '../../models/actionDispatcherStore';
-import { UserAction } from '../../models/userStore';
 import {
   EntityDescriptorModelType,
   RecordStatus,
@@ -26,10 +22,12 @@ import {
 } from '../../models';
 import { GeoJsonMapValuePresentorComponent } from './field-value-presentors/geojson-map.value-presentor';
 import { LayersDetailsComponent } from './layer-details';
+import { useDeleteLayerDialog, VALID } from './delete-dialog/delete.hook';
 
 import './entity.delete-dialog.css';
+import { UserAction } from '../../models/userStore';
 
-interface EntityDeleteDialogProps {
+export interface EntityDeleteDialogProps {
   isOpen: boolean;
   onSetOpen: (open: boolean) => void;
   recordType?: RecordType;
@@ -37,10 +35,7 @@ interface EntityDeleteDialogProps {
   // recordType?: RecordType;
 }
 
-const VALID = 'ok';
-
-
-interface DeleteTitleProps {
+export interface DeleteTitleProps {
   domain: string;
   action: Mode;
   onClose: () => void;
@@ -65,35 +60,18 @@ export const DialogsTitle: React.FC<DeleteTitleProps> = (props) => {
       />
     </DialogTitle>
   );
-}
+};
 
 export const EntityDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
   (props: EntityDeleteDialogProps) => {
     const { isOpen, onSetOpen, layerRecord } = props;
     const store = useStore();
-    const mutationQuery = useQuery();
     const intl = useIntl();
+    const mutationQuery = useQuery();
     const [allowDeleting, setAllowDeleting] = useState(false);
 
-    const [recordType] = useState<RecordType>(
-      props.recordType ?? (layerRecord?.type as RecordType)
-    );
-
-    const dialogTitleParam = recordType;
-    const dialogTitleParamTranslation = intl.formatMessage({
-      id: `record-type.${(dialogTitleParam as string).toLowerCase()}.label`,
-    });
-
-    const closeDialog = useCallback(() => {
-      onSetOpen(false);
-    }, [onSetOpen, store.discreteLayersStore]);
-
-    const dispatchAction = (action: Record<string, unknown>): void => {
-      store.actionDispatcherStore.dispatchAction({
-        action: action.action,
-        data: action.data,
-      } as IDispatchAction);
-    };
+    const { dialogTitleParamTranslation, closeDialog, dispatchAction, warningMessage } =
+      useDeleteLayerDialog({ onSetOpen, layerRecord, recordType: props.recordType });
 
     useEffect(() => {
       if (
@@ -124,20 +102,17 @@ export const EntityDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
       );
     };
 
-    const warningMessage = useMemo((): string => {
-      return intl.formatMessage(
-        { id: 'delete.dialog.message' },
-        { action: emphasizeByHTML(`${intl.formatMessage({ id: 'delete.dialog.action' })}`) }
-      );
-    }, []);
-
     return (
       <Box id="entityDeleteDialog">
         <Dialog open={isOpen} preventOutsideDismiss={true}>
-          <DialogsTitle domain={dialogTitleParamTranslation} action={Mode.DELETE} onClose={closeDialog}/>
+          <DialogsTitle
+            domain={dialogTitleParamTranslation}
+            action={Mode.DELETE}
+            onClose={closeDialog}
+          />
           <DialogContent>
             <Box className="headerWarning">
-                <Icon className="icon" icon={{ icon: 'info', size: 'xsmall' }} />
+              <Icon className="icon" icon={{ icon: 'info', size: 'xsmall' }} />
               <Typography
                 tag="div"
                 dangerouslySetInnerHTML={{ __html: warningMessage }}

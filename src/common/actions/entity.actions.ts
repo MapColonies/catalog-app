@@ -15,6 +15,7 @@ export interface IAction {
   class: string;
   titleTranslationId: string;
   views: TabViews[];
+  disabled?: boolean;
   dependentField?: DependentField;
 }
 
