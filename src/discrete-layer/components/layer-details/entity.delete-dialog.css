@@ -24,10 +24,6 @@
   height: var(--footer-height);
 }
 
-body[dir='rtl'] #entityDeleteDialog .footer {
-  left: 20px;
-}
-
 #entityDeleteDialog .buttons {
   display: flex;
   gap: 20px;

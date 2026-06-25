@@ -53,12 +53,14 @@ export const RasterDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
       }
     }, [mutationQuery.data]);
 
-    const deleteLayer = (): void => {
+    const deleteLayer = (approverName: string, approvalCode: string): void => {
       mutationQuery.setQuery(
-        store.mutateDeleteLayer({
+        store.mutateDeleteRasterLayer({
           data: {
             id: layerRecord.id,
             type: layerRecord.type as RecordType,
+            approverName,
+            approvalCode,
           },
         })
       );
@@ -66,7 +68,7 @@ export const RasterDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
 
     let formikRef = useRef<FormikProps<any>>() as any;
 
-    const [initialDeleteValues, _] = React.useState<any>({ approverCode: '', approverName: '' });
+    const [initialDeleteValues, _] = React.useState<any>({ approvalCode: '', approverName: '' });
 
     return (
       <Box id="rasterDeleteDialog">
@@ -117,18 +119,18 @@ export const RasterDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
                 const errors: any = {};
 
                 if (!values.approverName?.trim()) {
-                  errors.approverName = 'Required';
+                  errors.approverName = true;
                 }
 
-                if (!values.approverCode?.trim()) {
-                  errors.approverCode = 'Required';
+                if (!values.approvalCode?.trim()) {
+                  errors.approvalCode = true;
                 }
 
                 return errors;
               }}
               onSubmit={(values, actions) => {
                 if (formikRef.current?.isValid) {
-                  deleteLayer();
+                  deleteLayer(formikRef.current?.values.approverName, formikRef.current?.values.approvalCode);
                 }
               }}
             >
@@ -154,13 +156,13 @@ export const RasterDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
                     <Box className="field">
                       <FieldLabelComponent
                         value={intl.formatMessage({
-                          id: 'delete.approver-code',
+                          id: 'delete.approval-code',
                         })}
                         isRequired={true}
                       />
                       <TextField
-                        name="approverCode"
-                        value={props.values.approverCode}
+                        name="approvalCode"
+                        value={props.values.approvalCode}
                         type="password"
                         required
                         autoComplete="off"

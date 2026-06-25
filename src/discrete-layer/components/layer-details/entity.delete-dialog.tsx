@@ -93,7 +93,7 @@ export const EntityDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
 
     const deleteLayer = (): void => {
       mutationQuery.setQuery(
-        store.mutateDeleteLayer({
+        store.mutateDelete3DLayer({
           data: {
             id: layerRecord.id,
             type: layerRecord.type as RecordType,

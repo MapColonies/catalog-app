@@ -13,10 +13,6 @@
   );
 }
 
-#rasterDeleteDialog .detailsPanelProductView {
-  height: var(--details-height);
-}
-
 #rasterDeleteDialog .icon {
   color: var(--mdc-theme-gc-warning-high);
   font-size: 28px;
@@ -30,20 +26,9 @@
   height: var(--footer-height);
 }
 
-body[dir='rtl'] #rasterDeleteDialog .footer {
-  left: 20px;
-}
-
 #rasterDeleteDialog .buttons {
   display: flex;
   gap: 20px;
-  align-items: center;
-  margin-left: auto;
-}
-
-body[dir='rtl'] #rasterDeleteDialog .buttons {
-  margin-left: unset;
-  margin-right: auto;
 }
 
 #rasterDeleteDialog .closeIcon {
@@ -93,14 +78,7 @@ body[dir='rtl'] #rasterDeleteDialog .closeIcon {
 
 #rasterDeleteDialog .errors {
   width: 100%;
-}
-
-#rasterDeleteDialog .textCategoryField {
-  width: 45%;
-  margin: 0;
-  box-sizing: border-box;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  margin: 0px 12px;
 }
 
 #rasterDeleteDialog .fields {

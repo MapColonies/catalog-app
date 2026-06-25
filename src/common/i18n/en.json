@@ -53,7 +53,7 @@
   "general.title.edit": "Edit {value} product's metadata",
   "general.title.update": "Update {value} product",
   "general.title.locked": "In progress - locked for update",
-  "general.title.delete": "Delete {value} product",
+  "general.title.Delete": "Delete {value} product",
   "general.title.view": "View {value} product",
   "general.title.choose": "Choose files",
   "general.dialog.exit.title": "Are you sure?",
@@ -178,6 +178,9 @@
   "delete.dialog.message": "This action will lead to {action} the product and all of its materials and may affect the systems that consume the product",
   "delete.dialog.action": "Delete",
   "delete.dialog.checkbox": "Confirm deleting",
+
+  "delete.approver-name": "Approver name:",
+  "delete.approval-code": "Approval code:",
 
   "snack.message.success": "SUCCESS",
   "snack.message.failed": "FAILURE",

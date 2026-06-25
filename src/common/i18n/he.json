@@ -180,7 +180,7 @@
   "delete.dialog.checkbox": "אישור מחיקה",
 
   "delete.approver-name": "שם מבצע:",
-  "delete.approver-code": "קוד מאשר:",
+  "delete.approval-code": "קוד מאשר:",
 
   "snack.message.success": "הצלחה",
   "snack.message.failed": "כשלון",
