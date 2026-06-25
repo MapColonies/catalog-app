@@ -1337,7 +1337,11 @@ const DiscreteLayerView: React.FC = observer(() => {
               imageryProvider={false}
               locale={mapSettingsLocale}
               baseMaps={store.discreteLayersStore.baseMaps}
+              layerManagerLayerIdMetaFieldPath={'id'}
+              layerManagerLayerNameMetaFieldPath={'layerRecord.productName'}
               layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
+              layerManagerDataLayerNameMetaFieldPath={'layerRecord.featureStructure.aliasLayerName'}
+              layerManagerDataLayerFieldsMetaFieldPath={'layerRecord.featureStructure.fields'}
               // @ts-ignore
               imageryContextMenu={<ContextMenuByTab />}
               imageryContextMenuSize={contextMenuSizeByTab}
