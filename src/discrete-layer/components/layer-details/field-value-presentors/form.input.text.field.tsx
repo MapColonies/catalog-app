@@ -9,6 +9,7 @@ import CONFIG from '../../../../common/config';
 import { convertExponentialToDecimal } from '../../../../common/helpers/number';
 import useDebounceField from '../../../../common/hooks/debounce-field.hook';
 import { Mode } from '../../../../common/models/mode.enum';
+import { isRtl } from '../../../../common/i18n/helpers';
 import {
   UpdateRulesModelType,
   ValidationConfigModelType,
@@ -89,8 +90,7 @@ export const FormInputTextFieldComponent: React.FC<FormInputTextFieldProps> = ({
     // @ts-ignore
     if (min && max) {
       validationProps = { min, max, step: precisionAllowed };
-      placeholder =
-        CONFIG.I18N.DEFAULT_LANGUAGE.toUpperCase() === 'HE' ? `${max} - ${min}` : `${min} - ${max}`;
+      placeholder = isRtl(CONFIG.I18N.DEFAULT_LANGUAGE) ? `${max} - ${min}` : `${min} - ${max}`;
     }
     return (
       <>
