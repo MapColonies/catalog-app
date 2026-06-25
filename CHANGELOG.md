@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [6.2.0](https://github.com/MapColonies/catalog-app/compare/v6.1.5...v6.2.0) (2026-06-25)
+
+
+### Features
+
+* support 3d sr ([#994](https://github.com/MapColonies/catalog-app/issues/994)) ([2b71d3c](https://github.com/MapColonies/catalog-app/commit/2b71d3c7d0dfe02e38508e6beb25216a5120717b))
+
 ## [6.1.5](https://github.com/MapColonies/catalog-app/compare/v6.1.4...v6.1.5) (2026-06-21)
 
 
