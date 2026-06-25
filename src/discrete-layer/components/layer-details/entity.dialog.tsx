@@ -93,7 +93,7 @@ export const buildRecord = (
       Layer3DRecordModelKeys.forEach((key) => {
         record[key as string] = undefined;
       });
-      record.productType = ProductType.PHOTO_REALISTIC_3D;
+      record.productType = ProductType.PHOTO_REALISTIC;
       record.productStatus = RecordStatus.UNPUBLISHED;
       record['__typename'] = Layer3DRecordModel.properties['__typename'].name.replaceAll('"', '');
       break;
