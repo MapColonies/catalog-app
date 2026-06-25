@@ -340,7 +340,7 @@ export const CatalogTreeComponent: React.FC<CatalogTreeComponentProps> = observe
                           actions={disableActionByPredicate(
                             rowInfo.node,
                             'delete',
-                            (data) => isUnpublished(data)
+                            (data) => !isUnpublished(data)
                           )}
                           entity={rowInfo.node.__typename}
                           actionHandler={dispatchAction}
