@@ -58,8 +58,11 @@ export const MCEnumsFetcher: React.FC = observer(() => {
         QUANTIZED_MESH_DSM,
         QUANTIZED_MESH_DTM_BEST,
         QUANTIZED_MESH_DSM_BEST,
-        PHOTO_REALISTIC_3D,
+        PHOTO_REALISTIC,
+        PHOTO_REALISTIC_BEST,
         POINT_CLOUD,
+        SEMANTIC,
+        SEMANTIC_MESH,
       } = ProductType;
 
       enums['LayerRasterRecord'] = {
@@ -193,14 +196,32 @@ export const MCEnumsFetcher: React.FC = observer(() => {
         parent: 'QuantizedMeshBestRecord',
         parentDomain: RecordType.RECORD_DEM,
       };
-      enums[PHOTO_REALISTIC_3D] = {
-        ...enums[PHOTO_REALISTIC_3D],
+      enums[PHOTO_REALISTIC] = {
+        ...enums[PHOTO_REALISTIC],
+        icon: 'mc-icon-Map-3D',
+        parent: 'Layer3DRecord',
+        parentDomain: RecordType.RECORD_3D,
+      };
+      enums[PHOTO_REALISTIC_BEST] = {
+        ...enums[PHOTO_REALISTIC_BEST],
         icon: 'mc-icon-Map-3D',
         parent: 'Layer3DRecord',
         parentDomain: RecordType.RECORD_3D,
       };
       enums[POINT_CLOUD] = {
         ...enums[POINT_CLOUD],
+        icon: 'mc-icon-Map-3D',
+        parent: 'Layer3DRecord',
+        parentDomain: RecordType.RECORD_3D,
+      };
+      enums[SEMANTIC] = {
+        ...enums[SEMANTIC],
+        icon: 'mc-icon-Map-3D',
+        parent: 'Layer3DRecord',
+        parentDomain: RecordType.RECORD_3D,
+      };
+      enums[SEMANTIC_MESH] = {
+        ...enums[SEMANTIC_MESH],
         icon: 'mc-icon-Map-3D',
         parent: 'Layer3DRecord',
         parentDomain: RecordType.RECORD_3D,

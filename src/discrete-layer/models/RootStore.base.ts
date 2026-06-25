@@ -347,6 +347,7 @@ export type Layer3DRecordInput = {
   productName: string
   productVersion?: string
   productType: ProductType
+  productSubType?: string
   description?: string
   creationDate?: any
   updateDate?: any
