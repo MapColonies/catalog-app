@@ -337,13 +337,10 @@ export const CatalogTreeComponent: React.FC<CatalogTreeComponentProps> = observe
                       hoveredNode.parentPath === rowInfo.path.slice(0, -1).toString() && (
                         <ActionsRenderer
                           node={rowInfo.node}
-                          // actions={
-                          //   entityPermittedActions[rowInfo.node.__typename] as IActionGroup[]
-                          // }
                           actions={disableActionByPredicate(
                             rowInfo.node,
                             'delete',
-                            (data) => !isUnpublished(data)
+                            (data) => isUnpublished(data)
                           )}
                           entity={rowInfo.node.__typename}
                           actionHandler={dispatchAction}

@@ -1,14 +1,10 @@
 #entityDeleteDialog {
   --header-height: 150px;
   --warning-message-height: 60px;
-  --footer-height: 48px;
-  --footer-offset: 40px;
+  --footer-height: 60px;
   --modal-height: 100vh;
   --modal-width: 888px;
-  --map-height: calc(
-    100% - var(--footer-offset) - var(--header-height) - var(--footer-height) -
-      var(--warning-message-height) - var(--footer-offset)
-  );
+  --map-height: calc(100% - var(--header-height) - var(--footer-height) - var(--warning-message-height));
 }
 
 #entityDeleteDialog .icon {
@@ -19,7 +15,6 @@
 
 #entityDeleteDialog .footer {
   display: flex;
-  margin-top: var(--footer-offset);
   width: 100%;
   height: var(--footer-height);
 }

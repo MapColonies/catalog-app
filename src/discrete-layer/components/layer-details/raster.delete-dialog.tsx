@@ -89,6 +89,7 @@ export const RasterDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
             <Box className="deleteLayerDetailsContainer">
               <Box className="deleteLayerDetails">
                 <LayersDetailsComponent
+                  className='detailsPanelProductView'
                   entityDescriptors={
                     store.discreteLayersStore.entityDescriptors as EntityDescriptorModelType[]
                   }
@@ -179,7 +180,6 @@ export const RasterDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
                         raised
                         type="submit"
                         disabled={!props.isValid || mutationQuery.loading}
-                        // onClick={() => formikRef.current?.submitForm()}
                       >
                         {mutationQuery.loading ? (
                           <CircularProgress className="loading" />
