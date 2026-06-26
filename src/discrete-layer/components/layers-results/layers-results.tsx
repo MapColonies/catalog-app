@@ -134,7 +134,6 @@ export const LayersResults: React.FC<LayersResultsProps> = observer((props) => {
     return entityActions;
   }, [store.userStore.user]);
 
-
   const disableActionByPredicate = (
     data: Record<string, any>,
     actionToDiable: string,
@@ -289,11 +288,7 @@ export const LayersResults: React.FC<LayersResultsProps> = observer((props) => {
       width: 0,
       cellRenderer: 'actionsRenderer',
       cellRendererParams: (params: any) => ({
-        actions: disableActionByPredicate(
-          params.data,
-          'delete',
-          (data) => !isUnpublished(data)
-        ),
+        actions: disableActionByPredicate(params.data, 'delete', (data) => !isUnpublished(data)),
         actionHandler: dispatchAction,
       }),
     },

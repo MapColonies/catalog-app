@@ -1,9 +1,9 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { emphasizeByHTML } from '../../../../common/helpers/formatters';
-import { ILayerImage } from '../../../models/layerImage';
-import { IDispatchAction } from '../../../models/actionDispatcherStore';
-import { RecordType, useStore } from '../../../models';
+import { emphasizeByHTML } from '../../../common/helpers/formatters';
+import { ILayerImage } from '../../models/layerImage';
+import { IDispatchAction } from '../../models/actionDispatcherStore';
+import { RecordType, useStore } from '../../models';
 
 export const VALID = 'ok';
 

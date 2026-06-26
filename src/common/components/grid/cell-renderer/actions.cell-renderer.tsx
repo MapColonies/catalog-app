@@ -50,10 +50,7 @@ export const ActionsRenderer: React.FC<IActionsRendererParams> = (props) => {
     return filteredActionGroups;
   };
 
-  const actions = useMemo(
-    () => filterActionsByDependentFields(props.actions),
-    [props.actions]
-  );
+  const actions = useMemo(() => filterActionsByDependentFields(props.actions), [props.actions]);
   let frequentActions: IAction[] = [];
   let allFlatActions: IAction[] = [];
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -127,11 +124,19 @@ export const ActionsRenderer: React.FC<IActionsRendererParams> = (props) => {
                     >
                       <Box className="actionMenuItem">
                         <IconButton
-                          className={`actionIcon actionDismissible ${action.class || 'glow-missing-icon'}`}
+                          className={`actionIcon actionDismissible ${
+                            action.class || 'glow-missing-icon'
+                          }`}
                           disabled={action.disabled}
                           icon={action.icon}
                         />
-                        <Typography tag="div" disabled={action.disabled} className={`actionMenuItemTitle actionDismissible ${action.disabled ? 'disabled' : ''}`}>
+                        <Typography
+                          tag="div"
+                          disabled={action.disabled}
+                          className={`actionMenuItemTitle actionDismissible ${
+                            action.disabled ? 'disabled' : ''
+                          }`}
+                        >
                           {action.titleTranslationId}
                         </Typography>
                       </Box>

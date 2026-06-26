@@ -23,7 +23,7 @@ import {
 } from '../../../models';
 import { GeoJsonMapValuePresentorComponent } from '../field-value-presentors/geojson-map.value-presentor';
 import { LayersDetailsComponent } from '../layer-details';
-import { useDeleteLayer, VALID } from '../delete-dialog/delete.hook';
+import { useDeleteLayer, VALID } from '../delete.hook';
 
 import './entity.3d.delete-dialog.css';
 
