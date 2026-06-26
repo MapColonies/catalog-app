@@ -10,29 +10,28 @@ import {
 } from '@map-colonies/react-core';
 import { Dialog, DialogTitle, Icon, IconButton, Typography } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
-import { GraphQLError } from '../../../common/components/error/graphql.error-presentor';
-import { Mode } from '../../../common/models/mode.enum';
-import { ILayerImage } from '../../models/layerImage';
+import { GraphQLError } from '../../../../common/components/error/graphql.error-presentor';
+import { Mode } from '../../../../common/models/mode.enum';
+import { ILayerImage } from '../../../models/layerImage';
+import { UserAction } from '../../../models/userStore';
 import {
   EntityDescriptorModelType,
   RecordStatus,
   RecordType,
   useQuery,
   useStore,
-} from '../../models';
-import { GeoJsonMapValuePresentorComponent } from './field-value-presentors/geojson-map.value-presentor';
-import { LayersDetailsComponent } from './layer-details';
-import { useDeleteLayerDialog, VALID } from './delete-dialog/delete.hook';
+} from '../../../models';
+import { GeoJsonMapValuePresentorComponent } from '../field-value-presentors/geojson-map.value-presentor';
+import { LayersDetailsComponent } from '../layer-details';
+import { useDeleteLayer, VALID } from '../delete-dialog/delete.hook';
 
-import './entity.delete-dialog.css';
-import { UserAction } from '../../models/userStore';
+import './entity.3d.delete-dialog.css';
 
 export interface EntityDeleteDialogProps {
   isOpen: boolean;
   onSetOpen: (open: boolean) => void;
-  recordType?: RecordType;
   layerRecord: ILayerImage;
-  // recordType?: RecordType;
+  recordType?: RecordType;
 }
 
 export interface DeleteTitleProps {
@@ -41,10 +40,10 @@ export interface DeleteTitleProps {
   onClose: () => void;
 }
 
-export const DialogsTitle: React.FC<DeleteTitleProps> = (props) => {
+export const DialogActionTitle: React.FC<DeleteTitleProps> = (props) => {
   const intl = useIntl();
   const title = intl.formatMessage(
-    { id: `general.title.${props.action}` },
+    { id: `general.title.${props.action.toLowerCase()}` },
     { value: props.domain }
   );
 
@@ -71,7 +70,7 @@ export const EntityDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
     const [allowDeleting, setAllowDeleting] = useState(false);
 
     const { dialogTitleParamTranslation, closeDialog, dispatchAction, warningMessage } =
-      useDeleteLayerDialog({ onSetOpen, layerRecord, recordType: props.recordType });
+      useDeleteLayer({ onSetOpen, layerRecord, recordType: props.recordType });
 
     useEffect(() => {
       if (
@@ -105,7 +104,7 @@ export const EntityDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
     return (
       <Box id="entityDeleteDialog">
         <Dialog open={isOpen} preventOutsideDismiss={true}>
-          <DialogsTitle
+          <DialogActionTitle
             domain={dialogTitleParamTranslation}
             action={Mode.DELETE}
             onClose={closeDialog}

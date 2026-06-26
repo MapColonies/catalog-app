@@ -4,24 +4,24 @@ import { observer } from 'mobx-react';
 import { Button, CircularProgress, DialogContent, TextField } from '@map-colonies/react-core';
 import { Dialog, Icon, Typography } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
-import { GraphQLError } from '../../../common/components/error/graphql.error-presentor';
-import { Mode } from '../../../common/models/mode.enum';
+import { GraphQLError } from '../../../../common/components/error/graphql.error-presentor';
+import { Mode } from '../../../../common/models/mode.enum';
 import {
   EntityDescriptorModelType,
   RecordStatus,
   RecordType,
   useQuery,
   useStore,
-} from '../../models';
-import { LayersDetailsComponent } from './layer-details';
-import { useDeleteLayerDialog, VALID } from './delete-dialog/delete.hook';
+} from '../../../models';
+import { LayersDetailsComponent } from '../layer-details';
+import { useDeleteLayer, VALID } from '../delete-dialog/delete.hook';
 
-import './raster.delete-dialog.css';
-import { DialogsTitle, EntityDeleteDialogProps } from './entity.delete-dialog';
-import { GeoFeaturesPresentorComponent } from './raster/pp-map';
+import './entity.raster.delete-dialog.css';
+import { DialogActionTitle, EntityDeleteDialogProps } from '../3D/entity.3d.delete-dialog';
+import { GeoFeaturesPresentorComponent } from './pp-map';
 import { Formik, FormikProps } from 'formik';
-import { FieldLabelComponent } from '../../../common/components/form/field-label';
-import { UserAction } from '../../models/userStore';
+import { FieldLabelComponent } from '../../../../common/components/form/field-label';
+import { UserAction } from '../../../models/userStore';
 
 export const RasterDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
   (props: EntityDeleteDialogProps) => {
@@ -29,14 +29,13 @@ export const RasterDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
     const store = useStore();
     const intl = useIntl();
     const mutationQuery = useQuery();
-    const [allowDeleting, setAllowDeleting] = useState(false);
 
     const {
       dialogTitleParamTranslation,
       closeDialog,
       dispatchAction,
       warningMessage,
-    } = useDeleteLayerDialog({ onSetOpen, layerRecord, recordType: props.recordType });
+    } = useDeleteLayer({ onSetOpen, layerRecord, recordType: props.recordType });
 
     useEffect(() => {
       if (
@@ -73,7 +72,7 @@ export const RasterDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
     return (
       <Box id="rasterDeleteDialog">
         <Dialog open={isOpen} preventOutsideDismiss={true}>
-          <DialogsTitle
+          <DialogActionTitle
             domain={dialogTitleParamTranslation}
             action={Mode.DELETE}
             onClose={closeDialog}

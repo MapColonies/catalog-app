@@ -28,11 +28,12 @@ import { Loading } from '../../../common/components/tree/statuses/loading';
 import CONFIG from '../../../common/config';
 import { getMax } from '../../../common/helpers/array';
 import { dateFormatter } from '../../../common/helpers/formatters';
-import { isPolygonPartsShown } from '../../../common/helpers/style';
+import { isPolygonPartsShown, isUnpublished } from '../../../common/helpers/style';
 import {
   getResponseErrorMesssage,
   getResponseErrorURL,
 } from '../../../common/helpers/server-error';
+import { IActionGroup } from '../../../common/actions/entity.actions';
 // import { usePrevious } from '../../../common/hooks/previous.hook';
 import { LayerRasterRecordModelType } from '../../models';
 import { IDispatchAction } from '../../models/actionDispatcherStore';
@@ -132,6 +133,34 @@ export const LayersResults: React.FC<LayersResultsProps> = observer((props) => {
     });
     return entityActions;
   }, [store.userStore.user]);
+
+
+  const disableActionByPredicate = (
+    data: Record<string, any>,
+    actionToDiable: string,
+    predicate: (data: Record<string, unknown>) => boolean
+  ): IActionGroup[] => {
+    const actionGroups = (entityPermittedActions[data.__typename] as IActionGroup[]).map(
+      (group) => ({
+        ...group,
+        group: group.group.map((action) => ({ ...action })),
+      })
+    );
+
+    if (predicate(data)) {
+      const deleteGroup = actionGroups.find((group) =>
+        group.group.some((action) => action.action === actionToDiable)
+      );
+
+      const deleteAction = deleteGroup?.group.find((action) => action.action === actionToDiable);
+
+      if (deleteAction) {
+        deleteAction.disabled = true;
+      }
+    }
+
+    return actionGroups;
+  };
 
   const dispatchAction = (action: Record<string, unknown>): void => {
     store.actionDispatcherStore.dispatchAction({
@@ -259,10 +288,14 @@ export const LayersResults: React.FC<LayersResultsProps> = observer((props) => {
       headerName: '',
       width: 0,
       cellRenderer: 'actionsRenderer',
-      cellRendererParams: {
-        actions: entityPermittedActions,
+      cellRendererParams: (params: any) => ({
+        actions: disableActionByPredicate(
+          params.data,
+          'delete',
+          (data) => !isUnpublished(data)
+        ),
         actionHandler: dispatchAction,
-      },
+      }),
     },
   ];
 

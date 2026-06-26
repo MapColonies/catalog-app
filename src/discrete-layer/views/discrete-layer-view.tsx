@@ -53,7 +53,7 @@ import { ExportLayerComponent } from '../components/export-layer/export-layer.co
 import ExportPolygonsRenderer from '../components/export-layer/export-polygons-renderer.component';
 // import { Filters } from '../components/filters/filters';
 import { JobsDialog } from '../components/job-manager/jobs.dialog';
-import { EntityDeleteDialog } from '../components/layer-details/entity.delete-dialog';
+import { EntityDeleteDialog } from '../components/layer-details/3D/entity.3d.delete-dialog';
 import { EntityDialog } from '../components/layer-details/entity.dialog';
 import { EntityRasterDialog } from '../components/layer-details/raster/entity.raster.dialog';
 import { LayersResults } from '../components/layers-results/layers-results';
@@ -80,7 +80,7 @@ import { ILayerImage } from '../models/layerImage';
 import { useStore } from '../models/RootStore';
 import { FilterField } from '../models/RootStore.base';
 import { UserAction, UserRole } from '../models/userStore';
-import { RasterDeleteDialog } from '../components/layer-details/raster.delete-dialog';
+import { RasterDeleteDialog } from '../components/layer-details/raster/entity.raster.delete-dialog';
 import { ActionResolver } from './components/action-resolver.component';
 import AppTitle from './components/app-title/app-title.component';
 import { DetailsPanel } from './components/details-panel.component';

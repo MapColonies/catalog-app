@@ -252,16 +252,14 @@ export const ActionResolver: React.FC<ActionResolverProps> = observer((props) =>
           handleOpenEntityDialog(store.discreteLayersStore.selectedLayer?.type as RecordType, true);
           break;
         case 'LayerRasterRecord.flyTo':
-          store.discreteLayersStore.selectLayer(
-            // @ts-ignore
-            cleanUpEntity(data, LayerRasterRecordModelKeys) as LayerMetadataMixedUnion
+          store.discreteLayersStore.selectLayer( 
+            cleanUpEntity(data, LayerRasterRecordModelKeys) as unknown as LayerMetadataMixedUnion
           );
           handleFlyTo();
           break;
         case 'Layer3DRecord.flyTo':
           store.discreteLayersStore.selectLayer(
-            // @ts-ignore
-            cleanUpEntity(data, Layer3DRecordModelKeys) as LayerMetadataMixedUnion
+            cleanUpEntity(data, Layer3DRecordModelKeys) as unknown as LayerMetadataMixedUnion
           );
           handleFlyTo();
           break;

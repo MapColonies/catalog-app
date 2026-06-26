@@ -53,7 +53,7 @@
   "general.title.edit": "Edit {value} product's metadata",
   "general.title.update": "Update {value} product",
   "general.title.locked": "In progress - locked for update",
-  "general.title.Delete": "Delete {value} product",
+  "general.title.delete": "Delete {value} product",
   "general.title.view": "View {value} product",
   "general.title.choose": "Choose files",
   "general.dialog.exit.title": "Are you sure?",

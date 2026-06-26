@@ -25,12 +25,11 @@ import { PriorityRenderer } from '../cell-renderer/priority.cell-renderer';
 import PlaceholderCellRenderer from '../cell-renderer/placeholder.cell-renderer';
 import { StatusRenderer } from '../cell-renderer/status.cell-renderer';
 import { TooltippedCellRenderer } from '../cell-renderer/tool-tipped.cell-renderer';
-import { JOB_ENTITY } from '../job.types';
 
 export interface ICommonJobManagerGridProps {
   rowData: unknown[];
   dispatchAction: (action: Record<string, unknown> | undefined) => void;
-  getJobActions: { [JOB_ENTITY]: IActionGroup[] };
+  getJobActions: IActionGroup[];
   updateJobCB: (updateParam: Record<string, unknown>) => void;
   rowDataChangeCB?: () => void;
   gridOptionsOverride?: Partial<GridComponentOptions>;
@@ -299,10 +298,10 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
         headerName: '',
         width: 0,
         cellRenderer: 'actionsRenderer',
-        cellRendererParams: {
+        cellRendererParams: (params: any) => ({
           actions: getJobActions,
           actionHandler: dispatchAction,
-        },
+        }),
       },
     ],
     []

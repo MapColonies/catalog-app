@@ -84,9 +84,7 @@ export const ActionsRenderer: React.FC<IActionsRendererParams> = ({
                 className="actionMenuItem"
               >
                 <IconButton
-                  className={`actionIcon actionDismissible ${action.class || ''} ${
-                    action.disabled ? 'disabled' : ''
-                  }`}
+                  className={`actionIcon actionDismissible ${action.class || ''}`}
                   disabled={action.disabled}
                   icon={action.icon}
                 />

@@ -13,7 +13,7 @@ interface DeleteLayerDialogOptions {
   recordType?: RecordType;
 }
 
-export const useDeleteLayerDialog = ({
+export const useDeleteLayer = ({
   onSetOpen,
   layerRecord,
   recordType: recordTypeProp,

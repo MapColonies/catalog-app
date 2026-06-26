@@ -55,6 +55,29 @@ export const actionDispatcherStore = ModelBase
       self.action = cloneDeep(action);
     };
 
+    // function disableAction(data: Record<string, unknown>) {
+    //   const actionGroups = (entityPermittedActions[treeItem.__typename] as IActionGroup[]).map(
+    //     (group) => ({
+    //       ...group,
+    //       group: group.group.map((action) => ({ ...action })),
+    //     })
+    //   );
+
+    //   if (!isUnpublished(treeItem)) {
+    //     const deleteGroup = actionGroups.find((group) =>
+    //       group.group.some((action) => action.action === 'delete')
+    //     );
+
+    //     const deleteAction = deleteGroup?.group.find((action) => action.action === 'delete');
+
+    //     if (deleteAction) {
+    //       deleteAction.disabled = true;
+    //     }
+    //   }
+
+    //   return actionGroups;
+    // }
+
     return {
       getEntityActionGroups,
       getEntityActionConfiguration,
