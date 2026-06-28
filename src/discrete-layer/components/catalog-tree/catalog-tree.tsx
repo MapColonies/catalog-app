@@ -7,7 +7,6 @@ import { changeNodeAtPath, getNodeAtPath, find, ExtendedNodeData } from 'react-s
 import { useIntl } from 'react-intl';
 import { Box } from '@map-colonies/react-components';
 import { useTheme } from '@map-colonies/react-core';
-import { IAction, IActionGroup } from '../../../common/actions/entity.actions';
 import { TreeComponent, TreeItem } from '../../../common/components/tree';
 import { ActionsRenderer } from '../../../common/components/tree/icon-renderers/actions.button-renderer';
 import { FootprintRenderer } from '../../../common/components/tree/icon-renderers/footprint.icon-renderer';
@@ -30,6 +29,7 @@ import { TabViews } from '../../views/tab-views';
 import { LayerMetadataMixedUnion } from '../../models';
 import { BestInEditDialog } from '../dialogs/best-in-edit.dialog';
 import { getLinkUrlWithToken } from '../helpers/layersUtils';
+import { disableActionByPredicate } from '../helpers/actionsUtils';
 import { queue } from '../snackbar/notification-queue';
 
 import './catalog-tree.css';
@@ -215,33 +215,6 @@ export const CatalogTreeComponent: React.FC<CatalogTreeComponentProps> = observe
       );
     }
 
-    const disableActionByPredicate = (
-      data: Record<string, any>,
-      actionToDiable: string,
-      predicate: (data: Record<string, unknown>) => boolean
-    ): IActionGroup[] => {
-      const actionGroups = (entityPermittedActions[data.__typename] as IActionGroup[]).map(
-        (group) => ({
-          ...group,
-          group: group.group.map((action) => ({ ...action })),
-        })
-      );
-
-      if (predicate(data)) {
-        const deleteGroup = actionGroups.find((group) =>
-          group.group.some((action) => action.action === actionToDiable)
-        );
-
-        const deleteAction = deleteGroup?.group.find((action) => action.action === actionToDiable);
-
-        if (deleteAction) {
-          deleteAction.disabled = true;
-        }
-      }
-
-      return actionGroups;
-    };
-
     return (
       <>
         {loading && <Loading />}
@@ -338,6 +311,7 @@ export const CatalogTreeComponent: React.FC<CatalogTreeComponentProps> = observe
                         <ActionsRenderer
                           node={rowInfo.node}
                           actions={disableActionByPredicate(
+                            entityPermittedActions,
                             rowInfo.node,
                             'delete',
                             (data) => !isUnpublished(data)

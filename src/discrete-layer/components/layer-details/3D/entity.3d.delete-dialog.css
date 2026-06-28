@@ -1,6 +1,6 @@
 #entityDeleteDialog {
-  --header-height: 150px;
   --warning-message-height: 60px;
+  --header-height: 150px;
   --footer-height: 60px;
   --modal-height: 100vh;
   --modal-width: 888px;
@@ -48,16 +48,9 @@ body[dir='rtl'] #entityDeleteDialog .closeIcon {
   align-items: center;
 }
 
-@media (min-width: 900px) {
-  #entityDeleteDialog .mdc-dialog .mdc-dialog__surface {
-    max-width: var(--modal-width);
-    height: var(--modal-height);
-  }
-
-  #entityDeleteDialog .mdc-dialog .mdc-dialog__surface .mdc-dialog .mdc-dialog__surface {
-    max-width: var(--modal-width);
-    height: var(--chonky-modal-height);
-  }
+#entityDeleteDialog .mdc-dialog .mdc-dialog__surface {
+  max-width: var(--modal-width);
+  height: var(--modal-height);
 }
 
 #deleteLayerDetailsContainer {

@@ -11,11 +11,12 @@ import { Mode } from '../../../../common/models/mode.enum';
 import { UserAction } from '../../../models/userStore';
 import { EntityDescriptorModelType, RecordType, useQuery, useStore } from '../../../models';
 import { LayersDetailsComponent } from '../layer-details';
-import { DialogActionTitle, EntityDeleteDialogProps } from '../3D/entity.3d.delete-dialog';
+import { EntityDeleteDialogProps } from '../3D/entity.3d.delete-dialog';
 import { useDeleteLayer, VALID } from '../delete.hook';
 import { GeoFeaturesPresentorComponent } from './pp-map';
 
 import './entity.raster.delete-dialog.css';
+import { DialogActionTitle } from '../dialog.helpers';
 
 export const RasterDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
   (props: EntityDeleteDialogProps) => {
@@ -158,7 +159,7 @@ export const RasterDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
                         value={props.values.approvalCode}
                         type="password"
                         required
-                        autoComplete="off"
+                        autoComplete="new-password"
                         onChange={props.handleChange}
                       />
                     </Box>

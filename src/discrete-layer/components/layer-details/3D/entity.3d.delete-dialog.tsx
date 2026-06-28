@@ -8,7 +8,7 @@ import {
   DialogActions,
   DialogContent,
 } from '@map-colonies/react-core';
-import { Dialog, DialogTitle, Icon, IconButton, Typography } from '@map-colonies/react-core';
+import { Dialog, Icon, Typography } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
 import { GraphQLError } from '../../../../common/components/error/graphql.error-presentor';
 import { Mode } from '../../../../common/models/mode.enum';
@@ -26,6 +26,7 @@ import { LayersDetailsComponent } from '../layer-details';
 import { useDeleteLayer, VALID } from '../delete.hook';
 
 import './entity.3d.delete-dialog.css';
+import { DialogActionTitle } from '../dialog.helpers';
 
 export interface EntityDeleteDialogProps {
   isOpen: boolean;
@@ -33,33 +34,6 @@ export interface EntityDeleteDialogProps {
   layerRecord: ILayerImage;
   recordType?: RecordType;
 }
-
-export interface DeleteTitleProps {
-  domain: string;
-  action: Mode;
-  onClose: () => void;
-}
-
-export const DialogActionTitle: React.FC<DeleteTitleProps> = (props) => {
-  const intl = useIntl();
-  const title = intl.formatMessage(
-    { id: `general.title.${props.action.toLowerCase()}` },
-    { value: props.domain }
-  );
-
-  return (
-    <DialogTitle>
-      {title}
-      <IconButton
-        className="closeIcon mc-icon-Close"
-        label="CLOSE"
-        onClick={(): void => {
-          props.onClose();
-        }}
-      />
-    </DialogTitle>
-  );
-};
 
 export const EntityDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
   (props: EntityDeleteDialogProps) => {

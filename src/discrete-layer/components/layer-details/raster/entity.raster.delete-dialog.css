@@ -1,7 +1,6 @@
 #rasterDeleteDialog {
-  --header-height: 150px;
   --warning-message-height: 60px;
-  /* --details-height: 150px; */
+  --header-height: 150px;
   --fields-height: 36px;
   --fields-offset: 8px;
   --footer-height: 60px;
@@ -46,16 +45,9 @@ body[dir='rtl'] #rasterDeleteDialog .closeIcon {
   align-items: center;
 }
 
-@media (min-width: 900px) {
-  #rasterDeleteDialog .mdc-dialog .mdc-dialog__surface {
-    max-width: var(--modal-width);
-    height: var(--modal-height);
-  }
-
-  #rasterDeleteDialog .mdc-dialog .mdc-dialog__surface .mdc-dialog .mdc-dialog__surface {
-    max-width: var(--modal-width);
-    height: var(--chonky-modal-height);
-  }
+#rasterDeleteDialog .mdc-dialog .mdc-dialog__surface {
+  max-width: var(--modal-width);
+  height: var(--modal-height);
 }
 
 #rasterDeleteDialog .deleteLayerDetailsContainer {

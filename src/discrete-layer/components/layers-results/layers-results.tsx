@@ -33,7 +33,7 @@ import {
   getResponseErrorMesssage,
   getResponseErrorURL,
 } from '../../../common/helpers/server-error';
-import { IActionGroup } from '../../../common/actions/entity.actions';
+import { disableActionByPredicate } from '../helpers/actionsUtils';
 // import { usePrevious } from '../../../common/hooks/previous.hook';
 import { LayerRasterRecordModelType } from '../../models';
 import { IDispatchAction } from '../../models/actionDispatcherStore';
@@ -133,33 +133,6 @@ export const LayersResults: React.FC<LayersResultsProps> = observer((props) => {
     });
     return entityActions;
   }, [store.userStore.user]);
-
-  const disableActionByPredicate = (
-    data: Record<string, any>,
-    actionToDiable: string,
-    predicate: (data: Record<string, unknown>) => boolean
-  ): IActionGroup[] => {
-    const actionGroups = (entityPermittedActions[data.__typename] as IActionGroup[]).map(
-      (group) => ({
-        ...group,
-        group: group.group.map((action) => ({ ...action })),
-      })
-    );
-
-    if (predicate(data)) {
-      const deleteGroup = actionGroups.find((group) =>
-        group.group.some((action) => action.action === actionToDiable)
-      );
-
-      const deleteAction = deleteGroup?.group.find((action) => action.action === actionToDiable);
-
-      if (deleteAction) {
-        deleteAction.disabled = true;
-      }
-    }
-
-    return actionGroups;
-  };
 
   const dispatchAction = (action: Record<string, unknown>): void => {
     store.actionDispatcherStore.dispatchAction({
@@ -288,7 +261,12 @@ export const LayersResults: React.FC<LayersResultsProps> = observer((props) => {
       width: 0,
       cellRenderer: 'actionsRenderer',
       cellRendererParams: (params: any) => ({
-        actions: disableActionByPredicate(params.data, 'delete', (data) => !isUnpublished(data)),
+        actions: disableActionByPredicate(
+          entityPermittedActions,
+          params.data,
+          'delete',
+          (data) => !isUnpublished(data)
+        ),
         actionHandler: dispatchAction,
       }),
     },
