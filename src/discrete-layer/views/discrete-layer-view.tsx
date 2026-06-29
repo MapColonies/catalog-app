@@ -1350,7 +1350,6 @@ const DiscreteLayerView: React.FC = observer(() => {
               center={CONFIG.MAP.CENTER}
               zoom={CONFIG.MAP.ZOOM}
               sceneMode={CesiumSceneMode.SCENE2D}
-              imageryProvider={false}
               locale={mapSettingsLocale}
               baseMaps={store.discreteLayersStore.baseMaps}
               layerManagerMetaMapping={layerManagerMetaMapping}
