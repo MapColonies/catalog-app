@@ -50,7 +50,9 @@ const WebSocketNotifications: React.FC = () => {
         },
         {
           next: (res) => {
-            const taskUpdateDetails = (res.data as { taskUpdateDetails: CallBack<unknown> } | null | undefined)?.taskUpdateDetails;
+            const taskUpdateDetails = (
+              res.data as { taskUpdateDetails: CallBack<unknown> } | null | undefined
+            )?.taskUpdateDetails;
             if (!taskUpdateDetails) return;
             console.log(
               'WebSocket notification received for',
