@@ -110,7 +110,7 @@ export class Layer3DRecordModelSelector extends QueryBuilder {
   get insertDate() { return this.__attr(`insertDate`) }
   get wktGeometry() { return this.__attr(`wktGeometry`) }
   get keywords() { return this.__attr(`keywords`) }
-  links(builder?: string | LinkModelSelector | ((selector: LinkModelSelector) => LinkModelSelector)) { return this.__child(`links`, LinkModelSelector, builder) }
+  links(builder: string | LinkModelSelector | ((selector: LinkModelSelector) => LinkModelSelector) | undefined) { return this.__child(`links`, LinkModelSelector, builder) }
 }
 export function selectFromLayer3DRecord() {
   return new Layer3DRecordModelSelector()

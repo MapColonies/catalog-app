@@ -105,16 +105,16 @@ export class FieldConfigModelSelector extends QueryBuilder {
   get dateGranularity() { return this.__attr(`dateGranularity`) }
   get lookupTable() { return this.__attr(`lookupTable`) }
   get lookupExcludeFields() { return this.__attr(`lookupExcludeFields`) }
-  isFilterable(builder?: string | FilterableFieldConfigModelSelector | ((selector: FilterableFieldConfigModelSelector) => FilterableFieldConfigModelSelector)) { return this.__child(`isFilterable`, FilterableFieldConfigModelSelector, builder) }
-  isBriefField(builder?: string | BriefFieldConfigModelSelector | ((selector: BriefFieldConfigModelSelector) => BriefFieldConfigModelSelector)) { return this.__child(`isBriefField`, BriefFieldConfigModelSelector, builder) }
-  autocomplete(builder?: string | AutocompletionModelSelector | ((selector: AutocompletionModelSelector) => AutocompletionModelSelector)) { return this.__child(`autocomplete`, AutocompletionModelSelector, builder) }
-  validation(builder?: string | ValidationConfigModelSelector | ((selector: ValidationConfigModelSelector) => ValidationConfigModelSelector)) { return this.__child(`validation`, ValidationConfigModelSelector, builder) }
-  enumValues(builder?: string | EnumAspectsModelSelector | ((selector: EnumAspectsModelSelector) => EnumAspectsModelSelector)) { return this.__child(`enumValues`, EnumAspectsModelSelector, builder) }
-  subFields(builder?: string | FieldConfigModelSelector | ((selector: FieldConfigModelSelector) => FieldConfigModelSelector)) { return this.__child(`subFields`, FieldConfigModelSelector, builder) }
-  updateRules(builder?: string | UpdateRulesModelSelector | ((selector: UpdateRulesModelSelector) => UpdateRulesModelSelector)) { return this.__child(`updateRules`, UpdateRulesModelSelector, builder) }
-  lookupTableBinding(builder?: string | LookupTableBindingModelSelector | ((selector: LookupTableBindingModelSelector) => LookupTableBindingModelSelector)) { return this.__child(`lookupTableBinding`, LookupTableBindingModelSelector, builder) }
-  dependentField(builder?: string | DependentFieldModelSelector | ((selector: DependentFieldModelSelector) => DependentFieldModelSelector)) { return this.__child(`dependentField`, DependentFieldModelSelector, builder) }
-  shapeFileMapping(builder?: string | ShapeMappingModelSelector | ((selector: ShapeMappingModelSelector) => ShapeMappingModelSelector)) { return this.__child(`shapeFileMapping`, ShapeMappingModelSelector, builder) }
+  isFilterable(builder: string | FilterableFieldConfigModelSelector | ((selector: FilterableFieldConfigModelSelector) => FilterableFieldConfigModelSelector) | undefined) { return this.__child(`isFilterable`, FilterableFieldConfigModelSelector, builder) }
+  isBriefField(builder: string | BriefFieldConfigModelSelector | ((selector: BriefFieldConfigModelSelector) => BriefFieldConfigModelSelector) | undefined) { return this.__child(`isBriefField`, BriefFieldConfigModelSelector, builder) }
+  autocomplete(builder: string | AutocompletionModelSelector | ((selector: AutocompletionModelSelector) => AutocompletionModelSelector) | undefined) { return this.__child(`autocomplete`, AutocompletionModelSelector, builder) }
+  validation(builder: string | ValidationConfigModelSelector | ((selector: ValidationConfigModelSelector) => ValidationConfigModelSelector) | undefined) { return this.__child(`validation`, ValidationConfigModelSelector, builder) }
+  enumValues(builder: string | EnumAspectsModelSelector | ((selector: EnumAspectsModelSelector) => EnumAspectsModelSelector) | undefined) { return this.__child(`enumValues`, EnumAspectsModelSelector, builder) }
+  subFields(builder: string | FieldConfigModelSelector | ((selector: FieldConfigModelSelector) => FieldConfigModelSelector) | undefined) { return this.__child(`subFields`, FieldConfigModelSelector, builder) }
+  updateRules(builder: string | UpdateRulesModelSelector | ((selector: UpdateRulesModelSelector) => UpdateRulesModelSelector) | undefined) { return this.__child(`updateRules`, UpdateRulesModelSelector, builder) }
+  lookupTableBinding(builder: string | LookupTableBindingModelSelector | ((selector: LookupTableBindingModelSelector) => LookupTableBindingModelSelector) | undefined) { return this.__child(`lookupTableBinding`, LookupTableBindingModelSelector, builder) }
+  dependentField(builder: string | DependentFieldModelSelector | ((selector: DependentFieldModelSelector) => DependentFieldModelSelector) | undefined) { return this.__child(`dependentField`, DependentFieldModelSelector, builder) }
+  shapeFileMapping(builder: string | ShapeMappingModelSelector | ((selector: ShapeMappingModelSelector) => ShapeMappingModelSelector) | undefined) { return this.__child(`shapeFileMapping`, ShapeMappingModelSelector, builder) }
 }
 export function selectFromFieldConfig() {
   return new FieldConfigModelSelector()

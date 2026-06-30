@@ -29,7 +29,7 @@ export const EntityDescriptorModelBase = ModelBase
 
 export class EntityDescriptorModelSelector extends QueryBuilder {
   get type() { return this.__attr(`type`) }
-  categories(builder?: string | CategoryConfigModelSelector | ((selector: CategoryConfigModelSelector) => CategoryConfigModelSelector)) { return this.__child(`categories`, CategoryConfigModelSelector, builder) }
+  categories(builder: string | CategoryConfigModelSelector | ((selector: CategoryConfigModelSelector) => CategoryConfigModelSelector) | undefined) { return this.__child(`categories`, CategoryConfigModelSelector, builder) }
 }
 export function selectFromEntityDescriptor() {
   return new EntityDescriptorModelSelector()

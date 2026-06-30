@@ -41,7 +41,7 @@ export class GetFeatureModelSelector extends QueryBuilder {
   get numberReturned() { return this.__attr(`numberReturned`) }
   get timeStamp() { return this.__attr(`timeStamp`) }
   get crs() { return this.__attr(`crs`) }
-  features(builder?: string | WfsFeatureModelSelector | ((selector: WfsFeatureModelSelector) => WfsFeatureModelSelector)) { return this.__child(`features`, WfsFeatureModelSelector, builder) }
+  features(builder: string | WfsFeatureModelSelector | ((selector: WfsFeatureModelSelector) => WfsFeatureModelSelector) | undefined) { return this.__child(`features`, WfsFeatureModelSelector, builder) }
 }
 export function selectFromGetFeature() {
   return new GetFeatureModelSelector()

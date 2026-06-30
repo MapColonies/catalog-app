@@ -80,7 +80,7 @@ export class JobModelSelector extends QueryBuilder {
   get inProgressTasks() { return this.__attr(`inProgressTasks`) }
   get isCleaned() { return this.__attr(`isCleaned`) }
   get domain() { return this.__attr(`domain`) }
-  availableActions(builder?: string | AvailableActionsModelSelector | ((selector: AvailableActionsModelSelector) => AvailableActionsModelSelector)) { return this.__child(`availableActions`, AvailableActionsModelSelector, builder) }
+  availableActions(builder: string | AvailableActionsModelSelector | ((selector: AvailableActionsModelSelector) => AvailableActionsModelSelector) | undefined) { return this.__child(`availableActions`, AvailableActionsModelSelector, builder) }
 }
 export function selectFromJob() {
   return new JobModelSelector()
