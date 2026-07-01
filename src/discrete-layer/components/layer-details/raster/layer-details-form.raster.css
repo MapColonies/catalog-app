@@ -116,29 +116,6 @@ body[dir='rtl'] #layerDetailsFormRaster .enumOptions .mdc-select__dropdown-icon 
   direction: inherit !important;
 }
 
-#layerDetailsFormRaster .mdc-checkbox__ripple {
-  display: none;
-}
-
-#layerDetailsFormRaster .flexCheckItem {
-  flex: 1;
-  position: relative;
-}
-
-#layerDetailsFormRaster .mdc-checkbox__background {
-  width: 12px;
-  height: 12px;
-}
-
-#layerDetailsFormRaster .showOnMapContainer .mdc-checkbox {
-  padding-left: 0px;
-}
-
-#layerDetailsFormRaster .showOnMapContainer label {
-  padding-bottom: 6px;
-  color: var(--mdc-theme-text-icon-on-dark);
-}
-
 #layerDetailsFormRaster .remainingTime {
   width: auto;
   position: absolute;

@@ -1,4 +1,4 @@
-#entityRasterDialog .geoFeaturesMapContainer .checkbox {
+#geoFeaturesMapContainer .checkbox {
   display: inline-block;
   position: absolute;
   bottom: 1px;
@@ -9,22 +9,40 @@
   padding-right: 12px;
 }
 
-body[dir='rtl'] #entityRasterDialog .geoFeaturesMapContainer .checkbox {
+body[dir='rtl'] #geoFeaturesMapContainer .checkbox {
   direction: rtl;
   padding-right: unset;
   padding-left: 12px;
 }
 
-.geoFeaturesMapContainer {
+#geoFeaturesMapContainer {
   position: relative;
 }
 
-.geoFeaturesMapContainer .ol-zoom button,
-.geoFeaturesMapContainer .ol-legend button {
+#geoFeaturesMapContainer .ol-zoom button,
+#geoFeaturesMapContainer .ol-legend button {
   cursor: pointer;
 }
 
-.featurePropertiesPopup {
+#geoFeaturesMapContainer .mdc-checkbox__ripple {
+  display: none;
+}
+
+#geoFeaturesMapContainer .showOnMapContainer .mdc-checkbox {
+  padding-left: 0px;
+}
+
+#geoFeaturesMapContainer .mdc-checkbox__background {
+  width: 12px;
+  height: 12px;
+}
+
+#geoFeaturesMapContainer .showOnMapContainer label {
+  padding-bottom: 6px;
+  color: var(--mdc-theme-text-icon-on-dark);
+}
+
+#geoFeaturesMapContainer .featurePropertiesPopup {
   position: absolute;
   top: 8px;
   left: 8px;

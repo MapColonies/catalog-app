@@ -179,6 +179,9 @@
   "delete.dialog.action": "מחיקת",
   "delete.dialog.checkbox": "אישור מחיקה",
 
+  "delete.approver-name": "שם מבצע:",
+  "delete.approval-code": "קוד מאשר:",
+
   "snack.message.success": "הצלחה",
   "snack.message.failed": "כשלון",
   "snack.dismiss-btn.text": "אישור",

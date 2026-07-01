@@ -1,0 +1,94 @@
+#rasterDeleteDialog {
+  --warning-message-height: 60px;
+  --header-height: 150px;
+  --fields-height: 36px;
+  --fields-offset: 8px;
+  --footer-height: 60px;
+  --modal-height: 100vh;
+  --modal-width: 888px;
+  --map-height: calc(
+    100% - var(--header-height) - var(--warning-message-height) - var(--fields-height) -
+      var(--fields-offset) - var(--footer-height)
+  );
+}
+
+#rasterDeleteDialog .icon {
+  color: var(--mdc-theme-gc-warning-high);
+  font-size: 28px;
+  margin: 12px;
+}
+
+#rasterDeleteDialog .footer {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  height: var(--footer-height);
+}
+
+#rasterDeleteDialog .buttons {
+  display: flex;
+  gap: 20px;
+}
+
+#rasterDeleteDialog .closeIcon {
+  margin-left: auto;
+}
+
+body[dir='rtl'] #rasterDeleteDialog .closeIcon {
+  margin-left: unset;
+  margin-right: auto;
+}
+
+#rasterDeleteDialog .deleteWarning {
+  height: var(--warning-message-height);
+  display: flex;
+  align-items: center;
+}
+
+#rasterDeleteDialog .mdc-dialog .mdc-dialog__surface {
+  max-width: var(--modal-width);
+  height: var(--modal-height);
+}
+
+#rasterDeleteDialog .deleteLayerDetailsContainer {
+  position: relative;
+  display: flex;
+  background-color: var(--mdc-theme-text-primary-on-light);
+  padding: 8px;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: var(--header-height);
+}
+
+#rasterDeleteDialog .deleteLayerDetails {
+  margin: 0 0;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+}
+
+#rasterDeleteDialog .errors {
+  width: 100%;
+  margin: 0px 12px;
+}
+
+#rasterDeleteDialog .fields {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  height: var(--fields-height);
+  gap: 16px;
+  margin-top: var(--fields-offset);
+}
+
+#rasterDeleteDialog .field {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  padding: 4px 4px;
+}
+
+#rasterDeleteDialog .field .mdc-text-field {
+  flex: 1;
+}

@@ -7,7 +7,6 @@ import { changeNodeAtPath, getNodeAtPath, find, ExtendedNodeData } from 'react-s
 import { useIntl } from 'react-intl';
 import { Box } from '@map-colonies/react-components';
 import { useTheme } from '@map-colonies/react-core';
-import { IActionGroup } from '../../../common/actions/entity.actions';
 import { TreeComponent, TreeItem } from '../../../common/components/tree';
 import { ActionsRenderer } from '../../../common/components/tree/icon-renderers/actions.button-renderer';
 import { FootprintRenderer } from '../../../common/components/tree/icon-renderers/footprint.icon-renderer';
@@ -15,7 +14,7 @@ import { LayerImageRenderer } from '../../../common/components/tree/icon-rendere
 import { ProductTypeRenderer } from '../../../common/components/tree/icon-renderers/product-type.icon-renderer';
 import { Error } from '../../../common/components/tree/statuses/error';
 import { Loading } from '../../../common/components/tree/statuses/loading';
-import { getTextStyle } from '../../../common/helpers/style';
+import { getTextStyle, isUnpublished } from '../../../common/helpers/style';
 import { isValidLayerMetadata } from '../../../common/helpers/layer-url';
 import { LinkType } from '../../../common/models/link-type.enum';
 import {
@@ -30,6 +29,7 @@ import { TabViews } from '../../views/tab-views';
 import { LayerMetadataMixedUnion } from '../../models';
 import { BestInEditDialog } from '../dialogs/best-in-edit.dialog';
 import { getLinkUrlWithToken } from '../helpers/layersUtils';
+import { disableActionByPredicate } from '../helpers/actionsUtils';
 import { queue } from '../snackbar/notification-queue';
 
 import './catalog-tree.css';
@@ -310,9 +310,12 @@ export const CatalogTreeComponent: React.FC<CatalogTreeComponentProps> = observe
                       hoveredNode.parentPath === rowInfo.path.slice(0, -1).toString() && (
                         <ActionsRenderer
                           node={rowInfo.node}
-                          actions={
-                            entityPermittedActions[rowInfo.node.__typename] as IActionGroup[]
-                          }
+                          actions={disableActionByPredicate(
+                            entityPermittedActions,
+                            rowInfo.node,
+                            'delete',
+                            (data) => !isUnpublished(data)
+                          )}
                           entity={rowInfo.node.__typename}
                           actionHandler={dispatchAction}
                         />

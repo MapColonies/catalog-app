@@ -179,6 +179,9 @@
   "delete.dialog.action": "Delete",
   "delete.dialog.checkbox": "Confirm deleting",
 
+  "delete.approver-name": "Approver name:",
+  "delete.approval-code": "Approval code:",
+
   "snack.message.success": "SUCCESS",
   "snack.message.failed": "FAILURE",
   "snack.dismiss-btn.text": "Dismiss",

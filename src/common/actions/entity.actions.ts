@@ -15,6 +15,7 @@ export interface IAction {
   class: string;
   titleTranslationId: string;
   views: TabViews[];
+  disabled?: boolean;
   dependentField?: DependentField;
 }
 
@@ -113,6 +114,14 @@ const ACTIONS_CONFIG: IEntityActions[] = [
             class: 'mc-icon-Update',
             titleTranslationId: 'action.update.tooltip',
             dependentField: { field: 'layerURLMissing', expectedValue: false },
+            views: [TabViews.CATALOG, TabViews.SEARCH_RESULTS],
+          },
+          {
+            action: 'delete',
+            frequent: false,
+            icon: '',
+            class: 'mc-icon-Delete',
+            titleTranslationId: 'action.delete.tooltip',
             views: [TabViews.CATALOG, TabViews.SEARCH_RESULTS],
           },
         ],

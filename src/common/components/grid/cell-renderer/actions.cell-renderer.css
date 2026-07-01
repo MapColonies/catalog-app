@@ -106,3 +106,8 @@ body[dir='rtl'] #gridActionsCellRenderer .actionMenuItemTitle {
 .actionMenuItemContainer:hover {
   background: var(--mdc-theme-gc-alternative-surface);
 }
+
+#gridActionsCellRenderer .disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}

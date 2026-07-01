@@ -104,9 +104,7 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
       return { ...action, group: groupsWithTranslation };
     });
 
-    return {
-      [JOB_ENTITY]: actions,
-    };
+    return actions;
   }, []);
 
   useEffect(() => {

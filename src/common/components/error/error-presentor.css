@@ -16,6 +16,7 @@
   height: 60px;
   min-width: 264px;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 body[dir='rtl'] .errorsList {

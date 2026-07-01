@@ -28,11 +28,12 @@ import { Loading } from '../../../common/components/tree/statuses/loading';
 import CONFIG from '../../../common/config';
 import { getMax } from '../../../common/helpers/array';
 import { dateFormatter } from '../../../common/helpers/formatters';
-import { isPolygonPartsShown } from '../../../common/helpers/style';
+import { isPolygonPartsShown, isUnpublished } from '../../../common/helpers/style';
 import {
   getResponseErrorMesssage,
   getResponseErrorURL,
 } from '../../../common/helpers/server-error';
+import { disableActionByPredicate } from '../helpers/actionsUtils';
 // import { usePrevious } from '../../../common/hooks/previous.hook';
 import { LayerRasterRecordModelType } from '../../models';
 import { IDispatchAction } from '../../models/actionDispatcherStore';
@@ -259,10 +260,15 @@ export const LayersResults: React.FC<LayersResultsProps> = observer((props) => {
       headerName: '',
       width: 0,
       cellRenderer: 'actionsRenderer',
-      cellRendererParams: {
-        actions: entityPermittedActions,
+      cellRendererParams: (params: any) => ({
+        actions: disableActionByPredicate(
+          entityPermittedActions,
+          params.data,
+          'delete',
+          (data) => !isUnpublished(data)
+        ),
         actionHandler: dispatchAction,
-      },
+      }),
     },
   ];
 
