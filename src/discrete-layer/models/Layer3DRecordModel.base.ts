@@ -27,6 +27,7 @@ export const Layer3DRecordModelBase = ModelBase
     // ASSAF: MUST REMAIN STRING
     productVersion: types.union(types.undefined, types.null, types.string),
     productType: types.union(types.undefined, ProductTypeEnumType),
+    productSubType: types.union(types.undefined, types.null, types.string),
     description: types.union(types.undefined, types.null, types.string),
     creationDate: types.union(types.undefined, types.null, types.frozen()),
     updateDate: types.union(types.undefined, types.null, types.frozen()),
@@ -75,6 +76,7 @@ export class Layer3DRecordModelSelector extends QueryBuilder {
   get productName() { return this.__attr(`productName`) }
   get productVersion() { return this.__attr(`productVersion`) }
   get productType() { return this.__attr(`productType`) }
+  get productSubType() { return this.__attr(`productSubType`) }
   get description() { return this.__attr(`description`) }
   get creationDate() { return this.__attr(`creationDate`) }
   get updateDate() { return this.__attr(`updateDate`) }
@@ -114,4 +116,4 @@ export function selectFromLayer3DRecord() {
   return new Layer3DRecordModelSelector()
 }
 
-export const layer3DRecordModelPrimitives = selectFromLayer3DRecord().type.productId.productName.productVersion.productType.description.creationDate.updateDate.sourceDateStart.sourceDateEnd.minResolutionMeter.maxResolutionMeter.maxAccuracyCE90.absoluteAccuracyLE90.accuracySE90.relativeAccuracySE90.visualAccuracy.sensors.footprint.heightRangeFrom.heightRangeTo.srsId.srsName.region.classification.productionSystem.productionSystemVer.producerName.minFlightAlt.maxFlightAlt.geographicArea.productBoundingBox.productSource.productStatus.insertDate.wktGeometry.keywords.id.links(linkModelPrimitives)
+export const layer3DRecordModelPrimitives = selectFromLayer3DRecord().type.productId.productName.productVersion.productType.productSubType.description.creationDate.updateDate.sourceDateStart.sourceDateEnd.minResolutionMeter.maxResolutionMeter.maxAccuracyCE90.absoluteAccuracyLE90.accuracySE90.relativeAccuracySE90.visualAccuracy.sensors.footprint.heightRangeFrom.heightRangeTo.srsId.srsName.region.classification.productionSystem.productionSystemVer.producerName.minFlightAlt.maxFlightAlt.geographicArea.productBoundingBox.productSource.productStatus.insertDate.wktGeometry.keywords.id.links(linkModelPrimitives)
