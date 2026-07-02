@@ -1,4 +1,10 @@
-import { CesiumGeographicTilingScheme, Proj, IRasterLayer, IBaseMaps, IBaseMap } from '@map-colonies/react-components';
+import {
+  CesiumGeographicTilingScheme,
+  Proj,
+  IRasterLayer,
+  IBaseMaps,
+  IBaseMap,
+} from '@map-colonies/react-components';
 import { LinkType } from '../models/link-type.enum';
 import { IRasterIngestionFilesStructureConfig } from '../models/raster-ingestion-files-structure';
 

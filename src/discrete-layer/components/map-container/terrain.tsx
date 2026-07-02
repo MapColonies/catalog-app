@@ -51,7 +51,9 @@ export const Terrain: React.FC<TerrainProps> = () => {
     }
 
     if (CONFIG.DEFAULT_TERRAIN_PROVIDER_URL as string) {
-      void CesiumCesiumTerrainProvider.fromUrl(getTokenResource(CONFIG.DEFAULT_TERRAIN_PROVIDER_URL)).then((provider) => {
+      void CesiumCesiumTerrainProvider.fromUrl(
+        getTokenResource(CONFIG.DEFAULT_TERRAIN_PROVIDER_URL)
+      ).then((provider) => {
         mapViewer.terrainProvider = provider;
         provider.errorEvent.addEventListener(handleTerrainError);
       });

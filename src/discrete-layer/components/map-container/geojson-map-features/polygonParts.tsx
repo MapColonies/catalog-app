@@ -283,7 +283,7 @@ export const PolygonParts: React.FC = observer(() => {
           },
         ],
       },
-    }
+    },
   };
 
   const NOT_VALID = 'NOT_VALID';
