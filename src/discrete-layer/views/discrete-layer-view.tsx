@@ -33,9 +33,9 @@ import {
   IDrawing,
   IDrawingEvent,
   ILayerManagerMetaMapping,
+  GeocoderOptions,
+  IMapLegend,
 } from '@map-colonies/react-components';
-import { GeocoderOptions } from '@map-colonies/react-components/dist/cesium-map/geocoder/geocoder-panel';
-import { IMapLegend } from '@map-colonies/react-components/dist/cesium-map/legend';
 import { getTextDirection, isRtl } from '../../common/i18n/helpers';
 import { AutoDirectionBox } from '../../common/components/auto-direction-box/auto-direction-box.component';
 // import { BrowserCompatibilityChecker } from '../../common/components/browser-compatibility-checker/browser-compatibility-checker';
