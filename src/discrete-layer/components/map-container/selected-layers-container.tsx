@@ -154,8 +154,13 @@ export const SelectedLayersContainer: React.FC = observer(() => {
           <CesiumWFSLayer
             key={layer.id}
             options={options}
-            meta={layer as unknown as Record<string, unknown>}
-            withGeometryValidation={true}
+            meta={{
+              id: layer.id,
+              layerRecord: {
+                ...layer,
+              },
+            }}
+            withGeometryValidation
           />
         );
       default:

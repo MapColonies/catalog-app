@@ -27,7 +27,7 @@ export const UpdateRulesValueModelBase = ModelBase
   }))
 
 export class UpdateRulesValueModelSelector extends QueryBuilder {
-  operation(builder?: string | UpdateRulesOperationModelSelector | ((selector: UpdateRulesOperationModelSelector) => UpdateRulesOperationModelSelector)) { return this.__child(`operation`, UpdateRulesOperationModelSelector, builder) }
+  operation(builder: string | UpdateRulesOperationModelSelector | ((selector: UpdateRulesOperationModelSelector) => UpdateRulesOperationModelSelector) | undefined) { return this.__child(`operation`, UpdateRulesOperationModelSelector, builder) }
 }
 export function selectFromUpdateRulesValue() {
   return new UpdateRulesValueModelSelector()

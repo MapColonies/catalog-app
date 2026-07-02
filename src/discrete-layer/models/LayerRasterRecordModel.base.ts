@@ -98,7 +98,7 @@ export class LayerRasterRecordModelSelector extends QueryBuilder {
   get transparency() { return this.__attr(`transparency`) }
   get insertDate() { return this.__attr(`insertDate`) }
   get keywords() { return this.__attr(`keywords`) }
-  links(builder?: string | LinkModelSelector | ((selector: LinkModelSelector) => LinkModelSelector)) { return this.__child(`links`, LinkModelSelector, builder) }
+  links(builder: string | LinkModelSelector | ((selector: LinkModelSelector) => LinkModelSelector) | undefined) { return this.__child(`links`, LinkModelSelector, builder) }
 }
 export function selectFromLayerRasterRecord() {
   return new LayerRasterRecordModelSelector()

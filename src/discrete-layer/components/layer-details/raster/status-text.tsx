@@ -19,7 +19,7 @@ export const StatusText: React.FC<StatusTextProps> = ({ status, reason }) => {
   const [dots, setDots] = useState<string>('');
 
   useEffect(() => {
-    let interval: NodeJS.Timer;
+    let interval: ReturnType<typeof setInterval>;
     if (status === Status.InProgress) {
       interval = setInterval(() => {
         setDots((prevDots) => (prevDots.length < 3 ? prevDots + '.' : ''));
