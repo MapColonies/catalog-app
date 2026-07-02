@@ -7,7 +7,9 @@ import {
   CesiumWFSLayer,
   CesiumWMTSLayer,
   CesiumXYZLayer,
+  getImageryProviderUrl,
   ICesiumImageryLayer,
+  isBaseMapLayer,
   useCesiumMap,
 } from '@map-colonies/react-components';
 import CONFIG from '../../../common/config';
@@ -36,6 +38,13 @@ export const SelectedLayersContainer: React.FC = observer(() => {
   const prevLayersImages = usePrevious<ILayerImage[]>(layersImages);
   const cacheRef = useRef({} as CacheMap);
   const mapViewer = useCesiumMap();
+
+  const getUrlWithoutQueryParams = (url?: string): string | undefined => {
+    if (!url) {
+      return undefined;
+    }
+    return url.split('?')[0];
+  };
 
   useEffect(() => {
     if (store.discreteLayersStore.layersImages) {
@@ -69,11 +78,14 @@ export const SelectedLayersContainer: React.FC = observer(() => {
                 const correctLinkByProtocol = (layer.links as LinkModelType[]).find(
                   (link) => link.protocol === layerLink.protocol
                 );
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                return (
-                  correctLinkByProtocol?.url ===
-                  (cesiumLayer as any)._imageryProvider._resource._url
+                const linkUrl = getUrlWithoutQueryParams(correctLinkByProtocol?.url);
+                const cesiumLayerLinkUrl = getUrlWithoutQueryParams(
+                  getImageryProviderUrl(cesiumLayer)
                 );
+                if (!linkUrl || !cesiumLayerLinkUrl) {
+                  return false;
+                }
+                return linkUrl === cesiumLayerLinkUrl;
               }) as SearchLayerPredicate,
               layerRecord: {
                 ...layer,
@@ -100,6 +112,10 @@ export const SelectedLayersContainer: React.FC = observer(() => {
               layerLink.url as string,
               (layer as Layer3DRecordModelType).productVersion as string
             )}
+            meta={{
+              id: layer.id,
+              layerRecord: { ...layer },
+            }}
           />
         );
       case LinkType.WMTS_LAYER:
@@ -120,14 +136,17 @@ export const SelectedLayersContainer: React.FC = observer(() => {
             meta={{
               id: layer.id,
               searchLayerPredicate: ((cesiumLayer, idx) => {
-                const linkUrl = (optionsWMTS.url as Record<string, any>)._url as string;
-                const cesiumLayerLinkUrl = get(
-                  cesiumLayer,
-                  '_imageryProvider._resource._url'
-                ) as string;
-                const isBaseLayer = get(cesiumLayer, 'meta.parentBasetMapId') as string;
+                const linkUrl = getUrlWithoutQueryParams(
+                  get(optionsWMTS, 'url._url') as string | undefined
+                );
+                const cesiumLayerLinkUrl = getUrlWithoutQueryParams(
+                  getImageryProviderUrl(cesiumLayer)
+                );
+                if (!linkUrl || !cesiumLayerLinkUrl) {
+                  return false;
+                }
                 const isLayerFound =
-                  linkUrl.split('?')[0] === cesiumLayerLinkUrl.split('?')[0] && !isBaseLayer;
+                  linkUrl === cesiumLayerLinkUrl && !isBaseMapLayer(cesiumLayer.meta);
                 return isLayerFound;
               }) as SearchLayerPredicate,
               layerRecord: {
@@ -154,7 +173,7 @@ export const SelectedLayersContainer: React.FC = observer(() => {
           <CesiumWFSLayer
             key={layer.id}
             options={options}
-            meta={layer as unknown as Record<string, unknown>}
+            meta={{ id: layer.id, layerRecord: { ...layer } }}
             withGeometryValidation={true}
           />
         );
