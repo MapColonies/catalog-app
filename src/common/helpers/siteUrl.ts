@@ -1,4 +1,4 @@
-import { GraphQLClient } from 'mst-gql/node_modules/graphql-request';
+import { GraphQLClient } from 'graphql-request';
 import { createHttpClient } from 'mst-gql';
 import { site, siteName } from '../../discrete-layer/models/userStore';
 import CONFIG from '../config';

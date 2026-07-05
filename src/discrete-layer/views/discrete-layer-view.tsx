@@ -32,9 +32,10 @@ import {
   IContextMenuData,
   IDrawing,
   IDrawingEvent,
+  ILayerManagerMetaMapping,
+  GeocoderOptions,
+  IMapLegend,
 } from '@map-colonies/react-components';
-import { GeocoderOptions } from '@map-colonies/react-components/dist/cesium-map/geocoder/geocoder-panel';
-import { IMapLegend } from '@map-colonies/react-components/dist/cesium-map/legend';
 import { getTextDirection, isRtl } from '../../common/i18n/helpers';
 import { AutoDirectionBox } from '../../common/components/auto-direction-box/auto-direction-box.component';
 // import { BrowserCompatibilityChecker } from '../../common/components/browser-compatibility-checker/browser-compatibility-checker';
@@ -996,6 +997,20 @@ const DiscreteLayerView: React.FC = observer(() => {
     return actionsMenuDimensions as MenuDimensions;
   }, [activeTabView, actionsMenuDimensions]);
 
+  const layerManagerMetaMapping = useMemo<ILayerManagerMetaMapping>(() => {
+    return {
+      layer: {
+        id: 'id',
+        name: 'layerRecord.productName',
+        footprint: 'layerRecord.footprint',
+      },
+      dataLayer: {
+        name: 'layerRecord.featureStructure.aliasLayerName',
+        fields: 'layerRecord.featureStructure.fields',
+      },
+    };
+  }, []);
+
   const site = useMemo(() => currentSite(), []);
 
   const triggerCallbackFunc = (data: Feature, options: GeocoderOptions, i: number) => {
@@ -1333,10 +1348,9 @@ const DiscreteLayerView: React.FC = observer(() => {
               center={CONFIG.MAP.CENTER}
               zoom={CONFIG.MAP.ZOOM}
               sceneMode={CesiumSceneMode.SCENE2D}
-              imageryProvider={false}
               locale={mapSettingsLocale}
               baseMaps={store.discreteLayersStore.baseMaps}
-              layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
+              layerManagerMetaMapping={layerManagerMetaMapping}
               // @ts-ignore
               imageryContextMenu={<ContextMenuByTab />}
               imageryContextMenuSize={contextMenuSizeByTab}

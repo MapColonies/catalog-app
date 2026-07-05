@@ -181,105 +181,108 @@ export const PolygonParts: React.FC = observer(() => {
   const SHOW_PP_ZOOM_LEVEL = 7;
 
   const metaPolygonParts = {
-    ...activeLayer,
     id: `virt-PP_${activeLayer?.id}`,
-    featureStructure: {
-      layerName: 'polygonParts:layer',
-      aliasLayerName: `${activeLayer?.productName} (${intl.formatMessage({
-        id: 'field-names.dem.layerPolygonParts',
-      })})`,
-      fields: [
-        // {
-        //   fieldName: 'id',
-        //   aliasFieldName: 'id',
-        //   type: 'String',
-        // },
-        // {
-        //   fieldName: 'catalogId',
-        //   aliasFieldName: 'catalogId',
-        //   type: 'String',
-        // },
-        // {
-        //   fieldName: 'productId',
-        //   aliasFieldName: 'productId',
-        //   type: 'String',
-        // },
-        // {
-        //   fieldName: 'productType',
-        //   aliasFieldName: 'productType',
-        //   type: 'String',
-        // },
-        {
-          fieldName: 'sourceId',
-          aliasFieldName: getFieldLabelTranslation('sourceId'),
-          type: 'String',
-        },
-        {
-          fieldName: 'sourceName',
-          aliasFieldName: getFieldLabelTranslation('sourceName'),
-          type: 'String',
-        },
-        {
-          fieldName: 'productVersion',
-          aliasFieldName: getFieldLabelTranslation('productVersion'),
-          type: 'String',
-        },
-        {
-          fieldName: 'ingestionDateUTC',
-          aliasFieldName: getFieldLabelTranslation('ingestionDateUTC'),
-          type: 'Date',
-        },
-        {
-          fieldName: 'imagingTimeBeginUTC',
-          aliasFieldName: getFieldLabelTranslation('imagingTimeBeginUTC'),
-          type: 'Date',
-        },
-        {
-          fieldName: 'imagingTimeEndUTC',
-          aliasFieldName: getFieldLabelTranslation('imagingTimeEndUTC'),
-          type: 'Date',
-        },
-        {
-          fieldName: 'resolutionDegree',
-          aliasFieldName: getFieldLabelTranslation('resolutionDegree'),
-          type: 'Number',
-        },
-        {
-          fieldName: 'resolutionMeter',
-          aliasFieldName: getFieldLabelTranslation('resolutionMeter'),
-          type: 'Number',
-        },
-        {
-          fieldName: 'sourceResolutionMeter',
-          aliasFieldName: getFieldLabelTranslation('sourceResolutionMeter'),
-          type: 'Number',
-        },
-        {
-          fieldName: 'horizontalAccuracyCe90',
-          aliasFieldName: getFieldLabelTranslation('horizontalAccuracyCe90'),
-          type: 'Number',
-        },
-        {
-          fieldName: 'sensors',
-          aliasFieldName: getFieldLabelTranslation('sensors'),
-          type: 'String',
-        },
-        {
-          fieldName: 'countries',
-          aliasFieldName: getFieldLabelTranslation('countries'),
-          type: 'String',
-        },
-        {
-          fieldName: 'cities',
-          aliasFieldName: getFieldLabelTranslation('cities'),
-          type: 'String',
-        },
-        {
-          fieldName: '_description',
-          aliasFieldName: getFieldLabelTranslation('description'),
-          type: 'String',
-        },
-      ],
+    layerRecord: {
+      ...activeLayer,
+      id: `virt-PP_${activeLayer?.id}`,
+      featureStructure: {
+        layerName: 'polygonParts:layer',
+        aliasLayerName: `${activeLayer?.productName} (${intl.formatMessage({
+          id: 'field-names.dem.layerPolygonParts',
+        })})`,
+        fields: [
+          // {
+          //   fieldName: 'id',
+          //   aliasFieldName: 'id',
+          //   type: 'String',
+          // },
+          // {
+          //   fieldName: 'catalogId',
+          //   aliasFieldName: 'catalogId',
+          //   type: 'String',
+          // },
+          // {
+          //   fieldName: 'productId',
+          //   aliasFieldName: 'productId',
+          //   type: 'String',
+          // },
+          // {
+          //   fieldName: 'productType',
+          //   aliasFieldName: 'productType',
+          //   type: 'String',
+          // },
+          {
+            fieldName: 'sourceId',
+            aliasFieldName: getFieldLabelTranslation('sourceId'),
+            type: 'String',
+          },
+          {
+            fieldName: 'sourceName',
+            aliasFieldName: getFieldLabelTranslation('sourceName'),
+            type: 'String',
+          },
+          {
+            fieldName: 'productVersion',
+            aliasFieldName: getFieldLabelTranslation('productVersion'),
+            type: 'String',
+          },
+          {
+            fieldName: 'ingestionDateUTC',
+            aliasFieldName: getFieldLabelTranslation('ingestionDateUTC'),
+            type: 'Date',
+          },
+          {
+            fieldName: 'imagingTimeBeginUTC',
+            aliasFieldName: getFieldLabelTranslation('imagingTimeBeginUTC'),
+            type: 'Date',
+          },
+          {
+            fieldName: 'imagingTimeEndUTC',
+            aliasFieldName: getFieldLabelTranslation('imagingTimeEndUTC'),
+            type: 'Date',
+          },
+          {
+            fieldName: 'resolutionDegree',
+            aliasFieldName: getFieldLabelTranslation('resolutionDegree'),
+            type: 'Number',
+          },
+          {
+            fieldName: 'resolutionMeter',
+            aliasFieldName: getFieldLabelTranslation('resolutionMeter'),
+            type: 'Number',
+          },
+          {
+            fieldName: 'sourceResolutionMeter',
+            aliasFieldName: getFieldLabelTranslation('sourceResolutionMeter'),
+            type: 'Number',
+          },
+          {
+            fieldName: 'horizontalAccuracyCe90',
+            aliasFieldName: getFieldLabelTranslation('horizontalAccuracyCe90'),
+            type: 'Number',
+          },
+          {
+            fieldName: 'sensors',
+            aliasFieldName: getFieldLabelTranslation('sensors'),
+            type: 'String',
+          },
+          {
+            fieldName: 'countries',
+            aliasFieldName: getFieldLabelTranslation('countries'),
+            type: 'String',
+          },
+          {
+            fieldName: 'cities',
+            aliasFieldName: getFieldLabelTranslation('cities'),
+            type: 'String',
+          },
+          {
+            fieldName: '_description',
+            aliasFieldName: getFieldLabelTranslation('description'),
+            type: 'String',
+          },
+        ],
+      },
     },
   };
 
@@ -461,7 +464,7 @@ export const PolygonParts: React.FC = observer(() => {
       pixelWidth: number,
       pixelHeight: number
     ): { widthMeters: number; heightMeters: number } | null => {
-      const screenPosition = CesiumSceneTransforms.wgs84ToWindowCoordinates(scene, position);
+      const screenPosition = CesiumSceneTransforms.worldToWindowCoordinates(scene, position);
 
       if (!screenPosition) return null;
 

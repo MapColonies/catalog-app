@@ -55,8 +55,8 @@ export class VectorBestRecordModelSelector extends QueryBuilder {
   get productType() { return this.__attr(`productType`) }
   get srsName() { return this.__attr(`srsName`) }
   get footprint() { return this.__attr(`footprint`) }
-  links(builder?: string | LinkModelSelector | ((selector: LinkModelSelector) => LinkModelSelector)) { return this.__child(`links`, LinkModelSelector, builder) }
-  featureStructure(builder?: string | VectorFeatureTypeStructureModelSelector | ((selector: VectorFeatureTypeStructureModelSelector) => VectorFeatureTypeStructureModelSelector)) { return this.__child(`featureStructure`, VectorFeatureTypeStructureModelSelector, builder) }
+  links(builder: string | LinkModelSelector | ((selector: LinkModelSelector) => LinkModelSelector) | undefined) { return this.__child(`links`, LinkModelSelector, builder) }
+  featureStructure(builder: string | VectorFeatureTypeStructureModelSelector | ((selector: VectorFeatureTypeStructureModelSelector) => VectorFeatureTypeStructureModelSelector) | undefined) { return this.__child(`featureStructure`, VectorFeatureTypeStructureModelSelector, builder) }
 }
 export function selectFromVectorBestRecord() {
   return new VectorBestRecordModelSelector()

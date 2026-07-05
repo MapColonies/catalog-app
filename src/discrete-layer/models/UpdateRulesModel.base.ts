@@ -29,7 +29,7 @@ export const UpdateRulesModelBase = ModelBase
 
 export class UpdateRulesModelSelector extends QueryBuilder {
   get freeze() { return this.__attr(`freeze`) }
-  value(builder?: string | UpdateRulesValueModelSelector | ((selector: UpdateRulesValueModelSelector) => UpdateRulesValueModelSelector)) { return this.__child(`value`, UpdateRulesValueModelSelector, builder) }
+  value(builder: string | UpdateRulesValueModelSelector | ((selector: UpdateRulesValueModelSelector) => UpdateRulesValueModelSelector) | undefined) { return this.__child(`value`, UpdateRulesValueModelSelector, builder) }
 }
 export function selectFromUpdateRules() {
   return new UpdateRulesModelSelector()

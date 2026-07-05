@@ -49,17 +49,18 @@ const WebSocketNotifications: React.FC = () => {
           }`,
         },
         {
-          next: (res: {
-            data: { taskUpdateDetails: CallBack<unknown> };
-            errors: Record<string, unknown>[];
-          }) => {
+          next: (res) => {
+            const taskUpdateDetails = (
+              res.data as { taskUpdateDetails: CallBack<unknown> } | null | undefined
+            )?.taskUpdateDetails;
+            if (!taskUpdateDetails) return;
             console.log(
               'WebSocket notification received for',
-              `job:${res.data.taskUpdateDetails.jobId} task:${res.data.taskUpdateDetails.taskId}`
+              `job:${taskUpdateDetails.jobId} task:${taskUpdateDetails.taskId}`
             );
             const newCount = parseInt(localStore.get('taskNotificationCount') || '0', 10) + 1;
             localStore.set('taskNotificationCount', newCount.toString());
-            localStore.setObject('lastTask', res.data.taskUpdateDetails);
+            localStore.setObject('lastTask', taskUpdateDetails);
           },
           error: (err) => {
             console.error('WebSocket subscription error:', err);
