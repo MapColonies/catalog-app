@@ -36,5 +36,10 @@ module.exports = function override(config, env) {
     },
   });
 
+  config.ignoreWarnings = [
+    ...(config.ignoreWarnings || []),
+    /Critical dependency: Accessing import\.meta directly is unsupported/,
+  ];
+
   return config;
 };

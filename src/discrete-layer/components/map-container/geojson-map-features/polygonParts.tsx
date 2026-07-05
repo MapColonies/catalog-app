@@ -464,7 +464,7 @@ export const PolygonParts: React.FC = observer(() => {
       pixelWidth: number,
       pixelHeight: number
     ): { widthMeters: number; heightMeters: number } | null => {
-      const screenPosition = CesiumSceneTransforms.wgs84ToWindowCoordinates(scene, position);
+      const screenPosition = CesiumSceneTransforms.worldToWindowCoordinates(scene, position);
 
       if (!screenPosition) return null;
 

@@ -30,10 +30,10 @@ export const CswCatalogsModelBase = ModelBase
   }))
 
 export class CswCatalogsModelSelector extends QueryBuilder {
-  _RASTER(builder?: string | CswCatalogModelSelector | ((selector: CswCatalogModelSelector) => CswCatalogModelSelector)) { return this.__child(`_RASTER`, CswCatalogModelSelector, builder) }
-  _DEM(builder?: string | CswCatalogModelSelector | ((selector: CswCatalogModelSelector) => CswCatalogModelSelector)) { return this.__child(`_DEM`, CswCatalogModelSelector, builder) }
-  _VECTOR(builder?: string | CswCatalogModelSelector | ((selector: CswCatalogModelSelector) => CswCatalogModelSelector)) { return this.__child(`_VECTOR`, CswCatalogModelSelector, builder) }
-  _3D(builder?: string | CswCatalogModelSelector | ((selector: CswCatalogModelSelector) => CswCatalogModelSelector)) { return this.__child(`_3D`, CswCatalogModelSelector, builder) }
+  _RASTER(builder: string | CswCatalogModelSelector | ((selector: CswCatalogModelSelector) => CswCatalogModelSelector) | undefined) { return this.__child(`_RASTER`, CswCatalogModelSelector, builder) }
+  _DEM(builder: string | CswCatalogModelSelector | ((selector: CswCatalogModelSelector) => CswCatalogModelSelector) | undefined) { return this.__child(`_DEM`, CswCatalogModelSelector, builder) }
+  _VECTOR(builder: string | CswCatalogModelSelector | ((selector: CswCatalogModelSelector) => CswCatalogModelSelector) | undefined) { return this.__child(`_VECTOR`, CswCatalogModelSelector, builder) }
+  _3D(builder: string | CswCatalogModelSelector | ((selector: CswCatalogModelSelector) => CswCatalogModelSelector) | undefined) { return this.__child(`_3D`, CswCatalogModelSelector, builder) }
 }
 export function selectFromCswCatalogs() {
   return new CswCatalogsModelSelector()

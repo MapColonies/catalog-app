@@ -33,7 +33,7 @@ export class DeploymentWithServicesModelSelector extends QueryBuilder {
   get name() { return this.__attr(`name`) }
   get status() { return this.__attr(`status`) }
   get image() { return this.__attr(`image`) }
-  services(builder?: string | K8SServiceModelSelector | ((selector: K8SServiceModelSelector) => K8SServiceModelSelector)) { return this.__child(`services`, K8SServiceModelSelector, builder) }
+  services(builder: string | K8SServiceModelSelector | ((selector: K8SServiceModelSelector) => K8SServiceModelSelector) | undefined) { return this.__child(`services`, K8SServiceModelSelector, builder) }
 }
 export function selectFromDeploymentWithServices() {
   return new DeploymentWithServicesModelSelector()
