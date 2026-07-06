@@ -22,7 +22,7 @@ export const InternalService: React.FC<InternalServiceProps> = ({
 
   const svcList = (services as Services[] | undefined)?.map((service) => {
     return (
-      <Box className="internalService">
+      <Box className="internalService" key={`${service.uid}-${service.name}`}>
         <Box
           className="statusIndicator"
           style={{
