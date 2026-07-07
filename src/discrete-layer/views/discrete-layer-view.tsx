@@ -1022,9 +1022,13 @@ const DiscreteLayerView: React.FC = observer(() => {
     }
     return (layerMeta: ICesiumImageryLayerMeta): boolean => {
       const productType = get(layerMeta, 'layerRecord.productType');
-      return (
-        productType === ProductType.RASTER_VECTOR || productType === ProductType.RASTER_VECTOR_BEST
-      );
+      if (
+        productType === ProductType.RASTER_VECTOR ||
+        productType === ProductType.RASTER_VECTOR_BEST
+      ) {
+        return true;
+      }
+      return layerMeta.shouldBeUsedInModelDraping === true;
     };
   }, []);
 
