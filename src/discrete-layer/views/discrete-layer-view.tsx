@@ -55,6 +55,7 @@ import ExportPolygonsRenderer from '../components/export-layer/export-polygons-r
 // import { Filters } from '../components/filters/filters';
 import { JobsDialog } from '../components/job-manager/jobs.dialog';
 import { EntityDeleteDialog } from '../components/layer-details/entity.delete-dialog';
+import { RasterDeleteDialog } from '../components/layer-details/raster-delete-dialog';
 import { EntityDialog } from '../components/layer-details/entity.dialog';
 import { EntityRasterDialog } from '../components/layer-details/raster/entity.raster.dialog';
 import { LayersResults } from '../components/layers-results/layers-results';
@@ -143,6 +144,7 @@ const DiscreteLayerView: React.FC = observer(() => {
   const [isDemIngestDialogOpen, setIsDemIngestDialogOpen] = useState<boolean>(false);
   const [isEntityDialogOpen, setIsEntityDialogOpen] = useState<boolean>(false);
   const [isEntityDeleteDialogOpen, setIsEntityDeleteDialogOpen] = useState<boolean>(false);
+  const [isRasterDeleteDialogOpen, setIsRasterDeleteDialogOpen] = useState<boolean>(false);
   const [isSystemsJobsDialogOpen, setIsSystemsJobsDialogOpen] = useState<boolean>(false);
   const [isSystemCoreInfoDialogOpen, setIsSystemCoreInfoDialogOpen] = useState<boolean>(false);
   const [isCreateEntityMenuOpen, setIsCreateEntityMenuOpen] = useState<boolean>(false);
@@ -494,6 +496,7 @@ const DiscreteLayerView: React.FC = observer(() => {
       [Mode.UPDATE]: setIsRasterDialogOpen,
       [Mode.EDIT]: setIsEntityDialogOpen,
       [Mode.VIEW]: setIsEntityDialogOpen,
+      [Mode.DELETE]: setIsRasterDeleteDialogOpen,
     },
     [RecordType.RECORD_3D]: {
       [Mode.NEW]: setIs3DIngestDialogOpen,
@@ -1470,6 +1473,18 @@ const DiscreteLayerView: React.FC = observer(() => {
               isOpen={isEntityDeleteDialogOpen}
               onSetOpen={(open) => {
                 setIsEntityDeleteDialogOpen(open);
+                onCloseDialog();
+              }}
+              layerRecord={store.discreteLayersStore.selectedLayer}
+            />
+          )}
+        {permissions.isDeleteAllowed &&
+          store.discreteLayersStore.selectedLayer &&
+          isRasterDeleteDialogOpen && (
+            <RasterDeleteDialog
+              isOpen={isRasterDeleteDialogOpen}
+              onSetOpen={(open) => {
+                setIsRasterDeleteDialogOpen(open);
                 onCloseDialog();
               }}
               layerRecord={store.discreteLayersStore.selectedLayer}
