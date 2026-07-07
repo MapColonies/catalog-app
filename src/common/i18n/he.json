@@ -179,6 +179,11 @@
   "delete.dialog.action": "מחיקת",
   "delete.dialog.checkbox": "אישור מחיקה",
 
+  "raster-delete.dialog.title": "מחיקת שכבת רסטר",
+  "raster-delete.dialog.message": "הפעולה תוביל ל{action} המוצר וכל חומריו ועלולה להשפיע על מערכות הצורכות את המוצר",
+  "raster-delete.dialog.approverName-field.label": "שם המאשר",
+  "raster-delete.dialog.deletionCode-field.label": "קוד מחיקה",
+
   "snack.message.success": "הצלחה",
   "snack.message.failed": "כשלון",
   "snack.dismiss-btn.text": "אישור",

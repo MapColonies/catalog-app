@@ -1,0 +1,107 @@
+#rasterDeleteDialog {
+  --dialog-title-height: 40px;
+  --header-warning-height: 100px;
+  --details-height: 150px;
+  --fields-height: 80px;
+  --footer-height: 60px;
+  --footer-offset: 4px;
+  --modal-content-offset: 20px;
+  --modal-height: calc(100vh - 80px);
+  --modal-width: 888px;
+  --map-height: calc(
+    var(--modal-height) - var(--dialog-title-height) - var(--header-warning-height) -
+      var(--details-height) - var(--fields-height) - var(--footer-height) - var(--footer-offset) -
+      var(--modal-content-offset)
+  );
+}
+
+#rasterDeleteDialog .icon {
+  color: var(--mdc-theme-gc-warning-high);
+  font-size: 28px;
+  margin: 12px;
+}
+
+#rasterDeleteDialog .dialogBody {
+  overflow-y: hidden !important;
+}
+
+#rasterDeleteDialog .footer {
+  display: flex;
+  margin-top: var(--footer-offset);
+  width: 100%;
+  height: var(--footer-height);
+}
+
+body[dir='rtl'] #rasterDeleteDialog .footer {
+  left: 20px;
+}
+
+#rasterDeleteDialog .buttons {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  margin-left: auto;
+}
+
+body[dir='rtl'] #rasterDeleteDialog .buttons {
+  margin-left: unset;
+  margin-right: auto;
+}
+
+#rasterDeleteDialog .closeIcon {
+  margin-left: auto;
+}
+
+body[dir='rtl'] #rasterDeleteDialog .closeIcon {
+  margin-left: unset;
+  margin-right: auto;
+}
+
+#rasterDeleteDialog .headerWarning {
+  height: var(--header-warning-height);
+  display: flex;
+  align-items: center;
+}
+
+@media (min-width: 900px) {
+  #rasterDeleteDialog .mdc-dialog .mdc-dialog__surface {
+    max-width: var(--modal-width);
+    height: var(--modal-height);
+  }
+}
+
+#rasterDeleteDetailsContainer {
+  position: relative;
+  display: flex;
+  background-color: var(--mdc-theme-text-primary-on-light);
+  padding: 8px;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: var(--details-height);
+}
+
+#rasterDeleteDetails {
+  margin: 0 0;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+}
+
+#rasterDeleteDialog .rasterDeleteMap {
+  width: 100%;
+  height: var(--map-height);
+}
+
+#rasterDeleteDialog .categoryFieldsContainer {
+  height: var(--fields-height);
+}
+
+#rasterDeleteDialog .rasterDeleteFieldValue {
+  flex: 1 1;
+  margin: 0 2px;
+}
+
+#rasterDeleteDialog .errors {
+  width: 520px;
+}

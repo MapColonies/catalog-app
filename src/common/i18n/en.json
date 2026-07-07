@@ -179,6 +179,11 @@
   "delete.dialog.action": "Delete",
   "delete.dialog.checkbox": "Confirm deleting",
 
+  "raster-delete.dialog.title": "Delete raster layer",
+  "raster-delete.dialog.message": "This action will lead to {action} the product and all of its materials and may affect the systems that consume the product",
+  "raster-delete.dialog.approverName-field.label": "Approver name",
+  "raster-delete.dialog.deletionCode-field.label": "Deletion code",
+
   "snack.message.success": "SUCCESS",
   "snack.message.failed": "FAILURE",
   "snack.dismiss-btn.text": "Dismiss",
