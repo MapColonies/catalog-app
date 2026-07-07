@@ -74,7 +74,7 @@ export const EntityDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
     useEffect(() => {
       if (
         !mutationQuery.loading &&
-        (mutationQuery.data as { deleteLayer: string } | undefined)?.deleteLayer === VALID
+        (mutationQuery.data as { delete3DLayer: string } | undefined)?.delete3DLayer === VALID
       ) {
         onSetOpen(false);
         const payload = {
@@ -91,7 +91,7 @@ export const EntityDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
 
     const deleteLayer = (): void => {
       mutationQuery.setQuery(
-        store.mutateDeleteLayer({
+        store.mutateDelete3DLayer({
           data: {
             id: layerRecord.id,
             type: layerRecord.type as RecordType,

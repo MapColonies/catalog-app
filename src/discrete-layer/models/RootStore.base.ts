@@ -430,6 +430,11 @@ export type RecordDeletePartial = {
   id: string
   type: RecordType
 }
+export type RasterDeleteInput = {
+  id: string
+  approverName: string
+  deletionCode: string
+}
 export type JobUpdateData = {
   parameters?: (any | null)
   status?: (string | null)
@@ -504,7 +509,8 @@ mutateStartRasterIngestion="mutateStartRasterIngestion",
 mutateStartRasterUpdateGeopkg="mutateStartRasterUpdateGeopkg",
 mutateStart3DIngestion="mutateStart3DIngestion",
 mutateStartDemIngestion="mutateStartDemIngestion",
-mutateDeleteLayer="mutateDeleteLayer",
+mutateDelete3DLayer="mutateDelete3DLayer",
+mutateDeleteRasterLayer="mutateDeleteRasterLayer",
 mutateUpdateJob="mutateUpdateJob",
 mutateJobAbort="mutateJobAbort",
 mutateJobRetry="mutateJobRetry",
@@ -717,8 +723,11 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     mutateStartDemIngestion(variables: { data: IngestionDemData }, optimisticUpdate?: () => void) {
       return self.mutate<{ startDemIngestion: string }>(`mutation startDemIngestion($data: IngestionDemData!) { startDemIngestion(data: $data) }`, variables, optimisticUpdate)
     },
-    mutateDeleteLayer(variables: { data: RecordDeletePartial }, optimisticUpdate?: () => void) {
-      return self.mutate<{ deleteLayer: string }>(`mutation deleteLayer($data: RecordDeletePartial!) { deleteLayer(data: $data) }`, variables, optimisticUpdate)
+    mutateDelete3DLayer(variables: { data: RecordDeletePartial }, optimisticUpdate?: () => void) {
+      return self.mutate<{ delete3DLayer: string }>(`mutation delete3DLayer($data: RecordDeletePartial!) { delete3DLayer(data: $data) }`, variables, optimisticUpdate)
+    },
+    mutateDeleteRasterLayer(variables: { data: RasterDeleteInput }, optimisticUpdate?: () => void) {
+      return self.mutate<{ deleteRasterLayer: string }>(`mutation deleteRasterLayer($data: RasterDeleteInput!) { deleteRasterLayer(data: $data) }`, variables, optimisticUpdate)
     },
     mutateUpdateJob(variables: { data: JobUpdateData, id: string }, optimisticUpdate?: () => void) {
       return self.mutate<{ updateJob: string }>(`mutation updateJob($data: JobUpdateData!, $id: String!) { updateJob(data: $data, id: $id) }`, variables, optimisticUpdate)
