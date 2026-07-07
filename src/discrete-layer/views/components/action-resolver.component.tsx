@@ -290,9 +290,7 @@ export const ActionResolver: React.FC<ActionResolverProps> = observer((props) =>
         case 'LayerRasterRecord.update':
           store.discreteLayersStore.selectLayer(
             // @ts-ignore
-            cleanUpEntity(data, LayerRasterRecordModelKeys) as LayerMetadataMixedUnion,
-            // @ts-ignore
-            true
+            cleanUpEntity(data, LayerRasterRecordModelKeys) as LayerMetadataMixedUnion
           );
           store.discreteLayersStore.setSelectedLayerOperationMode(Mode.UPDATE);
           handleOpenEntityDialog(RecordType.RECORD_RASTER, true);
@@ -305,13 +303,18 @@ export const ActionResolver: React.FC<ActionResolverProps> = observer((props) =>
         case 'Layer3DRecord.delete':
           store.discreteLayersStore.selectLayer(
             // @ts-ignore
-            cleanUpEntity(data, Layer3DRecordModelKeys) as LayerMetadataMixedUnion,
-            // @ts-ignore
-            false,
-            true
+            cleanUpEntity(data, Layer3DRecordModelKeys) as LayerMetadataMixedUnion
           );
           store.discreteLayersStore.setSelectedLayerOperationMode(Mode.DELETE);
           handleOpenEntityDialog(RecordType.RECORD_3D, true);
+          break;
+        case 'LayerRasterRecord.delete':
+          store.discreteLayersStore.selectLayer(
+            // @ts-ignore
+            cleanUpEntity(data, LayerRasterRecordModelKeys) as LayerMetadataMixedUnion
+          );
+          store.discreteLayersStore.setSelectedLayerOperationMode(Mode.DELETE);
+          handleOpenEntityDialog(RecordType.RECORD_RASTER, true);
           break;
         case 'LayerRasterRecord.viewer':
         case 'LayerDemRecord.viewer':
