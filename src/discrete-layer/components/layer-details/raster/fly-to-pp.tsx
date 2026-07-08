@@ -18,13 +18,34 @@ export const FlyToPP: React.FC<FlyToPPProps> = ({ feature }) => {
       setIsOutsideExtent(false);
       return;
     }
-    try {
-      const geometry = new GeoJSON().readGeometry(feature.geometry);
-      const currentExtent = map.getView().calculateExtent(map.getSize());
-      const selectedExtent = geometry.getExtent();
-      setIsOutsideExtent(!containsExtent(currentExtent, selectedExtent));
-    } catch {
-      setIsOutsideExtent(false);
+
+    const checkExtent = (): boolean => {
+      const mapSize = map.getSize();
+      if (!mapSize) {
+        return false;
+      }
+      try {
+        const geometry = new GeoJSON().readGeometry(feature.geometry);
+        const currentExtent = map.getView().calculateExtent(mapSize);
+        const selectedExtent = geometry.getExtent();
+        setIsOutsideExtent(!containsExtent(currentExtent, selectedExtent));
+      } catch (e) {
+        console.log('e', e);
+        setIsOutsideExtent(false);
+      }
+      return true;
+    };
+
+    if (!checkExtent()) {
+      // Map not ready yet - retry once after first render
+      const onPostRender = (): void => {
+        checkExtent();
+        map.un('postrender', onPostRender);
+      };
+      map.on('postrender', onPostRender);
+      return () => {
+        map.un('postrender', onPostRender);
+      };
     }
   }, [feature?.properties?.id]);
 

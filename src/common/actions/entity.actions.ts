@@ -122,6 +122,7 @@ const ACTIONS_CONFIG: IEntityActions[] = [
             icon: '',
             class: 'mc-icon-Delete',
             titleTranslationId: 'action.delete.tooltip',
+            dependentField: { field: 'productStatus', expectedValue: RecordStatus.UNPUBLISHED },
             views: [TabViews.CATALOG, TabViews.SEARCH_RESULTS],
           },
         ],

@@ -32,10 +32,11 @@ export interface EntityDeleteDialogProps {
   isOpen: boolean;
   onSetOpen: (open: boolean) => void;
   layerRecord: ILayerImage;
+  onSuccess?: () => void;
   recordType?: RecordType;
 }
 
-export const EntityDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
+export const EntityDelete3DDialog: React.FC<EntityDeleteDialogProps> = observer(
   (props: EntityDeleteDialogProps) => {
     const { isOpen, onSetOpen, layerRecord } = props;
     const store = useStore();

@@ -8,40 +8,24 @@ import { Box } from '@map-colonies/react-components';
 import { FieldLabelComponent } from '../../../../common/components/form/field-label';
 import { GraphQLError } from '../../../../common/components/error/graphql.error-presentor';
 import { Mode } from '../../../../common/models/mode.enum';
-import { UserAction } from '../../../models/userStore';
 import { EntityDescriptorModelType, RecordType, useQuery, useStore } from '../../../models';
+import { DialogActionTitle } from '../dialog.helpers';
 import { LayersDetailsComponent } from '../layer-details';
 import { EntityDeleteDialogProps } from '../3D/entity.3d.delete-dialog';
-import { useDeleteLayer, VALID } from '../delete.hook';
+import { useDeleteLayer } from '../delete.hook';
 import { GeoFeaturesPresentorComponent } from './pp-map';
 
 import './entity.raster.delete-dialog.css';
-import { DialogActionTitle } from '../dialog.helpers';
 
-export const RasterDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
+export const EntityDeleteRasterDialog: React.FC<EntityDeleteDialogProps> = observer(
   (props: EntityDeleteDialogProps) => {
     const { isOpen, onSetOpen, layerRecord } = props;
     const store = useStore();
     const intl = useIntl();
     const mutationQuery = useQuery();
 
-    const { dialogTitleParamTranslation, closeDialog, dispatchAction, warningMessage } =
+    const { dialogTitleParamTranslation, closeDialog, warningMessage } =
       useDeleteLayer({ onSetOpen, layerRecord, recordType: props.recordType });
-
-    useEffect(() => {
-      if (
-        !mutationQuery.loading &&
-        (mutationQuery.data as { deleteLayer: string } | undefined)?.deleteLayer === VALID
-      ) {
-        onSetOpen(false);
-        const payload = {
-          action: UserAction.SYSTEM_CALLBACK_DELETE,
-          data: { ...layerRecord },
-        };
-
-        dispatchAction(payload);
-      }
-    }, [mutationQuery.data]);
 
     const deleteLayer = (approverName: string, approvalCode: string): void => {
       mutationQuery.setQuery(
@@ -55,6 +39,13 @@ export const RasterDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
         })
       );
     };
+
+    useEffect(() => {
+      if (mutationQuery.data && !mutationQuery.error) {
+        props.onSetOpen(false);
+        props.onSuccess?.();
+      }
+    }, [mutationQuery.data]);
 
     let formikRef = useRef<FormikProps<any>>() as any;
 
@@ -94,9 +85,15 @@ export const RasterDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
               mode={Mode.DELETE}
               showPolygonParts={true}
               style={{ height: 'var(--map-height)', position: 'relative', direction: 'ltr' }}
-              fitOptions={{ padding: [10, 20, 10, 20] }}
-            />
-
+            >
+              <FlyToPP feature={
+                {
+                  "type": "Feature",
+                  "properties": {},
+                  "geometry": layerRecord.footprint
+                }
+              }></FlyToPP>
+            </GeoFeaturesPresentorComponent>
             <Formik
               initialValues={initialDeleteValues}
               enableReinitialize={true}
