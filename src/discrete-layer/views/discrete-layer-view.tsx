@@ -35,6 +35,8 @@ import {
   ILayerManagerMetaMapping,
   GeocoderOptions,
   IMapLegend,
+  DrapingLayerPredicate,
+  ICesiumImageryLayerMeta,
 } from '@map-colonies/react-components';
 import { getTextDirection, isRtl } from '../../common/i18n/helpers';
 import { AutoDirectionBox } from '../../common/components/auto-direction-box/auto-direction-box.component';
@@ -78,6 +80,7 @@ import { SystemCoreInfoDialog } from '../components/system-status/system-core-in
 import { JobModelType, LayerMetadataMixedUnion, LinkModelType, RecordType } from '../models';
 import { IDispatchAction } from '../models/actionDispatcherStore';
 import { ILayerImage } from '../models/layerImage';
+import { ProductType } from '../models/ProductTypeEnum';
 import { useStore } from '../models/RootStore';
 import { FilterField } from '../models/RootStore.base';
 import { UserAction, UserRole } from '../models/userStore';
@@ -1013,6 +1016,22 @@ const DiscreteLayerView: React.FC = observer(() => {
     };
   }, []);
 
+  const drapingLayerPredicate = useMemo<DrapingLayerPredicate | undefined>(() => {
+    if (!CONFIG.MAP.ENABLE_MODEL_DRAPING) {
+      return undefined;
+    }
+    return (layerMeta: ICesiumImageryLayerMeta): boolean => {
+      const productType = get(layerMeta, 'layerRecord.productType');
+      if (
+        productType === ProductType.RASTER_VECTOR ||
+        productType === ProductType.RASTER_VECTOR_BEST
+      ) {
+        return true;
+      }
+      return layerMeta.shouldBeUsedInModelDraping === true;
+    };
+  }, []);
+
   const site = useMemo(() => currentSite(), []);
 
   const triggerCallbackFunc = (data: Feature, options: GeocoderOptions, i: number) => {
@@ -1368,6 +1387,7 @@ const DiscreteLayerView: React.FC = observer(() => {
               showDebuggerTool={CONFIG.MAP.SHOW_DEBUGGER_TOOL === true && isAdminUser}
               showActiveLayersTool={CONFIG.MAP.SHOW_ACTIVE_LAYERS_TOOL}
               {...(CONFIG.MAP.SHOW_GEOCODER_TOOL ? { geocoderPanel: GEOCODER_OPTIONS } : {})}
+              {...(drapingLayerPredicate !== undefined ? { drapingLayerPredicate } : {})}
             >
               {activeTabView !== TabViews.EXPORT_LAYER && (
                 <CesiumDrawingsDataSource

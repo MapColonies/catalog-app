@@ -141,6 +141,7 @@ env:
     showDebuggerTool: true
     showActiveLayersTool: true
     showGeocoderTool: true
+    enableModelDraping: true
   baseMaps: ''
   defaultTerrainProviderUrl: ''
   webToolsUrl: ''
