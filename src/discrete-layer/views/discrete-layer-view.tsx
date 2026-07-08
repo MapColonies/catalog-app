@@ -1017,7 +1017,7 @@ const DiscreteLayerView: React.FC = observer(() => {
   }, []);
 
   const drapingLayerPredicate = useMemo<DrapingLayerPredicate | undefined>(() => {
-    if (!CONFIG.MAP.ENABLE_DRAPING_3D) {
+    if (!CONFIG.MAP.ENABLE_MODEL_DRAPING) {
       return undefined;
     }
     return (layerMeta: ICesiumImageryLayerMeta): boolean => {

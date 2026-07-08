@@ -35,7 +35,7 @@ if (!window._env_) {
         showDebuggerTool: true,
         showActiveLayersTool: true,
         showGeocoderTool: true,
-        enableDraping3d: true,
+        enableModelDraping: true,
       },
       LOGGER: {
         level: 'warn',
