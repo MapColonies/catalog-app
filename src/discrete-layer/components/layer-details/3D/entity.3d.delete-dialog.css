@@ -10,7 +10,7 @@
 }
 
 #entityDeleteDialog .icon {
-  color: var(--mdc-theme-gc-warning-high);
+  color: var(--mdc-theme-gc-error-high);
   font-size: 28px;
   margin: 12px;
 }

@@ -16,13 +16,9 @@ import {
   Box,
   getWMTSOptions,
   getXYZOptions,
-  IBaseMap,
   Legend,
   LegendItem,
   Map,
-  TileLayer,
-  TileWMTS,
-  TileXYZ,
   VectorLayer,
   VectorSource,
 } from '@map-colonies/react-components';
@@ -30,15 +26,22 @@ import { Checkbox } from '@map-colonies/react-core';
 import CONFIG from '../../../../common/config';
 import { useEnums } from '../../../../common/hooks/useEnum.hook';
 import { Mode } from '../../../../common/models/mode.enum';
+import { LinkType } from '../../../../common/models/link-type.enum';
 import { MapFeatureClickHandler } from '../../../../common/components/ol-map/map-feature-click-handler';
 import { MapLoadingIndicator } from '../../../../common/components/ol-map/map-loading-indicator';
 import { SelectedFeatureVectorLayer } from '../../../../common/components/ol-map/selected-feature-vector-layer';
 import { ZoomLevelIndicator } from '../../../../common/components/ol-map/zoom-level-indicator';
-import { LayerRasterRecordModelType } from '../../../models';
+import { LayerRasterRecordModelType, LinkModelType } from '../../../models';
 import { ILayerImage } from '../../../models/layerImage';
 import { useStore } from '../../../models/RootStore';
 import { GeojsonFeatureInput } from '../../../models/RootStore.base';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
+import {
+  getLayerLink,
+  getLinkUrlWithToken,
+  resolveWmtsCapabilityParams,
+} from '../../helpers/layersUtils';
+import { buildOlTileLayer, usePreviewBaseMapTiles } from '../../helpers/ol-tile-layer.utils';
 import { FeaturePropertiesPopupComponent } from './feature-properties-popup.component';
 import { FlyToPP } from './fly-to-pp';
 import { GeoFeaturesInnerComponent } from './geo-features-inner.component';
@@ -65,6 +68,7 @@ interface GeoFeaturesPresentorProps {
   onMapFeatureClick?: (feature: Feature | undefined) => void;
   showFeaturePropertiesPopup?: boolean;
   showPolygonParts?: boolean;
+  isLayerImageShown?: boolean;
   fitOptions?: FitOptions | undefined;
   style?: CSSProperties | undefined;
   children?: JSX.Element | null;
@@ -82,6 +86,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   onMapFeatureClick,
   showFeaturePropertiesPopup = false,
   showPolygonParts = false,
+  isLayerImageShown = false,
   fitOptions,
   style,
   children,
@@ -167,56 +172,43 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
     setIsOpenProperties(false);
   }, []);
 
-  const previewBaseMap = useMemo(() => {
-    // eslint-disable-next-line @typescript-eslint/no-array-constructor
-    const olBaseMap = new Array();
-    let baseMap = store.discreteLayersStore.baseMaps?.maps.find(
-      (map: IBaseMap) => map.isForPreview
-    );
-    if (!baseMap) {
-      baseMap = store.discreteLayersStore.baseMaps?.maps.find((map: IBaseMap) => map.isCurrent);
+  const previewBaseMap = usePreviewBaseMapTiles();
+
+  const layerTiles = useMemo(() => {
+    if (!isLayerImageShown || !layerRecord) {
+      return undefined;
     }
-    if (baseMap) {
-      baseMap.baseRasterLayers.forEach((layer) => {
-        if (layer.type === 'WMTS_LAYER') {
-          const wmtsOptions = getWMTSOptions({
-            url: layer.options.url as string,
-            layer: '',
-            matrixSet: get(layer.options, 'tileMatrixSetID') as string,
-            format: get(layer.options, 'format'),
-            projection: DEFAULT_PROJECTION, // Should be taken from map-server capabilities (MAPCO-3780)
-            style: get(layer.options, 'style'),
-          });
-          olBaseMap.push(
-            <TileLayer key={layer.id} options={{ opacity: layer.opacity }}>
-              <TileWMTS
-                options={{
-                  ...wmtsOptions,
-                  crossOrigin: 'anonymous',
-                }}
-              />
-            </TileLayer>
-          );
-        }
-        if (layer.type === 'XYZ_LAYER') {
-          const xyzOptions = getXYZOptions({
-            url: layer.options.url as string,
-          });
-          olBaseMap.push(
-            <TileLayer key={layer.id} options={{ opacity: layer.opacity }}>
-              <TileXYZ
-                options={{
-                  ...xyzOptions,
-                  crossOrigin: 'anonymous',
-                }}
-              />
-            </TileLayer>
-          );
-        }
+    const layerLink = getLayerLink(layerRecord);
+    if (!layerLink?.url) {
+      return undefined;
+    }
+    if (layerLink.protocol === LinkType.XYZ_LAYER) {
+      const xyzOptions = getXYZOptions({
+        url: getLinkUrlWithToken([layerLink]) as string,
       });
+      return buildOlTileLayer({ key: layerRecord.id, kind: 'XYZ', options: xyzOptions });
     }
-    return olBaseMap;
-  }, []);
+    if (layerLink.protocol === LinkType.WMTS_LAYER || layerLink.protocol === LinkType.WMTS) {
+      const capability = store.discreteLayersStore.capabilities?.find(
+        (item) => layerLink.name === item.id
+      );
+      const resolved = resolveWmtsCapabilityParams(
+        layerRecord as LayerRasterRecordModelType,
+        layerLink.url as string,
+        capability
+      );
+      const wmtsOptions = getWMTSOptions({
+        url: getLinkUrlWithToken([{ ...layerLink, url: resolved.url } as LinkModelType]) as string,
+        layer: resolved.layer,
+        matrixSet: resolved.tileMatrixSetID,
+        format: resolved.format,
+        projection: DEFAULT_PROJECTION,
+        style: resolved.style,
+      });
+      return buildOlTileLayer({ key: layerRecord.id, kind: 'WMTS', options: wmtsOptions });
+    }
+    return undefined;
+  }, [isLayerImageShown, layerRecord]);
 
   const LegendsArray = useMemo(() => {
     const res: LegendItem[] = [];
@@ -265,6 +257,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
     <Box id="geoFeaturesMapContainer" style={{ ...style }}>
       <Map>
         {previewBaseMap}
+        {layerTiles}
         <MapLoadingIndicator />
         <ZoomLevelIndicator
           indicateTillZoomLevel={

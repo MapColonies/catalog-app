@@ -8,12 +8,14 @@ import { Box } from '@map-colonies/react-components';
 import { FieldLabelComponent } from '../../../../common/components/form/field-label';
 import { GraphQLError } from '../../../../common/components/error/graphql.error-presentor';
 import { Mode } from '../../../../common/models/mode.enum';
+import { getTextStyle } from '../../../../common/helpers/style';
 import { EntityDescriptorModelType, RecordType, useQuery, useStore } from '../../../models';
 import { DialogActionTitle } from '../dialog.helpers';
 import { LayersDetailsComponent } from '../layer-details';
 import { EntityDeleteDialogProps } from '../3D/entity.3d.delete-dialog';
 import { useDeleteLayer } from '../delete.hook';
 import { GeoFeaturesPresentorComponent } from './pp-map';
+import { FlyToPP } from './fly-to-pp';
 
 import './entity.raster.delete-dialog.css';
 
@@ -58,6 +60,7 @@ export const EntityDeleteRasterDialog: React.FC<EntityDeleteDialogProps> = obser
             domain={dialogTitleParamTranslation}
             action={Mode.DELETE}
             onClose={closeDialog}
+            style={getTextStyle(layerRecord as any, 'backgroundColor')}
           />
           <DialogContent>
             <Box className="deleteWarning">
@@ -85,6 +88,7 @@ export const EntityDeleteRasterDialog: React.FC<EntityDeleteDialogProps> = obser
               mode={Mode.DELETE}
               showPolygonParts={true}
               style={{ height: 'var(--map-height)', position: 'relative', direction: 'ltr' }}
+              isLayerImageShown={true}
             >
               <FlyToPP feature={
                 {

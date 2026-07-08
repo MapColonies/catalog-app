@@ -151,11 +151,20 @@ export const getTokenResource = (url: string, ver?: string): CesiumResource => {
   return new CesiumResource({ ...(tokenProps as unknown as CesiumResource) });
 };
 
-export const getWMTSOptions = (
+export interface ResolvedWmtsCapabilityParams {
+  url: string;
+  layer: string;
+  style: string;
+  format: string;
+  tileMatrixSetID: string;
+  tileMatrixLabels: string[];
+}
+
+export const resolveWmtsCapabilityParams = (
   layer: LayerRasterRecordModelType,
   url: string,
   capability: CapabilityModelType | undefined
-): RCesiumWMTSLayerOptions => {
+): ResolvedWmtsCapabilityParams => {
   let style = 'default';
   let format = 'image/jpeg';
   let { tileMatrixSetID, tileMatrixLabels } = {
@@ -207,13 +216,29 @@ export const getWMTSOptions = (
       )?.template ?? url;
   }
   return {
-    url: getTokenResource(url, layer.productVersion as string),
+    url,
     layer: `${layer.productId as string}-${layer.productVersion as string}`,
     style,
     format,
     tileMatrixSetID,
-    // tileMatrixLabels,
-    maximumLevel: Math.max(...tileMatrixLabels.map(Number)),
+    tileMatrixLabels,
+  };
+};
+
+export const getWMTSOptions = (
+  layer: LayerRasterRecordModelType,
+  url: string,
+  capability: CapabilityModelType | undefined
+): RCesiumWMTSLayerOptions => {
+  const resolved = resolveWmtsCapabilityParams(layer, url, capability);
+  return {
+    url: getTokenResource(resolved.url, layer.productVersion as string),
+    layer: resolved.layer,
+    style: resolved.style,
+    format: resolved.format,
+    tileMatrixSetID: resolved.tileMatrixSetID,
+    // tileMatrixLabels: resolved.tileMatrixLabels,
+    maximumLevel: Math.max(...resolved.tileMatrixLabels.map(Number)),
     tilingScheme: new CesiumGeographicTilingScheme(),
   };
 };
