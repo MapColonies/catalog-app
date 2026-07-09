@@ -2,12 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { observer } from 'mobx-react';
 import { DialogContent } from '@material-ui/core';
-import {
-  Button,
-  Checkbox,
-  CircularProgress,
-  DialogActions,
-} from '@map-colonies/react-core';
+import { Button, Checkbox, CircularProgress, DialogActions } from '@map-colonies/react-core';
 import { Dialog, Icon, Typography } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
 import { GraphQLError } from '../../../../common/components/error/graphql.error-presentor';
