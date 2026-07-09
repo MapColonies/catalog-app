@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { observer } from 'mobx-react';
+import { DialogContent } from '@material-ui/core';
 import {
   Button,
   Checkbox,
   CircularProgress,
   DialogActions,
-  DialogContent,
 } from '@map-colonies/react-core';
 import { Dialog, Icon, Typography } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
 import { GraphQLError } from '../../../../common/components/error/graphql.error-presentor';
 import { Mode } from '../../../../common/models/mode.enum';
+import { getTextStyle } from '../../../../common/helpers/style';
 import { ILayerImage } from '../../../models/layerImage';
 import { UserAction } from '../../../models/userStore';
 import {
@@ -23,11 +24,10 @@ import {
 } from '../../../models';
 import { GeoJsonMapValuePresentorComponent } from '../field-value-presentors/geojson-map.value-presentor';
 import { LayersDetailsComponent } from '../layer-details';
+import { DialogActionTitle } from '../dialog.helpers';
 import { useDeleteLayer, VALID } from '../delete.hook';
 
 import './entity.3d.delete-dialog.css';
-import { DialogActionTitle } from '../dialog.helpers';
-import { getTextStyle } from '../../../../common/helpers/style';
 
 export interface EntityDeleteDialogProps {
   isOpen: boolean;

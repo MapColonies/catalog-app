@@ -19,10 +19,10 @@ body[dir='rtl'] #geoFeaturesMapContainer .checkbox {
   padding-left: 12px;
 }
 
-body[dir='rtl'] #geoFeaturesMapContainer .baseMap {
+#geoFeaturesMapContainer .baseMap {
   top: 0px;
   right: 8px;
-  margin-top: 98px;
+  margin-top: 88px;
 }
 
 #geoFeaturesMapContainer .baseMap.ol-control button.mdc-icon-button,
