@@ -16,6 +16,7 @@ export interface IAction {
   titleTranslationId: string;
   views: TabViews[];
   disabled?: boolean;
+  titleClass?: string;
   dependentField?: DependentField;
 }
 
@@ -120,9 +121,10 @@ const ACTIONS_CONFIG: IEntityActions[] = [
             action: 'delete',
             frequent: false,
             icon: '',
-            class: 'mc-icon-Delete',
+            class: 'mc-icon-Delete error',
             titleTranslationId: 'action.delete.tooltip',
-            dependentField: { field: 'productStatus', expectedValue: RecordStatus.UNPUBLISHED },
+            titleClass: 'error',
+            dependentField: { field: 'layerURLMissing', expectedValue: false },
             views: [TabViews.CATALOG, TabViews.SEARCH_RESULTS],
           },
         ],
@@ -155,8 +157,9 @@ const ACTIONS_CONFIG: IEntityActions[] = [
             action: 'delete',
             frequent: false,
             icon: '',
-            class: 'mc-icon-Delete',
+            class: 'mc-icon-Delete error',
             titleTranslationId: 'action.delete.tooltip',
+            titleClass: 'error',
             dependentField: {
               field: 'productStatus',
               expectedValue: RecordStatus.BEING_DELETED,
@@ -231,7 +234,8 @@ const ACTIONS_CONFIG: IEntityActions[] = [
           //   action: 'delete',
           //   frequent: false,
           //   icon: '',
-          //   class: 'mc-icon-Delete',
+          //   class: 'mc-icon-Delete error',
+          //   titleClass: 'error',
           //   titleTranslationId: 'action.delete.tooltip',
           //   views: [TabViews.CATALOG, TabViews.SEARCH_RESULTS]
           // },

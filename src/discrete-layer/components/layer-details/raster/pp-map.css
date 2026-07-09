@@ -1,3 +1,7 @@
+#geoFeaturesMapContainer {
+  position: relative;
+}
+
 #geoFeaturesMapContainer .checkbox {
   display: inline-block;
   position: absolute;
@@ -15,10 +19,13 @@ body[dir='rtl'] #geoFeaturesMapContainer .checkbox {
   padding-left: 12px;
 }
 
-#geoFeaturesMapContainer {
-  position: relative;
+body[dir='rtl'] #geoFeaturesMapContainer .baseMap {
+  top: 0px;
+  right: 8px;
+  margin-top: 98px;
 }
 
+#geoFeaturesMapContainer .baseMap.ol-control button.mdc-icon-button,
 #geoFeaturesMapContainer .ol-zoom button,
 #geoFeaturesMapContainer .ol-legend button {
   cursor: pointer;

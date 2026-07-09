@@ -135,7 +135,9 @@ export const ActionsRenderer: React.FC<IActionsRendererParams> = (props) => {
                           disabled={action.disabled}
                           className={`actionMenuItemTitle actionDismissible ${
                             action.disabled ? 'disabled' : ''
-                          }`}
+                          }
+                          ${action.titleClass ?? ''}
+                          `}
                         >
                           {action.titleTranslationId}
                         </Typography>

@@ -16,19 +16,26 @@ export const FlyTo: React.FC<FlyToProps> = ({ feature, flyOnce = false }) => {
     if (!feature || (flyOnce && hasFlownRef.current)) {
       return;
     }
-    try {
-      const geometry = new GeoJSON().readGeometry(feature?.geometry);
-      const view = map.getView();
-      map.getView().fit(geometry.getExtent(), {
-        duration: 250,
-        maxZoom: view.getMaxZoom() ?? 18,
-        padding: [32, 32, 32, 32],
-      });
-      hasFlownRef.current = true;
-    } catch {
-      return;
-    }
-  }, [feature]);
+
+    const listener = () => {
+      try {
+        const geometry = new GeoJSON().readGeometry(feature.geometry);
+        const view = map.getView();
+
+        view.fit(geometry.getExtent(), {
+          duration: 250,
+          maxZoom: view.getMaxZoom() ?? 18,
+          padding: [32, 32, 32, 32],
+        });
+
+        hasFlownRef.current = true;
+      } finally {
+        map.un('rendercomplete', listener);
+      }
+    };
+
+    map.once('rendercomplete', listener);
+  }, [feature, map]);
 
   return null;
 };

@@ -1,10 +1,12 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { observer } from 'mobx-react';
+import { Feature } from 'geojson';
 import { Formik, FormikProps } from 'formik';
 import { Button, CircularProgress, DialogContent, TextField } from '@map-colonies/react-core';
 import { Dialog, Icon, Typography } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
+import { FlyTo } from '../../../../common/components/ol-map/fly-to';
 import { FieldLabelComponent } from '../../../../common/components/form/field-label';
 import { GraphQLError } from '../../../../common/components/error/graphql.error-presentor';
 import { Mode } from '../../../../common/models/mode.enum';
@@ -15,7 +17,6 @@ import { LayersDetailsComponent } from '../layer-details';
 import { EntityDeleteDialogProps } from '../3D/entity.3d.delete-dialog';
 import { useDeleteLayer } from '../delete.hook';
 import { GeoFeaturesPresentorComponent } from './pp-map';
-import { FlyToPP } from './fly-to-pp';
 
 import './entity.raster.delete-dialog.css';
 
@@ -26,8 +27,11 @@ export const EntityDeleteRasterDialog: React.FC<EntityDeleteDialogProps> = obser
     const intl = useIntl();
     const mutationQuery = useQuery();
 
-    const { dialogTitleParamTranslation, closeDialog, warningMessage } =
-      useDeleteLayer({ onSetOpen, layerRecord, recordType: props.recordType });
+    const { dialogTitleParamTranslation, closeDialog, warningMessage } = useDeleteLayer({
+      onSetOpen,
+      layerRecord,
+      recordType: props.recordType,
+    });
 
     const deleteLayer = (approverName: string, approvalCode: string): void => {
       mutationQuery.setQuery(
@@ -52,6 +56,14 @@ export const EntityDeleteRasterDialog: React.FC<EntityDeleteDialogProps> = obser
     let formikRef = useRef<FormikProps<any>>() as any;
 
     const [initialDeleteValues] = React.useState<any>({ approvalCode: '', approverName: '' });
+
+    const flyToFeature = useMemo(() => {
+      return {
+        type: 'Feature',
+        properties: {},
+        geometry: layerRecord.footprint,
+      } as Feature;
+    }, []);
 
     return (
       <Box id="rasterDeleteDialog">
@@ -89,14 +101,9 @@ export const EntityDeleteRasterDialog: React.FC<EntityDeleteDialogProps> = obser
               showPolygonParts={true}
               style={{ height: 'var(--map-height)', position: 'relative', direction: 'ltr' }}
               isLayerImageShown={true}
+              defaultShowBaseMap={false}
             >
-              <FlyToPP feature={
-                {
-                  "type": "Feature",
-                  "properties": {},
-                  "geometry": layerRecord.footprint
-                }
-              }></FlyToPP>
+              <FlyTo feature={flyToFeature} flyOnce={true}></FlyTo>
             </GeoFeaturesPresentorComponent>
             <Formik
               initialValues={initialDeleteValues}

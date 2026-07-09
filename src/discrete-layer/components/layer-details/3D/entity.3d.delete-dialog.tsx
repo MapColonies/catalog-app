@@ -27,6 +27,7 @@ import { useDeleteLayer, VALID } from '../delete.hook';
 
 import './entity.3d.delete-dialog.css';
 import { DialogActionTitle } from '../dialog.helpers';
+import { getTextStyle } from '../../../../common/helpers/style';
 
 export interface EntityDeleteDialogProps {
   isOpen: boolean;
@@ -83,6 +84,7 @@ export const EntityDelete3DDialog: React.FC<EntityDeleteDialogProps> = observer(
             domain={dialogTitleParamTranslation}
             action={Mode.DELETE}
             onClose={closeDialog}
+            style={getTextStyle(layerRecord as any, 'backgroundColor')}
           />
           <DialogContent>
             <Box className="headerWarning">

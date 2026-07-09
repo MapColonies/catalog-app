@@ -22,7 +22,8 @@ import {
   VectorLayer,
   VectorSource,
 } from '@map-colonies/react-components';
-import { Checkbox } from '@map-colonies/react-core';
+import { Checkbox, IconButton, useTheme } from '@map-colonies/react-core';
+import { ActiveLayersIcon } from '../../../../icons/4font/ActiveLayers';
 import CONFIG from '../../../../common/config';
 import { useEnums } from '../../../../common/hooks/useEnum.hook';
 import { Mode } from '../../../../common/models/mode.enum';
@@ -69,6 +70,7 @@ interface GeoFeaturesPresentorProps {
   showFeaturePropertiesPopup?: boolean;
   showPolygonParts?: boolean;
   isLayerImageShown?: boolean;
+  defaultShowBaseMap?: boolean;
   fitOptions?: FitOptions | undefined;
   style?: CSSProperties | undefined;
   children?: JSX.Element | null;
@@ -87,6 +89,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   showFeaturePropertiesPopup = false,
   showPolygonParts = false,
   isLayerImageShown = false,
+  defaultShowBaseMap = true,
   fitOptions,
   style,
   children,
@@ -94,11 +97,13 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   const store = useStore();
   const ENUMS = useEnums();
   const intl = useIntl();
+  const theme = useTheme();
   const ZOOM_LEVELS_TABLE = useZoomLevelsTable();
   const renderCount = useRef(0);
   const [selectedFeature, setSelectedFeature] = useState<Feature | undefined>(undefined);
   const [showExistingPolygonParts, setShowExistingPolygonParts] =
     useState<boolean>(showPolygonParts);
+  const [showBaseMap, setShowBaseMap] = useState<boolean>(defaultShowBaseMap);
   const [childrenWithZoomIndication, setChildrenWithZoomIndication] = useState<boolean>(false);
   const [isOpenProperties, setIsOpenProperties] = useState<boolean>(true);
 
@@ -174,8 +179,8 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
 
   const previewBaseMap = usePreviewBaseMapTiles();
 
-  const layerTiles = useMemo(() => {
-    if (!isLayerImageShown || !layerRecord) {
+  const layerImage = useMemo(() => {
+    if (!layerRecord) {
       return undefined;
     }
     const layerLink = getLayerLink(layerRecord);
@@ -186,7 +191,12 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
       const xyzOptions = getXYZOptions({
         url: getLinkUrlWithToken([layerLink]) as string,
       });
-      return buildOlTileLayer({ key: layerRecord.id, kind: 'XYZ', options: xyzOptions });
+      return buildOlTileLayer({
+        key: layerRecord.id,
+        kind: 'XYZ',
+        options: xyzOptions,
+        layerOptions: { zIndex: 1 },
+      });
     }
     if (layerLink.protocol === LinkType.WMTS_LAYER || layerLink.protocol === LinkType.WMTS) {
       const capability = store.discreteLayersStore.capabilities?.find(
@@ -205,7 +215,13 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
         projection: DEFAULT_PROJECTION,
         style: resolved.style,
       });
-      return buildOlTileLayer({ key: layerRecord.id, kind: 'WMTS', options: wmtsOptions });
+
+      return buildOlTileLayer({
+        key: layerRecord.id,
+        kind: 'WMTS',
+        options: wmtsOptions,
+        layerOptions: { extent: layerRecord.footprint?.bbox, zIndex: 1 },
+      });
     }
     return undefined;
   }, [isLayerImageShown, layerRecord]);
@@ -256,8 +272,8 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   return (
     <Box id="geoFeaturesMapContainer" style={{ ...style }}>
       <Map>
-        {previewBaseMap}
-        {layerTiles}
+        {showBaseMap && previewBaseMap}
+        {isLayerImageShown && layerImage}
         <MapLoadingIndicator />
         <ZoomLevelIndicator
           indicateTillZoomLevel={
@@ -294,6 +310,23 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
             />
           </Box>
         )}
+        <Box className="baseMap ol-control">
+          <IconButton
+            className="showOnMapContainer"
+            icon={
+              <ActiveLayersIcon
+                isFiltered={showBaseMap}
+                color={{
+                  active: theme.primary,
+                  inactive: theme.textIconOnBackground,
+                }}
+              />
+            }
+            onClick={(): void => {
+              setShowBaseMap(!showBaseMap);
+            }}
+          />
+        </Box>
         {showExistingPolygonParts && (
           <PolygonPartsExtentQueryVectorLayer
             featureType={FeatureType.EXISTING_PP}

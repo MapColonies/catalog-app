@@ -1,5 +1,11 @@
 import { CSSProperties, useEffect, useState } from 'react';
-import { Box, GeoJSONFeature, Map, VectorLayer, VectorSource } from '@map-colonies/react-components';
+import {
+  Box,
+  GeoJSONFeature,
+  Map,
+  VectorLayer,
+  VectorSource,
+} from '@map-colonies/react-components';
 import { Geometry } from 'geojson';
 import { FitOptions } from 'ol/View';
 import { validateGeoJSONString } from '../../../../common/utils/geojson.validation';
