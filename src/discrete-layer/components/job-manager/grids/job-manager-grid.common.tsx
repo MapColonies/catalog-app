@@ -298,10 +298,10 @@ const JobManagerGrid: React.FC<ICommonJobManagerGridProps> = (props) => {
         headerName: '',
         width: 0,
         cellRenderer: 'actionsRenderer',
-        cellRendererParams: (params: any) => ({
+        cellRendererParams: {
           actions: getJobActions,
           actionHandler: dispatchAction,
-        }),
+        },
       },
     ],
     []

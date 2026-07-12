@@ -53,7 +53,7 @@ export const ActionsRenderer: React.FC<IActionsRendererParams> = (props) => {
   const actions = useMemo(() => filterActionsByDependentFields(props.actions), [props.actions]);
   let frequentActions: IAction[] = [];
   let allFlatActions: IAction[] = [];
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+
   if (actions !== undefined) {
     actions.forEach((actionGroup) => {
       frequentActions = [

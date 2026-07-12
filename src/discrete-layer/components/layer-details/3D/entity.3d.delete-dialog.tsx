@@ -73,7 +73,7 @@ export const EntityDelete3DDialog: React.FC<EntityDeleteDialogProps> = observer(
     };
 
     return (
-      <Box id="entityDeleteDialog">
+      <Box id="dialog3DDelete">
         <Dialog open={isOpen} preventOutsideDismiss={true}>
           <DialogActionTitle
             domain={dialogTitleParamTranslation}
