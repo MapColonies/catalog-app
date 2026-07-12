@@ -2,6 +2,7 @@
 .vscode/
 
 # folders
+build/**
 schemas/**
 confd/**
 helm/**

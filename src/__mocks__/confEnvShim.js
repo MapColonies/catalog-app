@@ -32,9 +32,10 @@ if (!window._env_) {
         center: [34.811, 31.908],
         zoom: 14,
         mapMode2D: 'ROTATE',
-        showDebuggerTool: false,
+        showDebuggerTool: true,
         showActiveLayersTool: true,
         showGeocoderTool: true,
+        enableModelDraping: true,
       },
       LOGGER: {
         level: 'warn',

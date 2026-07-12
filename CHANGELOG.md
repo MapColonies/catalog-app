@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [6.3.0](https://github.com/MapColonies/catalog-app/compare/v6.2.1...v6.3.0) (2026-07-08)
+
+
+### Features
+
+* 3D models draping with raster vector layers ([#999](https://github.com/MapColonies/catalog-app/issues/999)) ([73188d3](https://github.com/MapColonies/catalog-app/commit/73188d35e98fc220c6abbdf5bc378bb79f6d3712))
+
+## [6.2.1](https://github.com/MapColonies/catalog-app/compare/v6.2.0...v6.2.1) (2026-07-05)
+
+
+### Bug Fixes
+
+* add service layers to active layers widget ([#992](https://github.com/MapColonies/catalog-app/issues/992)) ([e09e62b](https://github.com/MapColonies/catalog-app/commit/e09e62b800e24acc267226ea6df2e43876c1ed25))
+
 ## [6.2.0](https://github.com/MapColonies/catalog-app/compare/v6.1.5...v6.2.0) (2026-06-25)
 
 

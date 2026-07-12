@@ -1,6 +1,10 @@
-import { CesiumGeographicTilingScheme, Proj } from '@map-colonies/react-components';
-import { IRasterLayer } from '@map-colonies/react-components/dist/cesium-map/layers-manager';
-import { IBaseMaps, IBaseMap } from '@map-colonies/react-components/dist/cesium-map/map';
+import {
+  CesiumGeographicTilingScheme,
+  Proj,
+  IRasterLayer,
+  IBaseMaps,
+  IBaseMap,
+} from '@map-colonies/react-components';
 import { LinkType } from '../models/link-type.enum';
 import { IRasterIngestionFilesStructureConfig } from '../models/raster-ingestion-files-structure';
 
@@ -151,6 +155,7 @@ const APP_CONFIG = {
     SHOW_DEBUGGER_TOOL: MAP.showDebuggerTool,
     SHOW_ACTIVE_LAYERS_TOOL: MAP.showActiveLayersTool,
     SHOW_GEOCODER_TOOL: MAP.showGeocoderTool,
+    ENABLE_MODEL_DRAPING: MAP.enableModelDraping,
   },
   ACTIVE_LAYER: ACTIVE_LAYER, // | 'WMTS_LAYER' | 'WMS_LAYER' | 'XYZ_LAYER' | 'OSM_LAYER'
   ACTIVE_LAYER_PROPERTIES: ACTIVE_LAYER_PROPERTIES,

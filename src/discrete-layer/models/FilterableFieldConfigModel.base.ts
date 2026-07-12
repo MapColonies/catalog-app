@@ -33,7 +33,7 @@ export class FilterableFieldConfigModelSelector extends QueryBuilder {
   get participateInFilterPanel() { return this.__attr(`participateInFilterPanel`) }
   get operation() { return this.__attr(`operation`) }
   get order() { return this.__attr(`order`) }
-  validation(builder?: string | FilterFieldValidationModelSelector | ((selector: FilterFieldValidationModelSelector) => FilterFieldValidationModelSelector)) { return this.__child(`validation`, FilterFieldValidationModelSelector, builder) }
+  validation(builder: string | FilterFieldValidationModelSelector | ((selector: FilterFieldValidationModelSelector) => FilterFieldValidationModelSelector) | undefined) { return this.__child(`validation`, FilterFieldValidationModelSelector, builder) }
 }
 export function selectFromFilterableFieldConfig() {
   return new FilterableFieldConfigModelSelector()

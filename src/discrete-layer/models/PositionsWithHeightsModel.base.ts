@@ -29,7 +29,7 @@ export const PositionsWithHeightsModelBase = ModelBase
 
 export class PositionsWithHeightsModelSelector extends QueryBuilder {
   get products() { return this.__attr(`products`) }
-  data(builder?: string | PositionWithHeightModelSelector | ((selector: PositionWithHeightModelSelector) => PositionWithHeightModelSelector)) { return this.__child(`data`, PositionWithHeightModelSelector, builder) }
+  data(builder: string | PositionWithHeightModelSelector | ((selector: PositionWithHeightModelSelector) => PositionWithHeightModelSelector) | undefined) { return this.__child(`data`, PositionWithHeightModelSelector, builder) }
 }
 export function selectFromPositionsWithHeights() {
   return new PositionsWithHeightsModelSelector()

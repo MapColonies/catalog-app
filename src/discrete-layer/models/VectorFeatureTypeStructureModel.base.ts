@@ -31,7 +31,7 @@ export const VectorFeatureTypeStructureModelBase = ModelBase
 export class VectorFeatureTypeStructureModelSelector extends QueryBuilder {
   get layerName() { return this.__attr(`layerName`) }
   get aliasLayerName() { return this.__attr(`aliasLayerName`) }
-  fields(builder?: string | FieldFeatureTypeModelSelector | ((selector: FieldFeatureTypeModelSelector) => FieldFeatureTypeModelSelector)) { return this.__child(`fields`, FieldFeatureTypeModelSelector, builder) }
+  fields(builder: string | FieldFeatureTypeModelSelector | ((selector: FieldFeatureTypeModelSelector) => FieldFeatureTypeModelSelector) | undefined) { return this.__child(`fields`, FieldFeatureTypeModelSelector, builder) }
 }
 export function selectFromVectorFeatureTypeStructure() {
   return new VectorFeatureTypeStructureModelSelector()

@@ -32,9 +32,12 @@ import {
   IContextMenuData,
   IDrawing,
   IDrawingEvent,
+  ILayerManagerMetaMapping,
+  GeocoderOptions,
+  IMapLegend,
+  DrapingLayerPredicate,
+  ICesiumImageryLayerMeta,
 } from '@map-colonies/react-components';
-import { GeocoderOptions } from '@map-colonies/react-components/dist/cesium-map/geocoder/geocoder-panel';
-import { IMapLegend } from '@map-colonies/react-components/dist/cesium-map/legend';
 import { getTextDirection, isRtl } from '../../common/i18n/helpers';
 import { AutoDirectionBox } from '../../common/components/auto-direction-box/auto-direction-box.component';
 // import { BrowserCompatibilityChecker } from '../../common/components/browser-compatibility-checker/browser-compatibility-checker';
@@ -76,6 +79,7 @@ import { SystemCoreInfoDialog } from '../components/system-status/system-core-in
 import { JobModelType, LayerMetadataMixedUnion, LinkModelType, RecordType } from '../models';
 import { IDispatchAction } from '../models/actionDispatcherStore';
 import { ILayerImage } from '../models/layerImage';
+import { ProductType } from '../models/ProductTypeEnum';
 import { useStore } from '../models/RootStore';
 import { FilterField } from '../models/RootStore.base';
 import { UserAction, UserRole } from '../models/userStore';
@@ -313,7 +317,9 @@ const DiscreteLayerView: React.FC = observer(() => {
       NO_DATA_LAYERS: intl.formatMessage({ id: 'debug-panel.empty' }),
       ACTIVE_LAYERS_TITLE: intl.formatMessage({ id: 'active-layers.title' }),
       IMAGERY: intl.formatMessage({ id: 'active-layers.imagery' }),
+      SERVICE: intl.formatMessage({ id: 'active-layers.service' }),
       DATA: intl.formatMessage({ id: 'active-layers.data' }),
+      '3D': intl.formatMessage({ id: 'active-layers.3d' }),
       FLY_TO: intl.formatMessage({ id: 'action.flyTo.tooltip' }),
       REMOVE: intl.formatMessage({ id: 'active-layers.remove' }),
       BASE_MAP_TITLE: intl.formatMessage({ id: 'map-settings.base-map.title' }),
@@ -999,6 +1005,36 @@ const DiscreteLayerView: React.FC = observer(() => {
     return actionsMenuDimensions as MenuDimensions;
   }, [activeTabView, actionsMenuDimensions]);
 
+  const layerManagerMetaMapping = useMemo<ILayerManagerMetaMapping>(() => {
+    return {
+      layer: {
+        id: 'id',
+        name: 'layerRecord.productName',
+        footprint: 'layerRecord.footprint',
+      },
+      dataLayer: {
+        name: 'layerRecord.featureStructure.aliasLayerName',
+        fields: 'layerRecord.featureStructure.fields',
+      },
+    };
+  }, []);
+
+  const drapingLayerPredicate = useMemo<DrapingLayerPredicate | undefined>(() => {
+    if (!CONFIG.MAP.ENABLE_MODEL_DRAPING) {
+      return undefined;
+    }
+    return (layerMeta: ICesiumImageryLayerMeta): boolean => {
+      const productType = get(layerMeta, 'layerRecord.productType');
+      if (
+        productType === ProductType.RASTER_VECTOR ||
+        productType === ProductType.RASTER_VECTOR_BEST
+      ) {
+        return true;
+      }
+      return layerMeta.shouldBeUsedInModelDraping === true;
+    };
+  }, []);
+
   const site = useMemo(() => currentSite(), []);
 
   const triggerCallbackFunc = (data: Feature, options: GeocoderOptions, i: number) => {
@@ -1336,10 +1372,9 @@ const DiscreteLayerView: React.FC = observer(() => {
               center={CONFIG.MAP.CENTER}
               zoom={CONFIG.MAP.ZOOM}
               sceneMode={CesiumSceneMode.SCENE2D}
-              imageryProvider={false}
               locale={mapSettingsLocale}
               baseMaps={store.discreteLayersStore.baseMaps}
-              layerManagerFootprintMetaFieldPath={'layerRecord.footprint'}
+              layerManagerMetaMapping={layerManagerMetaMapping}
               // @ts-ignore
               imageryContextMenu={<ContextMenuByTab />}
               imageryContextMenuSize={contextMenuSizeByTab}
@@ -1355,6 +1390,7 @@ const DiscreteLayerView: React.FC = observer(() => {
               showDebuggerTool={CONFIG.MAP.SHOW_DEBUGGER_TOOL === true && isAdminUser}
               showActiveLayersTool={CONFIG.MAP.SHOW_ACTIVE_LAYERS_TOOL}
               {...(CONFIG.MAP.SHOW_GEOCODER_TOOL ? { geocoderPanel: GEOCODER_OPTIONS } : {})}
+              {...(drapingLayerPredicate !== undefined ? { drapingLayerPredicate } : {})}
             >
               {activeTabView !== TabViews.EXPORT_LAYER && (
                 <CesiumDrawingsDataSource

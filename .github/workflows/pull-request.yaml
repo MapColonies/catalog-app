@@ -26,10 +26,10 @@ jobs:
         with:
           path: '**/node_modules'
           key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
-      - name: Use Node.js 16
+      - name: Use Node.js 24
         uses: actions/setup-node@v5
         with:
-          node-version: 16
+          node-version: 24
       - name: Install yarn
         run: |
           curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -

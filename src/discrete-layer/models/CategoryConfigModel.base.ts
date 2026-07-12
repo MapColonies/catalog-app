@@ -32,7 +32,7 @@ export const CategoryConfigModelBase = ModelBase
 export class CategoryConfigModelSelector extends QueryBuilder {
   get category() { return this.__attr(`category`) }
   get categoryTitle() { return this.__attr(`categoryTitle`) }
-  fields(builder?: string | FieldConfigModelSelector | ((selector: FieldConfigModelSelector) => FieldConfigModelSelector)) { return this.__child(`fields`, FieldConfigModelSelector, builder) }
+  fields(builder: string | FieldConfigModelSelector | ((selector: FieldConfigModelSelector) => FieldConfigModelSelector) | undefined) { return this.__child(`fields`, FieldConfigModelSelector, builder) }
 }
 export function selectFromCategoryConfig() {
   return new CategoryConfigModelSelector()

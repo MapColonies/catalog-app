@@ -1,4 +1,4 @@
-FROM node:16.13.0-alpine3.12 AS prepare
+FROM node:24-alpine AS prepare
 
 # Install dependencies for confd
 RUN apk add --no-cache wget

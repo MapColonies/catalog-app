@@ -38,9 +38,9 @@ export const CapabilityModelBase = ModelBase
 export class CapabilityModelSelector extends QueryBuilder {
   get id() { return this.__attr(`id`) }
   get format() { return this.__attr(`format`) }
-  style(builder?: string | StyleModelSelector | ((selector: StyleModelSelector) => StyleModelSelector)) { return this.__child(`style`, StyleModelSelector, builder) }
-  tileMatrixSet(builder?: string | TileMatrixSetModelSelector | ((selector: TileMatrixSetModelSelector) => TileMatrixSetModelSelector)) { return this.__child(`tileMatrixSet`, TileMatrixSetModelSelector, builder) }
-  url(builder?: string | ResourceUrlModelSelector | ((selector: ResourceUrlModelSelector) => ResourceUrlModelSelector)) { return this.__child(`url`, ResourceUrlModelSelector, builder) }
+  style(builder: string | StyleModelSelector | ((selector: StyleModelSelector) => StyleModelSelector) | undefined) { return this.__child(`style`, StyleModelSelector, builder) }
+  tileMatrixSet(builder: string | TileMatrixSetModelSelector | ((selector: TileMatrixSetModelSelector) => TileMatrixSetModelSelector) | undefined) { return this.__child(`tileMatrixSet`, TileMatrixSetModelSelector, builder) }
+  url(builder: string | ResourceUrlModelSelector | ((selector: ResourceUrlModelSelector) => ResourceUrlModelSelector) | undefined) { return this.__child(`url`, ResourceUrlModelSelector, builder) }
 }
 export function selectFromCapability() {
   return new CapabilityModelSelector()

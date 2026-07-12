@@ -29,6 +29,7 @@ keys = [
   "/configuration/map/show/debugger/tool",
   "/configuration/map/show/active/layers/tool",
   "/configuration/map/show/geocoder/tool",
+  "/configuration/map/enable/model/draping",
   "/configuration/logger/http/host",
   "/configuration/logger/http/port",
   "/configuration/logger/http/path",
