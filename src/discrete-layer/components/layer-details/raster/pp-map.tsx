@@ -22,7 +22,7 @@ import {
   VectorLayer,
   VectorSource,
 } from '@map-colonies/react-components';
-import { Checkbox, IconButton, useTheme } from '@map-colonies/react-core';
+import { Checkbox, IconButton, Tooltip, useTheme } from '@map-colonies/react-core';
 import { ActiveLayersIcon } from '../../../../icons/4font/ActiveLayers';
 import CONFIG from '../../../../common/config';
 import { useEnums } from '../../../../common/hooks/useEnum.hook';
@@ -314,21 +314,29 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
           </Box>
         )}
         <Box className="baseMap ol-control">
-          <IconButton
-            className="showOnMapContainer"
-            icon={
-              <ActiveLayersIcon
-                isFiltered={showBaseMap}
-                color={{
-                  active: theme.primary,
-                  inactive: theme.textIconOnBackground,
-                }}
-              />
+          <Tooltip
+            content={
+              showBaseMap
+                ? intl.formatMessage({ id: 'polygon-parts.map-preview.without.base-map' })
+                : intl.formatMessage({ id: 'polygon-parts.map-preview.base-map' })
             }
-            onClick={(): void => {
-              setShowBaseMap(!showBaseMap);
-            }}
-          />
+          >
+            <IconButton
+              className="showOnMapContainer"
+              icon={
+                <ActiveLayersIcon
+                  isFiltered={showBaseMap}
+                  color={{
+                    active: theme.primary,
+                    inactive: theme.textIconOnBackground,
+                  }}
+                />
+              }
+              onClick={(): void => {
+                setShowBaseMap(!showBaseMap);
+              }}
+            />
+          </Tooltip>
         </Box>
         {showExistingPolygonParts && (
           <PolygonPartsExtentQueryVectorLayer

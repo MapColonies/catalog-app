@@ -1,5 +1,6 @@
 #geoFeaturesMapContainer {
   position: relative;
+  border: 1px solid var(--mdc-theme-gc-selection-background, #fff);
 }
 
 #geoFeaturesMapContainer .checkbox {
