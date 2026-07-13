@@ -33,7 +33,7 @@ import {
   getResponseErrorMesssage,
   getResponseErrorURL,
 } from '../../../common/helpers/server-error';
-import { disableActionByPredicate } from '../helpers/actionsUtils';
+import { getActionsWithDisable, IActionGroup } from '../../../common/actions/entity.actions';
 // import { usePrevious } from '../../../common/hooks/previous.hook';
 import { LayerRasterRecordModelType } from '../../models';
 import { IDispatchAction } from '../../models/actionDispatcherStore';
@@ -261,11 +261,9 @@ export const LayersResults: React.FC<LayersResultsProps> = observer((props) => {
       width: 0,
       cellRenderer: 'actionsRenderer',
       cellRendererParams: (params: any) => ({
-        actions: disableActionByPredicate(
-          entityPermittedActions,
-          params.data,
-          'delete',
-          (data) => !isUnpublished(data)
+        actions: getActionsWithDisable(
+          entityPermittedActions[params.data.__typename] as IActionGroup[],
+          [['delete', !isUnpublished(params.data)]]
         ),
         actionHandler: dispatchAction,
       }),

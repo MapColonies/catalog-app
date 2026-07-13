@@ -10,7 +10,7 @@ import { Geometry } from 'geojson';
 import { FitOptions } from 'ol/View';
 import { validateGeoJSONString } from '../../../../common/utils/geojson.validation';
 import { Mode } from '../../../../common/models/mode.enum';
-import { usePreviewBaseMapTiles } from '../../helpers/ol-tile-layer.utils';
+import { usePreviewBaseMapTiles } from '../../../../common/components/ol-map/ol-tile-layer.utils';
 
 interface GeoJsonMapValuePresentorProps {
   mode: Mode;

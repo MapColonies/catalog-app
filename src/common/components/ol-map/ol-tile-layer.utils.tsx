@@ -10,7 +10,7 @@ import {
 } from '@map-colonies/react-components';
 import { Options as WMTSOptions } from 'ol/source/WMTS';
 import { Options as XYZOptions } from 'ol/source/XYZ';
-import { useStore } from '../../models/RootStore';
+import { useStore } from '../../../discrete-layer/models/RootStore';
 
 const DEFAULT_PROJECTION = 'EPSG:4326';
 

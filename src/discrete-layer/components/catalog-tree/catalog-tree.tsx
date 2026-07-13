@@ -21,6 +21,7 @@ import {
   getResponseErrorMesssage,
   getResponseErrorURL,
 } from '../../../common/helpers/server-error';
+import { getActionsWithDisable, IActionGroup } from '../../../common/actions/entity.actions';
 import { IDispatchAction } from '../../models/actionDispatcherStore';
 import { ILayerImage } from '../../models/layerImage';
 import { useStore } from '../../models/RootStore';
@@ -29,7 +30,6 @@ import { TabViews } from '../../views/tab-views';
 import { LayerMetadataMixedUnion } from '../../models';
 import { BestInEditDialog } from '../dialogs/best-in-edit.dialog';
 import { getLinkUrlWithToken } from '../helpers/layersUtils';
-import { disableActionByPredicate } from '../helpers/actionsUtils';
 import { queue } from '../snackbar/notification-queue';
 
 import './catalog-tree.css';
@@ -310,11 +310,9 @@ export const CatalogTreeComponent: React.FC<CatalogTreeComponentProps> = observe
                       hoveredNode.parentPath === rowInfo.path.slice(0, -1).toString() && (
                         <ActionsRenderer
                           node={rowInfo.node}
-                          actions={disableActionByPredicate(
-                            entityPermittedActions,
-                            rowInfo.node,
-                            'delete',
-                            (data) => !isUnpublished(data)
+                          actions={getActionsWithDisable(
+                            entityPermittedActions[rowInfo.node.__typename] as IActionGroup[],
+                            [['delete', !isUnpublished(rowInfo.node)]]
                           )}
                           entity={rowInfo.node.__typename}
                           actionHandler={dispatchAction}

@@ -42,7 +42,10 @@ import {
   getLinkUrlWithToken,
   resolveWmtsCapabilityParams,
 } from '../../helpers/layersUtils';
-import { buildOlTileLayer, usePreviewBaseMapTiles } from '../../helpers/ol-tile-layer.utils';
+import {
+  buildOlTileLayer,
+  usePreviewBaseMapTiles,
+} from '../../../../common/components/ol-map/ol-tile-layer.utils';
 import { FeaturePropertiesPopupComponent } from './feature-properties-popup.component';
 import { FlyToPP } from './fly-to-pp';
 import { GeoFeaturesInnerComponent } from './geo-features-inner.component';

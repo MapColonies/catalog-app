@@ -51,6 +51,25 @@ export const isDependentFieldWithValue = (
   );
 };
 
+export const getActionsWithDisable = (
+  entityActions: IActionGroup[],
+  disabledActions: Array<[string, boolean]>
+): IActionGroup[] => {
+  const actions = structuredClone(entityActions);
+
+  for (const actionGroup of actions) {
+    for (const [actionName, isDisabled] of disabledActions) {
+      const action = actionGroup.group.find((action) => action.action === actionName);
+
+      if (action) {
+        action.disabled = isDisabled;
+      }
+    }
+  }
+
+  return actions;
+};
+
 const GENERAL_ACTIONS_GROUP: IActionGroup = {
   id: 0,
   titleTranslationId: 'layerCatalogToMap',
