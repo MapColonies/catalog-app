@@ -96,9 +96,12 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
       const groupsWithTranslation = action.group.map((action) => {
         return {
           ...action,
-          titleTranslationId: intl.formatMessage({
-            id: action.titleTranslationId,
-          }),
+          title: {
+            ...action.title,
+            translationId: intl.formatMessage({
+              id: action.title.translationId,
+            }),
+          },
         };
       });
       return { ...action, group: groupsWithTranslation };

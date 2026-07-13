@@ -117,9 +117,12 @@ export const CatalogTreeComponent: React.FC<CatalogTreeComponentProps> = observe
               .map((action) => {
                 return {
                   ...action,
-                  titleTranslationId: intl.formatMessage({
-                    id: action.titleTranslationId,
-                  }),
+                  title: {
+                    ...action.title,
+                    translationId: intl.formatMessage({
+                      id: action.title.translationId,
+                    }),
+                  },
                 };
               }),
           };

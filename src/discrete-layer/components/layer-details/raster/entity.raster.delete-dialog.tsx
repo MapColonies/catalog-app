@@ -99,7 +99,6 @@ export const EntityDeleteRasterDialog: React.FC<EntityDeleteDialogProps> = obser
             <GeoFeaturesPresentorComponent
               layerRecord={layerRecord}
               mode={Mode.DELETE}
-              showPolygonParts={true}
               style={{ height: 'var(--map-height)', position: 'relative', direction: 'ltr' }}
               isLayerImageShown={true}
               defaultShowBaseMap={false}

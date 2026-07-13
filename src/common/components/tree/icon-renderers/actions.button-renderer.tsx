@@ -47,11 +47,11 @@ export const ActionsRenderer: React.FC<IActionsRendererParams> = ({
         return (
           <IconButton
             className={
-              action.class
-                ? `actionIcon actionDismissible ${action.class}`
+              action.symbol.class
+                ? `actionIcon actionDismissible ${action.symbol.class}`
                 : `actionIcon actionDismissible`
             }
-            icon={action.icon}
+            icon={action.symbol.icon}
             disabled={action.disabled}
             key={`freqAct_${node.id as string}_${idx}`}
             onClick={(): void => {
@@ -84,9 +84,9 @@ export const ActionsRenderer: React.FC<IActionsRendererParams> = ({
                 className="actionMenuItem"
               >
                 <IconButton
-                  className={`actionIcon actionDismissible ${action.class || ''}`}
+                  className={`actionIcon actionDismissible ${action.symbol.class || ''}`}
                   disabled={action.disabled}
-                  icon={action.icon}
+                  icon={action.symbol.icon}
                 />
                 <Typography
                   tag="div"
@@ -94,10 +94,10 @@ export const ActionsRenderer: React.FC<IActionsRendererParams> = ({
                   className={`actionMenuItemTitle actionDismissible ${
                     action.disabled ? 'disabled' : ''
                   }
-                  ${action.titleClass ?? ''}
+                  ${action.title.class ?? ''}
                   `}
                 >
-                  {action.titleTranslationId}
+                  {action.title.translationId}
                 </Typography>
               </Box>
             );

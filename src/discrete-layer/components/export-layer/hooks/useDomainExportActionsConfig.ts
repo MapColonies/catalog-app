@@ -46,14 +46,15 @@ const EXPORT_ACTIONS: ExportAction[] = [
   {
     action: ExportActions.TOGGLE_FULL_LAYER_EXPORT,
     frequent: true,
-    icon: '',
-    class: '',
+    symbol: {},
     toggleExportStoreFieldOptions: {
       field: 'isFullLayerExportEnabled',
       labelChecked: 'action.export.full-layer.label',
       labelUnchecked: 'action.export.full-layer.label',
     },
-    titleTranslationId: 'action.export.full-layer.tooltip',
+    title: {
+      translationId: 'action.export.full-layer.tooltip',
+    },
     disabled: false,
     views: [TabViews.EXPORT_LAYER],
   },
@@ -61,54 +62,72 @@ const EXPORT_ACTIONS: ExportAction[] = [
   {
     action: ExportActions.DRAW_FOOTPRINT,
     frequent: true,
-    icon: '',
-    class: 'mc-icon-Map-Orthophoto',
-    titleTranslationId: 'action.export.footprint.tooltip',
+    symbol: {
+      class: 'mc-icon-Map-Orthophoto',
+    },
+    title: {
+      translationId: 'action.export.footprint.tooltip',
+    },
     disabled: false,
     views: [TabViews.EXPORT_LAYER],
   },
   {
     action: ExportActions.DRAW_RECTANGLE,
     frequent: true,
-    icon: '',
-    class: 'mc-icon-Rectangle',
-    titleTranslationId: 'action.export.box.tooltip',
+    symbol: {
+      class: 'mc-icon-Rectangle',
+    },
+    title: {
+      translationId: 'action.export.box.tooltip',
+    },
     disabled: false,
     views: [TabViews.EXPORT_LAYER],
   },
   {
     action: ExportActions.DRAW_POLYGON,
     frequent: true,
-    icon: '',
-    class: 'mc-icon-Polygon',
-    titleTranslationId: 'action.export.polygon.tooltip',
+    symbol: {
+      class: 'mc-icon-Polygon',
+    },
+    title: {
+      translationId: 'action.export.polygon.tooltip',
+    },
     disabled: false,
     views: [TabViews.EXPORT_LAYER],
   },
   {
     action: ExportActions.DRAW_BY_COORDINATES,
     frequent: true,
-    icon: '',
-    class: 'mc-icon-Coordinates',
-    titleTranslationId: 'action.export.bbox-corners.tooltip',
+    symbol: {
+      class: 'mc-icon-Coordinates',
+    },
+    title: {
+      translationId: 'action.export.bbox-corners.tooltip',
+    },
     disabled: false,
     views: [TabViews.EXPORT_LAYER],
   },
   {
     action: ExportActions.IMPORT_FROM_SHAPE_FILE,
     frequent: true,
-    icon: '',
-    class: 'mc-icon-Upload',
-    titleTranslationId: 'action.export.import-shape.tooltip',
+    symbol: {
+      class: 'mc-icon-Upload',
+    },
+    title: {
+      translationId: 'action.export.import-shape.tooltip',
+    },
     disabled: false,
     views: [TabViews.EXPORT_LAYER],
   },
   {
     action: ExportActions.OPEN_HOT_AREAS_MENU,
     frequent: true,
-    icon: '',
-    class: 'mc-icon-Predefined-AOIs',
-    titleTranslationId: 'action.export.select-hot-area.tooltip',
+    symbol: {
+      class: 'mc-icon-Predefined-AOIs',
+    },
+    title: {
+      translationId: 'action.export.select-hot-area.tooltip',
+    },
     menuActionOptions: {
       items: new Map<string, unknown>(),
       dispatchOnItemClick: {
@@ -122,9 +141,12 @@ const EXPORT_ACTIONS: ExportAction[] = [
   {
     action: ExportActions.CLEAR_DRAWINGS,
     frequent: true,
-    icon: '',
-    class: 'mc-icon-Delete',
-    titleTranslationId: 'action.clear.tooltip',
+    symbol: {
+      class: 'mc-icon-Delete',
+    },
+    title: {
+      translationId: 'action.clear.tooltip',
+    },
     disabled: false,
     views: [TabViews.EXPORT_LAYER],
   },
@@ -208,13 +230,11 @@ const useDomainExportActionsConfig = (): ExportAction[] => {
         const newActionList = domainActionList.map((action) => {
           if (action === 'SEPARATOR' || action.action === ExportActions.CLEAR_DRAWINGS)
             return action;
-          const rasterAction: ExportAction = {
-            ...action,
-            class:
-              action.action === ExportActions.DRAW_FOOTPRINT
-                ? 'mc-icon-Map-Orthophoto'
-                : action.class,
-          };
+          const rasterClass: string =
+            action.action === ExportActions.DRAW_FOOTPRINT
+              ? 'mc-icon-Map-Orthophoto'
+              : action.symbol.class ?? '';
+          const rasterAction: ExportAction = { ...action, symbol: { class: rasterClass } };
 
           if (!isEmpty(selectionsFeatures)) {
             if (
@@ -251,10 +271,11 @@ const useDomainExportActionsConfig = (): ExportAction[] => {
         const newActionList = domainActionList.map((action) => {
           if (action === 'SEPARATOR') return action;
 
-          const action3D: ExportAction = {
-            ...action,
-            class: action.action === ExportActions.DRAW_FOOTPRINT ? 'mc-icon-Map-3D' : action.class,
-          };
+          const action3DClass: string =
+            action.action === ExportActions.DRAW_FOOTPRINT
+              ? 'mc-icon-Map-3D'
+              : action.symbol.class ?? '';
+          const action3D: ExportAction = { ...action, symbol: { class: action3DClass } };
 
           return { ...action3D, disabled: true };
         });
@@ -273,11 +294,11 @@ const useDomainExportActionsConfig = (): ExportAction[] => {
         const newActionList = domainActionList.map((action) => {
           if (action === 'SEPARATOR' || action.action === ExportActions.CLEAR_DRAWINGS)
             return action;
-          const demAction: ExportAction = {
-            ...action,
-            class:
-              action.action === ExportActions.DRAW_FOOTPRINT ? 'mc-icon-Map-DTM' : action.class,
-          };
+          const demClass: string =
+            action.action === ExportActions.DRAW_FOOTPRINT
+              ? 'mc-icon-Map-DTM'
+              : action.symbol.class ?? '';
+          const demAction: ExportAction = { ...action, symbol: { class: demClass } };
 
           if (!isEmpty(selectionsFeatures)) {
             if (

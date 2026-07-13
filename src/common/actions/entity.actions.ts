@@ -1,5 +1,8 @@
 import { TabViews } from '../../discrete-layer/views/tab-views';
+import { UserAction } from '../../discrete-layer/models/userStore';
 import { RecordStatus } from '../../discrete-layer/models';
+import { ExportActions } from '../../discrete-layer/components/export-layer/hooks/useDomainExportActionsConfig';
+import { ContextActions } from './context.actions';
 
 interface DependentFieldWithValue {
   field: string;
@@ -8,15 +11,38 @@ interface DependentFieldWithValue {
 }
 export type DependentField = string | DependentFieldWithValue;
 
+enum GeneralAction {
+  flyTo = 'flyTo',
+  viewer = 'viewer',
+  export = 'export',
+}
+
+enum JobAction {
+  restore = 'restore',
+  abort = 'abort',
+  retry = 'retry',
+  download_details = 'download_details',
+}
+
+enum CRUDAction {
+  delete = 'delete',
+  update = 'update',
+  edit = 'edit',
+}
+
 export interface IAction {
-  action: string;
+  action: ContextActions | UserAction | ExportActions | GeneralAction | JobAction | CRUDAction;
   frequent: boolean;
-  icon: string;
-  class: string;
-  titleTranslationId: string;
+  symbol: {
+    icon?: string;
+    class?: string;
+  };
+  title: {
+    translationId: string;
+    class?: string;
+  };
   views: TabViews[];
   disabled?: boolean;
-  titleClass?: string;
   dependentField?: DependentField;
 }
 
@@ -76,19 +102,25 @@ const GENERAL_ACTIONS_GROUP: IActionGroup = {
   type: EntityActionsTypes.GENERAL_ACTIONS,
   group: [
     {
-      action: 'flyTo',
+      action: GeneralAction.flyTo,
       frequent: true,
-      icon: '',
-      class: 'mc-icon-Fly-to',
-      titleTranslationId: 'action.flyTo.tooltip',
+      symbol: {
+        class: 'mc-icon-Fly-to',
+      },
+      title: {
+        translationId: 'action.flyTo.tooltip',
+      },
       views: [TabViews.CATALOG, TabViews.SEARCH_RESULTS],
     },
     {
-      action: 'viewer',
+      action: GeneralAction.viewer,
       frequent: false,
-      icon: '',
-      class: 'mc-icon-Earth',
-      titleTranslationId: 'action.viewer.tooltip',
+      symbol: {
+        class: 'mc-icon-Earth',
+      },
+      title: {
+        translationId: 'action.viewer.tooltip',
+      },
       dependentField: {
         field: 'productStatus',
         expectedValue: RecordStatus.BEING_DELETED,
@@ -97,11 +129,14 @@ const GENERAL_ACTIONS_GROUP: IActionGroup = {
       views: [TabViews.CATALOG, TabViews.SEARCH_RESULTS],
     },
     {
-      action: 'export',
+      action: GeneralAction.export,
       frequent: false,
-      icon: '',
-      class: 'mc-icon-Export',
-      titleTranslationId: 'action.export.tooltip',
+      symbol: {
+        class: 'mc-icon-Export',
+      },
+      title: {
+        translationId: 'action.export.tooltip',
+      },
       dependentField: { field: 'layerURLMissing', expectedValue: false },
       views: [TabViews.CATALOG, TabViews.SEARCH_RESULTS],
     },
@@ -119,30 +154,26 @@ const ACTIONS_CONFIG: IEntityActions[] = [
         type: EntityActionsTypes.CRUD,
         group: [
           {
-            action: 'edit',
+            action: CRUDAction.edit,
             frequent: true,
-            icon: '',
-            class: 'mc-icon-Edit1',
-            titleTranslationId: 'action.edit.tooltip',
+            symbol: { class: 'mc-icon-Edit1' },
+            title: { translationId: 'action.edit.tooltip' },
             dependentField: { field: 'layerURLMissing', expectedValue: false },
             views: [TabViews.CATALOG, TabViews.SEARCH_RESULTS],
           },
           {
-            action: 'update',
+            action: CRUDAction.update,
             frequent: false,
-            icon: '',
-            class: 'mc-icon-Update',
-            titleTranslationId: 'action.update.tooltip',
+            symbol: { class: 'mc-icon-Update' },
+            title: { translationId: 'action.update.tooltip' },
             dependentField: { field: 'layerURLMissing', expectedValue: false },
             views: [TabViews.CATALOG, TabViews.SEARCH_RESULTS],
           },
           {
-            action: 'delete',
+            action: CRUDAction.delete,
             frequent: false,
-            icon: '',
-            class: 'mc-icon-Delete error',
-            titleTranslationId: 'action.delete.tooltip',
-            titleClass: 'error',
+            symbol: { class: 'mc-icon-Delete error' },
+            title: { translationId: 'action.delete.tooltip', class: 'error' },
             dependentField: { field: 'layerURLMissing', expectedValue: false },
             views: [TabViews.CATALOG, TabViews.SEARCH_RESULTS],
           },
@@ -160,11 +191,10 @@ const ACTIONS_CONFIG: IEntityActions[] = [
         type: EntityActionsTypes.CRUD,
         group: [
           {
-            action: 'edit',
+            action: CRUDAction.edit,
             frequent: true,
-            icon: '',
-            class: 'mc-icon-Edit1',
-            titleTranslationId: 'action.edit.tooltip',
+            symbol: { class: 'mc-icon-Edit1' },
+            title: { translationId: 'action.edit.tooltip' },
             dependentField: {
               field: 'productStatus',
               expectedValue: RecordStatus.BEING_DELETED,
@@ -173,12 +203,10 @@ const ACTIONS_CONFIG: IEntityActions[] = [
             views: [TabViews.CATALOG, TabViews.SEARCH_RESULTS],
           },
           {
-            action: 'delete',
+            action: CRUDAction.delete,
             frequent: false,
-            icon: '',
-            class: 'mc-icon-Delete error',
-            titleTranslationId: 'action.delete.tooltip',
-            titleClass: 'error',
+            symbol: { class: 'mc-icon-Delete error' },
+            title: { translationId: 'action.delete.tooltip', class: 'error' },
             dependentField: {
               field: 'productStatus',
               expectedValue: RecordStatus.BEING_DELETED,
@@ -200,11 +228,10 @@ const ACTIONS_CONFIG: IEntityActions[] = [
         type: EntityActionsTypes.CRUD,
         group: [
           {
-            action: 'edit',
+            action: CRUDAction.edit,
             frequent: true,
-            icon: '',
-            class: 'mc-icon-Edit1',
-            titleTranslationId: 'action.edit.tooltip',
+            symbol: { class: 'mc-icon-Edit1' },
+            title: { translationId: 'action.edit.tooltip' },
             views: [TabViews.CATALOG, TabViews.SEARCH_RESULTS],
           },
         ],
@@ -221,11 +248,10 @@ const ACTIONS_CONFIG: IEntityActions[] = [
         type: EntityActionsTypes.CRUD,
         group: [
           {
-            action: 'edit',
+            action: CRUDAction.edit,
             frequent: true,
-            icon: '',
-            class: 'mc-icon-Edit1',
-            titleTranslationId: 'action.edit.tooltip',
+            symbol: { class: 'mc-icon-Edit1' },
+            title: { translationId: 'action.edit.tooltip' },
             views: [TabViews.CATALOG, TabViews.SEARCH_RESULTS],
           },
         ],
@@ -242,11 +268,10 @@ const ACTIONS_CONFIG: IEntityActions[] = [
         type: EntityActionsTypes.CRUD,
         group: [
           {
-            action: 'edit',
+            action: CRUDAction.edit,
             frequent: true,
-            icon: '',
-            class: 'mc-icon-Edit1',
-            titleTranslationId: 'action.edit.tooltip',
+            symbol: { class: 'mc-icon-Edit1' },
+            title: { translationId: 'action.edit.tooltip' },
             views: [TabViews.CATALOG, TabViews.SEARCH_RESULTS],
           },
           // {
@@ -271,11 +296,10 @@ const ACTIONS_CONFIG: IEntityActions[] = [
         type: EntityActionsTypes.JOB_ACTIONS,
         group: [
           {
-            action: 'download_details',
+            action: JobAction.download_details,
             frequent: false,
-            icon: '',
-            class: 'mc-icon-Download',
-            titleTranslationId: 'action.job.download_details',
+            symbol: { class: 'mc-icon-Download' },
+            title: { translationId: 'action.job.download_details' },
             views: [],
           },
         ],
@@ -286,29 +310,26 @@ const ACTIONS_CONFIG: IEntityActions[] = [
         type: EntityActionsTypes.JOB_ACTIONS,
         group: [
           {
-            action: 'retry',
+            action: JobAction.retry,
             frequent: false,
-            icon: '',
-            class: 'mc-icon-Job-Resume',
-            titleTranslationId: 'action.job.retry',
+            symbol: { class: 'mc-icon-Job-Resume' },
+            title: { translationId: 'action.job.retry' },
             dependentField: 'availableActions.isResumable',
             views: [],
           },
           {
-            action: 'abort',
+            action: JobAction.abort,
             frequent: false,
-            icon: '',
-            class: 'mc-icon-Job-Abort',
-            titleTranslationId: 'action.job.abort',
+            symbol: { class: 'mc-icon-Job-Abort' },
+            title: { translationId: 'action.job.abort' },
             dependentField: 'availableActions.isAbortable',
             views: [],
           },
           {
-            action: 'restore',
+            action: JobAction.restore,
             frequent: false,
-            icon: '',
-            class: 'mc-icon-Upload',
-            titleTranslationId: 'action.job.restore',
+            symbol: { class: 'mc-icon-Upload' },
+            title: { translationId: 'action.job.restore' },
             dependentField: 'availableActions.isRestorable',
             views: [],
           },
