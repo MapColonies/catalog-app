@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { ILayerImage } from '../../../../discrete-layer/models/layerImage';
 import { LayerRasterRecordModelType } from '../../../../discrete-layer/models';
-import { getIconStyle } from '../../../helpers/style';
+import { getIconStyle, hasWFSLink } from '../../../helpers/style';
 import { TypeIcon } from '../../shared/type-icon';
 
 interface IProductTypeCellRendererParams {
@@ -18,7 +18,7 @@ export const ProductTypeRenderer: React.FC<IProductTypeCellRendererParams> = ({
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     const rasterData = data as LayerRasterRecordModelType;
 
-    if (onClick && rasterData.links?.some((link) => link.protocol === 'WFS')) {
+    if (onClick && hasWFSLink(rasterData as unknown as Record<string, unknown>)) {
       onClick(data, !rasterData.polygonPartsShown);
     }
   };

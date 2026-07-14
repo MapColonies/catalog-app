@@ -32,6 +32,7 @@ export interface MenuItemsGroup extends CommonMenuItem {
   groupProps: ContextActionGroupProps;
   items: MenuItemsList;
   icon?: string;
+  disabled?: boolean;
 }
 
 

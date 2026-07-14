@@ -162,6 +162,7 @@ export const ContextMenu: React.FC<PropsWithChildren<IMapContextMenuData>> = ({
 
             return (
               <MenuItemWithSeparator
+                key={`menu_item_${menuItemOrGroup.title}_${idx}`}
                 separatorKeySuffix={`${idx}`}
                 separator={menuItemOrGroup.action.separator}
                 showSeparatorBefore={showSeparatorBefore}
@@ -196,11 +197,14 @@ export const ContextMenu: React.FC<PropsWithChildren<IMapContextMenuData>> = ({
                   })}
                 </TooltippedValue>
               );
+              const groupDisabled = menuItemOrGroup.disabled ?? false;
               groupToRender = (
                 <Submenu
                   key={`imageryMenuGroupItems_${menuItemOrGroup.groupProps.id}`}
                   dir={direction}
                   label={menuTitle}
+                  disabled={groupDisabled}
+                  style={{ pointerEvents: groupDisabled ? 'none' : 'unset' }}
                   onMouseOver={handleMouseEnter}
                   onMouseLeave={handleMouseLeave}
                 >
@@ -217,6 +221,7 @@ export const ContextMenu: React.FC<PropsWithChildren<IMapContextMenuData>> = ({
 
             return (
               <MenuItemWithSeparator
+                key={`menu_group_${menuItemOrGroup.groupProps.id}_${idx}`}
                 separatorKeySuffix={`${menuItemOrGroup.groupProps.id}`}
                 separator={menuItemOrGroup.groupProps.separator}
                 showSeparatorBefore={showSeparatorBefore}

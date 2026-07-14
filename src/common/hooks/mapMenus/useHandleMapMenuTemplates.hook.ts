@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
-import _ from 'lodash';
+import _, { get } from 'lodash';
 import { IContextMenuData } from '@map-colonies/react-components';
 import {
   DynamicMenuData,
@@ -20,6 +20,7 @@ import {
   ContextActionsTemplates,
 } from '../../actions/context.actions';
 import CONFIG from '../../config';
+import { hasWFSLink } from '../../helpers/style';
 
 export const useHandleMapMenuTemplates = (
   menuProperties?: IMapMenuProperties,
@@ -116,13 +117,25 @@ export const useHandleMapMenuTemplates = (
             },
           };
 
+          const layerHasWFSLink = hasWFSLink(
+            get(activeLayer, 'meta.layerRecord') as Record<string, unknown>
+          );
+
           const generatedGroup: MenuItemsGroup = {
             ...groupTemplateMenuItem,
             groupProps: groupProp,
             title: groupProp.titleTranslationId,
             items: groupTemplateMenuItem.items.map((item) => {
               if (!isMenuItemGroup(item)) {
-                return { ...item, payloadData: activeLayer.meta as Record<string, unknown> };
+                const itemDisabled =
+                  item.action.action === ContextActions.QUERY_POLYGON_PARTS
+                    ? !layerHasWFSLink
+                    : item.disabled;
+                return {
+                  ...item,
+                  disabled: itemDisabled,
+                  payloadData: activeLayer.meta as Record<string, unknown>,
+                };
               }
 
               return item;

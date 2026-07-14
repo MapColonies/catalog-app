@@ -137,7 +137,7 @@ export const ActionsContextMenu: React.FC<IActionsContextMenuProps> = observer((
       <Box className="contextMenuFooter">
         <Box className="heightContainer">
           <Icon className="menuIcon mc-icon-Height-DTM" />
-          <Typography tag="p">
+          <Typography tag="div">
             {heightsAtCoordinates.isLoadingData ? <CircularProgress /> : getHeightText()}
           </Typography>
         </Box>
