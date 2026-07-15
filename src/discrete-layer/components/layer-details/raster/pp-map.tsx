@@ -44,7 +44,7 @@ import {
 } from './polygon-parts-extent-query-vector-layer';
 import {
   FEATURE_LABEL_CONFIG,
-  GeometryZIndex,
+  VectorLayerZIndex,
   getText,
   getWFSFeatureTypeName,
   PPMapStyles,
@@ -269,7 +269,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
             outerPerimeter={layerRecord?.footprint as Geometry | undefined}
             options={{
               properties: { id: FeatureType.EXISTING_PP },
-              zIndex: GeometryZIndex.EXISTING_GEOMETRY,
+              zIndex: VectorLayerZIndex.EXISTING,
             }}
           />
         )}
@@ -282,7 +282,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
           feature={selectedFeature}
           options={{
             properties: { id: 'SELECTED_PP' },
-            zIndex: GeometryZIndex.SELECTED_GEOMETRY,
+            zIndex: VectorLayerZIndex.SELECTED,
           }}
         />
         <FlyToPP feature={selectedFeature} />

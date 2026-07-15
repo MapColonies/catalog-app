@@ -16,21 +16,21 @@ export const DEFAULT_PROJECTION = 'EPSG:4326';
 
 interface BuildOlTileLayerParams {
   key: string;
-  kind: 'WMTS' | 'XYZ';
+  protocol: 'WMTS' | 'XYZ';
   options: WMTSOptions | XYZOptions;
   layerOptions?: Record<string, unknown>;
 }
 
-export const buildOlTileLayer = ({
+export const OlTileLayer: React.FC<BuildOlTileLayerParams> = ({
   key,
-  kind,
+  protocol,
   options,
   layerOptions,
-}: BuildOlTileLayerParams): JSX.Element => {
+}): JSX.Element => {
   const tileOptions = { ...options, crossOrigin: 'anonymous' };
   return (
     <TileLayer key={key} options={layerOptions}>
-      {kind === 'WMTS' ? (
+      {protocol === 'WMTS' ? (
         <TileWMTS options={tileOptions as WMTSOptions} />
       ) : (
         <TileXYZ options={tileOptions as XYZOptions} />
@@ -58,12 +58,12 @@ export const usePreviewBaseMapTiles = (baseMaps: IBaseMaps | undefined): JSX.Ele
             style: get(layer.options, 'style'),
           });
           olBaseMap.push(
-            buildOlTileLayer({
-              key: layer.id,
-              kind: 'WMTS',
-              options: wmtsOptions,
-              layerOptions: { opacity: layer.opacity },
-            })
+            <OlTileLayer
+              key={layer.id}
+              protocol="WMTS"
+              options={wmtsOptions}
+              layerOptions={{ opacity: layer.opacity }}
+            />
           );
         }
         if (layer.type === 'XYZ_LAYER') {
@@ -71,12 +71,12 @@ export const usePreviewBaseMapTiles = (baseMaps: IBaseMaps | undefined): JSX.Ele
             url: layer.options.url as string,
           });
           olBaseMap.push(
-            buildOlTileLayer({
-              key: layer.id,
-              kind: 'XYZ',
-              options: xyzOptions,
-              layerOptions: { opacity: layer.opacity },
-            })
+            <OlTileLayer
+              key={layer.id}
+              protocol="XYZ"
+              options={xyzOptions}
+              layerOptions={{ opacity: layer.opacity }}
+            />
           );
         }
       });

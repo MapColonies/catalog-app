@@ -34,7 +34,7 @@ import {
   PolygonPartsExtentQueryVectorLayer,
 } from './polygon-parts-extent-query-vector-layer';
 import { GeoFeaturesPresentorComponent } from './pp-map';
-import { EXCEEDED_PROPERTY_NAME, EXCEEDED_PROPERTY_VALUE, GeometryZIndex } from './pp-map.utils';
+import { EXCEEDED_PROPERTY_NAME, EXCEEDED_PROPERTY_VALUE, VectorLayerZIndex } from './pp-map.utils';
 import { ProgressCurtain } from './progressCurtain/progressCurtain';
 import { RasterWorkflowContext } from './state-machine/context';
 import { Events } from './state-machine/types';
@@ -721,13 +721,13 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                           outerPerimeter={outerPerimeter?.geometry}
                           options={{
                             properties: { id: FeatureType.LOW_RESOLUTION_PP },
-                            zIndex: GeometryZIndex.LOW_RESOLUTION_GEOMETRY,
+                            zIndex: VectorLayerZIndex.LOW_RESOLUTION,
                           }}
                         />
                         <VectorLayer
                           options={{
                             maxZoom: CONFIG.POLYGON_PARTS.MAX.SHOW_FOOTPRINT_ZOOM_LEVEL,
-                            zIndex: GeometryZIndex.EXCEEDED_GEOMETRY,
+                            zIndex: VectorLayerZIndex.EXCEEDED,
                           }}
                         >
                           <VectorSource>

@@ -14,7 +14,7 @@ import { FlyTo } from '../../../../common/components/ol-map/fly-to';
 import { FieldLabelComponent } from '../../../../common/components/form/field-label';
 import { GraphQLError } from '../../../../common/components/error/graphql.error-presentor';
 import {
-  buildOlTileLayer,
+  OlTileLayer,
   DEFAULT_PROJECTION,
 } from '../../../../common/components/ol-map/ol-tile-layer.utils';
 import {
@@ -35,7 +35,7 @@ import { LayersDetailsComponent } from '../layer-details';
 import { EntityDeleteDialogProps } from '../3D/entity.3d.delete-dialog';
 import { useDeleteLayer } from '../delete.hook';
 import { GeoFeaturesPresentorComponent } from './pp-map';
-import { GeometryZIndex } from './pp-map.utils';
+import { START_RASTER_LAYER_ZINDEX } from './pp-map.utils';
 
 import './entity.raster.delete-dialog.css';
 
@@ -95,12 +95,14 @@ export const EntityDeleteRasterDialog: React.FC<EntityDeleteDialogProps> = obser
         const xyzOptions = getXYZOptions({
           url: getLinkUrlWithToken([layerLink]) as string,
         });
-        return buildOlTileLayer({
-          key: layerRecord.id,
-          kind: 'XYZ',
-          options: xyzOptions,
-          layerOptions: { zIndex: GeometryZIndex.LAYER_IMAGE },
-        });
+        return (
+          <OlTileLayer
+            key={layerRecord.id}
+            protocol="XYZ"
+            options={xyzOptions}
+            layerOptions={{ zIndex: START_RASTER_LAYER_ZINDEX }}
+          />
+        );
       }
       if (layerLink.protocol === LinkType.WMTS_LAYER || layerLink.protocol === LinkType.WMTS) {
         const capability = store.discreteLayersStore.capabilities?.find(
@@ -122,12 +124,17 @@ export const EntityDeleteRasterDialog: React.FC<EntityDeleteDialogProps> = obser
           style: resolved.style,
         });
 
-        return buildOlTileLayer({
-          key: layerRecord.id,
-          kind: 'WMTS',
-          options: wmtsOptions,
-          layerOptions: { extent: layerRecord.footprint?.bbox, zIndex: GeometryZIndex.LAYER_IMAGE },
-        });
+        return (
+          <OlTileLayer
+            key={layerRecord.id}
+            protocol="WMTS"
+            options={wmtsOptions}
+            layerOptions={{
+              extent: layerRecord.footprint?.bbox,
+              zIndex: START_RASTER_LAYER_ZINDEX,
+            }}
+          />
+        );
       }
       return undefined;
     }, [layerRecord]);
