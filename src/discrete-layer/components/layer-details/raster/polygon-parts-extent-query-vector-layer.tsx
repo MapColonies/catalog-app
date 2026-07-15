@@ -238,7 +238,7 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<
             />
           ) : null;
         })}
-        {existingPolygonPartsMarker && (
+        {existingPolygonPartsMarker && polygonParts.length > 0 && (
           <GeoJSONFeature
             key="pp-perimeter-marker"
             geometry={existingPolygonPartsMarker}
