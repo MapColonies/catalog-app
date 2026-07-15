@@ -12,7 +12,7 @@ import { Options as WMTSOptions } from 'ol/source/WMTS';
 import { Options as XYZOptions } from 'ol/source/XYZ';
 import { useStore } from '../../../discrete-layer/models/RootStore';
 
-const DEFAULT_PROJECTION = 'EPSG:4326';
+export const DEFAULT_PROJECTION = 'EPSG:4326';
 
 interface BuildOlTileLayerParams {
   key: string;

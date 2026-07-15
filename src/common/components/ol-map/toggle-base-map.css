@@ -1,0 +1,9 @@
+#baseMap {
+  top: 0px;
+  right: 8px;
+  margin-top: 88px;
+}
+
+#baseMap.ol-control button.mdc-icon-button {
+  cursor: pointer;
+}

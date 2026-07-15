@@ -721,13 +721,13 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                           outerPerimeter={outerPerimeter?.geometry}
                           options={{
                             properties: { id: FeatureType.LOW_RESOLUTION_PP },
-                            zIndex: GeometryZIndex.LOW_RESOLUTION_GEOMETRY_ZINDEX,
+                            zIndex: GeometryZIndex.LOW_RESOLUTION_GEOMETRY,
                           }}
                         />
                         <VectorLayer
                           options={{
                             maxZoom: CONFIG.POLYGON_PARTS.MAX.SHOW_FOOTPRINT_ZOOM_LEVEL,
-                            zIndex: GeometryZIndex.EXCEEDED_GEOMETRY_ZINDEX,
+                            zIndex: GeometryZIndex.EXCEEDED_GEOMETRY,
                           }}
                         >
                           <VectorSource>

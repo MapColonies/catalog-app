@@ -14,38 +14,27 @@ import bboxPolygon from '@turf/bbox-polygon';
 import { FitOptions } from 'ol/View';
 import {
   Box,
-  getWMTSOptions,
-  getXYZOptions,
   Legend,
   LegendItem,
   Map,
   VectorLayer,
   VectorSource,
 } from '@map-colonies/react-components';
-import { Checkbox, IconButton, Tooltip, useTheme } from '@map-colonies/react-core';
-import { ActiveLayersIcon } from '../../../../icons/4font/ActiveLayers';
+import { Checkbox, useTheme } from '@map-colonies/react-core';
 import CONFIG from '../../../../common/config';
 import { useEnums } from '../../../../common/hooks/useEnum.hook';
 import { Mode } from '../../../../common/models/mode.enum';
-import { LinkType } from '../../../../common/models/link-type.enum';
 import { MapFeatureClickHandler } from '../../../../common/components/ol-map/map-feature-click-handler';
 import { MapLoadingIndicator } from '../../../../common/components/ol-map/map-loading-indicator';
 import { SelectedFeatureVectorLayer } from '../../../../common/components/ol-map/selected-feature-vector-layer';
 import { ZoomLevelIndicator } from '../../../../common/components/ol-map/zoom-level-indicator';
-import { LayerRasterRecordModelType, LinkModelType } from '../../../models';
+import { LayerRasterRecordModelType } from '../../../models';
 import { ILayerImage } from '../../../models/layerImage';
 import { useStore } from '../../../models/RootStore';
 import { GeojsonFeatureInput } from '../../../models/RootStore.base';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
-import {
-  getLayerLink,
-  getLinkUrlWithToken,
-  resolveWmtsCapabilityParams,
-} from '../../helpers/layersUtils';
-import {
-  buildOlTileLayer,
-  usePreviewBaseMapTiles,
-} from '../../../../common/components/ol-map/ol-tile-layer.utils';
+import { usePreviewBaseMapTiles } from '../../../../common/components/ol-map/ol-tile-layer.utils';
+import { ToggleBaseMap } from '../../../../common/components/ol-map/toggle-base-map';
 import { FeaturePropertiesPopupComponent } from './feature-properties-popup.component';
 import { FlyToPP } from './fly-to-pp';
 import { GeoFeaturesInnerComponent } from './geo-features-inner.component';
@@ -72,14 +61,13 @@ interface GeoFeaturesPresentorProps {
   onMapFeatureClick?: (feature: Feature | undefined) => void;
   showFeaturePropertiesPopup?: boolean;
   showPolygonParts?: boolean;
-  isLayerImageShown?: boolean;
+  onShowPolygonPartsChange?: (show: boolean) => void;
   defaultShowBaseMap?: boolean;
   fitOptions?: FitOptions | undefined;
   style?: CSSProperties | undefined;
   children?: JSX.Element | null;
 }
 
-const DEFAULT_PROJECTION = 'EPSG:4326';
 const MIN_FEATURES_NUMBER = 4; // minimal set of fetures (source, source_marker, perimeter, perimeter_marker)
 const CHILDREN_WITH_ZOOM_INDICATION = ['PolygonPartsExtentQueryVectorLayer'];
 
@@ -91,7 +79,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   onMapFeatureClick,
   showFeaturePropertiesPopup = false,
   showPolygonParts = false,
-  isLayerImageShown = false,
+  onShowPolygonPartsChange,
   defaultShowBaseMap = true,
   fitOptions,
   style,
@@ -182,53 +170,6 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
 
   const previewBaseMap = usePreviewBaseMapTiles();
 
-  const layerImage = useMemo(() => {
-    if (!layerRecord) {
-      return undefined;
-    }
-    const layerLink = getLayerLink(layerRecord);
-    if (!layerLink?.url) {
-      return undefined;
-    }
-    if (layerLink.protocol === LinkType.XYZ_LAYER) {
-      const xyzOptions = getXYZOptions({
-        url: getLinkUrlWithToken([layerLink]) as string,
-      });
-      return buildOlTileLayer({
-        key: layerRecord.id,
-        kind: 'XYZ',
-        options: xyzOptions,
-        layerOptions: { zIndex: 1 },
-      });
-    }
-    if (layerLink.protocol === LinkType.WMTS_LAYER || layerLink.protocol === LinkType.WMTS) {
-      const capability = store.discreteLayersStore.capabilities?.find(
-        (item) => layerLink.name === item.id
-      );
-      const resolved = resolveWmtsCapabilityParams(
-        layerRecord as LayerRasterRecordModelType,
-        layerLink.url as string,
-        capability
-      );
-      const wmtsOptions = getWMTSOptions({
-        url: getLinkUrlWithToken([{ ...layerLink, url: resolved.url } as LinkModelType]) as string,
-        layer: resolved.layer,
-        matrixSet: resolved.tileMatrixSetID,
-        format: resolved.format,
-        projection: DEFAULT_PROJECTION,
-        style: resolved.style,
-      });
-
-      return buildOlTileLayer({
-        key: layerRecord.id,
-        kind: 'WMTS',
-        options: wmtsOptions,
-        layerOptions: { extent: layerRecord.footprint?.bbox, zIndex: 1 },
-      });
-    }
-    return undefined;
-  }, [isLayerImageShown, layerRecord]);
-
   const LegendsArray = useMemo(() => {
     const res: LegendItem[] = [];
     PPMapStyles.forEach((value, key) => {
@@ -276,7 +217,6 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
     <Box id="geoFeaturesMapContainer" style={{ ...style }}>
       <Map>
         {showBaseMap && previewBaseMap}
-        {isLayerImageShown && layerImage}
         <MapLoadingIndicator />
         <ZoomLevelIndicator
           indicateTillZoomLevel={
@@ -288,6 +228,14 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
         <Legend
           legendItems={LegendsArray}
           title={intl.formatMessage({ id: 'polygon-parts.map-preview-legend.title' })}
+        />
+        <ToggleBaseMap
+          isBaseMapVisible={showBaseMap}
+          onToggle={() => setShowBaseMap(!showBaseMap)}
+          enableLabel={intl.formatMessage({
+            id: 'polygon-parts.map-preview.without.base-map',
+          })}
+          disableLabel={intl.formatMessage({ id: 'polygon-parts.map-preview.base-map' })}
         />
         <VectorLayer>
           <VectorSource>
@@ -309,35 +257,11 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
                 evt.stopPropagation();
                 const isChecked = evt.currentTarget.checked;
                 setShowExistingPolygonParts(isChecked);
+                onShowPolygonPartsChange?.(isChecked);
               }}
             />
           </Box>
         )}
-        <Box className="baseMap ol-control">
-          <Tooltip
-            content={
-              showBaseMap
-                ? intl.formatMessage({ id: 'polygon-parts.map-preview.without.base-map' })
-                : intl.formatMessage({ id: 'polygon-parts.map-preview.base-map' })
-            }
-          >
-            <IconButton
-              className="showOnMapContainer"
-              icon={
-                <ActiveLayersIcon
-                  isFiltered={showBaseMap}
-                  color={{
-                    active: theme.primary,
-                    inactive: theme.textIconOnBackground,
-                  }}
-                />
-              }
-              onClick={(): void => {
-                setShowBaseMap(!showBaseMap);
-              }}
-            />
-          </Tooltip>
-        </Box>
         {showExistingPolygonParts && (
           <PolygonPartsExtentQueryVectorLayer
             featureType={FeatureType.EXISTING_PP}
@@ -345,7 +269,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
             outerPerimeter={layerRecord?.footprint as Geometry | undefined}
             options={{
               properties: { id: FeatureType.EXISTING_PP },
-              zIndex: GeometryZIndex.EXISTING_GEOMETRY_ZINDEX,
+              zIndex: GeometryZIndex.EXISTING_GEOMETRY,
             }}
           />
         )}
@@ -358,7 +282,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
           feature={selectedFeature}
           options={{
             properties: { id: 'SELECTED_PP' },
-            zIndex: GeometryZIndex.SELECTED_GEOMETRY_ZINDEX,
+            zIndex: GeometryZIndex.SELECTED_GEOMETRY,
           }}
         />
         <FlyToPP feature={selectedFeature} />

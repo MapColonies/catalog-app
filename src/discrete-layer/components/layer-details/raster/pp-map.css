@@ -20,13 +20,6 @@ body[dir='rtl'] #geoFeaturesMapContainer .checkbox {
   padding-left: 12px;
 }
 
-#geoFeaturesMapContainer .baseMap {
-  top: 0px;
-  right: 8px;
-  margin-top: 88px;
-}
-
-#geoFeaturesMapContainer .baseMap.ol-control button.mdc-icon-button,
 #geoFeaturesMapContainer .ol-zoom button,
 #geoFeaturesMapContainer .ol-legend button {
   cursor: pointer;

@@ -1,23 +1,50 @@
 import React, { useRef, useEffect, useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { observer } from 'mobx-react';
-import { Feature } from 'geojson';
+import { Feature, Geometry } from 'geojson';
 import { Formik, FormikProps } from 'formik';
 import { DialogContent } from '@material-ui/core';
 import { Button, CircularProgress, TextField } from '@map-colonies/react-core';
 import { Dialog, Icon, Typography } from '@map-colonies/react-core';
-import { Box } from '@map-colonies/react-components';
+import {
+  Box,
+  getWMTSOptions,
+  getXYZOptions,
+  VectorLayer,
+  VectorSource,
+} from '@map-colonies/react-components';
+import { getFirstPoint } from '../../../../common/utils/geo.tools';
+import { Mode } from '../../../../common/models/mode.enum';
+import { LinkType } from '../../../../common/models/link-type.enum';
+import { getTextStyle } from '../../../../common/helpers/style';
 import { FlyTo } from '../../../../common/components/ol-map/fly-to';
 import { FieldLabelComponent } from '../../../../common/components/form/field-label';
 import { GraphQLError } from '../../../../common/components/error/graphql.error-presentor';
-import { Mode } from '../../../../common/models/mode.enum';
-import { getTextStyle } from '../../../../common/helpers/style';
-import { EntityDescriptorModelType, RecordType, useQuery, useStore } from '../../../models';
+import {
+  buildOlTileLayer,
+  DEFAULT_PROJECTION,
+} from '../../../../common/components/ol-map/ol-tile-layer.utils';
+import {
+  EntityDescriptorModelType,
+  LayerRasterRecordModelType,
+  LinkModelType,
+  RecordType,
+  useQuery,
+  useStore,
+} from '../../../models';
+import {
+  getLayerLink,
+  getLinkUrlWithToken,
+  resolveWmtsCapabilityParams,
+} from '../../helpers/layersUtils';
 import { DialogActionTitle } from '../dialog.helpers';
 import { LayersDetailsComponent } from '../layer-details';
 import { EntityDeleteDialogProps } from '../3D/entity.3d.delete-dialog';
 import { useDeleteLayer } from '../delete.hook';
 import { GeoFeaturesPresentorComponent } from './pp-map';
+import { FeatureType } from './feature-type.enum';
+import { GeometryZIndex } from './pp-map.utils';
+import { GeoFeaturesInnerComponent } from './geo-features-inner.component';
 
 import './entity.raster.delete-dialog.css';
 
@@ -57,6 +84,7 @@ export const EntityDeleteRasterDialog: React.FC<EntityDeleteDialogProps> = obser
     let formikRef = useRef<FormikProps<any>>() as any;
 
     const [initialDeleteValues] = React.useState<any>({ approvalCode: '', approverName: '' });
+    const [showPolygonParts, setShowPolygonParts] = React.useState<boolean>(false);
 
     const flyToFeature = useMemo(() => {
       return {
@@ -65,6 +93,72 @@ export const EntityDeleteRasterDialog: React.FC<EntityDeleteDialogProps> = obser
         geometry: layerRecord.footprint,
       } as Feature;
     }, []);
+
+    const existingPolygonPartsMarker = useMemo((): Feature | undefined => {
+      const footprint = layerRecord?.footprint;
+      if (!footprint) {
+        return undefined;
+      }
+      return {
+        type: 'Feature',
+        properties: {
+          _featureType: FeatureType.PP_PERIMETER_MARKER,
+        },
+        geometry: {
+          type: 'Point',
+          coordinates: getFirstPoint(footprint as Geometry),
+        },
+      };
+    }, [layerRecord?.footprint]);
+
+    const layerImage = useMemo(() => {
+      if (!layerRecord) {
+        return undefined;
+      }
+      const layerLink = getLayerLink(layerRecord);
+      if (!layerLink?.url) {
+        return undefined;
+      }
+      if (layerLink.protocol === LinkType.XYZ_LAYER) {
+        const xyzOptions = getXYZOptions({
+          url: getLinkUrlWithToken([layerLink]) as string,
+        });
+        return buildOlTileLayer({
+          key: layerRecord.id,
+          kind: 'XYZ',
+          options: xyzOptions,
+          layerOptions: { zIndex: GeometryZIndex.LAYER_IMAGE },
+        });
+      }
+      if (layerLink.protocol === LinkType.WMTS_LAYER || layerLink.protocol === LinkType.WMTS) {
+        const capability = store.discreteLayersStore.capabilities?.find(
+          (item) => layerLink.name === item.id
+        );
+        const resolved = resolveWmtsCapabilityParams(
+          layerRecord as LayerRasterRecordModelType,
+          layerLink.url as string,
+          capability
+        );
+        const wmtsOptions = getWMTSOptions({
+          url: getLinkUrlWithToken([
+            { ...layerLink, url: resolved.url } as LinkModelType,
+          ]) as string,
+          layer: resolved.layer,
+          matrixSet: resolved.tileMatrixSetID,
+          format: resolved.format,
+          projection: DEFAULT_PROJECTION,
+          style: resolved.style,
+        });
+
+        return buildOlTileLayer({
+          key: layerRecord.id,
+          kind: 'WMTS',
+          options: wmtsOptions,
+          layerOptions: { extent: layerRecord.footprint?.bbox, zIndex: GeometryZIndex.LAYER_IMAGE },
+        });
+      }
+      return undefined;
+    }, [layerRecord]);
 
     return (
       <Box id="rasterDeleteDialog">
@@ -100,10 +194,24 @@ export const EntityDeleteRasterDialog: React.FC<EntityDeleteDialogProps> = obser
               layerRecord={layerRecord}
               mode={Mode.DELETE}
               style={{ height: 'var(--map-height)', position: 'relative', direction: 'ltr' }}
-              isLayerImageShown={true}
+              // isLayerImageShown={true}
               defaultShowBaseMap={false}
+              onShowPolygonPartsChange={setShowPolygonParts}
             >
-              <FlyTo feature={flyToFeature} flyOnce={true}></FlyTo>
+              <>
+                <FlyTo feature={flyToFeature} flyOnce={true}></FlyTo>
+                {layerImage}
+                {showPolygonParts && existingPolygonPartsMarker && (
+                  <VectorLayer options={{ zIndex: GeometryZIndex.PP_PERIMETER_MARKER }}>
+                    <VectorSource>
+                      <GeoFeaturesInnerComponent
+                        geoFeatures={[existingPolygonPartsMarker]}
+                        renderCount={{ current: 1 }}
+                      />
+                    </VectorSource>
+                  </VectorLayer>
+                )}
+              </>
             </GeoFeaturesPresentorComponent>
             <Formik
               initialValues={initialDeleteValues}
