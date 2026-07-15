@@ -1,19 +1,12 @@
 import React, { useRef, useEffect, useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { observer } from 'mobx-react';
-import { Feature, Geometry } from 'geojson';
+import { Feature } from 'geojson';
 import { Formik, FormikProps } from 'formik';
 import { DialogContent } from '@material-ui/core';
 import { Button, CircularProgress, TextField } from '@map-colonies/react-core';
 import { Dialog, Icon, Typography } from '@map-colonies/react-core';
-import {
-  Box,
-  getWMTSOptions,
-  getXYZOptions,
-  VectorLayer,
-  VectorSource,
-} from '@map-colonies/react-components';
-import { getFirstPoint } from '../../../../common/utils/geo.tools';
+import { Box, getWMTSOptions, getXYZOptions } from '@map-colonies/react-components';
 import { Mode } from '../../../../common/models/mode.enum';
 import { LinkType } from '../../../../common/models/link-type.enum';
 import { getTextStyle } from '../../../../common/helpers/style';
@@ -42,9 +35,7 @@ import { LayersDetailsComponent } from '../layer-details';
 import { EntityDeleteDialogProps } from '../3D/entity.3d.delete-dialog';
 import { useDeleteLayer } from '../delete.hook';
 import { GeoFeaturesPresentorComponent } from './pp-map';
-import { FeatureType } from './feature-type.enum';
 import { GeometryZIndex } from './pp-map.utils';
-import { GeoFeaturesInnerComponent } from './geo-features-inner.component';
 
 import './entity.raster.delete-dialog.css';
 
@@ -57,7 +48,6 @@ export const EntityDeleteRasterDialog: React.FC<EntityDeleteDialogProps> = obser
 
     const formikRef = useRef<FormikProps<any>>() as any;
     const [initialDeleteValues] = React.useState<any>({ approvalCode: '', approverName: '' });
-    const [showPolygonParts, setShowPolygonParts] = React.useState<boolean>(false);
 
     const { dialogTitleParamTranslation, closeDialog, warningMessage } = useDeleteLayer({
       onSetOpen,
@@ -92,23 +82,6 @@ export const EntityDeleteRasterDialog: React.FC<EntityDeleteDialogProps> = obser
         geometry: layerRecord.footprint,
       } as Feature;
     }, []);
-
-    const existingPolygonPartsMarker = useMemo((): Feature | undefined => {
-      const footprint = layerRecord?.footprint;
-      if (!footprint) {
-        return undefined;
-      }
-      return {
-        type: 'Feature',
-        properties: {
-          _featureType: FeatureType.PP_PERIMETER_MARKER,
-        },
-        geometry: {
-          type: 'Point',
-          coordinates: getFirstPoint(footprint as Geometry),
-        },
-      };
-    }, [layerRecord?.footprint]);
 
     const layerImage = useMemo(() => {
       if (!layerRecord) {
@@ -194,20 +167,10 @@ export const EntityDeleteRasterDialog: React.FC<EntityDeleteDialogProps> = obser
               mode={Mode.DELETE}
               style={{ height: 'var(--map-height)', position: 'relative', direction: 'ltr' }}
               defaultShowBaseMap={false}
-              onShowPolygonPartsChange={setShowPolygonParts}
+              toggleBaseMap={true}
             >
               <>
                 {layerImage}
-                {showPolygonParts && existingPolygonPartsMarker && (
-                  <VectorLayer options={{ zIndex: GeometryZIndex.PP_PERIMETER_MARKER }}>
-                    <VectorSource>
-                      <GeoFeaturesInnerComponent
-                        geoFeatures={[existingPolygonPartsMarker]}
-                        renderCount={{ current: 1 }}
-                      />
-                    </VectorSource>
-                  </VectorLayer>
-                )}
                 <FlyTo feature={flyToFeature} flyOnce={true}></FlyTo>
               </>
             </GeoFeaturesPresentorComponent>

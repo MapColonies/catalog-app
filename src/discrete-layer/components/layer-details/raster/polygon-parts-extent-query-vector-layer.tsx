@@ -11,9 +11,15 @@ import { polygon } from '@turf/helpers';
 import bboxPolygon from '@turf/bbox-polygon';
 import { GeoJSONFeature, useMap, VectorLayer, VectorSource } from '@map-colonies/react-components';
 import CONFIG from '../../../../common/config';
+import { getFirstPoint } from '../../../../common/utils/geo.tools';
 import { useStore } from '../../../models';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
-import { createTextStyle, FEATURE_LABEL_CONFIG, getStyleByFeatureType } from './pp-map.utils';
+import {
+  createTextStyle,
+  FEATURE_LABEL_CONFIG,
+  GeometryZIndex,
+  getStyleByFeatureType,
+} from './pp-map.utils';
 import { FeatureType } from './feature-type.enum';
 
 export interface IQueryExecutorResponse {
@@ -87,6 +93,22 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<
   }, []);
 
   const geoJsonFormat = useMemo(() => new GeoJSON(), []);
+
+  const existingPolygonPartsMarker = useMemo((): Feature | undefined => {
+    if (!outerPerimeter) {
+      return undefined;
+    }
+    return {
+      type: 'Feature',
+      properties: {
+        _featureType: FeatureType.PP_PERIMETER_MARKER,
+      },
+      geometry: {
+        type: 'Point',
+        coordinates: getFirstPoint(outerPerimeter),
+      },
+    };
+  }, [outerPerimeter]);
 
   const getCurrentExtent = (): BBox => {
     return mapOl.getView().calculateExtent(mapOl.getSize()) as BBox;
@@ -165,63 +187,80 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<
   };
 
   return (
-    <VectorLayer options={options}>
-      <VectorSource>
-        {polygonParts.map((feat, idx) => {
-          const featureKey =
-            feat.properties?.id ??
-            `${featureType}-${feat.properties?._showAsFootprint ? 'footprint' : 'feature'}-${idx}`;
-          const ppStyle = getStyleByFeatureType(feat);
-          let ppStroke = ppStyle?.getStroke()?.clone();
-          let ppFill = ppStyle?.getFill()?.clone();
-          const featureStyle = new Style({
-            text: createTextStyle(
-              feat,
-              4,
-              FEATURE_LABEL_CONFIG.polygons,
-              ZOOM_LEVELS_TABLE,
-              intl.formatMessage({ id: 'polygon-parts.map-preview.zoom-before-fetch' })
-            ),
-            stroke: ppStroke,
-            fill: ppFill,
-          });
-
-          const BUFFER = 2; // Add extra pixels to perimeter around the OL extent in order to discard new geometry boundaries
-          const size = mapOl.getSize() as Size;
-          const bbox = bboxPolygon(
-            mapOl.getView().calculateExtent([size[0] + BUFFER, size[1] + BUFFER]) as BBox
-          );
-          const extentPolygon = polygon(bbox.geometry.coordinates);
-
-          try {
-            // There are some cases when turf.intersect() throws exception, then no need to change geometry
-            // @ts-ignore
-            const featureClippedPolygon = intersect(feat, extentPolygon);
-
-            if (featureClippedPolygon) {
-              const geometry = geoJsonFormat.readGeometry(featureClippedPolygon.geometry);
-              featureStyle.setGeometry(geometry);
-            }
-          } catch (e) {
-            console.log(
-              '*** PP: turf.intersect() failed ***',
-              'feat -->',
-              feat,
-              'extentPolygon -->',
-              extentPolygon
-            );
-          }
-
-          return feat ? (
+    <>
+      <VectorLayer options={{ zIndex: GeometryZIndex.PP_PERIMETER_MARKER }}>
+        <VectorSource>
+          {existingPolygonPartsMarker && (
             <GeoJSONFeature
-              key={featureKey}
-              geometry={feat}
+              key="pp-perimeter-marker"
+              geometry={existingPolygonPartsMarker}
               fit={false}
-              featureStyle={featureStyle}
+              featureStyle={getStyleByFeatureType(existingPolygonPartsMarker)}
             />
-          ) : null;
-        })}
-      </VectorSource>
-    </VectorLayer>
+          )}
+        </VectorSource>
+      </VectorLayer>
+
+      <VectorLayer options={options}>
+        <VectorSource>
+          {polygonParts.map((feat, idx) => {
+            const featureKey =
+              feat.properties?.id ??
+              `${featureType}-${
+                feat.properties?._showAsFootprint ? 'footprint' : 'feature'
+              }-${idx}`;
+            const ppStyle = getStyleByFeatureType(feat);
+            let ppStroke = ppStyle?.getStroke()?.clone();
+            let ppFill = ppStyle?.getFill()?.clone();
+            const featureStyle = new Style({
+              text: createTextStyle(
+                feat,
+                4,
+                FEATURE_LABEL_CONFIG.polygons,
+                ZOOM_LEVELS_TABLE,
+                intl.formatMessage({ id: 'polygon-parts.map-preview.zoom-before-fetch' })
+              ),
+              stroke: ppStroke,
+              fill: ppFill,
+            });
+
+            const BUFFER = 2; // Add extra pixels to perimeter around the OL extent in order to discard new geometry boundaries
+            const size = mapOl.getSize() as Size;
+            const bbox = bboxPolygon(
+              mapOl.getView().calculateExtent([size[0] + BUFFER, size[1] + BUFFER]) as BBox
+            );
+            const extentPolygon = polygon(bbox.geometry.coordinates);
+
+            try {
+              // There are some cases when turf.intersect() throws exception, then no need to change geometry
+              // @ts-ignore
+              const featureClippedPolygon = intersect(feat, extentPolygon);
+
+              if (featureClippedPolygon) {
+                const geometry = geoJsonFormat.readGeometry(featureClippedPolygon.geometry);
+                featureStyle.setGeometry(geometry);
+              }
+            } catch (e) {
+              console.log(
+                '*** PP: turf.intersect() failed ***',
+                'feat -->',
+                feat,
+                'extentPolygon -->',
+                extentPolygon
+              );
+            }
+
+            return feat ? (
+              <GeoJSONFeature
+                key={featureKey}
+                geometry={feat}
+                fit={false}
+                featureStyle={featureStyle}
+              />
+            ) : null;
+          })}
+        </VectorSource>
+      </VectorLayer>
+    </>
   );
 };

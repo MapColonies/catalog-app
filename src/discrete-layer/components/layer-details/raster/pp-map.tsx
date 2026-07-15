@@ -60,8 +60,8 @@ interface GeoFeaturesPresentorProps {
   selectedItem?: Feature;
   onMapFeatureClick?: (feature: Feature | undefined) => void;
   showFeaturePropertiesPopup?: boolean;
+  toggleBaseMap?: boolean;
   showPolygonParts?: boolean;
-  onShowPolygonPartsChange?: (show: boolean) => void;
   defaultShowBaseMap?: boolean;
   fitOptions?: FitOptions | undefined;
   style?: CSSProperties | undefined;
@@ -79,8 +79,8 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   onMapFeatureClick,
   showFeaturePropertiesPopup = false,
   showPolygonParts = false,
-  onShowPolygonPartsChange,
   defaultShowBaseMap = true,
+  toggleBaseMap = false,
   fitOptions,
   style,
   children,
@@ -228,14 +228,16 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
           legendItems={LegendsArray}
           title={intl.formatMessage({ id: 'polygon-parts.map-preview-legend.title' })}
         />
-        <ToggleBaseMap
-          isBaseMapVisible={showBaseMap}
-          onToggle={() => setShowBaseMap(!showBaseMap)}
-          enableLabel={intl.formatMessage({
-            id: 'polygon-parts.map-preview.without.base-map',
-          })}
-          disableLabel={intl.formatMessage({ id: 'polygon-parts.map-preview.base-map' })}
-        />
+        {toggleBaseMap && (
+          <ToggleBaseMap
+            isBaseMapVisible={showBaseMap}
+            onToggle={() => setShowBaseMap(!showBaseMap)}
+            enableLabel={intl.formatMessage({
+              id: 'polygon-parts.map-preview.without.base-map',
+            })}
+            disableLabel={intl.formatMessage({ id: 'polygon-parts.map-preview.base-map' })}
+          />
+        )}
         <VectorLayer>
           <VectorSource>
             <GeoFeaturesInnerComponent
@@ -256,7 +258,6 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
                 evt.stopPropagation();
                 const isChecked = evt.currentTarget.checked;
                 setShowExistingPolygonParts(isChecked);
-                onShowPolygonPartsChange?.(isChecked);
               }}
             />
           </Box>
