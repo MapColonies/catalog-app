@@ -168,7 +168,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
     setIsOpenProperties(false);
   }, []);
 
-  const previewBaseMap = usePreviewBaseMapTiles();
+  const previewBaseMap = usePreviewBaseMapTiles(store.discreteLayersStore.baseMaps);
 
   const LegendsArray = useMemo(() => {
     const res: LegendItem[] = [];

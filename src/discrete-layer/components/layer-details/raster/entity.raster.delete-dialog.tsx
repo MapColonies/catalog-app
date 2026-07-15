@@ -55,6 +55,10 @@ export const EntityDeleteRasterDialog: React.FC<EntityDeleteDialogProps> = obser
     const intl = useIntl();
     const mutationQuery = useQuery();
 
+    const formikRef = useRef<FormikProps<any>>() as any;
+    const [initialDeleteValues] = React.useState<any>({ approvalCode: '', approverName: '' });
+    const [showPolygonParts, setShowPolygonParts] = React.useState<boolean>(false);
+
     const { dialogTitleParamTranslation, closeDialog, warningMessage } = useDeleteLayer({
       onSetOpen,
       layerRecord,
@@ -80,11 +84,6 @@ export const EntityDeleteRasterDialog: React.FC<EntityDeleteDialogProps> = obser
         props.onSuccess?.();
       }
     }, [mutationQuery.data]);
-
-    let formikRef = useRef<FormikProps<any>>() as any;
-
-    const [initialDeleteValues] = React.useState<any>({ approvalCode: '', approverName: '' });
-    const [showPolygonParts, setShowPolygonParts] = React.useState<boolean>(false);
 
     const flyToFeature = useMemo(() => {
       return {
@@ -194,12 +193,10 @@ export const EntityDeleteRasterDialog: React.FC<EntityDeleteDialogProps> = obser
               layerRecord={layerRecord}
               mode={Mode.DELETE}
               style={{ height: 'var(--map-height)', position: 'relative', direction: 'ltr' }}
-              // isLayerImageShown={true}
               defaultShowBaseMap={false}
               onShowPolygonPartsChange={setShowPolygonParts}
             >
               <>
-                <FlyTo feature={flyToFeature} flyOnce={true}></FlyTo>
                 {layerImage}
                 {showPolygonParts && existingPolygonPartsMarker && (
                   <VectorLayer options={{ zIndex: GeometryZIndex.PP_PERIMETER_MARKER }}>
@@ -211,6 +208,7 @@ export const EntityDeleteRasterDialog: React.FC<EntityDeleteDialogProps> = obser
                     </VectorSource>
                   </VectorLayer>
                 )}
+                <FlyTo feature={flyToFeature} flyOnce={true}></FlyTo>
               </>
             </GeoFeaturesPresentorComponent>
             <Formik

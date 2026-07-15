@@ -4,13 +4,13 @@ import {
   getWMTSOptions,
   getXYZOptions,
   IBaseMap,
+  IBaseMaps,
   TileLayer,
   TileWMTS,
   TileXYZ,
 } from '@map-colonies/react-components';
 import { Options as WMTSOptions } from 'ol/source/WMTS';
 import { Options as XYZOptions } from 'ol/source/XYZ';
-import { useStore } from '../../../discrete-layer/models/RootStore';
 
 export const DEFAULT_PROJECTION = 'EPSG:4326';
 
@@ -39,15 +39,12 @@ export const buildOlTileLayer = ({
   );
 };
 
-export const usePreviewBaseMapTiles = (): JSX.Element[] => {
-  const store = useStore();
+export const usePreviewBaseMapTiles = (baseMaps: IBaseMaps | undefined): JSX.Element[] => {
   return useMemo(() => {
     const olBaseMap: JSX.Element[] = [];
-    let baseMap = store.discreteLayersStore.baseMaps?.maps.find(
-      (map: IBaseMap) => map.isForPreview
-    );
+    let baseMap = baseMaps?.maps.find((map: IBaseMap) => map.isForPreview);
     if (!baseMap) {
-      baseMap = store.discreteLayersStore.baseMaps?.maps.find((map: IBaseMap) => map.isCurrent);
+      baseMap = baseMaps?.maps.find((map: IBaseMap) => map.isCurrent);
     }
     if (baseMap) {
       baseMap.baseRasterLayers.forEach((layer) => {

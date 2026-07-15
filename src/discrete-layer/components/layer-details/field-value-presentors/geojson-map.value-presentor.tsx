@@ -11,6 +11,7 @@ import { FitOptions } from 'ol/View';
 import { validateGeoJSONString } from '../../../../common/utils/geojson.validation';
 import { Mode } from '../../../../common/models/mode.enum';
 import { usePreviewBaseMapTiles } from '../../../../common/components/ol-map/ol-tile-layer.utils';
+import { useStore } from '../../../models/RootStore';
 
 interface GeoJsonMapValuePresentorProps {
   mode: Mode;
@@ -26,6 +27,8 @@ export const GeoJsonMapValuePresentorComponent: React.FC<GeoJsonMapValuePresento
   fitOptions,
 }) => {
   const [geoJsonValue, setGeoJsonValue] = useState();
+  const store = useStore();
+
   useEffect(() => {
     if (jsonValue && validateGeoJSONString(jsonValue).valid) {
       //Postpone feature generation till OL-viewer present in DOM
@@ -40,7 +43,7 @@ export const GeoJsonMapValuePresentorComponent: React.FC<GeoJsonMapValuePresento
     }
   }, [mode, jsonValue]);
 
-  const previewBaseMap = usePreviewBaseMapTiles();
+  const previewBaseMap = usePreviewBaseMapTiles(store.discreteLayersStore.baseMaps);
 
   return (
     <Box style={{ ...style }}>
