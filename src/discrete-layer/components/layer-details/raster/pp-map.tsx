@@ -20,7 +20,7 @@ import {
   VectorLayer,
   VectorSource,
 } from '@map-colonies/react-components';
-import { Checkbox, useTheme } from '@map-colonies/react-core';
+import { Checkbox } from '@map-colonies/react-core';
 import CONFIG from '../../../../common/config';
 import { useEnums } from '../../../../common/hooks/useEnum.hook';
 import { Mode } from '../../../../common/models/mode.enum';
@@ -88,7 +88,6 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   const store = useStore();
   const ENUMS = useEnums();
   const intl = useIntl();
-  const theme = useTheme();
   const ZOOM_LEVELS_TABLE = useZoomLevelsTable();
   const renderCount = useRef(0);
   const [selectedFeature, setSelectedFeature] = useState<Feature | undefined>(undefined);
