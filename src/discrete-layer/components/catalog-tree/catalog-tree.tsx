@@ -21,7 +21,11 @@ import {
   getResponseErrorMesssage,
   getResponseErrorURL,
 } from '../../../common/helpers/server-error';
-import { getActionsWithDisable, IActionGroup } from '../../../common/actions/entity.actions';
+import {
+  CRUDAction,
+  getActionsWithDisable,
+  IActionGroup,
+} from '../../../common/actions/entity.actions';
 import { IDispatchAction } from '../../models/actionDispatcherStore';
 import { ILayerImage } from '../../models/layerImage';
 import { useStore } from '../../models/RootStore';
@@ -315,7 +319,7 @@ export const CatalogTreeComponent: React.FC<CatalogTreeComponentProps> = observe
                           node={rowInfo.node}
                           actions={getActionsWithDisable(
                             entityPermittedActions[rowInfo.node.__typename] as IActionGroup[],
-                            [['delete', !isUnpublished(rowInfo.node)]]
+                            [[CRUDAction.delete, !isUnpublished(rowInfo.node)]]
                           )}
                           entity={rowInfo.node.__typename}
                           actionHandler={dispatchAction}

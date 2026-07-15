@@ -11,20 +11,20 @@ interface DependentFieldWithValue {
 }
 export type DependentField = string | DependentFieldWithValue;
 
-enum GeneralAction {
+export enum GeneralAction {
   flyTo = 'flyTo',
   viewer = 'viewer',
   export = 'export',
 }
 
-enum JobAction {
+export enum JobAction {
   restore = 'restore',
   abort = 'abort',
   retry = 'retry',
   download_details = 'download_details',
 }
 
-enum CRUDAction {
+export enum CRUDAction {
   delete = 'delete',
   update = 'update',
   edit = 'edit',
