@@ -26,7 +26,6 @@ export enum ExportActions {
 
 export type ExportAction =
   | (IAction & {
-      disabled: boolean;
       toggleExportStoreFieldOptions?: {
         field: string;
         labelChecked: string;

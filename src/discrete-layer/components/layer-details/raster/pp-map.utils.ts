@@ -25,7 +25,6 @@ interface IStyleByProp {
     value: string | number | boolean;
     style: Style;
   }[];
-  // zIndex?: GeometryZIndex;
 }
 
 export const PPMapStyles = new Map<FeatureType, IStyleByProp>([

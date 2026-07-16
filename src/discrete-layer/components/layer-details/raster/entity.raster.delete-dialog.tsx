@@ -98,7 +98,7 @@ export const EntityDeleteRasterDialog: React.FC<EntityDeleteDialogProps> = obser
         return (
           <OlTileLayer
             key={layerRecord.id}
-            protocol="XYZ"
+            protocol={LinkType.XYZ_LAYER}
             options={xyzOptions}
             layerOptions={{ zIndex: START_RASTER_LAYER_ZINDEX }}
           />
@@ -127,7 +127,7 @@ export const EntityDeleteRasterDialog: React.FC<EntityDeleteDialogProps> = obser
         return (
           <OlTileLayer
             key={layerRecord.id}
-            protocol="WMTS"
+            protocol={LinkType.WMTS_LAYER}
             options={wmtsOptions}
             layerOptions={{
               extent: layerRecord.footprint?.bbox,
