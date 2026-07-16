@@ -21,38 +21,33 @@ import { GeoJsonMapValuePresentorComponent } from '../field-value-presentors/geo
 import { LayersDetailsComponent } from '../layer-details';
 import { DialogActionTitle } from '../dialog.helpers';
 import { useDeleteLayer, VALID } from '../delete.hook';
+import { EntityDeleteDialogProps } from '../entity.delete';
 
 import './entity.3d.delete-dialog.css';
 
-export interface EntityDeleteDialogProps {
-  isOpen: boolean;
-  onSetOpen: (open: boolean) => void;
-  layerRecord: ILayerImage;
-  onSuccess?: () => void;
-  recordType?: RecordType;
-}
-
 export const EntityDelete3DDialog: React.FC<EntityDeleteDialogProps> = observer(
   (props: EntityDeleteDialogProps) => {
-    const { isOpen, onSetOpen, layerRecord } = props;
     const store = useStore();
     const intl = useIntl();
     const mutationQuery = useQuery();
     const [allowDeleting, setAllowDeleting] = useState(false);
 
     const { dialogTitleParamTranslation, closeDialog, dispatchAction, warningMessage } =
-      useDeleteLayer({ onSetOpen, layerRecord, recordType: props.recordType });
+      useDeleteLayer({
+        onSetOpen: props.onSetOpen,
+        layerRecord: props.layerRecord,
+        recordType: RecordType.RECORD_3D,
+      });
 
     useEffect(() => {
       if (
         !mutationQuery.loading &&
         (mutationQuery.data as { deleteLayer: string } | undefined)?.deleteLayer === VALID
       ) {
-        onSetOpen(false);
         const payload = {
           action: UserAction.SYSTEM_CALLBACK_DELETE,
           data: {
-            ...layerRecord,
+            ...props.layerRecord,
             productStatus: RecordStatus.BEING_DELETED,
           },
         };
@@ -61,12 +56,19 @@ export const EntityDelete3DDialog: React.FC<EntityDeleteDialogProps> = observer(
       }
     }, [mutationQuery.data]);
 
+    useEffect(() => {
+      if (mutationQuery.data && !mutationQuery.error) {
+        props.onSetOpen(false);
+        props.onSuccess?.();
+      }
+    }, [mutationQuery.data]);
+
     const deleteLayer = (): void => {
       mutationQuery.setQuery(
         store.mutateDelete3DLayer({
           data: {
-            id: layerRecord.id,
-            type: layerRecord.type as RecordType,
+            id: props.layerRecord.id,
+            type: props.layerRecord.type as RecordType,
           },
         })
       );
@@ -74,12 +76,12 @@ export const EntityDelete3DDialog: React.FC<EntityDeleteDialogProps> = observer(
 
     return (
       <Box id="dialog3DDelete">
-        <Dialog open={isOpen} preventOutsideDismiss={true}>
+        <Dialog open={props.isOpen} preventOutsideDismiss={true}>
           <DialogActionTitle
             domain={dialogTitleParamTranslation}
             action={Mode.DELETE}
             onClose={closeDialog}
-            style={getTextStyle(layerRecord as any, 'backgroundColor')}
+            style={getTextStyle(props.layerRecord as any, 'backgroundColor')}
           />
           <DialogContent>
             <Box className="headerWarning">

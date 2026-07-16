@@ -13,6 +13,7 @@ import { getTextStyle } from '../../../../common/helpers/style';
 import { FlyTo } from '../../../../common/components/ol-map/fly-to';
 import { FieldLabelComponent } from '../../../../common/components/form/field-label';
 import { GraphQLError } from '../../../../common/components/error/graphql.error-presentor';
+import { ValidationsError } from '../../../../common/components/error/validations.error-presentor';
 import {
   OlTileLayer,
   DEFAULT_PROJECTION,
@@ -32,35 +33,47 @@ import {
 } from '../../helpers/layersUtils';
 import { DialogActionTitle } from '../dialog.helpers';
 import { LayersDetailsComponent } from '../layer-details';
-import { EntityDeleteDialogProps } from '../3D/entity.3d.delete-dialog';
+import { EntityDeleteDialogProps } from '../entity.delete';
 import { useDeleteLayer } from '../delete.hook';
 import { GeoFeaturesPresentorComponent } from './pp-map';
 import { START_RASTER_LAYER_ZINDEX } from './pp-map.utils';
 
 import './entity.raster.delete-dialog.css';
 
+const NONE = 0;
+
 export const EntityDeleteRasterDialog: React.FC<EntityDeleteDialogProps> = observer(
   (props: EntityDeleteDialogProps) => {
-    const { isOpen, onSetOpen, layerRecord } = props;
     const store = useStore();
     const intl = useIntl();
     const mutationQuery = useQuery();
 
     const formikRef = useRef<FormikProps<any>>() as any;
     const [initialDeleteValues] = React.useState<any>({ approvalCode: '', approverName: '' });
+    const [mutationError, setMutationError] = React.useState<any>({});
 
     const { dialogTitleParamTranslation, closeDialog, warningMessage } = useDeleteLayer({
-      onSetOpen,
-      layerRecord,
-      recordType: props.recordType,
+      onSetOpen: props.onSetOpen,
+      layerRecord: props.layerRecord,
+      recordType: RecordType.RECORD_RASTER,
     });
+
+    useEffect(() => {
+      if (mutationQuery.data && !mutationQuery.error) {
+        props.onSetOpen(false);
+        props.onSuccess?.();
+      }
+      if (mutationQuery.error) {
+        setMutationError(mutationQuery.error);
+      }
+    }, [mutationQuery.data, mutationQuery.error]);
 
     const deleteLayer = (approverName: string, approvalCode: string): void => {
       mutationQuery.setQuery(
         store.mutateDeleteRasterLayer({
           data: {
-            id: layerRecord.id,
-            type: layerRecord.type as RecordType,
+            id: props.layerRecord.id,
+            type: props.layerRecord.type as RecordType,
             approverName,
             approvalCode,
           },
@@ -68,26 +81,19 @@ export const EntityDeleteRasterDialog: React.FC<EntityDeleteDialogProps> = obser
       );
     };
 
-    useEffect(() => {
-      if (mutationQuery.data && !mutationQuery.error) {
-        props.onSetOpen(false);
-        props.onSuccess?.();
-      }
-    }, [mutationQuery.data]);
-
     const flyToFeature = useMemo(() => {
       return {
         type: 'Feature',
         properties: {},
-        geometry: layerRecord.footprint,
+        geometry: props.layerRecord.footprint,
       } as Feature;
     }, []);
 
     const layerImage = useMemo(() => {
-      if (!layerRecord) {
+      if (!props.layerRecord) {
         return undefined;
       }
-      const layerLink = getLayerLink(layerRecord);
+      const layerLink = getLayerLink(props.layerRecord);
       if (!layerLink?.url) {
         return undefined;
       }
@@ -97,7 +103,7 @@ export const EntityDeleteRasterDialog: React.FC<EntityDeleteDialogProps> = obser
         });
         return (
           <OlTileLayer
-            key={layerRecord.id}
+            key={props.layerRecord.id}
             protocol={LinkType.XYZ_LAYER}
             options={xyzOptions}
             layerOptions={{ zIndex: START_RASTER_LAYER_ZINDEX }}
@@ -109,7 +115,7 @@ export const EntityDeleteRasterDialog: React.FC<EntityDeleteDialogProps> = obser
           (item) => layerLink.name === item.id
         );
         const resolved = resolveWmtsCapabilityParams(
-          layerRecord as LayerRasterRecordModelType,
+          props.layerRecord as LayerRasterRecordModelType,
           layerLink.url as string,
           capability
         );
@@ -126,27 +132,27 @@ export const EntityDeleteRasterDialog: React.FC<EntityDeleteDialogProps> = obser
 
         return (
           <OlTileLayer
-            key={layerRecord.id}
+            key={props.layerRecord.id}
             protocol={LinkType.WMTS_LAYER}
             options={wmtsOptions}
             layerOptions={{
-              extent: layerRecord.footprint?.bbox,
+              extent: props.layerRecord.footprint?.bbox,
               zIndex: START_RASTER_LAYER_ZINDEX,
             }}
           />
         );
       }
       return undefined;
-    }, [layerRecord]);
+    }, [props.layerRecord]);
 
     return (
       <Box id="rasterDeleteDialog">
-        <Dialog open={isOpen} preventOutsideDismiss={true}>
+        <Dialog open={props.isOpen} preventOutsideDismiss={true}>
           <DialogActionTitle
             domain={dialogTitleParamTranslation}
             action={Mode.DELETE}
             onClose={closeDialog}
-            style={getTextStyle(layerRecord as any, 'backgroundColor')}
+            style={getTextStyle(props.layerRecord as any, 'backgroundColor')}
           />
           <DialogContent>
             <Box className="deleteWarning">
@@ -170,7 +176,7 @@ export const EntityDeleteRasterDialog: React.FC<EntityDeleteDialogProps> = obser
               </Box>
             </Box>
             <GeoFeaturesPresentorComponent
-              layerRecord={layerRecord}
+              layerRecord={props.layerRecord}
               mode={Mode.DELETE}
               style={{ height: 'var(--map-height)', position: 'relative', direction: 'ltr' }}
               defaultShowBaseMap={false}
@@ -192,13 +198,20 @@ export const EntityDeleteRasterDialog: React.FC<EntityDeleteDialogProps> = obser
               validateOnMount
               validate={(values) => {
                 const errors: any = {};
+                setMutationError({});
 
                 if (!values.approverName?.trim()) {
-                  errors.approverName = true;
+                  errors.approverName = intl.formatMessage(
+                    { id: 'validation-general.required' },
+                    { fieldName: intl.formatMessage({ id: 'delete.approver-name' }) }
+                  );
                 }
 
                 if (!values.approvalCode?.trim()) {
-                  errors.approvalCode = true;
+                  errors.approvalCode = intl.formatMessage(
+                    { id: 'validation-general.required' },
+                    { fieldName: intl.formatMessage({ id: 'delete.approval-code' }) }
+                  );
                 }
 
                 return errors;
@@ -212,70 +225,83 @@ export const EntityDeleteRasterDialog: React.FC<EntityDeleteDialogProps> = obser
                 }
               }}
             >
-              {(props) => (
-                <form onSubmit={props.handleSubmit}>
-                  <Box className="fields">
-                    <Box className="field">
-                      <FieldLabelComponent
-                        value={intl.formatMessage({
-                          id: 'delete.approver-name',
-                        })}
-                        isRequired={true}
-                      />
-                      <TextField
-                        name="approverName"
-                        value={props.values.approverName}
-                        type="text"
-                        required
-                        autoComplete="off"
-                        onChange={props.handleChange}
-                      />
+              {(formikProps) => {
+                let fieldErrors: Record<string, string[]> = {};
+                Object.entries(formikProps.errors).forEach(([key, value]) => {
+                  if (formikProps.getFieldMeta(key).touched) {
+                    fieldErrors[key] = (Array.isArray(value) ? value : [value]) as string[];
+                  }
+                });
+                return (
+                  <form onSubmit={formikProps.handleSubmit}>
+                    <Box className="fields">
+                      <Box className="field">
+                        <FieldLabelComponent
+                          value={intl.formatMessage({
+                            id: 'delete.approver-name',
+                          })}
+                          isRequired={true}
+                        />
+                        <TextField
+                          name="approverName"
+                          value={formikProps.values.approverName}
+                          type="text"
+                          required
+                          autoComplete="off"
+                          onChange={formikProps.handleChange}
+                          onBlur={formikProps.handleBlur}
+                        />
+                      </Box>
+                      <Box className="field">
+                        <FieldLabelComponent
+                          value={intl.formatMessage({
+                            id: 'delete.approval-code',
+                          })}
+                          isRequired={true}
+                        />
+                        <TextField
+                          name="approvalCode"
+                          value={formikProps.values.approvalCode}
+                          type="password"
+                          required
+                          autoComplete="new-password"
+                          onChange={formikProps.handleChange}
+                          onBlur={formikProps.handleBlur}
+                        />
+                      </Box>
                     </Box>
-                    <Box className="field">
-                      <FieldLabelComponent
-                        value={intl.formatMessage({
-                          id: 'delete.approval-code',
-                        })}
-                        isRequired={true}
-                      />
-                      <TextField
-                        name="approvalCode"
-                        value={props.values.approvalCode}
-                        type="password"
-                        required
-                        autoComplete="new-password"
-                        onChange={props.handleChange}
-                      />
-                    </Box>
-                  </Box>
-                  <Box className="footer">
-                    <Box className="errors">
-                      <GraphQLError error={mutationQuery.error ?? {}} />
-                    </Box>
-                    <Box className="buttons">
-                      <Button
-                        raised
-                        type="submit"
-                        disabled={!props.isValid || mutationQuery.loading}
-                      >
-                        {mutationQuery.loading ? (
-                          <CircularProgress className="loading" />
-                        ) : (
-                          <FormattedMessage id="general.ok-btn.text" />
+                    <Box className="footer">
+                      <Box className="errors">
+                        <GraphQLError error={mutationError} />
+                        {Object.keys(fieldErrors).length > NONE && (
+                          <ValidationsError errors={fieldErrors} />
                         )}
-                      </Button>
-                      <Button
-                        type="button"
-                        onClick={(): void => {
-                          closeDialog();
-                        }}
-                      >
-                        <FormattedMessage id="general.cancel-btn.text" />
-                      </Button>
+                      </Box>
+                      <Box className="buttons">
+                        <Button
+                          raised
+                          type="submit"
+                          disabled={!formikProps.isValid || mutationQuery.loading}
+                        >
+                          {mutationQuery.loading ? (
+                            <CircularProgress className="loading" />
+                          ) : (
+                            <FormattedMessage id="general.ok-btn.text" />
+                          )}
+                        </Button>
+                        <Button
+                          type="button"
+                          onClick={(): void => {
+                            closeDialog();
+                          }}
+                        >
+                          <FormattedMessage id="general.cancel-btn.text" />
+                        </Button>
+                      </Box>
                     </Box>
-                  </Box>
-                </form>
-              )}
+                  </form>
+                );
+              }}
             </Formik>
           </DialogContent>
         </Dialog>
