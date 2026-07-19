@@ -22,8 +22,8 @@ import {
   getLayerLink,
   generateLayerRectangle,
   getTokenResource,
-  getWMTSOptions,
   getLinksArrWithTokens,
+  getCesiumWMTSOptions,
 } from '../helpers/layersUtils';
 
 interface CacheMap {
@@ -124,7 +124,7 @@ export const SelectedLayersContainer: React.FC = observer(() => {
           (item) => layerLink.name === item.id
         );
         const optionsWMTS = {
-          ...getWMTSOptions(
+          ...getCesiumWMTSOptions(
             layer as LayerRasterRecordModelType,
             layerLink.url as string,
             capability

@@ -1,4 +1,3 @@
-import { RecordType } from '../../models';
 import { ILayerImage } from '../../models/layerImage';
 
 export interface EntityDeleteDialogProps {

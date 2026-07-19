@@ -8,7 +8,6 @@ import { Box } from '@map-colonies/react-components';
 import { GraphQLError } from '../../../../common/components/error/graphql.error-presentor';
 import { Mode } from '../../../../common/models/mode.enum';
 import { getTextStyle } from '../../../../common/helpers/style';
-import { ILayerImage } from '../../../models/layerImage';
 import { UserAction } from '../../../models/userStore';
 import {
   EntityDescriptorModelType,

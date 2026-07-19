@@ -318,5 +318,5 @@ body[dir='rtl'] .MuiBox-root .resultsContainer {
 
 .disabled {
   opacity: 0.5;
-  pointer-events: none;
+  cursor: default;
 }

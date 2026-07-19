@@ -151,7 +151,7 @@ export const getTokenResource = (url: string, ver?: string): CesiumResource => {
   return new CesiumResource({ ...(tokenProps as unknown as CesiumResource) });
 };
 
-export interface ResolvedWmtsCapabilityParams {
+export interface ResolvedWmtsParams {
   url: string;
   layer: string;
   style: string;
@@ -164,7 +164,7 @@ export const resolveWmtsCapabilityParams = (
   layer: LayerRasterRecordModelType,
   url: string,
   capability: CapabilityModelType | undefined
-): ResolvedWmtsCapabilityParams => {
+): ResolvedWmtsParams => {
   let style = 'default';
   let format = 'image/jpeg';
   let { tileMatrixSetID, tileMatrixLabels } = {
@@ -225,7 +225,7 @@ export const resolveWmtsCapabilityParams = (
   };
 };
 
-export const getWMTSOptions = (
+export const getCesiumWMTSOptions = (
   layer: LayerRasterRecordModelType,
   url: string,
   capability: CapabilityModelType | undefined
