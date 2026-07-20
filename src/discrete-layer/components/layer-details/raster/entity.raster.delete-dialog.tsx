@@ -6,37 +6,28 @@ import { Formik, FormikProps } from 'formik';
 import { DialogContent } from '@material-ui/core';
 import { Button, CircularProgress, TextField } from '@map-colonies/react-core';
 import { Dialog, Icon, Typography } from '@map-colonies/react-core';
-import { Box, getWMTSOptions, getXYZOptions } from '@map-colonies/react-components';
+import { Box } from '@map-colonies/react-components';
 import { Mode } from '../../../../common/models/mode.enum';
-import { LinkType } from '../../../../common/models/link-type.enum';
 import { getTextStyle } from '../../../../common/helpers/style';
 import { FlyTo } from '../../../../common/components/ol-map/fly-to';
 import { FieldLabelComponent } from '../../../../common/components/form/field-label';
 import { GraphQLError } from '../../../../common/components/error/graphql.error-presentor';
 import { ValidationsError } from '../../../../common/components/error/validations.error-presentor';
-import {
-  OlTileLayer,
-  DEFAULT_PROJECTION,
-} from '../../../../common/components/ol-map/ol-tile-layer.utils';
+import { OlTileLayer } from '../../helpers/ol-tile-layer.utils';
 import {
   EntityDescriptorModelType,
   LayerRasterRecordModelType,
-  LinkModelType,
   RecordType,
   useQuery,
   useStore,
 } from '../../../models';
-import {
-  getLayerLink,
-  getLinkUrlWithToken,
-  resolveWmtsCapabilityParams,
-} from '../../helpers/layersUtils';
+import { getLayerLink } from '../../helpers/layersUtils';
 import { DialogActionTitle } from '../dialog.helpers';
 import { LayersDetailsComponent } from '../layer-details';
 import { EntityDeleteDialogProps } from '../entity.delete';
 import { useDeleteLayer } from '../delete.hook';
-import { GeoFeaturesPresentorComponent } from './pp-map';
 import { START_RASTER_LAYER_ZINDEX } from './pp-map.utils';
+import { GeoFeaturesPresentorComponent } from './pp-map';
 
 import './entity.raster.delete-dialog.css';
 
@@ -50,7 +41,7 @@ export const EntityDeleteRasterDialog: React.FC<EntityDeleteDialogProps> = obser
 
     const formikRef = useRef<FormikProps<any>>() as any;
     const [initialDeleteValues] = React.useState<any>({ approvalCode: '', approverName: '' });
-    const [mutationError, setMutationError] = React.useState<any>({});
+    const [mutationError, setMutationError] = React.useState<any>(null);
 
     const { dialogTitleParamTranslation, closeDialog, warningMessage } = useDeleteLayer({
       onSetOpen: props.onSetOpen,
@@ -97,52 +88,19 @@ export const EntityDeleteRasterDialog: React.FC<EntityDeleteDialogProps> = obser
       if (!layerLink?.url) {
         return undefined;
       }
-      if (layerLink.protocol === LinkType.XYZ_LAYER) {
-        const xyzOptions = getXYZOptions({
-          url: getLinkUrlWithToken([layerLink]) as string,
-        });
-        return (
-          <OlTileLayer
-            key={props.layerRecord.id}
-            protocol={LinkType.XYZ_LAYER}
-            options={xyzOptions}
-            layerOptions={{ zIndex: START_RASTER_LAYER_ZINDEX }}
-          />
-        );
-      }
-      if (layerLink.protocol === LinkType.WMTS_LAYER || layerLink.protocol === LinkType.WMTS) {
-        const capability = store.discreteLayersStore.capabilities?.find(
-          (item) => layerLink.name === item.id
-        );
-        const resolved = resolveWmtsCapabilityParams(
-          props.layerRecord as LayerRasterRecordModelType,
-          layerLink.url as string,
-          capability
-        );
-        const wmtsOptions = getWMTSOptions({
-          url: getLinkUrlWithToken([
-            { ...layerLink, url: resolved.url } as LinkModelType,
-          ]) as string,
-          layer: resolved.layer,
-          matrixSet: resolved.tileMatrixSetID,
-          format: resolved.format,
-          projection: DEFAULT_PROJECTION,
-          style: resolved.style,
-        });
-
-        return (
-          <OlTileLayer
-            key={props.layerRecord.id}
-            protocol={LinkType.WMTS_LAYER}
-            options={wmtsOptions}
-            layerOptions={{
-              extent: props.layerRecord.footprint?.bbox,
-              zIndex: START_RASTER_LAYER_ZINDEX,
-            }}
-          />
-        );
-      }
-      return undefined;
+      const capability = store.discreteLayersStore.capabilities?.find(
+        (item) => layerLink.name === item.id
+      );
+      return (
+        <OlTileLayer
+          layerRecord={props.layerRecord as LayerRasterRecordModelType}
+          capability={capability}
+          layerOptions={{
+            extent: props.layerRecord.footprint?.bbox,
+            zIndex: START_RASTER_LAYER_ZINDEX,
+          }}
+        />
+      );
     }, [props.layerRecord]);
 
     return (
@@ -198,7 +156,7 @@ export const EntityDeleteRasterDialog: React.FC<EntityDeleteDialogProps> = obser
               validateOnMount
               validate={(values) => {
                 const errors: any = {};
-                setMutationError({});
+                setMutationError(null);
 
                 if (!values.approverName?.trim()) {
                   errors.approverName = intl.formatMessage(
@@ -281,7 +239,9 @@ export const EntityDeleteRasterDialog: React.FC<EntityDeleteDialogProps> = obser
                         <Button
                           raised
                           type="submit"
-                          disabled={!formikProps.isValid || mutationQuery.loading}
+                          disabled={
+                            !formikProps.isValid || mutationQuery.loading || mutationError !== null
+                          }
                         >
                           {mutationQuery.loading ? (
                             <CircularProgress className="loading" />

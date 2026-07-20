@@ -8,7 +8,7 @@ import {
 } from '@map-colonies/react-components';
 import CONFIG from '../../../common/config';
 import { Error } from '../../../common/components/tree/statuses/error';
-import { getTokenResource } from '../helpers/layersUtils';
+import { getTokenResource } from '../helpers/cesiumUtils';
 import { queue } from '../snackbar/notification-queue';
 
 const NONE = 0;

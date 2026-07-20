@@ -18,13 +18,12 @@ import { LinkType } from '../../../common/models/link-type.enum';
 import { ILayerImage } from '../../models/layerImage';
 import { useStore } from '../../models/RootStore';
 import { Layer3DRecordModelType, LayerRasterRecordModelType, LinkModelType } from '../../models';
+import { getLayerLink, getLinksArrWithTokens } from '../helpers/layersUtils';
 import {
-  getLayerLink,
   generateLayerRectangle,
   getTokenResource,
-  getLinksArrWithTokens,
   getCesiumWMTSOptions,
-} from '../helpers/layersUtils';
+} from '../helpers/cesiumUtils';
 
 interface CacheMap {
   [key: string]: JSX.Element | undefined;

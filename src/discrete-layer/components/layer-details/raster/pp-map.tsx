@@ -33,7 +33,7 @@ import { ILayerImage } from '../../../models/layerImage';
 import { useStore } from '../../../models/RootStore';
 import { GeojsonFeatureInput } from '../../../models/RootStore.base';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
-import { usePreviewBaseMapTiles } from '../../../../common/components/ol-map/ol-tile-layer.utils';
+import { usePreviewBaseMapTiles } from '../../helpers/ol-tile-layer.utils';
 import { ToggleBaseMap } from '../../../../common/components/ol-map/toggle-base-map';
 import { FeaturePropertiesPopupComponent } from './feature-properties-popup.component';
 import { FlyToPP } from './fly-to-pp';
