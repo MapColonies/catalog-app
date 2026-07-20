@@ -89,7 +89,7 @@ export const getLinkUrlWithToken = (
   }
 };
 
-export interface ResolvedWMTSParams {
+export interface NormalizedWMTSParams {
   url: string;
   layer: string;
   style: string;
@@ -102,7 +102,7 @@ export const normalizeWMTSParams = (
   layer: LayerRasterRecordModelType,
   url: string,
   capability: CapabilityModelType | undefined
-): ResolvedWMTSParams => {
+): NormalizedWMTSParams => {
   let style = 'default';
   let format = 'image/jpeg';
   let { tileMatrixSetID, tileMatrixLabels } = {
