@@ -14,7 +14,7 @@ import { Options as XYZOptions } from 'ol/source/XYZ';
 import { Options as LayerOptions } from 'ol/layer/Base';
 import { LinkType } from '../../../common/models/link-type.enum';
 import { CapabilityModelType, LayerRasterRecordModelType, LinkModelType } from '../../models';
-import { getLayerLink, getLinkUrlWithToken, normalizeWmtsParams } from './layersUtils';
+import { getLayerLink, getLinkUrlWithToken, normalizeWMTSParams } from './layersUtils';
 
 export const DEFAULT_PROJECTION = 'EPSG:4326';
 
@@ -153,7 +153,7 @@ export const OlTileLayer: React.FC<OlTileLayerProps> = (props) => {
   }
 
   if (layerLink.protocol === LinkType.WMTS_LAYER || layerLink.protocol === LinkType.WMTS) {
-    const resolved = normalizeWmtsParams(
+    const resolved = normalizeWMTSParams(
       props.layerRecord,
       layerLink.url as string,
       props.capability

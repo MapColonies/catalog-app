@@ -98,7 +98,7 @@ export interface ResolvedWmtsParams {
   tileMatrixLabels: string[];
 }
 
-export const normalizeWmtsParams = (
+export const normalizeWMTSParams = (
   layer: LayerRasterRecordModelType,
   url: string,
   capability: CapabilityModelType | undefined
