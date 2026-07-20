@@ -13,7 +13,7 @@ import { FlyTo } from '../../../../common/components/ol-map/fly-to';
 import { FieldLabelComponent } from '../../../../common/components/form/field-label';
 import { GraphQLError } from '../../../../common/components/error/graphql.error-presentor';
 import { ValidationsError } from '../../../../common/components/error/validations.error-presentor';
-import { OlTileLayer } from '../../helpers/ol-tile-layer.utils';
+import { OlTileLayer } from '../../helpers/olTileLayerUtils';
 import {
   EntityDescriptorModelType,
   LayerRasterRecordModelType,
