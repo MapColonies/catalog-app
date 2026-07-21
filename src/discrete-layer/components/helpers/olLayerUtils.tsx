@@ -26,10 +26,15 @@ import {
 
 export const DEFAULT_PROJECTION = 'EPSG:4326';
 
-type SupportedProtocols = LinkType.WMTS_LAYER | LinkType.XYZ_LAYER;
+const SupportedProtocols = {
+  WMTS_LAYER: LinkType.WMTS_LAYER,
+  WMTS: LinkType.WMTS,
+  XYZ_LAYER: LinkType.XYZ_LAYER,
+} as const;
+type SupportedProtocol = (typeof SupportedProtocols)[keyof typeof SupportedProtocols];
 
 interface OlLayerInnerParams {
-  protocol: SupportedProtocols;
+  protocol: SupportedProtocol;
   sourceOptions: WMTSOptions | XYZOptions;
   layerOptions?: LayerOptions;
 }
@@ -43,16 +48,19 @@ const OlLayerInner: React.FC<OlLayerInnerParams> = ({
   let tileComponent: JSX.Element | undefined = undefined;
 
   switch (protocol) {
-    case LinkType.WMTS_LAYER:
+    case SupportedProtocols.WMTS_LAYER:
       tileComponent = <TileWMTS options={tileOptions as WMTSOptions} />;
       break;
-    case LinkType.XYZ_LAYER:
+    case SupportedProtocols.XYZ_LAYER:
       tileComponent = <TileXYZ options={tileOptions as XYZOptions} />;
       break;
   }
 
   return <TileLayer options={layerOptions}>{tileComponent}</TileLayer>;
 };
+
+const isWMTSProtocol = (protocol?: string) =>
+  protocol === LinkType.WMTS_LAYER || protocol === LinkType.WMTS;
 
 export const usePreviewBaseMapTiles = (baseMaps: IBaseMaps | undefined): JSX.Element[] => {
   return useMemo(() => {
@@ -65,18 +73,21 @@ export const usePreviewBaseMapTiles = (baseMaps: IBaseMaps | undefined): JSX.Ele
       baseMap.baseRasterLayers.forEach((layer) => {
         let options: XYZOptions | WMTSOptions | null = null;
 
-        if (layer.type === LinkType.WMTS_LAYER) {
-          options = getOLSourceOptions(LinkType.WMTS_LAYER, layer);
-        }
-        if (layer.type === LinkType.XYZ_LAYER) {
-          options = getOLSourceOptions(LinkType.XYZ_LAYER, layer);
+        switch (layer.type) {
+          case SupportedProtocols.WMTS_LAYER:
+            options = getOLSourceOptions(SupportedProtocols.WMTS_LAYER, layer);
+            break;
+
+          case SupportedProtocols.XYZ_LAYER:
+            options = getOLSourceOptions(SupportedProtocols.XYZ_LAYER, layer);
+            break;
         }
 
         if (options) {
           olBaseMap.push(
             <OlLayerInner
               key={layer.id}
-              protocol={layer.type as SupportedProtocols}
+              protocol={layer.type as SupportedProtocol}
               sourceOptions={options}
               layerOptions={{ opacity: layer.opacity }}
             />
@@ -96,43 +107,39 @@ interface OlLayerProps {
 
 export const OlLayer: React.FC<OlLayerProps> = (props) => {
   let options: XYZOptions | WMTSOptions | null = null;
-  let protocol: SupportedProtocols | null = null;
+  let protocol: SupportedProtocol | null = null;
 
   const layerLink = getLayerLink(props.layerRecord);
   if (!layerLink?.url) {
     return undefined;
   }
 
-  if (layerLink.protocol === LinkType.XYZ_LAYER) {
-    protocol = LinkType.XYZ_LAYER;
+  if (layerLink.protocol === SupportedProtocols.XYZ_LAYER) {
+    protocol = SupportedProtocols.XYZ_LAYER;
     options = getOLSourceOptions(
-      LinkType.XYZ_LAYER,
+      SupportedProtocols.XYZ_LAYER,
       {
         id: '',
         opacity: 1,
-        type: LinkType.XYZ_LAYER,
+        type: SupportedProtocols.XYZ_LAYER,
         zIndex: 1,
         options: { url: layerLink.url },
       } satisfies IRasterLayer // support XYZ protocol for outer layers like OpenStreetmap etc.
     );
   }
 
-  const isRasterProtocol =
-    layerLink.protocol !== undefined &&
-    [LinkType.WMTS_LAYER, LinkType.WMTS].includes(layerLink.protocol as LinkType);
-  if (isRasterProtocol) {
-    const rasterLayerRecord = props.layerOptions as LayerRasterRecordModelType;
+  if (isWMTSProtocol(layerLink.protocol)) {
     const resolved = normalizeWMTSParams(
-      rasterLayerRecord,
+      props.layerOptions as LayerRasterRecordModelType,
       layerLink.url as string,
       props.capability
     );
 
-    protocol = LinkType.WMTS_LAYER;
-    options = getOLSourceOptions(LinkType.WMTS_LAYER, {
+    protocol = SupportedProtocols.WMTS_LAYER;
+    options = getOLSourceOptions(SupportedProtocols.WMTS_LAYER, {
       id: '',
       opacity: 1,
-      type: LinkType.WMTS_LAYER,
+      type: SupportedProtocols.WMTS_LAYER,
       zIndex: 1,
       options: {
         ...resolved,
