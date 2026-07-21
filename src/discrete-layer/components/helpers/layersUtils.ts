@@ -1,5 +1,7 @@
 import { get, isEmpty } from 'lodash';
 import { Feature } from 'geojson';
+import { Options as WMTSOptions } from 'ol/source/WMTS';
+import { Options as XYZOptions } from 'ol/source/XYZ';
 import bbox from '@turf/bbox';
 import bboxPolygon from '@turf/bbox-polygon';
 import booleanContains from '@turf/boolean-contains';
@@ -15,6 +17,12 @@ import {
   StyleModelType,
   TileMatrixSetModelType,
 } from '../../models';
+import {
+  getWMTSOptions,
+  getXYZOptions,
+  IRasterLayer,
+  RCesiumWMTSLayerOptions,
+} from '@map-colonies/react-components';
 
 export const isPolygonContainedInLayer = (
   polygon: Feature,
@@ -89,7 +97,7 @@ export const getLinkUrlWithToken = (
   }
 };
 
-export interface NormalizedWMTSParams {
+export interface WMTSSourceOptions {
   url: string;
   layer: string;
   style: string;
@@ -101,8 +109,8 @@ export interface NormalizedWMTSParams {
 export const normalizeWMTSParams = (
   layer: LayerRasterRecordModelType,
   url: string,
-  capability: CapabilityModelType | undefined
-): NormalizedWMTSParams => {
+  capability?: CapabilityModelType
+): WMTSSourceOptions => {
   let style = 'default';
   let format = 'image/jpeg';
   let { tileMatrixSetID, tileMatrixLabels } = {
@@ -162,3 +170,43 @@ export const normalizeWMTSParams = (
     tileMatrixLabels,
   };
 };
+
+export const DEFAULT_PROJECTION = 'EPSG:4326';
+
+export const toOlSubdomainTemplate = (url: string): string => {
+  return url.includes('{s}') ? url.replace('{s}', '{a-c}') : url;
+};
+
+export function getOLSourceOptions(
+  protocol: LinkType.WMTS_LAYER | LinkType.XYZ_LAYER,
+  rasterLayer: IRasterLayer
+): XYZOptions | WMTSOptions | null {
+  const layerOptions = rasterLayer.options;
+  let resOptions = null;
+  let url = toOlSubdomainTemplate(layerOptions.url as string);
+
+  switch (protocol) {
+    case LinkType.XYZ_LAYER:
+      resOptions = getXYZOptions({ url });
+      break;
+
+    case LinkType.WMTS_LAYER:
+      {
+        const wmtsSourceOptions = layerOptions as RCesiumWMTSLayerOptions;
+        resOptions = getWMTSOptions({
+          url,
+          layer: wmtsSourceOptions.layer ?? '',
+          matrixSet: wmtsSourceOptions.tileMatrixSetID as string,
+          format: wmtsSourceOptions.format as string,
+          projection: DEFAULT_PROJECTION, // Should be taken from map-server capabilities (MAPCO-3780)
+          style: wmtsSourceOptions.style ?? '',
+        });
+      }
+      break;
+
+    default:
+      resOptions = null;
+  }
+
+  return resOptions;
+}

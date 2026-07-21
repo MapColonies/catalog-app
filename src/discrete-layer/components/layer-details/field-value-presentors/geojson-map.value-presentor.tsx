@@ -11,7 +11,7 @@ import { FitOptions } from 'ol/View';
 import { validateGeoJSONString } from '../../../../common/utils/geojson.validation';
 import { Mode } from '../../../../common/models/mode.enum';
 import { useStore } from '../../../models/RootStore';
-import { usePreviewBaseMapTiles } from '../../helpers/olTileLayerUtils';
+import { usePreviewBaseMapTiles } from '../../helpers/olLayerUtils';
 
 interface GeoJsonMapValuePresentorProps {
   mode: Mode;

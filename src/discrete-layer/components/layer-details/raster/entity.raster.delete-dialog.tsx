@@ -13,14 +13,8 @@ import { FlyTo } from '../../../../common/components/ol-map/fly-to';
 import { FieldLabelComponent } from '../../../../common/components/form/field-label';
 import { GraphQLError } from '../../../../common/components/error/graphql.error-presentor';
 import { ValidationsError } from '../../../../common/components/error/validations.error-presentor';
-import { OlTileLayer } from '../../helpers/olTileLayerUtils';
-import {
-  EntityDescriptorModelType,
-  LayerRasterRecordModelType,
-  RecordType,
-  useQuery,
-  useStore,
-} from '../../../models';
+import { OlLayer } from '../../helpers/olLayerUtils';
+import { EntityDescriptorModelType, RecordType, useQuery, useStore } from '../../../models';
 import { getLayerLink } from '../../helpers/layersUtils';
 import { DialogActionTitle } from '../dialog.helpers';
 import { LayersDetailsComponent } from '../layer-details';
@@ -92,8 +86,8 @@ export const EntityDeleteRasterDialog: React.FC<EntityDeleteDialogProps> = obser
         (item) => layerLink.name === item.id
       );
       return (
-        <OlTileLayer
-          layerRecord={props.layerRecord as LayerRasterRecordModelType}
+        <OlLayer
+          layerRecord={props.layerRecord}
           capability={capability}
           layerOptions={{
             extent: props.layerRecord.footprint?.bbox,
