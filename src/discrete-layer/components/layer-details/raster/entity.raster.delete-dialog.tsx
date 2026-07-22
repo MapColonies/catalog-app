@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useMemo } from 'react';
+import React, { useRef, useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { observer } from 'mobx-react';
 import { Feature } from 'geojson';
@@ -34,8 +34,11 @@ export const EntityDeleteRasterDialog: React.FC<EntityDeleteDialogProps> = obser
     const mutationQuery = useQuery();
 
     const formikRef = useRef<FormikProps<any>>() as any;
-    const [initialDeleteValues] = React.useState<any>({ approvalCode: '', approverName: '' });
-    const [mutationError, setMutationError] = React.useState<any>(null);
+    const [initialDeleteValues] = useState<any>({ approvalCode: '', approverName: '' });
+    const [mutationError, setMutationError] = useState<any>(null);
+    const [polygonPartsError, setPolygonPartsError] = useState<Record<string, string[]> | null>(
+      null
+    );
 
     const { dialogTitleParamTranslation, closeDialog, warningMessage } = useDeleteLayer({
       onSetOpen: props.onSetOpen,
@@ -44,12 +47,28 @@ export const EntityDeleteRasterDialog: React.FC<EntityDeleteDialogProps> = obser
     });
 
     useEffect(() => {
+      if (store.discreteLayersStore.customValidationError) {
+        setPolygonPartsError(store.discreteLayersStore.customValidationError);
+        setMutationError(null);
+      } else {
+        setPolygonPartsError(null);
+      }
+    }, [store.discreteLayersStore.customValidationError]);
+
+    useEffect(() => {
+      return () => {
+        store.discreteLayersStore.clearCustomValidationError();
+      };
+    }, []);
+
+    useEffect(() => {
       if (mutationQuery.data && !mutationQuery.error) {
         props.onSetOpen(false);
         props.onSuccess?.();
       }
       if (mutationQuery.error) {
         setMutationError(mutationQuery.error);
+        setPolygonPartsError(null);
       }
     }, [mutationQuery.data, mutationQuery.error]);
 
@@ -151,6 +170,7 @@ export const EntityDeleteRasterDialog: React.FC<EntityDeleteDialogProps> = obser
               validate={(values) => {
                 const errors: any = {};
                 setMutationError(null);
+                setPolygonPartsError(null);
 
                 if (!values.approverName?.trim()) {
                   errors.approverName = intl.formatMessage(
@@ -225,8 +245,11 @@ export const EntityDeleteRasterDialog: React.FC<EntityDeleteDialogProps> = obser
                     <Box className="footer">
                       <Box className="errors">
                         <GraphQLError error={mutationError} />
-                        {Object.keys(fieldErrors).length > NONE && (
-                          <ValidationsError errors={fieldErrors} />
+                        {Object.keys({ ...fieldErrors, ...(polygonPartsError ?? {}) }).length >
+                          NONE && (
+                          <ValidationsError
+                            errors={{ ...fieldErrors, ...(polygonPartsError ?? {}) }}
+                          />
                         )}
                       </Box>
                       <Box className="buttons">
