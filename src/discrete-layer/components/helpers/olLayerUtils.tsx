@@ -49,6 +49,7 @@ const OlLayerInner: React.FC<OlLayerInnerParams> = ({
 
   switch (protocol) {
     case SupportedProtocols.WMTS_LAYER:
+    case SupportedProtocols.WMTS:
       tileComponent = <TileWMTS options={tileOptions as WMTSOptions} />;
       break;
     case SupportedProtocols.XYZ_LAYER:
@@ -60,7 +61,7 @@ const OlLayerInner: React.FC<OlLayerInnerParams> = ({
 };
 
 const isWMTSProtocol = (protocol?: string) =>
-  protocol === LinkType.WMTS_LAYER || protocol === LinkType.WMTS;
+  protocol === SupportedProtocols.WMTS_LAYER || protocol === SupportedProtocols.WMTS;
 
 export const usePreviewBaseMapTiles = (baseMaps: IBaseMaps | undefined): JSX.Element[] => {
   return useMemo(() => {
