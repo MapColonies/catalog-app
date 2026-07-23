@@ -112,6 +112,12 @@ export const EntityDeleteRasterDialog: React.FC<EntityDeleteDialogProps> = obser
     }, []);
 
     const layerCapability = store.discreteLayersStore.getLayerCapability(props.layerRecord);
+    const layerOptions = useMemo(() => {
+      return {
+        extent: props.layerRecord.footprint?.bbox,
+        zIndex: START_RASTER_LAYER_ZINDEX,
+      };
+    }, [props.layerRecord.footprint?.bbox]);
 
     return (
       <Box id="rasterDeleteDialog">
@@ -154,10 +160,7 @@ export const EntityDeleteRasterDialog: React.FC<EntityDeleteDialogProps> = obser
                 <OlLayerRecordTile
                   layerRecord={props.layerRecord}
                   capability={layerCapability}
-                  layerOptions={{
-                    extent: props.layerRecord.footprint?.bbox,
-                    zIndex: START_RASTER_LAYER_ZINDEX,
-                  }}
+                  layerOptions={layerOptions}
                 />
                 <FlyTo feature={flyToFeature} flyOnce={true}></FlyTo>
               </>

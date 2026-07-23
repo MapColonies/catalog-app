@@ -1,3 +1,4 @@
+import React from 'react';
 import { LinkType } from '../../../common/models/link-type.enum';
 import {
   LayerOptions,
@@ -21,7 +22,7 @@ interface OlLayerRecordTileProps {
   layerOptions?: LayerOptions;
 }
 
-export const OlLayerRecordTile: React.FC<OlLayerRecordTileProps> = (props) => {
+export const OlLayerRecordTile: React.FC<OlLayerRecordTileProps> = React.memo((props) => {
   let options: XYZOptions | WMTSOptions | null = null;
   let linkType: LinkType | null = null;
 
@@ -60,4 +61,4 @@ export const OlLayerRecordTile: React.FC<OlLayerRecordTileProps> = (props) => {
   return (
     <OlTileLayer layerType={linkType} sourceOptions={options} layerOptions={props.layerOptions} />
   );
-};
+});
