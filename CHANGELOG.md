@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [6.4.0](https://github.com/MapColonies/catalog-app/compare/v6.3.1...v6.4.0) (2026-07-23)
+
+
+### Features
+
+* delete raster layer ([#996](https://github.com/MapColonies/catalog-app/issues/996)) ([0231ed4](https://github.com/MapColonies/catalog-app/commit/0231ed41e9f2231a243cba9ca2a408405f4d1017))
+
 ## [6.3.1](https://github.com/MapColonies/catalog-app/compare/v6.3.0...v6.3.1) (2026-07-15)
 
 
