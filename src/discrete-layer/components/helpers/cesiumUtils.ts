@@ -12,7 +12,7 @@ import {
   LayerMetadataMixedUnion,
   LayerRasterRecordModelType,
 } from '../../models';
-import { normalizeWMTSParams } from './layersUtils';
+import { getWMTSConfigOptions } from './layersUtils';
 
 const DEFAULT_RECTANGLE_FACTOR = 0.2;
 const EARTH_AREA = 509000000; //whole EARTH surface, in square km
@@ -74,15 +74,15 @@ export const getCesiumWMTSOptions = (
   url: string,
   capability: CapabilityModelType | undefined
 ): RCesiumWMTSLayerOptions => {
-  const resolved = normalizeWMTSParams(layer, url, capability);
+  const resolved = getWMTSConfigOptions(layer, url, capability);
   return {
-    url: getTokenResource(resolved.url, layer.productVersion as string),
+    url: getTokenResource(resolved.url as string, layer.productVersion as string),
     layer: resolved.layer,
     style: resolved.style,
     format: resolved.format,
     tileMatrixSetID: resolved.tileMatrixSetID,
     // tileMatrixLabels: resolved.tileMatrixLabels,
-    maximumLevel: Math.max(...resolved.tileMatrixLabels.map(Number)),
+    maximumLevel: Math.max(...(resolved.tileMatrixLabels ?? []).map(Number)),
     tilingScheme: new CesiumGeographicTilingScheme(),
   };
 };

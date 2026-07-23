@@ -10,8 +10,8 @@ import { Geometry } from 'geojson';
 import { FitOptions } from 'ol/View';
 import { validateGeoJSONString } from '../../../../common/utils/geojson.validation';
 import { Mode } from '../../../../common/models/mode.enum';
+import { OlBaseMap } from '../../../../common/components/ol-layer/ol.base-map';
 import { useStore } from '../../../models/RootStore';
-import { usePreviewBaseMapTiles } from '../../helpers/olLayerUtils';
 
 interface GeoJsonMapValuePresentorProps {
   mode: Mode;
@@ -43,12 +43,10 @@ export const GeoJsonMapValuePresentorComponent: React.FC<GeoJsonMapValuePresento
     }
   }, [mode, jsonValue]);
 
-  const previewBaseMap = usePreviewBaseMapTiles(store.discreteLayersStore.baseMaps);
-
   return (
     <Box style={{ ...style }}>
       <Map>
-        {previewBaseMap}
+        <OlBaseMap baseMaps={store.discreteLayersStore.baseMaps} />
         {geoJsonValue && (
           <VectorLayer>
             <VectorSource>

@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { observer } from 'mobx-react';
 import { Feature } from 'geojson';
+import * as Yup from 'yup';
 import { Formik, FormikProps } from 'formik';
 import { DialogContent } from '@material-ui/core';
 import { Button, CircularProgress, TextField } from '@map-colonies/react-core';
@@ -13,9 +14,15 @@ import { FlyTo } from '../../../../common/components/ol-map/fly-to';
 import { FieldLabelComponent } from '../../../../common/components/form/field-label';
 import { GraphQLError } from '../../../../common/components/error/graphql.error-presentor';
 import { ValidationsError } from '../../../../common/components/error/validations.error-presentor';
-import { OlLayer } from '../../helpers/olLayerUtils';
-import { EntityDescriptorModelType, RecordType, useQuery, useStore } from '../../../models';
-import { getLayerLink } from '../../helpers/layersUtils';
+import { OlLayerRecordTile } from '../../map-container/ol.layer-record.tile';
+import {
+  EntityDescriptorModelType,
+  FieldConfigModelType,
+  RecordType,
+  useQuery,
+  useStore,
+} from '../../../models';
+import { getYupFieldConfig } from '../utils';
 import { DialogActionTitle } from '../dialog.helpers';
 import { LayersDetailsComponent } from '../layer-details';
 import { EntityDeleteDialogProps } from '../entity.delete';
@@ -39,6 +46,17 @@ export const EntityDeleteRasterDialog: React.FC<EntityDeleteDialogProps> = obser
     const [polygonPartsError, setPolygonPartsError] = useState<Record<string, string[]> | null>(
       null
     );
+
+    const deleteFieldsSchema = Yup.object({
+      approverName: getYupFieldConfig(
+        { label: 'delete.approver-name' } as FieldConfigModelType,
+        intl
+      ),
+      approvalCode: getYupFieldConfig(
+        { label: 'delete.approval-code' } as FieldConfigModelType,
+        intl
+      ),
+    });
 
     const { dialogTitleParamTranslation, closeDialog, warningMessage } = useDeleteLayer({
       onSetOpen: props.onSetOpen,
@@ -93,28 +111,7 @@ export const EntityDeleteRasterDialog: React.FC<EntityDeleteDialogProps> = obser
       } as Feature;
     }, []);
 
-    const layerImage = useMemo(() => {
-      if (!props.layerRecord) {
-        return undefined;
-      }
-      const layerLink = getLayerLink(props.layerRecord);
-      if (!layerLink?.url) {
-        return undefined;
-      }
-      const capability = store.discreteLayersStore.capabilities?.find(
-        (item) => layerLink.name === item.id
-      );
-      return (
-        <OlLayer
-          layerRecord={props.layerRecord}
-          capability={capability}
-          layerOptions={{
-            extent: props.layerRecord.footprint?.bbox,
-            zIndex: START_RASTER_LAYER_ZINDEX,
-          }}
-        />
-      );
-    }, [props.layerRecord]);
+    const layerCapability = store.discreteLayersStore.getLayerCapability(props.layerRecord);
 
     return (
       <Box id="rasterDeleteDialog">
@@ -154,7 +151,14 @@ export const EntityDeleteRasterDialog: React.FC<EntityDeleteDialogProps> = obser
               toggleBaseMap={true}
             >
               <>
-                {layerImage}
+                <OlLayerRecordTile
+                  layerRecord={props.layerRecord}
+                  capability={layerCapability}
+                  layerOptions={{
+                    extent: props.layerRecord.footprint?.bbox,
+                    zIndex: START_RASTER_LAYER_ZINDEX,
+                  }}
+                />
                 <FlyTo feature={flyToFeature} flyOnce={true}></FlyTo>
               </>
             </GeoFeaturesPresentorComponent>
@@ -167,34 +171,13 @@ export const EntityDeleteRasterDialog: React.FC<EntityDeleteDialogProps> = obser
                 }
               }}
               validateOnMount
-              validate={(values) => {
-                const errors: any = {};
+              validationSchema={deleteFieldsSchema}
+              validate={() => {
                 setMutationError(null);
                 setPolygonPartsError(null);
-
-                if (!values.approverName?.trim()) {
-                  errors.approverName = intl.formatMessage(
-                    { id: 'validation-general.required' },
-                    { fieldName: intl.formatMessage({ id: 'delete.approver-name' }) }
-                  );
-                }
-
-                if (!values.approvalCode?.trim()) {
-                  errors.approvalCode = intl.formatMessage(
-                    { id: 'validation-general.required' },
-                    { fieldName: intl.formatMessage({ id: 'delete.approval-code' }) }
-                  );
-                }
-
-                return errors;
               }}
-              onSubmit={(values, actions) => {
-                if (formikRef.current?.isValid) {
-                  deleteLayer(
-                    formikRef.current?.values.approverName,
-                    formikRef.current?.values.approvalCode
-                  );
-                }
+              onSubmit={(values) => {
+                deleteLayer(values.approverName, values.approvalCode);
               }}
             >
               {(formikProps) => {

@@ -33,7 +33,7 @@ import { ILayerImage } from '../../../models/layerImage';
 import { useStore } from '../../../models/RootStore';
 import { GeojsonFeatureInput } from '../../../models/RootStore.base';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
-import { usePreviewBaseMapTiles } from '../../helpers/olLayerUtils';
+import { OlBaseMap } from '../../../../common/components/ol-layer/ol.base-map';
 import { ToggleBaseMap } from '../../../../common/components/ol-map/toggle-base-map';
 import { FeaturePropertiesPopupComponent } from './feature-properties-popup.component';
 import { FlyToPP } from './fly-to-pp';
@@ -167,8 +167,6 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
     setIsOpenProperties(false);
   }, []);
 
-  const previewBaseMap = usePreviewBaseMapTiles(store.discreteLayersStore.baseMaps);
-
   const LegendsArray = useMemo(() => {
     const res: LegendItem[] = [];
     PPMapStyles.forEach((value, key) => {
@@ -215,7 +213,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   return (
     <Box id="geoFeaturesMapContainer" style={{ ...style }}>
       <Map>
-        {showBaseMap && previewBaseMap}
+        {showBaseMap && <OlBaseMap baseMaps={store.discreteLayersStore.baseMaps} />}
         <MapLoadingIndicator />
         <ZoomLevelIndicator
           indicateTillZoomLevel={
