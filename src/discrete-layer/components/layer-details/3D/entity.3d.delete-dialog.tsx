@@ -1,86 +1,52 @@
-import React, { useCallback, useState, useMemo, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { observer } from 'mobx-react';
-import {
-  Button,
-  Checkbox,
-  CircularProgress,
-  DialogActions,
-  DialogContent,
-  Tooltip,
-} from '@map-colonies/react-core';
-import { Dialog, DialogTitle, Icon, IconButton, Typography } from '@map-colonies/react-core';
+import { DialogContent } from '@material-ui/core';
+import { Button, Checkbox, CircularProgress, DialogActions } from '@map-colonies/react-core';
+import { Dialog, Icon, Typography } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
-import { GraphQLError } from '../../../common/components/error/graphql.error-presentor';
-import { emphasizeByHTML } from '../../../common/helpers/formatters';
-import { Mode } from '../../../common/models/mode.enum';
-import { ILayerImage } from '../../models/layerImage';
-import { IDispatchAction } from '../../models/actionDispatcherStore';
-import { UserAction } from '../../models/userStore';
+import { GraphQLError } from '../../../../common/components/error/graphql.error-presentor';
+import { Mode } from '../../../../common/models/mode.enum';
+import { getTextStyle } from '../../../../common/helpers/style';
+import { UserAction } from '../../../models/userStore';
 import {
   EntityDescriptorModelType,
   RecordStatus,
   RecordType,
   useQuery,
   useStore,
-} from '../../models';
-import { GeoJsonMapValuePresentorComponent } from './field-value-presentors/geojson-map.value-presentor';
-import { LayersDetailsComponent } from './layer-details';
+} from '../../../models';
+import { GeoJsonMapValuePresentorComponent } from '../field-value-presentors/geojson-map.value-presentor';
+import { LayersDetailsComponent } from '../layer-details';
+import { DialogActionTitle } from '../dialog.helpers';
+import { useDeleteLayer, VALID } from '../delete.hook';
+import { EntityDeleteDialogProps } from '../entity.delete';
 
-import './entity.delete-dialog.css';
+import './entity.3d.delete-dialog.css';
 
-interface EntityDeleteDialogProps {
-  isOpen: boolean;
-  onSetOpen: (open: boolean) => void;
-  recordType?: RecordType;
-  layerRecord: ILayerImage;
-}
-
-const VALID = 'ok';
-
-export const EntityDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
+export const EntityDelete3DDialog: React.FC<EntityDeleteDialogProps> = observer(
   (props: EntityDeleteDialogProps) => {
-    const { isOpen, onSetOpen, layerRecord } = props;
     const store = useStore();
-    const mutationQuery = useQuery();
     const intl = useIntl();
+    const mutationQuery = useQuery();
     const [allowDeleting, setAllowDeleting] = useState(false);
 
-    const [recordType] = useState<RecordType>(
-      props.recordType ?? (layerRecord?.type as RecordType)
-    );
-
-    const dialogTitleParam = recordType;
-    const dialogTitleParamTranslation = intl.formatMessage({
-      id: `record-type.${(dialogTitleParam as string).toLowerCase()}.label`,
-    });
-
-    const dialogTitle = intl.formatMessage(
-      { id: `general.title.delete` },
-      { value: dialogTitleParamTranslation }
-    );
-
-    const closeDialog = useCallback(() => {
-      onSetOpen(false);
-    }, [onSetOpen, store.discreteLayersStore]);
-
-    const dispatchAction = (action: Record<string, unknown>): void => {
-      store.actionDispatcherStore.dispatchAction({
-        action: action.action,
-        data: action.data,
-      } as IDispatchAction);
-    };
+    const { dialogTitleParamTranslation, closeDialog, dispatchAction, warningMessage } =
+      useDeleteLayer({
+        onSetOpen: props.onSetOpen,
+        layerRecord: props.layerRecord,
+        recordType: RecordType.RECORD_3D,
+      });
 
     useEffect(() => {
       if (
         !mutationQuery.loading &&
         (mutationQuery.data as { deleteLayer: string } | undefined)?.deleteLayer === VALID
       ) {
-        onSetOpen(false);
         const payload = {
           action: UserAction.SYSTEM_CALLBACK_DELETE,
           data: {
-            ...layerRecord,
+            ...props.layerRecord,
             productStatus: RecordStatus.BEING_DELETED,
           },
         };
@@ -89,45 +55,39 @@ export const EntityDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
       }
     }, [mutationQuery.data]);
 
+    useEffect(() => {
+      if (mutationQuery.data && !mutationQuery.error) {
+        props.onSetOpen(false);
+        props.onSuccess?.();
+      }
+    }, [mutationQuery.data]);
+
     const deleteLayer = (): void => {
       mutationQuery.setQuery(
-        store.mutateDeleteLayer({
+        store.mutateDelete3DLayer({
           data: {
-            id: layerRecord.id,
-            type: layerRecord.type as RecordType,
+            id: props.layerRecord.id,
+            type: props.layerRecord.type as RecordType,
           },
         })
       );
     };
 
-    const deleteMessage = useMemo((): string => {
-      return intl.formatMessage(
-        { id: 'delete.dialog.message' },
-        { action: emphasizeByHTML(`${intl.formatMessage({ id: 'delete.dialog.action' })}`) }
-      );
-    }, []);
-
     return (
-      <div id="entityDeleteDialog">
-        <Dialog open={isOpen} preventOutsideDismiss={true}>
-          <DialogTitle>
-            {dialogTitle}
-            <IconButton
-              className="closeIcon mc-icon-Close"
-              label="CLOSE"
-              onClick={(): void => {
-                closeDialog();
-              }}
-            />
-          </DialogTitle>
+      <Box id="dialog3DDelete">
+        <Dialog open={props.isOpen} preventOutsideDismiss={true}>
+          <DialogActionTitle
+            domain={dialogTitleParamTranslation}
+            action={Mode.DELETE}
+            onClose={closeDialog}
+            style={getTextStyle(props.layerRecord as any, 'backgroundColor')}
+          />
           <DialogContent>
             <Box className="headerWarning">
-              <Tooltip content={intl.formatMessage({ id: 'general.warning.text' })}>
-                <Icon className="icon" icon={{ icon: 'info', size: 'xsmall' }} />
-              </Tooltip>
+              <Icon className="icon" icon={{ icon: 'info', size: 'xsmall' }} />
               <Typography
                 tag="div"
-                dangerouslySetInnerHTML={{ __html: deleteMessage }}
+                dangerouslySetInnerHTML={{ __html: warningMessage }}
               ></Typography>
             </Box>
             <Box id="deleteLayerDetailsContainer">
@@ -147,11 +107,10 @@ export const EntityDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
               mode={Mode.VIEW}
               jsonValue={JSON.stringify(props.layerRecord?.footprint)}
               fitOptions={{ padding: [80, 160, 80, 160] }}
-              style={{ width: '100%', height: '480px' }}
+              style={{ width: '100%', height: 'var(--map-height)' }}
             />
 
             <Box className="footer">
-              <Box className="messages"></Box>
               <Checkbox
                 checked={allowDeleting}
                 label={intl.formatMessage({ id: 'delete.dialog.checkbox' })}
@@ -187,7 +146,7 @@ export const EntityDeleteDialog: React.FC<EntityDeleteDialogProps> = observer(
             </Box>
           </DialogContent>
         </Dialog>
-      </div>
+      </Box>
     );
   }
 );

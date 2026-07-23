@@ -103,8 +103,8 @@ export const mapMenusManagerStore = ModelBase
             
             const item: MenuItem = {
               action: {...groupOrAction},
-              title: groupOrAction.titleTranslationId,
-              icon: groupOrAction.icon,
+              title: groupOrAction.title.translationId,
+              icon: groupOrAction.symbol.icon,
               templateId: groupOrAction.templateId,
               disabled: !store.servicesAvailabilityStore.isActionAvailable(groupOrAction.action)
             };

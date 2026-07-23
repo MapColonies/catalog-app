@@ -74,9 +74,9 @@ const MenuActionPresentor: React.FC<ActionPresentorBaseProps> = ({
               );
             })}
           </Menu>
-          <Tooltip content={intl.formatMessage({ id: action.titleTranslationId })}>
+          <Tooltip content={intl.formatMessage({ id: action.title.translationId })}>
             <IconButton
-              className={`exportAction ${action.disabled ? 'disabled' : ''} ${action.class}`}
+              className={`exportAction ${action.disabled ? 'disabled' : ''} ${action.symbol.class}`}
               id="exportMenuActionIcon"
               onClick={(): void => setIsActionMenuOpen((isMenuOpen) => !isMenuOpen)}
               disabled={action.disabled}
@@ -111,7 +111,9 @@ const ToggleActionPresentor: React.FC<ActionPresentorBaseProps> = ({
       checked={isChecked}
       onClick={(): void => dispatchAction({ action: action.action, data })}
       label={checkboxLabel}
-      className={`exportAction exportToggle ${action.disabled ? 'disabled' : ''} ${action.class}`}
+      className={`exportAction exportToggle ${action.disabled ? 'disabled' : ''} ${
+        action.symbol.class
+      }`}
       key={listKey}
       disabled={action.disabled}
     />
@@ -142,7 +144,7 @@ const ActionPresentor: React.FC<ActionPresentorBaseProps> = (props) => {
       default:
         presentor = (
           <IconButton
-            className={`exportAction ${action.disabled ? 'disabled' : ''} ${action.class}`}
+            className={`exportAction ${action.disabled ? 'disabled' : ''} ${action.symbol.class}`}
             key={listKey}
             label={action.action}
             disabled={action.disabled}
@@ -154,7 +156,9 @@ const ActionPresentor: React.FC<ActionPresentorBaseProps> = (props) => {
     }
 
     return (
-      <Tooltip content={intl.formatMessage({ id: action.titleTranslationId })}>{presentor}</Tooltip>
+      <Tooltip content={intl.formatMessage({ id: action.title.translationId })}>
+        {presentor}
+      </Tooltip>
     );
   }, [action]);
 

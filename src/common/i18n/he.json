@@ -179,6 +179,9 @@
   "delete.dialog.action": "מחיקת",
   "delete.dialog.checkbox": "אישור מחיקה",
 
+  "delete.approver-name": "שם מבצע",
+  "delete.approval-code": "קוד מחיקה",
+
   "snack.message.success": "הצלחה",
   "snack.message.failed": "כשלון",
   "snack.dismiss-btn.text": "אישור",
@@ -237,6 +240,8 @@
   "polygon-parts.map-preview-legend.LOW_RESOLUTION_PP_EXCEEDED": "חלקי תיחום חורגים",
   "polygon-parts.map-preview.zoom-before-fetch": "התקרב כדי לראות את חלקי התיחום",
   "polygon-parts.map-preview.no-feature-properties": "אין מאפיינים להצגה",
+  "polygon-parts.map-preview.base-map": "הצג מפת בסיס",
+  "polygon-parts.map-preview.without.base-map": "הסר מפת בסיס",
 
   "field.actions.edit-draft": "ערוך טיוטה",
   "field.actions.more": "פעולות נוספות",

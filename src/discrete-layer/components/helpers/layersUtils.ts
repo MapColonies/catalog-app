@@ -1,17 +1,13 @@
-import { Feature } from 'geojson';
 import { get, isEmpty } from 'lodash';
+import { Feature } from 'geojson';
 import bbox from '@turf/bbox';
-import area from '@turf/area';
 import bboxPolygon from '@turf/bbox-polygon';
 import booleanContains from '@turf/boolean-contains';
-import {
-  CesiumGeographicTilingScheme,
-  CesiumRectangle,
-  CesiumResource,
-  RCesiumWMTSLayerOptions,
-} from '@map-colonies/react-components';
-import CONFIG from '../../../common/config';
 import { LinkType } from '../../../common/models/link-type.enum';
+import { WMTSSourceOptions } from '../../../common/components/ol-layer/layer.config.options';
+import CONFIG from '../../../common/config';
+import { ResourceUrlModelType } from '../../models/ResourceUrlModel';
+import { ILayerImage } from '../../models/layerImage';
 import {
   CapabilityModelType,
   LayerMetadataMixedUnion,
@@ -20,11 +16,6 @@ import {
   StyleModelType,
   TileMatrixSetModelType,
 } from '../../models';
-import { ILayerImage } from '../../models/layerImage';
-import { ResourceUrlModelType } from '../../models/ResourceUrlModel';
-
-const DEFAULT_RECTANGLE_FACTOR = 0.2;
-const EARTH_AREA = 509000000; //whole EARTH surface, in square km
 
 export const isPolygonContainedInLayer = (
   polygon: Feature,
@@ -35,28 +26,14 @@ export const isPolygonContainedInLayer = (
   return booleanContains(layerFootprintBBoxPolygon, polygon);
 };
 
-export const generateLayerRectangle = (layer: LayerMetadataMixedUnion): CesiumRectangle => {
-  // eslint-disable-next-line
-  return CesiumRectangle.fromDegrees(...bbox(layer.footprint)) as CesiumRectangle;
-};
-
-export const applyFactor = (rect: CesiumRectangle, factor = DEFAULT_RECTANGLE_FACTOR) => {
-  rect.east = rect.east + rect.width * factor;
-  rect.west = rect.west - rect.width * factor;
-  rect.south = rect.south - rect.height * factor;
-  rect.north = rect.north + rect.height * factor;
-};
-
-export const generateFactoredLayerRectangle = (
-  layer: LayerMetadataMixedUnion,
-  factor = DEFAULT_RECTANGLE_FACTOR
-): CesiumRectangle => {
-  const rectWithBuffers = generateLayerRectangle(layer);
-  if (area({ type: 'Feature', properties: {}, geometry: layer.footprint }) / 1000000 > EARTH_AREA) {
-    factor = 0;
-  }
-  applyFactor(rectWithBuffers, factor);
-  return rectWithBuffers;
+export const getLinksArrWithTokens = (links: LinkModelType[]): LinkModelType[] => {
+  const linksWithTokens = links.map((link) => {
+    return {
+      ...link,
+      url: getLinkUrlWithToken([link]),
+    };
+  });
+  return linksWithTokens;
 };
 
 export const findLayerLink = (layer: ILayerImage): LinkModelType | undefined => {
@@ -113,49 +90,11 @@ export const getLinkUrlWithToken = (
   }
 };
 
-export const getLinksArrWithTokens = (links: LinkModelType[]): LinkModelType[] => {
-  const linksWithTokens = links.map((link) => {
-    return {
-      ...link,
-      url: getLinkUrlWithToken([link]),
-    };
-  });
-  return linksWithTokens;
-};
-
-export const getTokenResource = (url: string, ver?: string): CesiumResource => {
-  const tokenProps: Record<string, unknown> = { url };
-
-  // eslint-disable-next-line
-  const { INJECTION_TYPE, ATTRIBUTE_NAME, TOKEN_VALUE } = CONFIG.ACCESS_TOKEN as {
-    INJECTION_TYPE: string;
-    ATTRIBUTE_NAME: string;
-    TOKEN_VALUE: string;
-  };
-
-  if (INJECTION_TYPE && INJECTION_TYPE.toLowerCase() === 'header') {
-    tokenProps.headers = {
-      [ATTRIBUTE_NAME]: TOKEN_VALUE,
-    } as Record<string, unknown>;
-  } else if (INJECTION_TYPE && INJECTION_TYPE.toLowerCase() === 'queryparam') {
-    tokenProps.queryParameters = {
-      [ATTRIBUTE_NAME]: TOKEN_VALUE,
-    } as Record<string, unknown>;
-  }
-
-  tokenProps.queryParameters = {
-    ...(tokenProps.queryParameters as Record<string, unknown>),
-    // ...(typeof ver !== 'undefined' ? { ver } : {})
-  };
-
-  return new CesiumResource({ ...(tokenProps as unknown as CesiumResource) });
-};
-
-export const getWMTSOptions = (
+export const getWMTSConfigOptions = (
   layer: LayerRasterRecordModelType,
   url: string,
-  capability: CapabilityModelType | undefined
-): RCesiumWMTSLayerOptions => {
+  capability?: CapabilityModelType
+): WMTSSourceOptions => {
   let style = 'default';
   let format = 'image/jpeg';
   let { tileMatrixSetID, tileMatrixLabels } = {
@@ -207,13 +146,11 @@ export const getWMTSOptions = (
       )?.template ?? url;
   }
   return {
-    url: getTokenResource(url, layer.productVersion as string),
+    url,
     layer: `${layer.productId as string}-${layer.productVersion as string}`,
     style,
     format,
     tileMatrixSetID,
-    // tileMatrixLabels,
-    maximumLevel: Math.max(...tileMatrixLabels.map(Number)),
-    tilingScheme: new CesiumGeographicTilingScheme(),
+    tileMatrixLabels,
   };
 };

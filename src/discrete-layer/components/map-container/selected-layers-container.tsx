@@ -18,13 +18,12 @@ import { LinkType } from '../../../common/models/link-type.enum';
 import { ILayerImage } from '../../models/layerImage';
 import { useStore } from '../../models/RootStore';
 import { Layer3DRecordModelType, LayerRasterRecordModelType, LinkModelType } from '../../models';
+import { getLayerLink, getLinksArrWithTokens } from '../helpers/layersUtils';
 import {
-  getLayerLink,
   generateLayerRectangle,
   getTokenResource,
-  getWMTSOptions,
-  getLinksArrWithTokens,
-} from '../helpers/layersUtils';
+  getCesiumWMTSOptions,
+} from '../helpers/cesiumUtils';
 
 interface CacheMap {
   [key: string]: JSX.Element | undefined;
@@ -124,7 +123,7 @@ export const SelectedLayersContainer: React.FC = observer(() => {
           (item) => layerLink.name === item.id
         );
         const optionsWMTS = {
-          ...getWMTSOptions(
+          ...getCesiumWMTSOptions(
             layer as LayerRasterRecordModelType,
             layerLink.url as string,
             capability
