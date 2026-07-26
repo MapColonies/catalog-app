@@ -28,8 +28,10 @@ export const EntityDelete3DDialog: React.FC<EntityDeleteDialogProps> = observer(
   (props: EntityDeleteDialogProps) => {
     const store = useStore();
     const intl = useIntl();
-    const mutationQuery = useQuery();
     const [allowDeleting, setAllowDeleting] = useState(false);
+
+    type Delete3DLayerResult = Awaited<ReturnType<typeof store.mutateDelete3DLayer>>;
+    const mutationQuery = useQuery<Delete3DLayerResult>();
 
     const { dialogTitleParamTranslation, closeDialog, dispatchAction, warningMessage } =
       useDeleteLayer({
@@ -39,10 +41,7 @@ export const EntityDelete3DDialog: React.FC<EntityDeleteDialogProps> = observer(
       });
 
     useEffect(() => {
-      if (
-        !mutationQuery.loading &&
-        (mutationQuery.data as { deleteLayer: string } | undefined)?.deleteLayer === VALID
-      ) {
+      if (!mutationQuery.loading && mutationQuery.data?.delete3DLayer === VALID) {
         const payload = {
           action: UserAction.SYSTEM_CALLBACK_DELETE,
           data: {
