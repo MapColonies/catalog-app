@@ -11,6 +11,7 @@ import { polygon } from '@turf/helpers';
 import bboxPolygon from '@turf/bbox-polygon';
 import { GeoJSONFeature, useMap, VectorLayer, VectorSource } from '@map-colonies/react-components';
 import CONFIG from '../../../../common/config';
+import { getFirstPoint } from '../../../../common/utils/geo.tools';
 import { useStore } from '../../../models';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
 import { createTextStyle, FEATURE_LABEL_CONFIG, getStyleByFeatureType } from './pp-map.utils';
@@ -87,6 +88,22 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<
   }, []);
 
   const geoJsonFormat = useMemo(() => new GeoJSON(), []);
+
+  const existingPolygonPartsMarker = useMemo((): Feature | undefined => {
+    if (!outerPerimeter) {
+      return undefined;
+    }
+    return {
+      type: 'Feature',
+      properties: {
+        _featureType: FeatureType.EXISTING_PP_FOOTPRINT_MARKER,
+      },
+      geometry: {
+        type: 'Point',
+        coordinates: getFirstPoint(outerPerimeter),
+      },
+    };
+  }, [outerPerimeter]);
 
   const getCurrentExtent = (): BBox => {
     return mapOl.getView().calculateExtent(mapOl.getSize()) as BBox;
@@ -221,6 +238,14 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<
             />
           ) : null;
         })}
+        {existingPolygonPartsMarker && polygonParts.length > 0 && (
+          <GeoJSONFeature
+            key="pp-perimeter-marker"
+            geometry={existingPolygonPartsMarker}
+            fit={false}
+            featureStyle={getStyleByFeatureType(existingPolygonPartsMarker)}
+          />
+        )}
       </VectorSource>
     </VectorLayer>
   );

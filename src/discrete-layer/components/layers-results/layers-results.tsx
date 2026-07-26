@@ -28,11 +28,16 @@ import { Loading } from '../../../common/components/tree/statuses/loading';
 import CONFIG from '../../../common/config';
 import { getMax } from '../../../common/helpers/array';
 import { dateFormatter } from '../../../common/helpers/formatters';
-import { isPolygonPartsShown } from '../../../common/helpers/style';
+import { isPolygonPartsShown, isUnpublished } from '../../../common/helpers/style';
 import {
   getResponseErrorMesssage,
   getResponseErrorURL,
 } from '../../../common/helpers/server-error';
+import {
+  CRUDAction,
+  getActionsWithDisable,
+  IActionGroup,
+} from '../../../common/actions/entity.actions';
 // import { usePrevious } from '../../../common/hooks/previous.hook';
 import { LayerRasterRecordModelType } from '../../models';
 import { IDispatchAction } from '../../models/actionDispatcherStore';
@@ -123,7 +128,10 @@ export const LayersResults: React.FC<LayersResultsProps> = observer((props) => {
             .map((action) => {
               return {
                 ...action,
-                titleTranslationId: intl.formatMessage({ id: action.titleTranslationId }),
+                title: {
+                  ...action.title,
+                  translationId: intl.formatMessage({ id: action.title.translationId }),
+                },
               };
             }),
         };
@@ -259,10 +267,13 @@ export const LayersResults: React.FC<LayersResultsProps> = observer((props) => {
       headerName: '',
       width: 0,
       cellRenderer: 'actionsRenderer',
-      cellRendererParams: {
-        actions: entityPermittedActions,
+      cellRendererParams: (params: any) => ({
+        actions: getActionsWithDisable(
+          entityPermittedActions[params.data.__typename] as IActionGroup[],
+          [[CRUDAction.delete, !isUnpublished(params.data)]]
+        ),
         actionHandler: dispatchAction,
-      },
+      }),
     },
   ];
 

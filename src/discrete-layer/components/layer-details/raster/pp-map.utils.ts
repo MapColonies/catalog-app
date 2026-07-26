@@ -10,11 +10,12 @@ import { FeatureType } from './feature-type.enum';
 export const EXCEEDED_PROPERTY_NAME = 'res_exceed';
 export const EXCEEDED_PROPERTY_VALUE = 'true';
 
-export enum GeometryZIndex {
-  EXISTING_GEOMETRY_ZINDEX = 1,
-  LOW_RESOLUTION_GEOMETRY_ZINDEX = 2,
-  EXCEEDED_GEOMETRY_ZINDEX = 3,
-  SELECTED_GEOMETRY_ZINDEX = 4,
+export const START_RASTER_LAYER_ZINDEX = 10;
+export enum VectorLayerZIndex {
+  EXISTING = 20,
+  LOW_RESOLUTION = 30,
+  EXCEEDED = 40,
+  SELECTED = 50,
 }
 
 interface IStyleByProp {
@@ -83,6 +84,18 @@ export const PPMapStyles = new Map<FeatureType, IStyleByProp>([
         }),
         fill: new Fill({
           color: CONFIG.CONTEXT_MENUS.MAP.POLYGON_PARTS_FEATURE_CONFIG.color,
+        }),
+      }),
+    },
+  ],
+  [
+    FeatureType.EXISTING_PP_FOOTPRINT_MARKER,
+    {
+      style: new Style({
+        image: new Icon({
+          scale: 0.2,
+          anchor: [0.5, 1],
+          src: 'assets/img/map-marker.gif',
         }),
       }),
     },

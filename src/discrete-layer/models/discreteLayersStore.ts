@@ -145,6 +145,11 @@ export const discreteLayersStore = ModelBase
       });
     }
 
+    function getLayerCapability(layer: ILayerImage) {
+      const layerLink = getLayerLink(layer);
+      return self.capabilities?.find(item => layerLink.name === item.id);
+    }
+
     function getPreparedLayersImages(data: ILayerImage[], showFootprint = true): LayersImagesResponse {
       // self.layersImages = filterBySearchParams(data).map(item => ({...item, footprintShown: true, layerImageShown: false, order: null}));
 
@@ -651,6 +656,7 @@ export const discreteLayersStore = ModelBase
 
     return {
       getLayersImages,
+      getLayerCapability,
       getPreparedLayersImages,
       setLayersImages,
       setLayersImagesData,

@@ -71,11 +71,10 @@ export const isActionGroup = (
 const DEFAULT_MINIMUM_ITEMS_IN_MENU = 2;
 
 const defaultContextActionProps: IAction = {
-  action: '',
-  class: '',
+  action: '' as ContextActions,
+  symbol: {},
   frequent: false,
-  icon: '',
-  titleTranslationId: '',
+  title: { translationId: '' },
   views: [TabViews.CATALOG, TabViews.SEARCH_RESULTS],
 };
 
@@ -107,6 +106,7 @@ const CONTEXT_ACTIONS_CONFIG: IContextActions[] = [
             ...defaultContextActionProps,
             templateId: ContextActionsTemplates.WFS_QUERY_FEATURES,
             action: ContextActions.QUERY_WFS_FEATURE,
+            title: { translationId: '' },
           },
         ],
       },
@@ -121,7 +121,7 @@ const CONTEXT_ACTIONS_CONFIG: IContextActions[] = [
         actions: [
           {
             ...defaultContextActionProps,
-            titleTranslationId: 'map-context-menu.query-dem-height.title',
+            title: { translationId: 'map-context-menu.query-dem-height.title' },
             action: ContextActions.QUERY_DEM_HEIGHT,
           },
         ],
@@ -147,28 +147,28 @@ const CONTEXT_ACTIONS_CONFIG: IContextActions[] = [
             actions: [
               {
                 ...defaultContextActionProps,
-                titleTranslationId: 'map-context-menu.polygon-parts.title',
+                title: { translationId: 'map-context-menu.polygon-parts.title' },
                 action: ContextActions.QUERY_POLYGON_PARTS,
                 separator: 'AFTER',
               },
               {
                 ...defaultContextActionProps,
-                titleTranslationId: 'map-context-menu.layer-up.title',
+                title: { translationId: 'map-context-menu.layer-up.title' },
                 action: ContextActions.MOVE_LAYER_UP,
               },
               {
                 ...defaultContextActionProps,
-                titleTranslationId: 'map-context-menu.layer-down.title',
+                title: { translationId: 'map-context-menu.layer-down.title' },
                 action: ContextActions.MOVE_LAYER_DOWN,
               },
               {
                 ...defaultContextActionProps,
-                titleTranslationId: 'map-context-menu.layer-to-top.title',
+                title: { translationId: 'map-context-menu.layer-to-top.title' },
                 action: ContextActions.MOVE_LAYER_TO_TOP,
               },
               {
                 ...defaultContextActionProps,
-                titleTranslationId: 'map-context-menu.layer-to-bottom.title',
+                title: { translationId: 'map-context-menu.layer-to-bottom.title' },
                 action: ContextActions.MOVE_LAYER_TO_BOTTOM,
               },
             ],

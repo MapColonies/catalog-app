@@ -9,7 +9,7 @@ import CONTEXT_ACTIONS_CONFIG, { IContextActionGroup, IContextActions } from '..
 
 export interface IDispatchAction {
   action: string;
-  data: Record<string,unknown>;
+  data: Record<string, unknown>;
 };
 
 export type CombinedActionsType = (IEntityActions | IContextActions)[];
@@ -50,8 +50,8 @@ export const actionDispatcherStore = ModelBase
       const actions = self.actionsConfig?.find(entityActions => entityActions.entity === entity);
       return actions ?? undefined;
     };
-    
-    function dispatchAction(action:IDispatchAction | undefined): void {
+
+    function dispatchAction(action: IDispatchAction | undefined): void {
       self.action = cloneDeep(action);
     };
 

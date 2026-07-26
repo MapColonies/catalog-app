@@ -47,11 +47,12 @@ export const ActionsRenderer: React.FC<IActionsRendererParams> = ({
         return (
           <IconButton
             className={
-              action.class
-                ? `actionIcon actionDismissible ${action.class}`
+              action.symbol.class
+                ? `actionIcon actionDismissible ${action.symbol.class}`
                 : `actionIcon actionDismissible`
             }
-            icon={action.icon}
+            icon={action.symbol.icon}
+            disabled={action.disabled}
             key={`freqAct_${node.id as string}_${idx}`}
             onClick={(): void => {
               sendAction(entity, action, node);
@@ -72,21 +73,31 @@ export const ActionsRenderer: React.FC<IActionsRendererParams> = ({
               <Box
                 key={`menuAct_${node.id as string}_${idx}`}
                 onClick={(evt): void => {
+                  if (action.disabled) {
+                    evt.preventDefault();
+                    evt.stopPropagation();
+                    return;
+                  }
                   sendAction(entity, action, node);
                   setOpenActionsMenu(false);
                 }}
                 className="actionMenuItem"
               >
                 <IconButton
-                  className={
-                    action.class
-                      ? `actionIcon actionDismissible ${action.class}`
-                      : `actionIcon actionDismissible`
-                  }
-                  icon={action.icon}
+                  className={`actionIcon actionDismissible ${action.symbol.class || ''}`}
+                  disabled={action.disabled}
+                  icon={action.symbol.icon}
                 />
-                <Typography tag="div" className="actionMenuItemTitle actionDismissible">
-                  {action.titleTranslationId}
+                <Typography
+                  tag="div"
+                  disabled={action.disabled}
+                  className={`actionMenuItemTitle actionDismissible ${
+                    action.disabled ? 'disabled' : ''
+                  }
+                  ${action.title.class ?? ''}
+                  `}
+                >
+                  {action.title.translationId}
                 </Typography>
               </Box>
             );

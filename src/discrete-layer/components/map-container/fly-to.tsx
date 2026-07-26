@@ -6,7 +6,7 @@ import {
   useCesiumMap,
 } from '@map-colonies/react-components';
 import { LayerMetadataMixedUnion, RecordType } from '../../models';
-import { generateFactoredLayerRectangle, generateLayerRectangle } from '../helpers/layersUtils';
+import { generateFactoredLayerRectangle, generateLayerRectangle } from '../helpers/cesiumUtils';
 
 const IMMEDIATELY = 0;
 const TRANSPARENT = 0.0;

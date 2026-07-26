@@ -11,7 +11,7 @@ import { Feature } from 'geojson';
 import { observer } from 'mobx-react-lite';
 import React, { useEffect } from 'react';
 import { useStore } from '../../models';
-import { applyFactor } from '../helpers/layersUtils';
+import { applyFactor } from '../helpers/cesiumUtils';
 
 const DRAWING_MATERIAL_OPACITY = 0.5;
 const DRAWING_MATERIAL_COLOR = CesiumColor.CYAN.withAlpha(DRAWING_MATERIAL_OPACITY);

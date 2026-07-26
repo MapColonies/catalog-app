@@ -17,7 +17,7 @@ const FIRST = 0;
 const EMPTY_ACTION_GROUP = 0;
 
 interface IActionsRendererParams extends ICellRendererParams {
-  actions: Record<string, IActionGroup[]>;
+  actions: IActionGroup[];
   actionHandler: (action: Record<string, unknown>) => void;
 }
 
@@ -50,13 +50,10 @@ export const ActionsRenderer: React.FC<IActionsRendererParams> = (props) => {
     return filteredActionGroups;
   };
 
-  const actions = useMemo(
-    () => filterActionsByDependentFields(props.actions[entity]),
-    [props.actions[entity]]
-  );
+  const actions = useMemo(() => filterActionsByDependentFields(props.actions), [props.actions]);
   let frequentActions: IAction[] = [];
   let allFlatActions: IAction[] = [];
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+
   if (actions !== undefined) {
     actions.forEach((actionGroup) => {
       frequentActions = [
@@ -83,11 +80,12 @@ export const ActionsRenderer: React.FC<IActionsRendererParams> = (props) => {
         return (
           <IconButton
             className={
-              action.class
-                ? `actionIcon actionDismissible ${action.class}`
+              action.symbol.class
+                ? `actionIcon actionDismissible ${action.symbol.class}`
                 : `actionIcon actionDismissible`
             }
-            icon={action.icon}
+            icon={action.symbol.icon}
+            disabled={action.disabled}
             key={`freqAct_${action.action}_${idx}`}
             onClick={(): void => {
               sendAction(entity, action, props.data);
@@ -114,6 +112,11 @@ export const ActionsRenderer: React.FC<IActionsRendererParams> = (props) => {
                     <MenuItem
                       className="actionMenuItemContainer"
                       onClick={(evt): void => {
+                        if (action.disabled) {
+                          evt.preventDefault();
+                          evt.stopPropagation();
+                          return;
+                        }
                         sendAction(entity, action, props.data);
                         setOpenActionsMenu(false);
                       }}
@@ -121,15 +124,22 @@ export const ActionsRenderer: React.FC<IActionsRendererParams> = (props) => {
                     >
                       <Box className="actionMenuItem">
                         <IconButton
-                          className={
-                            action.class
-                              ? `actionIcon actionDismissible ${action.class}`
-                              : `actionIcon actionDismissible glow-missing-icon`
-                          }
-                          icon={action.icon}
+                          className={`actionIcon actionDismissible ${
+                            action.symbol.class || 'glow-missing-icon'
+                          }`}
+                          disabled={action.disabled}
+                          icon={action.symbol.icon}
                         />
-                        <Typography tag="div" className="actionMenuItemTitle actionDismissible">
-                          {action.titleTranslationId}
+                        <Typography
+                          tag="div"
+                          disabled={action.disabled}
+                          className={`actionMenuItemTitle actionDismissible ${
+                            action.disabled ? 'disabled' : ''
+                          }
+                          ${action.title.class ?? ''}
+                          `}
+                        >
+                          {action.title.translationId}
                         </Typography>
                       </Box>
                     </MenuItem>
