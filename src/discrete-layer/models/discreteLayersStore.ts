@@ -246,6 +246,10 @@ export const discreteLayersStore = ModelBase
       self.layersImages = [];
     }
 
+    function removeLayerById(id: string): void {
+      self.layersImages = self.layersImages?.filter((layer) => layer.id !== id);
+    }
+
     function showPolygonParts(id: string, isShow: boolean): void {
       self.layersImages = self.layersImages?.map(el => {return {...el, polygonPartsShown: (el.id === id && isShow)};});
       setIsActiveLayersImages();
@@ -662,6 +666,7 @@ export const discreteLayersStore = ModelBase
       setLayersImagesData,
       refreshLayersImages,
       clearLayersImages,
+      removeLayerById,
       showPolygonParts,
       showLayer,
       showFootprint,
