@@ -45,7 +45,6 @@ export const findLayerLink = (layer: ILayerImage): LinkModelType | undefined => 
   let wmtsLayer = layer.links?.find((link: LinkModelType) =>
     [LinkType.WMTS_LAYER as string].includes(link.protocol as string)
   ) as LinkModelType | undefined;
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (wmtsLayer === undefined) {
     wmtsLayer = layer.links?.find((link: LinkModelType) =>
       [LinkType.WMTS as string].includes(link.protocol as string)
