@@ -1,7 +1,8 @@
 import React, { useMemo } from 'react';
 import { ILayerImage } from '../../../../discrete-layer/models/layerImage';
 import { LayerRasterRecordModelType } from '../../../../discrete-layer/models';
-import { getIconStyle, hasWFSLink } from '../../../helpers/style';
+import { hasWFSLink } from '../../../../discrete-layer/components/helpers/layersUtils';
+import { getIconStyle } from '../../../helpers/style';
 import { TypeIcon } from '../../shared/type-icon';
 
 interface IProductTypeCellRendererParams {

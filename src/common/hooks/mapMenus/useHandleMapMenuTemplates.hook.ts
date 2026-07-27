@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import _, { get } from 'lodash';
 import { IContextMenuData } from '@map-colonies/react-components';
+import { hasWFSLink } from '../../../discrete-layer/components/helpers/layersUtils';
 import {
   DynamicMenuData,
   IMapMenuProperties,
@@ -20,7 +21,6 @@ import {
   ContextActionsTemplates,
 } from '../../actions/context.actions';
 import CONFIG from '../../config';
-import { hasWFSLink } from '../../helpers/style';
 
 export const useHandleMapMenuTemplates = (
   menuProperties?: IMapMenuProperties,

@@ -22,6 +22,14 @@ export const isWMTSProtocol = (linkType?: string): boolean =>
 
 export const isXYZProtocol = (linkType?: string): boolean => linkType === LinkType.XYZ_LAYER;
 
+export const hasWFSLink = (data: Record<string, unknown>): boolean => {
+  return (
+    (data.links as Array<Record<string, unknown>> | undefined)?.some(
+      (link) => link.protocol === LinkType.WFS
+    ) ?? false
+  );
+};
+
 export const isPolygonContainedInLayer = (
   polygon: Feature,
   layer: LayerMetadataMixedUnion

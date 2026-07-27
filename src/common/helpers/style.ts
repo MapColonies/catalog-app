@@ -1,8 +1,8 @@
 import { get } from 'lodash';
+import { hasWFSLink } from '../../discrete-layer/components/helpers/layersUtils';
 import { DEFAULT_ID } from '../../discrete-layer/components/layer-details/utils';
 import { LayerMetadataMixedUnion, RecordStatus } from '../../discrete-layer/models';
 import CONFIG from '../config';
-import { LinkType } from '../models/link-type.enum';
 import { isValidLayerMetadata } from './layer-url';
 
 const STATUS = 'productStatus';
@@ -27,14 +27,6 @@ export const isUnpublished = (data: Record<string, unknown>): boolean => {
 
 export const isPolygonPartsShown = (data: Record<string, unknown>): boolean => {
   return get(data, POLYGON_PARTS_SHOWN) === true;
-};
-
-export const hasWFSLink = (data: Record<string, unknown>): boolean => {
-  return (
-    (data.links as Array<Record<string, unknown>> | undefined)?.some(
-      (link) => link.protocol === LinkType.WFS
-    ) ?? false
-  );
 };
 
 export const isUnpublishedValue = (value: string): boolean => {
