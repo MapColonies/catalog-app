@@ -8,56 +8,40 @@ import { Box } from '@map-colonies/react-components';
 import { GraphQLError } from '../../../../common/components/error/graphql.error-presentor';
 import { Mode } from '../../../../common/models/mode.enum';
 import { getTextStyle } from '../../../../common/helpers/style';
-import { UserAction } from '../../../models/userStore';
 import {
   EntityDescriptorModelType,
-  RecordStatus,
   RecordType,
+  RootStoreType,
   useQuery,
   useStore,
 } from '../../../models';
 import { GeoJsonMapValuePresentorComponent } from '../field-value-presentors/geojson-map.value-presentor';
 import { LayersDetailsComponent } from '../layer-details';
 import { DialogActionTitle } from '../dialog.helpers';
-import { useDeleteLayer, VALID } from '../delete.hook';
+import { useDeleteLayer } from '../delete.hook';
 import { EntityDeleteDialogProps } from '../entity.delete';
 
 import './entity.3d.delete-dialog.css';
+
+type Delete3DLayerResult = Awaited<ReturnType<RootStoreType['mutateDelete3DLayer']>>; // should be generated in RootStore.base (MAPCO-11216)
 
 export const EntityDelete3DDialog: React.FC<EntityDeleteDialogProps> = observer(
   (props: EntityDeleteDialogProps) => {
     const store = useStore();
     const intl = useIntl();
+    const mutationQuery = useQuery<Delete3DLayerResult>();
     const [allowDeleting, setAllowDeleting] = useState(false);
 
-    type Delete3DLayerResult = Awaited<ReturnType<typeof store.mutateDelete3DLayer>>;
-    const mutationQuery = useQuery<Delete3DLayerResult>();
-
-    const { dialogTitleParamTranslation, closeDialog, dispatchAction, warningMessage } =
-      useDeleteLayer({
-        onSetOpen: props.onSetOpen,
-        layerRecord: props.layerRecord,
-        recordType: RecordType.RECORD_3D,
-      });
-
-    useEffect(() => {
-      if (!mutationQuery.loading && mutationQuery.data?.delete3DLayer === VALID) {
-        const payload = {
-          action: UserAction.SYSTEM_CALLBACK_DELETE,
-          data: {
-            ...props.layerRecord,
-            productStatus: RecordStatus.BEING_DELETED,
-          },
-        };
-
-        dispatchAction(payload);
-      }
-    }, [mutationQuery.data]);
+    const { dialogTitleParamTranslation, closeDialog, warningMessage } = useDeleteLayer({
+      onSetOpen: props.onSetOpen,
+      layerRecord: props.layerRecord,
+      recordType: RecordType.RECORD_3D,
+    });
 
     useEffect(() => {
       if (mutationQuery.data && !mutationQuery.error) {
-        props.onSetOpen(false);
         props.onSuccess?.();
+        props.onSetOpen(false);
       }
     }, [mutationQuery.data]);
 

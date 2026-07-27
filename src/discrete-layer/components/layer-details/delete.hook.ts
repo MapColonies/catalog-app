@@ -5,8 +5,6 @@ import { ILayerImage } from '../../models/layerImage';
 import { IDispatchAction } from '../../models/actionDispatcherStore';
 import { RecordType, useStore } from '../../models';
 
-export const VALID = 'ok';
-
 interface DeleteLayerDialogOptions {
   onSetOpen: (open: boolean) => void;
   layerRecord: ILayerImage;

@@ -19,6 +19,7 @@ import {
   EntityDescriptorModelType,
   FieldConfigModelType,
   RecordType,
+  RootStoreType,
   useQuery,
   useStore,
 } from '../../../models';
@@ -34,11 +35,13 @@ import './entity.raster.delete-dialog.css';
 
 const NONE = 0;
 
+type DeleteRasterLayerResult = Awaited<ReturnType<RootStoreType['mutateDeleteRasterLayer']>>; // should be generated in RootStore.base (MAPCO-11216)
+
 export const EntityDeleteRasterDialog: React.FC<EntityDeleteDialogProps> = observer(
   (props: EntityDeleteDialogProps) => {
     const store = useStore();
     const intl = useIntl();
-    const mutationQuery = useQuery();
+    const mutationQuery = useQuery<DeleteRasterLayerResult>();
 
     const formikRef = useRef<FormikProps<any>>() as any;
     const [initialDeleteValues] = useState<any>({ approvalCode: '', approverName: '' });
@@ -81,8 +84,8 @@ export const EntityDeleteRasterDialog: React.FC<EntityDeleteDialogProps> = obser
 
     useEffect(() => {
       if (mutationQuery.data && !mutationQuery.error) {
-        props.onSetOpen(false);
         props.onSuccess?.();
+        props.onSetOpen(false);
       }
       if (mutationQuery.error) {
         setMutationError(mutationQuery.error);
