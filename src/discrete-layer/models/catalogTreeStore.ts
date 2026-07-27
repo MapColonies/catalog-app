@@ -616,15 +616,15 @@ export const catalogTreeStore = ModelBase.props({
 
     function removeEmptyAncestorsGroups(
       treeData: TreeItem[],
-      path: (string | number)[]
+      parentPath: (string | number)[]
     ): void {
       let currentTree = treeData;
       const ROOT_PATH_DEPTH = 1;
 
-      while (path.length > ROOT_PATH_DEPTH) {
+      while (parentPath.length > ROOT_PATH_DEPTH) {
         const parentNode = getNodeAtPath({
           treeData: currentTree,
-          path,
+          path: parentPath,
           getNodeKey: keyFromTreeIndex,
         }) as NodeData | null;
 
@@ -634,11 +634,11 @@ export const catalogTreeStore = ModelBase.props({
 
         currentTree = removeNodeAtPath({
           treeData: currentTree,
-          path,
+          path: parentPath,
           getNodeKey: keyFromTreeIndex,
         });
 
-        path = path.slice(0, -1);
+        parentPath = parentPath.slice(0, -1);
       }
 
       setCatalogTreeData(currentTree);
