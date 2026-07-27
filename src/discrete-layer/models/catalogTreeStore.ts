@@ -614,19 +614,63 @@ export const catalogTreeStore = ModelBase.props({
       }
     }
 
+    function removeEmptyAncestorsGroups(
+      treeData: TreeItem[],
+      parentPath: (string | number)[]
+    ): void {
+      let currentTree = treeData;
+      const ROOT_PATH_DEPTH = 1;
+
+      while (parentPath.length > ROOT_PATH_DEPTH) {
+        const parentNode = getNodeAtPath({
+          treeData: currentTree,
+          path: parentPath,
+          getNodeKey: keyFromTreeIndex,
+        }) as NodeData | null;
+
+        if (!parentNode?.node?.isGroup || (parentNode.node.children as TreeItem[])?.length) {
+          break;
+        }
+
+        currentTree = removeNodeAtPath({
+          treeData: currentTree,
+          path: parentPath,
+          getNodeKey: keyFromTreeIndex,
+        });
+
+        parentPath = parentPath.slice(0, -1);
+      }
+
+      setCatalogTreeData(currentTree);
+    }
+
     /**
      * 
      * @param path Node path to remove
-     * @returns void - remove the node from tree in store
+     * @returns void - remove the node from tree in store, and recursively removes
+     *   any ancestor group that becomes empty as a result
      */
     function removeNodeFromTree(path: (string | number)[]): void {
       const newTree = removeNodeAtPath({
         treeData: self.catalogTreeData as TreeItem[],
         getNodeKey: keyFromTreeIndex,
-        path
+        path,
       });
 
-      self.catalogTreeData = newTree;
+      const parentPath = path.slice(0, -1);
+      removeEmptyAncestorsGroups(newTree, parentPath);
+    }
+
+    /**
+     * Removes all tree nodes whose id matches the given id.
+     * Empty ancestor groups are cleaned up after each removal.
+     */
+    function removeNodesById(id: string): void {
+      let node = findNodeById(id);
+      while (node) {
+        removeNodeFromTree(node.path);
+        node = findNodeById(id);
+      }
     }
 
     /**
@@ -644,7 +688,7 @@ export const catalogTreeStore = ModelBase.props({
         newNode: parentNode.node
       });
 
-      setCatalogTreeData(newTreeWithoutChild);
+      removeEmptyAncestorsGroups(newTreeWithoutChild, parentNode.path);
     }
 
     return {
@@ -662,6 +706,7 @@ export const catalogTreeStore = ModelBase.props({
       updateNodeById,
       updateFieldNodeById,
       removeNodeFromTree,
+      removeNodesById,
       removeChildFromParent,
     };
   });

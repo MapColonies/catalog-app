@@ -76,7 +76,13 @@ import { PolygonSelectionUi } from '../components/map-container/polygon-selectio
 import { SelectedLayersContainer } from '../components/map-container/selected-layers-container';
 import { Terrain } from '../components/map-container/terrain';
 import { SystemCoreInfoDialog } from '../components/system-status/system-core-info/system-core-info.dialog';
-import { JobModelType, LayerMetadataMixedUnion, LinkModelType, RecordType } from '../models';
+import {
+  JobModelType,
+  LayerMetadataMixedUnion,
+  LinkModelType,
+  RecordStatus,
+  RecordType,
+} from '../models';
 import { IDispatchAction } from '../models/actionDispatcherStore';
 import { ILayerImage } from '../models/layerImage';
 import { ProductType } from '../models/ProductTypeEnum';
@@ -1495,6 +1501,17 @@ const DiscreteLayerView: React.FC = observer(() => {
                 setIsEntityDelete3DDialogOpen(open);
                 onCloseDialog();
               }}
+              onSuccess={() => {
+                const payload = {
+                  action: UserAction.SYSTEM_CALLBACK_3D_DELETE,
+                  data: {
+                    ...store.discreteLayersStore.selectedLayer,
+                    productStatus: RecordStatus.BEING_DELETED,
+                  },
+                };
+
+                dispatchAction(payload);
+              }}
               layerRecord={store.discreteLayersStore.selectedLayer}
             />
           )}
@@ -1508,7 +1525,14 @@ const DiscreteLayerView: React.FC = observer(() => {
                 onCloseDialog();
               }}
               onSuccess={() => {
-                setCatalogRefresh(catalogRefresh + 1);
+                const payload = {
+                  action: UserAction.SYSTEM_CALLBACK_RASTER_DELETE,
+                  data: {
+                    ...store.discreteLayersStore.selectedLayer,
+                  },
+                };
+
+                dispatchAction(payload);
               }}
               layerRecord={store.discreteLayersStore.selectedLayer}
             />

@@ -64,7 +64,8 @@ export enum UserAction {
 
   SYSTEM_CALLBACK_EDIT = 'system_callback.editEntity',
   SYSTEM_CALLBACK_PUBLISH = 'system_callback.publish',
-  SYSTEM_CALLBACK_DELETE = 'system_callback.delete',
+  SYSTEM_CALLBACK_3D_DELETE = 'system_callback.3d_delete',
+  SYSTEM_CALLBACK_RASTER_DELETE = 'system_callback.raster_delete',
   SYSTEM_CALLBACK_FLYTO = 'system_callback.flyToEntity',
   SYSTEM_CALLBACK_SHOWFOOTPRINT = 'system_callback.showFootprint',
   SYSTEM_CALLBACK_SHOWLAYERIMAGE = 'system_callback.showLayerImage',
