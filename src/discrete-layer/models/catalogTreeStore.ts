@@ -663,7 +663,6 @@ export const catalogTreeStore = ModelBase.props({
 
     /**
      * Removes all tree nodes whose id matches the given id.
-     * Re-finds after each removal to avoid stale paths caused by index shifts.
      * Empty ancestor groups are cleaned up after each removal.
      */
     function removeNodesById(id: string): void {
