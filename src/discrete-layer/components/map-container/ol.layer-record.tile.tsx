@@ -6,14 +6,19 @@ import {
   XYZOptions,
 } from '../../../common/components/ol-layer/layer.config.options';
 import { OlTileLayer } from '../../../common/components/ol-layer/ol.tile-layer';
-import { isWMTSProtocol, isXYZProtocol } from '../../../common/components/ol-layer/ol.helpers';
 import {
   CapabilityModelType,
   LayerMetadataMixedUnion,
   LayerRasterRecordModelType,
   LinkModelType,
 } from '../../models';
-import { getLayerLink, getLinkUrlWithToken, getWMTSConfigOptions } from '../helpers/layersUtils';
+import {
+  getLayerLink,
+  getLinkUrlWithToken,
+  getWMTSConfigOptions,
+  isWMTSProtocol,
+  isXYZProtocol,
+} from '../helpers/layersUtils';
 import { getOLSourceOptions } from '../helpers/olUtils';
 
 interface OlLayerRecordTileProps {

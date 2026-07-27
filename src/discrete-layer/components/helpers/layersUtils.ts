@@ -17,6 +17,11 @@ import {
   TileMatrixSetModelType,
 } from '../../models';
 
+export const isWMTSProtocol = (linkType?: string): boolean =>
+  linkType === LinkType.WMTS_LAYER || linkType === LinkType.WMTS;
+
+export const isXYZProtocol = (linkType?: string): boolean => linkType === LinkType.XYZ_LAYER;
+
 export const isPolygonContainedInLayer = (
   polygon: Feature,
   layer: LayerMetadataMixedUnion

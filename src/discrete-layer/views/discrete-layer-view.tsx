@@ -931,10 +931,10 @@ const DiscreteLayerView: React.FC = observer(() => {
 
   const mapLegendsExtractor = useCallback(
     (layers: (ILayerImage & { meta: unknown })[]): IMapLegend[] => {
-      const legendDocProtocol = LinkType.LEGEND_DOC;
-      const legendImgProtocol = LinkType.LEGEND_IMG;
-      const legendObjProtocol = LinkType.LEGEND;
-      const legendsProtocols = [legendDocProtocol, legendImgProtocol, legendObjProtocol];
+      const LEGEND_PDF_PROTOCOL = LinkType.LEGEND_DOC;
+      const LEGEND_IMG_PROTOCOL = LinkType.LEGEND_IMG;
+      const LEGEND_OBJ_PROTOCOL = LinkType.LEGEND;
+      const legendsProtocols = [LEGEND_PDF_PROTOCOL, LEGEND_IMG_PROTOCOL, LEGEND_OBJ_PROTOCOL];
 
       return layers.reduce((legendsList, cesiumLayer): IMapLegend[] => {
         if (typeof get(cesiumLayer.meta, 'layerRecord.links') !== 'undefined') {
