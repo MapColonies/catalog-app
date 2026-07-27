@@ -666,7 +666,7 @@ export const catalogTreeStore = ModelBase.props({
      * Re-finds after each removal to avoid stale paths caused by index shifts.
      * Empty ancestor groups are cleaned up after each removal.
      */
-    function removeAllNodesByLayerId(id: string): void {
+    function removeAllNodes(id: string): void {
       let node = findNodeById(id);
       while (node) {
         removeNodeFromTree(node.path);
@@ -707,7 +707,7 @@ export const catalogTreeStore = ModelBase.props({
       updateNodeById,
       updateFieldNodeById,
       removeNodeFromTree,
-      removeAllNodesByLayerId,
+      removeAllNodes,
       removeChildFromParent,
     };
   });

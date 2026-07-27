@@ -519,7 +519,7 @@ export const ActionResolver: React.FC<ActionResolverProps> = observer((props) =>
         }
         case UserAction.SYSTEM_CALLBACK_RASTER_DELETE: {
           const selectedLayer = data as unknown as ILayerImage;
-          store.catalogTreeStore.removeAllNodesByLayerId(selectedLayer.id);
+          store.catalogTreeStore.removeAllNodes(selectedLayer.id);
           break;
         }
         case UserAction.SYSTEM_CALLBACK_FLYTO: {
