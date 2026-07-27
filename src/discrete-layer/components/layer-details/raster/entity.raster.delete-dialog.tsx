@@ -35,7 +35,7 @@ import './entity.raster.delete-dialog.css';
 
 const NONE = 0;
 
-type DeleteRasterLayerResult = Awaited<ReturnType<RootStoreType['mutateDeleteRasterLayer']>>; // should be generated in RootStore.base (MAPCO-11216)
+type DeleteRasterLayerResult = Awaited<ReturnType<RootStoreType['mutateDeleteRasterLayer']>>; // see (MAPCO-11216)
 
 export const EntityDeleteRasterDialog: React.FC<EntityDeleteDialogProps> = observer(
   (props: EntityDeleteDialogProps) => {

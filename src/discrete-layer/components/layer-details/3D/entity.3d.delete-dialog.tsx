@@ -23,7 +23,7 @@ import { EntityDeleteDialogProps } from '../entity.delete';
 
 import './entity.3d.delete-dialog.css';
 
-type Delete3DLayerResult = Awaited<ReturnType<RootStoreType['mutateDelete3DLayer']>>; // should be generated in RootStore.base (MAPCO-11216)
+type Delete3DLayerResult = Awaited<ReturnType<RootStoreType['mutateDelete3DLayer']>>; // see (MAPCO-11216)
 
 export const EntityDelete3DDialog: React.FC<EntityDeleteDialogProps> = observer(
   (props: EntityDeleteDialogProps) => {
