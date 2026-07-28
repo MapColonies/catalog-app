@@ -16,7 +16,7 @@ export const ProductTypeRenderer: React.FC<IProductTypeCellRendererParams> = ({
   thumbnailUrl,
   onClick,
 }) => {
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleClick = () => {
     const rasterData = data as LayerRasterRecordModelType;
 
     if (onClick && hasWFSLink(rasterData as unknown as Record<string, unknown>)) {
@@ -30,17 +30,12 @@ export const ProductTypeRenderer: React.FC<IProductTypeCellRendererParams> = ({
     };
   }, [data]);
 
-  const disabled = useMemo(
-    () => isPolygonPartsDisabled(data as unknown as Record<string, unknown>),
-    [data]
-  );
-
   return (
     <TypeIcon
       typeName={data.productType as string}
       thumbnailUrl={thumbnailUrl}
       style={computedStyle}
-      disabled={disabled}
+      disabled={isPolygonPartsDisabled(data as unknown as Record<string, unknown>)}
       onClick={data.__typename === 'LayerRasterRecord' ? handleClick : undefined}
     />
   );
