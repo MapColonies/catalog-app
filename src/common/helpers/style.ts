@@ -29,6 +29,10 @@ export const isPolygonPartsShown = (data: Record<string, unknown>): boolean => {
   return get(data, POLYGON_PARTS_SHOWN) === true;
 };
 
+export const isPolygonPartsDisabled = (data: Record<string, unknown>): boolean => {
+  return existPolygonParts(data) && !hasWFSLink(data);
+};
+
 export const isUnpublishedValue = (value: string): boolean => {
   return value === RecordStatus.UNPUBLISHED;
 };
@@ -57,20 +61,8 @@ export const getIconStyle = (
   if (existStatus(data) && isUnpublished(data)) {
     resStyle = { [colorProperty]: UNPUBLISHED_COLOR };
   }
-  if (existPolygonParts(data) && isPolygonPartsShown(data)) {
-    if (hasWFSLink(data)) {
-      resStyle = { [colorProperty]: POLYGON_PARTS_SHOWN_COLOR };
-    } else {
-      resStyle = { opacity: 0.5 };
-    }
-  }
-  if (existPolygonParts(data) && !isPolygonPartsShown(data)) {
-    if (!hasWFSLink(data)) {
-      resStyle = {
-        ...resStyle,
-        opacity: 0.5,
-      };
-    }
+  if (existPolygonParts(data) && isPolygonPartsShown(data) && hasWFSLink(data)) {
+    resStyle = { [colorProperty]: POLYGON_PARTS_SHOWN_COLOR };
   }
   return resStyle;
 };

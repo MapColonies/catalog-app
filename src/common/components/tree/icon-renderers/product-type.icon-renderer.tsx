@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { ILayerImage } from '../../../../discrete-layer/models/layerImage';
 import { LayerRasterRecordModelType } from '../../../../discrete-layer/models';
 import { hasWFSLink } from '../../../../discrete-layer/components/helpers/layersUtils';
-import { getIconStyle } from '../../../helpers/style';
+import { getIconStyle, isPolygonPartsDisabled } from '../../../helpers/style';
 import { TypeIcon } from '../../shared/type-icon';
 
 interface IProductTypeCellRendererParams {
@@ -30,11 +30,17 @@ export const ProductTypeRenderer: React.FC<IProductTypeCellRendererParams> = ({
     };
   }, [data]);
 
+  const disabled = useMemo(
+    () => isPolygonPartsDisabled(data as unknown as Record<string, unknown>),
+    [data]
+  );
+
   return (
     <TypeIcon
       typeName={data.productType as string}
       thumbnailUrl={thumbnailUrl}
       style={computedStyle}
+      disabled={disabled}
       onClick={data.__typename === 'LayerRasterRecord' ? handleClick : undefined}
     />
   );
