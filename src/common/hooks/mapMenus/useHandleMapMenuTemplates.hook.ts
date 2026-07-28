@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
-import _, { get } from 'lodash';
+import _ from 'lodash';
 import { IContextMenuData } from '@map-colonies/react-components';
-import { hasWFSLink } from '../../../discrete-layer/components/helpers/layersUtils';
 import {
   DynamicMenuData,
   IMapMenuProperties,
@@ -20,6 +19,7 @@ import {
   ContextActionsGroupTemplates,
   ContextActionsTemplates,
 } from '../../actions/context.actions';
+import { getContextActionDisabledResolver } from '../../actions/context-actions-disabled-resolvers';
 import CONFIG from '../../config';
 
 export const useHandleMapMenuTemplates = (
@@ -117,24 +117,19 @@ export const useHandleMapMenuTemplates = (
             },
           };
 
-          const layerHasWFSLink = hasWFSLink(
-            get(activeLayer, 'meta.layerRecord') as Record<string, unknown>
-          );
-
           const generatedGroup: MenuItemsGroup = {
             ...groupTemplateMenuItem,
             groupProps: groupProp,
             title: groupProp.titleTranslationId,
             items: groupTemplateMenuItem.items.map((item) => {
               if (!isMenuItemGroup(item)) {
-                const itemDisabled =
-                  item.action.action === ContextActions.QUERY_POLYGON_PARTS
-                    ? !layerHasWFSLink
-                    : item.disabled;
+                const payloadData = activeLayer.meta as Record<string, unknown>;
+                const disabledResolver = getContextActionDisabledResolver(item.action.action);
+                const actionDisabled = disabledResolver?.({ payloadData });
                 return {
                   ...item,
-                  disabled: itemDisabled,
-                  payloadData: activeLayer.meta as Record<string, unknown>,
+                  disabled: Boolean(item.disabled || actionDisabled),
+                  payloadData,
                 };
               }
 
