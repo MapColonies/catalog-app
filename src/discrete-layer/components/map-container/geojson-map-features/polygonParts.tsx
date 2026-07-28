@@ -295,7 +295,7 @@ export const PolygonParts: React.FC = observer(() => {
   // const buildWFSUrl = (layer: ILayerImage) => {
   //   const token = CONFIG.ACCESS_TOKEN.TOKEN_VALUE;
   //   if (layer) {
-  //     const url = layer.links?.find((link) => link.protocol === 'WFS')?.url?.split(/[?#]/)[0];
+  //     const url = layer.links?.find((link) => link.protocol === LinkType.WFS)?.url?.split(/[?#]/)[0];
   //     if (!url) {
   //       console.log(
   //         `[<PolygonParts>][buildWFSUrl] Layer ${layer.productName} does not have a WFS link`

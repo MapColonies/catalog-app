@@ -42,6 +42,12 @@ export interface IContextAction extends IAction {
   separator?: SeparatorPosition;
 }
 
+export interface ActionDisabledContext {
+  payloadData?: Record<string, unknown>;
+}
+
+export type ActionDisabledResolver = (context: ActionDisabledContext) => boolean;
+
 export interface IContextActionGroup extends Omit<IActionGroup, 'group'> {
   order: number;
   actionsSpreadPreference: ActionSpreadPreference;

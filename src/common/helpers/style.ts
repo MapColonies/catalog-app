@@ -1,4 +1,5 @@
 import { get } from 'lodash';
+import { hasWFSLink } from '../../discrete-layer/components/helpers/layersUtils';
 import { DEFAULT_ID } from '../../discrete-layer/components/layer-details/utils';
 import { LayerMetadataMixedUnion, RecordStatus } from '../../discrete-layer/models';
 import CONFIG from '../config';
@@ -26,6 +27,10 @@ export const isUnpublished = (data: Record<string, unknown>): boolean => {
 
 export const isPolygonPartsShown = (data: Record<string, unknown>): boolean => {
   return get(data, POLYGON_PARTS_SHOWN) === true;
+};
+
+export const isPolygonPartsDisabled = (data: Record<string, unknown>): boolean => {
+  return existPolygonParts(data) && !hasWFSLink(data);
 };
 
 export const isUnpublishedValue = (value: string): boolean => {
@@ -56,26 +61,8 @@ export const getIconStyle = (
   if (existStatus(data) && isUnpublished(data)) {
     resStyle = { [colorProperty]: UNPUBLISHED_COLOR };
   }
-  if (existPolygonParts(data) && isPolygonPartsShown(data)) {
-    const hasWFSLink = (data.links as Array<Record<string, unknown>>)?.some(
-      (link) => link.protocol === 'WFS'
-    );
-    if (hasWFSLink) {
-      resStyle = { [colorProperty]: POLYGON_PARTS_SHOWN_COLOR };
-    } else {
-      resStyle = { opacity: 0.5 };
-    }
-  }
-  if (existPolygonParts(data) && !isPolygonPartsShown(data)) {
-    const hasWFSLink = (data.links as Array<Record<string, unknown>>)?.some(
-      (link) => link.protocol === 'WFS'
-    );
-    if (!hasWFSLink) {
-      resStyle = {
-        ...resStyle,
-        opacity: 0.5,
-      };
-    }
+  if (existPolygonParts(data) && isPolygonPartsShown(data) && hasWFSLink(data)) {
+    resStyle = { [colorProperty]: POLYGON_PARTS_SHOWN_COLOR };
   }
   return resStyle;
 };

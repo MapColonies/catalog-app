@@ -1,0 +1,14 @@
+.typeIconWrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.typeIconDisabledIndicator {
+  position: absolute;
+  top: -4px;
+  right: 0;
+  width: 14px;
+  height: 14px;
+  pointer-events: none;
+  background: transparent;
+}

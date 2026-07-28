@@ -1,9 +1,11 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import React, { useContext } from 'react';
 import { useIntl } from 'react-intl';
-import { IconButton, Tooltip } from '@map-colonies/react-core';
+import { IconButton, Tooltip, Typography } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
+import { NoEntryIcon } from '../../../icons/4font/NoEntry';
 import EnumsMapContext, { DEFAULT_ENUM_DESCRIPTOR } from '../../contexts/enumsMap.context';
+
+import './type-icon.css';
 
 const SIZE = 128;
 
@@ -12,6 +14,7 @@ interface ITypeIconProps {
   thumbnailUrl?: string;
   style?: Record<string, unknown>;
   className?: string;
+  disabled?: boolean;
   onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
@@ -20,6 +23,7 @@ export const TypeIcon: React.FC<ITypeIconProps> = ({
   thumbnailUrl,
   style,
   className,
+  disabled,
   onClick,
 }) => {
   const intl = useIntl();
@@ -34,11 +38,19 @@ export const TypeIcon: React.FC<ITypeIconProps> = ({
   return (
     <Box style={style}>
       <Tooltip content={thumbnailUrl !== undefined ? img(thumbnailUrl) : tooltip}>
-        <IconButton
-          className={`${icon} ${className ?? ''}`}
-          style={'color' in (style ?? {}) ? { color: style?.color as string } : undefined}
-          onClick={onClick}
-        />
+        <Typography tag="span" className="typeIconWrapper">
+          <IconButton
+            className={`${icon} ${className ?? ''}`}
+            style={'color' in (style ?? {}) ? { color: style?.color as string } : undefined}
+            disabled={disabled}
+            onClick={onClick}
+          />
+          {disabled === true && (
+            <Typography tag="span" className="typeIconDisabledIndicator" aria-hidden="true">
+              <NoEntryIcon />
+            </Typography>
+          )}
+        </Typography>
       </Tooltip>
     </Box>
   );

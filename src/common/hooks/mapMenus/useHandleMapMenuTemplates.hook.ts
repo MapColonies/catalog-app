@@ -19,6 +19,7 @@ import {
   ContextActionsGroupTemplates,
   ContextActionsTemplates,
 } from '../../actions/context.actions';
+import { getContextActionDisabledResolver } from '../../actions/context-actions-disabled-resolvers';
 import CONFIG from '../../config';
 
 export const useHandleMapMenuTemplates = (
@@ -122,7 +123,14 @@ export const useHandleMapMenuTemplates = (
             title: groupProp.titleTranslationId,
             items: groupTemplateMenuItem.items.map((item) => {
               if (!isMenuItemGroup(item)) {
-                return { ...item, payloadData: activeLayer.meta as Record<string, unknown> };
+                const payloadData = activeLayer.meta as Record<string, unknown>;
+                const disabledResolver = getContextActionDisabledResolver(item.action.action);
+                const actionDisabled = disabledResolver?.({ payloadData });
+                return {
+                  ...item,
+                  disabled: Boolean(item.disabled || actionDisabled),
+                  payloadData,
+                };
               }
 
               return item;

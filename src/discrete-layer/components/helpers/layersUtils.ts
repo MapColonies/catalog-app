@@ -17,6 +17,19 @@ import {
   TileMatrixSetModelType,
 } from '../../models';
 
+export const isWMTSProtocol = (linkType?: string): boolean =>
+  linkType === LinkType.WMTS_LAYER || linkType === LinkType.WMTS;
+
+export const isXYZProtocol = (linkType?: string): boolean => linkType === LinkType.XYZ_LAYER;
+
+export const hasWFSLink = (data: Record<string, unknown>): boolean => {
+  return (
+    (data.links as Array<Record<string, unknown>> | undefined)?.some(
+      (link) => link.protocol === LinkType.WFS
+    ) ?? false
+  );
+};
+
 export const isPolygonContainedInLayer = (
   polygon: Feature,
   layer: LayerMetadataMixedUnion
@@ -40,7 +53,6 @@ export const findLayerLink = (layer: ILayerImage): LinkModelType | undefined => 
   let wmtsLayer = layer.links?.find((link: LinkModelType) =>
     [LinkType.WMTS_LAYER as string].includes(link.protocol as string)
   ) as LinkModelType | undefined;
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (wmtsLayer === undefined) {
     wmtsLayer = layer.links?.find((link: LinkModelType) =>
       [LinkType.WMTS as string].includes(link.protocol as string)

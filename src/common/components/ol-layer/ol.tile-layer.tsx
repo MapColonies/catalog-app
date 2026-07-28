@@ -1,5 +1,8 @@
 import { LayerType, TileLayer, TileWMTS, TileXYZ } from '@map-colonies/react-components';
-import { isWMTSProtocol, isXYZProtocol } from './ol.helpers';
+import {
+  isWMTSProtocol,
+  isXYZProtocol,
+} from '../../../discrete-layer/components/helpers/layersUtils';
 import { LayerOptions, WMTSOptions, XYZOptions } from './layer.config.options';
 
 interface OlTileLayerParams {
