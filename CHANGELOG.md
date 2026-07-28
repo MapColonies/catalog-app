@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [6.5.0](https://github.com/MapColonies/catalog-app/compare/v6.4.1...v6.5.0) (2026-07-28)
+
+
+### Features
+
+* pp not exist indicator (MAPCO-11244) ([#1001](https://github.com/MapColonies/catalog-app/issues/1001)) ([b45af77](https://github.com/MapColonies/catalog-app/commit/b45af776e13f2a33784c66e6b2e88577e8b52435))
+
 ## [6.4.1](https://github.com/MapColonies/catalog-app/compare/v6.4.0...v6.4.1) (2026-07-27)
 
 
