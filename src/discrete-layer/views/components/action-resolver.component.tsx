@@ -508,13 +508,20 @@ export const ActionResolver: React.FC<ActionResolverProps> = observer((props) =>
           }
           break;
         }
-        case UserAction.SYSTEM_CALLBACK_DELETE: {
+        case UserAction.SYSTEM_CALLBACK_3D_DELETE: {
           const selectedLayer = data as unknown as ILayerImage;
           baseUpdateEntityField(
             selectedLayer,
             'productStatus' as keyof ILayerImage,
             get(selectedLayer, 'productStatus')
           );
+          break;
+        }
+        case UserAction.SYSTEM_CALLBACK_RASTER_DELETE: {
+          const selectedLayer = data as unknown as ILayerImage;
+          store.catalogTreeStore.removeNodesById(selectedLayer.id);
+          store.discreteLayersStore.removeLayerById(selectedLayer.id);
+          store.discreteLayersStore.resetSelectedLayer();
           break;
         }
         case UserAction.SYSTEM_CALLBACK_FLYTO: {
