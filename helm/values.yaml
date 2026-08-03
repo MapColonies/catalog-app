@@ -45,7 +45,7 @@ configValues:
   # ----------- containers ------------
   image:
     repository: app/catalog-app
-    tag: v1.0.0
+    tag: ''
     pullPolicy: Always
     debug: false
   containerSecurityContext:

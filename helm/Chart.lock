@@ -1,6 +1,6 @@
 dependencies:
 - name: helm-common
-  repository: oci://acrarolibotnonprod.azurecr.io/helm
-  version: 1.0.1
-digest: sha256:a67d9f4977a0ab81aeea677038affb9b3e1a7b77939bdfdfba4b2f0f2f6b9a28
-generated: "2024-11-13T16:37:16.139484104+02:00"
+  repository: oci://acrarolibotnonprod.azurecr.io/helm/library
+  version: 1.0.2
+digest: sha256:699a1043bc22749974c5f54e081ee2be1a24f46209d279a350b842ec42d2b2a6
+generated: "2026-08-03T15:48:59.062780729+03:00"
