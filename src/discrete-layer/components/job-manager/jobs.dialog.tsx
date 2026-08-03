@@ -5,7 +5,7 @@ import { cloneDeep, isEmpty } from 'lodash';
 import { observer } from 'mobx-react';
 import moment from 'moment';
 import { DialogContent } from '@material-ui/core';
-import { Button, Dialog, DialogTitle, IconButton } from '@map-colonies/react-core';
+import { Button, Checkbox, Dialog, DialogTitle, IconButton } from '@map-colonies/react-core';
 import { Box, DateTimeRangePicker, SupportedLocales } from '@map-colonies/react-components';
 import { IActionGroup } from '../../../common/actions/entity.actions';
 import { GraphQLError } from '../../../common/components/error/graphql.error-presentor';
@@ -55,6 +55,8 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
     moment().subtract(CONFIG.JOB_MANAGER.FILTER_DAYS_TIME_SLOT, 'days').startOf('day').toDate()
   );
   const [tillDate, setTillDate] = useState<Date | undefined>(moment().endOf('day').toDate());
+  const [includeInternals, setIncludeInternals] = useState<boolean>(false);
+  const [includeB2B, setIncludeB2B] = useState<boolean>(false);
   const [focusError, setFocusError] = useState<IError | undefined>(undefined);
   const [dateRangeError, setDateRangeError] = useState<IError | undefined>(undefined);
   const [errorMessages, setErrorMessages] = useState<IError[]>([]);
@@ -65,14 +67,21 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
     (actions as IActions).start();
   }, []);
 
+  const getJobsQueryParams = useCallback(
+    () => ({
+      fromDate,
+      tillDate,
+      includeInternals,
+      includeB2B,
+    }),
+    [fromDate, tillDate, includeInternals, includeB2B]
+  );
+
   // eslint-disable-next-line
   const { setQuery, loading, error, data, query } = useQuery(
     (store) =>
       store.queryJobs({
-        params: {
-          fromDate,
-          tillDate,
-        },
+        params: getJobsQueryParams(),
       }),
     {
       fetchPolicy: 'no-cache',
@@ -115,14 +124,11 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
       (actions as IActions).start(POLLING_CYCLE_INTERVAL);
       setQuery((store) =>
         store.queryJobs({
-          params: {
-            fromDate,
-            tillDate,
-          },
+          params: getJobsQueryParams(),
         })
       );
     }
-  }, [fromDate, tillDate, setQuery]);
+  }, [fromDate, tillDate, includeInternals, includeB2B, setQuery, getJobsQueryParams]);
 
   useEffect(() => {
     if (data !== undefined) {
@@ -136,10 +142,7 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
       setUpdateTaskPayload({});
       setQuery((store) =>
         store.queryJobs({
-          params: {
-            fromDate,
-            tillDate,
-          },
+          params: getJobsQueryParams(),
         })
       );
     }
@@ -158,10 +161,7 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
       (actions as IActions).start(POLLING_CYCLE_INTERVAL);
       setQuery((store) =>
         store.queryJobs({
-          params: {
-            fromDate,
-            tillDate,
-          },
+          params: getJobsQueryParams(),
         })
       );
     }, POLLING_CYCLE_INTERVAL);
@@ -319,6 +319,27 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
     );
   };
 
+  const renderJobTypeFilters = (): JSX.Element => {
+    return (
+      <Box className="jobsTypeFilters">
+        <Checkbox
+          checked={includeInternals}
+          label={intl.formatMessage({ id: 'system-status.job.filter.include-internals.label' })}
+          onChange={(evt: React.MouseEvent<HTMLInputElement>): void => {
+            setIncludeInternals(evt.currentTarget.checked);
+          }}
+        />
+        <Checkbox
+          checked={includeB2B}
+          label={intl.formatMessage({ id: 'system-status.job.filter.include-b2b.label' })}
+          onChange={(evt: React.MouseEvent<HTMLInputElement>): void => {
+            setIncludeB2B(evt.currentTarget.checked);
+          }}
+        />
+      </Box>
+    );
+  };
+
   const renderDateTimeRangePicker = (): JSX.Element => {
     return (
       <Box className="jobsTimeRangePicker">
@@ -379,10 +400,7 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
               (actions as IActions).start(POLLING_CYCLE_INTERVAL);
               setQuery((store) =>
                 store.queryJobs({
-                  params: {
-                    fromDate,
-                    tillDate,
-                  },
+                  params: getJobsQueryParams(),
                 })
               );
             }}
@@ -399,6 +417,7 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
         </DialogTitle>
         <DialogContent className="jobsBody">
           {renderDateTimeRangePicker()}
+          {renderJobTypeFilters()}
           {!error &&
             typeof fromDate !== 'undefined' &&
             typeof tillDate !== 'undefined' &&
