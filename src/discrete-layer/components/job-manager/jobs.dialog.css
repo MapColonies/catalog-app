@@ -13,11 +13,32 @@ body[dir='rtl'] #jobsDialog .mdc-dialog__surface {
   justify-content: flex-end;
 }
 
+#jobsDialog .jobsBody .jobsFilterRow {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 16px;
+}
+
+#jobsDialog .jobsBody .jobsFilterSpacer {
+  justify-self: center;
+}
+
+#jobsDialog .jobsBody .jobsTimeRangePicker {
+  justify-self: center;
+  border: 1px solid var(--mdc-theme-gc-selection-background);
+  border-radius: 10px;
+  padding: 0 16px 16px 16px;
+}
+
 #jobsDialog .jobsBody .jobsTypeFilters {
   display: flex;
-  justify-content: center;
+  justify-self: center;
   gap: 24px;
-  margin-top: 4px;
+}
+
+#jobsDialog .jobsBody .jobsTypeFilters .mdc-checkbox__ripple {
+  display: none;
 }
 
 #jobsDialog .jobsBody .drpContainer {
@@ -170,8 +191,7 @@ body[dir='rtl'] .jobsBody .ag-pinned-right-cols-container {
 }
 
 #jobsDialog .gridsContainer {
-  margin-top: 10px;
-  height: calc(100% - 120px);
+  height: calc(100% - 140px);
   overflow-y: overlay;
 }
 

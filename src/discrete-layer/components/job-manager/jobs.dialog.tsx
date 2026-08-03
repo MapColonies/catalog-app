@@ -416,8 +416,11 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
           />
         </DialogTitle>
         <DialogContent className="jobsBody">
-          {renderDateTimeRangePicker()}
-          {renderJobTypeFilters()}
+          <Box className="jobsFilterRow">
+            <Box className="jobsFilterSpacer" />
+            {renderDateTimeRangePicker()}
+            {renderJobTypeFilters()}
+          </Box>
           {!error &&
             typeof fromDate !== 'undefined' &&
             typeof tillDate !== 'undefined' &&
