@@ -54,6 +54,11 @@ body[dir='rtl'] #jobsDialog .mdc-dialog__surface {
   position: relative;
 }
 
+#jobsDialog .jobsBody .drpContainer .mdc-button {
+  margin-left: unset;
+  margin-top: unset;
+}
+
 #jobsDialog .jobsBody .drpContainer .MuiFormHelperText-root {
   position: absolute;
   top: 100%;
