@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useEffect, useCallback, useState, useMemo } from 'react';
+import React, { useEffect, useCallback, useRef, useState, useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { cloneDeep, isEmpty } from 'lodash';
 import { observer } from 'mobx-react';
@@ -57,6 +57,8 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
   const [tillDate, setTillDate] = useState<Date | undefined>(moment().endOf('day').toDate());
   const [includeInternals, setIncludeInternals] = useState<boolean>(false);
   const [includeB2B, setIncludeB2B] = useState<boolean>(false);
+  const [hasDateFieldError, setHasDateFieldError] = useState<boolean>(false);
+  const drpContainerRef = useRef<HTMLDivElement>(null);
   const [focusError, setFocusError] = useState<IError | undefined>(undefined);
   const [dateRangeError, setDateRangeError] = useState<IError | undefined>(undefined);
   const [errorMessages, setErrorMessages] = useState<IError[]>([]);
@@ -65,6 +67,26 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
   // start the timer during the first render
   useEffect(() => {
     (actions as IActions).start();
+  }, []);
+
+  useEffect(() => {
+    const container = drpContainerRef.current;
+    if (!container) {
+      return;
+    }
+    const updateHasDateFieldError = (): void => {
+      setHasDateFieldError(container.querySelector('.Mui-error') !== null);
+    };
+    updateHasDateFieldError();
+    const observer = new MutationObserver(updateHasDateFieldError);
+    observer.observe(container, {
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['class'],
+    });
+    return (): void => {
+      observer.disconnect();
+    };
   }, []);
 
   const getJobsQueryParams = useCallback(
@@ -324,6 +346,7 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
       <Box className="jobsTypeFilters">
         <Checkbox
           checked={includeInternals}
+          disabled={loading || hasDateFieldError}
           label={intl.formatMessage({ id: 'system-status.job.filter.include-internals.label' })}
           onChange={(evt: React.MouseEvent<HTMLInputElement>): void => {
             setIncludeInternals(evt.currentTarget.checked);
@@ -331,6 +354,7 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
         />
         <Checkbox
           checked={includeB2B}
+          disabled={loading || hasDateFieldError}
           label={intl.formatMessage({ id: 'system-status.job.filter.include-b2b.label' })}
           onChange={(evt: React.MouseEvent<HTMLInputElement>): void => {
             setIncludeB2B(evt.currentTarget.checked);
@@ -342,7 +366,7 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
 
   const renderDateTimeRangePicker = (): JSX.Element => {
     return (
-      <Box className="jobsTimeRangePicker">
+      <div className="jobsTimeRangePicker" ref={drpContainerRef}>
         <DateTimeRangePicker
           controlsLayout="row"
           dateFormat="dd/MM/yyyy"
@@ -382,7 +406,7 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
               ],
           }}
         />
-      </Box>
+      </div>
     );
   };
 
