@@ -4,8 +4,8 @@ import {
   LayerOptions,
   WMTSOptions,
   XYZOptions,
-} from '../../../common/components/ol-layer/layer.config.options';
-import { OlTileLayer } from '../../../common/components/ol-layer/ol.tile-layer';
+} from '../../../common/components/ol-map/layer.config.options-bridging';
+import { OlTileLayer } from '../../../common/components/ol-map/ol.tile-layer';
 import {
   CapabilityModelType,
   LayerMetadataMixedUnion,

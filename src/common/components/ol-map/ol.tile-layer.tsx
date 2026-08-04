@@ -3,7 +3,7 @@ import {
   isWMTSProtocol,
   isXYZProtocol,
 } from '../../../discrete-layer/components/helpers/layersUtils';
-import { LayerOptions, WMTSOptions, XYZOptions } from './layer.config.options';
+import { LayerOptions, WMTSOptions, XYZOptions } from './layer.config.options-bridging';
 
 interface OlTileLayerParams {
   layerType: LayerType;
@@ -27,10 +27,10 @@ export const OlTileLayer: React.FC<OlTileLayerParams> = ({
       tileComponent = <TileXYZ options={tileOptions as XYZOptions} />;
       break;
     // case isOSMProtocol(layerType):
-    //   tileComponent = <TileWMTS options={tileOptions as WMTSOptions} />;
+    //   tileComponent = <TileOSM options={tileOptions as OSMOptions} />;
     //   break;
     // case isWMSProtocol(layerType):
-    //   tileComponent = <TileXYZ options={tileOptions as XYZOptions} />;
+    //   tileComponent = <TileWMS options={tileOptions as WMSOptions} />;
     //   break;
   }
 

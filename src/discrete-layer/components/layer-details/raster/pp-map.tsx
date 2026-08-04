@@ -12,29 +12,19 @@ import { BBox, Feature, Geometry } from 'geojson';
 import { get } from 'lodash';
 import bboxPolygon from '@turf/bbox-polygon';
 import { FitOptions } from 'ol/View';
-import {
-  Box,
-  Legend,
-  LegendItem,
-  Map,
-  VectorLayer,
-  VectorSource,
-} from '@map-colonies/react-components';
+import { Box, LegendItem, VectorLayer, VectorSource } from '@map-colonies/react-components';
 import { Checkbox } from '@map-colonies/react-core';
 import CONFIG from '../../../../common/config';
 import { useEnums } from '../../../../common/hooks/useEnum.hook';
 import { Mode } from '../../../../common/models/mode.enum';
 import { MapFeatureClickHandler } from '../../../../common/components/ol-map/map-feature-click-handler';
-import { MapLoadingIndicator } from '../../../../common/components/ol-map/map-loading-indicator';
+import { OLMap } from '../../../../common/components/ol-map/ol-map';
 import { SelectedFeatureVectorLayer } from '../../../../common/components/ol-map/selected-feature-vector-layer';
-import { ZoomLevelIndicator } from '../../../../common/components/ol-map/zoom-level-indicator';
 import { LayerRasterRecordModelType } from '../../../models';
 import { ILayerImage } from '../../../models/layerImage';
 import { useStore } from '../../../models/RootStore';
 import { GeojsonFeatureInput } from '../../../models/RootStore.base';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
-import { OlBaseMap } from '../../../../common/components/ol-layer/ol.base-map';
-import { ToggleBaseMap } from '../../../../common/components/ol-map/toggle-base-map';
 import { FeaturePropertiesPopupComponent } from './feature-properties-popup.component';
 import { FlyToPP } from './fly-to-pp';
 import { GeoFeaturesInnerComponent } from './geo-features-inner.component';
@@ -93,7 +83,6 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   const [selectedFeature, setSelectedFeature] = useState<Feature | undefined>(undefined);
   const [showExistingPolygonParts, setShowExistingPolygonParts] =
     useState<boolean>(showPolygonParts);
-  const [showBaseMap, setShowBaseMap] = useState<boolean>(defaultShowBaseMap);
   const [childrenWithZoomIndication, setChildrenWithZoomIndication] = useState<boolean>(false);
   const [isOpenProperties, setIsOpenProperties] = useState<boolean>(true);
 
@@ -189,6 +178,18 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
     return res;
   }, []);
 
+  const mapLocale = useMemo(
+    () => ({
+      ZOOM_LABEL: intl.formatMessage({ id: 'map.zoom.label' }),
+      LEGEND_TITLE: intl.formatMessage({ id: 'polygon-parts.map-preview-legend.title' }),
+      BASE_MAP_ENABLE_LABEL: intl.formatMessage({
+        id: 'polygon-parts.map-preview.without.base-map',
+      }),
+      BASE_MAP_DISABLE_LABEL: intl.formatMessage({ id: 'polygon-parts.map-preview.base-map' }),
+    }),
+    [intl]
+  );
+
   const queryExecutor = async (bbox: BBox, startIndex: number): Promise<IQueryExecutorResponse> => {
     const result = await store.queryGetPolygonPartsFeature({
       data: {
@@ -212,30 +213,21 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
 
   return (
     <Box id="geoFeaturesMapContainer" style={{ ...style }}>
-      <Map>
-        {showBaseMap && <OlBaseMap baseMaps={store.discreteLayersStore.baseMaps} />}
-        <MapLoadingIndicator />
-        <ZoomLevelIndicator
-          indicateTillZoomLevel={
+      <OLMap
+        baseMapsConfig={{
+          baseMaps: store.discreteLayersStore.baseMaps,
+          defaultShowBaseMap,
+          toggleBaseMap,
+        }}
+        zoomLevelWidget={{
+          indicateTillZoomLevel:
             showExistingPolygonParts || childrenWithZoomIndication
               ? CONFIG.POLYGON_PARTS.MAX.SHOW_FOOTPRINT_ZOOM_LEVEL
-              : undefined
-          }
-        />
-        <Legend
-          legendItems={LegendsArray}
-          title={intl.formatMessage({ id: 'polygon-parts.map-preview-legend.title' })}
-        />
-        {toggleBaseMap && (
-          <ToggleBaseMap
-            isBaseMapVisible={showBaseMap}
-            onToggle={() => setShowBaseMap(!showBaseMap)}
-            enableLabel={intl.formatMessage({
-              id: 'polygon-parts.map-preview.without.base-map',
-            })}
-            disableLabel={intl.formatMessage({ id: 'polygon-parts.map-preview.base-map' })}
-          />
-        )}
+              : undefined,
+        }}
+        legends={LegendsArray}
+        locale={mapLocale}
+      >
         <VectorLayer>
           <VectorSource>
             <GeoFeaturesInnerComponent
@@ -290,7 +282,7 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
             onClose={closePropertiesPopup}
           />
         )}
-      </Map>
+      </OLMap>
     </Box>
   );
 };
