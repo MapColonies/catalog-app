@@ -96,6 +96,11 @@ body[dir='rtl'] #jobsDialog .closeIcon {
   align-items: center;
 }
 
+#jobsDialog .refreshContainer.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
 #jobsDialog .refreshContainer .refreshIcon {
   font-size: 24px;
 }

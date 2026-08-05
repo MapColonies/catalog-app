@@ -416,8 +416,11 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
         <DialogTitle>
           <FormattedMessage id="system-status.title" />
           <Box
-            className="refreshContainer"
+            className={`refreshContainer${loading || hasDateFieldError ? ' disabled' : ''}`}
             onClick={(): void => {
+              if (loading || hasDateFieldError) {
+                return;
+              }
               setErrorMessages((prev) =>
                 upsertOrRemoveError(prev, undefined, 'error.server-error')
               );
@@ -429,7 +432,10 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
               );
             }}
           >
-            <IconButton className="refreshIcon mc-icon-Refresh" />
+            <IconButton
+              className="refreshIcon mc-icon-Refresh"
+              disabled={loading || hasDateFieldError}
+            />
             <Box className="refreshSecs">{`${(timeLeft as number) / MILLISECONDS_IN_SEC}`}</Box>
           </Box>
           <IconButton
