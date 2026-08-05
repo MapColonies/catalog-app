@@ -4,7 +4,7 @@ import { Geometry } from 'geojson';
 import { FitOptions } from 'ol/View';
 import { validateGeoJSONString } from '../../../../common/utils/geojson.validation';
 import { Mode } from '../../../../common/models/mode.enum';
-import { OLMap } from '../../../../common/components/ol-map/ol-map';
+import { IOLMapBaseMaps, OLMap } from '../../../../common/components/ol-map/ol-map';
 import { useStore } from '../../../models/RootStore';
 
 interface GeoJsonMapValuePresentorProps {
@@ -40,7 +40,7 @@ export const GeoJsonMapValuePresentorComponent: React.FC<GeoJsonMapValuePresento
   return (
     <Box style={{ ...style, position: 'relative' }}>
       <OLMap
-        baseMapsConfig={{ baseMaps: store.discreteLayersStore.baseMaps }}
+        baseMapsConfig={store.discreteLayersStore.baseMaps as unknown as IOLMapBaseMaps}
         mapLoadingIndicator={false}
         zoomLevelWidget={null}
       >

@@ -5,10 +5,10 @@ import { MapLoadingIndicator } from './map-loading-indicator';
 import { ToggleBaseMap } from './toggle-base-map';
 import { ZoomLevelIndicator } from './zoom-level-indicator';
 
-export interface IOLMapBaseMaps {
-  baseMaps: IBaseMaps | undefined;
-  defaultShowBaseMap?: boolean;
-  toggleBaseMap?: boolean;
+export interface IOLMapBaseMaps extends IBaseMaps {
+  // TODO: MAPCO-11365
+  showBaseMap?: boolean;
+  showWidget?: boolean;
 }
 
 export interface IOLMapLocale {
@@ -39,14 +39,12 @@ export const OLMap: React.FC<PropsWithChildren<IOLMapProps>> = ({
   children,
   ...mapProps
 }) => {
-  const [showBaseMap, setShowBaseMap] = useState<boolean>(
-    baseMapsConfig?.defaultShowBaseMap ?? true
-  );
+  const [showBaseMap, setShowBaseMap] = useState<boolean>(baseMapsConfig?.showBaseMap ?? true);
 
   return (
     <Map {...mapProps}>
       {mapLoadingIndicator && <MapLoadingIndicator />}
-      {baseMapsConfig && showBaseMap && <OlBaseMap baseMaps={baseMapsConfig.baseMaps} />}
+      {baseMapsConfig && showBaseMap && <OlBaseMap maps={baseMapsConfig.maps} />}
       {zoomLevelWidget && (
         <ZoomLevelIndicator
           indicateTillZoomLevel={zoomLevelWidget.indicateTillZoomLevel}
@@ -56,7 +54,7 @@ export const OLMap: React.FC<PropsWithChildren<IOLMapProps>> = ({
       {legends && legends.length > 0 && (
         <Legend legendItems={legends} title={locale?.LEGEND_TITLE} />
       )}
-      {baseMapsConfig?.toggleBaseMap && (
+      {baseMapsConfig?.showWidget && (
         <ToggleBaseMap
           isBaseMapVisible={showBaseMap}
           onToggle={(): void => setShowBaseMap((prev) => !prev)}

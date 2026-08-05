@@ -50,9 +50,9 @@ interface GeoFeaturesPresentorProps {
   selectedItem?: Feature;
   onMapFeatureClick?: (feature: Feature | undefined) => void;
   showFeaturePropertiesPopup?: boolean;
-  toggleBaseMap?: boolean;
   showPolygonParts?: boolean;
-  defaultShowBaseMap?: boolean;
+  showBaseMap?: boolean;
+  showBaseMapWidget?: boolean;
   fitOptions?: FitOptions | undefined;
   style?: CSSProperties | undefined;
   children?: JSX.Element | null;
@@ -69,8 +69,8 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   onMapFeatureClick,
   showFeaturePropertiesPopup = false,
   showPolygonParts = false,
-  defaultShowBaseMap = true,
-  toggleBaseMap = false,
+  showBaseMap = true,
+  showBaseMapWidget = false,
   fitOptions,
   style,
   children,
@@ -214,11 +214,15 @@ export const GeoFeaturesPresentorComponent: React.FC<GeoFeaturesPresentorProps> 
   return (
     <Box id="geoFeaturesMapContainer" style={{ ...style }}>
       <OLMap
-        baseMapsConfig={{
-          baseMaps: store.discreteLayersStore.baseMaps,
-          defaultShowBaseMap,
-          toggleBaseMap,
-        }}
+        baseMapsConfig={
+          store.discreteLayersStore.baseMaps
+            ? {
+                maps: store.discreteLayersStore.baseMaps.maps,
+                showBaseMap,
+                showWidget: showBaseMapWidget,
+              }
+            : undefined
+        }
         zoomLevelWidget={{
           indicateTillZoomLevel:
             showExistingPolygonParts || childrenWithZoomIndication

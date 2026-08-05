@@ -156,8 +156,8 @@ export const EntityDeleteRasterDialog: React.FC<EntityDeleteDialogProps> = obser
               layerRecord={props.layerRecord}
               mode={Mode.DELETE}
               style={{ height: 'var(--map-height)', position: 'relative', direction: 'ltr' }}
-              defaultShowBaseMap={false}
-              toggleBaseMap={true}
+              showBaseMap={false}
+              showBaseMapWidget={true}
             >
               <>
                 <OlLayerRecordTile
