@@ -3,11 +3,9 @@ import { isEmpty } from 'lodash';
 import { IconButton, MenuSurfaceAnchor, MenuSurface, Typography } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
 import { IActionGroup, IAction } from '../../../actions/entity.actions';
+import { shouldRenderSeparator } from '../../../helpers/actionsHelper';
 
 import './actions.button-renderer.css';
-
-const FIRST = 0;
-const EMPTY_ACTION_GROUP = 0;
 
 interface IActionsRendererParams {
   actions: IActionGroup[];
@@ -74,7 +72,7 @@ export const ActionsRenderer: React.FC<IActionsRendererParams> = ({
           {actions.map((actionGroup: IActionGroup, groupIdx: number) => {
             return (
               <React.Fragment key={`actGroup_${node.id as string}_${groupIdx}`}>
-                {actionGroup.group.length > EMPTY_ACTION_GROUP && groupIdx > FIRST && (
+                {shouldRenderSeparator(actionGroup, groupIdx) && (
                   <Box
                     key={`menuSeparator_${node.id as string}_${groupIdx}`}
                     className="menuSeparator"

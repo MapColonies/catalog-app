@@ -10,11 +10,9 @@ import {
 } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
 import { IActionGroup, IAction, isDependentFieldWithValue } from '../../../actions/entity.actions';
+import { shouldRenderSeparator } from '../../../helpers/actionsHelper';
 
 import './actions.cell-renderer.css';
-
-const FIRST = 0;
-const EMPTY_ACTION_GROUP = 0;
 
 interface IActionsRendererParams extends ICellRendererParams {
   actions: IActionGroup[];
@@ -107,7 +105,7 @@ export const ActionsRenderer: React.FC<IActionsRendererParams> = (props) => {
           {actions.map((actionGroup: IActionGroup, groupIdx: number) => {
             return (
               <React.Fragment key={`actGroup_${groupIdx}`}>
-                {actionGroup.group.length > EMPTY_ACTION_GROUP && groupIdx > FIRST && (
+                {shouldRenderSeparator(actionGroup, groupIdx) && (
                   <MenuItem key={`menuItemSeparator_groupId_${groupIdx}`}>
                     <Box className="menuSeparator"></Box>
                   </MenuItem>
