@@ -23,28 +23,8 @@ body[dir='rtl'] #layerDetailsFormRaster .ingestionSwitchContainer {
   align-items: center;
 }
 
-body[dir='rtl'] #layerDetailsFormRaster .ingestionSwitch {
-  flex-direction: row-reverse;
-}
-
-#layerDetailsFormRaster .ingestionSwitch .MuiSwitch-track {
-  background-color: var(--mdc-theme-gc-selection-background);
-}
-
-#layerDetailsFormRaster .ingestionSwitch .MuiSwitch-colorSecondary.Mui-checked + .MuiSwitch-track {
-  background-color: var(--mdc-theme-gc-selection-background);
-  filter: brightness(2);
-}
-
-#layerDetailsFormRaster .ingestionSwitch .MuiSwitch-colorSecondary.Mui-checked {
-  color: var(--mdc-theme-text-icon-on-dark);
-}
-
-#layerDetailsFormRaster .ingestionSwitch .MuiSwitch-switchBase {
-  color: var(--mdc-theme-text-icon-on-dark);
-}
-
-#layerDetailsFormRaster .ingestionSwitch .MuiSwitch-input:disabled {
+#layerDetailsFormRaster .ingestionSwitch .mdc-switch__thumb-underlay::before,
+#layerDetailsFormRaster .ingestionSwitch .mdc-switch__thumb-underlay::after {
   display: none;
 }
 
