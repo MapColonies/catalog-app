@@ -56,6 +56,11 @@ body[dir='rtl'] #actionsMenuContainer .mdc-menu-surface.mdc-menu-surface--open {
   cursor: pointer;
 }
 
+#actionsMenuContainer .menuSeparator {
+  border-bottom: 1px solid;
+  width: 100%;
+}
+
 .actionMenuItemTitle {
   font-size: 16px;
   padding-left: 8px;

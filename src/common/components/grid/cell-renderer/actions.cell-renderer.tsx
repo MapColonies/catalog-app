@@ -100,6 +100,7 @@ export const ActionsRenderer: React.FC<IActionsRendererParams> = (props) => {
       <MenuSurfaceAnchor id="gridActionsMenuContainer">
         <Menu
           open={openActionsMenu}
+          focusOnOpen={false}
           onClose={(): void => setOpenActionsMenu(false)}
           onMouseOver={(evt: React.MouseEvent): void => evt.stopPropagation()}
         >
