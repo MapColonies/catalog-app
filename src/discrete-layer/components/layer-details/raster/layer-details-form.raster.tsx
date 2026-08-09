@@ -30,7 +30,7 @@ import {
 import { Curtain } from '../../../../common/components/curtain/curtain.component';
 import { IngestionFields } from './ingestion-fields.raster';
 import { JobInfo } from './job-info';
-import { GeoFeaturesPresentorComponent } from './pp-map';
+import { PPIngestionMap } from './pp-map';
 import { StateError } from './state-error';
 import { RasterWorkflowContext } from './state-machine/context';
 import {
@@ -292,7 +292,7 @@ export const InnerRasterForm = (
               )}
               <JobInfo job={state.context.job} />
             </Box>
-            <GeoFeaturesPresentorComponent
+            <PPIngestionMap
               layerRecord={layerRecord}
               mode={mode}
               geoFeatures={[

@@ -1,7 +1,6 @@
-import React, { useRef, useEffect, useMemo, useState } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { observer } from 'mobx-react';
-import { Feature } from 'geojson';
 import * as Yup from 'yup';
 import { Formik, FormikProps } from 'formik';
 import { DialogContent } from '@material-ui/core';
@@ -10,11 +9,9 @@ import { Dialog, Icon, Typography } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
 import { Mode } from '../../../../common/models/mode.enum';
 import { getTextStyle } from '../../../../common/helpers/style';
-import { FlyTo } from '../../../../common/components/ol-map/fly-to';
 import { FieldLabelComponent } from '../../../../common/components/form/field-label';
 import { GraphQLError } from '../../../../common/components/error/graphql.error-presentor';
 import { ValidationsError } from '../../../../common/components/error/validations.error-presentor';
-import { OlLayerRecordTile } from '../../map-container/ol.layer-record.tile';
 import {
   EntityDescriptorModelType,
   FieldConfigModelType,
@@ -28,8 +25,7 @@ import { DialogActionTitle } from '../dialog.helpers';
 import { LayersDetailsComponent } from '../layer-details';
 import { EntityDeleteDialogProps } from '../entity.delete';
 import { useDeleteLayer } from '../delete.hook';
-import { START_RASTER_LAYER_ZINDEX } from './pp-map.utils';
-import { GeoFeaturesPresentorComponent } from './pp-map';
+import { OlLayerMap } from './layer-map';
 
 import './entity.raster.delete-dialog.css';
 
@@ -106,22 +102,6 @@ export const EntityDeleteRasterDialog: React.FC<EntityDeleteDialogProps> = obser
       );
     };
 
-    const flyToFeature = useMemo(() => {
-      return {
-        type: 'Feature',
-        properties: {},
-        geometry: props.layerRecord.footprint,
-      } as Feature;
-    }, []);
-
-    const layerCapability = store.discreteLayersStore.getLayerCapability(props.layerRecord);
-    const layerOptions = useMemo(() => {
-      return {
-        extent: props.layerRecord.footprint?.bbox,
-        zIndex: START_RASTER_LAYER_ZINDEX,
-      };
-    }, [props.layerRecord.footprint?.bbox]);
-
     return (
       <Box id="rasterDeleteDialog">
         <Dialog open={props.isOpen} preventOutsideDismiss={true}>
@@ -152,22 +132,12 @@ export const EntityDeleteRasterDialog: React.FC<EntityDeleteDialogProps> = obser
                 />
               </Box>
             </Box>
-            <GeoFeaturesPresentorComponent
+            <OlLayerMap
               layerRecord={props.layerRecord}
-              mode={Mode.DELETE}
               style={{ height: 'var(--map-height)', position: 'relative', direction: 'ltr' }}
-              showBaseMap={false}
-              showBaseMapWidget={true}
-            >
-              <>
-                <OlLayerRecordTile
-                  layerRecord={props.layerRecord}
-                  capability={layerCapability}
-                  layerOptions={layerOptions}
-                />
-                <FlyTo feature={flyToFeature} flyOnce={true}></FlyTo>
-              </>
-            </GeoFeaturesPresentorComponent>
+              showBaseMap={{ value: false, showToggleButton: true }}
+              showPolygonParts={{ value: false, showCheckbox: true }}
+            ></OlLayerMap>
             <Formik
               initialValues={initialDeleteValues}
               enableReinitialize={true}

@@ -8,14 +8,14 @@ import { ZoomLevelIndicator } from './zoom-level-indicator';
 export interface IOLMapBaseMaps extends IBaseMaps {
   // TODO: MAPCO-11365
   showBaseMap?: boolean;
-  showWidget?: boolean;
+  showToggleButton?: boolean;
 }
 
 export interface IOLMapLocale {
   ZOOM_LABEL: string;
   LEGEND_TITLE: string;
-  BASE_MAP_ENABLE_LABEL: string;
-  BASE_MAP_DISABLE_LABEL: string;
+  BASE_MAP_TOGGLE_ENABLE_LABEL: string;
+  BASE_MAP_TOGGLE_DISABLE_LABEL: string;
 }
 
 export interface IOLMapProps extends MapProps {
@@ -54,12 +54,12 @@ export const OLMap: React.FC<PropsWithChildren<IOLMapProps>> = ({
       {legends && legends.length > 0 && (
         <Legend legendItems={legends} title={locale?.LEGEND_TITLE} />
       )}
-      {baseMapsConfig?.showWidget && (
+      {baseMapsConfig?.showToggleButton && (
         <ToggleBaseMap
           isBaseMapVisible={showBaseMap}
           onToggle={(): void => setShowBaseMap((prev) => !prev)}
-          enableLabel={locale?.BASE_MAP_ENABLE_LABEL ?? ''}
-          disableLabel={locale?.BASE_MAP_DISABLE_LABEL ?? ''}
+          enableLabel={locale?.BASE_MAP_TOGGLE_ENABLE_LABEL ?? ''}
+          disableLabel={locale?.BASE_MAP_TOGGLE_DISABLE_LABEL ?? ''}
         />
       )}
       {children}

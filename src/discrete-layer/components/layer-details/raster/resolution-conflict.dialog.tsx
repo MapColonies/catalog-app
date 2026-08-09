@@ -33,7 +33,7 @@ import {
   IQueryExecutorResponse,
   PolygonPartsExtentQueryVectorLayer,
 } from './polygon-parts-extent-query-vector-layer';
-import { GeoFeaturesPresentorComponent } from './pp-map';
+import { PPIngestionMap } from './pp-map';
 import { EXCEEDED_PROPERTY_NAME, EXCEEDED_PROPERTY_VALUE, VectorLayerZIndex } from './pp-map.utils';
 import { ProgressCurtain } from './progressCurtain/progressCurtain';
 import { RasterWorkflowContext } from './state-machine/context';
@@ -703,7 +703,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                 layerRecord={state.context.updatedLayer}
               />
               <Box className="polygonPartsMap">
-                <GeoFeaturesPresentorComponent
+                <PPIngestionMap
                   mode={Mode.UPDATE}
                   layerRecord={state.context.updatedLayer}
                   selectedItem={selectedItem}
@@ -744,7 +744,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                     ) : null}
                     <FlyTo feature={initialFlyToFeature} flyOnce={true} />
                   </>
-                </GeoFeaturesPresentorComponent>
+                </PPIngestionMap>
               </Box>
             </Box>
           </Box>
