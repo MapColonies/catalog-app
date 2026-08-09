@@ -5,21 +5,21 @@ import { ILayerImage } from '../../models/layerImage';
 import { IDispatchAction } from '../../models/actionDispatcherStore';
 import { RecordType, useStore } from '../../models';
 
-interface DeleteLayerDialogOptions {
-  onSetOpen: (open: boolean) => void;
+interface LayerActionDialogOptions {
   layerRecord: ILayerImage;
+  onSetOpen: (open: boolean) => void;
   recordType?: RecordType;
+  disclaimerActionId?: string;
 }
 
-export const useDeleteLayer = ({
-  onSetOpen,
+export const useLayerActionDialog = ({
   layerRecord,
+  onSetOpen,
   recordType: recordTypeProp,
-}: DeleteLayerDialogOptions) => {
+  disclaimerActionId = 'action.dialog.delete',
+}: LayerActionDialogOptions) => {
   const store = useStore();
-
   const intl = useIntl();
-
   const [recordType] = useState<RecordType>(recordTypeProp ?? (layerRecord?.type as RecordType));
 
   const dialogTitleParamTranslation = intl.formatMessage({
@@ -37,18 +37,18 @@ export const useDeleteLayer = ({
     } as IDispatchAction);
   };
 
-  const warningMessage = useMemo((): string => {
+  const disclaimer = useMemo((): string => {
     return intl.formatMessage(
-      { id: 'delete.dialog.message' },
-      { action: emphasizeByHTML(`${intl.formatMessage({ id: 'delete.dialog.action' })}`) }
+      { id: 'action.dialog.disclaimer' },
+      { action: emphasizeByHTML(`${intl.formatMessage({ id: disclaimerActionId })}`) }
     );
-  }, []);
+  }, [disclaimerActionId]);
 
   return {
     recordType,
     dialogTitleParamTranslation,
     closeDialog,
     dispatchAction,
-    warningMessage,
+    disclaimer,
   };
 };

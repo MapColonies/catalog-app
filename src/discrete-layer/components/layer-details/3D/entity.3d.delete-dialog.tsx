@@ -3,36 +3,31 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { observer } from 'mobx-react';
 import { DialogContent } from '@material-ui/core';
 import { Button, Checkbox, CircularProgress, DialogActions } from '@map-colonies/react-core';
-import { Dialog, Icon, Typography } from '@map-colonies/react-core';
+import { Dialog } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
 import { GraphQLError } from '../../../../common/components/error/graphql.error-presentor';
 import { Mode } from '../../../../common/models/mode.enum';
 import { getTextStyle } from '../../../../common/helpers/style';
-import {
-  EntityDescriptorModelType,
-  RecordType,
-  RootStoreType,
-  useQuery,
-  useStore,
-} from '../../../models';
-import { GeoJsonMapValuePresentorComponent } from '../field-value-presentors/geojson-map.value-presentor';
-import { LayersDetailsComponent } from '../layer-details';
+import { RecordType, RootStoreType, useQuery, useStore } from '../../../models';
+import { ActionDialogProps } from '../destructive-action-dialog';
+import { DialogDisclaimer } from '../dialog-disclaimer';
 import { DialogActionTitle } from '../dialog.helpers';
-import { useDeleteLayer } from '../delete.hook';
-import { EntityDeleteDialogProps } from '../entity.delete';
+import { GeoJsonMapValuePresentorComponent } from '../field-value-presentors/geojson-map.value-presentor';
+import { useLayerActionDialog } from '../layer-action-dialog.hook';
+import { LayerHeader } from '../layer-header';
 
 import './entity.3d.delete-dialog.css';
 
 type Delete3DLayerResult = Awaited<ReturnType<RootStoreType['mutateDelete3DLayer']>>; // see (MAPCO-11216)
 
-export const EntityDelete3DDialog: React.FC<EntityDeleteDialogProps> = observer(
-  (props: EntityDeleteDialogProps) => {
+export const EntityDelete3DDialog: React.FC<ActionDialogProps> = observer(
+  (props: ActionDialogProps) => {
     const store = useStore();
     const intl = useIntl();
     const mutationQuery = useQuery<Delete3DLayerResult>();
     const [allowDeleting, setAllowDeleting] = useState(false);
 
-    const { dialogTitleParamTranslation, closeDialog, warningMessage } = useDeleteLayer({
+    const { dialogTitleParamTranslation, closeDialog, disclaimer } = useLayerActionDialog({
       onSetOpen: props.onSetOpen,
       layerRecord: props.layerRecord,
       recordType: RecordType.RECORD_3D,
@@ -57,7 +52,7 @@ export const EntityDelete3DDialog: React.FC<EntityDeleteDialogProps> = observer(
     };
 
     return (
-      <Box id="dialog3DDelete">
+      <Box id="dialog3DDelete" className="destructiveActionDialog">
         <Dialog open={props.isOpen} preventOutsideDismiss={true}>
           <DialogActionTitle
             domain={dialogTitleParamTranslation}
@@ -66,26 +61,8 @@ export const EntityDelete3DDialog: React.FC<EntityDeleteDialogProps> = observer(
             style={getTextStyle(props.layerRecord as any, 'backgroundColor')}
           />
           <DialogContent>
-            <Box className="headerWarning">
-              <Icon className="icon" icon={{ icon: 'info', size: 'xsmall' }} />
-              <Typography
-                tag="div"
-                dangerouslySetInnerHTML={{ __html: warningMessage }}
-              ></Typography>
-            </Box>
-            <Box id="deleteLayerDetailsContainer">
-              <Box id="deleteLayerDetails">
-                <LayersDetailsComponent
-                  className="detailsPanelProductView"
-                  entityDescriptors={
-                    store.discreteLayersStore.entityDescriptors as EntityDescriptorModelType[]
-                  }
-                  layerRecord={props.layerRecord}
-                  isBrief={true}
-                  mode={Mode.VIEW}
-                />
-              </Box>
-            </Box>
+            <DialogDisclaimer content={disclaimer} />
+            <LayerHeader layerRecord={props.layerRecord} />
             <GeoJsonMapValuePresentorComponent
               mode={Mode.VIEW}
               jsonValue={JSON.stringify(props.layerRecord?.footprint)}
