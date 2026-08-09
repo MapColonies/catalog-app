@@ -22,7 +22,7 @@ import { LayerRasterRecordModelType } from '../../../models';
 import { ILayerImage } from '../../../models/layerImage';
 import { useStore } from '../../../models/RootStore';
 import { GeojsonFeatureInput } from '../../../models/RootStore.base';
-import { OlLayer } from '../../map-container/ol.layer-record.tile';
+import { OlLayer } from '../../map-container/ol.layer';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
 import { FeaturePropertiesPopupComponent } from './feature-properties-popup.component';
 import {
