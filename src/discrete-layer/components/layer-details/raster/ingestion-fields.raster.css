@@ -23,11 +23,6 @@ body[dir='rtl'] #layerDetailsFormRaster .ingestionSwitchContainer {
   align-items: center;
 }
 
-#layerDetailsFormRaster .ingestionSwitch .mdc-switch__thumb-underlay::before,
-#layerDetailsFormRaster .ingestionSwitch .mdc-switch__thumb-underlay::after {
-  display: none;
-}
-
 #layerDetailsFormRaster .header {
   display: flex;
   height: 96px;

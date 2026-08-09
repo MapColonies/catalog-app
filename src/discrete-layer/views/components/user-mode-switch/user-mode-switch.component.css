@@ -43,11 +43,6 @@ body[dir='rtl'] .userModeSwitchDialog .closeIcon {
   margin-top: var(--invalid_msg_height);
 }
 
-.switchContainer .mdc-switch__thumb-underlay::before,
-.switchContainer .mdc-switch__thumb-underlay::after {
-  display: none;
-}
-
 .dialogContentContainer {
   display: flex;
   flex-direction: column;
