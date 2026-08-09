@@ -1,9 +1,9 @@
 apiVersion: v2
 description: Helm chart to deploy Catalog App
 name: catalog-app
-version: 6.5.0
-appVersion: 6.5.0
+version: 6.5.2
+appVersion: 6.5.2
 dependencies:
   - name: helm-common
-    version: 1.0.1
-    repository: oci://acrarolibotnonprod.azurecr.io/helm
+    version: 1.0.2
+    repository: oci://acrarolibotnonprod.azurecr.io/helm/library
