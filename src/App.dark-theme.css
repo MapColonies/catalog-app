@@ -337,6 +337,11 @@ body[dir='rtl'] .dark-theme .rst__virtualScrollOverride {
   background-color: var(--mdc-theme-gc-selection-background);
 }
 
+.dark-theme .mdc-switch__thumb-underlay::before,
+.dark-theme .mdc-switch__thumb-underlay::after {
+  display: none;
+}
+
 /* BUTTON CUSTOMIZATION */
 
 .dark-theme .mdc-button:disabled {

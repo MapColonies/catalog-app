@@ -1,14 +1,13 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { observer } from 'mobx-react';
-import { Switch } from '@material-ui/core';
 import {
   Button,
   Dialog,
   DialogContent,
   DialogTitle,
   IconButton,
-  // Switch, // Doesn't work for some reason
+  Switch,
   TextField,
   Typography,
 } from '@map-colonies/react-core';
