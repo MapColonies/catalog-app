@@ -207,6 +207,8 @@ export type JobsSearchParams = {
   type?: (string | null)
   fromDate?: (any | null)
   tillDate?: (any | null)
+  includeInternals?: (boolean | null)
+  includeB2B?: (boolean | null)
 }
 export type ActiveJobFindParams = {
   resourceId: string

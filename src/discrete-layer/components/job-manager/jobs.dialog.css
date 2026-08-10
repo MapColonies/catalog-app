@@ -13,8 +13,37 @@ body[dir='rtl'] #jobsDialog .mdc-dialog__surface {
   justify-content: flex-end;
 }
 
+#jobsDialog .jobsBody .jobsFilterRow {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 16px;
+}
+
+#jobsDialog .jobsBody .jobsFilterSpacer {
+  justify-self: center;
+}
+
+#jobsDialog .jobsBody .jobsTimeRangePicker {
+  justify-self: center;
+  border: 1px solid var(--mdc-theme-gc-selection-background);
+  border-radius: 10px;
+  padding: 0 16px 16px 16px;
+}
+
+#jobsDialog .jobsBody .jobsTypeFilters {
+  display: flex;
+  justify-self: center;
+  gap: 24px;
+}
+
+#jobsDialog .jobsBody .jobsTypeFilters .mdc-checkbox__ripple {
+  display: none;
+}
+
 #jobsDialog .jobsBody .drpContainer {
   justify-content: center;
+  align-items: flex-start;
   margin-top: 10px;
   padding: 0;
   gap: 32px;
@@ -22,6 +51,24 @@ body[dir='rtl'] #jobsDialog .mdc-dialog__surface {
 
 #jobsDialog .jobsBody .drpContainer > div:nth-child(-n + 2) {
   width: 160px;
+  position: relative;
+}
+
+#jobsDialog .jobsBody .drpContainer .mdc-button {
+  margin-left: unset;
+  margin-top: unset;
+}
+
+#jobsDialog .jobsBody .drpContainer .MuiFormHelperText-root {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  white-space: nowrap;
+}
+
+body[dir='rtl'] #jobsDialog .jobsBody .drpContainer .MuiFormHelperText-root {
+  left: unset;
+  right: 0;
 }
 
 #jobsDialog .jobsBody {
@@ -47,6 +94,11 @@ body[dir='rtl'] #jobsDialog .closeIcon {
 #jobsDialog .refreshContainer {
   display: flex;
   align-items: center;
+}
+
+#jobsDialog .refreshContainer.disabled {
+  opacity: 0.5;
+  pointer-events: none;
 }
 
 #jobsDialog .refreshContainer .refreshIcon {
@@ -163,8 +215,7 @@ body[dir='rtl'] .jobsBody .ag-pinned-right-cols-container {
 }
 
 #jobsDialog .gridsContainer {
-  margin-top: 10px;
-  height: calc(100% - 120px);
+  height: calc(100% - 140px);
   overflow-y: overlay;
 }
 

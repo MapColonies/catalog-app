@@ -679,6 +679,9 @@
 
   "system-status.job.filter.status.all": "הכל",
 
+  "system-status.job.filter.include-internals.label": "כולל תפעוליים",
+  "system-status.job.filter.include-b2b.label": "כולל Export",
+
   "system-status.job-priority-lowest": "נמוך מאוד",
   "system-status.job-priority-low": "נמוך",
   "system-status.job-priority-normal": "רגיל",
