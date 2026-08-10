@@ -5,4 +5,5 @@ export enum Mode {
   UPDATE = 'Update',
   EXPORT = 'Export',
   DELETE = 'Delete',
+  REVERT = 'Revert',
 }

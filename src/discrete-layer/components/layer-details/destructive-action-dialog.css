@@ -1,0 +1,128 @@
+.destructiveActionDialog .icon {
+  color: var(--mdc-theme-gc-error-high);
+  font-size: 28px;
+  margin: 12px;
+}
+
+.destructiveActionDialog .disclaimer {
+  height: var(--disclaimer-height);
+  display: flex;
+  align-items: center;
+}
+
+.destructiveActionDialog .layerHeaderContainer {
+  position: relative;
+  display: flex;
+  background-color: var(--mdc-theme-text-primary-on-light);
+  padding: 8px;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: var(--header-height);
+}
+
+.destructiveActionDialog .layerHeaderDetails {
+  margin: 0 0;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.destructiveActionDialog .mdc-dialog .mdc-dialog__surface {
+  max-width: var(--modal-width);
+  height: var(--modal-height);
+}
+
+.destructiveActionDialog .closeIcon {
+  margin-left: auto;
+}
+
+body[dir='rtl'] .destructiveActionDialog .closeIcon {
+  margin-left: unset;
+  margin-right: auto;
+}
+
+.destructiveActionDialog .footer {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  height: var(--footer-height);
+}
+
+.destructiveActionDialog .buttons {
+  display: flex;
+  gap: 20px;
+  margin-left: auto;
+}
+
+body[dir='rtl'] .destructiveActionDialog .buttons {
+  margin-left: unset;
+  margin-right: auto;
+}
+
+.destructiveActionDialog .errors {
+  width: 100%;
+  margin: 0px 12px;
+}
+
+.destructiveActionDialog .fields {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  height: var(--fields-height);
+  gap: 16px;
+  margin-top: var(--fields-offset);
+}
+
+.destructiveActionDialog .field {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  padding: 4px 4px;
+}
+
+.destructiveActionDialog .field .mdc-text-field {
+  flex: 1;
+}
+
+.destructiveActionDialog .mapRow {
+  display: flex;
+  gap: var(--overlay-panel-gap);
+  height: var(--map-height);
+}
+
+.destructiveActionDialog .mapColumn {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 100%;
+}
+
+.destructiveActionDialog .overlayPanel {
+  flex: 0 0 var(--overlay-panel-width);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.destructiveActionDialog .sidePanelFields {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 8px;
+}
+
+.destructiveActionDialog .sidePanelFields .field {
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 4px 0;
+  gap: 4px;
+}
+
+.destructiveActionDialog .sidePanelFields .field .mdc-text-field {
+  width: 100%;
+}
+
+.destructiveActionDialog form {
+  display: contents;
+}

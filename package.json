@@ -108,6 +108,7 @@
     "@turf/center": "^6.5.0",
     "@turf/center-of-mass": "^7.3.5",
     "@turf/convex": "^6.0.3",
+    "@turf/difference": "^6.5.0",
     "@turf/distance": "6.2.0-alpha.2",
     "@turf/flatten": "^7.3.5",
     "@turf/helpers": "^6.1.4",

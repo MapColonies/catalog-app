@@ -297,6 +297,13 @@ export const ActionResolver: React.FC<ActionResolverProps> = observer((props) =>
           store.discreteLayersStore.setSelectedLayerOperationMode(Mode.DELETE);
           handleOpenEntityDialog(RecordType.RECORD_RASTER, true);
           break;
+        case 'LayerRasterRecord.revert':
+          store.discreteLayersStore.selectLayer(
+            cleanUpEntity(data, LayerRasterRecordModelKeys) as unknown as LayerMetadataMixedUnion
+          );
+          store.discreteLayersStore.setSelectedLayerOperationMode(Mode.REVERT);
+          handleOpenEntityDialog(RecordType.RECORD_RASTER, true);
+          break;
         case 'Layer3DRecord.viewer':
           window.open(
             `${CONFIG.WEB_TOOLS_URL}/${CONFIG.MODEL_VIEWER_ROUTE}?model_ids=${data.productId}&token=${CONFIG.MODEL_VIEWER_TOKEN_VALUE}`
@@ -521,6 +528,10 @@ export const ActionResolver: React.FC<ActionResolverProps> = observer((props) =>
           const selectedLayer = data as unknown as ILayerImage;
           store.catalogTreeStore.removeNodesById(selectedLayer.id);
           store.discreteLayersStore.removeLayerById(selectedLayer.id);
+          store.discreteLayersStore.resetSelectedLayer();
+          break;
+        }
+        case UserAction.SYSTEM_CALLBACK_RASTER_REVERT: {
           store.discreteLayersStore.resetSelectedLayer();
           break;
         }
