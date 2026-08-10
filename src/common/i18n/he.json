@@ -54,6 +54,7 @@
   "general.title.update": "עדכון מוצר {value}",
   "general.title.locked": "בתהליך - נעול לעדכון",
   "general.title.delete": "מחיקת מוצר {value}",
+  "general.title.revert": "שחזור מוצר {value}",
   "general.title.view": "צפייה במוצר {value}",
   "general.title.choose": "בחירת קבצים",
   "general.dialog.exit.title": "בטוח שברצונך להמשיך?",
@@ -85,6 +86,7 @@
   "action.operations.tooltip": "פעולות",
   "action.clear.tooltip": "ניקוי",
   "action.delete.tooltip": "מחיקה",
+  "action.revert.tooltip": "שחזור",
   "action.filter.tooltip": "חיפוש מתקדם",
   "action.filter-nonactive.tooltip": "הצג רק שכבות פעילות",
   "action.show-all.tooltip": "הצג הכל",
@@ -175,12 +177,18 @@
   "publish-unpublish.dialog.unpublish.message": "הפעולה תוביל ל{action} המוצר ולהסתרתו <br/>ועלולה להשפיע על מערכות הצורכות את המוצר",
   "publish-unpublish.dialog.unpublish.action": "ביטול פרסום",
 
-  "delete.dialog.message": "הפעולה תוביל ל{action} המוצר וכל חומריו ועלולה להשפיע על מערכות הצורכות את המוצר",
-  "delete.dialog.action": "מחיקת",
-  "delete.dialog.checkbox": "אישור מחיקה",
+  "action.dialog.disclaimer": "הפעולה תוביל ל{action} ועלולה להשפיע על מערכות הצורכות את המוצר",
+  "action.dialog.delete": "מחיקת המוצר וכל חומריו ",
+  "action.dialog.revert": "שחזור המוצר לעדכון האחרון שלו ",
 
-  "delete.approver-name": "שם מבצע",
-  "delete.approval-code": "קוד מחיקה",
+  "action.approver-name": "שם מבצע הפעולה",
+  "action.approval-code": "קוד אישור",
+
+  "delete.dialog.checkbox": "אישור המחיקה",
+
+  "revert.dialog.checkbox.existing.label": "גרסה נוכחית",
+  "revert.dialog.checkbox.backup.label": "גרסה קודמת (גיבוי)",
+  "revert.dialog.checkbox.changes-area.label": "אזור העדכון",
 
   "snack.message.success": "הצלחה",
   "snack.message.failed": "כשלון",

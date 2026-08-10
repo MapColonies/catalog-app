@@ -28,6 +28,7 @@ export enum CRUDAction {
   delete = 'delete',
   update = 'update',
   edit = 'edit',
+  revert = 'revert',
 }
 
 export interface IAction {
@@ -166,6 +167,14 @@ const ACTIONS_CONFIG: IEntityActions[] = [
             frequent: false,
             symbol: { class: 'mc-icon-Update' },
             title: { translationId: 'action.update.tooltip' },
+            dependentField: { field: 'layerURLMissing', expectedValue: false },
+            views: [TabViews.CATALOG, TabViews.SEARCH_RESULTS],
+          },
+          {
+            action: CRUDAction.revert,
+            frequent: false,
+            symbol: { class: 'mc-icon-Refresh' },
+            title: { translationId: 'action.revert.tooltip' },
             dependentField: { field: 'layerURLMissing', expectedValue: false },
             views: [TabViews.CATALOG, TabViews.SEARCH_RESULTS],
           },
