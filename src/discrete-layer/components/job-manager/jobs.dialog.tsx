@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React, { useEffect, useCallback, useState, useMemo } from 'react';
+import React, { useEffect, useCallback, useRef, useState, useMemo } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { cloneDeep, isEmpty } from 'lodash';
 import { observer } from 'mobx-react';
 import moment from 'moment';
 import { DialogContent } from '@material-ui/core';
-import { Button, Dialog, DialogTitle, IconButton } from '@map-colonies/react-core';
+import { Button, Checkbox, Dialog, DialogTitle, IconButton } from '@map-colonies/react-core';
 import { Box, DateTimeRangePicker, SupportedLocales } from '@map-colonies/react-components';
 import { IActionGroup } from '../../../common/actions/entity.actions';
 import { GraphQLError } from '../../../common/components/error/graphql.error-presentor';
@@ -55,6 +55,10 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
     moment().subtract(CONFIG.JOB_MANAGER.FILTER_DAYS_TIME_SLOT, 'days').startOf('day').toDate()
   );
   const [tillDate, setTillDate] = useState<Date | undefined>(moment().endOf('day').toDate());
+  const [includeInternals, setIncludeInternals] = useState<boolean>(false);
+  const [includeB2B, setIncludeB2B] = useState<boolean>(false);
+  const [hasDateFieldError, setHasDateFieldError] = useState<boolean>(false);
+  const drpContainerRef = useRef<HTMLDivElement>(null);
   const [focusError, setFocusError] = useState<IError | undefined>(undefined);
   const [dateRangeError, setDateRangeError] = useState<IError | undefined>(undefined);
   const [errorMessages, setErrorMessages] = useState<IError[]>([]);
@@ -65,14 +69,41 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
     (actions as IActions).start();
   }, []);
 
+  useEffect(() => {
+    const container = drpContainerRef.current;
+    if (!container) {
+      return;
+    }
+    const updateHasDateFieldError = (): void => {
+      setHasDateFieldError(container.querySelector('.Mui-error') !== null);
+    };
+    updateHasDateFieldError();
+    const observer = new MutationObserver(updateHasDateFieldError);
+    observer.observe(container, {
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['class'],
+    });
+    return (): void => {
+      observer.disconnect();
+    };
+  }, []);
+
+  const getJobsQueryParams = useCallback(
+    () => ({
+      fromDate,
+      tillDate,
+      includeInternals,
+      includeB2B,
+    }),
+    [fromDate, tillDate, includeInternals, includeB2B]
+  );
+
   // eslint-disable-next-line
   const { setQuery, loading, error, data, query } = useQuery(
     (store) =>
       store.queryJobs({
-        params: {
-          fromDate,
-          tillDate,
-        },
+        params: getJobsQueryParams(),
       }),
     {
       fetchPolicy: 'no-cache',
@@ -115,14 +146,11 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
       (actions as IActions).start(POLLING_CYCLE_INTERVAL);
       setQuery((store) =>
         store.queryJobs({
-          params: {
-            fromDate,
-            tillDate,
-          },
+          params: getJobsQueryParams(),
         })
       );
     }
-  }, [fromDate, tillDate, setQuery]);
+  }, [fromDate, tillDate, includeInternals, includeB2B, setQuery, getJobsQueryParams]);
 
   useEffect(() => {
     if (data !== undefined) {
@@ -136,10 +164,7 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
       setUpdateTaskPayload({});
       setQuery((store) =>
         store.queryJobs({
-          params: {
-            fromDate,
-            tillDate,
-          },
+          params: getJobsQueryParams(),
         })
       );
     }
@@ -158,10 +183,7 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
       (actions as IActions).start(POLLING_CYCLE_INTERVAL);
       setQuery((store) =>
         store.queryJobs({
-          params: {
-            fromDate,
-            tillDate,
-          },
+          params: getJobsQueryParams(),
         })
       );
     }, POLLING_CYCLE_INTERVAL);
@@ -319,9 +341,32 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
     );
   };
 
+  const renderJobTypeFilters = (): JSX.Element => {
+    return (
+      <Box className="jobsTypeFilters">
+        <Checkbox
+          checked={includeInternals}
+          disabled={loading || hasDateFieldError}
+          label={intl.formatMessage({ id: 'system-status.job.filter.include-internals.label' })}
+          onChange={(evt: React.MouseEvent<HTMLInputElement>): void => {
+            setIncludeInternals(evt.currentTarget.checked);
+          }}
+        />
+        <Checkbox
+          checked={includeB2B}
+          disabled={loading || hasDateFieldError}
+          label={intl.formatMessage({ id: 'system-status.job.filter.include-b2b.label' })}
+          onChange={(evt: React.MouseEvent<HTMLInputElement>): void => {
+            setIncludeB2B(evt.currentTarget.checked);
+          }}
+        />
+      </Box>
+    );
+  };
+
   const renderDateTimeRangePicker = (): JSX.Element => {
     return (
-      <Box className="jobsTimeRangePicker">
+      <div className="jobsTimeRangePicker" ref={drpContainerRef}>
         <DateTimeRangePicker
           controlsLayout="row"
           dateFormat="dd/MM/yyyy"
@@ -361,7 +406,7 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
               ],
           }}
         />
-      </Box>
+      </div>
     );
   };
 
@@ -371,23 +416,26 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
         <DialogTitle>
           <FormattedMessage id="system-status.title" />
           <Box
-            className="refreshContainer"
+            className={`refreshContainer${loading || hasDateFieldError ? ' disabled' : ''}`}
             onClick={(): void => {
+              if (loading || hasDateFieldError) {
+                return;
+              }
               setErrorMessages((prev) =>
                 upsertOrRemoveError(prev, undefined, 'error.server-error')
               );
               (actions as IActions).start(POLLING_CYCLE_INTERVAL);
               setQuery((store) =>
                 store.queryJobs({
-                  params: {
-                    fromDate,
-                    tillDate,
-                  },
+                  params: getJobsQueryParams(),
                 })
               );
             }}
           >
-            <IconButton className="refreshIcon mc-icon-Refresh" />
+            <IconButton
+              className="refreshIcon mc-icon-Refresh"
+              disabled={loading || hasDateFieldError}
+            />
             <Box className="refreshSecs">{`${(timeLeft as number) / MILLISECONDS_IN_SEC}`}</Box>
           </Box>
           <IconButton
@@ -398,7 +446,11 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
           />
         </DialogTitle>
         <DialogContent className="jobsBody">
-          {renderDateTimeRangePicker()}
+          <Box className="jobsFilterRow">
+            <Box className="jobsFilterSpacer" />
+            {renderDateTimeRangePicker()}
+            {renderJobTypeFilters()}
+          </Box>
           {!error &&
             typeof fromDate !== 'undefined' &&
             typeof tillDate !== 'undefined' &&
