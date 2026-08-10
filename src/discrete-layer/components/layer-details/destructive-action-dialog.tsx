@@ -102,17 +102,7 @@ export const DestructiveActionDialog: React.FC<DestructiveActionDialogProps> = (
               const mergedErrors = { ...fieldErrors, ...(polygonPartsError ?? {}) };
 
               return (
-                <form
-                  onSubmit={formikProps.handleSubmit}
-                  noValidate
-                  onClick={(event: React.MouseEvent<HTMLFormElement>): void => {
-                    const button = (event.target as HTMLElement).closest('button');
-                    const explicitType = button?.getAttribute('type');
-                    if (button && explicitType !== 'submit' && explicitType !== 'button') {
-                      event.preventDefault();
-                    }
-                  }}
-                >
+                <form onSubmit={formikProps.handleSubmit}>
                   {sidePanel ? (
                     <Box className="mapRow">
                       <Box className="overlayPanel">
