@@ -11,10 +11,6 @@
   padding-inline: 20px;
 }
 
-body[dir='rtl'] .switchContainer {
-  flex-direction: row-reverse;
-}
-
 .userModeSwitchDialogContent {
   min-width: 400px;
   min-height: 200px;
@@ -45,23 +41,6 @@ body[dir='rtl'] .userModeSwitchDialog .closeIcon {
   align-items: center;
   justify-content: center;
   margin-top: var(--invalid_msg_height);
-}
-
-.switchContainer .MuiSwitch-track {
-  background-color: var(--mdc-theme-gc-selection-background);
-}
-
-.switchContainer .MuiSwitch-colorSecondary.Mui-checked + .MuiSwitch-track {
-  background-color: var(--mdc-theme-gc-selection-background);
-  filter: brightness(2);
-}
-
-.switchContainer .MuiSwitch-colorSecondary.Mui-checked {
-  color: var(--mdc-theme-text-icon-on-dark);
-}
-
-.switchContainer .MuiSwitch-switchBase {
-  color: var(--mdc-theme-text-icon-on-dark);
 }
 
 .dialogContentContainer {

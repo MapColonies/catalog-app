@@ -687,6 +687,9 @@
 
   "system-status.job.filter.status.all": "All",
 
+  "system-status.job.filter.include-internals.label": "Include Internals",
+  "system-status.job.filter.include-b2b.label": "Include Export",
+
   "system-status.job-priority-lowest": "Lowest",
   "system-status.job-priority-low": "Low",
   "system-status.job-priority-normal": "Normal",
