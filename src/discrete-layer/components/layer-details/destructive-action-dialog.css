@@ -52,6 +52,12 @@ body[dir='rtl'] .destructiveActionDialog .closeIcon {
 .destructiveActionDialog .buttons {
   display: flex;
   gap: 20px;
+  margin-left: auto;
+}
+
+body[dir='rtl'] .destructiveActionDialog .buttons {
+  margin-left: unset;
+  margin-right: auto;
 }
 
 .destructiveActionDialog .errors {
