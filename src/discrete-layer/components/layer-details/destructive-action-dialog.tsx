@@ -24,9 +24,6 @@ import './destructive-action-dialog.css';
 
 const NONE = 0;
 
-// Shared props every destructive action dialog (raster delete/revert, 3D delete) is invoked
-// with from discrete-layer-view.tsx - independent of whether it renders through
-// DestructiveActionDialog or composes the shared pieces directly.
 export interface ActionDialogProps {
   layerRecord: ILayerImage;
   isOpen: boolean;
@@ -46,19 +43,12 @@ interface DestructiveActionDialogProps {
   loading: boolean;
   error: unknown;
   polygonPartsError?: Record<string, string[]> | null;
-  // The caller builds its own map (e.g. ActionMap for raster, GeoJsonMapValuePresentorComponent
-  // for 3D) - this dialog has no opinion on which map implementation is used.
   map: JSX.Element | null;
   sidePanel?: JSX.Element | null;
   extraContent?: JSX.Element | null;
   onFieldsValidate?: () => void;
 }
 
-// Generic shell for confirm-with-approver-fields destructive actions: title, disclaimer,
-// layer header, an injected map (+ optional side panel), the approver-name/approval-code
-// form, and the errors/submit/cancel footer. Operation-specific business logic (the actual
-// mutation, map contents, overlay state) stays with the caller - this component only owns
-// the parts that look and behave identically across raster delete and raster revert.
 export const DestructiveActionDialog: React.FC<DestructiveActionDialogProps> = ({
   elementId,
   action,
@@ -116,11 +106,11 @@ export const DestructiveActionDialog: React.FC<DestructiveActionDialogProps> = (
                 <form onSubmit={formikProps.handleSubmit}>
                   {sidePanel ? (
                     <Box className="mapRow">
-                      <Box className="mapColumn">{map}</Box>
                       <Box className="overlayPanel">
                         {sidePanel}
                         <ApproverFields formikProps={formikProps} className="sidePanelFields" />
                       </Box>
+                      <Box className="mapColumn">{map}</Box>
                     </Box>
                   ) : (
                     <>
