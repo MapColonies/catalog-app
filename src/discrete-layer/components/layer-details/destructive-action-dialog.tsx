@@ -45,7 +45,6 @@ interface DestructiveActionDialogProps {
   polygonPartsError?: Record<string, string[]> | null;
   map: JSX.Element | null;
   sidePanel?: JSX.Element | null;
-  extraContent?: JSX.Element | null;
   onFieldsValidate?: () => void;
 }
 
@@ -63,7 +62,6 @@ export const DestructiveActionDialog: React.FC<DestructiveActionDialogProps> = (
   polygonPartsError = null,
   map,
   sidePanel = null,
-  extraContent = null,
   onFieldsValidate,
 }) => {
   const intl = useIntl();
@@ -118,7 +116,6 @@ export const DestructiveActionDialog: React.FC<DestructiveActionDialogProps> = (
                       <ApproverFields formikProps={formikProps} className="fields" />
                     </>
                   )}
-                  {extraContent}
                   <Box className="footer">
                     <Box className="errors">
                       <GraphQLError error={error} />
