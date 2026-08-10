@@ -9,6 +9,7 @@ import { Mode } from '../../../common/models/mode.enum';
 import { getTextStyle } from '../../../common/helpers/style';
 import { GraphQLError } from '../../../common/components/error/graphql.error-presentor';
 import { ValidationsError } from '../../../common/components/error/validations.error-presentor';
+import { RecordType } from '../../models';
 import { ILayerImage } from '../../models/layerImage';
 import {
   ApprovalFormValues,
@@ -16,7 +17,7 @@ import {
   APPROVAL_INITIAL_VALUES,
   buildApprovalFieldsSchema,
 } from './approver-fields';
-import { DialogActionTitle } from './dialog.helpers';
+import { DialogActionTitle } from './dialog-action-title';
 import { DialogDisclaimer } from './dialog-disclaimer';
 import { LayerHeader } from './layer-header';
 
@@ -36,8 +37,8 @@ interface DestructiveActionDialogProps {
   action: Mode;
   isOpen: boolean;
   layerRecord: ILayerImage;
-  dialogTitleParamTranslation: string;
-  disclaimer: string;
+  recordType: RecordType;
+  disclaimerActionId: string;
   onClose: () => void;
   onSubmit: (approverName: string, approvalCode: string) => void;
   loading: boolean;
@@ -53,8 +54,8 @@ export const DestructiveActionDialog: React.FC<DestructiveActionDialogProps> = (
   action,
   isOpen,
   layerRecord,
-  dialogTitleParamTranslation,
-  disclaimer,
+  recordType,
+  disclaimerActionId,
   onClose,
   onSubmit,
   loading,
@@ -72,13 +73,13 @@ export const DestructiveActionDialog: React.FC<DestructiveActionDialogProps> = (
     <Box id={elementId} className="destructiveActionDialog">
       <Dialog open={isOpen} preventOutsideDismiss={true}>
         <DialogActionTitle
-          domain={dialogTitleParamTranslation}
+          recordType={recordType}
           action={action}
           onClose={onClose}
           style={getTextStyle(layerRecord as any, 'backgroundColor')}
         />
         <DialogContent>
-          <DialogDisclaimer content={disclaimer} />
+          <DialogDisclaimer actionId={disclaimerActionId} />
           <LayerHeader layerRecord={layerRecord} />
           <Formik
             initialValues={APPROVAL_INITIAL_VALUES}

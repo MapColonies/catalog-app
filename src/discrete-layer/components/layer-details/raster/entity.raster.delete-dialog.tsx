@@ -6,7 +6,6 @@ import { FlyTo } from '../../../../common/components/ol-map/fly-to';
 import { RecordType, RootStoreType, useQuery, useStore } from '../../../models';
 import { OlLayerRecordTile } from '../../map-container/ol.layer-record.tile';
 import { ActionDialogProps, DestructiveActionDialog } from '../destructive-action-dialog';
-import { useLayerActionDialog } from '../layer-action-dialog.hook';
 import { GeoFeaturesPresentorComponent } from './pp-map';
 import { START_RASTER_LAYER_ZINDEX } from './pp-map.utils';
 
@@ -40,11 +39,9 @@ export const EntityDeleteRasterDialog: React.FC<ActionDialogProps> = observer(
       };
     }, [props.layerRecord.footprint?.bbox]);
 
-    const { dialogTitleParamTranslation, closeDialog, disclaimer } = useLayerActionDialog({
-      onSetOpen: props.onSetOpen,
-      layerRecord: props.layerRecord,
-      recordType: RecordType.RECORD_RASTER,
-    });
+    const closeDialog = (): void => {
+      props.onSetOpen(false);
+    };
 
     useEffect(() => {
       if (store.discreteLayersStore.customValidationError) {
@@ -91,8 +88,8 @@ export const EntityDeleteRasterDialog: React.FC<ActionDialogProps> = observer(
         action={Mode.DELETE}
         isOpen={props.isOpen}
         layerRecord={props.layerRecord}
-        dialogTitleParamTranslation={dialogTitleParamTranslation}
-        disclaimer={disclaimer}
+        recordType={RecordType.RECORD_RASTER}
+        disclaimerActionId="action.dialog.delete"
         onClose={closeDialog}
         onSubmit={deleteLayer}
         loading={mutationQuery.loading}

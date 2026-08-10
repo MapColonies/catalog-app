@@ -4,7 +4,6 @@ import { Box } from '@map-colonies/react-components';
 import { Mode } from '../../../../common/models/mode.enum';
 import { RecordType } from '../../../models';
 import { ActionDialogProps, DestructiveActionDialog } from '../destructive-action-dialog';
-import { useLayerActionDialog } from '../layer-action-dialog.hook';
 
 import './entity.raster.revert-dialog.css';
 
@@ -24,12 +23,9 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
     //   DEFAULT_OVERLAY_VISIBILITY.changesArea
     // );
 
-    const { dialogTitleParamTranslation, closeDialog, disclaimer } = useLayerActionDialog({
-      onSetOpen: props.onSetOpen,
-      layerRecord: props.layerRecord,
-      recordType: RecordType.RECORD_RASTER,
-      disclaimerActionId: 'action.dialog.revert',
-    });
+    const closeDialog = (): void => {
+      props.onSetOpen(false);
+    };
 
     // const overlays = useMemo(
     //   () => buildRevertOverlayFeatures(props.layerRecord.footprint?.bbox),
@@ -163,8 +159,8 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
         action={Mode.REVERT}
         isOpen={props.isOpen}
         layerRecord={props.layerRecord}
-        dialogTitleParamTranslation={dialogTitleParamTranslation}
-        disclaimer={disclaimer}
+        recordType={RecordType.RECORD_RASTER}
+        disclaimerActionId="action.dialog.revert"
         onClose={closeDialog}
         onSubmit={revertLayer}
         loading={false}

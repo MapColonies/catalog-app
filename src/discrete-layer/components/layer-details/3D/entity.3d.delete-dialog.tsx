@@ -10,10 +10,9 @@ import { Mode } from '../../../../common/models/mode.enum';
 import { getTextStyle } from '../../../../common/helpers/style';
 import { RecordType, RootStoreType, useQuery, useStore } from '../../../models';
 import { ActionDialogProps } from '../destructive-action-dialog';
+import { DialogActionTitle } from '../dialog-action-title';
 import { DialogDisclaimer } from '../dialog-disclaimer';
-import { DialogActionTitle } from '../dialog.helpers';
 import { GeoJsonMapValuePresentorComponent } from '../field-value-presentors/geojson-map.value-presentor';
-import { useLayerActionDialog } from '../layer-action-dialog.hook';
 import { LayerHeader } from '../layer-header';
 
 import './entity.3d.delete-dialog.css';
@@ -27,11 +26,9 @@ export const EntityDelete3DDialog: React.FC<ActionDialogProps> = observer(
     const mutationQuery = useQuery<Delete3DLayerResult>();
     const [allowDeleting, setAllowDeleting] = useState(false);
 
-    const { dialogTitleParamTranslation, closeDialog, disclaimer } = useLayerActionDialog({
-      onSetOpen: props.onSetOpen,
-      layerRecord: props.layerRecord,
-      recordType: RecordType.RECORD_3D,
-    });
+    const closeDialog = (): void => {
+      props.onSetOpen(false);
+    };
 
     useEffect(() => {
       if (mutationQuery.data && !mutationQuery.error) {
@@ -55,13 +52,13 @@ export const EntityDelete3DDialog: React.FC<ActionDialogProps> = observer(
       <Box id="dialog3DDelete" className="destructiveActionDialog">
         <Dialog open={props.isOpen} preventOutsideDismiss={true}>
           <DialogActionTitle
-            domain={dialogTitleParamTranslation}
+            recordType={RecordType.RECORD_3D}
             action={Mode.DELETE}
             onClose={closeDialog}
             style={getTextStyle(props.layerRecord as any, 'backgroundColor')}
           />
           <DialogContent>
-            <DialogDisclaimer content={disclaimer} />
+            <DialogDisclaimer actionId="action.dialog.delete" />
             <LayerHeader layerRecord={props.layerRecord} />
             <GeoJsonMapValuePresentorComponent
               mode={Mode.VIEW}
