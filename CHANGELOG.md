@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [6.6.0](https://github.com/MapColonies/catalog-app/compare/v6.5.2...v6.6.0) (2026-08-10)
+
+
+### Features
+
+* job manager b2b and internal jobs (MAPCO-11314) ([#1014](https://github.com/MapColonies/catalog-app/issues/1014)) ([33d7780](https://github.com/MapColonies/catalog-app/commit/33d7780ba9a28c425acc90e8b4e6100063bbea6f))
+
 ## [6.5.2](https://github.com/MapColonies/catalog-app/compare/v6.5.1...v6.5.2) (2026-08-03)
 
 
