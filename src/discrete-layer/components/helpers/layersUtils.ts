@@ -4,7 +4,7 @@ import bbox from '@turf/bbox';
 import bboxPolygon from '@turf/bbox-polygon';
 import booleanContains from '@turf/boolean-contains';
 import { LinkType } from '../../../common/models/link-type.enum';
-import { WMTSSourceOptions } from '../../../common/components/ol-layer/layer.config.options';
+import { WMTSSourceOptions } from '../../../common/components/ol-map/layer.config.options-bridging';
 import CONFIG from '../../../common/config';
 import { ResourceUrlModelType } from '../../models/ResourceUrlModel';
 import { ILayerImage } from '../../models/layerImage';

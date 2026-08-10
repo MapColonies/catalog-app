@@ -9,6 +9,7 @@ helm/**
 public/**
 build
 node_modules
+coverage
 
 # generated files
 src/discrete-layer/models/**/*

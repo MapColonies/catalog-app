@@ -5,7 +5,7 @@ import {
   WMTSSourceOptions,
   WMTSOptions,
   XYZOptions,
-} from '../../../common/components/ol-layer/layer.config.options';
+} from '../../../common/components/ol-map/layer.config.options-bridging';
 
 export const DEFAULT_PROJECTION = 'EPSG:4326';
 

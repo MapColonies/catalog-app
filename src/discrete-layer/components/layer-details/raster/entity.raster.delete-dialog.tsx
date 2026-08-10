@@ -1,15 +1,11 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { Feature } from 'geojson';
+import React, { useEffect, useState } from 'react';
 import { observer } from 'mobx-react';
 import { Mode } from '../../../../common/models/mode.enum';
-import { FlyTo } from '../../../../common/components/ol-map/fly-to';
 import { RecordType, RootStoreType, useQuery, useStore } from '../../../models';
-import { OlLayerRecordTile } from '../../map-container/ol.layer-record.tile';
 import { ActionDialogProps, DestructiveActionDialog } from '../destructive-action-dialog';
-import { GeoFeaturesPresentorComponent } from './pp-map';
-import { START_RASTER_LAYER_ZINDEX } from './pp-map.utils';
 
 import './entity.raster.delete-dialog.css';
+import { OlLayerMap } from './layer-map';
 
 type DeleteRasterLayerResult = Awaited<ReturnType<RootStoreType['mutateDeleteRasterLayer']>>; // see (MAPCO-11216)
 
@@ -22,22 +18,6 @@ export const EntityDeleteRasterDialog: React.FC<ActionDialogProps> = observer(
     const [polygonPartsError, setPolygonPartsError] = useState<Record<string, string[]> | null>(
       null
     );
-
-    const flyToFeature = useMemo(() => {
-      return {
-        type: 'Feature',
-        properties: {},
-        geometry: props.layerRecord.footprint,
-      } as Feature;
-    }, [props.layerRecord.footprint]);
-
-    const layerCapability = store.discreteLayersStore.getLayerCapability(props.layerRecord);
-    const layerOptions = useMemo(() => {
-      return {
-        extent: props.layerRecord.footprint?.bbox,
-        zIndex: START_RASTER_LAYER_ZINDEX,
-      };
-    }, [props.layerRecord.footprint?.bbox]);
 
     const closeDialog = (): void => {
       props.onSetOpen(false);
@@ -96,22 +76,12 @@ export const EntityDeleteRasterDialog: React.FC<ActionDialogProps> = observer(
         error={mutationError}
         polygonPartsError={polygonPartsError}
         map={
-          <GeoFeaturesPresentorComponent
+          <OlLayerMap
             layerRecord={props.layerRecord}
-            mode={Mode.DELETE}
+            showBaseMap={{ value: false, showToggleButton: true }}
+            showPolygonParts={{ value: false, showCheckbox: true }}
             style={{ height: 'var(--map-height)', position: 'relative', direction: 'ltr' }}
-            defaultShowBaseMap={false}
-            toggleBaseMap={true}
-          >
-            <>
-              <OlLayerRecordTile
-                layerRecord={props.layerRecord}
-                capability={layerCapability}
-                layerOptions={layerOptions}
-              />
-              <FlyTo feature={flyToFeature} flyOnce={true}></FlyTo>
-            </>
-          </GeoFeaturesPresentorComponent>
+          ></OlLayerMap>
         }
         onFieldsValidate={() => {
           setMutationError(null);

@@ -1,16 +1,10 @@
 import { CSSProperties, useEffect, useState } from 'react';
-import {
-  Box,
-  GeoJSONFeature,
-  Map,
-  VectorLayer,
-  VectorSource,
-} from '@map-colonies/react-components';
+import { Box, GeoJSONFeature, VectorLayer, VectorSource } from '@map-colonies/react-components';
 import { Geometry } from 'geojson';
 import { FitOptions } from 'ol/View';
 import { validateGeoJSONString } from '../../../../common/utils/geojson.validation';
 import { Mode } from '../../../../common/models/mode.enum';
-import { OlBaseMap } from '../../../../common/components/ol-layer/ol.base-map';
+import { IOLMapBaseMaps, OLMap } from '../../../../common/components/ol-map/ol-map';
 import { useStore } from '../../../models/RootStore';
 
 interface GeoJsonMapValuePresentorProps {
@@ -44,9 +38,12 @@ export const GeoJsonMapValuePresentorComponent: React.FC<GeoJsonMapValuePresento
   }, [mode, jsonValue]);
 
   return (
-    <Box style={{ ...style }}>
-      <Map>
-        <OlBaseMap baseMaps={store.discreteLayersStore.baseMaps} />
+    <Box style={{ ...style, position: 'relative' }}>
+      <OLMap
+        baseMapsConfig={store.discreteLayersStore.baseMaps as unknown as IOLMapBaseMaps}
+        mapLoadingIndicator={false}
+        zoomLevelWidget={null}
+      >
         {geoJsonValue && (
           <VectorLayer>
             <VectorSource>
@@ -58,7 +55,7 @@ export const GeoJsonMapValuePresentorComponent: React.FC<GeoJsonMapValuePresento
             </VectorSource>
           </VectorLayer>
         )}
-      </Map>
+      </OLMap>
     </Box>
   );
 };

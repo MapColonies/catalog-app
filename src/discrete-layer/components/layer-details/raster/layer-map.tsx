@@ -4,30 +4,27 @@ import React, {
   useCallback,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from 'react';
 import { useIntl } from 'react-intl';
 import { BBox, Feature, Geometry } from 'geojson';
 import { get } from 'lodash';
 import bboxPolygon from '@turf/bbox-polygon';
-import { FitOptions } from 'ol/View';
-import { Box, LegendItem, VectorLayer, VectorSource } from '@map-colonies/react-components';
+import { Box, LegendItem } from '@map-colonies/react-components';
 import { Checkbox } from '@map-colonies/react-core';
 import CONFIG from '../../../../common/config';
 import { useEnums } from '../../../../common/hooks/useEnum.hook';
-import { Mode } from '../../../../common/models/mode.enum';
 import { MapFeatureClickHandler } from '../../../../common/components/ol-map/map-feature-click-handler';
 import { OLMap } from '../../../../common/components/ol-map/ol-map';
 import { SelectedFeatureVectorLayer } from '../../../../common/components/ol-map/selected-feature-vector-layer';
+import { FlyTo } from '../../../../common/components/ol-map/fly-to';
 import { LayerRasterRecordModelType } from '../../../models';
 import { ILayerImage } from '../../../models/layerImage';
 import { useStore } from '../../../models/RootStore';
 import { GeojsonFeatureInput } from '../../../models/RootStore.base';
+import { OlLayer } from '../../map-container/ol.layer';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
 import { FeaturePropertiesPopupComponent } from './feature-properties-popup.component';
-import { FlyToPP } from './fly-to-pp';
-import { GeoFeaturesInnerComponent } from './geo-features-inner.component';
 import {
   IQueryExecutorResponse,
   PolygonPartsExtentQueryVectorLayer,
@@ -38,36 +35,42 @@ import {
   getText,
   getWFSFeatureTypeName,
   PPMapStyles,
+  START_RASTER_LAYER_ZINDEX,
 } from './pp-map.utils';
 import { FeatureType } from './feature-type.enum';
 
 import './pp-map.css';
 
-interface PPIngestionMapProps {
-  mode: Mode;
-  layerRecord?: ILayerImage | null;
-  geoFeatures?: Feature[];
-  selectedItem?: Feature;
-  onMapFeatureClick?: (feature: Feature | undefined) => void;
+interface LayerMapProps {
+  layerRecord: ILayerImage;
+  showPolygonParts?: {
+    value: boolean;
+    showCheckbox: boolean;
+  };
+  showLayer?: boolean;
+  showBaseMap?: {
+    value: boolean;
+    showToggleButton?: boolean;
+  };
   showFeaturePropertiesPopup?: boolean;
-  showPolygonParts?: boolean;
-  fitOptions?: FitOptions | undefined;
   style?: CSSProperties | undefined;
   children?: JSX.Element | null;
 }
 
-const MIN_FEATURES_NUMBER = 4; // minimal set of fetures (source, source_marker, perimeter, perimeter_marker)
 const CHILDREN_WITH_ZOOM_INDICATION = ['PolygonPartsExtentQueryVectorLayer'];
 
-export const PPIngestionMap: React.FC<PPIngestionMapProps> = ({
-  mode,
+export const OlLayerMap: React.FC<LayerMapProps> = ({
   layerRecord,
-  geoFeatures,
-  selectedItem,
-  onMapFeatureClick,
+  showPolygonParts = {
+    value: false,
+    showCheckbox: true,
+  },
+  showLayer = true,
+  showBaseMap = {
+    value: true,
+    showToggleButton: false,
+  },
   showFeaturePropertiesPopup = false,
-  showPolygonParts = false,
-  fitOptions,
   style,
   children,
 }) => {
@@ -75,10 +78,10 @@ export const PPIngestionMap: React.FC<PPIngestionMapProps> = ({
   const ENUMS = useEnums();
   const intl = useIntl();
   const ZOOM_LEVELS_TABLE = useZoomLevelsTable();
-  const renderCount = useRef(0);
   const [selectedFeature, setSelectedFeature] = useState<Feature | undefined>(undefined);
-  const [showExistingPolygonParts, setShowExistingPolygonParts] =
-    useState<boolean>(showPolygonParts);
+  const [showExistingPolygonParts, setShowExistingPolygonParts] = useState<boolean>(
+    showPolygonParts.value
+  );
   const [childrenWithZoomIndication, setChildrenWithZoomIndication] = useState<boolean>(false);
   const [isOpenProperties, setIsOpenProperties] = useState<boolean>(true);
 
@@ -103,18 +106,8 @@ export const PPIngestionMap: React.FC<PPIngestionMapProps> = ({
   }, [children]);
 
   useEffect(() => {
-    setShowExistingPolygonParts(showPolygonParts);
-  }, [showPolygonParts]);
-
-  useEffect(() => {
-    const definedElements = geoFeatures?.filter((feat) => feat !== undefined);
-    if (definedElements?.length === 0) {
-      renderCount.current = 0;
-    }
-    if (definedElements && definedElements?.length >= MIN_FEATURES_NUMBER) {
-      renderCount.current += 1;
-    }
-  });
+    setShowExistingPolygonParts(showPolygonParts.value);
+  }, [showPolygonParts.value]);
 
   useEffect(() => {
     if (selectedFeature) {
@@ -123,30 +116,6 @@ export const PPIngestionMap: React.FC<PPIngestionMapProps> = ({
       setIsOpenProperties(false);
     }
   }, [selectedFeature]);
-
-  useEffect(() => {
-    if (selectedItem) {
-      setSelectedFeature(selectedItem);
-      return;
-    }
-    setSelectedFeature((prev) => {
-      if (prev?.properties?._featureType === FeatureType.LOW_RESOLUTION_PP) {
-        return undefined;
-      }
-      return prev;
-    });
-  }, [selectedItem]);
-
-  useEffect(() => {
-    const selectedFeatureType = selectedFeature?.properties?._featureType;
-    const isManagedExternally =
-      selectedFeatureType === FeatureType.EXISTING_PP ||
-      selectedFeatureType === FeatureType.LOW_RESOLUTION_PP ||
-      !!selectedItem;
-    if (!isManagedExternally) {
-      setSelectedFeature(undefined);
-    }
-  }, [selectedFeature, selectedItem]);
 
   const closePropertiesPopup = useCallback((): void => {
     setIsOpenProperties(false);
@@ -162,17 +131,8 @@ export const PPIngestionMap: React.FC<PPIngestionMapProps> = ({
         });
       }
     });
-    const exceededStyle = PPMapStyles.get(FeatureType.LOW_RESOLUTION_PP)?.values?.[0]?.style;
-    if (exceededStyle) {
-      res.push({
-        title: intl.formatMessage({
-          id: 'polygon-parts.map-preview-legend.LOW_RESOLUTION_PP_EXCEEDED',
-        }) as string,
-        style: exceededStyle,
-      });
-    }
     return res;
-  }, []);
+  }, [intl]);
 
   const mapLocale = useMemo(
     () => ({
@@ -209,6 +169,23 @@ export const PPIngestionMap: React.FC<PPIngestionMapProps> = ({
     return { features, pageSize: CONFIG.POLYGON_PARTS.MAX.WFS_FEATURES };
   };
 
+  const layerCapability = store.discreteLayersStore.getLayerCapability(layerRecord);
+
+  const olLayerOptions = useMemo(() => {
+    return {
+      extent: layerRecord.footprint?.bbox,
+      zIndex: START_RASTER_LAYER_ZINDEX,
+    };
+  }, [layerRecord.footprint?.bbox]);
+
+  const footprintFeature = useMemo(() => {
+    return {
+      type: 'Feature',
+      properties: {},
+      geometry: layerRecord.footprint,
+    } as Feature;
+  }, [layerRecord.footprint]);
+
   return (
     <Box id="geoFeaturesMapContainer" style={{ ...style }}>
       <OLMap
@@ -216,6 +193,8 @@ export const PPIngestionMap: React.FC<PPIngestionMapProps> = ({
           store.discreteLayersStore.baseMaps
             ? {
                 maps: store.discreteLayersStore.baseMaps.maps,
+                showBaseMap: showBaseMap?.value ?? false,
+                showToggleButton: showBaseMap?.showToggleButton,
               }
             : undefined
         }
@@ -228,16 +207,7 @@ export const PPIngestionMap: React.FC<PPIngestionMapProps> = ({
         legends={LegendsArray}
         locale={mapLocale}
       >
-        <VectorLayer>
-          <VectorSource>
-            <GeoFeaturesInnerComponent
-              geoFeatures={geoFeatures}
-              fitOptions={fitOptions}
-              renderCount={renderCount}
-            />
-          </VectorSource>
-        </VectorLayer>
-        {mode !== Mode.NEW && (
+        {showPolygonParts.showCheckbox && (
           <Box className="checkbox">
             <Checkbox
               className="showOnMapContainer"
@@ -264,10 +234,7 @@ export const PPIngestionMap: React.FC<PPIngestionMapProps> = ({
           />
         )}
         {children}
-        <MapFeatureClickHandler
-          onMapFeatureClick={onMapFeatureClick}
-          setSelectedFeature={setSelectedFeature}
-        />
+        <MapFeatureClickHandler setSelectedFeature={setSelectedFeature} />
         <SelectedFeatureVectorLayer
           feature={selectedFeature}
           options={{
@@ -275,12 +242,22 @@ export const PPIngestionMap: React.FC<PPIngestionMapProps> = ({
             zIndex: VectorLayerZIndex.SELECTED,
           }}
         />
-        <FlyToPP feature={selectedFeature} />
+        <FlyTo feature={selectedFeature} />
         {showFeaturePropertiesPopup && isOpenProperties && (
           <FeaturePropertiesPopupComponent
             selectedFeature={selectedFeature}
             onClose={closePropertiesPopup}
           />
+        )}
+        {showLayer && (
+          <>
+            <OlLayer
+              layerRecord={layerRecord}
+              capability={layerCapability}
+              layerOptions={olLayerOptions}
+            />
+            <FlyTo feature={footprintFeature} flyOnce={true} />
+          </>
         )}
       </OLMap>
     </Box>
