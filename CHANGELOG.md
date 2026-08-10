@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [6.7.0](https://github.com/MapColonies/catalog-app/compare/v6.6.0...v6.7.0) (2026-08-10)
+
+
+### Features
+
+* refactor ol map (MAPCO-11301, MAPCO-11305) ([#1015](https://github.com/MapColonies/catalog-app/issues/1015)) ([5356f2a](https://github.com/MapColonies/catalog-app/commit/5356f2a9fe01b248567bf892537828a3ca3d86a8))
+
 ## [6.6.0](https://github.com/MapColonies/catalog-app/compare/v6.5.2...v6.6.0) (2026-08-10)
 
 
