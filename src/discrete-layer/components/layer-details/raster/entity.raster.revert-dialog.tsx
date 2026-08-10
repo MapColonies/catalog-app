@@ -1,45 +1,23 @@
-import React, { useMemo, useState } from 'react';
-import { useIntl } from 'react-intl';
+import React from 'react';
 import { observer } from 'mobx-react';
-import { VectorLayer, VectorSource, GeoJSONFeature, Box } from '@map-colonies/react-components';
-import { Checkbox } from '@map-colonies/react-core';
+import { Box } from '@map-colonies/react-components';
 import { Mode } from '../../../../common/models/mode.enum';
 import { RecordType } from '../../../models';
-import { ActionMap } from '../action-map';
 import { ActionDialogProps, DestructiveActionDialog } from '../destructive-action-dialog';
 import { useLayerActionDialog } from '../layer-action-dialog.hook';
-import {
-  EXISTING_STYLE,
-  BACKUP_STYLE,
-  CHANGES_ADDED_STYLE,
-  CHANGES_REMOVED_STYLE,
-  EXISTING_COLOR,
-  BACKUP_COLOR,
-  CHANGES_ADDED_COLOR,
-  CHANGES_REMOVED_COLOR,
-  buildRevertOverlayFeatures,
-} from './MOCK';
 
 import './entity.raster.revert-dialog.css';
 
-type OverlayId = 'existing' | 'backup' | 'changesArea';
+// type OverlayId = 'existing' | 'backup' | 'changesArea';
 
-const REVERT_OVERLAY_ZINDEX = {
-  EXISTING: 21,
-  BACKUP: 22,
-  CHANGES_AREA: 23,
-};
-
-const DEFAULT_OVERLAY_VISIBILITY: Record<OverlayId, boolean> = {
-  existing: true,
-  backup: true,
-  changesArea: false,
-};
+// const DEFAULT_OVERLAY_VISIBILITY: Record<OverlayId, boolean> = {
+//   existing: true,
+//   backup: true,
+//   changesArea: false,
+// };
 
 export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
   (props: ActionDialogProps) => {
-    // const intl = useIntl();
-
     // const [isExistingVisible, setIsExistingVisible] = useState(DEFAULT_OVERLAY_VISIBILITY.existing);
     // const [isBackupVisible, setIsBackupVisible] = useState(DEFAULT_OVERLAY_VISIBILITY.backup);
     // const [isChangesAreaVisible, setIsChangesAreaVisible] = useState(
