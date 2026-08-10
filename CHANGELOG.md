@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [6.6.0](https://github.com/MapColonies/catalog-app/compare/v6.5.2...v6.6.0) (2026-08-10)
+
+
+### Features
+
+* job manager b2b and internal jobs (MAPCO-11314) ([#1014](https://github.com/MapColonies/catalog-app/issues/1014)) ([33d7780](https://github.com/MapColonies/catalog-app/commit/33d7780ba9a28c425acc90e8b4e6100063bbea6f))
+
+
+### Bug Fixes
+
+* missing layer actions menu line separator (MAPCO-11371) ([#1017](https://github.com/MapColonies/catalog-app/issues/1017)) ([33c2cc6](https://github.com/MapColonies/catalog-app/commit/33c2cc6d07288b066fb9cb51f240a7f0f2d1159c))
+* use Switches from react-core instead of [@material-ui](https://github.com/material-ui) (MAPCO-11372) ([#1016](https://github.com/MapColonies/catalog-app/issues/1016)) ([dc49c53](https://github.com/MapColonies/catalog-app/commit/dc49c5307e0f25e9ecad7b584c12a1dec1fed392))
+
 ## [6.5.2](https://github.com/MapColonies/catalog-app/compare/v6.5.1...v6.5.2) (2026-08-03)
 
 
