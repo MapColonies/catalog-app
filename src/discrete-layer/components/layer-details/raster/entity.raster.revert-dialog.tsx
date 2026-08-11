@@ -249,7 +249,7 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
       <OlLayerMap
         layerRecord={props.layerRecord}
         showBaseMap={{ value: true, showToggleButton: false }}
-        style={{ height: 'var(--map-height)', position: 'relative', direction: 'ltr' }}
+        style={{ position: 'relative', direction: 'ltr', height: '100%' }}
       >
         {mapChildren}
       </OlLayerMap>

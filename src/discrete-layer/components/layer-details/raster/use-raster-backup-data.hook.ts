@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import {
+  GeojsonFeatureCollectionModelType,
   GetFeatureModelType,
   LayerRasterRecordModelType,
   ProductType,
@@ -11,7 +12,7 @@ import { ILayerImage } from '../../../models/layerImage';
 export interface RasterBackupData {
   backupMetadata: LayerRasterRecordModelType | undefined;
   backupPolygonParts: GetFeatureModelType | undefined;
-  backupOuterPerimeter: GetFeatureModelType | undefined;
+  backupOuterPerimeter: GeojsonFeatureCollectionModelType | undefined;
   loading: boolean;
   metadataError: unknown;
   polygonPartsError: unknown;
@@ -24,7 +25,9 @@ export const useRasterBackupData = (layerRecord: ILayerImage): RasterBackupData 
 
   const metadataQuery = useQuery<{ getRasterBackupMetadata: LayerRasterRecordModelType }>();
   const polygonPartsQuery = useQuery<{ getRasterBackupPolygonParts: GetFeatureModelType }>();
-  const outerPerimeterQuery = useQuery<{ getRasterBackupOuterPerimeter: GetFeatureModelType }>();
+  const outerPerimeterQuery = useQuery<{
+    getRasterBackupOuterPerimeter: GeojsonFeatureCollectionModelType;
+  }>();
 
   useEffect(() => {
     const { productId, productVersion, productType } = currentLayer;
