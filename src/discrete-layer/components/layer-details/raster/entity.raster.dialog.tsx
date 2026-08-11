@@ -45,11 +45,11 @@ import {
   DEFAULT_TYPE_NAME,
 } from '../utils';
 import suite from '../validate';
+import { LayerHeader } from '../layer-header';
 import EntityRasterForm from './layer-details-form.raster';
 import { RasterWorkflowProvider, RasterWorkflowContext } from './state-machine/context';
 import { Events } from './state-machine/types';
-import { UpdateLayerHeader } from './update-layer-header';
-import { getUIIngestionFieldDescriptors } from './utils';
+import { getUIIngestionFieldDescriptors, isLayerLocked } from './utils';
 
 import './entity.raster.dialog.css';
 
@@ -397,9 +397,10 @@ const EntityRasterDialogInner: React.FC<EntityRasterInnerProps> = observer(
           </DialogTitle>
           <DialogContent className="dialogBody">
             {state.context.updatedLayer && (
-              <UpdateLayerHeader
+              <LayerHeader
                 entityDescriptors={entityDescriptors}
                 layerRecord={state.context.updatedLayer}
+                layerState={isLayerLocked(state.context) ? 'locked' : undefined}
               />
             )}
             {isAllInfoReady && (

@@ -27,6 +27,7 @@ import { isGeometryEmpty } from '../../../../common/utils/geo.tools';
 import { EntityDescriptorModelType } from '../../../models';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
 import { isEmptyLayerRecord } from '../utils';
+import { LayerHeader } from '../layer-header';
 import { FeatureType } from './feature-type.enum';
 import { GeoFeaturesInnerComponent } from './geo-features-inner.component';
 import {
@@ -38,7 +39,7 @@ import { EXCEEDED_PROPERTY_NAME, EXCEEDED_PROPERTY_VALUE, VectorLayerZIndex } fr
 import { ProgressCurtain } from './progressCurtain/progressCurtain';
 import { RasterWorkflowContext } from './state-machine/context';
 import { Events } from './state-machine/types';
-import { UpdateLayerHeader } from './update-layer-header';
+import { isLayerLocked } from './utils';
 import { useRasterWorkerAPI } from './worker/raster-worker-api.hook';
 import { extractProgressArray } from './worker/utils';
 import { Process } from './worker/worker.types';
@@ -698,9 +699,10 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
               </Box>
             </Box>
             <Box className="leftPane">
-              <UpdateLayerHeader
+              <LayerHeader
                 entityDescriptors={entityDescriptors}
                 layerRecord={state.context.updatedLayer}
+                layerState={isLayerLocked(state.context) ? 'locked' : undefined}
               />
               <Box className="polygonPartsMap">
                 <PPIngestionMap
