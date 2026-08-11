@@ -434,7 +434,7 @@ export const LayersDetailsComponent: React.FC<LayersDetailsComponentProps> = obs
           layerRecord?.links &&
           getLinkUrl(layerRecord.links, LinkType.THUMBNAIL_L) !== undefined &&
           mode !== Mode.UPDATE &&
-          mode !== Mode.EXPORT && (
+          !isBrief && (
             <img
               className="detailsThumbnail"
               src={getLinkUrlWithToken(layerRecord.links, LinkType.THUMBNAIL_L)}

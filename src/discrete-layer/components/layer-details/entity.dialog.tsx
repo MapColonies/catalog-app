@@ -9,7 +9,6 @@ import * as Yup from 'yup';
 import { DraftResult } from 'vest/vestResult';
 import { DialogContent } from '@material-ui/core';
 import { Dialog, DialogTitle, IconButton } from '@map-colonies/react-core';
-import { Box } from '@map-colonies/react-components';
 import { emphasizeByHTML } from '../../../common/helpers/formatters';
 import { getTextStyle } from '../../../common/helpers/style';
 import { Mode } from '../../../common/models/mode.enum';
@@ -40,9 +39,9 @@ import {
   // LayerRasterRecordModelKeys,
   LayerRecordTypes,
 } from './entity-types-keys';
-import { LayersDetailsComponent } from './layer-details';
 import { IRecordFieldInfo } from './layer-details.field-info';
 import EntityForm from './layer-datails-form';
+import { LayerHeader } from './layer-header';
 import {
   cleanUpEntityPayload,
   clearSyncWarnings,
@@ -444,24 +443,6 @@ export const EntityDialog: React.FC<EntityDialogProps> = observer((props: Entity
     inputValues,
   ]);
 
-  const UpdateLayerHeader = (): JSX.Element => {
-    return (
-      <Box id="updateLayerHeader">
-        <Box id="updateLayerHeaderContent">
-          <LayersDetailsComponent
-            className="detailsPanelProductView"
-            entityDescriptors={
-              store.discreteLayersStore.entityDescriptors as EntityDescriptorModelType[]
-            }
-            layerRecord={layerRecord}
-            isBrief={true}
-            mode={Mode.VIEW}
-          />
-        </Box>
-      </Box>
-    );
-  };
-
   return (
     <div id="entityDialog" ref={dialogContainerRef}>
       <Dialog open={isOpen} preventOutsideDismiss={true}>
@@ -480,7 +461,14 @@ export const EntityDialog: React.FC<EntityDialogProps> = observer((props: Entity
           />
         </DialogTitle>
         <DialogContent className="dialogBody">
-          {mode === Mode.UPDATE && <UpdateLayerHeader />}
+          {mode === Mode.UPDATE && (
+            <LayerHeader
+              entityDescriptors={
+                store.discreteLayersStore.entityDescriptors as EntityDescriptorModelType[]
+              }
+              layerRecord={layerRecord}
+            />
+          )}
           {isAllInfoReady && (
             <EntityForm
               mode={mode}

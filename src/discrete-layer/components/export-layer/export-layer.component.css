@@ -1,26 +1,10 @@
 #exportLayerHeader {
   display: flex;
   flex-direction: column;
-  --update-layer-header-height: 150px;
 }
 
-.exportLayerDetails {
-  position: relative;
-  display: flex;
-  background-color: var(--mdc-theme-text-primary-on-light);
-  padding: 8px;
+#exportLayerHeader .layerHeaderContainer {
   margin-top: 12px;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: var(--update-layer-header-height);
-}
-
-#exportLayerHeaderContent {
-  margin: 0 auto;
-  width: 100%;
-  height: 100%;
-  overflow-y: auto;
 }
 
 .exportToolbarContainer {
