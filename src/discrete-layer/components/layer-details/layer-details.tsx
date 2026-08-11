@@ -432,7 +432,7 @@ export const LayersDetailsComponent: React.FC<LayersDetailsComponentProps> = obs
         {!isUiDescriptor(layerRecord) &&
           layerRecord?.links &&
           getLinkUrl(layerRecord.links, LinkType.THUMBNAIL_L) !== undefined &&
-          mode !== Mode.UPDATE &&
+          [Mode.EDIT, Mode.VIEW].includes(mode) &&
           !isBrief && (
             <img
               className="detailsThumbnail"
