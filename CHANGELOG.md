@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [6.7.1](https://github.com/MapColonies/catalog-app/compare/v6.7.0...v6.7.1) (2026-08-10)
+
+
+### Bug Fixes
+
+* click on the basemaps icon on the map invoked submit because of role instead of type ([#1024](https://github.com/MapColonies/catalog-app/issues/1024)) ([92cb50a](https://github.com/MapColonies/catalog-app/commit/92cb50a0cb7b18b21323f40cbd5e3e67c95b0bf1))
+
+## [6.7.0](https://github.com/MapColonies/catalog-app/compare/v6.6.0...v6.7.0) (2026-08-10)
+
+
+### Features
+
+* refactor ol map (MAPCO-11301, MAPCO-11305) ([#1015](https://github.com/MapColonies/catalog-app/issues/1015)) ([5356f2a](https://github.com/MapColonies/catalog-app/commit/5356f2a9fe01b248567bf892537828a3ca3d86a8))
+
 ## [6.6.0](https://github.com/MapColonies/catalog-app/compare/v6.5.2...v6.6.0) (2026-08-10)
 
 

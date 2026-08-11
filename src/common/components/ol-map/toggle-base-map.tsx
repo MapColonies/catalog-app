@@ -19,6 +19,7 @@ export const ToggleBaseMap: React.FC<ToggleBaseMapProps> = (props) => {
       <Box id="baseMap" className="ol-control">
         <Tooltip content={props.isBaseMapVisible ? props.enableLabel : props.disableLabel}>
           <IconButton
+            type="button"
             className="showOnMapContainer"
             icon={
               <ActiveLayersIcon
