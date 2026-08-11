@@ -12,7 +12,7 @@ import './layer-header.css';
 
 interface LayerHeaderProps {
   entityDescriptors: EntityDescriptorModelType[];
-  layerRecord?: ILayerImage;
+  layerRecord: ILayerImage | null | undefined;
   layerState?: 'locked';
 }
 
