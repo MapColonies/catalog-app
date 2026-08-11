@@ -11,7 +11,8 @@
 }
 
 .destructiveActionDialog .mdc-dialog .mdc-dialog__surface {
-  min-width: var(--modal-width);
+  width: var(--modal-width);
+  max-width: var(--modal-width);
   height: var(--modal-height);
 }
 
