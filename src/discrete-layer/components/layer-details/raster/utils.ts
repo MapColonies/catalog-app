@@ -1,5 +1,8 @@
+import { Mode } from '../../../../common/models/mode.enum';
 import { resolutionDegree } from '../../../../common/ui-descriptors/resolution/resolutionDegree';
 import { resolutionMeter } from '../../../../common/ui-descriptors/resolution/resolutionMeter';
+import { Status } from '../../../models';
+import { IContext } from './state-machine/types';
 
 export const getUIIngestionFieldDescriptors = () => {
   const ingestionUiDescriptorFieldNames = [resolutionDegree, resolutionMeter];
@@ -12,4 +15,12 @@ export const getUIIngestionFieldDescriptors = () => {
       infoMsgCode: ['info-general-tooltip.required'],
     };
   });
+};
+
+export const isLayerLocked = (context: IContext): boolean => {
+  return (
+    context.selectionMode === 'restore' &&
+    context.flowType === Mode.UPDATE &&
+    ![Status.Completed, Status.Aborted].includes(context.job?.details?.status as Status)
+  );
 };

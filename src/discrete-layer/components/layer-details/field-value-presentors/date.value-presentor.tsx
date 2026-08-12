@@ -73,9 +73,7 @@ export const DateValuePresentorComponent: React.FC<DateValuePresentorProps> = ({
   };
 
   const isReadOnlyMode =
-    mode === Mode.VIEW ||
-    (mode === Mode.EDIT && fieldInfo.isManuallyEditable !== true) ||
-    mode === Mode.EXPORT;
+    mode === Mode.VIEW || (mode === Mode.EDIT && fieldInfo.isManuallyEditable !== true);
   const isDataError = fieldInfo.isRequired && isInvalidDate();
 
   if (isReadOnlyMode) {

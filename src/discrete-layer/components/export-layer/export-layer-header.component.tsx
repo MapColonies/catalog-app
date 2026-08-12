@@ -2,9 +2,8 @@ import React from 'react';
 import { isEmpty } from 'lodash';
 import { observer } from 'mobx-react-lite';
 import { Box } from '@map-colonies/react-components';
-import { Mode } from '../../../common/models/mode.enum';
 import { EntityDescriptorModelType, useStore } from '../../models';
-import { LayersDetailsComponent } from '../layer-details/layer-details';
+import { LayerHeader } from '../layer-details/layer-header';
 import ExportLayerToolbar from './export-layer-toolbar.component';
 
 import './export-layer.component.css';
@@ -20,17 +19,7 @@ const ExportLayerHeader: React.FC<ExportLayerHeaderProps> = observer(() => {
   return (
     <Box id="exportLayerHeader">
       <ExportLayerToolbar disableAll={!isEmpty(store.exportStore.finalJobId)} />
-      <Box className="exportLayerDetails">
-        <Box id="exportLayerHeaderContent">
-          <LayersDetailsComponent
-            className="detailsPanelProductView"
-            entityDescriptors={entityDescriptors}
-            layerRecord={layerToExport}
-            isBrief={true}
-            mode={Mode.EXPORT}
-          />
-        </Box>
-      </Box>
+      <LayerHeader entityDescriptors={entityDescriptors} layerRecord={layerToExport} />
     </Box>
   );
 });
