@@ -31,7 +31,7 @@ const DEFAULT_OVERLAY_VISIBILITY: Record<OverlayId, boolean> = {
 enum RevertOverlayZIndex {
   EXISTING = 21,
   BACKUP = 22,
-  CHANGES_AREA = 23,
+  CHANGED_AREA = 23,
 }
 
 const EXISTING_COLOR = '#22C55E';
@@ -77,7 +77,7 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
       areaSquareKm: number;
     }
 
-    const EMPTY_CHANGES_AREA: ChangedArea = { added: null, removed: null, areaSquareKm: 0 };
+    const EMPTY_CHANGED_AREA: ChangedArea = { added: null, removed: null, areaSquareKm: 0 };
 
     const buildChangedArea = (
       existingFootprint: Geometry | undefined | null,
@@ -85,7 +85,7 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
       changedAreaOuterPerimeterArea: number | undefined
     ): ChangedArea => {
       if (!isPolygonal(existingFootprint) || !isPolygonal(changedAreaOuterPerimeter)) {
-        return EMPTY_CHANGES_AREA;
+        return EMPTY_CHANGED_AREA;
       }
       const existingFeature = toFeature(existingFootprint);
       const backupFeature = toFeature(changedAreaOuterPerimeter);
@@ -216,7 +216,7 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
           </VectorLayer>
         )}
         {isChangedAreaVisible && (
-          <VectorLayer options={{ zIndex: RevertOverlayZIndex.CHANGES_AREA }}>
+          <VectorLayer options={{ zIndex: RevertOverlayZIndex.CHANGED_AREA }}>
             <VectorSource>
               {changedArea.added && (
                 <GeoJSONFeature
