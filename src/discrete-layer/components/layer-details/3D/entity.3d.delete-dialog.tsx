@@ -8,7 +8,13 @@ import { Box } from '@map-colonies/react-components';
 import { GraphQLError } from '../../../../common/components/error/graphql.error-presentor';
 import { Mode } from '../../../../common/models/mode.enum';
 import { getTextStyle } from '../../../../common/helpers/style';
-import { RecordType, RootStoreType, useQuery, useStore } from '../../../models';
+import {
+  EntityDescriptorModelType,
+  RecordType,
+  RootStoreType,
+  useQuery,
+  useStore,
+} from '../../../models';
 import { ActionDialogProps } from '../destructive-action-dialog';
 import { DialogActionTitle } from '../dialog-action-title';
 import { DialogDisclaimer } from '../dialog-disclaimer';
@@ -59,7 +65,12 @@ export const EntityDelete3DDialog: React.FC<ActionDialogProps> = observer(
           />
           <DialogContent>
             <DialogDisclaimer actionId="action.dialog.delete" />
-            <LayerHeader layerRecord={props.layerRecord} />
+            <LayerHeader
+              entityDescriptors={
+                store.discreteLayersStore.entityDescriptors as EntityDescriptorModelType[]
+              }
+              layerRecord={props.layerRecord}
+            />
             <GeoJsonMapValuePresentorComponent
               mode={Mode.VIEW}
               jsonValue={JSON.stringify(props.layerRecord?.footprint)}

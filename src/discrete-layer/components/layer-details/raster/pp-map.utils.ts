@@ -21,6 +21,7 @@ export enum VectorLayerZIndex {
 }
 
 export const BACKUP_PP_COLOR = '#3B82F6';
+const FILL_OPACITY = '66';
 
 interface IStyleByProp {
   style: Style;
@@ -29,6 +30,98 @@ interface IStyleByProp {
     value: string | number | boolean;
     style: Style;
   }[];
+}
+
+/*function createHatchPatternGISStyle(color: string, opacity = 0.45): CanvasPattern {
+  const size = 20;
+  const lineWidth = 1.5;
+
+  const canvas = document.createElement('canvas');
+
+  // Higher resolution helps keep diagonal lines crisp.
+  const dpr = window.devicePixelRatio || 1;
+
+  canvas.width = size * dpr;
+  canvas.height = size * dpr;
+  canvas.style.width = `${size}px`;
+  canvas.style.height = `${size}px`;
+
+  const ctx = canvas.getContext('2d')!;
+
+  // Draw in CSS-pixel coordinates.
+  ctx.scale(dpr, dpr);
+
+  // Transparent background.
+  ctx.clearRect(0, 0, size, size);
+
+  // Hatch configuration.
+  ctx.strokeStyle = color;
+  ctx.globalAlpha = opacity;
+  ctx.lineWidth = lineWidth;
+  ctx.lineCap = 'butt';
+  ctx.lineJoin = 'miter';
+
+  // Straight 45° diagonal lines.
+  ctx.beginPath();
+
+  // Main diagonal.
+  ctx.moveTo(0, size);
+  ctx.lineTo(size, 0);
+
+  // Continuation to the left.
+  ctx.moveTo(-size, size);
+  ctx.lineTo(0, 0);
+
+  // Continuation to the right.
+  ctx.moveTo(size, size);
+  ctx.lineTo(size * 2, 0);
+
+  ctx.stroke();
+
+  // Reset state before creating the pattern.
+  ctx.globalAlpha = 1;
+
+  const pattern = ctx.createPattern(canvas, 'repeat');
+
+  if (!pattern) {
+    throw new Error('Failed to create hatch pattern');
+  }
+
+  return pattern;
+}*/
+
+function createHatchPattern(color: string, opacity: number): CanvasPattern {
+  const canvas = document.createElement('canvas');
+  const size = 16;
+
+  canvas.width = size;
+  canvas.height = size;
+
+  const ctx = canvas.getContext('2d')!;
+
+  ctx.clearRect(0, 0, size, size);
+
+  ctx.strokeStyle = color;
+  ctx.globalAlpha = opacity;
+  ctx.lineWidth = 2;
+  ctx.lineCap = 'butt';
+  ctx.lineJoin = 'miter';
+
+  // Straight 45° diagonal hatch
+  ctx.beginPath();
+
+  ctx.moveTo(0, size);
+  ctx.lineTo(size, 0);
+
+  ctx.moveTo(-size, size);
+  ctx.lineTo(0, 0);
+
+  ctx.moveTo(size, size);
+  ctx.lineTo(2 * size, 0);
+
+  ctx.stroke();
+
+  return ctx.createPattern(canvas, 'repeat')!;
 }
 
 export const PPMapStyles = new Map<FeatureType, IStyleByProp>([
@@ -113,7 +206,7 @@ export const PPMapStyles = new Map<FeatureType, IStyleByProp>([
           color: '#FF7F00',
         }),
         fill: new Fill({
-          color: '#FF7F0066',
+          color: '#FF7F00' + FILL_OPACITY,
         }),
       }),
       prop: EXCEEDED_PROPERTY_NAME,
@@ -126,7 +219,7 @@ export const PPMapStyles = new Map<FeatureType, IStyleByProp>([
               color: CONFIG.POLYGON_PARTS.STYLE.lowResolutionColor,
             }),
             fill: new Fill({
-              color: CONFIG.POLYGON_PARTS.STYLE.lowResolutionColor + '66',
+              color: CONFIG.POLYGON_PARTS.STYLE.lowResolutionColor + FILL_OPACITY,
             }),
           }),
         },
@@ -140,9 +233,38 @@ export const PPMapStyles = new Map<FeatureType, IStyleByProp>([
         stroke: new Stroke({
           width: 2,
           color: BACKUP_PP_COLOR,
+          lineDash: [10, 5],
         }),
         fill: new Fill({
-          color: `${BACKUP_PP_COLOR}33`,
+          color: BACKUP_PP_COLOR + FILL_OPACITY,
+        }),
+      }),
+    },
+  ],
+  [
+    FeatureType.CHANGED_AREA_OVERLAPPED_PP,
+    {
+      style: new Style({
+        fill: new Fill({
+          color: createHatchPattern('#FF7F00', 0.45),
+        }),
+        stroke: new Stroke({
+          color: '#FF7F00',
+          width: 2,
+        }),
+      }),
+    },
+  ],
+  [
+    FeatureType.CHANGED_AREA_ADDED_PP,
+    {
+      style: new Style({
+        fill: new Fill({
+          color: createHatchPattern('#EF4444', 0.45), //Alternative function createHatchPatternGISStyle()
+        }),
+        stroke: new Stroke({
+          color: '#EF4444',
+          width: 2,
         }),
       }),
     },
