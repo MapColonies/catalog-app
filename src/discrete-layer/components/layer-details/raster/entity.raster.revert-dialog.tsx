@@ -20,12 +20,12 @@ import { useRasterBackupData } from './use-raster-backup-data.hook';
 import './entity.raster.revert-dialog.css';
 import { OlLayerMap } from './layer-map';
 
-type OverlayId = 'existing' | 'backup' | 'changesArea';
+type OverlayId = 'existing' | 'backup' | 'changedArea';
 
 const DEFAULT_OVERLAY_VISIBILITY: Record<OverlayId, boolean> = {
   existing: true,
   backup: true,
-  changesArea: false,
+  changedArea: false,
 };
 
 enum RevertOverlayZIndex {
@@ -57,38 +57,38 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
 
     const [isExistingVisible, setIsExistingVisible] = useState(DEFAULT_OVERLAY_VISIBILITY.existing);
     const [isBackupVisible, setIsBackupVisible] = useState(DEFAULT_OVERLAY_VISIBILITY.backup);
-    const [isChangesAreaVisible, setIsChangesAreaVisible] = useState(
-      DEFAULT_OVERLAY_VISIBILITY.changesArea
+    const [isChangedAreaVisible, setIsChangedAreaVisible] = useState(
+      DEFAULT_OVERLAY_VISIBILITY.changedArea
     );
 
     const {
       backupMetadata,
       backupPolygonParts,
-      changesAreaOuterPerimeter,
+      changedAreaOuterPerimeter,
       loading,
       metadataError,
     } = useRasterBackupData(props.layerRecord);
 
     const SQUARE_METERS_PER_SQUARE_KM = 1_000_000;
 
-    interface ChangesArea {
+    interface ChangedArea {
       added: Feature<PolygonalGeometry> | null;
       removed: Feature<PolygonalGeometry> | null;
       areaSquareKm: number;
     }
 
-    const EMPTY_CHANGES_AREA: ChangesArea = { added: null, removed: null, areaSquareKm: 0 };
+    const EMPTY_CHANGES_AREA: ChangedArea = { added: null, removed: null, areaSquareKm: 0 };
 
-    const buildChangesArea = (
+    const buildChangedArea = (
       existingFootprint: Geometry | undefined | null,
-      changesAreaOuterPerimeter: Geometry | undefined | null
-    ): ChangesArea => {
-      if (!isPolygonal(existingFootprint) || !isPolygonal(changesAreaOuterPerimeter)) {
+      changedAreaOuterPerimeter: Geometry | undefined | null
+    ): ChangedArea => {
+      if (!isPolygonal(existingFootprint) || !isPolygonal(changedAreaOuterPerimeter)) {
         return EMPTY_CHANGES_AREA;
       }
 
       const existingFeature = toFeature(existingFootprint);
-      const backupFeature = toFeature(changesAreaOuterPerimeter);
+      const backupFeature = toFeature(changedAreaOuterPerimeter);
 
       const added = difference(backupFeature, existingFeature);
       const removed = difference(existingFeature, backupFeature);
@@ -112,17 +112,17 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
       [backupPolygonParts]
     );
 
-    const changesAreaOuterPerimeterGeometry = changesAreaOuterPerimeter?.features?.[0]?.geometry as
+    const changedAreaOuterPerimeterGeometry = changedAreaOuterPerimeter?.features?.[0]?.geometry as
       | Geometry
       | undefined;
 
-    const changesArea = useMemo(
+    const changedArea = useMemo(
       () =>
-        buildChangesArea(
+        buildChangedArea(
           currentLayer.footprint as Geometry | undefined,
-          changesAreaOuterPerimeterGeometry
+          changedAreaOuterPerimeterGeometry
         ),
-      [currentLayer.footprint, changesAreaOuterPerimeterGeometry]
+      [currentLayer.footprint, changedAreaOuterPerimeterGeometry]
     );
 
     const closeDialog = (): void => {
@@ -154,11 +154,11 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
         badgeBackground: BACKUP_COLOR,
       },
       {
-        id: 'changesArea',
+        id: 'changedArea',
         labelId: 'revert.dialog.checkbox.changes-area.label',
-        checked: isChangesAreaVisible,
-        onChange: setIsChangesAreaVisible,
-        badge: `${changesArea.areaSquareKm.toFixed(1)}${intl.formatMessage({
+        checked: isChangedAreaVisible,
+        onChange: setIsChangedAreaVisible,
+        badge: `${changedArea.areaSquareKm.toFixed(1)}${intl.formatMessage({
           id: 'resolutionConflict.units.km2',
         })}`,
         badgeBackground: `linear-gradient(to right, ${CHANGES_REMOVED_COLOR} 50%, ${CHANGES_ADDED_COLOR} 50%)`,
@@ -215,19 +215,19 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
             </VectorSource>
           </VectorLayer>
         )}
-        {isChangesAreaVisible && (
+        {isChangedAreaVisible && (
           <VectorLayer options={{ zIndex: RevertOverlayZIndex.CHANGES_AREA }}>
             <VectorSource>
-              {changesArea.added && (
+              {changedArea.added && (
                 <GeoJSONFeature
-                  geometry={changesArea.added}
+                  geometry={changedArea.added}
                   featureStyle={CHANGES_ADDED_STYLE}
                   fit={false}
                 />
               )}
-              {changesArea.removed && (
+              {changedArea.removed && (
                 <GeoJSONFeature
-                  geometry={changesArea.removed}
+                  geometry={changedArea.removed}
                   featureStyle={CHANGES_REMOVED_STYLE}
                   fit={false}
                 />

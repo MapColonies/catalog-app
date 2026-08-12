@@ -12,7 +12,7 @@ import { ILayerImage } from '../../../models/layerImage';
 export interface RasterBackupData {
   backupMetadata: LayerRasterRecordModelType | undefined;
   backupPolygonParts: GetFeatureModelType | undefined;
-  changesAreaOuterPerimeter: GeojsonFeatureCollectionModelType | undefined;
+  changedAreaOuterPerimeter: GeojsonFeatureCollectionModelType | undefined;
   loading: boolean;
   metadataError: unknown;
   polygonPartsError: unknown;
@@ -26,7 +26,7 @@ export const useRasterBackupData = (layerRecord: ILayerImage): RasterBackupData 
   const metadataQuery = useQuery<{ getRasterBackupMetadata: LayerRasterRecordModelType }>();
   const polygonPartsQuery = useQuery<{ getRasterBackupPolygonParts: GetFeatureModelType }>();
   const outerPerimeterQuery = useQuery<{
-    getChangesAreaOuterPerimeter: GeojsonFeatureCollectionModelType;
+    getChangedAreaOuterPerimeter: GeojsonFeatureCollectionModelType;
   }>();
 
   useEffect(() => {
@@ -52,13 +52,21 @@ export const useRasterBackupData = (layerRecord: ILayerImage): RasterBackupData 
     }
     const data = { productId, productVersion, productType: productType as ProductType };
     polygonPartsQuery.setQuery(store.queryGetRasterBackupPolygonParts({ data }));
-    outerPerimeterQuery.setQuery(store.queryGetChangesAreaOuterPerimeter({ data }));
+    outerPerimeterQuery.setQuery(store.queryGetChangedAreaOuterPerimeter({ data }));
   }, [metadataQuery.data]);
+
+  useEffect(() => {
+    console.log('outerPerimeterQuery.error', outerPerimeterQuery.error);
+  }, [outerPerimeterQuery.error]);
+
+  useEffect(() => {
+    console.log('outerPerimeterQuery.data', outerPerimeterQuery.data);
+  }, [outerPerimeterQuery.data]);
 
   return {
     backupMetadata: metadataQuery.data?.getRasterBackupMetadata,
     backupPolygonParts: polygonPartsQuery.data?.getRasterBackupPolygonParts,
-    changesAreaOuterPerimeter: outerPerimeterQuery.data?.getChangesAreaOuterPerimeter,
+    changedAreaOuterPerimeter: outerPerimeterQuery.data?.getChangedAreaOuterPerimeter,
     loading: metadataQuery.loading || polygonPartsQuery.loading || outerPerimeterQuery.loading,
     metadataError: metadataQuery.error,
     polygonPartsError: polygonPartsQuery.error,

@@ -6,7 +6,7 @@ import { types } from "mobx-state-tree"
 import { QueryBuilder } from "mst-gql"
 import { ModelBase } from "./ModelBase"
 import { GeojsonFeatureModel, GeojsonFeatureModelType } from "./GeojsonFeatureModel"
-import { GeojsonFeatureModelSelector } from "./GeojsonFeatureModel.base"
+import { GeojsonFeatureModelSelector, geojsonFeatureModelPrimitives } from "./GeojsonFeatureModel.base"
 import { RootStoreType } from "./index"
 
 
@@ -35,4 +35,4 @@ export function selectFromGeojsonFeatureCollection() {
   return new GeojsonFeatureCollectionModelSelector()
 }
 
-export const geojsonFeatureCollectionModelPrimitives = selectFromGeojsonFeatureCollection().type
+export const geojsonFeatureCollectionModelPrimitives = selectFromGeojsonFeatureCollection().type.features(geojsonFeatureModelPrimitives)
