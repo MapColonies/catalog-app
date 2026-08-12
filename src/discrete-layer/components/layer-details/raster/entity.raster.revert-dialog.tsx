@@ -81,24 +81,23 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
 
     const buildChangedArea = (
       existingFootprint: Geometry | undefined | null,
-      changedAreaOuterPerimeter: Geometry | undefined | null
+      changedAreaOuterPerimeter: Geometry | undefined | null,
+      changedAreaOuterPerimeterArea: number | undefined
     ): ChangedArea => {
       if (!isPolygonal(existingFootprint) || !isPolygonal(changedAreaOuterPerimeter)) {
         return EMPTY_CHANGES_AREA;
       }
-
       const existingFeature = toFeature(existingFootprint);
       const backupFeature = toFeature(changedAreaOuterPerimeter);
-
       const added = difference(backupFeature, existingFeature);
       const removed = difference(existingFeature, backupFeature);
-
       const areaSquareMeters = (added ? area(added) : 0) + (removed ? area(removed) : 0);
-
+      const areaSquareKm =
+        changedAreaOuterPerimeterArea ?? areaSquareMeters / SQUARE_METERS_PER_SQUARE_KM;
       return {
         added,
         removed,
-        areaSquareKm: areaSquareMeters / SQUARE_METERS_PER_SQUARE_KM,
+        areaSquareKm,
       };
     };
 
@@ -120,7 +119,8 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
       () =>
         buildChangedArea(
           currentLayer.footprint as Geometry | undefined,
-          changedAreaOuterPerimeterGeometry
+          changedAreaOuterPerimeterGeometry,
+          changedAreaOuterPerimeter?.features?.[0]?.properties?.area as number | undefined
         ),
       [currentLayer.footprint, changedAreaOuterPerimeterGeometry]
     );
