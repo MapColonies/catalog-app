@@ -12,6 +12,7 @@ import { get } from 'lodash';
 import bboxPolygon from '@turf/bbox-polygon';
 import { Box, LegendItem } from '@map-colonies/react-components';
 import { Checkbox } from '@map-colonies/react-core';
+import { Style } from 'ol/style';
 import CONFIG from '../../../../common/config';
 import { useEnums } from '../../../../common/hooks/useEnum.hook';
 import { MapFeatureClickHandler } from '../../../../common/components/ol-map/map-feature-click-handler';
@@ -54,6 +55,7 @@ interface LayerMapProps {
   };
   showFeaturePropertiesPopup?: boolean;
   style?: CSSProperties | undefined;
+  additionalLegends?: LegendItem[];
   children?: JSX.Element | null;
 }
 
@@ -72,6 +74,7 @@ export const OlLayerMap: React.FC<LayerMapProps> = ({
   },
   showFeaturePropertiesPopup = false,
   style,
+  additionalLegends,
   children,
 }) => {
   const store = useStore();
@@ -122,16 +125,15 @@ export const OlLayerMap: React.FC<LayerMapProps> = ({
   }, []);
 
   const LegendsArray = useMemo(() => {
-    const res: LegendItem[] = [];
-    PPMapStyles.forEach((value, key) => {
-      if (!key.includes('MARKER')) {
-        res.push({
-          title: intl.formatMessage({ id: `polygon-parts.map-preview-legend.${key}` }) as string,
-          style: value.style,
-        });
-      }
-    });
-    return res;
+    return [
+      {
+        title: intl.formatMessage({
+          id: `polygon-parts.map-preview-legend.${FeatureType.EXISTING_PP}`,
+        }) as string,
+        style: PPMapStyles.get(FeatureType.EXISTING_PP)?.style as Style,
+      },
+      ...(additionalLegends ?? []),
+    ];
   }, [intl]);
 
   const mapLocale = useMemo(
