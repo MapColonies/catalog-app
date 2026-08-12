@@ -55,14 +55,6 @@ export const useRasterBackupData = (layerRecord: ILayerImage): RasterBackupData 
     outerPerimeterQuery.setQuery(store.queryGetChangedAreaOuterPerimeter({ data }));
   }, [metadataQuery.data]);
 
-  useEffect(() => {
-    console.log('outerPerimeterQuery.error', outerPerimeterQuery.error);
-  }, [outerPerimeterQuery.error]);
-
-  useEffect(() => {
-    console.log('outerPerimeterQuery.data', outerPerimeterQuery.data);
-  }, [outerPerimeterQuery.data]);
-
   return {
     backupMetadata: metadataQuery.data?.getRasterBackupMetadata,
     backupPolygonParts: polygonPartsQuery.data?.getRasterBackupPolygonParts,
