@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [6.7.2](https://github.com/MapColonies/catalog-app/compare/v6.7.1...v6.7.2) (2026-08-12)
+
+
+### Bug Fixes
+
+* three additional pp styles and olmap legend more explicit ([#1030](https://github.com/MapColonies/catalog-app/issues/1030)) ([900952b](https://github.com/MapColonies/catalog-app/commit/900952b1018ad58b893b8699f523391935b7f935))
+* unify LayersDetailsComponent usage under LayerHeader and fix unnecessary layer thumbnail placement bug (MAPCO-11331, MAPCO-11406) ([#1028](https://github.com/MapColonies/catalog-app/issues/1028)) ([17f54ca](https://github.com/MapColonies/catalog-app/commit/17f54ca1fc5f3abf4817eb80f629c252760506cf))
+
 ## [6.7.1](https://github.com/MapColonies/catalog-app/compare/v6.7.0...v6.7.1) (2026-08-10)
 
 
