@@ -13,6 +13,7 @@ import {
   PolygonalGeometry,
   toFeature,
 } from '../../../../common/utils/geojson.validation';
+import CONFIG from '../../../../common/config';
 import { LayerRasterRecordModelType, RecordType } from '../../../models';
 import { ActionDialogProps, DestructiveActionDialog } from '../destructive-action-dialog';
 import { useRasterBackupData } from './use-raster-backup-data.hook';
@@ -216,7 +217,12 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
           </VectorLayer>
         )}
         {isChangedAreaVisible && (
-          <VectorLayer options={{ zIndex: RevertOverlayZIndex.CHANGED_AREA }}>
+          <VectorLayer
+            options={{
+              maxZoom: CONFIG.POLYGON_PARTS.MAX.SHOW_FOOTPRINT_ZOOM_LEVEL,
+              zIndex: RevertOverlayZIndex.CHANGED_AREA,
+            }}
+          >
             <VectorSource>
               {changedArea.added && (
                 <GeoJSONFeature
