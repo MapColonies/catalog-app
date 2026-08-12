@@ -1,12 +1,15 @@
 import React, { useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { observer } from 'mobx-react';
-import { Feature, Geometry } from 'geojson';
+import { BBox, Feature, Geometry } from 'geojson';
+import { get } from 'lodash';
 import { Fill, Stroke, Style } from 'ol/style';
 import area from '@turf/area';
+import bboxPolygon from '@turf/bbox-polygon';
 import difference from '@turf/difference';
 import { Box, GeoJSONFeature, VectorLayer, VectorSource } from '@map-colonies/react-components';
 import { Checkbox } from '@map-colonies/react-core';
+import { useEnums } from '../../../../common/hooks/useEnum.hook';
 import { Mode } from '../../../../common/models/mode.enum';
 import {
   isPolygonal,
@@ -14,9 +17,16 @@ import {
   toFeature,
 } from '../../../../common/utils/geojson.validation';
 import CONFIG from '../../../../common/config';
-import { LayerRasterRecordModelType, RecordType } from '../../../models';
+import { LayerRasterRecordModelType, RecordType, useStore } from '../../../models';
+import { GeojsonFeatureInput } from '../../../models/RootStore.base';
 import { ActionDialogProps, DestructiveActionDialog } from '../destructive-action-dialog';
 import { useRasterBackupData } from './use-raster-backup-data.hook';
+import { FeatureType } from './feature-type.enum';
+import {
+  IQueryExecutorResponse,
+  PolygonPartsExtentQueryVectorLayer,
+} from './polygon-parts-extent-query-vector-layer';
+import { BACKUP_PP_COLOR, VectorLayerZIndex, getWFSFeatureTypeName } from './pp-map.utils';
 
 import './entity.raster.revert-dialog.css';
 import { OlLayerMap } from './layer-map';
@@ -29,14 +39,7 @@ const DEFAULT_OVERLAY_VISIBILITY: Record<OverlayId, boolean> = {
   changedArea: false,
 };
 
-enum RevertOverlayZIndex {
-  EXISTING = 21,
-  BACKUP = 22,
-  CHANGED_AREA = 23,
-}
-
 const EXISTING_COLOR = '#22C55E';
-const BACKUP_COLOR = '#3B82F6';
 const CHANGES_ADDED_COLOR = '#FF7F00'; // #FF3401
 const CHANGES_REMOVED_COLOR = '#C62828';
 
@@ -47,13 +50,14 @@ const strokeAndFillStyle = (color: string): Style =>
   });
 
 export const EXISTING_STYLE = strokeAndFillStyle(EXISTING_COLOR);
-export const BACKUP_STYLE = strokeAndFillStyle(BACKUP_COLOR);
 export const CHANGES_ADDED_STYLE = strokeAndFillStyle(CHANGES_ADDED_COLOR);
 export const CHANGES_REMOVED_STYLE = strokeAndFillStyle(CHANGES_REMOVED_COLOR);
 
 export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
   (props: ActionDialogProps) => {
     const intl = useIntl();
+    const store = useStore();
+    const ENUMS = useEnums();
     const currentLayer = props.layerRecord as LayerRasterRecordModelType;
 
     const [isExistingVisible, setIsExistingVisible] = useState(DEFAULT_OVERLAY_VISIBILITY.existing);
@@ -62,13 +66,8 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
       DEFAULT_OVERLAY_VISIBILITY.changedArea
     );
 
-    const {
-      backupMetadata,
-      backupPolygonParts,
-      changedAreaOuterPerimeter,
-      loading,
-      metadataError,
-    } = useRasterBackupData(props.layerRecord);
+    const { backupMetadata, changedAreaOuterPerimeter, loading, metadataError } =
+      useRasterBackupData(props.layerRecord);
 
     const SQUARE_METERS_PER_SQUARE_KM = 1_000_000;
 
@@ -102,16 +101,6 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
       };
     };
 
-    const backupFeatures = useMemo<Feature[]>(
-      () =>
-        (backupPolygonParts?.features ?? []).map((feature) => ({
-          type: 'Feature',
-          geometry: feature.geometry as Geometry,
-          properties: feature.properties ?? null,
-        })),
-      [backupPolygonParts]
-    );
-
     const changedAreaOuterPerimeterGeometry = changedAreaOuterPerimeter?.features?.[0]?.geometry as
       | Geometry
       | undefined;
@@ -125,6 +114,32 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
         ),
       [currentLayer.footprint, changedAreaOuterPerimeterGeometry]
     );
+
+    const backupQueryExecutor = async (
+      bbox: BBox,
+      startIndex: number
+    ): Promise<IQueryExecutorResponse> => {
+      if (!backupMetadata) {
+        return { features: [], pageSize: -1 };
+      }
+      const result = await store.queryGetRasterBackupPolygonPartsFeature({
+        data: {
+          feature: bboxPolygon(bbox) as GeojsonFeatureInput,
+          typeName: getWFSFeatureTypeName(backupMetadata, ENUMS),
+          count: CONFIG.POLYGON_PARTS.MAX.WFS_FEATURES,
+          startIndex,
+        },
+      });
+      const fetchedFeatures = get(result, 'getRasterBackupPolygonPartsFeature.features', []);
+      const features = (Array.isArray(fetchedFeatures) ? fetchedFeatures : []).map((feature) => ({
+        ...feature,
+        properties: {
+          ...(feature?.properties ?? {}),
+          _featureType: FeatureType.BACKUP_PP,
+        },
+      }));
+      return { features, pageSize: CONFIG.POLYGON_PARTS.MAX.WFS_FEATURES };
+    };
 
     const closeDialog = (): void => {
       props.onSetOpen(false);
@@ -152,11 +167,11 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
         checked: isBackupVisible,
         onChange: setIsBackupVisible,
         badge: backupMetadata?.productVersion ? `v${backupMetadata.productVersion}` : '',
-        badgeBackground: BACKUP_COLOR,
+        badgeBackground: BACKUP_PP_COLOR,
       },
       {
         id: 'changedArea',
-        labelId: 'revert.dialog.checkbox.changes-area.label',
+        labelId: 'revert.dialog.checkbox.changed-area.label',
         checked: isChangedAreaVisible,
         onChange: setIsChangedAreaVisible,
         badge: `${changedArea.areaSquareKm.toFixed(1)}${intl.formatMessage({
@@ -192,7 +207,7 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
         {isExistingVisible &&
           currentLayer.footprint !== undefined &&
           currentLayer.footprint !== null && (
-            <VectorLayer options={{ zIndex: RevertOverlayZIndex.EXISTING }}>
+            <VectorLayer options={{ zIndex: VectorLayerZIndex.EXISTING }}>
               <VectorSource>
                 <GeoJSONFeature
                   geometry={currentLayer.footprint as Geometry}
@@ -202,25 +217,22 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
               </VectorSource>
             </VectorLayer>
           )}
-        {isBackupVisible && backupFeatures.length > 0 && (
-          <VectorLayer options={{ zIndex: RevertOverlayZIndex.BACKUP }}>
-            <VectorSource>
-              {backupFeatures.map((feature, index) => (
-                <GeoJSONFeature
-                  key={feature.properties?.id ?? index}
-                  geometry={feature}
-                  featureStyle={BACKUP_STYLE}
-                  fit={false}
-                />
-              ))}
-            </VectorSource>
-          </VectorLayer>
+        {isBackupVisible && backupMetadata && (
+          <PolygonPartsExtentQueryVectorLayer
+            featureType={FeatureType.BACKUP_PP}
+            queryExecutor={backupQueryExecutor}
+            outerPerimeter={backupMetadata.footprint as Geometry | undefined}
+            options={{
+              properties: { id: FeatureType.BACKUP_PP },
+              zIndex: VectorLayerZIndex.BACKUP,
+            }}
+          />
         )}
         {isChangedAreaVisible && (
           <VectorLayer
             options={{
               maxZoom: CONFIG.POLYGON_PARTS.MAX.SHOW_FOOTPRINT_ZOOM_LEVEL,
-              zIndex: RevertOverlayZIndex.CHANGED_AREA,
+              zIndex: VectorLayerZIndex.CHANGED_AREA,
             }}
           >
             <VectorSource>

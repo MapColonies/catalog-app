@@ -188,7 +188,7 @@
 
   "revert.dialog.checkbox.existing.label": "Current version",
   "revert.dialog.checkbox.backup.label": "Previous version (backup)",
-  "revert.dialog.checkbox.changes-area.label": "Changes Area",
+  "revert.dialog.checkbox.changed-area.label": "Changed Area",
 
   "snack.message.success": "SUCCESS",
   "snack.message.failed": "FAILURE",

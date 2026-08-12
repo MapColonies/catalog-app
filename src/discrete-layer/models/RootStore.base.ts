@@ -509,7 +509,7 @@ queryGetFeatureTypes="queryGetFeatureTypes",
 queryGetPointsHeights="queryGetPointsHeights",
 queryServicesAvailability="queryServicesAvailability",
 queryGetPolygonPartsFeature="queryGetPolygonPartsFeature",
-queryGetRasterBackupPolygonParts="queryGetRasterBackupPolygonParts",
+queryGetRasterBackupPolygonPartsFeature="queryGetRasterBackupPolygonPartsFeature",
 queryGetChangedAreaOuterPerimeter="queryGetChangedAreaOuterPerimeter",
 queryGetRasterBackupMetadata="queryGetRasterBackupMetadata",
 queryLogin="queryLogin",
@@ -696,8 +696,8 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
         ${typeof resultSelector === "function" ? resultSelector(new GetFeatureModelSelector()).toString() : resultSelector}
       } }`, variables, options)
     },
-    queryGetRasterBackupPolygonParts(variables: { data: RasterBackupParams }, resultSelector: string | ((qb: GetFeatureModelSelector) => GetFeatureModelSelector) = getFeatureModelPrimitives.toString(), options: QueryOptions = {}) {
-      return self.query<{ getRasterBackupPolygonParts: GetFeatureModelType }>(`query getRasterBackupPolygonParts($data: RasterBackupParams!) { getRasterBackupPolygonParts(data: $data) {
+    queryGetRasterBackupPolygonPartsFeature(variables: { data: WfsPolygonPartsGetFeatureParams }, resultSelector: string | ((qb: GetFeatureModelSelector) => GetFeatureModelSelector) = getFeatureModelPrimitives.toString(), options: QueryOptions = {}) {
+      return self.query<{ getRasterBackupPolygonPartsFeature: GetFeatureModelType }>(`query getRasterBackupPolygonPartsFeature($data: WfsPolygonPartsGetFeatureParams!) { getRasterBackupPolygonPartsFeature(data: $data) {
         ${typeof resultSelector === "function" ? resultSelector(new GetFeatureModelSelector()).toString() : resultSelector}
       } }`, variables, options)
     },

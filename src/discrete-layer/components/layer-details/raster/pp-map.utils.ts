@@ -16,7 +16,11 @@ export enum VectorLayerZIndex {
   LOW_RESOLUTION = 30,
   EXCEEDED = 40,
   SELECTED = 50,
+  BACKUP = 60,
+  CHANGED_AREA = 70,
 }
+
+export const BACKUP_PP_COLOR = '#3B82F6';
 
 interface IStyleByProp {
   style: Style;
@@ -127,6 +131,20 @@ export const PPMapStyles = new Map<FeatureType, IStyleByProp>([
           }),
         },
       ],
+    },
+  ],
+  [
+    FeatureType.BACKUP_PP,
+    {
+      style: new Style({
+        stroke: new Stroke({
+          width: 2,
+          color: BACKUP_PP_COLOR,
+        }),
+        fill: new Fill({
+          color: `${BACKUP_PP_COLOR}33`,
+        }),
+      }),
     },
   ],
 ]);
