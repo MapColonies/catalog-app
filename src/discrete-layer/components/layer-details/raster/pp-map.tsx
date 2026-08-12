@@ -154,8 +154,14 @@ export const PPIngestionMap: React.FC<PPIngestionMapProps> = ({
 
   const LegendsArray = useMemo(() => {
     const res: LegendItem[] = [];
+    const relevantStyles = [
+      FeatureType.SOURCE_EXTENT,
+      FeatureType.EXISTING_PP,
+      FeatureType.LOW_RESOLUTION_PP,
+      FeatureType.PP_PERIMETER,
+    ];
     PPMapStyles.forEach((value, key) => {
-      if (!key.includes('MARKER')) {
+      if (relevantStyles.includes(key)) {
         res.push({
           title: intl.formatMessage({ id: `polygon-parts.map-preview-legend.${key}` }) as string,
           style: value.style,

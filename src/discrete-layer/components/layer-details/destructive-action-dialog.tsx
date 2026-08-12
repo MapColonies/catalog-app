@@ -9,7 +9,7 @@ import { Mode } from '../../../common/models/mode.enum';
 import { getTextStyle } from '../../../common/helpers/style';
 import { GraphQLError } from '../../../common/components/error/graphql.error-presentor';
 import { ValidationsError } from '../../../common/components/error/validations.error-presentor';
-import { RecordType } from '../../models';
+import { EntityDescriptorModelType, RecordType, useStore } from '../../models';
 import { ILayerImage } from '../../models/layerImage';
 import {
   ApprovalFormValues,
@@ -66,6 +66,7 @@ export const DestructiveActionDialog: React.FC<DestructiveActionDialogProps> = (
   onFieldsValidate,
 }) => {
   const intl = useIntl();
+  const store = useStore();
 
   const fieldsSchema = useMemo(() => buildApprovalFieldsSchema(intl), [intl]);
 
@@ -80,7 +81,12 @@ export const DestructiveActionDialog: React.FC<DestructiveActionDialogProps> = (
         />
         <DialogContent>
           <DialogDisclaimer actionId={disclaimerActionId} />
-          <LayerHeader layerRecord={layerRecord} />
+          <LayerHeader
+            entityDescriptors={
+              store.discreteLayersStore.entityDescriptors as EntityDescriptorModelType[]
+            }
+            layerRecord={layerRecord}
+          />
           <Formik
             initialValues={APPROVAL_INITIAL_VALUES}
             validateOnMount
