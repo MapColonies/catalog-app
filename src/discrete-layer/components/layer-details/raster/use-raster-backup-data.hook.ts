@@ -12,7 +12,7 @@ import { ILayerImage } from '../../../models/layerImage';
 export interface RasterBackupData {
   backupMetadata: LayerRasterRecordModelType | undefined;
   backupPolygonParts: GetFeatureModelType | undefined;
-  backupOuterPerimeter: GeojsonFeatureCollectionModelType | undefined;
+  changesAreaOuterPerimeter: GeojsonFeatureCollectionModelType | undefined;
   loading: boolean;
   metadataError: unknown;
   polygonPartsError: unknown;
@@ -26,7 +26,7 @@ export const useRasterBackupData = (layerRecord: ILayerImage): RasterBackupData 
   const metadataQuery = useQuery<{ getRasterBackupMetadata: LayerRasterRecordModelType }>();
   const polygonPartsQuery = useQuery<{ getRasterBackupPolygonParts: GetFeatureModelType }>();
   const outerPerimeterQuery = useQuery<{
-    getRasterBackupOuterPerimeter: GeojsonFeatureCollectionModelType;
+    getChangesAreaOuterPerimeter: GeojsonFeatureCollectionModelType;
   }>();
 
   useEffect(() => {
@@ -52,13 +52,13 @@ export const useRasterBackupData = (layerRecord: ILayerImage): RasterBackupData 
     }
     const data = { productId, productVersion, productType: productType as ProductType };
     polygonPartsQuery.setQuery(store.queryGetRasterBackupPolygonParts({ data }));
-    outerPerimeterQuery.setQuery(store.queryGetRasterBackupOuterPerimeter({ data }));
+    outerPerimeterQuery.setQuery(store.queryGetChangesAreaOuterPerimeter({ data }));
   }, [metadataQuery.data]);
 
   return {
     backupMetadata: metadataQuery.data?.getRasterBackupMetadata,
     backupPolygonParts: polygonPartsQuery.data?.getRasterBackupPolygonParts,
-    backupOuterPerimeter: outerPerimeterQuery.data?.getRasterBackupOuterPerimeter,
+    changesAreaOuterPerimeter: outerPerimeterQuery.data?.getChangesAreaOuterPerimeter,
     loading: metadataQuery.loading || polygonPartsQuery.loading || outerPerimeterQuery.loading,
     metadataError: metadataQuery.error,
     polygonPartsError: polygonPartsQuery.error,

@@ -510,7 +510,7 @@ queryGetPointsHeights="queryGetPointsHeights",
 queryServicesAvailability="queryServicesAvailability",
 queryGetPolygonPartsFeature="queryGetPolygonPartsFeature",
 queryGetRasterBackupPolygonParts="queryGetRasterBackupPolygonParts",
-queryGetRasterBackupOuterPerimeter="queryGetRasterBackupOuterPerimeter",
+queryGetChangesAreaOuterPerimeter="queryGetChangesAreaOuterPerimeter",
 queryGetRasterBackupMetadata="queryGetRasterBackupMetadata",
 queryLogin="queryLogin",
 queryValidateSource="queryValidateSource",
@@ -701,8 +701,8 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
         ${typeof resultSelector === "function" ? resultSelector(new GetFeatureModelSelector()).toString() : resultSelector}
       } }`, variables, options)
     },
-    queryGetRasterBackupOuterPerimeter(variables: { data: RasterBackupParams }, resultSelector: string | ((qb: GeojsonFeatureCollectionModelSelector) => GeojsonFeatureCollectionModelSelector) = geojsonFeatureCollectionModelPrimitives.toString(), options: QueryOptions = {}) {
-      return self.query<{ getRasterBackupOuterPerimeter: GeojsonFeatureCollectionModelType }>(`query getRasterBackupOuterPerimeter($data: RasterBackupParams!) { getRasterBackupOuterPerimeter(data: $data) {
+    queryGetChangesAreaOuterPerimeter(variables: { data: RasterBackupParams }, resultSelector: string | ((qb: GeojsonFeatureCollectionModelSelector) => GeojsonFeatureCollectionModelSelector) = geojsonFeatureCollectionModelPrimitives.toString(), options: QueryOptions = {}) {
+      return self.query<{ getChangesAreaOuterPerimeter: GeojsonFeatureCollectionModelType }>(`query getChangesAreaOuterPerimeter($data: RasterBackupParams!) { getChangesAreaOuterPerimeter(data: $data) {
         ${typeof resultSelector === "function" ? resultSelector(new GeojsonFeatureCollectionModelSelector()).toString() : resultSelector}
       } }`, variables, options)
     },

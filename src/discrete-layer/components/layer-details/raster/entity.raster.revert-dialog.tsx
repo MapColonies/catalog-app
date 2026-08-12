@@ -61,8 +61,13 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
       DEFAULT_OVERLAY_VISIBILITY.changesArea
     );
 
-    const { backupMetadata, backupPolygonParts, backupOuterPerimeter, loading, metadataError } =
-      useRasterBackupData(props.layerRecord);
+    const {
+      backupMetadata,
+      backupPolygonParts,
+      changesAreaOuterPerimeter,
+      loading,
+      metadataError,
+    } = useRasterBackupData(props.layerRecord);
 
     const SQUARE_METERS_PER_SQUARE_KM = 1_000_000;
 
@@ -76,14 +81,14 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
 
     const buildChangesArea = (
       existingFootprint: Geometry | undefined | null,
-      backupOuterPerimeter: Geometry | undefined | null
+      changesAreaOuterPerimeter: Geometry | undefined | null
     ): ChangesArea => {
-      if (!isPolygonal(existingFootprint) || !isPolygonal(backupOuterPerimeter)) {
+      if (!isPolygonal(existingFootprint) || !isPolygonal(changesAreaOuterPerimeter)) {
         return EMPTY_CHANGES_AREA;
       }
 
       const existingFeature = toFeature(existingFootprint);
-      const backupFeature = toFeature(backupOuterPerimeter);
+      const backupFeature = toFeature(changesAreaOuterPerimeter);
 
       const added = difference(backupFeature, existingFeature);
       const removed = difference(existingFeature, backupFeature);
@@ -107,7 +112,7 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
       [backupPolygonParts]
     );
 
-    const backupOuterPerimeterGeometry = backupOuterPerimeter?.features?.[0]?.geometry as
+    const changesAreaOuterPerimeterGeometry = changesAreaOuterPerimeter?.features?.[0]?.geometry as
       | Geometry
       | undefined;
 
@@ -115,9 +120,9 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
       () =>
         buildChangesArea(
           currentLayer.footprint as Geometry | undefined,
-          backupOuterPerimeterGeometry
+          changesAreaOuterPerimeterGeometry
         ),
-      [currentLayer.footprint, backupOuterPerimeterGeometry]
+      [currentLayer.footprint, changesAreaOuterPerimeterGeometry]
     );
 
     const closeDialog = (): void => {
