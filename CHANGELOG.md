@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [6.7.2](https://github.com/MapColonies/catalog-app/compare/v6.7.1...v6.7.2) (2026-08-13)
+
+
+### Bug Fixes
+
+* added utility to convert ol style to css ([#1031](https://github.com/MapColonies/catalog-app/issues/1031)) ([b9f5d4d](https://github.com/MapColonies/catalog-app/commit/b9f5d4d0d5b8d22b64c36ad99267e1a0cfd3c243))
+* fetch backup data mock (MAPCO-11306) ([#1026](https://github.com/MapColonies/catalog-app/issues/1026)) ([a9457af](https://github.com/MapColonies/catalog-app/commit/a9457afa3decc7c82e091ce6de85ad7c119454c8))
+* three additional pp styles and olmap legend more explicit ([#1030](https://github.com/MapColonies/catalog-app/issues/1030)) ([900952b](https://github.com/MapColonies/catalog-app/commit/900952b1018ad58b893b8699f523391935b7f935))
+* unify LayersDetailsComponent usage under LayerHeader and fix unnecessary layer thumbnail placement bug (MAPCO-11331, MAPCO-11406) ([#1028](https://github.com/MapColonies/catalog-app/issues/1028)) ([17f54ca](https://github.com/MapColonies/catalog-app/commit/17f54ca1fc5f3abf4817eb80f629c252760506cf))
+
 ## [6.7.1](https://github.com/MapColonies/catalog-app/compare/v6.7.0...v6.7.1) (2026-08-10)
 
 
