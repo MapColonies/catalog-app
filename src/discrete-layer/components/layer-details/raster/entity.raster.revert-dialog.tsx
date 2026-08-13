@@ -187,26 +187,26 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
       },
     ];
 
-    const sidePanel = (
-      <Box className="overlayCheckboxes" role="group">
-        {overlayCheckboxes.map((cfg) => (
-          <Box key={cfg.id} className="overlayCheckboxRow">
-            <Checkbox
-              className="overlayCheckbox"
-              label={intl.formatMessage({ id: cfg.labelId })}
-              checked={cfg.checked}
-              onClick={(evt: React.MouseEvent<HTMLInputElement>): void => {
-                evt.stopPropagation();
-                cfg.onChange(evt.currentTarget.checked);
-              }}
-            />
-            <Box className="overlayCheckboxBadge" style={{ background: cfg.badgeBackground }}>
-              {cfg.badge}
-            </Box>
-          </Box>
-        ))}
-      </Box>
-    );
+    // const sidePanel = (
+    //   <Box className="overlayCheckboxes" role="group">
+    //     {overlayCheckboxes.map((cfg) => (
+    //       <Box key={cfg.id} className="overlayCheckboxRow">
+    //         <Checkbox
+    //           className="overlayCheckbox"
+    //           label={intl.formatMessage({ id: cfg.labelId })}
+    //           checked={cfg.checked}
+    //           onClick={(evt: React.MouseEvent<HTMLInputElement>): void => {
+    //             evt.stopPropagation();
+    //             cfg.onChange(evt.currentTarget.checked);
+    //           }}
+    //         />
+    //         <Box className="overlayCheckboxBadge" style={{ background: cfg.badgeBackground }}>
+    //           {cfg.badge}
+    //         </Box>
+    //       </Box>
+    //     ))}
+    //   </Box>
+    // );
 
     // const mapChildren = (
     //   <>
