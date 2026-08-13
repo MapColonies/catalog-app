@@ -26,7 +26,7 @@ import {
   IQueryExecutorResponse,
   PolygonPartsExtentQueryVectorLayer,
 } from './polygon-parts-extent-query-vector-layer';
-import { BACKUP_PP_COLOR, VectorLayerZIndex, getWFSFeatureTypeName } from './pp-map.utils';
+import { VectorLayerZIndex, getWFSFeatureTypeName } from './pp-map.utils';
 
 import './entity.raster.revert-dialog.css';
 import { OlLayerMap } from './layer-map';
@@ -40,7 +40,8 @@ const DEFAULT_OVERLAY_VISIBILITY: Record<OverlayId, boolean> = {
 };
 
 const EXISTING_COLOR = '#22C55E';
-const CHANGES_ADDED_COLOR = '#FF7F00'; // #FF3401
+const BACKUP_PP_COLOR = '#3B82F6';
+const CHANGES_ADDED_COLOR = '#FF7F00';
 const CHANGES_REMOVED_COLOR = '#C62828';
 
 const strokeAndFillStyle = (color: string): Style =>
@@ -68,7 +69,7 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
 
     const {
       backupMetadata,
-      OuterPerimeter: changedAreaOuterPerimeter,
+      outerPerimeter: changedAreaOuterPerimeter,
       loading,
       metadataError,
     } = useRasterBackupData(props.layerRecord);
@@ -84,17 +85,17 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
     const EMPTY_CHANGED_AREA: ChangedArea = { added: null, removed: null, areaSquareKm: 0 };
 
     const buildChangedArea = (
-      existingFootprint: Geometry | undefined | null,
+      backupFootprint: Geometry | undefined | null,
       changedAreaOuterPerimeter: Geometry | undefined | null,
       changedAreaOuterPerimeterArea: number | undefined
     ): ChangedArea => {
-      if (!isPolygonal(existingFootprint) || !isPolygonal(changedAreaOuterPerimeter)) {
+      if (!isPolygonal(backupFootprint) || !isPolygonal(changedAreaOuterPerimeter)) {
         return EMPTY_CHANGED_AREA;
       }
-      const existingFeature = toFeature(existingFootprint);
-      const backupFeature = toFeature(changedAreaOuterPerimeter);
-      const added = difference(backupFeature, existingFeature);
-      const removed = difference(existingFeature, backupFeature);
+      const backupFeature = toFeature(backupFootprint);
+      const changedAreaFeature = toFeature(changedAreaOuterPerimeter);
+      const added = difference(changedAreaFeature, backupFeature);
+      const removed = difference(backupFeature, changedAreaFeature);
       const areaSquareMeters = (added ? area(added) : 0) + (removed ? area(removed) : 0);
       const areaSquareKm =
         changedAreaOuterPerimeterArea ?? areaSquareMeters / SQUARE_METERS_PER_SQUARE_KM;
@@ -112,11 +113,11 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
     const changedArea = useMemo(
       () =>
         buildChangedArea(
-          currentLayer.footprint as Geometry | undefined,
+          backupMetadata?.footprint as Geometry | undefined,
           changedAreaOuterPerimeterGeometry,
           changedAreaOuterPerimeter?.features?.[0]?.properties?.area as number | undefined
         ),
-      [currentLayer.footprint, changedAreaOuterPerimeterGeometry]
+      [backupMetadata?.footprint, changedAreaOuterPerimeterGeometry]
     );
 
     const backupQueryExecutor = async (

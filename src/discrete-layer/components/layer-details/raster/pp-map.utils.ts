@@ -20,7 +20,7 @@ export enum VectorLayerZIndex {
   CHANGED_AREA = 70,
 }
 
-export const BACKUP_PP_COLOR = '#3B82F6';
+const BACKUP_PP_COLOR = '#3B82F6';
 const FILL_OPACITY = '66';
 
 interface IStyleByProp {
@@ -32,7 +32,7 @@ interface IStyleByProp {
   }[];
 }
 
-/*function createHatchPatternGISStyle(color: string, opacity = 0.45): CanvasPattern {
+function createHatchPatternGISStyle(color: string, opacity = 0.45): CanvasPattern {
   const size = 20;
   const lineWidth = 1.5;
 
@@ -88,7 +88,7 @@ interface IStyleByProp {
   }
 
   return pattern;
-}*/
+}
 
 function createHatchPattern(color: string, opacity: number): CanvasPattern {
   const canvas = document.createElement('canvas');
