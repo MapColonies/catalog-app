@@ -208,59 +208,59 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
       </Box>
     );
 
-    const mapChildren = (
-      <>
-        {isExistingVisible &&
-          currentLayer.footprint !== undefined &&
-          currentLayer.footprint !== null && (
-            <VectorLayer options={{ zIndex: VectorLayerZIndex.EXISTING }}>
-              <VectorSource>
-                <GeoJSONFeature
-                  geometry={currentLayer.footprint as Geometry}
-                  featureStyle={EXISTING_STYLE}
-                  fit={false}
-                />
-              </VectorSource>
-            </VectorLayer>
-          )}
-        {isBackupVisible && backupMetadata && (
-          <PolygonPartsExtentQueryVectorLayer
-            featureType={FeatureType.BACKUP_PP}
-            queryExecutor={backupQueryExecutor}
-            outerPerimeter={backupMetadata.footprint as Geometry | undefined}
-            options={{
-              properties: { id: FeatureType.BACKUP_PP },
-              zIndex: VectorLayerZIndex.BACKUP,
-            }}
-          />
-        )}
-        {isChangedAreaVisible && (
-          <VectorLayer
-            options={{
-              maxZoom: CONFIG.POLYGON_PARTS.MAX.SHOW_FOOTPRINT_ZOOM_LEVEL,
-              zIndex: VectorLayerZIndex.CHANGED_AREA,
-            }}
-          >
-            <VectorSource>
-              {changedArea.added && (
-                <GeoJSONFeature
-                  geometry={changedArea.added}
-                  featureStyle={CHANGES_ADDED_STYLE}
-                  fit={false}
-                />
-              )}
-              {changedArea.overlapped && (
-                <GeoJSONFeature
-                  geometry={changedArea.overlapped}
-                  featureStyle={CHANGES_OVERLAPPED_STYLE}
-                  fit={false}
-                />
-              )}
-            </VectorSource>
-          </VectorLayer>
-        )}
-      </>
-    );
+    // const mapChildren = (
+    //   <>
+    //     {isExistingVisible &&
+    //       currentLayer.footprint !== undefined &&
+    //       currentLayer.footprint !== null && (
+    //         <VectorLayer options={{ zIndex: VectorLayerZIndex.EXISTING }}>
+    //           <VectorSource>
+    //             <GeoJSONFeature
+    //               geometry={currentLayer.footprint as Geometry}
+    //               featureStyle={EXISTING_STYLE}
+    //               fit={false}
+    //             />
+    //           </VectorSource>
+    //         </VectorLayer>
+    //       )}
+    //     {isBackupVisible && backupMetadata && (
+    //       <PolygonPartsExtentQueryVectorLayer
+    //         featureType={FeatureType.BACKUP_PP}
+    //         queryExecutor={backupQueryExecutor}
+    //         outerPerimeter={backupMetadata.footprint as Geometry | undefined}
+    //         options={{
+    //           properties: { id: FeatureType.BACKUP_PP },
+    //           zIndex: VectorLayerZIndex.BACKUP,
+    //         }}
+    //       />
+    //     )}
+    //     {isChangedAreaVisible && (
+    //       <VectorLayer
+    //         options={{
+    //           maxZoom: CONFIG.POLYGON_PARTS.MAX.SHOW_FOOTPRINT_ZOOM_LEVEL,
+    //           zIndex: VectorLayerZIndex.CHANGED_AREA,
+    //         }}
+    //       >
+    //         <VectorSource>
+    //           {changedArea.added && (
+    //             <GeoJSONFeature
+    //               geometry={changedArea.added}
+    //               featureStyle={CHANGES_ADDED_STYLE}
+    //               fit={false}
+    //             />
+    //           )}
+    //           {changedArea.overlapped && (
+    //             <GeoJSONFeature
+    //               geometry={changedArea.overlapped}
+    //               featureStyle={CHANGES_OVERLAPPED_STYLE}
+    //               fit={false}
+    //             />
+    //           )}
+    //         </VectorSource>
+    //       </VectorLayer>
+    //     )}
+    //   </>
+    // );
 
     const revertLayer = (approverName: string, approvalCode: string): void => {
       // eslint-disable-next-line no-console
@@ -274,16 +274,6 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
       props.onSetOpen(false);
     };
 
-    const map = (
-      <OlLayerMap
-        layerRecord={props.layerRecord}
-        showBaseMap={{ value: true, showToggleButton: false }}
-        style={{ position: 'relative', direction: 'ltr', height: '100%' }}
-      >
-        {mapChildren}
-      </OlLayerMap>
-    );
-
     return (
       <DestructiveActionDialog
         elementId="rasterRevertDialog"
@@ -296,18 +286,18 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
         onSubmit={revertLayer}
         loading={loading}
         error={metadataError ?? null}
-        map={map}
-        // map={
-        //   <Box style={{ height: '100%', backgroundColor: 'lightgray', color: 'red' }}>
-        //     MAP PLACEHOLDER
-        //   </Box>
-        // }
-        sidePanel={sidePanel}
-        // sidePanel={
-        //   <Box style={{ width: '100%', height: '25%', backgroundColor: 'lightgray', color: 'red' }}>
-        //     SWITCHES PLACEHOLDER
-        //   </Box>
-        // }
+        // map={map}
+        map={
+          <Box style={{ height: '100%', backgroundColor: 'lightgray', color: 'red' }}>
+            MAP PLACEHOLDER
+          </Box>
+        }
+        // sidePanel={sidePanel}
+        sidePanel={
+          <Box style={{ width: '100%', height: '25%', backgroundColor: 'lightgray', color: 'red' }}>
+            SWITCHES PLACEHOLDER
+          </Box>
+        }
       />
     );
   }
