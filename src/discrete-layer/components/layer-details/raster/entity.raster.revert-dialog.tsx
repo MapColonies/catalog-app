@@ -121,71 +121,71 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
       [backupMetadata?.footprint, changedAreaOuterPerimeterGeometry]
     );
 
-    const backupQueryExecutor = async (
-      bbox: BBox,
-      startIndex: number
-    ): Promise<IQueryExecutorResponse> => {
-      if (!backupMetadata) {
-        return { features: [], pageSize: -1 };
-      }
-      const result = await store.queryGetRasterBackupPolygonPartsFeature({
-        data: {
-          feature: bboxPolygon(bbox) as GeojsonFeatureInput,
-          typeName: getWFSFeatureTypeName(backupMetadata, ENUMS),
-          count: CONFIG.POLYGON_PARTS.MAX.WFS_FEATURES,
-          startIndex,
-        },
-      });
-      const fetchedFeatures = get(result, 'getRasterBackupPolygonPartsFeature.features', []);
-      const features = (Array.isArray(fetchedFeatures) ? fetchedFeatures : []).map((feature) => ({
-        ...feature,
-        properties: {
-          ...(feature?.properties ?? {}),
-          _featureType: FeatureType.BACKUP_PP,
-        },
-      }));
-      return { features, pageSize: CONFIG.POLYGON_PARTS.MAX.WFS_FEATURES };
-    };
+    // const backupQueryExecutor = async (
+    //   bbox: BBox,
+    //   startIndex: number
+    // ): Promise<IQueryExecutorResponse> => {
+    //   if (!backupMetadata) {
+    //     return { features: [], pageSize: -1 };
+    //   }
+    //   const result = await store.queryGetRasterBackupPolygonPartsFeature({
+    //     data: {
+    //       feature: bboxPolygon(bbox) as GeojsonFeatureInput,
+    //       typeName: getWFSFeatureTypeName(backupMetadata, ENUMS),
+    //       count: CONFIG.POLYGON_PARTS.MAX.WFS_FEATURES,
+    //       startIndex,
+    //     },
+    //   });
+    //   const fetchedFeatures = get(result, 'getRasterBackupPolygonPartsFeature.features', []);
+    //   const features = (Array.isArray(fetchedFeatures) ? fetchedFeatures : []).map((feature) => ({
+    //     ...feature,
+    //     properties: {
+    //       ...(feature?.properties ?? {}),
+    //       _featureType: FeatureType.BACKUP_PP,
+    //     },
+    //   }));
+    //   return { features, pageSize: CONFIG.POLYGON_PARTS.MAX.WFS_FEATURES };
+    // };
 
     const closeDialog = (): void => {
       props.onSetOpen(false);
     };
 
-    const overlayCheckboxes: {
-      id: OverlayId;
-      labelId: string;
-      checked: boolean;
-      onChange: (checked: boolean) => void;
-      badge: string;
-      badgeBackground: string;
-    }[] = [
-      {
-        id: 'existing',
-        labelId: 'revert.dialog.checkbox.existing.label',
-        checked: isExistingVisible,
-        onChange: setIsExistingVisible,
-        badge: currentLayer.productVersion ? `v${currentLayer.productVersion}` : '',
-        badgeBackground: EXISTING_COLOR,
-      },
-      {
-        id: 'backup',
-        labelId: 'revert.dialog.checkbox.backup.label',
-        checked: isBackupVisible,
-        onChange: setIsBackupVisible,
-        badge: backupMetadata?.productVersion ? `v${backupMetadata.productVersion}` : '',
-        badgeBackground: BACKUP_PP_COLOR,
-      },
-      {
-        id: 'changedArea',
-        labelId: 'revert.dialog.checkbox.changed-area.label',
-        checked: isChangedAreaVisible,
-        onChange: setIsChangedAreaVisible,
-        badge: `${changedArea.areaSquareKm.toFixed(1)}${intl.formatMessage({
-          id: 'resolutionConflict.units.km2',
-        })}`,
-        badgeBackground: `linear-gradient(to right, ${CHANGES_OVERLAPPED_COLOR} 50%, ${CHANGES_ADDED_COLOR} 50%)`,
-      },
-    ];
+    // const overlayCheckboxes: {
+    //   id: OverlayId;
+    //   labelId: string;
+    //   checked: boolean;
+    //   onChange: (checked: boolean) => void;
+    //   badge: string;
+    //   badgeBackground: string;
+    // }[] = [
+    //   {
+    //     id: 'existing',
+    //     labelId: 'revert.dialog.checkbox.existing.label',
+    //     checked: isExistingVisible,
+    //     onChange: setIsExistingVisible,
+    //     badge: currentLayer.productVersion ? `v${currentLayer.productVersion}` : '',
+    //     badgeBackground: EXISTING_COLOR,
+    //   },
+    //   {
+    //     id: 'backup',
+    //     labelId: 'revert.dialog.checkbox.backup.label',
+    //     checked: isBackupVisible,
+    //     onChange: setIsBackupVisible,
+    //     badge: backupMetadata?.productVersion ? `v${backupMetadata.productVersion}` : '',
+    //     badgeBackground: BACKUP_PP_COLOR,
+    //   },
+    //   {
+    //     id: 'changedArea',
+    //     labelId: 'revert.dialog.checkbox.changed-area.label',
+    //     checked: isChangedAreaVisible,
+    //     onChange: setIsChangedAreaVisible,
+    //     badge: `${changedArea.areaSquareKm.toFixed(1)}${intl.formatMessage({
+    //       id: 'resolutionConflict.units.km2',
+    //     })}`,
+    //     badgeBackground: `linear-gradient(to right, ${CHANGES_OVERLAPPED_COLOR} 50%, ${CHANGES_ADDED_COLOR} 50%)`,
+    //   },
+    // ];
 
     // const sidePanel = (
     //   <Box className="overlayCheckboxes" role="group">
