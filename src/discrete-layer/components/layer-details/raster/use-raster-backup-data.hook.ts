@@ -7,6 +7,7 @@ import {
   useStore,
 } from '../../../models';
 import { ILayerImage } from '../../../models/layerImage';
+import { RasterBackupParams } from '../../../models/RootStore.base';
 
 export interface RasterBackupData {
   backupMetadata: LayerRasterRecordModelType | undefined;
@@ -22,7 +23,7 @@ export const useRasterBackupData = (layerRecord: ILayerImage): RasterBackupData 
 
   const metadataQuery = useQuery<{ getRasterBackupMetadata: LayerRasterRecordModelType }>();
   const outerPerimeterQuery = useQuery<{
-    getChangedAreaOuterPerimeter: GeojsonFeatureCollectionModelType;
+    getOuterPerimeter: GeojsonFeatureCollectionModelType;
   }>();
 
   useEffect(() => {
@@ -30,29 +31,18 @@ export const useRasterBackupData = (layerRecord: ILayerImage): RasterBackupData 
     if (!productId || !productVersion || !productType) {
       return;
     }
-    metadataQuery.setQuery(
-      store.queryGetRasterBackupMetadata({
-        data: { productId, productVersion, productType: productType as ProductType },
-      })
-    );
+    const currentLayerParams: RasterBackupParams = {
+      productId,
+      productVersion,
+      productType: productType as ProductType,
+    };
+    metadataQuery.setQuery(store.queryGetRasterBackupMetadata({ data: currentLayerParams }));
+    outerPerimeterQuery.setQuery(store.queryGetOuterPerimeter({ data: currentLayerParams }));
   }, []);
-
-  useEffect(() => {
-    const backupMetadata = metadataQuery.data?.getRasterBackupMetadata;
-    if (!backupMetadata) {
-      return;
-    }
-    const { productId, productVersion, productType } = backupMetadata;
-    if (!productId || !productVersion || !productType) {
-      return;
-    }
-    const data = { productId, productVersion, productType: productType as ProductType };
-    outerPerimeterQuery.setQuery(store.queryGetChangedAreaOuterPerimeter({ data }));
-  }, [metadataQuery.data]);
 
   return {
     backupMetadata: metadataQuery.data?.getRasterBackupMetadata,
-    changedAreaOuterPerimeter: outerPerimeterQuery.data?.getChangedAreaOuterPerimeter,
+    changedAreaOuterPerimeter: outerPerimeterQuery.data?.getOuterPerimeter,
     loading: metadataQuery.loading || outerPerimeterQuery.loading,
     metadataError: metadataQuery.error,
     outerPerimeterError: outerPerimeterQuery.error,

@@ -2,7 +2,7 @@
   display: flex;
   position: absolute;
   top: 7px;
-  right: 9px;
+  right: 8px;
   color: var(--mdc-theme-on-surface);
   opacity: 0.7;
   pointer-events: none;
