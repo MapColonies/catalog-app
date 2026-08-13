@@ -23,6 +23,7 @@ import { GeojsonFeatureInput } from '../../../models/RootStore.base';
 import { ActionDialogProps, DestructiveActionDialog } from '../destructive-action-dialog';
 import { useRasterBackupData } from './use-raster-backup-data.hook';
 import { FeatureType } from './feature-type.enum';
+import { OlLayerMap } from './layer-map';
 import {
   IQueryExecutorResponse,
   PolygonPartsExtentQueryVectorLayer,
@@ -30,7 +31,6 @@ import {
 import { VectorLayerZIndex, getWFSFeatureTypeName } from './pp-map.utils';
 
 import './entity.raster.revert-dialog.css';
-import { OlLayerMap } from './layer-map';
 
 type OverlayId = 'existing' | 'backup' | 'changedArea';
 
