@@ -188,7 +188,7 @@
 
   "revert.dialog.checkbox.existing.label": "גרסה נוכחית",
   "revert.dialog.checkbox.backup.label": "גרסה קודמת (גיבוי)",
-  "revert.dialog.checkbox.changes-area.label": "אזור העדכון",
+  "revert.dialog.checkbox.changed-area.label": "אזור העדכון",
 
   "snack.message.success": "הצלחה",
   "snack.message.failed": "כשלון",

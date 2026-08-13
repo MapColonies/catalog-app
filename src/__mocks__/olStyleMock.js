@@ -12,4 +12,19 @@ export class Circle {
 
 export class Style {
   constructor() {}
+  getStroke() {
+    return null;
+  }
+  getFill() {
+    return null;
+  }
+  setGeometry() {}
+}
+
+export class Icon {
+  constructor() {}
+}
+
+export class Text {
+  constructor() {}
 }

@@ -95,6 +95,17 @@ export const isValidGeometryType = (json: Geometry): boolean => {
   return json.type === 'Polygon' || json.type === 'MultiPolygon';
 };
 
+export type PolygonalGeometry = Polygon | MultiPolygon;
+
+export const isPolygonal = (geometry: Geometry | undefined | null): geometry is PolygonalGeometry =>
+  geometry != null && isValidGeometryType(geometry);
+
+export const toFeature = (geometry: PolygonalGeometry): Feature<PolygonalGeometry> => ({
+  type: 'Feature',
+  geometry,
+  properties: null as GeoJsonProperties,
+});
+
 const isAllGeometryLinearRingsValid = (geom: Geometry): geoJSONValidation => {
   if (isValidGeometryType(geom)) {
     const polygons = geom.type === 'Polygon' ? [geom.coordinates] : geom.coordinates;

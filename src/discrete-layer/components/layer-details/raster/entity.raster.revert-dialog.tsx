@@ -1,38 +1,143 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { observer } from 'mobx-react';
+import { Feature, Geometry } from 'geojson';
+import { Fill, Stroke, Style } from 'ol/style';
+import area from '@turf/area';
+import difference from '@turf/difference';
+import intersect from '@turf/intersect';
 import { Box } from '@map-colonies/react-components';
 import { Mode } from '../../../../common/models/mode.enum';
+import {
+  isPolygonal,
+  PolygonalGeometry,
+  toFeature,
+} from '../../../../common/utils/geojson.validation';
 import { RecordType } from '../../../models';
 import { ActionDialogProps, DestructiveActionDialog } from '../destructive-action-dialog';
+import { useRasterBackupData } from './use-raster-backup-data.hook';
 import { getCSSFromOlStyle, IStyleByProp, PPMapStyles } from './pp-map.utils';
 import { FeatureType } from './feature-type.enum';
 
 import './entity.raster.revert-dialog.css';
 
-// type OverlayId = 'existing' | 'backup' | 'changesArea';
+// type OverlayId = 'existing' | 'backup' | 'changedArea';
 
 // const DEFAULT_OVERLAY_VISIBILITY: Record<OverlayId, boolean> = {
 //   existing: true,
 //   backup: true,
-//   changesArea: false,
+//   changedArea: false,
 // };
+
+const EXISTING_COLOR = '#22C55E';
+// const BACKUP_PP_COLOR = '#3B82F6';
+const CHANGES_OVERLAPPED_COLOR = '#C62828';
+const CHANGES_ADDED_COLOR = '#FF7F00';
+
+const strokeAndFillStyle = (color: string): Style =>
+  new Style({
+    stroke: new Stroke({ width: 3, color }),
+    fill: new Fill({ color: `${color}33` }),
+  });
+
+export const EXISTING_STYLE = strokeAndFillStyle(EXISTING_COLOR);
+export const CHANGES_ADDED_STYLE = strokeAndFillStyle(CHANGES_ADDED_COLOR);
+export const CHANGES_OVERLAPPED_STYLE = strokeAndFillStyle(CHANGES_OVERLAPPED_COLOR);
 
 export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
   (props: ActionDialogProps) => {
+    // const intl = useIntl();
+    // const store = useStore();
+    // const ENUMS = useEnums();
+    // const currentLayer = props.layerRecord as LayerRasterRecordModelType;
+
     // const [isExistingVisible, setIsExistingVisible] = useState(DEFAULT_OVERLAY_VISIBILITY.existing);
     // const [isBackupVisible, setIsBackupVisible] = useState(DEFAULT_OVERLAY_VISIBILITY.backup);
-    // const [isChangesAreaVisible, setIsChangesAreaVisible] = useState(
-    //   DEFAULT_OVERLAY_VISIBILITY.changesArea
+    // const [isChangedAreaVisible, setIsChangedAreaVisible] = useState(
+    //   DEFAULT_OVERLAY_VISIBILITY.changedArea
     // );
+
+    const {
+      backupMetadata,
+      outerPerimeter: changedAreaOuterPerimeter,
+      loading,
+      metadataError,
+    } = useRasterBackupData(props.layerRecord);
+
+    const SQUARE_METERS_PER_SQUARE_KM = 1_000_000;
+
+    interface ChangedArea {
+      overlapped: Feature<PolygonalGeometry> | null;
+      added: Feature<PolygonalGeometry> | null;
+      areaSquareKm: number;
+    }
+
+    const EMPTY_CHANGED_AREA: ChangedArea = { overlapped: null, added: null, areaSquareKm: 0 };
+
+    const buildChangedArea = (
+      backupFootprint: Geometry | undefined | null,
+      changedAreaOuterPerimeter: Geometry | undefined | null,
+      changedAreaOuterPerimeterArea: number | undefined
+    ): ChangedArea => {
+      if (!isPolygonal(backupFootprint) || !isPolygonal(changedAreaOuterPerimeter)) {
+        return EMPTY_CHANGED_AREA;
+      }
+      const backupFeature = toFeature(backupFootprint);
+      const changedAreaFeature = toFeature(changedAreaOuterPerimeter);
+      const overlapped = intersect(backupFeature, changedAreaFeature);
+      const added = difference(changedAreaFeature, backupFeature);
+      const areaSquareMeters = (added ? area(added) : 0) + (overlapped ? area(overlapped) : 0);
+      const areaSquareKm =
+        changedAreaOuterPerimeterArea ?? areaSquareMeters / SQUARE_METERS_PER_SQUARE_KM;
+      return {
+        overlapped,
+        added,
+        areaSquareKm,
+      };
+    };
+
+    const changedAreaOuterPerimeterGeometry = changedAreaOuterPerimeter?.features?.[0]?.geometry as
+      | Geometry
+      | undefined;
+
+    const changedArea = useMemo(
+      () =>
+        buildChangedArea(
+          backupMetadata?.footprint as Geometry | undefined,
+          changedAreaOuterPerimeterGeometry,
+          changedAreaOuterPerimeter?.features?.[0]?.properties?.area as number | undefined
+        ),
+      [backupMetadata?.footprint, changedAreaOuterPerimeterGeometry]
+    );
+
+    // const backupQueryExecutor = async (
+    //   bbox: BBox,
+    //   startIndex: number
+    // ): Promise<IQueryExecutorResponse> => {
+    //   if (!backupMetadata) {
+    //     return { features: [], pageSize: -1 };
+    //   }
+    //   const result = await store.queryGetRasterBackupPolygonPartsFeature({
+    //     data: {
+    //       feature: bboxPolygon(bbox) as GeojsonFeatureInput,
+    //       typeName: getWFSFeatureTypeName(backupMetadata, ENUMS),
+    //       count: CONFIG.POLYGON_PARTS.MAX.WFS_FEATURES,
+    //       startIndex,
+    //     },
+    //   });
+    //   const fetchedFeatures = get(result, 'getRasterBackupPolygonPartsFeature.features', []);
+    //   const features = (Array.isArray(fetchedFeatures) ? fetchedFeatures : []).map((feature) => ({
+    //     ...feature,
+    //     properties: {
+    //       ...(feature?.properties ?? {}),
+    //       _featureType: FeatureType.BACKUP_PP,
+    //     },
+    //   }));
+    //   return { features, pageSize: CONFIG.POLYGON_PARTS.MAX.WFS_FEATURES };
+    // };
 
     const closeDialog = (): void => {
       props.onSetOpen(false);
     };
-
-    // const overlays = useMemo(
-    //   () => buildRevertOverlayFeatures(props.layerRecord.footprint?.bbox),
-    //   [props.layerRecord.footprint?.bbox]
-    // );
 
     // const overlayCheckboxes: {
     //   id: OverlayId;
@@ -47,7 +152,7 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
     //     labelId: 'revert.dialog.checkbox.existing.label',
     //     checked: isExistingVisible,
     //     onChange: setIsExistingVisible,
-    //     badge: 'v24',
+    //     badge: currentLayer.productVersion ? `v${currentLayer.productVersion}` : '',
     //     badgeBackground: EXISTING_COLOR,
     //   },
     //   {
@@ -55,16 +160,18 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
     //     labelId: 'revert.dialog.checkbox.backup.label',
     //     checked: isBackupVisible,
     //     onChange: setIsBackupVisible,
-    //     badge: 'v23',
-    //     badgeBackground: BACKUP_COLOR,
+    //     badge: backupMetadata?.productVersion ? `v${backupMetadata.productVersion}` : '',
+    //     badgeBackground: BACKUP_PP_COLOR,
     //   },
     //   {
-    //     id: 'changesArea',
-    //     labelId: 'revert.dialog.checkbox.changes-area.label',
-    //     checked: isChangesAreaVisible,
-    //     onChange: setIsChangesAreaVisible,
-    //     badge: '394.5 קמ״ר',
-    //     badgeBackground: `linear-gradient(to right, ${CHANGES_REMOVED_COLOR} 50%, ${CHANGES_ADDED_COLOR} 50%)`,
+    //     id: 'changedArea',
+    //     labelId: 'revert.dialog.checkbox.changed-area.label',
+    //     checked: isChangedAreaVisible,
+    //     onChange: setIsChangedAreaVisible,
+    //     badge: `${changedArea.areaSquareKm.toFixed(1)}${intl.formatMessage({
+    //       id: 'resolutionConflict.units.km2',
+    //     })}`,
+    //     badgeBackground: `linear-gradient(to right, ${CHANGES_OVERLAPPED_COLOR} 50%, ${CHANGES_ADDED_COLOR} 50%)`,
     //   },
     // ];
 
@@ -91,38 +198,49 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
 
     // const mapChildren = (
     //   <>
-    //     {isExistingVisible && (
-    //       <VectorLayer options={{ zIndex: REVERT_OVERLAY_ZINDEX.EXISTING }}>
-    //         <VectorSource>
-    //           <GeoJSONFeature
-    //             geometry={overlays.existing}
-    //             featureStyle={EXISTING_STYLE}
-    //             fit={false}
-    //           />
-    //         </VectorSource>
-    //       </VectorLayer>
-    //     )}
-    //     {isBackupVisible && (
-    //       <VectorLayer options={{ zIndex: REVERT_OVERLAY_ZINDEX.BACKUP }}>
-    //         <VectorSource>
-    //           <GeoJSONFeature geometry={overlays.backup} featureStyle={BACKUP_STYLE} fit={false} />
-    //         </VectorSource>
-    //       </VectorLayer>
-    //     )}
-    //     {isChangesAreaVisible && (
-    //       <VectorLayer options={{ zIndex: REVERT_OVERLAY_ZINDEX.CHANGES_AREA }}>
-    //         <VectorSource>
-    //           {overlays.changesAdded && (
+    //     {isExistingVisible &&
+    //       currentLayer.footprint !== undefined &&
+    //       currentLayer.footprint !== null && (
+    //         <VectorLayer options={{ zIndex: VectorLayerZIndex.EXISTING }}>
+    //           <VectorSource>
     //             <GeoJSONFeature
-    //               geometry={overlays.changesAdded}
+    //               geometry={currentLayer.footprint as Geometry}
+    //               featureStyle={EXISTING_STYLE}
+    //               fit={false}
+    //             />
+    //           </VectorSource>
+    //         </VectorLayer>
+    //       )}
+    //     {isBackupVisible && backupMetadata && (
+    //       <PolygonPartsExtentQueryVectorLayer
+    //         featureType={FeatureType.BACKUP_PP}
+    //         queryExecutor={backupQueryExecutor}
+    //         outerPerimeter={backupMetadata.footprint as Geometry | undefined}
+    //         options={{
+    //           properties: { id: FeatureType.BACKUP_PP },
+    //           zIndex: VectorLayerZIndex.BACKUP,
+    //         }}
+    //       />
+    //     )}
+    //     {isChangedAreaVisible && (
+    //       <VectorLayer
+    //         options={{
+    //           maxZoom: CONFIG.POLYGON_PARTS.MAX.SHOW_FOOTPRINT_ZOOM_LEVEL,
+    //           zIndex: VectorLayerZIndex.CHANGED_AREA,
+    //         }}
+    //       >
+    //         <VectorSource>
+    //           {changedArea.added && (
+    //             <GeoJSONFeature
+    //               geometry={changedArea.added}
     //               featureStyle={CHANGES_ADDED_STYLE}
     //               fit={false}
     //             />
     //           )}
-    //           {overlays.changesRemoved && (
+    //           {changedArea.overlapped && (
     //             <GeoJSONFeature
-    //               geometry={overlays.changesRemoved}
-    //               featureStyle={CHANGES_REMOVED_STYLE}
+    //               geometry={changedArea.overlapped}
+    //               featureStyle={CHANGES_OVERLAPPED_STYLE}
     //               fit={false}
     //             />
     //           )}
@@ -158,17 +276,6 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
       props.onSetOpen(false);
     };
 
-    // const map = (
-    //   <ActionMap
-    //     layerRecord={props.layerRecord}
-    //     style={{ height: '100%' }}
-    //     defaultShowBaseMap={true}
-    //     toggleBaseMap={false}
-    //   >
-    //     {mapChildren}
-    //   </ActionMap>
-    // );
-
     return (
       <DestructiveActionDialog
         elementId="rasterRevertDialog"
@@ -179,8 +286,8 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
         disclaimerActionId="action.dialog.revert"
         onClose={closeDialog}
         onSubmit={revertLayer}
-        loading={false}
-        error={null}
+        loading={loading}
+        error={metadataError ?? null}
         // map={map}
         map={
           <Box style={{ height: '100%', backgroundColor: 'lightgray', color: 'red' }}>

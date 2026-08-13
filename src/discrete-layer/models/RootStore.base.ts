@@ -107,6 +107,10 @@ import { PositionsWithHeightsModel, PositionsWithHeightsModelType } from "./Posi
 import { positionsWithHeightsModelPrimitives, PositionsWithHeightsModelSelector } from "./PositionsWithHeightsModel.base"
 import { PositionWithHeightModel, PositionWithHeightModelType } from "./PositionWithHeightModel"
 import { positionWithHeightModelPrimitives, PositionWithHeightModelSelector } from "./PositionWithHeightModel.base"
+import { GeojsonFeatureCollectionModel, GeojsonFeatureCollectionModelType } from "./GeojsonFeatureCollectionModel"
+import { geojsonFeatureCollectionModelPrimitives, GeojsonFeatureCollectionModelSelector } from "./GeojsonFeatureCollectionModel.base"
+import { GeojsonFeatureModel, GeojsonFeatureModelType } from "./GeojsonFeatureModel"
+import { geojsonFeatureModelPrimitives, GeojsonFeatureModelSelector } from "./GeojsonFeatureModel.base"
 import { UserLoginModel, UserLoginModelType } from "./UserLoginModel"
 import { userLoginModelPrimitives, UserLoginModelSelector } from "./UserLoginModel.base"
 import { SourceValidationModel, SourceValidationModelType } from "./SourceValidationModel"
@@ -264,6 +268,11 @@ export type WfsPolygonPartsGetFeatureParams = {
 export type WfsFilterPropertyParam = {
   propertyName: string
   propertyValue: string
+}
+export type RasterBackupParams = {
+  productId: string
+  productVersion: string
+  productType: ProductType
 }
 export type UserLoginParams = {
   userName: string
@@ -500,6 +509,9 @@ queryGetFeatureTypes="queryGetFeatureTypes",
 queryGetPointsHeights="queryGetPointsHeights",
 queryServicesAvailability="queryServicesAvailability",
 queryGetPolygonPartsFeature="queryGetPolygonPartsFeature",
+queryGetRasterBackupPolygonPartsFeature="queryGetRasterBackupPolygonPartsFeature",
+queryGetRasterBackupMetadata="queryGetRasterBackupMetadata",
+queryGetOuterPerimeter="queryGetOuterPerimeter",
 queryLogin="queryLogin",
 queryValidateSource="queryValidateSource",
 queryValidateGPKGSource="queryValidateGPKGSource",
@@ -525,7 +537,7 @@ mutateJobApproveAndResume="mutateJobApproveAndResume"
 */
 export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
   .named("RootStore")
-  .extend(configureStoreMixin([['Capability', () => CapabilityModel], ['Style', () => StyleModel], ['TileMatrixSet', () => TileMatrixSetModel], ['ResourceURL', () => ResourceUrlModel], ['CSWCatalogs', () => CswCatalogsModel], ['CSWCatalog', () => CswCatalogModel], ['Layer3DRecord', () => Layer3DRecordModel], ['Link', () => LinkModel], ['LayerRasterRecord', () => LayerRasterRecordModel], ['LayerDemRecord', () => LayerDemRecordModel], ['VectorBestRecord', () => VectorBestRecordModel], ['VectorFeatureTypeStructure', () => VectorFeatureTypeStructureModel], ['FieldFeatureType', () => FieldFeatureTypeModel], ['QuantizedMeshBestRecord', () => QuantizedMeshBestRecordModel], ['CSWQuerySummary', () => CswQuerySummaryModel], ['StringArrayObjectType', () => StringArrayObjectTypeModel], ['EntityDescriptor', () => EntityDescriptorModel], ['CategoryConfig', () => CategoryConfigModel], ['FieldConfig', () => FieldConfigModel], ['FilterableFieldConfig', () => FilterableFieldConfigModel], ['FilterFieldValidation', () => FilterFieldValidationModel], ['BriefFieldConfig', () => BriefFieldConfigModel], ['Autocompletion', () => AutocompletionModel], ['ValidationConfig', () => ValidationConfigModel], ['EnumAspects', () => EnumAspectsModel], ['UpdateRules', () => UpdateRulesModel], ['UpdateRulesValue', () => UpdateRulesValueModel], ['UpdateRulesOperation', () => UpdateRulesOperationModel], ['LookupTableBinding', () => LookupTableBindingModel], ['DependentField', () => DependentFieldModel], ['ShapeMapping', () => ShapeMappingModel], ['MCEnums', () => McEnumsModel], ['PolygonPartRecord', () => PolygonPartRecordModel], ['EstimatedSize', () => EstimatedSizeModel], ['FreeDiskSpace', () => FreeDiskSpaceModel], ['TriggerExportTask', () => TriggerExportTaskModel], ['ExternalService', () => ExternalServiceModel], ['Job', () => JobModel], ['AvailableActions', () => AvailableActionsModel], ['LookupTableData', () => LookupTableDataModel], ['DeploymentWithServices', () => DeploymentWithServicesModel], ['K8sService', () => K8SServiceModel], ['File', () => FileModel], ['DecryptedId', () => DecryptedIdModel], ['TasksGroup', () => TasksGroupModel], ['Task', () => TaskModel], ['GetFeature', () => GetFeatureModel], ['WfsFeature', () => WfsFeatureModel], ['GetFeatureTypes', () => GetFeatureTypesModel], ['PositionsWithHeights', () => PositionsWithHeightsModel], ['PositionWithHeight', () => PositionWithHeightModel], ['UserLogin', () => UserLoginModel], ['SourceValidation', () => SourceValidationModel], ['DummyForTypesOnClient', () => DummyForTypesOnClientModel], ['RasterIngestion', () => RasterIngestionModel]], ['LayerRasterRecord', 'Layer3DRecord', 'LayerDemRecord', 'EntityDescriptor', 'VectorBestRecord', 'QuantizedMeshBestRecord', 'PolygonPartRecord'], "js"))
+  .extend(configureStoreMixin([['Capability', () => CapabilityModel], ['Style', () => StyleModel], ['TileMatrixSet', () => TileMatrixSetModel], ['ResourceURL', () => ResourceUrlModel], ['CSWCatalogs', () => CswCatalogsModel], ['CSWCatalog', () => CswCatalogModel], ['Layer3DRecord', () => Layer3DRecordModel], ['Link', () => LinkModel], ['LayerRasterRecord', () => LayerRasterRecordModel], ['LayerDemRecord', () => LayerDemRecordModel], ['VectorBestRecord', () => VectorBestRecordModel], ['VectorFeatureTypeStructure', () => VectorFeatureTypeStructureModel], ['FieldFeatureType', () => FieldFeatureTypeModel], ['QuantizedMeshBestRecord', () => QuantizedMeshBestRecordModel], ['CSWQuerySummary', () => CswQuerySummaryModel], ['StringArrayObjectType', () => StringArrayObjectTypeModel], ['EntityDescriptor', () => EntityDescriptorModel], ['CategoryConfig', () => CategoryConfigModel], ['FieldConfig', () => FieldConfigModel], ['FilterableFieldConfig', () => FilterableFieldConfigModel], ['FilterFieldValidation', () => FilterFieldValidationModel], ['BriefFieldConfig', () => BriefFieldConfigModel], ['Autocompletion', () => AutocompletionModel], ['ValidationConfig', () => ValidationConfigModel], ['EnumAspects', () => EnumAspectsModel], ['UpdateRules', () => UpdateRulesModel], ['UpdateRulesValue', () => UpdateRulesValueModel], ['UpdateRulesOperation', () => UpdateRulesOperationModel], ['LookupTableBinding', () => LookupTableBindingModel], ['DependentField', () => DependentFieldModel], ['ShapeMapping', () => ShapeMappingModel], ['MCEnums', () => McEnumsModel], ['PolygonPartRecord', () => PolygonPartRecordModel], ['EstimatedSize', () => EstimatedSizeModel], ['FreeDiskSpace', () => FreeDiskSpaceModel], ['TriggerExportTask', () => TriggerExportTaskModel], ['ExternalService', () => ExternalServiceModel], ['Job', () => JobModel], ['AvailableActions', () => AvailableActionsModel], ['LookupTableData', () => LookupTableDataModel], ['DeploymentWithServices', () => DeploymentWithServicesModel], ['K8sService', () => K8SServiceModel], ['File', () => FileModel], ['DecryptedId', () => DecryptedIdModel], ['TasksGroup', () => TasksGroupModel], ['Task', () => TaskModel], ['GetFeature', () => GetFeatureModel], ['WfsFeature', () => WfsFeatureModel], ['GetFeatureTypes', () => GetFeatureTypesModel], ['PositionsWithHeights', () => PositionsWithHeightsModel], ['PositionWithHeight', () => PositionWithHeightModel], ['GeojsonFeatureCollection', () => GeojsonFeatureCollectionModel], ['GeojsonFeature', () => GeojsonFeatureModel], ['UserLogin', () => UserLoginModel], ['SourceValidation', () => SourceValidationModel], ['DummyForTypesOnClient', () => DummyForTypesOnClientModel], ['RasterIngestion', () => RasterIngestionModel]], ['LayerRasterRecord', 'Layer3DRecord', 'LayerDemRecord', 'EntityDescriptor', 'VectorBestRecord', 'QuantizedMeshBestRecord', 'PolygonPartRecord'], "js"))
   .props({
     layerRasterRecords: types.optional(types.map(types.late((): any => LayerRasterRecordModel)), {}),
     layer3DRecords: types.optional(types.map(types.late((): any => Layer3DRecordModel)), {}),
@@ -682,6 +694,21 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     queryGetPolygonPartsFeature(variables: { data: WfsPolygonPartsGetFeatureParams }, resultSelector: string | ((qb: GetFeatureModelSelector) => GetFeatureModelSelector) = getFeatureModelPrimitives.toString(), options: QueryOptions = {}) {
       return self.query<{ getPolygonPartsFeature: GetFeatureModelType }>(`query getPolygonPartsFeature($data: WfsPolygonPartsGetFeatureParams!) { getPolygonPartsFeature(data: $data) {
         ${typeof resultSelector === "function" ? resultSelector(new GetFeatureModelSelector()).toString() : resultSelector}
+      } }`, variables, options)
+    },
+    queryGetRasterBackupPolygonPartsFeature(variables: { data: WfsPolygonPartsGetFeatureParams }, resultSelector: string | ((qb: GetFeatureModelSelector) => GetFeatureModelSelector) = getFeatureModelPrimitives.toString(), options: QueryOptions = {}) {
+      return self.query<{ getRasterBackupPolygonPartsFeature: GetFeatureModelType }>(`query getRasterBackupPolygonPartsFeature($data: WfsPolygonPartsGetFeatureParams!) { getRasterBackupPolygonPartsFeature(data: $data) {
+        ${typeof resultSelector === "function" ? resultSelector(new GetFeatureModelSelector()).toString() : resultSelector}
+      } }`, variables, options)
+    },
+    queryGetRasterBackupMetadata(variables: { data: RasterBackupParams }, resultSelector: string | ((qb: LayerRasterRecordModelSelector) => LayerRasterRecordModelSelector) = layerRasterRecordModelPrimitives.toString(), options: QueryOptions = {}) {
+      return self.query<{ getRasterBackupMetadata: LayerRasterRecordModelType }>(`query getRasterBackupMetadata($data: RasterBackupParams!) { getRasterBackupMetadata(data: $data) {
+        ${typeof resultSelector === "function" ? resultSelector(new LayerRasterRecordModelSelector()).toString() : resultSelector}
+      } }`, variables, options)
+    },
+    queryGetOuterPerimeter(variables: { data: RasterBackupParams }, resultSelector: string | ((qb: GeojsonFeatureCollectionModelSelector) => GeojsonFeatureCollectionModelSelector) = geojsonFeatureCollectionModelPrimitives.toString(), options: QueryOptions = {}) {
+      return self.query<{ getOuterPerimeter: GeojsonFeatureCollectionModelType }>(`query getOuterPerimeter($data: RasterBackupParams!) { getOuterPerimeter(data: $data) {
+        ${typeof resultSelector === "function" ? resultSelector(new GeojsonFeatureCollectionModelSelector()).toString() : resultSelector}
       } }`, variables, options)
     },
     queryLogin(variables: { data: UserLoginParams }, resultSelector: string | ((qb: UserLoginModelSelector) => UserLoginModelSelector) = userLoginModelPrimitives.toString(), options: QueryOptions = {}) {
