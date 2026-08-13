@@ -7,6 +7,7 @@ import { Fill, Stroke, Style } from 'ol/style';
 import area from '@turf/area';
 import bboxPolygon from '@turf/bbox-polygon';
 import difference from '@turf/difference';
+import intersect from '@turf/intersect';
 import { Box, GeoJSONFeature, VectorLayer, VectorSource } from '@map-colonies/react-components';
 import { Checkbox } from '@map-colonies/react-core';
 import { useEnums } from '../../../../common/hooks/useEnum.hook';
@@ -94,7 +95,7 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
       }
       const backupFeature = toFeature(backupFootprint);
       const changedAreaFeature = toFeature(changedAreaOuterPerimeter);
-      const overlapped = difference(backupFeature, changedAreaFeature);
+      const overlapped = intersect(backupFeature, changedAreaFeature);
       const added = difference(changedAreaFeature, backupFeature);
       const areaSquareMeters = (added ? area(added) : 0) + (overlapped ? area(overlapped) : 0);
       const areaSquareKm =
