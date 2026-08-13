@@ -20,11 +20,9 @@ export enum VectorLayerZIndex {
   CHANGED_AREA = 70,
 }
 
-const BACKUP_PP_COLOR = '#3B82F6';
-const FILL_OPACITY = '66';
-
-interface IStyleByProp {
+export interface IStyleByProp {
   style: Style;
+  backgroundImage?: string;
   prop?: string;
   values?: {
     value: string | number | boolean;
@@ -90,7 +88,13 @@ function createHatchPatternGISStyle(color: string, opacity = 0.45): CanvasPatter
   return pattern;
 }
 
-function createHatchPattern(color: string, opacity: number): CanvasPattern {
+function createHatchPattern(
+  color: string,
+  opacity: number
+): {
+  pattern: CanvasPattern;
+  backgroundImage: string;
+} {
   const canvas = document.createElement('canvas');
   const size = 16;
 
@@ -121,9 +125,23 @@ function createHatchPattern(color: string, opacity: number): CanvasPattern {
 
   ctx.stroke();
 
-  return ctx.createPattern(canvas, 'repeat')!;
+  const pattern = ctx.createPattern(canvas, 'repeat')!;
+
+  return {
+    pattern,
+    backgroundImage: `url(${canvas.toDataURL('image/png')})`,
+  };
 }
 
+const FILL_OPACITY = '66';
+const SOURCE_EXTENT = '#7F00FF';
+const PP_PERIMETER_COLOR = '#000000';
+const LOW_RESOLUTION_COLOR = '#FF7F00';
+const CHANGED_AREA_ADDED_COLOR = '#ef4444';
+const CHANGED_AREA_OVERLAPPED_COLOR = '#FF7F00';
+const BACKUP_COLOR = '#3b82f6';
+const hatchChangedAreaAdded = createHatchPattern(CHANGED_AREA_ADDED_COLOR, 0.45);
+const hatchChangedAreaOverlapped = createHatchPattern(CHANGED_AREA_OVERLAPPED_COLOR, 0.45);
 export const PPMapStyles = new Map<FeatureType, IStyleByProp>([
   [
     FeatureType.SOURCE_EXTENT,
@@ -131,7 +149,7 @@ export const PPMapStyles = new Map<FeatureType, IStyleByProp>([
       style: new Style({
         stroke: new Stroke({
           width: 4,
-          color: '#7F00FF',
+          color: SOURCE_EXTENT,
         }),
       }),
     },
@@ -154,7 +172,7 @@ export const PPMapStyles = new Map<FeatureType, IStyleByProp>([
       style: new Style({
         stroke: new Stroke({
           width: 4,
-          color: '#000000',
+          color: PP_PERIMETER_COLOR,
         }),
       }),
     },
@@ -203,10 +221,10 @@ export const PPMapStyles = new Map<FeatureType, IStyleByProp>([
       style: new Style({
         stroke: new Stroke({
           width: 2,
-          color: '#FF7F00',
+          color: LOW_RESOLUTION_COLOR,
         }),
         fill: new Fill({
-          color: '#FF7F00' + FILL_OPACITY,
+          color: LOW_RESOLUTION_COLOR + FILL_OPACITY,
         }),
       }),
       prop: EXCEEDED_PROPERTY_NAME,
@@ -230,7 +248,11 @@ export const PPMapStyles = new Map<FeatureType, IStyleByProp>([
     FeatureType.BACKUP_PP,
     {
       style: new Style({
+        fill: new Fill({
+          color: hatchChangedAreaAdded.pattern,
+        }),
         stroke: new Stroke({
+          color: CHANGED_AREA_ADDED_COLOR,
           width: 2,
           color: BACKUP_PP_COLOR,
           lineDash: [10, 5],
@@ -239,6 +261,7 @@ export const PPMapStyles = new Map<FeatureType, IStyleByProp>([
           color: BACKUP_PP_COLOR + FILL_OPACITY,
         }),
       }),
+      backgroundImage: hatchChangedAreaAdded.backgroundImage,
     },
   ],
   [
@@ -246,13 +269,14 @@ export const PPMapStyles = new Map<FeatureType, IStyleByProp>([
     {
       style: new Style({
         fill: new Fill({
-          color: createHatchPattern('#FF7F00', 0.45),
+          color: hatchChangedAreaOverlapped.pattern,
         }),
         stroke: new Stroke({
-          color: '#FF7F00',
+          color: CHANGED_AREA_OVERLAPPED_COLOR,
           width: 2,
         }),
       }),
+      backgroundImage: hatchChangedAreaOverlapped.backgroundImage,
     },
   ],
   [
@@ -265,11 +289,69 @@ export const PPMapStyles = new Map<FeatureType, IStyleByProp>([
         stroke: new Stroke({
           color: '#EF4444',
           width: 2,
+          color: BACKUP_COLOR,
+          lineDash: [10, 5],
+        }),
+        fill: new Fill({
+          color: BACKUP_COLOR + FILL_OPACITY,
         }),
       }),
     },
   ],
 ]);
+
+const getColor = (color: unknown): string | undefined => {
+  if (!color || typeof color !== 'string') {
+    return undefined;
+  }
+
+  return color;
+};
+
+export function getCSSFromOlStyle(OLStyleConf: IStyleByProp | undefined): React.CSSProperties {
+  if (!OLStyleConf) {
+    return {};
+  }
+
+  const style = OLStyleConf.style;
+  const image = OLStyleConf.backgroundImage;
+  const stroke = style.getStroke();
+  const fill = style.getFill();
+
+  const css: React.CSSProperties = {};
+
+  // Border
+  if (stroke) {
+    const strokeColor = getColor(stroke.getColor());
+    const width = stroke.getWidth() ?? 1;
+    const lineDash = stroke.getLineDash();
+
+    if (strokeColor) {
+      if (lineDash?.length) {
+        // CSS cannot represent arbitrary lineDash values directly.
+        // Approximate OpenLayers lineDash with a dashed border.
+        css.border = `${width}px dashed ${strokeColor}`;
+      } else {
+        css.border = `${width}px solid ${strokeColor}`;
+      }
+    }
+  }
+
+  // Background
+  if (image) {
+    css.backgroundImage = image;
+    css.backgroundSize = 8;
+    css.backgroundRepeat = 'repeat';
+  } else if (fill) {
+    const fillColor = getColor(fill.getColor());
+
+    if (fillColor) {
+      css.backgroundColor = fillColor;
+    }
+  }
+
+  return css;
+}
 
 export const getStyleByFeatureType = (feature?: Feature): Style | undefined => {
   const defaultStyle = PPMapStyles.get(FeatureType.EXISTING_PP)?.style;
