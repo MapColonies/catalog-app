@@ -6,8 +6,8 @@
 #geoFeaturesMapContainer .checkbox {
   display: inline-block;
   position: absolute;
-  bottom: 1px;
-  right: 1px;
+  bottom: 0px;
+  right: 0px;
   height: 31px;
   background-color: #262626bf;
   direction: ltr;
