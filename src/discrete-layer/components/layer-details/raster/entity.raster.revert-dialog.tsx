@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { observer } from 'mobx-react';
 import { Feature, Geometry } from 'geojson';
 import { Fill, Stroke, Style } from 'ol/style';
