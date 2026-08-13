@@ -66,8 +66,12 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
       DEFAULT_OVERLAY_VISIBILITY.changedArea
     );
 
-    const { backupMetadata, changedAreaOuterPerimeter, loading, metadataError } =
-      useRasterBackupData(props.layerRecord);
+    const {
+      backupMetadata,
+      OuterPerimeter: changedAreaOuterPerimeter,
+      loading,
+      metadataError,
+    } = useRasterBackupData(props.layerRecord);
 
     const SQUARE_METERS_PER_SQUARE_KM = 1_000_000;
 

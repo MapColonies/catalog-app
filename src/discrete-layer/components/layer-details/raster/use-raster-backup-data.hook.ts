@@ -11,7 +11,7 @@ import { RasterBackupParams } from '../../../models/RootStore.base';
 
 export interface RasterBackupData {
   backupMetadata: LayerRasterRecordModelType | undefined;
-  changedAreaOuterPerimeter: GeojsonFeatureCollectionModelType | undefined;
+  OuterPerimeter: GeojsonFeatureCollectionModelType | undefined;
   loading: boolean;
   metadataError: unknown;
   outerPerimeterError: unknown;
@@ -42,7 +42,7 @@ export const useRasterBackupData = (layerRecord: ILayerImage): RasterBackupData 
 
   return {
     backupMetadata: metadataQuery.data?.getRasterBackupMetadata,
-    changedAreaOuterPerimeter: outerPerimeterQuery.data?.getOuterPerimeter,
+    OuterPerimeter: outerPerimeterQuery.data?.getOuterPerimeter,
     loading: metadataQuery.loading || outerPerimeterQuery.loading,
     metadataError: metadataQuery.error,
     outerPerimeterError: outerPerimeterQuery.error,
