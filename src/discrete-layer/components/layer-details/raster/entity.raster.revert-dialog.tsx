@@ -4,6 +4,8 @@ import { Box } from '@map-colonies/react-components';
 import { Mode } from '../../../../common/models/mode.enum';
 import { RecordType } from '../../../models';
 import { ActionDialogProps, DestructiveActionDialog } from '../destructive-action-dialog';
+import { getCSSFromOlStyle, IStyleByProp, PPMapStyles } from './pp-map.utils';
+import { FeatureType } from './feature-type.enum';
 
 import './entity.raster.revert-dialog.css';
 
@@ -129,6 +131,20 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
     //     )}
     //   </>
     // );
+    const FeaturePreview: React.FC<{ stylePP: IStyleByProp | undefined }> = (props: {
+      stylePP: IStyleByProp | undefined;
+    }) => {
+      return (
+        <div
+          style={{
+            width: 16,
+            height: 16,
+            borderRadius: '50%',
+            ...getCSSFromOlStyle(props.stylePP),
+          }}
+        />
+      );
+    };
 
     const revertLayer = (approverName: string, approvalCode: string): void => {
       // eslint-disable-next-line no-console
@@ -175,6 +191,9 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
         sidePanel={
           <Box style={{ width: '100%', height: '25%', backgroundColor: 'lightgray', color: 'red' }}>
             SWITCHES PLACEHOLDER
+            <FeaturePreview stylePP={PPMapStyles.get(FeatureType.CHANGED_AREA_ADDED_PP)} />
+            <FeaturePreview stylePP={PPMapStyles.get(FeatureType.CHANGED_AREA_OVERLAPPED_PP)} />
+            <FeaturePreview stylePP={PPMapStyles.get(FeatureType.BACKUP_PP)} />
           </Box>
         }
       />
