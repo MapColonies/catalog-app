@@ -41,8 +41,8 @@ const DEFAULT_OVERLAY_VISIBILITY: Record<OverlayId, boolean> = {
 
 const EXISTING_COLOR = '#22C55E';
 const BACKUP_PP_COLOR = '#3B82F6';
+const CHANGES_OVERLAPPED_COLOR = '#C62828';
 const CHANGES_ADDED_COLOR = '#FF7F00';
-const CHANGES_REMOVED_COLOR = '#C62828';
 
 const strokeAndFillStyle = (color: string): Style =>
   new Style({
@@ -52,7 +52,7 @@ const strokeAndFillStyle = (color: string): Style =>
 
 export const EXISTING_STYLE = strokeAndFillStyle(EXISTING_COLOR);
 export const CHANGES_ADDED_STYLE = strokeAndFillStyle(CHANGES_ADDED_COLOR);
-export const CHANGES_REMOVED_STYLE = strokeAndFillStyle(CHANGES_REMOVED_COLOR);
+export const CHANGES_OVERLAPPED_STYLE = strokeAndFillStyle(CHANGES_OVERLAPPED_COLOR);
 
 export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
   (props: ActionDialogProps) => {
@@ -77,12 +77,12 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
     const SQUARE_METERS_PER_SQUARE_KM = 1_000_000;
 
     interface ChangedArea {
+      overlapped: Feature<PolygonalGeometry> | null;
       added: Feature<PolygonalGeometry> | null;
-      removed: Feature<PolygonalGeometry> | null;
       areaSquareKm: number;
     }
 
-    const EMPTY_CHANGED_AREA: ChangedArea = { added: null, removed: null, areaSquareKm: 0 };
+    const EMPTY_CHANGED_AREA: ChangedArea = { overlapped: null, added: null, areaSquareKm: 0 };
 
     const buildChangedArea = (
       backupFootprint: Geometry | undefined | null,
@@ -94,14 +94,14 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
       }
       const backupFeature = toFeature(backupFootprint);
       const changedAreaFeature = toFeature(changedAreaOuterPerimeter);
+      const overlapped = difference(backupFeature, changedAreaFeature);
       const added = difference(changedAreaFeature, backupFeature);
-      const removed = difference(backupFeature, changedAreaFeature);
-      const areaSquareMeters = (added ? area(added) : 0) + (removed ? area(removed) : 0);
+      const areaSquareMeters = (added ? area(added) : 0) + (overlapped ? area(overlapped) : 0);
       const areaSquareKm =
         changedAreaOuterPerimeterArea ?? areaSquareMeters / SQUARE_METERS_PER_SQUARE_KM;
       return {
+        overlapped,
         added,
-        removed,
         areaSquareKm,
       };
     };
@@ -182,7 +182,7 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
         badge: `${changedArea.areaSquareKm.toFixed(1)}${intl.formatMessage({
           id: 'resolutionConflict.units.km2',
         })}`,
-        badgeBackground: `linear-gradient(to right, ${CHANGES_REMOVED_COLOR} 50%, ${CHANGES_ADDED_COLOR} 50%)`,
+        badgeBackground: `linear-gradient(to right, ${CHANGES_OVERLAPPED_COLOR} 50%, ${CHANGES_ADDED_COLOR} 50%)`,
       },
     ];
 
@@ -248,10 +248,10 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
                   fit={false}
                 />
               )}
-              {changedArea.removed && (
+              {changedArea.overlapped && (
                 <GeoJSONFeature
-                  geometry={changedArea.removed}
-                  featureStyle={CHANGES_REMOVED_STYLE}
+                  geometry={changedArea.overlapped}
+                  featureStyle={CHANGES_OVERLAPPED_STYLE}
                   fit={false}
                 />
               )}
