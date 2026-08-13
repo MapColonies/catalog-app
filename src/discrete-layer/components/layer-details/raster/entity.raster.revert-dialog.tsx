@@ -1,22 +1,18 @@
 import React, { useMemo, useState } from 'react';
-import { useIntl } from 'react-intl';
 import { observer } from 'mobx-react';
-import { BBox, Feature, Geometry } from 'geojson';
-import { get } from 'lodash';
+import { Feature, Geometry } from 'geojson';
 import { Fill, Stroke, Style } from 'ol/style';
 import area from '@turf/area';
-import bboxPolygon from '@turf/bbox-polygon';
 import difference from '@turf/difference';
 import intersect from '@turf/intersect';
-import { Box, GeoJSONFeature, VectorLayer, VectorSource } from '@map-colonies/react-components';
-import { Checkbox } from '@map-colonies/react-core';
-import { useEnums } from '../../../../common/hooks/useEnum.hook';
+import { Box } from '@map-colonies/react-components';
 import { Mode } from '../../../../common/models/mode.enum';
 import {
   isPolygonal,
   PolygonalGeometry,
   toFeature,
 } from '../../../../common/utils/geojson.validation';
+import { RecordType } from '../../../models';
 import { ActionDialogProps, DestructiveActionDialog } from '../destructive-action-dialog';
 import { useRasterBackupData } from './use-raster-backup-data.hook';
 
