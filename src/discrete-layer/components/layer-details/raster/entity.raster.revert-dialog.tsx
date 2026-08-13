@@ -17,31 +17,21 @@ import {
   PolygonalGeometry,
   toFeature,
 } from '../../../../common/utils/geojson.validation';
-import CONFIG from '../../../../common/config';
-import { LayerRasterRecordModelType, RecordType, useStore } from '../../../models';
-import { GeojsonFeatureInput } from '../../../models/RootStore.base';
 import { ActionDialogProps, DestructiveActionDialog } from '../destructive-action-dialog';
 import { useRasterBackupData } from './use-raster-backup-data.hook';
-import { FeatureType } from './feature-type.enum';
-import { OlLayerMap } from './layer-map';
-import {
-  IQueryExecutorResponse,
-  PolygonPartsExtentQueryVectorLayer,
-} from './polygon-parts-extent-query-vector-layer';
-import { VectorLayerZIndex, getWFSFeatureTypeName } from './pp-map.utils';
 
 import './entity.raster.revert-dialog.css';
 
-type OverlayId = 'existing' | 'backup' | 'changedArea';
+// type OverlayId = 'existing' | 'backup' | 'changedArea';
 
-const DEFAULT_OVERLAY_VISIBILITY: Record<OverlayId, boolean> = {
-  existing: true,
-  backup: true,
-  changedArea: false,
-};
+// const DEFAULT_OVERLAY_VISIBILITY: Record<OverlayId, boolean> = {
+//   existing: true,
+//   backup: true,
+//   changedArea: false,
+// };
 
 const EXISTING_COLOR = '#22C55E';
-const BACKUP_PP_COLOR = '#3B82F6';
+// const BACKUP_PP_COLOR = '#3B82F6';
 const CHANGES_OVERLAPPED_COLOR = '#C62828';
 const CHANGES_ADDED_COLOR = '#FF7F00';
 
@@ -57,16 +47,16 @@ export const CHANGES_OVERLAPPED_STYLE = strokeAndFillStyle(CHANGES_OVERLAPPED_CO
 
 export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
   (props: ActionDialogProps) => {
-    const intl = useIntl();
-    const store = useStore();
-    const ENUMS = useEnums();
-    const currentLayer = props.layerRecord as LayerRasterRecordModelType;
+    // const intl = useIntl();
+    // const store = useStore();
+    // const ENUMS = useEnums();
+    // const currentLayer = props.layerRecord as LayerRasterRecordModelType;
 
-    const [isExistingVisible, setIsExistingVisible] = useState(DEFAULT_OVERLAY_VISIBILITY.existing);
-    const [isBackupVisible, setIsBackupVisible] = useState(DEFAULT_OVERLAY_VISIBILITY.backup);
-    const [isChangedAreaVisible, setIsChangedAreaVisible] = useState(
-      DEFAULT_OVERLAY_VISIBILITY.changedArea
-    );
+    // const [isExistingVisible, setIsExistingVisible] = useState(DEFAULT_OVERLAY_VISIBILITY.existing);
+    // const [isBackupVisible, setIsBackupVisible] = useState(DEFAULT_OVERLAY_VISIBILITY.backup);
+    // const [isChangedAreaVisible, setIsChangedAreaVisible] = useState(
+    //   DEFAULT_OVERLAY_VISIBILITY.changedArea
+    // );
 
     const {
       backupMetadata,
