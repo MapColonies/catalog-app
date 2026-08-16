@@ -245,7 +245,7 @@ export const PPMapStyles = new Map<FeatureType, IStyleByProp>([
     },
   ],
   [
-    FeatureType.BACKUP_PP,
+    FeatureType.CHANGED_AREA_ADDED_PP,
     {
       style: new Style({
         fill: new Fill({
@@ -254,11 +254,6 @@ export const PPMapStyles = new Map<FeatureType, IStyleByProp>([
         stroke: new Stroke({
           color: CHANGED_AREA_ADDED_COLOR,
           width: 2,
-          color: BACKUP_PP_COLOR,
-          lineDash: [10, 5],
-        }),
-        fill: new Fill({
-          color: BACKUP_PP_COLOR + FILL_OPACITY,
         }),
       }),
       backgroundImage: hatchChangedAreaAdded.backgroundImage,
@@ -280,14 +275,10 @@ export const PPMapStyles = new Map<FeatureType, IStyleByProp>([
     },
   ],
   [
-    FeatureType.CHANGED_AREA_ADDED_PP,
+    FeatureType.BACKUP_PP,
     {
       style: new Style({
-        fill: new Fill({
-          color: createHatchPattern('#EF4444', 0.45), //Alternative function createHatchPatternGISStyle()
-        }),
         stroke: new Stroke({
-          color: '#EF4444',
           width: 2,
           color: BACKUP_COLOR,
           lineDash: [10, 5],
