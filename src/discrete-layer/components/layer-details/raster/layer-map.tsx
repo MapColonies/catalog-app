@@ -54,6 +54,7 @@ interface LayerMapProps {
     showToggleButton?: boolean;
   };
   showFeaturePropertiesPopup?: boolean;
+  showLabels?: boolean;
   style?: CSSProperties | undefined;
   additionalLegends?: LegendItem[];
   children?: JSX.Element | null;
@@ -73,6 +74,7 @@ export const OlLayerMap: React.FC<LayerMapProps> = ({
     showToggleButton: false,
   },
   showFeaturePropertiesPopup = false,
+  showLabels = true,
   style,
   additionalLegends,
   children,
@@ -228,6 +230,7 @@ export const OlLayerMap: React.FC<LayerMapProps> = ({
           <PolygonPartsExtentQueryVectorLayer
             featureType={FeatureType.EXISTING_PP}
             queryExecutor={queryExecutor}
+            showLabels={showLabels}
             outerPerimeter={layerRecord?.footprint as Geometry | undefined}
             options={{
               properties: { id: FeatureType.EXISTING_PP },

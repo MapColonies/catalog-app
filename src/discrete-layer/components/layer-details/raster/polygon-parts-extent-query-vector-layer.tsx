@@ -27,6 +27,7 @@ interface PolygonPartsExtentQueryVectorLayerProps {
   queryExecutor: (bbox: BBox, startIndex: number) => Promise<IQueryExecutorResponse>;
   outerPerimeter?: Geometry;
   options?: Options;
+  showLabels?: boolean;
 }
 
 const START = 0;
@@ -54,7 +55,7 @@ const createZoomedOutFootprintFeature = (
 
 export const PolygonPartsExtentQueryVectorLayer: React.FC<
   PolygonPartsExtentQueryVectorLayerProps
-> = ({ featureType, queryExecutor, outerPerimeter, options }) => {
+> = ({ featureType, queryExecutor, outerPerimeter, options, showLabels = true }) => {
   const mapOl = useMap();
   const intl = useIntl();
   const store = useStore();
@@ -69,9 +70,11 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<
       return true;
     };
 
-    mapOl.once('postrender', () => {
+    const handlePostRender = () => {
       requestPolygonPartsByCurrentExtent();
-    });
+    };
+
+    mapOl.once('postrender', handlePostRender);
 
     const debounceCall = debounce(requestPolygonPartsByCurrentExtent, DEBOUNCE_MOUSE_INTERVAL);
 
@@ -81,11 +84,12 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<
       try {
         debounceCall.cancel();
         mapOl.un('moveend', debounceCall);
+        mapOl.un('postrender', handlePostRender);
       } catch (e) {
         console.log('OL "moveEnd" remove listener failed', e);
       }
     };
-  }, []);
+  }, [queryExecutor]);
 
   const geoJsonFormat = useMemo(() => new GeoJSON(), []);
 
@@ -192,13 +196,17 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<
           let ppStroke = ppStyle?.getStroke()?.clone();
           let ppFill = ppStyle?.getFill()?.clone();
           const featureStyle = new Style({
-            text: createTextStyle(
-              feat,
-              4,
-              FEATURE_LABEL_CONFIG.polygons,
-              ZOOM_LEVELS_TABLE,
-              intl.formatMessage({ id: 'polygon-parts.map-preview.zoom-before-fetch' })
-            ),
+            ...{
+              text: showLabels
+                ? createTextStyle(
+                    feat,
+                    4,
+                    FEATURE_LABEL_CONFIG.polygons,
+                    ZOOM_LEVELS_TABLE,
+                    intl.formatMessage({ id: 'polygon-parts.map-preview.zoom-before-fetch' })
+                  )
+                : undefined,
+            },
             stroke: ppStroke,
             fill: ppFill,
           });
@@ -238,7 +246,7 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<
             />
           ) : null;
         })}
-        {existingPolygonPartsMarker && polygonParts.length > 0 && (
+        {existingPolygonPartsMarker && polygonParts.length === 1 && (
           <GeoJSONFeature
             key="pp-perimeter-marker"
             geometry={existingPolygonPartsMarker}

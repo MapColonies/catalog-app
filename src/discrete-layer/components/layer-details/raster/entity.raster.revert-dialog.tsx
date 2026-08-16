@@ -1,10 +1,14 @@
 import React, { useMemo } from 'react';
+import { useIntl } from 'react-intl';
 import { observer } from 'mobx-react';
-import { Feature, Geometry } from 'geojson';
-import { Fill, Stroke, Style } from 'ol/style';
+import { BBox, Feature, GeoJsonProperties, Geometry, Polygon } from 'geojson';
+import { Style } from 'ol/style';
+import { get } from 'lodash';
 import area from '@turf/area';
 import difference from '@turf/difference';
 import intersect from '@turf/intersect';
+import buffer from '@turf/buffer';
+import bboxPolygon from '@turf/bbox-polygon';
 import { Box } from '@map-colonies/react-components';
 import { Mode } from '../../../../common/models/mode.enum';
 import {
@@ -12,10 +16,27 @@ import {
   PolygonalGeometry,
   toFeature,
 } from '../../../../common/utils/geojson.validation';
-import { RecordType } from '../../../models';
+import { useEnums } from '../../../../common/hooks/useEnum.hook';
+import CONFIG from '../../../../common/config';
+import { GeojsonFeatureInput } from '../../../models/RootStore.base';
+import { LayerRasterRecordModelType, RecordType, useStore } from '../../../models';
+import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
 import { ActionDialogProps, DestructiveActionDialog } from '../destructive-action-dialog';
 import { useRasterBackupData } from './use-raster-backup-data.hook';
-import { getCSSFromOlStyle, IStyleByProp, PPMapStyles } from './pp-map.utils';
+import {
+  FEATURE_LABEL_CONFIG,
+  getCSSFromOlStyle,
+  getText,
+  getWFSFeatureTypeName,
+  IStyleByProp,
+  PPMapStyles,
+  VectorLayerZIndex,
+} from './pp-map.utils';
+import {
+  IQueryExecutorResponse,
+  PolygonPartsExtentQueryVectorLayer,
+} from './polygon-parts-extent-query-vector-layer';
+import { OlLayerMap } from './layer-map';
 import { FeatureType } from './feature-type.enum';
 
 import './entity.raster.revert-dialog.css';
@@ -28,26 +49,29 @@ import './entity.raster.revert-dialog.css';
 //   changedArea: false,
 // };
 
-const EXISTING_COLOR = '#22C55E';
-// const BACKUP_PP_COLOR = '#3B82F6';
-const CHANGES_OVERLAPPED_COLOR = '#C62828';
-const CHANGES_ADDED_COLOR = '#FF7F00';
+// const EXISTING_COLOR = '#22C55E';
+// // const BACKUP_PP_COLOR = '#3B82F6';
+// const CHANGES_OVERLAPPED_COLOR = '#C62828';
+// const CHANGES_ADDED_COLOR = '#FF7F00';
 
-const strokeAndFillStyle = (color: string): Style =>
-  new Style({
-    stroke: new Stroke({ width: 3, color }),
-    fill: new Fill({ color: `${color}33` }),
-  });
+// const strokeAndFillStyle = (color: string): Style =>
+//   new Style({
+//     stroke: new Stroke({ width: 3, color }),
+//     fill: new Fill({ color: `${color}33` }),
+//   });
 
-export const EXISTING_STYLE = strokeAndFillStyle(EXISTING_COLOR);
-export const CHANGES_ADDED_STYLE = strokeAndFillStyle(CHANGES_ADDED_COLOR);
-export const CHANGES_OVERLAPPED_STYLE = strokeAndFillStyle(CHANGES_OVERLAPPED_COLOR);
+// export const EXISTING_STYLE = strokeAndFillStyle(EXISTING_COLOR);
+// export const CHANGES_ADDED_STYLE = strokeAndFillStyle(CHANGES_ADDED_COLOR);
+// export const CHANGES_OVERLAPPED_STYLE = strokeAndFillStyle(CHANGES_OVERLAPPED_COLOR);
+
+const WFS_BUFFER_DELTA = -0.2;
 
 export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
   (props: ActionDialogProps) => {
-    // const intl = useIntl();
-    // const store = useStore();
-    // const ENUMS = useEnums();
+    const intl = useIntl();
+    const store = useStore();
+    const ENUMS = useEnums();
+    const ZOOM_LEVELS_TABLE = useZoomLevelsTable();
     // const currentLayer = props.layerRecord as LayerRasterRecordModelType;
 
     // const [isExistingVisible, setIsExistingVisible] = useState(DEFAULT_OVERLAY_VISIBILITY.existing);
@@ -61,6 +85,7 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
       outerPerimeter: changedAreaOuterPerimeter,
       loading,
       metadataError,
+      outerPerimeterError,
     } = useRasterBackupData(props.layerRecord);
 
     const SQUARE_METERS_PER_SQUARE_KM = 1_000_000;
@@ -99,41 +124,101 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
       | Geometry
       | undefined;
 
-    const changedArea = useMemo(
+    const changedArea = useMemo(() => {
+      const asdf = buildChangedArea(
+        backupMetadata?.footprint as Geometry | undefined,
+        changedAreaOuterPerimeterGeometry,
+        changedAreaOuterPerimeter?.features?.[0]?.properties?.area as number | undefined
+      );
+      return asdf;
+    }, [backupMetadata?.footprint, changedAreaOuterPerimeterGeometry]);
+
+    const backupQueryExecutor = async (
+      bbox: BBox,
+      startIndex: number
+    ): Promise<IQueryExecutorResponse> => {
+      if (!backupMetadata) {
+        return { features: [], pageSize: -1 };
+      }
+      const result = await store.queryGetRasterBackupPolygonPartsFeature({
+        data: {
+          feature: bboxPolygon(bbox) as GeojsonFeatureInput,
+          typeName: getWFSFeatureTypeName(backupMetadata, ENUMS),
+          count: CONFIG.POLYGON_PARTS.MAX.WFS_FEATURES,
+          startIndex,
+        },
+      });
+      const fetchedFeatures = get(result, 'getRasterBackupPolygonPartsFeature.features', []);
+      const features = (Array.isArray(fetchedFeatures) ? fetchedFeatures : []).map((feature) => ({
+        ...feature,
+        properties: {
+          ...(feature?.properties ?? {}),
+          _featureType: FeatureType.BACKUP_PP,
+        },
+      }));
+      return { features, pageSize: CONFIG.POLYGON_PARTS.MAX.WFS_FEATURES };
+    };
+
+    const buildQueryExecutor =
+      (clipFootprint: Feature<Geometry, GeoJsonProperties>, featureType: FeatureType) =>
+      async (bbox: BBox, startIndex: number): Promise<IQueryExecutorResponse> => {
+        const bboxFeature = bboxPolygon(bbox);
+        const intersectedFeature = intersect(
+          bboxFeature as Feature<any, any>,
+          clipFootprint as Feature<any, any>
+        );
+        if (!intersectedFeature) {
+          return { features: [], pageSize: CONFIG.POLYGON_PARTS.MAX.WFS_FEATURES };
+        }
+        const featureWithDelta = buffer(intersectedFeature as Feature<Polygon>, WFS_BUFFER_DELTA, {
+          units: 'meters',
+        });
+        const result = await store.queryGetPolygonPartsFeature({
+          data: {
+            feature: featureWithDelta as GeojsonFeatureInput,
+            typeName: getWFSFeatureTypeName(props.layerRecord as LayerRasterRecordModelType, ENUMS),
+            count: CONFIG.POLYGON_PARTS.MAX.WFS_FEATURES,
+            startIndex,
+            filterProperties: [
+              {
+                propertyName: 'productVersion',
+                propertyValue: (props.layerRecord as LayerRasterRecordModelType)
+                  .productVersion as string,
+              },
+            ],
+          },
+        });
+        const fetchedFeatures = get(result, 'getPolygonPartsFeature.features', []);
+        const features = (Array.isArray(fetchedFeatures) ? fetchedFeatures : []).map((feature) => {
+          return {
+            ...feature,
+            properties: {
+              ...(feature?.properties ?? {}),
+              _featureType: featureType,
+              _featureTitle: getText(feature, 4, FEATURE_LABEL_CONFIG.polygons, ZOOM_LEVELS_TABLE),
+            },
+          };
+        });
+        return { features, pageSize: CONFIG.POLYGON_PARTS.MAX.WFS_FEATURES };
+      };
+
+    const queryExecutorOverlapped = useMemo(
       () =>
-        buildChangedArea(
-          backupMetadata?.footprint as Geometry | undefined,
-          changedAreaOuterPerimeterGeometry,
-          changedAreaOuterPerimeter?.features?.[0]?.properties?.area as number | undefined
+        buildQueryExecutor(
+          changedArea.overlapped as Feature<Geometry, GeoJsonProperties>,
+          FeatureType.CHANGED_AREA_OVERLAPPED_PP
         ),
-      [backupMetadata?.footprint, changedAreaOuterPerimeterGeometry]
+      [changedArea]
     );
 
-    // const backupQueryExecutor = async (
-    //   bbox: BBox,
-    //   startIndex: number
-    // ): Promise<IQueryExecutorResponse> => {
-    //   if (!backupMetadata) {
-    //     return { features: [], pageSize: -1 };
-    //   }
-    //   const result = await store.queryGetRasterBackupPolygonPartsFeature({
-    //     data: {
-    //       feature: bboxPolygon(bbox) as GeojsonFeatureInput,
-    //       typeName: getWFSFeatureTypeName(backupMetadata, ENUMS),
-    //       count: CONFIG.POLYGON_PARTS.MAX.WFS_FEATURES,
-    //       startIndex,
-    //     },
-    //   });
-    //   const fetchedFeatures = get(result, 'getRasterBackupPolygonPartsFeature.features', []);
-    //   const features = (Array.isArray(fetchedFeatures) ? fetchedFeatures : []).map((feature) => ({
-    //     ...feature,
-    //     properties: {
-    //       ...(feature?.properties ?? {}),
-    //       _featureType: FeatureType.BACKUP_PP,
-    //     },
-    //   }));
-    //   return { features, pageSize: CONFIG.POLYGON_PARTS.MAX.WFS_FEATURES };
-    // };
+    const queryExecutorAdded = useMemo(
+      () =>
+        buildQueryExecutor(
+          changedArea.added as Feature<Geometry, GeoJsonProperties>,
+          FeatureType.CHANGED_AREA_ADDED_PP
+        ),
+      [changedArea]
+    );
 
     const closeDialog = (): void => {
       props.onSetOpen(false);
@@ -288,11 +373,53 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
         onSubmit={revertLayer}
         loading={loading}
         error={metadataError ?? null}
-        // map={map}
         map={
-          <Box style={{ height: '100%', backgroundColor: 'lightgray', color: 'red' }}>
-            MAP PLACEHOLDER
-          </Box>
+          <OlLayerMap
+            layerRecord={props.layerRecord}
+            showLabels={false}
+            style={{ height: '100%' }}
+            additionalLegends={[
+              FeatureType.CHANGED_AREA_ADDED_PP,
+              FeatureType.CHANGED_AREA_OVERLAPPED_PP,
+              FeatureType.BACKUP_PP,
+            ].map((featureType) => ({
+              title: intl.formatMessage({ id: `polygon-parts.map-preview-legend.${featureType}` }),
+              style: PPMapStyles.get(featureType)?.style as Style,
+            }))}
+          >
+            <>
+              <PolygonPartsExtentQueryVectorLayer
+                featureType={FeatureType.CHANGED_AREA_OVERLAPPED_PP}
+                queryExecutor={queryExecutorOverlapped}
+                showLabels={false}
+                outerPerimeter={changedArea.overlapped?.geometry}
+                options={{
+                  properties: { id: FeatureType.CHANGED_AREA_OVERLAPPED_PP },
+                  zIndex: VectorLayerZIndex.CHANGED_AREA,
+                }}
+              />
+              <PolygonPartsExtentQueryVectorLayer
+                featureType={FeatureType.CHANGED_AREA_ADDED_PP}
+                queryExecutor={queryExecutorAdded}
+                showLabels={false}
+                outerPerimeter={changedArea.added?.geometry}
+                options={{
+                  properties: { id: FeatureType.CHANGED_AREA_ADDED_PP },
+                  zIndex: VectorLayerZIndex.CHANGED_AREA,
+                }}
+              />
+              <PolygonPartsExtentQueryVectorLayer
+                featureType={FeatureType.BACKUP_PP}
+                queryExecutor={backupQueryExecutor}
+                showLabels={false}
+                outerPerimeter={backupMetadata?.footprint}
+                options={{
+                  properties: { id: FeatureType.BACKUP_PP },
+                  zIndex: VectorLayerZIndex.BACKUP,
+                }}
+              />
+            </>
+          </OlLayerMap>
         }
         // sidePanel={sidePanel}
         sidePanel={
