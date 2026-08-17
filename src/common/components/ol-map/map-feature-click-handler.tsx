@@ -1,6 +1,6 @@
-import { Dispatch, SetStateAction, useEffect } from 'react';
+import { Dispatch, SetStateAction, useEffect, useRef } from 'react';
 import { Feature } from 'geojson';
-import OLFeature from 'ol/Feature';
+import OLFeature, { FeatureLike } from 'ol/Feature';
 import GeoJSON from 'ol/format/GeoJSON';
 import MapBrowserEvent from 'ol/MapBrowserEvent';
 import { useMap } from '@map-colonies/react-components';
@@ -15,14 +15,19 @@ export const MapFeatureClickHandler: React.FC<MapFeatureClickHandlerProps> = ({
   setSelectedFeature,
 }) => {
   const map = useMap();
+  const featureRef = useRef<OLFeature | null>(null);
 
   useEffect(() => {
     const onSingleClick = (event: MapBrowserEvent<UIEvent>): void => {
       const clickedFeatures = map.getFeaturesAtPixel(event.pixel, { hitTolerance: 4 });
-      const clickedFeature = clickedFeatures?.[0];
-      if (clickedFeature) {
+      const clickedFeature: FeatureLike = clickedFeatures?.[0];
+      if (!clickedFeature || clickedFeature === featureRef.current) {
+        featureRef.current = null;
+        setSelectedFeature(undefined);
+      } else {
         const geojsonFormat = new GeoJSON();
         const geojsonFeature = geojsonFormat.writeFeatureObject(clickedFeature as OLFeature);
+        featureRef.current = clickedFeature as OLFeature;
         onMapFeatureClick?.(geojsonFeature);
         setSelectedFeature(geojsonFeature);
       }
