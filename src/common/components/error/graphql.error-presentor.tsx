@@ -43,7 +43,9 @@ export const GraphQLError: React.FC<IGpaphQLError> = ({ error }) => {
     } else if (message) {
       return message;
     } else {
-      return serverError.message.substring(+serverError.message.indexOf('; ') + 1);
+      return (
+        serverError.message.substring(+serverError.message.indexOf('; ') + 1) ?? serverError.message
+      );
     }
   };
 
@@ -79,6 +81,20 @@ export const GraphQLError: React.FC<IGpaphQLError> = ({ error }) => {
                 <FormattedMessage id="general.server.error" />
               </li>
             )}
+          </ul>
+        </AutoDirectionBox>
+      )}
+      {!isEmpty(error?.message) && (
+        <AutoDirectionBox className="errorContainer">
+          <IconButton
+            className="errorIcon mc-icon-Status-Warnings error"
+            onClick={(e): void => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+          />
+          <ul className="errorsList">
+            <li dir="auto" dangerouslySetInnerHTML={{ __html: formatMessage(error) }}></li>
           </ul>
         </AutoDirectionBox>
       )}
