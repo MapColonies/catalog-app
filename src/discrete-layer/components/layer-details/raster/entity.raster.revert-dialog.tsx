@@ -372,7 +372,7 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
         onClose={closeDialog}
         onSubmit={revertLayer}
         loading={loading}
-        error={metadataError ?? null}
+        error={metadataError ? metadataError : outerPerimeterError ? outerPerimeterError : null}
         map={
           <OlLayerMap
             layerRecord={props.layerRecord}
