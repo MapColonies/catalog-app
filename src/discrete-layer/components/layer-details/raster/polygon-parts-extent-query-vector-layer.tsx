@@ -46,7 +46,7 @@ const createZoomedOutFootprintFeature = (
       ...outerPerimeter,
     },
     properties: {
-      text: 'hide',
+      text: '',
       _showAsFootprint: true,
       _featureType: featureType,
     },
@@ -239,7 +239,7 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<
 
           return feat ? (
             <GeoJSONFeature
-              key={featureKey}
+              key={`${featureKey}-${showLabels}`}
               geometry={feat}
               fit={false}
               featureStyle={featureStyle}
