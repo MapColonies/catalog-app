@@ -22,7 +22,8 @@ export const MapFeatureClickHandler: React.FC<MapFeatureClickHandlerProps> = ({
     const onSingleClick = (event: MapBrowserEvent<UIEvent>): void => {
       const clickedFeatures = map.getFeaturesAtPixel(event.pixel, { hitTolerance: 4 });
       const clickedFeature = clickedFeatures?.[0];
-      const isSameFeatureClicked = clickedFeature?.getId() === featureRef.current?.getId();
+      const isSameFeatureClicked =
+        clickedFeature?.getId() && clickedFeature?.getId() === featureRef.current?.getId();
 
       if (!clickedFeature || isSameFeatureClicked) {
         featureRef.current = null;
