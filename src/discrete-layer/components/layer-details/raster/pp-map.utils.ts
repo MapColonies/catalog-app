@@ -13,11 +13,15 @@ export const EXCEEDED_PROPERTY_VALUE = 'true';
 export const START_RASTER_LAYER_ZINDEX = 10;
 export enum VectorLayerZIndex {
   EXISTING = 20,
+  SELECTED = 9999,
+
+  // Low Resolution z-index
   LOW_RESOLUTION = 30,
   EXCEEDED = 40,
-  SELECTED = 50,
-  BACKUP = 60,
-  CHANGED_AREA = 70,
+
+  // Revert z-index
+  BACKUP = 30,
+  CHANGED_AREA = 40,
 }
 
 export interface IStyleByProp {
@@ -139,7 +143,7 @@ const PP_PERIMETER_COLOR = '#000000';
 const LOW_RESOLUTION_COLOR = '#FF7F00';
 const CHANGED_AREA_ADDED_COLOR = '#ef4444';
 const CHANGED_AREA_OVERLAPPED_COLOR = '#FF7F00';
-const BACKUP_COLOR = '#3b82f6';
+const BACKUP_COLOR = '#00afff';
 const hatchChangedAreaAdded = createHatchPattern(CHANGED_AREA_ADDED_COLOR, 0.45);
 const hatchChangedAreaOverlapped = createHatchPattern(CHANGED_AREA_OVERLAPPED_COLOR, 0.45);
 export const PPMapStyles = new Map<FeatureType, IStyleByProp>([
@@ -454,7 +458,7 @@ export const FEATURE_LABEL_CONFIG = {
     placement: 'point',
     maxangle: '0.7853981633974483',
     overflow: 'false',
-    size: '10px',
+    size: '12px',
     height: '1',
     offsetX: '0',
     offsetY: '0',

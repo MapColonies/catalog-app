@@ -56,7 +56,6 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
     const [showChangedArea, setShowChangedArea] = useState(true);
     const [showBackup, setShowBackup] = useState(true);
     const [showExisting, setShowExisting] = useState(false);
-    const [showLabels, setShowLabels] = useState(false);
 
     const {
       backupMetadata,
@@ -132,6 +131,7 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
         properties: {
           ...(feature?.properties ?? {}),
           _featureType: FeatureType.BACKUP_PP,
+          _featureTitle: getText(feature, 4, FEATURE_LABEL_CONFIG.polygons, ZOOM_LEVELS_TABLE),
         },
       }));
       return { features, pageSize: CONFIG.POLYGON_PARTS.MAX.WFS_FEATURES };
@@ -243,9 +243,9 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
         map={
           <OlLayerMap
             layerRecord={props.layerRecord}
-            showLabels={showLabels}
             style={{ height: '100%' }}
             showPolygonParts={{ value: showExisting, showCheckbox: false }}
+            showFeaturePropertiesPopup={true}
             additionalLegends={[
               FeatureType.CHANGED_AREA_ADDED_PP,
               FeatureType.CHANGED_AREA_OVERLAPPED_PP,
@@ -261,7 +261,6 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
                   <PolygonPartsExtentQueryVectorLayer
                     featureType={FeatureType.CHANGED_AREA_OVERLAPPED_PP}
                     queryExecutor={queryExecutorOverlapped}
-                    showLabels={showLabels}
                     outerPerimeter={changedArea.overlapped?.geometry}
                     options={{
                       properties: { id: FeatureType.CHANGED_AREA_OVERLAPPED_PP },
@@ -271,7 +270,6 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
                   <PolygonPartsExtentQueryVectorLayer
                     featureType={FeatureType.CHANGED_AREA_ADDED_PP}
                     queryExecutor={queryExecutorAdded}
-                    showLabels={showLabels}
                     outerPerimeter={changedArea.added?.geometry}
                     options={{
                       properties: { id: FeatureType.CHANGED_AREA_ADDED_PP },
@@ -284,7 +282,6 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
                 <PolygonPartsExtentQueryVectorLayer
                   featureType={FeatureType.BACKUP_PP}
                   queryExecutor={backupQueryExecutor}
-                  showLabels={showLabels}
                   outerPerimeter={backupMetadata?.footprint}
                   options={{
                     properties: { id: FeatureType.BACKUP_PP },
@@ -296,7 +293,7 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
           </OlLayerMap>
         }
         sidePanel={
-          <Box className="sidePanel">
+          <>
             <Box className="overlaySwitches">
               <Typography tag="p" className="sectionTitle">
                 {intl.formatMessage({ id: 'revert.dialog.switches.title' })}
@@ -336,16 +333,6 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
                   onClick={(): void => setShowExisting(!showExisting)}
                 />
               </Box>
-              <Box className="overlaySeparator" />
-              <Box className="overlaySwitchRow">
-                <Box className="overlaySwitchLabel">
-                  <Box className="overlaySwitchSpacer" />
-                  <Typography tag="p" className={showLabels ? 'switchLabelActive' : undefined}>
-                    {intl.formatMessage({ id: 'revert.dialog.checkbox.show-labels.label' })}
-                  </Typography>
-                </Box>
-                <Switch checked={showLabels} onClick={(): void => setShowLabels(!showLabels)} />
-              </Box>
             </Box>
             <Box className="backupInfo">
               <Typography tag="p" className="sectionTitle">
@@ -382,7 +369,7 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
                 </Typography>
               </Box>
             </Box>
-          </Box>
+          </>
         }
       />
     );

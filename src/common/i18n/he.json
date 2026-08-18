@@ -195,7 +195,7 @@
 
   "revert.dialog.info.current-version.label": "גרסה נוכחית",
   "revert.dialog.info.previous-version.label": "גרסה קודמת",
-  "revert.dialog.info.last-update-area.label": "אזור העדכון האחרון",
+  "revert.dialog.info.last-update-area.label": "שטח העדכון האחרון",
 
   "snack.message.success": "הצלחה",
   "snack.message.failed": "כשלון",
