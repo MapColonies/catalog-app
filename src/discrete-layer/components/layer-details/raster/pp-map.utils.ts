@@ -15,11 +15,11 @@ export enum VectorLayerZIndex {
   EXISTING = 20,
   SELECTED = 9999,
 
-  // Low Resolution z-index
+  // Low Resolution z-index (currently can't be with REVERT)
   LOW_RESOLUTION = 30,
   EXCEEDED = 40,
 
-  // Revert z-index
+  // Revert z-index (currently can't be with LOW RESOLUTION)
   BACKUP = 30,
   CHANGED_AREA = 40,
 }
