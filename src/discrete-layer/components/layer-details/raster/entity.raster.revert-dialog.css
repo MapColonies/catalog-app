@@ -1,37 +1,86 @@
 #rasterRevertDialog {
-  --disclaimer-height: 60px;
+  --disclaimer-height: 52px;
   --header-height: 154px;
   --footer-height: 60px;
   --modal-height: 100vh;
-  --overlay-panel-width: 220px;
+  --overlay-panel-width: 280px;
   --overlay-panel-gap: 16px;
-  --modal-width: calc(888px + var(--overlay-panel-width) + var(--overlay-panel-gap));
+  --modal-width: calc(960px + var(--overlay-panel-width) + var(--overlay-panel-gap));
   --map-height: calc(100% - var(--header-height) - var(--disclaimer-height) - var(--footer-height));
 }
 
-#rasterRevertDialog .overlayCheckboxes {
+#rasterRevertDialog .overlaySwitches,
+#rasterRevertDialog .backupInfo {
+  width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--mdc-theme-gc-selection-background);
+  border-radius: 8px;
 }
 
-#rasterRevertDialog .overlayCheckboxRow {
+#rasterRevertDialog .overlaySwitches {
+  margin-bottom: 12px;
+}
+
+#rasterRevertDialog .overlaySwitchRow {
+  display: flex;
+  align-items: center;
+}
+
+#rasterRevertDialog .overlaySwitchRow .mdc-switch {
+  zoom: 0.9;
+}
+
+#rasterRevertDialog .overlaySwitchLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+#rasterRevertDialog .backupInfoField {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
 }
 
-#rasterRevertDialog .overlayCheckbox .mdc-checkbox__ripple {
-  display: none;
+#rasterRevertDialog .backupInfoLabel {
+  color: var(--mdc-theme-text-icon-on-dark);
 }
 
-#rasterRevertDialog .overlayCheckboxBadge {
-  flex: 0 0 auto;
-  padding: 2px 8px;
-  border-radius: 10px;
-  font-size: 12px;
-  line-height: 16px;
+#rasterRevertDialog .overlaySwitchLabel p,
+#rasterRevertDialog .backupInfoField p {
+  margin: 0;
   white-space: nowrap;
-  color: #fff;
+}
+
+#rasterRevertDialog .switchLabelActive {
+  font-weight: bold;
+}
+
+#rasterRevertDialog .sectionTitle {
+  margin: 0;
+  color: var(--mdc-theme-text-icon-on-dark);
+  font-weight: bold;
+}
+
+#rasterRevertDialog .featureTitlePreviewBadge {
+  min-width: 16px;
+  padding: 0 8px;
+  width: 40px;
+  height: 20px;
+  border-radius: 12px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 12px;
+}
+
+#rasterRevertDialog .featurePreviewBadge {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
 }

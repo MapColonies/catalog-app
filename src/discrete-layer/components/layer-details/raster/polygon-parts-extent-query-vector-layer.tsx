@@ -46,7 +46,7 @@ const createZoomedOutFootprintFeature = (
       ...outerPerimeter,
     },
     properties: {
-      text: 'hide',
+      text: '',
       _showAsFootprint: true,
       _featureType: featureType,
     },

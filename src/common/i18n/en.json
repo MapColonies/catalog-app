@@ -189,6 +189,13 @@
   "revert.dialog.checkbox.existing.label": "Current version",
   "revert.dialog.checkbox.backup.label": "Previous version (backup)",
   "revert.dialog.checkbox.changed-area.label": "Changed Area",
+  "revert.dialog.checkbox.show-labels.label": "Show Labels",
+  "revert.dialog.switches.title": "Layer Controls",
+  "revert.dialog.backup-info.title": "Backup Info",
+
+  "revert.dialog.info.current-version.label": "Current Version",
+  "revert.dialog.info.previous-version.label": "Previous Version",
+  "revert.dialog.info.last-update-area.label": "Last Update Area",
 
   "snack.message.success": "SUCCESS",
   "snack.message.failed": "FAILURE",

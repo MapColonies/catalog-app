@@ -8,6 +8,8 @@
   height: var(--disclaimer-height);
   display: flex;
   align-items: center;
+  border-radius: 12px;
+  border: 1px solid var(--mdc-theme-gc-error-high);
 }
 
 .destructiveActionDialog .mdc-dialog .mdc-dialog__surface {

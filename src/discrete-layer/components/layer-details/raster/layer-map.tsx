@@ -242,12 +242,12 @@ export const OlLayerMap: React.FC<LayerMapProps> = ({
         <MapFeatureClickHandler setSelectedFeature={setSelectedFeature} />
         <SelectedFeatureVectorLayer
           feature={selectedFeature}
+          fit={true}
           options={{
             properties: { id: 'SELECTED_PP' },
             zIndex: VectorLayerZIndex.SELECTED,
           }}
         />
-        <FlyTo feature={selectedFeature} />
         {showFeaturePropertiesPopup && isOpenProperties && (
           <FeaturePropertiesPopupComponent
             selectedFeature={selectedFeature}

@@ -187,8 +187,15 @@
   "delete.dialog.checkbox": "אישור המחיקה",
 
   "revert.dialog.checkbox.existing.label": "גרסה נוכחית",
-  "revert.dialog.checkbox.backup.label": "גרסה קודמת (גיבוי)",
+  "revert.dialog.checkbox.backup.label": "גרסה קודמת",
   "revert.dialog.checkbox.changed-area.label": "אזור העדכון",
+  "revert.dialog.checkbox.show-labels.label": "הצג פרטי תיחום",
+  "revert.dialog.switches.title": "בקרת שכבות",
+  "revert.dialog.backup-info.title": "פרטי גיבוי",
+
+  "revert.dialog.info.current-version.label": "גרסה נוכחית",
+  "revert.dialog.info.previous-version.label": "גרסה קודמת",
+  "revert.dialog.info.last-update-area.label": "שטח העדכון האחרון",
 
   "snack.message.success": "הצלחה",
   "snack.message.failed": "כשלון",

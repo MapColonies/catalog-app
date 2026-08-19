@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { observer } from 'mobx-react';
 import { BBox, Feature, GeoJsonProperties, Geometry, Polygon } from 'geojson';
@@ -10,6 +10,7 @@ import intersect from '@turf/intersect';
 import buffer from '@turf/buffer';
 import bboxPolygon from '@turf/bbox-polygon';
 import { Box } from '@map-colonies/react-components';
+import { Switch, Typography } from '@map-colonies/react-core';
 import { Mode } from '../../../../common/models/mode.enum';
 import {
   isPolygonal,
@@ -41,30 +42,8 @@ import { FeatureType } from './feature-type.enum';
 
 import './entity.raster.revert-dialog.css';
 
-// type OverlayId = 'existing' | 'backup' | 'changedArea';
-
-// const DEFAULT_OVERLAY_VISIBILITY: Record<OverlayId, boolean> = {
-//   existing: true,
-//   backup: true,
-//   changedArea: false,
-// };
-
-// const EXISTING_COLOR = '#22C55E';
-// // const BACKUP_PP_COLOR = '#3B82F6';
-// const CHANGES_OVERLAPPED_COLOR = '#C62828';
-// const CHANGES_ADDED_COLOR = '#FF7F00';
-
-// const strokeAndFillStyle = (color: string): Style =>
-//   new Style({
-//     stroke: new Stroke({ width: 3, color }),
-//     fill: new Fill({ color: `${color}33` }),
-//   });
-
-// export const EXISTING_STYLE = strokeAndFillStyle(EXISTING_COLOR);
-// export const CHANGES_ADDED_STYLE = strokeAndFillStyle(CHANGES_ADDED_COLOR);
-// export const CHANGES_OVERLAPPED_STYLE = strokeAndFillStyle(CHANGES_OVERLAPPED_COLOR);
-
 const WFS_BUFFER_DELTA = -0.2;
+const NO_VALUE = '–';
 
 export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
   (props: ActionDialogProps) => {
@@ -72,13 +51,11 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
     const store = useStore();
     const ENUMS = useEnums();
     const ZOOM_LEVELS_TABLE = useZoomLevelsTable();
-    // const currentLayer = props.layerRecord as LayerRasterRecordModelType;
+    const currentLayer = props.layerRecord as LayerRasterRecordModelType;
 
-    // const [isExistingVisible, setIsExistingVisible] = useState(DEFAULT_OVERLAY_VISIBILITY.existing);
-    // const [isBackupVisible, setIsBackupVisible] = useState(DEFAULT_OVERLAY_VISIBILITY.backup);
-    // const [isChangedAreaVisible, setIsChangedAreaVisible] = useState(
-    //   DEFAULT_OVERLAY_VISIBILITY.changedArea
-    // );
+    const [showChangedArea, setShowChangedArea] = useState(true);
+    const [showBackup, setShowBackup] = useState(true);
+    const [showExisting, setShowExisting] = useState(false);
 
     const {
       backupMetadata,
@@ -125,12 +102,12 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
       | undefined;
 
     const changedArea = useMemo(() => {
-      const asdf = buildChangedArea(
+      const res = buildChangedArea(
         backupMetadata?.footprint as Geometry | undefined,
         changedAreaOuterPerimeterGeometry,
         changedAreaOuterPerimeter?.features?.[0]?.properties?.area as number | undefined
       );
-      return asdf;
+      return res;
     }, [backupMetadata?.footprint, changedAreaOuterPerimeterGeometry]);
 
     const backupQueryExecutor = async (
@@ -154,6 +131,7 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
         properties: {
           ...(feature?.properties ?? {}),
           _featureType: FeatureType.BACKUP_PP,
+          _featureTitle: getText(feature, 4, FEATURE_LABEL_CONFIG.polygons, ZOOM_LEVELS_TABLE),
         },
       }));
       return { features, pageSize: CONFIG.POLYGON_PARTS.MAX.WFS_FEATURES };
@@ -224,128 +202,17 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
       props.onSetOpen(false);
     };
 
-    // const overlayCheckboxes: {
-    //   id: OverlayId;
-    //   labelId: string;
-    //   checked: boolean;
-    //   onChange: (checked: boolean) => void;
-    //   badge: string;
-    //   badgeBackground: string;
-    // }[] = [
-    //   {
-    //     id: 'existing',
-    //     labelId: 'revert.dialog.checkbox.existing.label',
-    //     checked: isExistingVisible,
-    //     onChange: setIsExistingVisible,
-    //     badge: currentLayer.productVersion ? `v${currentLayer.productVersion}` : '',
-    //     badgeBackground: EXISTING_COLOR,
-    //   },
-    //   {
-    //     id: 'backup',
-    //     labelId: 'revert.dialog.checkbox.backup.label',
-    //     checked: isBackupVisible,
-    //     onChange: setIsBackupVisible,
-    //     badge: backupMetadata?.productVersion ? `v${backupMetadata.productVersion}` : '',
-    //     badgeBackground: BACKUP_PP_COLOR,
-    //   },
-    //   {
-    //     id: 'changedArea',
-    //     labelId: 'revert.dialog.checkbox.changed-area.label',
-    //     checked: isChangedAreaVisible,
-    //     onChange: setIsChangedAreaVisible,
-    //     badge: `${changedArea.areaSquareKm.toFixed(1)}${intl.formatMessage({
-    //       id: 'resolutionConflict.units.km2',
-    //     })}`,
-    //     badgeBackground: `linear-gradient(to right, ${CHANGES_OVERLAPPED_COLOR} 50%, ${CHANGES_ADDED_COLOR} 50%)`,
-    //   },
-    // ];
-
-    // const sidePanel = (
-    //   <Box className="overlayCheckboxes" role="group">
-    //     {overlayCheckboxes.map((cfg) => (
-    //       <Box key={cfg.id} className="overlayCheckboxRow">
-    //         <Checkbox
-    //           className="overlayCheckbox"
-    //           label={intl.formatMessage({ id: cfg.labelId })}
-    //           checked={cfg.checked}
-    //           onClick={(evt: React.MouseEvent<HTMLInputElement>): void => {
-    //             evt.stopPropagation();
-    //             cfg.onChange(evt.currentTarget.checked);
-    //           }}
-    //         />
-    //         <Box className="overlayCheckboxBadge" style={{ background: cfg.badgeBackground }}>
-    //           {cfg.badge}
-    //         </Box>
-    //       </Box>
-    //     ))}
-    //   </Box>
-    // );
-
-    // const mapChildren = (
-    //   <>
-    //     {isExistingVisible &&
-    //       currentLayer.footprint !== undefined &&
-    //       currentLayer.footprint !== null && (
-    //         <VectorLayer options={{ zIndex: VectorLayerZIndex.EXISTING }}>
-    //           <VectorSource>
-    //             <GeoJSONFeature
-    //               geometry={currentLayer.footprint as Geometry}
-    //               featureStyle={EXISTING_STYLE}
-    //               fit={false}
-    //             />
-    //           </VectorSource>
-    //         </VectorLayer>
-    //       )}
-    //     {isBackupVisible && backupMetadata && (
-    //       <PolygonPartsExtentQueryVectorLayer
-    //         featureType={FeatureType.BACKUP_PP}
-    //         queryExecutor={backupQueryExecutor}
-    //         outerPerimeter={backupMetadata.footprint as Geometry | undefined}
-    //         options={{
-    //           properties: { id: FeatureType.BACKUP_PP },
-    //           zIndex: VectorLayerZIndex.BACKUP,
-    //         }}
-    //       />
-    //     )}
-    //     {isChangedAreaVisible && (
-    //       <VectorLayer
-    //         options={{
-    //           maxZoom: CONFIG.POLYGON_PARTS.MAX.SHOW_FOOTPRINT_ZOOM_LEVEL,
-    //           zIndex: VectorLayerZIndex.CHANGED_AREA,
-    //         }}
-    //       >
-    //         <VectorSource>
-    //           {changedArea.added && (
-    //             <GeoJSONFeature
-    //               geometry={changedArea.added}
-    //               featureStyle={CHANGES_ADDED_STYLE}
-    //               fit={false}
-    //             />
-    //           )}
-    //           {changedArea.overlapped && (
-    //             <GeoJSONFeature
-    //               geometry={changedArea.overlapped}
-    //               featureStyle={CHANGES_OVERLAPPED_STYLE}
-    //               fit={false}
-    //             />
-    //           )}
-    //         </VectorSource>
-    //       </VectorLayer>
-    //     )}
-    //   </>
-    // );
-    const FeaturePreview: React.FC<{ stylePP: IStyleByProp | undefined }> = (props: {
+    const FeaturePreview: React.FC<{ stylePP: IStyleByProp | undefined; text?: string }> = (props: {
       stylePP: IStyleByProp | undefined;
+      text?: string;
     }) => {
       return (
-        <div
-          style={{
-            width: 16,
-            height: 16,
-            borderRadius: '50%',
-            ...getCSSFromOlStyle(props.stylePP),
-          }}
-        />
+        <Box
+          className={props.text ? 'featureTitlePreviewBadge' : 'featurePreviewBadge'}
+          style={{ ...getCSSFromOlStyle(props.stylePP) }}
+        >
+          {props.text}
+        </Box>
       );
     };
 
@@ -376,8 +243,9 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
         map={
           <OlLayerMap
             layerRecord={props.layerRecord}
-            showLabels={false}
             style={{ height: '100%' }}
+            showPolygonParts={{ value: showExisting, showCheckbox: false }}
+            showFeaturePropertiesPopup={true}
             additionalLegends={[
               FeatureType.CHANGED_AREA_ADDED_PP,
               FeatureType.CHANGED_AREA_OVERLAPPED_PP,
@@ -388,47 +256,120 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
             }))}
           >
             <>
-              <PolygonPartsExtentQueryVectorLayer
-                featureType={FeatureType.CHANGED_AREA_OVERLAPPED_PP}
-                queryExecutor={queryExecutorOverlapped}
-                showLabels={false}
-                outerPerimeter={changedArea.overlapped?.geometry}
-                options={{
-                  properties: { id: FeatureType.CHANGED_AREA_OVERLAPPED_PP },
-                  zIndex: VectorLayerZIndex.CHANGED_AREA,
-                }}
-              />
-              <PolygonPartsExtentQueryVectorLayer
-                featureType={FeatureType.CHANGED_AREA_ADDED_PP}
-                queryExecutor={queryExecutorAdded}
-                showLabels={false}
-                outerPerimeter={changedArea.added?.geometry}
-                options={{
-                  properties: { id: FeatureType.CHANGED_AREA_ADDED_PP },
-                  zIndex: VectorLayerZIndex.CHANGED_AREA,
-                }}
-              />
-              <PolygonPartsExtentQueryVectorLayer
-                featureType={FeatureType.BACKUP_PP}
-                queryExecutor={backupQueryExecutor}
-                showLabels={false}
-                outerPerimeter={backupMetadata?.footprint}
-                options={{
-                  properties: { id: FeatureType.BACKUP_PP },
-                  zIndex: VectorLayerZIndex.BACKUP,
-                }}
-              />
+              {showChangedArea && (
+                <>
+                  <PolygonPartsExtentQueryVectorLayer
+                    featureType={FeatureType.CHANGED_AREA_OVERLAPPED_PP}
+                    queryExecutor={queryExecutorOverlapped}
+                    outerPerimeter={changedArea.overlapped?.geometry}
+                    options={{
+                      properties: { id: FeatureType.CHANGED_AREA_OVERLAPPED_PP },
+                      zIndex: VectorLayerZIndex.CHANGED_AREA,
+                    }}
+                  />
+                  <PolygonPartsExtentQueryVectorLayer
+                    featureType={FeatureType.CHANGED_AREA_ADDED_PP}
+                    queryExecutor={queryExecutorAdded}
+                    outerPerimeter={changedArea.added?.geometry}
+                    options={{
+                      properties: { id: FeatureType.CHANGED_AREA_ADDED_PP },
+                      zIndex: VectorLayerZIndex.CHANGED_AREA,
+                    }}
+                  />
+                </>
+              )}
+              {showBackup && (
+                <PolygonPartsExtentQueryVectorLayer
+                  featureType={FeatureType.BACKUP_PP}
+                  queryExecutor={backupQueryExecutor}
+                  outerPerimeter={backupMetadata?.footprint}
+                  options={{
+                    properties: { id: FeatureType.BACKUP_PP },
+                    zIndex: VectorLayerZIndex.BACKUP,
+                  }}
+                />
+              )}
             </>
           </OlLayerMap>
         }
-        // sidePanel={sidePanel}
         sidePanel={
-          <Box style={{ width: '100%', height: '25%', backgroundColor: 'lightgray', color: 'red' }}>
-            SWITCHES PLACEHOLDER
-            <FeaturePreview stylePP={PPMapStyles.get(FeatureType.CHANGED_AREA_ADDED_PP)} />
-            <FeaturePreview stylePP={PPMapStyles.get(FeatureType.CHANGED_AREA_OVERLAPPED_PP)} />
-            <FeaturePreview stylePP={PPMapStyles.get(FeatureType.BACKUP_PP)} />
-          </Box>
+          <>
+            <Box className="overlaySwitches">
+              <Typography tag="p" className="sectionTitle">
+                {intl.formatMessage({ id: 'revert.dialog.switches.title' })}
+              </Typography>
+              <Box className="overlaySwitchRow">
+                <Box className="overlaySwitchLabel">
+                  <FeaturePreview
+                    stylePP={PPMapStyles.get(FeatureType.CHANGED_AREA_OVERLAPPED_PP)}
+                  />
+                  <Typography tag="p" className={showChangedArea ? 'switchLabelActive' : undefined}>
+                    {intl.formatMessage({ id: 'revert.dialog.checkbox.changed-area.label' })}
+                  </Typography>
+                </Box>
+                <Switch
+                  checked={showChangedArea}
+                  onClick={(): void => setShowChangedArea(!showChangedArea)}
+                />
+              </Box>
+              <Box className="overlaySwitchRow">
+                <Box className="overlaySwitchLabel">
+                  <FeaturePreview stylePP={PPMapStyles.get(FeatureType.BACKUP_PP)} />
+                  <Typography tag="p" className={showBackup ? 'switchLabelActive' : undefined}>
+                    {intl.formatMessage({ id: 'revert.dialog.checkbox.backup.label' })}
+                  </Typography>
+                </Box>
+                <Switch checked={showBackup} onClick={(): void => setShowBackup(!showBackup)} />
+              </Box>
+              <Box className="overlaySwitchRow">
+                <Box className="overlaySwitchLabel">
+                  <FeaturePreview stylePP={PPMapStyles.get(FeatureType.EXISTING_PP)} />
+                  <Typography tag="p" className={showExisting ? 'switchLabelActive' : undefined}>
+                    {intl.formatMessage({ id: 'revert.dialog.checkbox.existing.label' })}
+                  </Typography>
+                </Box>
+                <Switch
+                  checked={showExisting}
+                  onClick={(): void => setShowExisting(!showExisting)}
+                />
+              </Box>
+            </Box>
+            <Box className="backupInfo">
+              <Typography tag="p" className="sectionTitle">
+                {intl.formatMessage({ id: 'revert.dialog.backup-info.title' })}
+              </Typography>
+              <Box className="backupInfoField">
+                <Typography tag="p" className="backupInfoLabel">
+                  {intl.formatMessage({ id: 'revert.dialog.info.current-version.label' })}
+                </Typography>
+                <FeaturePreview
+                  stylePP={PPMapStyles.get(FeatureType.EXISTING_PP)}
+                  text={'v' + (currentLayer.productVersion ?? NO_VALUE)}
+                />
+              </Box>
+              <Box className="backupInfoField">
+                <Typography tag="p" className="backupInfoLabel">
+                  {intl.formatMessage({ id: 'revert.dialog.info.previous-version.label' })}
+                </Typography>
+                <FeaturePreview
+                  stylePP={PPMapStyles.get(FeatureType.BACKUP_PP)}
+                  text={loading ? NO_VALUE : 'v' + (backupMetadata?.productVersion ?? NO_VALUE)}
+                />
+              </Box>
+              <Box className="backupInfoField">
+                <Typography tag="p" className="backupInfoLabel">
+                  {intl.formatMessage({ id: 'revert.dialog.info.last-update-area.label' })}
+                </Typography>
+                <Typography tag="p" className="backupInfoValue">
+                  {loading || !backupMetadata
+                    ? NO_VALUE
+                    : `${changedArea.areaSquareKm.toFixed(1)}${intl.formatMessage({
+                        id: 'resolutionConflict.units.km2',
+                      })}`}
+                </Typography>
+              </Box>
+            </Box>
+          </>
         }
       />
     );
