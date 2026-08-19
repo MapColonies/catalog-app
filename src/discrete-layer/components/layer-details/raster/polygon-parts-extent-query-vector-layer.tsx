@@ -238,7 +238,12 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<
           }
 
           return feat ? (
-            <GeoJSONFeature geometry={feat} fit={false} featureStyle={featureStyle} />
+            <GeoJSONFeature
+              key={featureKey}
+              geometry={feat}
+              fit={false}
+              featureStyle={featureStyle}
+            />
           ) : null;
         })}
         {existingPolygonPartsMarker && polygonParts.length === 1 && (
