@@ -40,19 +40,6 @@
   flex: 1;
 }
 
-#rasterRevertDialog .overlaySwitchSpacer {
-  width: 16px;
-  height: 16px;
-  flex: 0 0 auto;
-}
-
-#rasterRevertDialog .overlaySeparator {
-  width: 100%;
-  height: 1px;
-  border: 1px solid var(--mdc-theme-text-primary-on-dark);
-  opacity: 0.7;
-}
-
 #rasterRevertDialog .backupInfoField {
   display: flex;
   align-items: center;
