@@ -19,6 +19,7 @@ import {
 } from '../../../../common/utils/geojson.validation';
 import { useEnums } from '../../../../common/hooks/useEnum.hook';
 import CONFIG from '../../../../common/config';
+import { getErrorMessage, IServerError } from '../../../../common/components/error/helpers';
 import { GeojsonFeatureInput } from '../../../models/RootStore.base';
 import { LayerRasterRecordModelType, RecordType, useStore } from '../../../models';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
@@ -45,6 +46,21 @@ import './entity.raster.revert-dialog.css';
 const WFS_BUFFER_DELTA = -0.2;
 const NO_VALUE = '–';
 
+const JOB_KEYWORD_REGEX = /\bjob\b/i;
+const UUID_REGEX = /[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/;
+
+const extractJobIdFromError = (error: IServerError | undefined): string | undefined => {
+  if (!error) {
+    return;
+  }
+  const message = getErrorMessage(error);
+  const hasJobKeyword = JOB_KEYWORD_REGEX.test(message);
+  const uuidMatch = message.match(UUID_REGEX);
+  if (hasJobKeyword && uuidMatch) {
+    return uuidMatch[0];
+  }
+};
+
 export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
   (props: ActionDialogProps) => {
     const intl = useIntl();
@@ -56,6 +72,7 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
     const [showChangedArea, setShowChangedArea] = useState(true);
     const [showBackup, setShowBackup] = useState(true);
     const [showExisting, setShowExisting] = useState(false);
+    const [submitError, setSubmitError] = useState<IServerError>();
 
     const {
       backupMetadata,
@@ -217,16 +234,23 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
     };
 
     const revertLayer = (approverName: string, approvalCode: string): void => {
-      // eslint-disable-next-line no-console
-      console.log('[EntityRevertRasterDialog] mock revert submit', {
-        id: props.layerRecord.id,
-        type: props.layerRecord.type as RecordType,
-        approverName,
-        approvalCode,
-      });
-      props.onSuccess?.();
-      props.onSetOpen(false);
+      const MOCK_CONFLICTING_JOB_ID = 'b3df1d88-6c06-4995-849b-f2c9c022f079';
+      try {
+        // eslint-disable-next-line no-console
+        console.log('[EntityRevertRasterDialog] mock revert submit', {
+          id: props.layerRecord.id,
+          type: props.layerRecord.type as RecordType,
+          approverName,
+          approvalCode,
+        });
+        // TODO: remove mock throw once a real revert mutation exists
+        throw new Error(`Revert failed, job ${MOCK_CONFLICTING_JOB_ID} is already in progress`);
+      } catch (error) {
+        setSubmitError(error as IServerError);
+      }
     };
+
+    const submitErrorJobId = useMemo(() => extractJobIdFromError(submitError), [submitError]);
 
     return (
       <DestructiveActionDialog
@@ -239,7 +263,8 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
         onClose={closeDialog}
         onSubmit={revertLayer}
         loading={loading}
-        error={metadataError ? metadataError : outerPerimeterError ? outerPerimeterError : null}
+        openRelatedJob={submitErrorJobId ? { jobId: submitErrorJobId } : undefined}
+        error={metadataError || outerPerimeterError || submitError}
         map={
           <OlLayerMap
             layerRecord={props.layerRecord}

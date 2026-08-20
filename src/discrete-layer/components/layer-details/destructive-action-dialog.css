@@ -40,6 +40,10 @@ body[dir='rtl'] .destructiveActionDialog .closeIcon {
   margin-left: auto;
 }
 
+.destructiveActionDialog .buttons button {
+  white-space: nowrap;
+}
+
 body[dir='rtl'] .destructiveActionDialog .buttons {
   margin-left: unset;
   margin-right: auto;
