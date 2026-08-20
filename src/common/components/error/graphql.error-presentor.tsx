@@ -7,47 +7,21 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { isEmpty } from 'lodash';
 import { IconButton } from '@map-colonies/react-core';
 import { AutoDirectionBox } from '../auto-direction-box/auto-direction-box.component';
+import {
+  getErrorMessage,
+  IServerError,
+  SERVER_ERROR_RESPONSE_CODE,
+  USER_ERROR_RESPONSE_CODE,
+} from './helpers';
 
 import './error-presentor.css';
-
-const NONE = 0;
-const USER_ERROR_RESPONSE_CODE = 400;
-const SERVER_ERROR_RESPONSE_CODE = 500;
 
 export interface IGpaphQLError {
   error: any;
 }
 
-export interface IServerError {
-  message: string;
-  serverResponse?: IServerErrorResponse;
-}
-
-interface IServerErrorResponse {
-  data: { message: string };
-  status?: number;
-  statusText?: string;
-}
-
 export const GraphQLError: React.FC<IGpaphQLError> = ({ error }) => {
   const intl = useIntl();
-
-  const formatMessage = (serverError: IServerError): string => {
-    const status = serverError.serverResponse?.status ?? NONE;
-    const message = serverError.serverResponse?.data.message
-      ? serverError.serverResponse.data.message
-      : serverError.serverResponse?.statusText ?? '';
-    if (status && status >= USER_ERROR_RESPONSE_CODE && status < SERVER_ERROR_RESPONSE_CODE) {
-      const translatedError = intl.formatMessage({ id: `general.http-${status}.error` });
-      return `${translatedError}<br/>${message}`;
-    } else if (message) {
-      return message;
-    } else {
-      return (
-        serverError.message.substring(+serverError.message.indexOf('; ') + 1) ?? serverError.message
-      );
-    }
-  };
 
   return (
     <>
@@ -66,7 +40,7 @@ export const GraphQLError: React.FC<IGpaphQLError> = ({ error }) => {
                 <li
                   dir="auto"
                   key={index}
-                  dangerouslySetInnerHTML={{ __html: formatMessage(error) }}
+                  dangerouslySetInnerHTML={{ __html: getErrorMessage(error, intl) }}
                 ></li>
               );
             })}
@@ -94,7 +68,7 @@ export const GraphQLError: React.FC<IGpaphQLError> = ({ error }) => {
             }}
           />
           <ul className="errorsList">
-            <li dir="auto" dangerouslySetInnerHTML={{ __html: formatMessage(error) }}></li>
+            <li dir="auto" dangerouslySetInnerHTML={{ __html: getErrorMessage(error, intl) }}></li>
           </ul>
         </AutoDirectionBox>
       )}

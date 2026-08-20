@@ -9,6 +9,7 @@ import { Mode } from '../../../common/models/mode.enum';
 import { getTextStyle } from '../../../common/helpers/style';
 import { GraphQLError } from '../../../common/components/error/graphql.error-presentor';
 import { ValidationsError } from '../../../common/components/error/validations.error-presentor';
+import { UserAction } from '../../models/userStore';
 import { EntityDescriptorModelType, RecordType, useStore } from '../../models';
 import { ILayerImage } from '../../models/layerImage';
 import {
@@ -47,6 +48,9 @@ interface DestructiveActionDialogProps {
   map: JSX.Element | null;
   sidePanel?: JSX.Element | null;
   onFieldsValidate?: () => void;
+  openRelatedJob?: {
+    jobId: string;
+  };
 }
 
 export const DestructiveActionDialog: React.FC<DestructiveActionDialogProps> = ({
@@ -64,6 +68,7 @@ export const DestructiveActionDialog: React.FC<DestructiveActionDialogProps> = (
   map,
   sidePanel = null,
   onFieldsValidate,
+  openRelatedJob,
 }) => {
   const intl = useIntl();
   const store = useStore();
@@ -131,10 +136,28 @@ export const DestructiveActionDialog: React.FC<DestructiveActionDialogProps> = (
                       )}
                     </Box>
                     <Box className="buttons">
+                      {openRelatedJob && (
+                        <Button
+                          raised
+                          type="button"
+                          className="blink-for-attention"
+                          onClick={(e): void => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            store.actionDispatcherStore.dispatchAction({
+                              action: UserAction.SYSTEM_CALLBACK_OPEN_JOB_MANAGER,
+                              data: { job: { id: openRelatedJob.jobId } },
+                            });
+                            onClose();
+                          }}
+                        >
+                          <FormattedMessage id="general.go-to-job-manager-btn.text" />
+                        </Button>
+                      )}
                       <Button
                         raised
                         type="submit"
-                        disabled={!formikProps.isValid || loading || error !== null}
+                        disabled={!formikProps.isValid || loading || !!error}
                       >
                         {loading ? (
                           <CircularProgress className="loading" />
