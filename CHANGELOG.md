@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [6.8.0](https://github.com/MapColonies/catalog-app/compare/v6.7.1...v6.8.0) (2026-08-20)
+
+
+### Features
+
+* add 3 wfs queries for polygon parts ([#1034](https://github.com/MapColonies/catalog-app/issues/1034)) ([273a216](https://github.com/MapColonies/catalog-app/commit/273a216c965ddbde12a3ecb9f32b15daecc632e8))
+* add show in job manger button and open related job (MAPCO-11315, MAPCO-11446) ([#1038](https://github.com/MapColonies/catalog-app/issues/1038)) ([5a4ec07](https://github.com/MapColonies/catalog-app/commit/5a4ec076d1289c74c3b3c9b32c261eb8cf772a9e))
+* add wfs pp layers switches and side panel visualization (MAPCO-11310) ([#1037](https://github.com/MapColonies/catalog-app/issues/1037)) ([3225059](https://github.com/MapColonies/catalog-app/commit/3225059c785f678093e89f9d7c4b57b2a156f34c))
+
+
+### Bug Fixes
+
+* added utility to convert ol style to css ([#1031](https://github.com/MapColonies/catalog-app/issues/1031)) ([b9f5d4d](https://github.com/MapColonies/catalog-app/commit/b9f5d4d0d5b8d22b64c36ad99267e1a0cfd3c243))
+* fetch backup data mock (MAPCO-11306) ([#1026](https://github.com/MapColonies/catalog-app/issues/1026)) ([a9457af](https://github.com/MapColonies/catalog-app/commit/a9457afa3decc7c82e091ce6de85ad7c119454c8))
+* schema related graphql error on client ([#1036](https://github.com/MapColonies/catalog-app/issues/1036)) ([95263c9](https://github.com/MapColonies/catalog-app/commit/95263c979708030440f5bdccdda0646cac597443))
+* three additional pp styles and olmap legend more explicit ([#1030](https://github.com/MapColonies/catalog-app/issues/1030)) ([900952b](https://github.com/MapColonies/catalog-app/commit/900952b1018ad58b893b8699f523391935b7f935))
+* unify LayersDetailsComponent usage under LayerHeader and fix unnecessary layer thumbnail placement bug (MAPCO-11331, MAPCO-11406) ([#1028](https://github.com/MapColonies/catalog-app/issues/1028)) ([17f54ca](https://github.com/MapColonies/catalog-app/commit/17f54ca1fc5f3abf4817eb80f629c252760506cf))
+
 ## [6.7.1](https://github.com/MapColonies/catalog-app/compare/v6.7.0...v6.7.1) (2026-08-10)
 
 
