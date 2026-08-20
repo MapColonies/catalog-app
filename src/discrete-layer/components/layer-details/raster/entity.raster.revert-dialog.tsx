@@ -264,7 +264,7 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
         onSubmit={revertLayer}
         loading={loading}
         openRelatedJob={submitErrorJobId ? { jobId: submitErrorJobId } : undefined}
-        error={submitError || metadataError || outerPerimeterError}
+        error={metadataError || outerPerimeterError || submitError}
         map={
           <OlLayerMap
             layerRecord={props.layerRecord}
