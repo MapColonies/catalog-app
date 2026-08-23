@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { observer } from 'mobx-react';
 import { BBox, Feature, GeoJsonProperties, Geometry, Polygon } from 'geojson';
@@ -21,7 +21,14 @@ import { useEnums } from '../../../../common/hooks/useEnum.hook';
 import CONFIG from '../../../../common/config';
 import { getErrorMessage, IServerError } from '../../../../common/components/error/helpers';
 import { GeojsonFeatureInput } from '../../../models/RootStore.base';
-import { LayerRasterRecordModelType, RecordType, useStore } from '../../../models';
+import {
+  LayerRasterRecordModelType,
+  RecordType,
+  RootStoreType,
+  useQuery,
+  useStore,
+} from '../../../models';
+import { ProductType } from '../../../models/ProductTypeEnum';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
 import { ActionDialogProps, DestructiveActionDialog } from '../destructive-action-dialog';
 import { useRasterBackupData } from './use-raster-backup-data.hook';
@@ -42,6 +49,8 @@ import { OlLayerMap } from './layer-map';
 import { FeatureType } from './feature-type.enum';
 
 import './entity.raster.revert-dialog.css';
+
+type RevertRasterLayerResult = Awaited<ReturnType<RootStoreType['mutateRevertRasterLayer']>>;
 
 const WFS_BUFFER_DELTA = -0.2;
 const NO_VALUE = '–';
@@ -69,10 +78,15 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
     const ZOOM_LEVELS_TABLE = useZoomLevelsTable();
     const currentLayer = props.layerRecord as LayerRasterRecordModelType;
 
+    const mutationQuery = useQuery<RevertRasterLayerResult>();
+
+    const [mutationError, setMutationError] = useState<any>(null);
+    const [polygonPartsError, setPolygonPartsError] = useState<Record<string, string[]> | null>(
+      null
+    );
     const [showChangedArea, setShowChangedArea] = useState(true);
     const [showBackup, setShowBackup] = useState(true);
     const [showExisting, setShowExisting] = useState(false);
-    const [submitError, setSubmitError] = useState<IServerError>();
 
     const {
       backupMetadata,
@@ -215,6 +229,32 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
       [changedArea]
     );
 
+    useEffect(() => {
+      if (store.discreteLayersStore.customValidationError) {
+        setPolygonPartsError(store.discreteLayersStore.customValidationError);
+        setMutationError(null);
+      } else {
+        setPolygonPartsError(null);
+      }
+    }, [store.discreteLayersStore.customValidationError]);
+
+    useEffect(() => {
+      return () => {
+        store.discreteLayersStore.clearCustomValidationError();
+      };
+    }, []);
+
+    useEffect(() => {
+      if (mutationQuery.data && !mutationQuery.error) {
+        props.onSuccess?.();
+        props.onSetOpen(false);
+      }
+      if (mutationQuery.error) {
+        setMutationError(mutationQuery.error);
+        setPolygonPartsError(null);
+      }
+    }, [mutationQuery.data, mutationQuery.error]);
+
     const closeDialog = (): void => {
       props.onSetOpen(false);
     };
@@ -234,23 +274,24 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
     };
 
     const revertLayer = (approverName: string, approvalCode: string): void => {
-      const MOCK_CONFLICTING_JOB_ID = 'b3df1d88-6c06-4995-849b-f2c9c022f079';
-      try {
-        // eslint-disable-next-line no-console
-        console.log('[EntityRevertRasterDialog] mock revert submit', {
-          id: props.layerRecord.id,
-          type: props.layerRecord.type as RecordType,
-          approverName,
-          approvalCode,
-        });
-        // TODO: remove mock throw once a real revert mutation exists
-        throw new Error(`Revert failed, job ${MOCK_CONFLICTING_JOB_ID} is already in progress`);
-      } catch (error) {
-        setSubmitError(error as IServerError);
-      }
+      mutationQuery.setQuery(
+        store.mutateRevertRasterLayer({
+          data: {
+            type: currentLayer.type as RecordType,
+            productId: currentLayer.productId as string,
+            productType: currentLayer.productType as ProductType,
+            productVersion: currentLayer.productVersion as string,
+            approverName,
+            approvalCode,
+          },
+        })
+      );
     };
 
-    const submitErrorJobId = useMemo(() => extractJobIdFromError(submitError), [submitError]);
+    const submitErrorJobId = useMemo(
+      () => extractJobIdFromError(mutationError as IServerError | undefined),
+      [mutationError]
+    );
 
     return (
       <DestructiveActionDialog
@@ -262,9 +303,14 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
         disclaimerActionId="action.dialog.revert"
         onClose={closeDialog}
         onSubmit={revertLayer}
-        loading={loading}
+        loading={loading || mutationQuery.loading}
         openRelatedJob={submitErrorJobId ? { jobId: submitErrorJobId } : undefined}
-        error={metadataError || outerPerimeterError || submitError}
+        error={metadataError || outerPerimeterError || mutationError}
+        polygonPartsError={polygonPartsError}
+        onFieldsValidate={(): void => {
+          setMutationError(null);
+          setPolygonPartsError(null);
+        }}
         map={
           <OlLayerMap
             layerRecord={props.layerRecord}
