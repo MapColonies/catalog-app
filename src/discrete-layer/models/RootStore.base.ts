@@ -463,6 +463,14 @@ export type JobActionParams = {
 export type JobApproveAndResumeData = {
   approver: string
 }
+export type RevertRasterLayerData = {
+  type: RecordType
+  productId: string
+  productType: ProductType
+  productVersion: string
+  approverName: string
+  approvalCode: string
+}
 /* The TypeScript type that explicits the refs to other models in order to prevent a circular refs issue */
 type Refs = {
   layerRasterRecords: ObservableMap<string, LayerRasterRecordModelType>,
@@ -529,7 +537,8 @@ mutateDeleteRasterLayer="mutateDeleteRasterLayer",
 mutateUpdateJob="mutateUpdateJob",
 mutateJobAbort="mutateJobAbort",
 mutateJobRetry="mutateJobRetry",
-mutateJobApproveAndResume="mutateJobApproveAndResume"
+mutateJobApproveAndResume="mutateJobApproveAndResume",
+mutateRevertRasterLayer="mutateRevertRasterLayer"
 }
 
 /**
@@ -770,5 +779,8 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     },
     mutateJobApproveAndResume(variables: { data: JobApproveAndResumeData, jobApproveAndResumeParams: JobActionParams }, optimisticUpdate?: () => void) {
       return self.mutate<{ jobApproveAndResume: string }>(`mutation jobApproveAndResume($data: JobApproveAndResumeData!, $jobApproveAndResumeParams: JobActionParams!) { jobApproveAndResume(data: $data, jobApproveAndResumeParams: $jobApproveAndResumeParams) }`, variables, optimisticUpdate)
+    },
+    mutateRevertRasterLayer(variables: { data: RevertRasterLayerData }, optimisticUpdate?: () => void) {
+      return self.mutate<{ revertRasterLayer: string }>(`mutation revertRasterLayer($data: RevertRasterLayerData!) { revertRasterLayer(data: $data) }`, variables, optimisticUpdate)
     },
   })))
