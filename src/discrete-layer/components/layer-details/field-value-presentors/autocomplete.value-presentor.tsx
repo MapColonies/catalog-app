@@ -56,7 +56,7 @@ export const AutocompleteValuePresentorComponent: React.FC<AutocompleteValuePres
       );
     } else {
       return (
-        <Box className="detailsFieldValue">
+        <Box className="detailsFieldValue autocompleteFieldValue">
           <Autocomplete
             {...{
               Component: <TextField />,
