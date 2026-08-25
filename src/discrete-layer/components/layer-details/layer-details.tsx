@@ -5,7 +5,7 @@ import React, { useContext, useMemo } from 'react';
 import { FormattedMessage, IntlShape } from 'react-intl';
 import moment from 'moment';
 import { observer } from 'mobx-react-lite';
-import { get } from 'lodash';
+import { get, isEmpty } from 'lodash';
 import { Typography } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
 import { FieldLabelComponent } from '../../../common/components/form/field-label';
@@ -19,7 +19,7 @@ import { geoJSONValidation } from '../../../common/utils/geojson.validation';
 import { geoArgs } from '../../../common/utils/geo.tools';
 
 import {
-  // AutocompletionModelType,
+  AutocompletionModelType,
   EntityDescriptorModelType,
   FieldConfigModelType,
   LayerMetadataMixedUnion,
@@ -33,7 +33,6 @@ import { DEFAULT_ENUM, getEnumKeys, isEnumType } from '../../components/layer-de
 import { ILayerImage } from '../../models/layerImage';
 import { links } from '../../models/links';
 import { getLinkUrl, getLinkUrlWithToken } from '../helpers/layersUtils';
-// import { AutocompleteValuePresentorComponent } from './field-value-presentors/autocomplete.value-presentor';
 import { DateValuePresentorComponent } from './field-value-presentors/date.value-presentor';
 import { EnumValuePresentorComponent } from './field-value-presentors/enum.value-presentor';
 import { JsonValuePresentorComponent } from './field-value-presentors/json.value-presentor';
@@ -56,6 +55,7 @@ import './layer-details.css';
 import { LookupOptionsPresentorComponent } from './field-value-presentors/lookup.options-presentor';
 import { PYCSW_ANY_TEXT_FIELD } from '../map-container/freeTextSearch.component';
 import { ResolutionValuePresentorComponent } from './field-value-presentors/resolution.value-presentor';
+import { AutocompleteValuePresentorComponent } from './field-value-presentors/autocomplete.value-presentor';
 
 const FOOTPRINT_FIELD_NAMES = ['footprint', 'geometry'];
 
@@ -108,7 +108,17 @@ export const getValuePresentor = (
     case 'string':
     case 'identifier':
     case 'sensors':
-      return (
+      return !isEmpty(formik) &&
+        !isEmpty(fieldInfo.autocomplete) &&
+        (fieldInfo.autocomplete as AutocompletionModelType).type === 'DOMAIN' ? (
+        <AutocompleteValuePresentorComponent
+          mode={mode}
+          fieldInfo={fieldInfo}
+          value={value as string}
+          formik={formik}
+          fieldNamePrefix={fieldNamePrefix}
+        />
+      ) : (
         <StringValuePresentorComponent
           mode={mode}
           fieldInfo={fieldInfo}
@@ -117,21 +127,6 @@ export const getValuePresentor = (
           fieldNamePrefix={fieldNamePrefix}
         />
       );
-    // return ((!isEmpty(formik) && !isEmpty(fieldInfo.autocomplete) && (fieldInfo.autocomplete as AutocompletionModelType).type === 'DOMAIN') ?
-    //   <AutocompleteValuePresentorComponent
-    //     mode={mode}
-    //     fieldInfo={fieldInfo}
-    //     value={value as string}
-    //     formik={formik}
-    //     fieldNamePrefix={fieldNamePrefix}
-    //   /> :
-    //   <StringValuePresentorComponent
-    //     mode={mode}
-    //     fieldInfo={fieldInfo}
-    //     value={value as string}
-    //     formik={formik}
-    //     fieldNamePrefix={fieldNamePrefix}/>
-    // );
     case 'featureStructure':
       return (
         <Box className="featureStructureContainer">
