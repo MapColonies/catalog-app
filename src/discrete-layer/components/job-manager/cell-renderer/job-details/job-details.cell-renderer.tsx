@@ -71,26 +71,18 @@ const StatusPresentor: React.FC<StatusPresentorParams> = ({ task, reactKey = '' 
   });
 
   const percentageComponent = () => {
-    const NUMBER_OF_TASKS_IN_GROUP = 1;
-
-    let showPercentage = false;
-
-    if (task.counts === NUMBER_OF_TASKS_IN_GROUP && task.status === Status.InProgress) {
-      showPercentage = true;
-    }
-
-    if (showPercentage) {
-      return (
-        <Typography
-          key={`${task.jobId}`}
-          tag="div"
-          className="percentageContainer"
-          style={{ fontWeight: 'bold' }}
-        >
-          {(task.percentage as Number).toString() + '%'}
-        </Typography>
-      );
-    }
+    return task.status === Status.InProgress ? (
+      <Typography
+        key={`${task.jobId}`}
+        tag="div"
+        className="percentageContainer"
+        style={{ fontWeight: 'bold' }}
+      >
+        {(task.percentage as Number).toString() + '%'}
+      </Typography>
+    ) : (
+      <></>
+    );
   };
 
   if (task.status === Status.Failed) {
@@ -115,7 +107,7 @@ const StatusPresentor: React.FC<StatusPresentorParams> = ({ task, reactKey = '' 
                 className="mc-icon-Warning taskStatusIcon"
                 label="FAIL REASON ICON"
               />
-              {percentageComponent() ?? <></>}
+              {percentageComponent()}
             </>
           </Tooltip>
         </AutoDirectionBox>
