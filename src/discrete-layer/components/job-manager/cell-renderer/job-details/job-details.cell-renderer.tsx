@@ -71,15 +71,7 @@ const StatusPresentor: React.FC<StatusPresentorParams> = ({ task, reactKey = '' 
   });
 
   const percentageComponent = () => {
-    const NUMBER_OF_TASKS_IN_GROUP = 1;
-
-    let showPercentage = false;
-
-    if (task.counts === NUMBER_OF_TASKS_IN_GROUP && task.status === Status.InProgress) {
-      showPercentage = true;
-    }
-
-    if (showPercentage) {
+    if (task.status === Status.InProgress) {
       return (
         <Typography
           key={`${task.jobId}`}
