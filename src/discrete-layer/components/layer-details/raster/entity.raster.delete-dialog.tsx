@@ -33,12 +33,6 @@ export const EntityDeleteRasterDialog: React.FC<ActionDialogProps> = observer(
     }, [store.discreteLayersStore.customValidationError]);
 
     useEffect(() => {
-      return () => {
-        store.discreteLayersStore.clearCustomValidationError();
-      };
-    }, []);
-
-    useEffect(() => {
       if (mutationQuery.data && !mutationQuery.error) {
         props.onSuccess?.();
         props.onSetOpen(false);

@@ -85,8 +85,9 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<
         debounceCall.cancel();
         mapOl.un('moveend', debounceCall);
         mapOl.un('postrender', handlePostRender);
+        store.discreteLayersStore.clearCustomValidationError();
       } catch (e) {
-        console.log('OL "moveEnd" remove listener failed', e);
+        console.log('Failed to unmount PolygonPartsExtentQueryVectorLayer', e);
       }
     };
   }, [queryExecutor]);

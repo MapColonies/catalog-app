@@ -277,10 +277,6 @@ export const discreteLayersStore = ModelBase
       self.selectedLayerOperationMode = mode;
     }
 
-    function resetUpdateMode(): void {
-      self.customValidationError = undefined;
-    }
-
     function selectLayerByID(layerID: string): void {
       const layer = self.layersImages?.find(layer => layer.id === layerID);
       self.selectedLayer = layer ? cloneDeep(layer) : undefined;
@@ -467,7 +463,7 @@ export const discreteLayersStore = ModelBase
       self.mapViewerExtentPolygon = cloneDeep(feature);
     }
 
-    function setCustomValidationError(err: Record<string, string[]> | undefined): void {
+    function setCustomValidationError(err: Record<string, string[]>): void {
       self.customValidationError = cloneDeep(err);
     }
 
@@ -693,7 +689,6 @@ export const discreteLayersStore = ModelBase
       resetAppState,
       resetTabView,
       getFieldConfig,
-      resetUpdateMode,
       setMapViewerExtentPolygon,
       setCustomValidationError,
       clearCustomValidationError,

@@ -374,7 +374,6 @@ const EntityRasterDialogInner: React.FC<EntityRasterInnerProps> = observer(
       if (job) {
         setJob?.(undefined);
       }
-      store.discreteLayersStore.resetUpdateMode();
       clearSyncWarnings();
     }, [onSetOpen, store.discreteLayersStore]);
 
