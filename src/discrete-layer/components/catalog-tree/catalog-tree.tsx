@@ -4,7 +4,6 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { observer } from 'mobx-react';
 import { changeNodeAtPath, getNodeAtPath, find, ExtendedNodeData } from 'react-sortable-tree';
-import { useIntl } from 'react-intl';
 import { Box } from '@map-colonies/react-components';
 import { useTheme } from '@map-colonies/react-core';
 import { TreeComponent, TreeItem } from '../../../common/components/tree';
@@ -26,6 +25,7 @@ import {
   getActionsWithDisable,
   IActionGroup,
 } from '../../../common/actions/entity.actions';
+import { useEntityPermittedActions } from '../../../common/hooks/useEntityPermittedActions.hook';
 import { IDispatchAction } from '../../models/actionDispatcherStore';
 import { ILayerImage } from '../../models/layerImage';
 import { useStore } from '../../models/RootStore';
@@ -55,7 +55,6 @@ export const CatalogTreeComponent: React.FC<CatalogTreeComponentProps> = observe
     const [hoveredNode, setHoveredNode] = useState<TreeItem>();
     const [isHoverAllowed, setIsHoverAllowed] = useState<boolean>(true);
     const [isBestInEditDialogOpen, setBestInEditDialogOpen] = useState<boolean>(false);
-    const intl = useIntl();
     const {
       isLoading: loading,
       getFilteredCatalogTreeData,
@@ -97,44 +96,7 @@ export const CatalogTreeComponent: React.FC<CatalogTreeComponentProps> = observe
       return isValidLayerMetadata(rowInfo.node as LayerMetadataMixedUnion);
     };
 
-    const entityPermittedActions = useMemo(() => {
-      const entityActions: Record<string, unknown> = {};
-      [
-        'LayerRasterRecord',
-        'Layer3DRecord',
-        'LayerDemRecord',
-        'VectorBestRecord',
-        'QuantizedMeshBestRecord',
-      ].forEach((entityName) => {
-        const allGroupsActions = store.actionDispatcherStore.getEntityActionGroups(entityName);
-        const permittedGroupsActions = allGroupsActions.map((actionGroup) => {
-          return {
-            titleTranslationId: actionGroup.titleTranslationId,
-            group: actionGroup.group
-              .filter((action) => {
-                return store.userStore.isActionAllowed(
-                  `entity_action.${entityName}.${action.action}`
-                ) === false
-                  ? false
-                  : true && action.views.includes(TabViews.CATALOG);
-              })
-              .map((action) => {
-                return {
-                  ...action,
-                  title: {
-                    ...action.title,
-                    translationId: intl.formatMessage({
-                      id: action.title.translationId,
-                    }),
-                  },
-                };
-              }),
-          };
-        });
-        entityActions[entityName] = permittedGroupsActions;
-      });
-      return entityActions;
-    }, [store.userStore.user]);
+    const entityPermittedActions = useEntityPermittedActions(TabViews.CATALOG);
 
     useEffect(() => {
       if (store.actionDispatcherStore.action !== undefined) {
