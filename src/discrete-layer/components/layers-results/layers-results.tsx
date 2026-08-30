@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { ColDef, RowDataUpdatedEvent, ValueGetterParams } from 'ag-grid-community';
 import { observer } from 'mobx-react-lite';
@@ -40,6 +40,7 @@ import {
 } from '../../../common/actions/entity.actions';
 // import { usePrevious } from '../../../common/hooks/previous.hook';
 import { LayerRasterRecordModelType } from '../../models';
+import { useEntityPermittedActions } from '../../../common/hooks/useEntityPermittedActions.hook';
 import { IDispatchAction } from '../../models/actionDispatcherStore';
 import { ILayerImage } from '../../models/layerImage';
 import { useStore } from '../../models/RootStore';
@@ -103,43 +104,7 @@ export const LayersResults: React.FC<LayersResultsProps> = observer((props) => {
     }
   };*/
 
-  const entityPermittedActions = useMemo(() => {
-    const entityActions: Record<string, unknown> = {};
-    [
-      'LayerRasterRecord',
-      'Layer3DRecord',
-      'LayerDemRecord',
-      'VectorBestRecord',
-      'QuantizedMeshBestRecord',
-    ].forEach((entityName) => {
-      const allGroupsActions = store.actionDispatcherStore.getEntityActionGroups(entityName);
-      const permittedGroupsActions = allGroupsActions.map((actionGroup) => {
-        return {
-          titleTranslationId: actionGroup.titleTranslationId,
-          group: actionGroup.group
-            .filter((action) => {
-              // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-              return store.userStore.isActionAllowed(
-                `entity_action.${entityName}.${action.action}`
-              ) === false
-                ? false
-                : true && action.views.includes(TabViews.SEARCH_RESULTS);
-            })
-            .map((action) => {
-              return {
-                ...action,
-                title: {
-                  ...action.title,
-                  translationId: intl.formatMessage({ id: action.title.translationId }),
-                },
-              };
-            }),
-        };
-      });
-      entityActions[entityName] = permittedGroupsActions;
-    });
-    return entityActions;
-  }, [store.userStore.user]);
+  const entityPermittedActions = useEntityPermittedActions(TabViews.SEARCH_RESULTS);
 
   const dispatchAction = (action: Record<string, unknown>): void => {
     store.actionDispatcherStore.dispatchAction({
