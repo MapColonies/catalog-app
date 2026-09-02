@@ -2,11 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { observer } from 'mobx-react';
 import { Mode } from '../../../../common/models/mode.enum';
 import { RecordType, RootStoreType, useQuery, useStore } from '../../../models';
+import { IGraphqlError } from '../../helpers/errorUtils';
 import { ActionDialogProps, DestructiveActionDialog } from '../destructive-action-dialog';
+import { OlLayerMap } from './layer-map';
 
 import './entity.raster.delete-dialog.css';
-import { OlLayerMap } from './layer-map';
-import { IGraphqlError } from '../../helpers/errorUtils';
 
 type DeleteRasterLayerResult = Awaited<ReturnType<RootStoreType['mutateDeleteRasterLayer']>>; // see (MAPCO-11216)
 
@@ -54,7 +54,7 @@ export const EntityDeleteRasterDialog: React.FC<ActionDialogProps> = observer(
         onClose={closeDialog}
         onSubmit={deleteLayer}
         loading={mutationQuery.loading}
-        error={[mutationError]}
+        errors={mutationError ? [mutationError] : []}
         map={
           <OlLayerMap
             layerRecord={props.layerRecord}

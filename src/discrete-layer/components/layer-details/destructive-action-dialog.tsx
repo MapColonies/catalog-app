@@ -43,7 +43,7 @@ interface DestructiveActionDialogProps {
   onSubmit: (approverName: string, approvalCode: string) => void;
   loading: boolean;
   map: JSX.Element | null;
-  error?: ErrorType[];
+  errors?: ErrorType[];
   sidePanel?: JSX.Element | null;
   onFieldsValidate?: () => void;
   openRelatedJob?: {
@@ -62,7 +62,7 @@ export const DestructiveActionDialog: React.FC<DestructiveActionDialogProps> = o
     onClose,
     onSubmit,
     loading,
-    error,
+    errors,
     map,
     sidePanel = null,
     onFieldsValidate,
@@ -128,7 +128,7 @@ export const DestructiveActionDialog: React.FC<DestructiveActionDialogProps> = o
                     <Box className="footer">
                       <Box className="errors">
                         <ErrorPresentor
-                          errors={[...(error ?? []), ...getErrorsItems(fieldErrors)]}
+                          errors={[...(errors ?? []), ...getErrorsItems(fieldErrors)]}
                         />
                       </Box>
                       <Box className="buttons">
@@ -153,7 +153,7 @@ export const DestructiveActionDialog: React.FC<DestructiveActionDialogProps> = o
                         <Button
                           raised
                           type="submit"
-                          disabled={!formikProps.isValid || loading || !!error}
+                          disabled={!formikProps.isValid || loading || (errors?.length ?? 0) > 0}
                         >
                           {loading ? (
                             <CircularProgress className="loading" />

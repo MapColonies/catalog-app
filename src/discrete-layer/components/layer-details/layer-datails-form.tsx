@@ -253,7 +253,9 @@ const InnerForm = (props: LayerDetailsFormCustomProps & FormikProps<FormValues>)
         </Box>
         <Box className="footer">
           <Box className="messages">
-            <ErrorPresentor errors={[graphQLError, ...formValidationErrorItems]} />
+            <ErrorPresentor
+              errors={[...(graphQLError ? [graphQLError] : []), ...formValidationErrorItems]}
+            />
           </Box>
           <Box className="buttons">
             {mode !== Mode.VIEW && (

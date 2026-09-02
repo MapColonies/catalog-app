@@ -22,6 +22,7 @@ import {
   useStore,
 } from '../../models';
 import { isMultiSelection } from '../layer-details/utils';
+import { IGraphqlError } from '../helpers/errorUtils';
 
 import './file-picker.dialog.css';
 
@@ -60,7 +61,7 @@ export const FilePickerDialog: React.FC<FilePickerDialogProps> = observer(
     const [path, setPath] = useState<string>(
       getSuffixFromFolderChain(currentSelection.folderChain)
     );
-    const [graphQLError, setGraphQLError] = useState<Record<string, unknown> | null>(null);
+    const [graphQLError, setGraphQLError] = useState<IGraphqlError | null>(null);
     const [selection, setSelection] = useState<Selection>(currentSelection);
     const store = useStore();
     const queryDirectory = useCallback(() => useQuery<{ getDirectory: FileModelType[] }>(), [])();

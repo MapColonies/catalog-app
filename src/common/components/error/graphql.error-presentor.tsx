@@ -2,17 +2,16 @@ import React from 'react';
 import { useIntl } from 'react-intl';
 import { IconButton } from '@map-colonies/react-core';
 import { AutoDirectionBox } from '../auto-direction-box/auto-direction-box.component';
-import { getGraphqlErrorItems } from '../../../discrete-layer/components/helpers/errorUtils';
+import {
+  getGraphqlErrorItems,
+  IGraphqlError,
+} from '../../../discrete-layer/components/helpers/errorUtils';
 
 import './error-presentor.css';
 
 const NONE = 0;
 
-export interface IGpaphQLError {
-  error: unknown;
-}
-
-export const GraphQLError: React.FC<IGpaphQLError> = ({ error }) => {
+export const GraphQLError: React.FC<{ error: IGraphqlError }> = ({ error }) => {
   const intl = useIntl();
   const errors = getGraphqlErrorItems([error].filter(Boolean), intl);
 

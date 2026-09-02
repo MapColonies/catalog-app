@@ -26,8 +26,12 @@ export const ErrorPresentor = observer(
     const { serviceError, customValidationError } = store.discreteLayersStore;
 
     const allErrors: IError[] = useMemo(() => {
+      const graphQLErrors = getGraphqlErrorItems(
+        [...(errors ?? []), serviceError].filter((error): error is ErrorType => Boolean(error)),
+        intl
+      );
       const combinedErrors = [
-        ...getGraphqlErrorItems([...(errors ?? []), serviceError].filter(Boolean), intl),
+        ...graphQLErrors,
         ...(customValidationError ? [customValidationError] : []),
       ];
       return combinedErrors;

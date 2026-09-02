@@ -284,6 +284,13 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
       [mutationError]
     );
 
+    const errors = useMemo(() => {
+      const actualErrors = [metadataError, outerPerimeterError, mutationError].filter(
+        (error): error is IGraphqlError => Boolean(error)
+      );
+      return actualErrors;
+    }, [metadataError, outerPerimeterError, mutationError]);
+
     return (
       <DestructiveActionDialog
         elementId="rasterRevertDialog"
@@ -296,10 +303,7 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
         onSubmit={revertLayer}
         loading={loading || mutationQuery.loading}
         openRelatedJob={submitErrorJobId ? { jobId: submitErrorJobId } : undefined}
-        error={useMemo(
-          () => [metadataError, outerPerimeterError, mutationQuery.error],
-          [metadataError, outerPerimeterError, mutationQuery.error]
-        )}
+        errors={errors}
         onFieldsValidate={(): void => {
           setMutationError(undefined);
         }}
