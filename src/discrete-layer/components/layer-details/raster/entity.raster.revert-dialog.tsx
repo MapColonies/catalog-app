@@ -19,7 +19,6 @@ import {
 } from '../../../../common/utils/geojson.validation';
 import { useEnums } from '../../../../common/hooks/useEnum.hook';
 import CONFIG from '../../../../common/config';
-import { getErrorMessage, IServerError } from '../../../../common/components/error/helpers';
 import { GeojsonFeatureInput } from '../../../models/RootStore.base';
 import {
   LayerRasterRecordModelType,

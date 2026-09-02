@@ -109,7 +109,11 @@ exports[`BBoxDialog component renders correctly 1`] = `
         >
           <U
             className="messages"
-          />
+          >
+            <ErrorPresentor
+              errors={Array []}
+            />
+          </U>
           <U
             className="buttons"
           >
