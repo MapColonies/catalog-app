@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [6.8.0](https://github.com/MapColonies/catalog-app/compare/v6.7.1...v6.8.0) (2026-09-02)
+
+
+### Features
+
+* add 3 wfs queries for polygon parts ([#1034](https://github.com/MapColonies/catalog-app/issues/1034)) ([273a216](https://github.com/MapColonies/catalog-app/commit/273a216c965ddbde12a3ecb9f32b15daecc632e8))
+* add show in job manger button and open related job (MAPCO-11315, MAPCO-11446) ([#1038](https://github.com/MapColonies/catalog-app/issues/1038)) ([5a4ec07](https://github.com/MapColonies/catalog-app/commit/5a4ec076d1289c74c3b3c9b32c261eb8cf772a9e))
+* add wfs pp layers switches and side panel visualization (MAPCO-11310) ([#1037](https://github.com/MapColonies/catalog-app/issues/1037)) ([3225059](https://github.com/MapColonies/catalog-app/commit/3225059c785f678093e89f9d7c4b57b2a156f34c))
+* use revert api ([#1039](https://github.com/MapColonies/catalog-app/issues/1039)) ([6b961e6](https://github.com/MapColonies/catalog-app/commit/6b961e6afbdd7baefd34abca1758d9e60b586dd7))
+
+
+### Bug Fixes
+
+* added utility to convert ol style to css ([#1031](https://github.com/MapColonies/catalog-app/issues/1031)) ([b9f5d4d](https://github.com/MapColonies/catalog-app/commit/b9f5d4d0d5b8d22b64c36ad99267e1a0cfd3c243))
+* display the autocomplete in the correct position ([#1040](https://github.com/MapColonies/catalog-app/issues/1040)) ([2723ae7](https://github.com/MapColonies/catalog-app/commit/2723ae7e1a14a69cc39100c173fbe803b2dfc9a3))
+* fetch backup data mock (MAPCO-11306) ([#1026](https://github.com/MapColonies/catalog-app/issues/1026)) ([a9457af](https://github.com/MapColonies/catalog-app/commit/a9457afa3decc7c82e091ce6de85ad7c119454c8))
+* handle exhaustive deps properly in shared-components ([#1046](https://github.com/MapColonies/catalog-app/issues/1046)) ([6dd4b3c](https://github.com/MapColonies/catalog-app/commit/6dd4b3cbd8d3f6950ab4939d4e24f766fae529f9))
+* memoize queryExecutor and its dependencies ([#1043](https://github.com/MapColonies/catalog-app/issues/1043)) ([9978b5f](https://github.com/MapColonies/catalog-app/commit/9978b5fc88af92ad17ddd7741a816dd66bf55f1c))
+* schema related graphql error on client ([#1036](https://github.com/MapColonies/catalog-app/issues/1036)) ([95263c9](https://github.com/MapColonies/catalog-app/commit/95263c979708030440f5bdccdda0646cac597443))
+* share entityPermittedActions function ([#1044](https://github.com/MapColonies/catalog-app/issues/1044)) ([c957208](https://github.com/MapColonies/catalog-app/commit/c957208212bc97f9b089f56c2a4ff8d5e2f53028))
+* show percentage for in-progress task groups ( MAPCO-10639 ) ([#1041](https://github.com/MapColonies/catalog-app/issues/1041)) ([9083553](https://github.com/MapColonies/catalog-app/commit/908355305fa9ac6655011ebd14a9aeb46c3413b7))
+* switch disabled mode appearance ([#1045](https://github.com/MapColonies/catalog-app/issues/1045)) ([ac8a52d](https://github.com/MapColonies/catalog-app/commit/ac8a52db61bb210df9f44e5e23650c7ef1bddaba))
+* three additional pp styles and olmap legend more explicit ([#1030](https://github.com/MapColonies/catalog-app/issues/1030)) ([900952b](https://github.com/MapColonies/catalog-app/commit/900952b1018ad58b893b8699f523391935b7f935))
+* unify LayersDetailsComponent usage under LayerHeader and fix unnecessary layer thumbnail placement bug (MAPCO-11331, MAPCO-11406) ([#1028](https://github.com/MapColonies/catalog-app/issues/1028)) ([17f54ca](https://github.com/MapColonies/catalog-app/commit/17f54ca1fc5f3abf4817eb80f629c252760506cf))
+
 ## [6.7.1](https://github.com/MapColonies/catalog-app/compare/v6.7.0...v6.7.1) (2026-08-10)
 
 
