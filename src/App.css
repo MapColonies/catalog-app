@@ -193,6 +193,11 @@ input:disabled {
   opacity: 0;
 }
 
+.mdc-switch__native-control:disabled {
+  background-color: transparent;
+  opacity: 0;
+}
+
 .mdc-checkbox.mdc-checkbox--disabled ~ label {
   opacity: 0.3;
 }
