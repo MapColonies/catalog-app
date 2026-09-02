@@ -6,6 +6,7 @@ import { ActionDialogProps, DestructiveActionDialog } from '../destructive-actio
 
 import './entity.raster.delete-dialog.css';
 import { OlLayerMap } from './layer-map';
+import { IGraphqlError } from '../../helpers/errorUtils';
 
 type DeleteRasterLayerResult = Awaited<ReturnType<RootStoreType['mutateDeleteRasterLayer']>>; // see (MAPCO-11216)
 
@@ -13,24 +14,11 @@ export const EntityDeleteRasterDialog: React.FC<ActionDialogProps> = observer(
   (props: ActionDialogProps) => {
     const store = useStore();
     const mutationQuery = useQuery<DeleteRasterLayerResult>();
-
-    const [mutationError, setMutationError] = useState<any>(null);
-    const [polygonPartsError, setPolygonPartsError] = useState<Record<string, string[]> | null>(
-      null
-    );
+    const [mutationError, setMutationError] = useState<IGraphqlError>();
 
     const closeDialog = (): void => {
       props.onSetOpen(false);
     };
-
-    useEffect(() => {
-      if (store.discreteLayersStore.customValidationError) {
-        setPolygonPartsError(store.discreteLayersStore.customValidationError);
-        setMutationError(null);
-      } else {
-        setPolygonPartsError(null);
-      }
-    }, [store.discreteLayersStore.customValidationError]);
 
     useEffect(() => {
       if (mutationQuery.data && !mutationQuery.error) {
@@ -39,7 +27,6 @@ export const EntityDeleteRasterDialog: React.FC<ActionDialogProps> = observer(
       }
       if (mutationQuery.error) {
         setMutationError(mutationQuery.error);
-        setPolygonPartsError(null);
       }
     }, [mutationQuery.data, mutationQuery.error]);
 
@@ -67,8 +54,7 @@ export const EntityDeleteRasterDialog: React.FC<ActionDialogProps> = observer(
         onClose={closeDialog}
         onSubmit={deleteLayer}
         loading={mutationQuery.loading}
-        error={mutationError}
-        polygonPartsError={polygonPartsError}
+        error={[mutationError]}
         map={
           <OlLayerMap
             layerRecord={props.layerRecord}
@@ -78,8 +64,7 @@ export const EntityDeleteRasterDialog: React.FC<ActionDialogProps> = observer(
           ></OlLayerMap>
         }
         onFieldsValidate={() => {
-          setMutationError(null);
-          setPolygonPartsError(null);
+          setMutationError(undefined);
         }}
       />
     );

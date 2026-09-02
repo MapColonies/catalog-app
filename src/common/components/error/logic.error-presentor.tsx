@@ -36,7 +36,7 @@ export const LogicError: React.FC<ILogicErrorProps> = ({ errors }) => {
                 dir="auto"
                 className={error.level}
                 dangerouslySetInnerHTML={{
-                  __html: intl.formatMessage({ id: error.code }, { value: error.message }),
+                  __html: intl.formatMessage({ id: error.code }, { value: error.errText }),
                 }}
               />
             ))}

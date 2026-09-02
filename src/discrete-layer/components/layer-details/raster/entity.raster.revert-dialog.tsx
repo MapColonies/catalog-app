@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useIntl } from 'react-intl';
+import { IntlShape, useIntl } from 'react-intl';
 import { observer } from 'mobx-react';
 import { BBox, Feature, GeoJsonProperties, Geometry, Polygon } from 'geojson';
 import { Style } from 'ol/style';
@@ -29,6 +29,7 @@ import {
   useStore,
 } from '../../../models';
 import { ProductType } from '../../../models/ProductTypeEnum';
+import { getGraphqlErrorItem, IGraphqlError } from '../../helpers/errorUtils';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
 import { ActionDialogProps, DestructiveActionDialog } from '../destructive-action-dialog';
 import { useRasterBackupData } from './use-raster-backup-data.hook';
@@ -58,16 +59,26 @@ const NO_VALUE = '–';
 const JOB_KEYWORD_REGEX = /\bjob\b/i;
 const UUID_REGEX = /[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/;
 
-const extractJobIdFromError = (error: IServerError | undefined): string | undefined => {
+const extractJobIdFromError = (
+  error: IGraphqlError | undefined,
+  intl: IntlShape
+): string | undefined => {
   if (!error) {
     return;
   }
-  const message = getErrorMessage(error);
-  const hasJobKeyword = JOB_KEYWORD_REGEX.test(message);
-  const uuidMatch = message.match(UUID_REGEX);
-  if (hasJobKeyword && uuidMatch) {
-    return uuidMatch[0];
+
+  const errors = getGraphqlErrorItem(error, intl);
+  const message = errors[0].errText;
+
+  if (!message) {
+    return;
   }
+
+  if (!JOB_KEYWORD_REGEX.test(message)) {
+    return;
+  }
+
+  return message.match(UUID_REGEX)?.[0];
 };
 
 export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
@@ -79,11 +90,8 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
     const currentLayer = props.layerRecord as LayerRasterRecordModelType;
 
     const mutationQuery = useQuery<RevertRasterLayerResult>();
+    const [mutationError, setMutationError] = useState<IGraphqlError>();
 
-    const [mutationError, setMutationError] = useState<any>(null);
-    const [polygonPartsError, setPolygonPartsError] = useState<Record<string, string[]> | null>(
-      null
-    );
     const [showChangedArea, setShowChangedArea] = useState(true);
     const [showBackup, setShowBackup] = useState(true);
     const [showExisting, setShowExisting] = useState(false);
@@ -230,22 +238,12 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
     );
 
     useEffect(() => {
-      if (store.discreteLayersStore.customValidationError) {
-        setPolygonPartsError(store.discreteLayersStore.customValidationError);
-        setMutationError(null);
-      } else {
-        setPolygonPartsError(null);
-      }
-    }, [store.discreteLayersStore.customValidationError]);
-
-    useEffect(() => {
       if (mutationQuery.data && !mutationQuery.error) {
         props.onSuccess?.();
         props.onSetOpen(false);
       }
       if (mutationQuery.error) {
         setMutationError(mutationQuery.error);
-        setPolygonPartsError(null);
       }
     }, [mutationQuery.data, mutationQuery.error]);
 
@@ -283,7 +281,7 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
     };
 
     const submitErrorJobId = useMemo(
-      () => extractJobIdFromError(mutationError as IServerError | undefined),
+      () => extractJobIdFromError(mutationError, intl),
       [mutationError]
     );
 
@@ -299,11 +297,12 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
         onSubmit={revertLayer}
         loading={loading || mutationQuery.loading}
         openRelatedJob={submitErrorJobId ? { jobId: submitErrorJobId } : undefined}
-        error={metadataError || outerPerimeterError || mutationError}
-        polygonPartsError={polygonPartsError}
+        error={useMemo(
+          () => [metadataError, outerPerimeterError, mutationQuery.error],
+          [metadataError, outerPerimeterError, mutationQuery.error]
+        )}
         onFieldsValidate={(): void => {
-          setMutationError(null);
-          setPolygonPartsError(null);
+          setMutationError(undefined);
         }}
         map={
           <OlLayerMap

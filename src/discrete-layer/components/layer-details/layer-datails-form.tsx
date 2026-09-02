@@ -9,8 +9,8 @@ import { get, isEmpty } from 'lodash';
 import { Button } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
 import { Mode } from '../../../common/models/mode.enum';
-import { ValidationsError } from '../../../common/components/error/validations.error-presentor';
-import { GraphQLError } from '../../../common/components/error/graphql.error-presentor';
+import { ErrorPresentor } from '../error/error-presentor';
+import { getErrorsItems, IGraphqlError } from '../helpers/errorUtils';
 import { MetadataFile } from '../../../common/components/file-picker';
 import { Curtain } from '../../../common/components/curtain/curtain.component';
 // import useSessionStoreWatcherForm from '../../../common/hooks/useSessionStoreWatcherForm';
@@ -52,7 +52,7 @@ interface LayerDetailsFormCustomProps {
   entityDescriptors: EntityDescriptorModelType[];
   layerRecord: LayerMetadataMixedUnion;
   vestValidationResults: DraftResult;
-  mutationQueryError: unknown;
+  mutationQueryError: IGraphqlError | undefined;
   mutationQueryLoading: boolean;
   closeDialog: () => void;
 }
@@ -101,7 +101,7 @@ const InnerForm = (props: LayerDetailsFormCustomProps & FormikProps<FormValues>)
 
   const status = props.status as StatusError | Record<string, unknown>;
   const intl = useIntl();
-  const [graphQLError, setGraphQLError] = useState<unknown>(mutationQueryError);
+  const [graphQLError, setGraphQLError] = useState<IGraphqlError | undefined>(mutationQueryError);
   const [isSelectedFiles, setIsSelectedFiles] = useState<boolean>(false);
   const [firstPhaseErrors, setFirstPhaseErrors] = useState<Record<string, string[]>>({});
   const [showCurtain, setShowCurtain] = useState<boolean>(true);
@@ -137,6 +137,19 @@ const InnerForm = (props: LayerDetailsFormCustomProps & FormikProps<FormValues>)
       ...(getStatusErrors() as { [fieldName: string]: string[] }),
     });
   }, [errors, getYupErrors, getStatusErrors]);
+
+  const formValidationErrorItems = useMemo(() => {
+    if (Object.keys(firstPhaseErrors).length > NONE && JSON.stringify(firstPhaseErrors) !== '{}') {
+      return getErrorsItems(firstPhaseErrors);
+    }
+    if (
+      (Object.keys(errors).length === NONE || JSON.stringify(errors) === '{}') &&
+      vestValidationResults.errorCount > NONE
+    ) {
+      return getErrorsItems(vestValidationResults.getErrors());
+    }
+    return [];
+  }, [firstPhaseErrors, errors, vestValidationResults]);
 
   const entityFormikHandlers: EntityFormikHandlers = useMemo(
     () => ({
@@ -205,7 +218,7 @@ const InnerForm = (props: LayerDetailsFormCustomProps & FormikProps<FormValues>)
       ...ingestionFields,
     });
 
-    setGraphQLError(metadata.error);
+    setGraphQLError(metadata.error as IGraphqlError);
   };
 
   return (
@@ -240,19 +253,7 @@ const InnerForm = (props: LayerDetailsFormCustomProps & FormikProps<FormValues>)
         </Box>
         <Box className="footer">
           <Box className="messages">
-            {Object.keys(firstPhaseErrors).length > NONE &&
-              JSON.stringify(firstPhaseErrors) !== '{}' && (
-                <ValidationsError errors={firstPhaseErrors} />
-              )}
-            {(Object.keys(errors).length === NONE || JSON.stringify(errors) === '{}') &&
-              vestValidationResults.errorCount > NONE && (
-                <ValidationsError errors={vestValidationResults.getErrors()} />
-              )}
-            {graphQLError !== undefined &&
-              graphQLError !== null &&
-              graphQLError &&
-              JSON.stringify(graphQLError) !== '{}' &&
-              Object.keys(graphQLError).length > NONE && <GraphQLError error={graphQLError} />}
+            <ErrorPresentor errors={[graphQLError, ...formValidationErrorItems]} />
           </Box>
           <Box className="buttons">
             {mode !== Mode.VIEW && (

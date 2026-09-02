@@ -85,7 +85,7 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<
         debounceCall.cancel();
         mapOl.un('moveend', debounceCall);
         mapOl.un('postrender', handlePostRender);
-        store.discreteLayersStore.clearCustomValidationError();
+        store.discreteLayersStore.clearServiceError();
       } catch (e) {
         console.log('Failed to unmount PolygonPartsExtentQueryVectorLayer', e);
       }
@@ -172,12 +172,11 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<
       }
 
       if (activeRequestIdRef.current === requestId && hasSuccessfulQuery) {
-        store.discreteLayersStore.clearCustomValidationError();
+        store.discreteLayersStore.clearServiceError();
       }
     } catch (error) {
       if (activeRequestIdRef.current === requestId) {
-        const errorMessage = intl.formatMessage({ id: 'resolutionConflict.error.queryFailed' });
-        store.discreteLayersStore.setCustomValidationError({ error: [errorMessage] });
+        store.discreteLayersStore.setServiceError(error);
       }
     } finally {
       if (activeRequestIdRef.current === requestId) {

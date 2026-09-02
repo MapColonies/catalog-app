@@ -31,6 +31,7 @@ import { FilterField, WfsPolygonPartsGetFeatureParams } from './RootStore.base';
 import { CswCatalogsModelType } from './CswCatalogsModel';
 import { CswCatalogModelType } from './CswCatalogModel';
 import { ResultType } from './ResultTypeEnum';
+import { IError, IGraphqlError } from '../components/helpers/errorUtils';
 
 export type LayersImagesResponse = ILayerImage[];
 
@@ -64,6 +65,7 @@ const INITIAL_STATE = {
   baseMaps: CONFIG.BASE_MAPS,
   mapViewerExtentPolygon: undefined,
   customValidationError: undefined,
+  serviceError: undefined,
   polygonPartsLayer: undefined,
   polygonPartsInfo: [],
   isActiveLayersImages: false,
@@ -90,7 +92,9 @@ export const discreteLayersStore = ModelBase
     capabilities: types.maybe(types.frozen<CapabilityModelType[]>(INITIAL_STATE.capabilities)),
     baseMaps: types.maybe(types.frozen<IBaseMaps>(INITIAL_STATE.baseMaps)),
     mapViewerExtentPolygon: types.maybe(types.frozen<Feature|undefined>(INITIAL_STATE.mapViewerExtentPolygon)),
-    customValidationError: types.maybe(types.frozen<Record<string,string[]>|undefined>(INITIAL_STATE.customValidationError)),
+    customValidationError: types.maybe(types.frozen<IError|undefined>(INITIAL_STATE.customValidationError)),
+    // Currently GraphQL Error
+    serviceError: types.maybe(types.frozen<IGraphqlError|undefined>(INITIAL_STATE.serviceError)),
     polygonPartsLayer: types.maybe(types.frozen<ILayerImage>(INITIAL_STATE.polygonPartsLayer as unknown as ILayerImage)),
     polygonPartsInfo: types.maybe(types.frozen<Feature<Geometry, GeoJsonProperties>[]>(INITIAL_STATE.polygonPartsInfo)),
     isActiveLayersImages: types.maybe(types.frozen<boolean>(INITIAL_STATE.isActiveLayersImages)),
@@ -463,12 +467,20 @@ export const discreteLayersStore = ModelBase
       self.mapViewerExtentPolygon = cloneDeep(feature);
     }
 
-    function setCustomValidationError(err: Record<string, string[]>): void {
+    function setCustomValidationError(err: IError): void {
       self.customValidationError = cloneDeep(err);
     }
 
     function clearCustomValidationError(): void {
       self.customValidationError = undefined;
+    }
+
+    function setServiceError(err: unknown): void {
+      self.serviceError = err as IGraphqlError;
+    }
+
+    function clearServiceError(): void {
+      self.serviceError = undefined;
     }
 
     function setPolygonPartsLayer(layer: ILayerImage | undefined): void {
@@ -692,6 +704,8 @@ export const discreteLayersStore = ModelBase
       setMapViewerExtentPolygon,
       setCustomValidationError,
       clearCustomValidationError,
+      setServiceError,
+      clearServiceError,
       setPolygonPartsLayer,
       setPolygonPartsInfo,
       addPolygonPartsInfo,

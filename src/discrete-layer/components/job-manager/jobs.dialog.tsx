@@ -227,7 +227,7 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
       const message = getResponseErrorMesssage(mutationQuery.error.response);
       newError = {
         code: 'error.server-error',
-        message: `${Number(status) > 0 ? status + ' ' : ''}${message}`,
+        errText: `${Number(status) > 0 ? status + ' ' : ''}${message}`,
         level: 'error',
       };
     }
@@ -239,7 +239,7 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
     if (focusOnJob && focusError?.code) {
       newError = {
         code: focusError.code,
-        message: `${focusOnJob.resourceId} <bdi>(${dateFormatter(focusOnJob.updated, true)})</bdi>`,
+        errText: `${focusOnJob.resourceId} <bdi>(${dateFormatter(focusOnJob.updated, true)})</bdi>`,
         level: focusError.level,
       };
     }
@@ -379,7 +379,7 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
             if (diff > CONFIG.JOB_MANAGER.MAX_DATE_RANGE_DAYS) {
               setDateRangeError({
                 code: 'warning.exceeded-date-range',
-                message: CONFIG.JOB_MANAGER.MAX_DATE_RANGE_DAYS,
+                errText: CONFIG.JOB_MANAGER.MAX_DATE_RANGE_DAYS,
                 level: 'warning',
               });
             } else {

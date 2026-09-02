@@ -421,8 +421,6 @@ const EntityRasterDialogInner: React.FC<EntityRasterInnerProps> = observer(
                 }}
                 vestValidationResults={vestValidationResults}
                 closeDialog={closeDialog}
-                customErrorReset={store.discreteLayersStore.clearCustomValidationError}
-                customError={store.discreteLayersStore.customValidationError}
               />
             )}
           </DialogContent>
