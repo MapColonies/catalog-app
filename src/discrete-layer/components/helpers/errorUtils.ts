@@ -87,7 +87,7 @@ export const getGraphqlErrorItem = (
   }
 
   if (error?.message) {
-    return [{ errText: error.message, level: 'error' }];
+    return [{ errText: getServerErrorMessage({ message: error.message }, intl), level: 'error' }];
   }
 
   return [];

@@ -67,7 +67,7 @@ const extractJobIdFromError = (
   }
 
   const errors = getGraphqlErrorItem(error, intl);
-  const message = errors[0].errText;
+  const message = errors[0]?.errText;
 
   if (!message) {
     return;
