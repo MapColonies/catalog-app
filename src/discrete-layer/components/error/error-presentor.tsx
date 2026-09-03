@@ -4,7 +4,7 @@ import { useIntl } from 'react-intl';
 import { IconButton } from '@map-colonies/react-core';
 import { AutoDirectionBox } from '../../../common/components/auto-direction-box/auto-direction-box.component';
 import { useStore } from '../../models';
-import { ErrorType, IError, getGraphqlErrorItems } from '../helpers/errorUtils';
+import { ErrorType, IError, getFormattedErrors } from '../helpers/errorUtils';
 
 import '../../../common/components/error/error-presentor.css';
 
@@ -23,11 +23,17 @@ export const ErrorPresentor = observer(
   forwardRef<IErrorPresentorRef, IErrorPresentor>(({ errors, onErrorsChange }, ref) => {
     const intl = useIntl();
     const store = useStore();
-    const { serviceError, customValidationError } = store.discreteLayersStore;
+    const { serviceErrors, customValidationError } = store.discreteLayersStore;
 
     const allErrors: IError[] = useMemo(() => {
-      const graphQLErrors = getGraphqlErrorItems(
-        [...(errors ?? []), serviceError].filter((error): error is ErrorType => Boolean(error)),
+      const serviceErrorItems: ErrorType[] = [];
+      serviceErrors?.forEach((error) => {
+        serviceErrorItems.push(error);
+      });
+      const graphQLErrors = getFormattedErrors(
+        [...(errors ?? []), ...serviceErrorItems].filter((error): error is ErrorType =>
+          Boolean(error)
+        ),
         intl
       );
       const combinedErrors = [
@@ -35,7 +41,7 @@ export const ErrorPresentor = observer(
         ...(customValidationError ? [customValidationError] : []),
       ];
       return combinedErrors;
-    }, [errors, serviceError, customValidationError, intl]);
+    }, [errors, serviceErrors, customValidationError, intl]);
 
     const hasErrors = allErrors.length > NONE;
 

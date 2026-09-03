@@ -224,7 +224,7 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
           changedArea.overlapped as Feature<Geometry, GeoJsonProperties>,
           FeatureType.CHANGED_AREA_OVERLAPPED_PP
         ),
-      [changedArea]
+      [changedArea.overlapped]
     );
 
     const queryExecutorAdded = useMemo(
@@ -233,7 +233,7 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
           changedArea.added as Feature<Geometry, GeoJsonProperties>,
           FeatureType.CHANGED_AREA_ADDED_PP
         ),
-      [changedArea]
+      [changedArea.added]
     );
 
     useEffect(() => {

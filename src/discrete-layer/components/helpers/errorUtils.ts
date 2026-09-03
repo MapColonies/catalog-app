@@ -52,7 +52,7 @@ const getServerErrorMessage = (serverError: IServerError, intl?: IntlShape): str
   }
 };
 
-const isIError = (error: ErrorType): error is IError => {
+const isIError = (error: ErrorType | undefined): error is IError => {
   const IERROR_MARKER_FIELD: keyof IError = 'errText';
   return typeof error === 'object' && error !== null && IERROR_MARKER_FIELD in error;
 };
@@ -93,10 +93,16 @@ export const getGraphqlErrorItem = (
   return [];
 };
 
-export const getGraphqlErrorItems = (errors: ErrorType[], intl: IntlShape): IError[] => {
-  const graphQLErrors = errors.flatMap((error) =>
-    isIError(error) ? [error] : getGraphqlErrorItem(error, intl)
-  );
+const getFormattedError = (error: ErrorType | undefined, intl: IntlShape): IError[] => {
+  if (isIError(error)) {
+    return [error];
+  }
+
+  return getGraphqlErrorItem(error, intl);
+};
+
+export const getFormattedErrors = (errors: ErrorType[], intl: IntlShape): IError[] => {
+  const graphQLErrors = errors.flatMap((error): IError[] => getFormattedError(error, intl));
   return graphQLErrors;
 };
 
