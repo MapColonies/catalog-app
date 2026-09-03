@@ -10,7 +10,7 @@ import { OptionalObjectSchema, TypeOfShape } from 'yup/lib/object';
 import { AnyObject } from 'yup/lib/types';
 import { Button, IconButton } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
-import { ValidationsError } from '../../../../common/components/error/validations.error-presentor';
+import { ErrorPresentor } from '../../error/error-presentor';
 import { mergeRecursive } from '../../../../common/helpers/object';
 import { Mode } from '../../../../common/models/mode.enum';
 import { UiDescriptorsTypeName } from '../../../../common/ui-descriptors/type';
@@ -32,6 +32,7 @@ import { IngestionFields } from './ingestion-fields.raster';
 import { JobInfo } from './job-info';
 import { PPIngestionMap } from './pp-map';
 import { StateError } from './state-error';
+import { getErrorsItems } from '../../helpers/errorUtils';
 import { RasterWorkflowContext } from './state-machine/context';
 import {
   hasActiveJob,
@@ -64,8 +65,6 @@ interface LayerDetailsFormCustomProps {
   layerRecord: LayerMetadataMixedUnion;
   vestValidationResults: DraftResult;
   closeDialog: () => void;
-  customErrorReset: () => void;
-  customError?: Record<string, string[]> | undefined;
 }
 
 export interface StatusError {
@@ -112,8 +111,6 @@ export const InnerRasterForm = (
     layerRecord,
     vestValidationResults,
     closeDialog,
-    customErrorReset,
-    customError,
   } = props;
 
   const status = props.status as StatusError | Record<string, unknown>;
@@ -154,9 +151,21 @@ export const InnerRasterForm = (
   const getStatusErrors = useCallback((): StatusError | Record<string, unknown> => {
     return {
       ...(get(status, 'errors') as Record<string, string[]>),
-      ...customError,
     };
-  }, [status, customError]);
+  }, [status]);
+
+  const formValidationErrorItems = useMemo(() => {
+    if (Object.keys(firstPhaseErrors).length > NONE && JSON.stringify(firstPhaseErrors) !== '{}') {
+      return getErrorsItems(firstPhaseErrors);
+    }
+    if (
+      (Object.keys(errors).length === NONE || JSON.stringify(errors) === '{}') &&
+      vestValidationResults.errorCount > NONE
+    ) {
+      return getErrorsItems(vestValidationResults.getErrors());
+    }
+    return [];
+  }, [firstPhaseErrors, errors, vestValidationResults]);
 
   const getYupErrors = useCallback((): Record<string, string[]> => {
     const validationResults: Record<string, string[]> = {};
@@ -214,7 +223,6 @@ export const InnerRasterForm = (
         handleChange(e);
       },
       handleBlur: (e: React.FocusEvent<unknown>): void => {
-        customErrorReset();
         handleBlur(e);
         setIngestionFieldsCurtain(true);
       },
@@ -343,19 +351,7 @@ export const InnerRasterForm = (
         <Box className="footer">
           <Box className="messages">
             <StateError errors={state.context.errors} />
-            {/* {
-              topLevelFieldsErrors && Object.keys(topLevelFieldsErrors).length > NONE &&
-              JSON.stringify(topLevelFieldsErrors) !== '{}' &&
-              <ValidationsError errors={topLevelFieldsErrors} />
-            } */}
-            {Object.keys(firstPhaseErrors).length > NONE &&
-              JSON.stringify(firstPhaseErrors) !== '{}' && (
-                <ValidationsError errors={firstPhaseErrors} />
-              )}
-            {(Object.keys(errors).length === NONE || JSON.stringify(errors) === '{}') &&
-              vestValidationResults.errorCount > NONE && (
-                <ValidationsError errors={vestValidationResults.getErrors()} />
-              )}
+            <ErrorPresentor errors={formValidationErrorItems} />
           </Box>
           <Box className="buttons">
             {isGoToJobEnabled(state.context) && (
@@ -438,8 +434,6 @@ interface LayerDetailsFormProps {
   onSubmit: (values: Record<string, unknown>) => void;
   vestValidationResults: DraftResult;
   closeDialog: () => void;
-  customErrorReset: () => void;
-  customError?: Record<string, string[]> | undefined;
 }
 
 export default withFormik<LayerDetailsFormProps, FormValues>({

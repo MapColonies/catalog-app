@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useIntl } from 'react-intl';
+import { IntlShape, useIntl } from 'react-intl';
 import { observer } from 'mobx-react';
 import { BBox, Feature, GeoJsonProperties, Geometry, Polygon } from 'geojson';
 import { Style } from 'ol/style';
@@ -19,7 +19,6 @@ import {
 } from '../../../../common/utils/geojson.validation';
 import { useEnums } from '../../../../common/hooks/useEnum.hook';
 import CONFIG from '../../../../common/config';
-import { getErrorMessage, IServerError } from '../../../../common/components/error/helpers';
 import { GeojsonFeatureInput } from '../../../models/RootStore.base';
 import {
   LayerRasterRecordModelType,
@@ -29,6 +28,7 @@ import {
   useStore,
 } from '../../../models';
 import { ProductType } from '../../../models/ProductTypeEnum';
+import { getGraphqlErrorItem, IGraphqlError } from '../../helpers/errorUtils';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
 import { ActionDialogProps, DestructiveActionDialog } from '../destructive-action-dialog';
 import { useRasterBackupData } from './use-raster-backup-data.hook';
@@ -58,16 +58,26 @@ const NO_VALUE = '–';
 const JOB_KEYWORD_REGEX = /\bjob\b/i;
 const UUID_REGEX = /[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/;
 
-const extractJobIdFromError = (error: IServerError | undefined): string | undefined => {
+const extractJobIdFromError = (
+  error: IGraphqlError | undefined,
+  intl: IntlShape
+): string | undefined => {
   if (!error) {
     return;
   }
-  const message = getErrorMessage(error);
-  const hasJobKeyword = JOB_KEYWORD_REGEX.test(message);
-  const uuidMatch = message.match(UUID_REGEX);
-  if (hasJobKeyword && uuidMatch) {
-    return uuidMatch[0];
+
+  const errors = getGraphqlErrorItem(error, intl);
+  const message = errors[0]?.errText;
+
+  if (!message) {
+    return;
   }
+
+  if (!JOB_KEYWORD_REGEX.test(message)) {
+    return;
+  }
+
+  return message.match(UUID_REGEX)?.[0];
 };
 
 export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
@@ -79,11 +89,8 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
     const currentLayer = props.layerRecord as LayerRasterRecordModelType;
 
     const mutationQuery = useQuery<RevertRasterLayerResult>();
+    const [mutationError, setMutationError] = useState<IGraphqlError>();
 
-    const [mutationError, setMutationError] = useState<any>(null);
-    const [polygonPartsError, setPolygonPartsError] = useState<Record<string, string[]> | null>(
-      null
-    );
     const [showChangedArea, setShowChangedArea] = useState(true);
     const [showBackup, setShowBackup] = useState(true);
     const [showExisting, setShowExisting] = useState(false);
@@ -217,7 +224,7 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
           changedArea.overlapped as Feature<Geometry, GeoJsonProperties>,
           FeatureType.CHANGED_AREA_OVERLAPPED_PP
         ),
-      [changedArea]
+      [changedArea.overlapped]
     );
 
     const queryExecutorAdded = useMemo(
@@ -226,23 +233,8 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
           changedArea.added as Feature<Geometry, GeoJsonProperties>,
           FeatureType.CHANGED_AREA_ADDED_PP
         ),
-      [changedArea]
+      [changedArea.added]
     );
-
-    useEffect(() => {
-      if (store.discreteLayersStore.customValidationError) {
-        setPolygonPartsError(store.discreteLayersStore.customValidationError);
-        setMutationError(null);
-      } else {
-        setPolygonPartsError(null);
-      }
-    }, [store.discreteLayersStore.customValidationError]);
-
-    useEffect(() => {
-      return () => {
-        store.discreteLayersStore.clearCustomValidationError();
-      };
-    }, []);
 
     useEffect(() => {
       if (mutationQuery.data && !mutationQuery.error) {
@@ -251,7 +243,6 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
       }
       if (mutationQuery.error) {
         setMutationError(mutationQuery.error);
-        setPolygonPartsError(null);
       }
     }, [mutationQuery.data, mutationQuery.error]);
 
@@ -289,9 +280,16 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
     };
 
     const submitErrorJobId = useMemo(
-      () => extractJobIdFromError(mutationError as IServerError | undefined),
+      () => extractJobIdFromError(mutationError, intl),
       [mutationError]
     );
+
+    const errors = useMemo(() => {
+      const actualErrors = [metadataError, outerPerimeterError, mutationError].filter(
+        (error): error is IGraphqlError => Boolean(error)
+      );
+      return actualErrors;
+    }, [metadataError, outerPerimeterError, mutationError]);
 
     return (
       <DestructiveActionDialog
@@ -305,11 +303,9 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
         onSubmit={revertLayer}
         loading={loading || mutationQuery.loading}
         openRelatedJob={submitErrorJobId ? { jobId: submitErrorJobId } : undefined}
-        error={metadataError || outerPerimeterError || mutationError}
-        polygonPartsError={polygonPartsError}
+        errors={errors}
         onFieldsValidate={(): void => {
-          setMutationError(null);
-          setPolygonPartsError(null);
+          setMutationError(undefined);
         }}
         map={
           <OlLayerMap

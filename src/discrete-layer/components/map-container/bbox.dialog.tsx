@@ -15,9 +15,10 @@ import {
 } from '@map-colonies/react-core';
 import { BboxCorner, Box, DrawType, IDrawingEvent } from '@map-colonies/react-components';
 import CONFIG from '../../../common/config';
-import { ValidationsError } from '../../../common/components/error/validations.error-presentor';
+import { ErrorPresentor } from '../error/error-presentor';
 import { FieldLabelComponent } from '../../../common/components/form/field-label';
 import { emphasizeByHTML } from '../../../common/helpers/formatters';
+import { getErrorsItems } from '../helpers/errorUtils';
 import { BBoxCorner, Corner } from '../bbox/bbox-corner-indicator';
 
 import './bbox.dialog.css';
@@ -256,14 +257,15 @@ export const BBoxDialog: React.FC<BBoxDialogProps> = ({
             </Box>
             <Box className="footer">
               <Box className="messages">
-                {!isEmpty(formik.errors) && (
-                  <ValidationsError errors={getValidationErrors(formik.errors)} />
-                )}
-                {isEmpty(formik.errors) && !isEmpty(formErrors) && (
-                  <ValidationsError
-                    errors={getValidationErrors(formErrors as Record<string, unknown>)}
-                  />
-                )}
+                <ErrorPresentor
+                  errors={getErrorsItems(
+                    getValidationErrors(
+                      !isEmpty(formik.errors)
+                        ? formik.errors
+                        : (formErrors as Record<string, unknown>)
+                    )
+                  )}
+                />
               </Box>
               <Box className="buttons">
                 <Button raised type="submit" disabled={Object.keys(formik.errors).length > NONE}>

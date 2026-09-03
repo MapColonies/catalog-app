@@ -1,77 +1,43 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/naming-convention */
 import React from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
-import { isEmpty } from 'lodash';
+import { useIntl } from 'react-intl';
 import { IconButton } from '@map-colonies/react-core';
 import { AutoDirectionBox } from '../auto-direction-box/auto-direction-box.component';
 import {
-  getErrorMessage,
-  IServerError,
-  SERVER_ERROR_RESPONSE_CODE,
-  USER_ERROR_RESPONSE_CODE,
-} from './helpers';
+  getFormattedErrors,
+  IGraphqlError,
+} from '../../../discrete-layer/components/helpers/errorUtils';
 
 import './error-presentor.css';
 
-export interface IGpaphQLError {
-  error: any;
-}
+const NONE = 0;
 
-export const GraphQLError: React.FC<IGpaphQLError> = ({ error }) => {
+export const GraphQLError: React.FC<{ error: IGraphqlError }> = ({ error }) => {
   const intl = useIntl();
+  const errors = getFormattedErrors([error].filter(Boolean), intl);
+
+  if (errors.length === NONE) {
+    return null;
+  }
 
   return (
-    <>
-      {!isEmpty(error?.response) && (
-        <AutoDirectionBox className="errorContainer">
-          <IconButton
-            className="errorIcon mc-icon-Status-Warnings error"
-            onClick={(e): void => {
-              e.preventDefault();
-              e.stopPropagation();
-            }}
-          />
-          <ul className="errorsList">
-            {error.response.errors?.map((error: IServerError, index: number) => {
-              return (
-                <li
-                  dir="auto"
-                  key={index}
-                  dangerouslySetInnerHTML={{ __html: getErrorMessage(error, intl) }}
-                ></li>
-              );
-            })}
-            {error.response.status >= USER_ERROR_RESPONSE_CODE &&
-              error.response.status < SERVER_ERROR_RESPONSE_CODE && (
-                <li dir="auto" key={error.response.status as number}>
-                  <FormattedMessage id={`general.http-${error.response.status}.error`} />
-                </li>
-              )}
-            {error.response.status >= SERVER_ERROR_RESPONSE_CODE && (
-              <li dir="auto" key={error.response.status as number}>
-                <FormattedMessage id="general.server.error" />
-              </li>
-            )}
-          </ul>
-        </AutoDirectionBox>
-      )}
-      {isEmpty(error?.response) && !isEmpty(error?.message) && (
-        <AutoDirectionBox className="errorContainer">
-          <IconButton
-            className="errorIcon mc-icon-Status-Warnings error"
-            onClick={(e): void => {
-              e.preventDefault();
-              e.stopPropagation();
-            }}
-          />
-          <ul className="errorsList">
-            <li dir="auto" dangerouslySetInnerHTML={{ __html: getErrorMessage(error, intl) }}></li>
-          </ul>
-        </AutoDirectionBox>
-      )}
-    </>
+    <AutoDirectionBox className="errorContainer">
+      <IconButton
+        className="errorIcon mc-icon-Status-Warnings error"
+        onClick={(e): void => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+      />
+      <ul className="errorsList">
+        {errors.map((err, index) => (
+          <li
+            dir="auto"
+            key={index}
+            className={err.level}
+            dangerouslySetInnerHTML={{ __html: err.errText ?? '' }}
+          ></li>
+        ))}
+      </ul>
+    </AutoDirectionBox>
   );
 };

@@ -19,6 +19,7 @@ import { GraphQLError } from '../../../../common/components/error/graphql.error-
 import { useQuery, useStore } from '../../../models/RootStore';
 import { ExternalServiceModelType } from '../../../models';
 import { DeploymentWithServicesModelType } from '../../../models';
+import { IGraphqlError } from '../../helpers/errorUtils';
 import { ExternalServices } from './external-services/external-services';
 import { InternalService } from './internal-service/internal-service';
 
@@ -50,14 +51,8 @@ export const SystemCoreInfoDialog: React.FC<SystemCoreInfoDialogProps> = observe
 
     const [clusterServices, setClusterServices] = useState<DeploymentWithServicesModelType[]>([]);
     const [externalServices, setExternalServices] = useState<CategorizedServices>({});
-    const [clusterServicesError, setClusterServicesError] = useState<Record<
-      string,
-      unknown
-    > | null>(null);
-    const [externalServicesError, setExternalServicesError] = useState<Record<
-      string,
-      unknown
-    > | null>(null);
+    const [clusterServicesError, setClusterServicesError] = useState<IGraphqlError | null>(null);
+    const [externalServicesError, setExternalServicesError] = useState<IGraphqlError | null>(null);
     const [activeTab, setActiveTab] = useState<number>(EXTERNAL_SERVICES_TAB_INDEX);
     const [isLoading, setIsLoading] = useState(true);
 

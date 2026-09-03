@@ -13,6 +13,7 @@ import { GeoJSONFeature, useMap, VectorLayer, VectorSource } from '@map-colonies
 import CONFIG from '../../../../common/config';
 import { getFirstPoint } from '../../../../common/utils/geo.tools';
 import { useStore } from '../../../models';
+import { IError, IGraphqlError } from '../../helpers/errorUtils';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
 import { createTextStyle, FEATURE_LABEL_CONFIG, getStyleByFeatureType } from './pp-map.utils';
 import { FeatureType } from './feature-type.enum';
@@ -85,8 +86,9 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<
         debounceCall.cancel();
         mapOl.un('moveend', debounceCall);
         mapOl.un('postrender', handlePostRender);
+        store.discreteLayersStore.clearServiceError(featureType);
       } catch (e) {
-        console.log('OL "moveEnd" remove listener failed', e);
+        console.log('Failed to unmount PolygonPartsExtentQueryVectorLayer', e);
       }
     };
   }, [queryExecutor]);
@@ -171,12 +173,17 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<
       }
 
       if (activeRequestIdRef.current === requestId && hasSuccessfulQuery) {
-        store.discreteLayersStore.clearCustomValidationError();
+        store.discreteLayersStore.clearServiceError(featureType);
       }
     } catch (error) {
       if (activeRequestIdRef.current === requestId) {
-        const errorMessage = intl.formatMessage({ id: 'resolutionConflict.error.queryFailed' });
-        store.discreteLayersStore.setCustomValidationError({ error: [errorMessage] });
+        console.error('PolygonPartsExtentQueryVectorLayer', {
+          featureType,
+          bbox,
+          startIndex,
+          error,
+        });
+        store.discreteLayersStore.setServiceError(featureType, error as IGraphqlError | IError);
       }
     } finally {
       if (activeRequestIdRef.current === requestId) {

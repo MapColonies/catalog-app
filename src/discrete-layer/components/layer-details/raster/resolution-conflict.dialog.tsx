@@ -18,14 +18,15 @@ import {
   Typography,
 } from '@map-colonies/react-core';
 import { AutoDirectionBox } from '../../../../common/components/auto-direction-box/auto-direction-box.component';
-import { ValidationsError } from '../../../../common/components/error/validations.error-presentor';
 import { FlyTo } from '../../../../common/components/ol-map/fly-to';
+import { getErrorsItems } from '../../helpers/errorUtils';
 import CONFIG from '../../../../common/config';
 import { Domain } from '../../../../common/models/domain';
 import { Mode } from '../../../../common/models/mode.enum';
 import { isGeometryEmpty } from '../../../../common/utils/geo.tools';
 import { EntityDescriptorModelType } from '../../../models';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
+import { ErrorPresentor } from '../../error/error-presentor';
 import { isEmptyLayerRecord } from '../utils';
 import { LayerHeader } from '../layer-header';
 import { FeatureType } from './feature-type.enum';
@@ -97,9 +98,6 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
   const [listFilterMode, setListFilterMode] = useState<FilterMode>('all');
   const [selectedItem, setSelectedItem] = useState<Feature>();
   const [polygonPartsErrors, setPolygonPartsErrors] = useState<string[] | undefined>();
-  const storePolygonPartsErrors =
-    state.context.store.discreteLayersStore.customValidationError?.error;
-  const displayedPolygonPartsErrors = polygonPartsErrors ?? storePolygonPartsErrors;
   const selectedLowResolutionFeatureId = getFeatureIdentifier(selectedItem);
   const entityDescriptors = state.context.store.discreteLayersStore
     ?.entityDescriptors as EntityDescriptorModelType[];
@@ -168,14 +166,6 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
       });
     }
   }, [hasExceededFeatures]);
-
-  useEffect(() => {
-    if (storePolygonPartsErrors) {
-      setPolygonPartsErrors(storePolygonPartsErrors);
-    } else {
-      setPolygonPartsErrors(undefined);
-    }
-  }, [storePolygonPartsErrors]);
 
   const selectedLowResolutionPosition = useMemo(() => {
     if (!selectedLowResolutionFeatureId) {
@@ -441,7 +431,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
     isLoadingLowResolutionParts ||
     hasExceededFeatures ||
     isEmptyLayerRecord(state.context.updatedLayer) ||
-    !isEmpty(displayedPolygonPartsErrors);
+    !isEmpty(polygonPartsErrors);
 
   return (
     <Box id="resolutionConflictDialog">
@@ -668,9 +658,9 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                   )}
                 </Box>
                 <Box className="errorMessage">
-                  {displayedPolygonPartsErrors && (
-                    <ValidationsError errors={{ errors: [...displayedPolygonPartsErrors] }} />
-                  )}
+                  <ErrorPresentor
+                    errors={[...getErrorsItems({ errors: polygonPartsErrors ?? [] })]}
+                  />
                 </Box>
                 <Box className="actionsRow">
                   {!viewOnly && (

@@ -133,7 +133,7 @@ export const buildError = (
     source,
     level,
     code,
-    message,
+    errText: message,
     addPolicy,
     response,
   };
