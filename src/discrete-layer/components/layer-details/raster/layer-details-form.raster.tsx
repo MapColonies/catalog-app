@@ -1,6 +1,6 @@
 // @ts-nocheck
 import React, { useMemo, useState, useEffect, useCallback } from 'react';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { withFormik, FormikProps, FormikErrors, Form, FormikHandlers, FormikBag } from 'formik';
 import { Feature, GeoJsonProperties, Geometry } from 'geojson';
 import { get } from 'lodash';
@@ -31,7 +31,6 @@ import { Curtain } from '../../../../common/components/curtain/curtain.component
 import { IngestionFields } from './ingestion-fields.raster';
 import { JobInfo } from './job-info';
 import { PPIngestionMap } from './pp-map';
-import { StateError } from './state-error';
 import { formatErrors } from '../../helpers/errorUtils';
 import { RasterWorkflowContext } from './state-machine/context';
 import {
@@ -257,6 +256,8 @@ export const InnerRasterForm = (
     ]
   );
 
+  const intl = useIntl();
+
   // const topLevelFieldsErrors = {} as Record<string,string[]>;
   // firstPhaseErrors && Object.keys(firstPhaseErrors).forEach((err) => {
   //   topLevelFieldsErrors[err] = firstPhaseErrors[err];
@@ -267,6 +268,11 @@ export const InnerRasterForm = (
       actorRef.send({ type: 'CLEAN_ERRORS' } satisfies Events);
     }
   }, [dirty]);
+
+  const stateErrors = useMemo(() => {
+    const formatedErrors = formatErrors(state.context.errors, intl);
+    return formatedErrors;
+  }, [state.context.errors]);
 
   return (
     <Box id="layerDetailsFormRaster">
@@ -350,8 +356,7 @@ export const InnerRasterForm = (
         </Box>
         <Box className="footer">
           <Box className="messages">
-            <StateError errors={state.context.errors} />
-            <ErrorPresentor errors={formValidationErrorItems} />
+            <ErrorPresentor errors={[...stateErrors, ...formValidationErrorItems]} />
           </Box>
           <Box className="buttons">
             {isGoToJobEnabled(state.context) && (

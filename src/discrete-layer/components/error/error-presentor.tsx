@@ -1,5 +1,6 @@
 import { forwardRef, useEffect, useImperativeHandle, useMemo } from 'react';
 import { observer } from 'mobx-react';
+import { useIntl } from 'react-intl';
 import { IconButton } from '@map-colonies/react-core';
 import { AutoDirectionBox } from '../../../common/components/auto-direction-box/auto-direction-box.component';
 import { useStore } from '../../models';
@@ -20,6 +21,7 @@ export interface IErrorPresentorRef {
 
 export const ErrorPresentor = observer(
   forwardRef<IErrorPresentorRef, IErrorPresentor>(({ errors, onErrorsChange }, ref) => {
+    const intl = useIntl();
     const store = useStore();
     const { serviceErrors, customValidationError } = store.discreteLayersStore;
 
@@ -65,9 +67,13 @@ export const ErrorPresentor = observer(
           {allErrors.map((error, index) => (
             <li
               key={index}
-              className={error.level}
               dir="auto"
-              dangerouslySetInnerHTML={{ __html: error.errText ?? '' }}
+              className={error.level}
+              dangerouslySetInnerHTML={{
+                __html: error.code
+                  ? intl.formatMessage({ id: error.code }, { value: error.errText })
+                  : error.errText ?? '',
+              }}
             ></li>
           ))}
         </ul>

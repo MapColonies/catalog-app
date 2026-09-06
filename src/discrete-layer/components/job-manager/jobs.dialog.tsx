@@ -9,7 +9,6 @@ import { Button, Checkbox, Dialog, DialogTitle, IconButton } from '@map-colonies
 import { Box, DateTimeRangePicker, SupportedLocales } from '@map-colonies/react-components';
 import { IActionGroup } from '../../../common/actions/entity.actions';
 import { GraphQLError } from '../../../common/components/error/graphql.error-presentor';
-import { LogicError } from '../../../common/components/error/logic.error-presentor';
 import { GridApi } from '../../../common/components/grid';
 import CONFIG from '../../../common/config';
 import { dateFormatter } from '../../../common/helpers/formatters';
@@ -23,6 +22,7 @@ import { IDispatchAction } from '../../models/actionDispatcherStore';
 import { useQuery, useStore } from '../../models/RootStore';
 import { IError } from '../helpers/errorUtils';
 import { downloadJSONToClient } from '../layer-details/utils';
+import { ErrorPresentor } from '../error/error-presentor';
 import JobManagerGrid from './grids/job-manager-grid.common';
 import { JOB_ENTITY } from './job.types';
 
@@ -473,7 +473,7 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
               </Button>
             </Box>
             <Box className="messages">
-              {errorMessages.length > 0 && <LogicError errors={errorMessages} />}
+              <ErrorPresentor errors={errorMessages} />
             </Box>
           </Box>
         </DialogContent>

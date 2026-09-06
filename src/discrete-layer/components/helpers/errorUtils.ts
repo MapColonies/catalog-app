@@ -58,63 +58,70 @@ const isIError = (error: unknown): error is IError => {
   return typeof error === 'object' && error !== null && IERROR_MARKER_FIELD in error;
 };
 
-const getGraphqlErrorItem = (error: IGraphqlError | undefined, intl: IntlShape): IError[] => {
+function updateErrorItemMetadata(error: IError, level?: ErrorLevel, code?: string): IError {
+  const levelErr = level ?? error.level ?? 'error';
+  const codeErr = code ?? error.code;
+
+  return {
+    ...error,
+    level: levelErr,
+    code: codeErr,
+  };
+}
+
+function createErrorItem(errorText: string, level?: ErrorLevel, code?: string): IError {
+  return updateErrorItemMetadata({ errText: errorText }, level, code);
+}
+
+const getGraphqlErrorItem = (
+  error: IGraphqlError | undefined,
+  intl: IntlShape,
+  level?: ErrorLevel,
+  code?: string
+): IError[] => {
   const response = error?.response;
 
   if (!isEmpty(response) && response) {
-    const items: IError[] = (response.errors ?? []).map(
-      (responseError) =>
-        ({
-          errText: getServerErrorMessage(responseError, intl),
-          level: 'error',
-        } satisfies IError)
+    const items: IError[] = (response.errors ?? []).map((responseError) =>
+      createErrorItem(getServerErrorMessage(responseError, intl), level, code)
     );
 
     const status = response.status;
     if (status && status >= USER_ERROR_RESPONSE_CODE && status < SERVER_ERROR_RESPONSE_CODE) {
-      items.push({
-        errText: intl.formatMessage({ id: `general.http-${status}.error` }),
-        level: 'error',
-      });
+      items.push(
+        createErrorItem(intl.formatMessage({ id: `general.http-${status}.error` }), level, code)
+      );
     }
     if (status && status >= SERVER_ERROR_RESPONSE_CODE) {
-      items.push({ errText: intl.formatMessage({ id: 'general.server.error' }), level: 'error' });
+      items.push(createErrorItem(intl.formatMessage({ id: 'general.server.error' }), level, code));
     }
 
     return items;
   }
 
   if (error?.message) {
-    return [{ errText: getServerErrorMessage({ message: error.message }, intl), level: 'error' }];
+    return [createErrorItem(getServerErrorMessage({ message: error.message }, intl), level, code)];
   }
 
   return [];
 };
 
-const applyErrorMetadata = (error: IError, level: ErrorLevel = 'error', code?: string): IError => ({
-  ...error,
-  level,
-  code,
-});
-
 export const formatError = (
   intl: IntlShape,
   error: FormattableError,
-  level: ErrorLevel = 'error',
+  level?: ErrorLevel,
   code?: string
 ): IError[] => {
   if (typeof error === 'string') {
-    return [{ errText: error, level, code }];
+    return [createErrorItem(error, level, code)];
   }
 
   if (isIError(error)) {
-    return [applyErrorMetadata(error, level, code)];
+    return [updateErrorItemMetadata(error, level, code)];
   }
 
   // Also handles generic Error instances
-  return getGraphqlErrorItem(error as IGraphqlError, intl).map((error) =>
-    applyErrorMetadata(error, level, code)
-  );
+  return getGraphqlErrorItem(error as IGraphqlError, intl, level, code);
 };
 
 export const formatErrors = (errors: FormattableError[], intl: IntlShape): IError[] => {
