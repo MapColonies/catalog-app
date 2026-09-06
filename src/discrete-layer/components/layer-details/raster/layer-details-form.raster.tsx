@@ -32,7 +32,7 @@ import { IngestionFields } from './ingestion-fields.raster';
 import { JobInfo } from './job-info';
 import { PPIngestionMap } from './pp-map';
 import { StateError } from './state-error';
-import { getErrorsItems } from '../../helpers/errorUtils';
+import { formatErrors } from '../../helpers/errorUtils';
 import { RasterWorkflowContext } from './state-machine/context';
 import {
   hasActiveJob,
@@ -156,13 +156,13 @@ export const InnerRasterForm = (
 
   const formValidationErrorItems = useMemo(() => {
     if (Object.keys(firstPhaseErrors).length > NONE && JSON.stringify(firstPhaseErrors) !== '{}') {
-      return getErrorsItems(firstPhaseErrors);
+      return formatErrors(Object.values(firstPhaseErrors).flat(), intl);
     }
     if (
       (Object.keys(errors).length === NONE || JSON.stringify(errors) === '{}') &&
       vestValidationResults.errorCount > NONE
     ) {
-      return getErrorsItems(vestValidationResults.getErrors());
+      return formatErrors(Object.values(vestValidationResults.getErrors()).flat(), intl);
     }
     return [];
   }, [firstPhaseErrors, errors, vestValidationResults]);

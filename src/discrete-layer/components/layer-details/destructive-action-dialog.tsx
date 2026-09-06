@@ -9,7 +9,7 @@ import { Box } from '@map-colonies/react-components';
 import { Mode } from '../../../common/models/mode.enum';
 import { getTextStyle } from '../../../common/helpers/style';
 import { ErrorPresentor } from '../error/error-presentor';
-import { ErrorType, getErrorsItems } from '../helpers/errorUtils';
+import { formatErrors, IError } from '../helpers/errorUtils';
 import { UserAction } from '../../models/userStore';
 import { EntityDescriptorModelType, RecordType, useStore } from '../../models';
 import { ILayerImage } from '../../models/layerImage';
@@ -43,7 +43,7 @@ interface DestructiveActionDialogProps {
   onSubmit: (approverName: string, approvalCode: string) => void;
   loading: boolean;
   map: JSX.Element | null;
-  errors?: ErrorType[];
+  errors?: IError[];
   sidePanel?: JSX.Element | null;
   onFieldsValidate?: () => void;
   openRelatedJob?: {
@@ -128,7 +128,10 @@ export const DestructiveActionDialog: React.FC<DestructiveActionDialogProps> = o
                     <Box className="footer">
                       <Box className="errors">
                         <ErrorPresentor
-                          errors={[...(errors ?? []), ...getErrorsItems(fieldErrors)]}
+                          errors={[
+                            ...(errors ?? []),
+                            ...formatErrors(Object.values(fieldErrors).flat(), intl),
+                          ]}
                         />
                       </Box>
                       <Box className="buttons">

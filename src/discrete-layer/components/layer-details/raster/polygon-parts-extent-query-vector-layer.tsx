@@ -13,7 +13,7 @@ import { GeoJSONFeature, useMap, VectorLayer, VectorSource } from '@map-colonies
 import CONFIG from '../../../../common/config';
 import { getFirstPoint } from '../../../../common/utils/geo.tools';
 import { useStore } from '../../../models';
-import { IError, IGraphqlError } from '../../helpers/errorUtils';
+import { formatError, IError, IGraphqlError } from '../../helpers/errorUtils';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
 import { createTextStyle, FEATURE_LABEL_CONFIG, getStyleByFeatureType } from './pp-map.utils';
 import { FeatureType } from './feature-type.enum';
@@ -179,11 +179,11 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<
       if (activeRequestIdRef.current === requestId) {
         console.error('PolygonPartsExtentQueryVectorLayer', {
           featureType,
-          bbox,
           startIndex,
           error,
         });
-        store.discreteLayersStore.setServiceError(featureType, error as IGraphqlError | IError);
+        const formattedError = formatError(intl, error as IGraphqlError | IError, 'warning');
+        store.discreteLayersStore.setServiceError(featureType, formattedError);
       }
     } finally {
       if (activeRequestIdRef.current === requestId) {

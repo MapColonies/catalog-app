@@ -28,7 +28,7 @@ import {
   useStore,
 } from '../../../models';
 import { ProductType } from '../../../models/ProductTypeEnum';
-import { getGraphqlErrorItem, IGraphqlError } from '../../helpers/errorUtils';
+import { formatError, formatErrors, IGraphqlError } from '../../helpers/errorUtils';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
 import { ActionDialogProps, DestructiveActionDialog } from '../destructive-action-dialog';
 import { useRasterBackupData } from './use-raster-backup-data.hook';
@@ -66,7 +66,7 @@ const extractJobIdFromError = (
     return;
   }
 
-  const errors = getGraphqlErrorItem(error, intl);
+  const errors = formatError(intl, error);
   const message = errors[0]?.errText;
 
   if (!message) {
@@ -221,7 +221,15 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
     const queryExecutorOverlapped = useMemo(
       () =>
         buildQueryExecutor(
-          changedArea.overlapped as Feature<Geometry, GeoJsonProperties>,
+          // changedArea.overlapped as Feature<Geometry, GeoJsonProperties>,
+          {
+            type: 'Feature',
+            properties: {},
+            geometry: {
+              type: 'Point',
+              coordinates: [29.3495189, 20.8378315],
+            },
+          } as Feature<Geometry, GeoJsonProperties>,
           FeatureType.CHANGED_AREA_OVERLAPPED_PP
         ),
       [changedArea.overlapped]
@@ -288,8 +296,8 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
       const actualErrors = [metadataError, outerPerimeterError, mutationError].filter(
         (error): error is IGraphqlError => Boolean(error)
       );
-      return actualErrors;
-    }, [metadataError, outerPerimeterError, mutationError]);
+      return formatErrors(actualErrors, intl);
+    }, [metadataError, outerPerimeterError, mutationError, intl]);
 
     return (
       <DestructiveActionDialog

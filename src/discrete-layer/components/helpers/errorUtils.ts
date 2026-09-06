@@ -1,8 +1,6 @@
 import { IntlShape } from 'react-intl';
 import { isEmpty } from 'lodash';
 
-export type ErrorType = IError | IGraphqlError;
-
 export type ErrorLevel = 'error' | 'warning';
 
 const NONE = 0;
@@ -21,6 +19,7 @@ interface IServerErrorResponse {
 }
 
 export interface IError {
+  // errParams?: relevant to error CODE should be supplied here
   code?: string;
   errText?: string;
   level?: ErrorLevel;
@@ -33,6 +32,8 @@ export interface IGraphqlError {
   };
   message?: string;
 }
+
+type FormattableError = IError | IGraphqlError | string;
 
 const getServerErrorMessage = (serverError: IServerError, intl?: IntlShape): string => {
   const status = serverError.serverResponse?.status ?? NONE;
@@ -52,15 +53,12 @@ const getServerErrorMessage = (serverError: IServerError, intl?: IntlShape): str
   }
 };
 
-const isIError = (error: ErrorType | undefined): error is IError => {
+const isIError = (error: unknown): error is IError => {
   const IERROR_MARKER_FIELD: keyof IError = 'errText';
   return typeof error === 'object' && error !== null && IERROR_MARKER_FIELD in error;
 };
 
-export const getGraphqlErrorItem = (
-  error: IGraphqlError | undefined,
-  intl: IntlShape
-): IError[] => {
+const getGraphqlErrorItem = (error: IGraphqlError | undefined, intl: IntlShape): IError[] => {
   const response = error?.response;
 
   if (!isEmpty(response) && response) {
@@ -93,21 +91,32 @@ export const getGraphqlErrorItem = (
   return [];
 };
 
-const getFormattedError = (error: ErrorType | undefined, intl: IntlShape): IError[] => {
-  if (isIError(error)) {
-    return [error];
+const applyErrorMetadata = (error: IError, level: ErrorLevel = 'error', code?: string): IError => ({
+  ...error,
+  level,
+  code,
+});
+
+export const formatError = (
+  intl: IntlShape,
+  error: FormattableError,
+  level: ErrorLevel = 'error',
+  code?: string
+): IError[] => {
+  if (typeof error === 'string') {
+    return [{ errText: error, level, code }];
   }
 
-  return getGraphqlErrorItem(error, intl);
-};
+  if (isIError(error)) {
+    return [applyErrorMetadata(error, level, code)];
+  }
 
-export const getFormattedErrors = (errors: ErrorType[], intl: IntlShape): IError[] => {
-  const graphQLErrors = errors.flatMap((error): IError[] => getFormattedError(error, intl));
-  return graphQLErrors;
-};
-
-export const getErrorsItems = (errors: Record<string, string[]>): IError[] => {
-  return Object.entries(errors).flatMap(([_, messages]) =>
-    messages.map((message) => ({ errText: message, level: 'error' } as IError))
+  // Also handles generic Error instances
+  return getGraphqlErrorItem(error as IGraphqlError, intl).map((error) =>
+    applyErrorMetadata(error, level, code)
   );
+};
+
+export const formatErrors = (errors: FormattableError[], intl: IntlShape): IError[] => {
+  return errors.flatMap((error) => formatError(intl, error));
 };

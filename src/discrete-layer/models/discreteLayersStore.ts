@@ -18,6 +18,7 @@ import { getLayerLink } from '../components/helpers/layersUtils';
 import { LayerMetadataMixedUnionKeys, LayerRecordTypes, LayerRecordTypesKeys } from '../components/layer-details/entity-types-keys';
 import { extractDescriptorRelatedFieldNames, getFlatEntityDescriptors } from '../components/layer-details/utils';
 import { TabViews } from '../views/tab-views';
+import { IError } from '../components/helpers/errorUtils';
 import { searchParams } from './search-params';
 import { IRootStore, RootStoreType } from './RootStore';
 import { ILayerImage } from './layerImage';
@@ -31,7 +32,6 @@ import { FilterField, WfsPolygonPartsGetFeatureParams } from './RootStore.base';
 import { CswCatalogsModelType } from './CswCatalogsModel';
 import { CswCatalogModelType } from './CswCatalogModel';
 import { ResultType } from './ResultTypeEnum';
-import { ErrorType, IError, IGraphqlError } from '../components/helpers/errorUtils';
 
 export type LayersImagesResponse = ILayerImage[];
 
@@ -93,7 +93,7 @@ export const discreteLayersStore = ModelBase
     baseMaps: types.maybe(types.frozen<IBaseMaps>(INITIAL_STATE.baseMaps)),
     mapViewerExtentPolygon: types.maybe(types.frozen<Feature|undefined>(INITIAL_STATE.mapViewerExtentPolygon)),
     customValidationError: types.maybe(types.frozen<IError|undefined>(INITIAL_STATE.customValidationError)),
-    serviceErrors: types.maybe(types.frozen<Map<string, ErrorType>|undefined>(INITIAL_STATE.serviceErrors)),
+    serviceErrors: types.maybe(types.frozen<Map<string, IError[]>|undefined>(INITIAL_STATE.serviceErrors)),
     polygonPartsLayer: types.maybe(types.frozen<ILayerImage>(INITIAL_STATE.polygonPartsLayer as unknown as ILayerImage)),
     polygonPartsInfo: types.maybe(types.frozen<Feature<Geometry, GeoJsonProperties>[]>(INITIAL_STATE.polygonPartsInfo)),
     isActiveLayersImages: types.maybe(types.frozen<boolean>(INITIAL_STATE.isActiveLayersImages)),
@@ -474,8 +474,10 @@ export const discreteLayersStore = ModelBase
       self.customValidationError = undefined;
     }
 
-    function setServiceError(key: string, err: IGraphqlError | IError): void {
-      const currentErrors = self.serviceErrors ? new Map(self.serviceErrors) : new Map<string, IGraphqlError | IError>();
+    function setServiceError(key: string, err: IError[]): void {
+      const currentErrors = self.serviceErrors
+        ? new Map(self.serviceErrors)
+        : new Map<string, IError[]>();
       currentErrors.set(key, err);
       self.serviceErrors = currentErrors;
     }

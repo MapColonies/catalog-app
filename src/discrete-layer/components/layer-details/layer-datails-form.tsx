@@ -10,7 +10,7 @@ import { Button } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
 import { Mode } from '../../../common/models/mode.enum';
 import { ErrorPresentor } from '../error/error-presentor';
-import { getErrorsItems, IGraphqlError } from '../helpers/errorUtils';
+import { formatErrors, IGraphqlError } from '../helpers/errorUtils';
 import { MetadataFile } from '../../../common/components/file-picker';
 import { Curtain } from '../../../common/components/curtain/curtain.component';
 // import useSessionStoreWatcherForm from '../../../common/hooks/useSessionStoreWatcherForm';
@@ -140,13 +140,13 @@ const InnerForm = (props: LayerDetailsFormCustomProps & FormikProps<FormValues>)
 
   const formValidationErrorItems = useMemo(() => {
     if (Object.keys(firstPhaseErrors).length > NONE && JSON.stringify(firstPhaseErrors) !== '{}') {
-      return getErrorsItems(firstPhaseErrors);
+      return formatErrors(Object.values(firstPhaseErrors).flat(), intl);
     }
     if (
       (Object.keys(errors).length === NONE || JSON.stringify(errors) === '{}') &&
       vestValidationResults.errorCount > NONE
     ) {
-      return getErrorsItems(vestValidationResults.getErrors());
+      return formatErrors(Object.values(vestValidationResults.getErrors()).flat(), intl);
     }
     return [];
   }, [firstPhaseErrors, errors, vestValidationResults]);
@@ -254,7 +254,10 @@ const InnerForm = (props: LayerDetailsFormCustomProps & FormikProps<FormValues>)
         <Box className="footer">
           <Box className="messages">
             <ErrorPresentor
-              errors={[...(graphQLError ? [graphQLError] : []), ...formValidationErrorItems]}
+              errors={[
+                ...formatErrors(graphQLError ? [graphQLError] : [], intl),
+                ...formValidationErrorItems,
+              ]}
             />
           </Box>
           <Box className="buttons">

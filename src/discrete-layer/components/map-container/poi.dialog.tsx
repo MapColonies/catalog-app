@@ -14,7 +14,7 @@ import {
 import { Box } from '@map-colonies/react-components';
 import { ErrorPresentor } from '../error/error-presentor';
 import { FieldLabelComponent } from '../../../common/components/form/field-label';
-import { getErrorsItems } from '../helpers/errorUtils';
+import { formatErrors } from '../helpers/errorUtils';
 import { emphasizeByHTML } from '../../../common/helpers/formatters';
 
 import './poi.dialog.css';
@@ -131,7 +131,12 @@ export const PoiDialog: React.FC<PoiDialogProps> = ({
             <Box className="footer">
               <Box className="messages">
                 {!isEmpty(formik.errors) && (
-                  <ErrorPresentor errors={getErrorsItems(getValidationErrors(formik.errors))} />
+                  <ErrorPresentor
+                    errors={formatErrors(
+                      Object.values(getValidationErrors(formik.errors)).flat(),
+                      intl
+                    )}
+                  />
                 )}
               </Box>
               <Box className="buttons">

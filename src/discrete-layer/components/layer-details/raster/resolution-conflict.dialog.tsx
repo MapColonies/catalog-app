@@ -19,7 +19,7 @@ import {
 } from '@map-colonies/react-core';
 import { AutoDirectionBox } from '../../../../common/components/auto-direction-box/auto-direction-box.component';
 import { FlyTo } from '../../../../common/components/ol-map/fly-to';
-import { getErrorsItems } from '../../helpers/errorUtils';
+import { formatErrors } from '../../helpers/errorUtils';
 import CONFIG from '../../../../common/config';
 import { Domain } from '../../../../common/models/domain';
 import { Mode } from '../../../../common/models/mode.enum';
@@ -658,9 +658,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                   )}
                 </Box>
                 <Box className="errorMessage">
-                  <ErrorPresentor
-                    errors={[...getErrorsItems({ errors: polygonPartsErrors ?? [] })]}
-                  />
+                  <ErrorPresentor errors={[...formatErrors(polygonPartsErrors ?? [], intl)]} />
                 </Box>
                 <Box className="actionsRow">
                   {!viewOnly && (

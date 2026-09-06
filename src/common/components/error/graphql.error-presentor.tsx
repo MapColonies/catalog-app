@@ -2,10 +2,7 @@ import React from 'react';
 import { useIntl } from 'react-intl';
 import { IconButton } from '@map-colonies/react-core';
 import { AutoDirectionBox } from '../auto-direction-box/auto-direction-box.component';
-import {
-  getFormattedErrors,
-  IGraphqlError,
-} from '../../../discrete-layer/components/helpers/errorUtils';
+import { formatErrors, IGraphqlError } from '../../../discrete-layer/components/helpers/errorUtils';
 
 import './error-presentor.css';
 
@@ -13,7 +10,7 @@ const NONE = 0;
 
 export const GraphQLError: React.FC<{ error: IGraphqlError }> = ({ error }) => {
   const intl = useIntl();
-  const errors = getFormattedErrors([error].filter(Boolean), intl);
+  const errors = formatErrors([error].filter(Boolean), intl);
 
   if (errors.length === NONE) {
     return null;

@@ -18,7 +18,7 @@ import CONFIG from '../../../common/config';
 import { ErrorPresentor } from '../error/error-presentor';
 import { FieldLabelComponent } from '../../../common/components/form/field-label';
 import { emphasizeByHTML } from '../../../common/helpers/formatters';
-import { getErrorsItems } from '../helpers/errorUtils';
+import { formatErrors } from '../helpers/errorUtils';
 import { BBoxCorner, Corner } from '../bbox/bbox-corner-indicator';
 
 import './bbox.dialog.css';
@@ -258,12 +258,15 @@ export const BBoxDialog: React.FC<BBoxDialogProps> = ({
             <Box className="footer">
               <Box className="messages">
                 <ErrorPresentor
-                  errors={getErrorsItems(
-                    getValidationErrors(
-                      !isEmpty(formik.errors)
-                        ? formik.errors
-                        : (formErrors as Record<string, unknown>)
-                    )
+                  errors={formatErrors(
+                    Object.values(
+                      getValidationErrors(
+                        !isEmpty(formik.errors)
+                          ? formik.errors
+                          : (formErrors as Record<string, unknown>)
+                      )
+                    ).flat(),
+                    intl
                   )}
                 />
               </Box>
