@@ -149,7 +149,7 @@ const InnerForm = (props: LayerDetailsFormCustomProps & FormikProps<FormValues>)
       return formatErrors(intl, Object.values(vestValidationResults.getErrors()).flat());
     }
     return [];
-  }, [firstPhaseErrors, errors, vestValidationResults]);
+  }, [firstPhaseErrors, errors, vestValidationResults, intl]);
 
   const entityFormikHandlers: EntityFormikHandlers = useMemo(
     () => ({

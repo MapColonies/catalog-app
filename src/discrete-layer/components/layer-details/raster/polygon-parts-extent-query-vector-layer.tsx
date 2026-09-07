@@ -184,7 +184,7 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<
         });
         const formattedError = formatError(intl, error as IGraphqlError | IError, 'warning');
 
-        if (Array.isArray(formattedError)) {
+        if (formattedError && formattedError.length > 0) {
           store.discreteLayersStore.setServiceError(featureType, formattedError);
         }
       }

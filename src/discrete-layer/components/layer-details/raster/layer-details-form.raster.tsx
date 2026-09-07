@@ -123,6 +123,7 @@ export const InnerRasterForm = (
   const state = RasterWorkflowContext.useSelector((s) => s);
 
   const store = useStore();
+  const intl = useIntl();
 
   useEffect(() => {
     const { files } = state.context || {};
@@ -164,7 +165,7 @@ export const InnerRasterForm = (
       return formatErrors(intl, Object.values(vestValidationResults.getErrors()).flat());
     }
     return [];
-  }, [firstPhaseErrors, errors, vestValidationResults]);
+  }, [firstPhaseErrors, errors, vestValidationResults, intl]);
 
   const getYupErrors = useCallback((): Record<string, string[]> => {
     const validationResults: Record<string, string[]> = {};
@@ -256,8 +257,6 @@ export const InnerRasterForm = (
     ]
   );
 
-  const intl = useIntl();
-
   // const topLevelFieldsErrors = {} as Record<string,string[]>;
   // firstPhaseErrors && Object.keys(firstPhaseErrors).forEach((err) => {
   //   topLevelFieldsErrors[err] = firstPhaseErrors[err];
@@ -272,7 +271,7 @@ export const InnerRasterForm = (
   const stateErrors = useMemo(() => {
     const formatedErrors = formatErrors(intl, state.context.errors);
     return formatedErrors;
-  }, [state.context.errors]);
+  }, [state.context.errors, intl]);
 
   return (
     <Box id="layerDetailsFormRaster">
