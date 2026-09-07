@@ -8,7 +8,6 @@ import { DialogContent } from '@material-ui/core';
 import { Button, Checkbox, Dialog, DialogTitle, IconButton } from '@map-colonies/react-core';
 import { Box, DateTimeRangePicker, SupportedLocales } from '@map-colonies/react-components';
 import { IActionGroup } from '../../../common/actions/entity.actions';
-import { GraphQLError } from '../../../common/components/error/graphql.error-presentor';
 import { GridApi } from '../../../common/components/grid';
 import CONFIG from '../../../common/config';
 import { dateFormatter } from '../../../common/helpers/formatters';
@@ -20,7 +19,7 @@ import useCountDown, { IActions } from '../../../common/hooks/countdown.hook';
 import { JobModelType } from '../../models';
 import { IDispatchAction } from '../../models/actionDispatcherStore';
 import { useQuery, useStore } from '../../models/RootStore';
-import { IError } from '../helpers/errorUtils';
+import { formatError, IError } from '../helpers/errorUtils';
 import { downloadJSONToClient } from '../layer-details/utils';
 import { ErrorPresentor } from '../error/error-presentor';
 import JobManagerGrid from './grids/job-manager-grid.common';
@@ -457,7 +456,7 @@ export const JobsDialog: React.FC<JobsDialogProps> = observer((props: JobsDialog
             renderGridList()}
           {error && (
             <Box className="jobsDataError">
-              <GraphQLError error={error} />
+              <ErrorPresentor errors={formatError(intl, error, 'error')} />
             </Box>
           )}
           <Box className="footer">

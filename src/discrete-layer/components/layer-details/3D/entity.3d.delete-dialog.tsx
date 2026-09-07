@@ -5,7 +5,6 @@ import { DialogContent } from '@material-ui/core';
 import { Button, Checkbox, CircularProgress, DialogActions } from '@map-colonies/react-core';
 import { Dialog } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
-import { GraphQLError } from '../../../../common/components/error/graphql.error-presentor';
 import { Mode } from '../../../../common/models/mode.enum';
 import { getTextStyle } from '../../../../common/helpers/style';
 import {
@@ -20,6 +19,8 @@ import { DialogActionTitle } from '../dialog-action-title';
 import { DialogDisclaimer } from '../dialog-disclaimer';
 import { GeoJsonMapValuePresentorComponent } from '../field-value-presentors/geojson-map.value-presentor';
 import { LayerHeader } from '../layer-header';
+import { formatError } from '../../helpers/errorUtils';
+import { ErrorPresentor } from '../../error/error-presentor';
 
 import './entity.3d.delete-dialog.css';
 
@@ -88,7 +89,7 @@ export const EntityDelete3DDialog: React.FC<ActionDialogProps> = observer(
               />
               <DialogActions className="buttons">
                 <Box className="errors">
-                  <GraphQLError error={mutationQuery.error ?? {}} />
+                  <ErrorPresentor errors={formatError(intl, mutationQuery.error, 'error')} />
                 </Box>
                 <Button
                   raised

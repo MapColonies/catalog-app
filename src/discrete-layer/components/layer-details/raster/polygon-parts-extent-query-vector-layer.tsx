@@ -183,7 +183,10 @@ export const PolygonPartsExtentQueryVectorLayer: React.FC<
           error,
         });
         const formattedError = formatError(intl, error as IGraphqlError | IError, 'warning');
-        store.discreteLayersStore.setServiceError(featureType, formattedError);
+
+        if (Array.isArray(formattedError)) {
+          store.discreteLayersStore.setServiceError(featureType, formattedError);
+        }
       }
     } finally {
       if (activeRequestIdRef.current === requestId) {

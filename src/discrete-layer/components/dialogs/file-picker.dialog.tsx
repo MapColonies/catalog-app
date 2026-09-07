@@ -6,7 +6,6 @@ import { observer } from 'mobx-react';
 import { DialogContent } from '@material-ui/core';
 import { Button, Dialog, DialogActions, DialogTitle, IconButton } from '@map-colonies/react-core';
 import { Box, FileActionData, FileData, FilePickerActions } from '@map-colonies/react-components';
-import { GraphQLError } from '../../../common/components/error/graphql.error-presentor';
 import {
   FilePickerComponent,
   FilePickerComponentHandle,
@@ -22,7 +21,8 @@ import {
   useStore,
 } from '../../models';
 import { isMultiSelection } from '../layer-details/utils';
-import { IGraphqlError } from '../helpers/errorUtils';
+import { formatError, IGraphqlError } from '../helpers/errorUtils';
+import { ErrorPresentor } from '../error/error-presentor';
 
 import './file-picker.dialog.css';
 
@@ -212,7 +212,7 @@ export const FilePickerDialog: React.FC<FilePickerDialogProps> = observer(
           </DialogContent>
           <DialogActions>
             <Box className="messages">
-              <GraphQLError error={graphQLError ?? {}} />
+              <ErrorPresentor errors={formatError(intl, graphQLError, 'error')} />
             </Box>
             <Box className="buttons">
               <Button

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { observer } from 'mobx-react';
 import { cloneDeep } from 'lodash';
 import { Box } from '@map-colonies/react-components';
@@ -15,13 +15,13 @@ import {
   Button,
   TabBarOnActivateEventT,
 } from '@map-colonies/react-core';
-import { GraphQLError } from '../../../../common/components/error/graphql.error-presentor';
 import { useQuery, useStore } from '../../../models/RootStore';
 import { ExternalServiceModelType } from '../../../models';
 import { DeploymentWithServicesModelType } from '../../../models';
-import { IGraphqlError } from '../../helpers/errorUtils';
+import { formatError, IGraphqlError } from '../../helpers/errorUtils';
 import { ExternalServices } from './external-services/external-services';
 import { InternalService } from './internal-service/internal-service';
+import { ErrorPresentor } from '../../error/error-presentor';
 
 import './system-core-info.dialog.css';
 
@@ -46,6 +46,7 @@ const INTERNAL_SERVICES_QUERY = `name
 export const SystemCoreInfoDialog: React.FC<SystemCoreInfoDialogProps> = observer(
   ({ isOpen, onSetOpen }: SystemCoreInfoDialogProps) => {
     const store = useStore();
+    const intl = useIntl();
     const clusterServicesQuery = useQuery();
     const externalServicesQuery = useQuery();
 
@@ -117,7 +118,9 @@ export const SystemCoreInfoDialog: React.FC<SystemCoreInfoDialogProps> = observe
       let renderContent;
 
       if (clusterServicesError) {
-        renderContent = <GraphQLError error={clusterServicesError} />;
+        renderContent = (
+          <ErrorPresentor errors={formatError(intl, clusterServicesError, 'error')} />
+        );
       } else {
         const sortedServicesByStatus = clusterServices.sort((a, b) => {
           const A_BEFORE_B = -1;
@@ -137,7 +140,9 @@ export const SystemCoreInfoDialog: React.FC<SystemCoreInfoDialogProps> = observe
       let renderContent;
 
       if (externalServicesError) {
-        renderContent = <GraphQLError error={externalServicesError} />;
+        renderContent = (
+          <ErrorPresentor errors={formatError(intl, externalServicesError, 'error')} />
+        );
       } else {
         renderContent = <ExternalServices services={externalServices} />;
       }
