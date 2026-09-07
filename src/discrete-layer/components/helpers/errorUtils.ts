@@ -35,20 +35,20 @@ export interface IGraphqlError {
 
 type FormattableError = IError | IGraphqlError | string;
 
-const getServerErrorMessage = (serverError: IServerError, intl?: IntlShape): string => {
+const getServerErrorItemMessage = (intl: IntlShape, serverError: IServerError): string => {
   const status = serverError.serverResponse?.status ?? NONE;
   const message = serverError.serverResponse?.data.message
     ? serverError.serverResponse.data.message
     : serverError.serverResponse?.statusText ?? '';
   if (status && status >= USER_ERROR_RESPONSE_CODE && status < SERVER_ERROR_RESPONSE_CODE) {
     const translatedError =
-      intl?.formatMessage({ id: `general.http-${status}.error` }) ?? 'HTTP_ERROR_TRANSLATION';
+      intl.formatMessage({ id: `general.http-${status}.error` }) ?? 'HTTP_ERROR_TRANSLATION';
     return `${translatedError}<br/>${message}`;
   } else if (message) {
     return message;
   } else {
     return (
-      serverError.message.substring(+serverError.message.indexOf('; ') + 1) ?? serverError.message
+      serverError.message?.substring(+serverError.message.indexOf('; ') + 1) ?? serverError.message
     );
   }
 };
@@ -83,7 +83,7 @@ const getGraphqlErrorItem = (
 
   if (!isEmpty(response) && response) {
     const items: IError[] = (response.errors ?? []).map((responseError) =>
-      createErrorItem(getServerErrorMessage(responseError, intl), level, code)
+      createErrorItem(getServerErrorItemMessage(intl, responseError), level, code)
     );
 
     const status = response.status;
@@ -100,7 +100,9 @@ const getGraphqlErrorItem = (
   }
 
   if (error?.message) {
-    return [createErrorItem(getServerErrorMessage({ message: error.message }, intl), level, code)];
+    return [
+      createErrorItem(getServerErrorItemMessage(intl, { message: error.message }), level, code),
+    ];
   }
 
   return [];
@@ -133,4 +135,60 @@ export const formatErrors = (
   errors: (FormattableError | undefined | null)[]
 ): IError[] => {
   return errors.flatMap((error) => formatError(intl, error) ?? []);
+};
+
+const HTTP_RESPONSE_ERROR_FIELD = 'error';
+const HTTP_RESPONSE_STATUS_FIELD = 'status';
+
+const isHttpError = (response: any): boolean => {
+  return HTTP_RESPONSE_ERROR_FIELD in response;
+};
+
+export const getResponseErrorMesssage = (response: any): string => {
+  let errMessage = '*** UNKNOWN_MSG ***';
+  if (response) {
+    if (isHttpError(response)) {
+      errMessage = response[HTTP_RESPONSE_ERROR_FIELD].replace(/<[^>]*>/g, '') // remove tags
+        .replace(/\n/g, ' ') // remove \n
+        .replace(/\s+/g, ' ') // clean extra spaces
+        .trim();
+    } else {
+      const serverError = response.errors[0];
+      errMessage = serverError.serverResponse?.data.message
+        ? serverError.serverResponse.data.message
+        : serverError.serverResponse?.statusText
+        ? serverError.serverResponse?.statusText
+        : serverError.message.substring(+serverError.message.indexOf('; ') + 1);
+    }
+  } else {
+    errMessage = '';
+  }
+  return errMessage;
+};
+
+export const getResponseErrorStatus = (response: any): number | string => {
+  let status: number | string = '*** UNKNOWN_STATUS ***';
+  if (response) {
+    if (isHttpError(response)) {
+      status = response[HTTP_RESPONSE_STATUS_FIELD];
+    } else {
+      const serverError = response.errors[0];
+      status = serverError.serverResponse?.status ?? NONE;
+    }
+  } else {
+    status = '';
+  }
+  return status;
+};
+
+export const getResponseErrorURL = (response: any): string => {
+  let url = '*** UNKNOWN_URL ***';
+  if (response) {
+    if (!isHttpError(response)) {
+      url = response?.errors?.[0].extensions?.exception?.config?.url;
+    }
+  } else {
+    url = '';
+  }
+  return url;
 };

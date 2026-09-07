@@ -11,15 +11,16 @@ import { IActionGroup } from '../../../common/actions/entity.actions';
 import { GridApi } from '../../../common/components/grid';
 import CONFIG from '../../../common/config';
 import { dateFormatter } from '../../../common/helpers/formatters';
-import {
-  getResponseErrorMesssage,
-  getResponseErrorStatus,
-} from '../../../common/helpers/server-error';
 import useCountDown, { IActions } from '../../../common/hooks/countdown.hook';
 import { JobModelType } from '../../models';
 import { IDispatchAction } from '../../models/actionDispatcherStore';
 import { useQuery, useStore } from '../../models/RootStore';
-import { formatError, IError } from '../helpers/errorUtils';
+import {
+  formatError,
+  getResponseErrorMesssage,
+  getResponseErrorStatus,
+  IError,
+} from '../helpers/errorUtils';
 import { downloadJSONToClient } from '../layer-details/utils';
 import { ErrorPresentor } from '../error/error-presentor';
 import JobManagerGrid from './grids/job-manager-grid.common';
