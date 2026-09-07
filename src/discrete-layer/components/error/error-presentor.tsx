@@ -6,7 +6,7 @@ import { AutoDirectionBox } from '../../../common/components/auto-direction-box/
 import { useStore } from '../../models';
 import { IError } from '../helpers/errorUtils';
 
-import '../../../common/components/error/error-presentor.css';
+import './error-presentor.css';
 
 const NONE = 0;
 
