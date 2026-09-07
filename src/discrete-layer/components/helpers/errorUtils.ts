@@ -4,18 +4,20 @@ import { isEmpty } from 'lodash';
 export type ErrorLevel = 'error' | 'warning';
 
 const NONE = 0;
+const HTTP_RESPONSE_ERROR_FIELD = 'error';
+const HTTP_RESPONSE_STATUS_FIELD = 'status';
 export const USER_ERROR_RESPONSE_CODE = 400;
 export const SERVER_ERROR_RESPONSE_CODE = 500;
-
-export interface IServerError {
-  message: string;
-  serverResponse?: IServerErrorResponse;
-}
 
 interface IServerErrorResponse {
   data: { message: string };
   status?: number;
   statusText?: string;
+}
+
+export interface IServerError {
+  message: string;
+  serverResponse?: IServerErrorResponse;
 }
 
 export interface IError {
@@ -136,9 +138,6 @@ export const formatErrors = (
 ): IError[] => {
   return errors.flatMap((error) => formatError(intl, error) ?? []);
 };
-
-const HTTP_RESPONSE_ERROR_FIELD = 'error';
-const HTTP_RESPONSE_STATUS_FIELD = 'status';
 
 const isHttpError = (response: any): boolean => {
   return HTTP_RESPONSE_ERROR_FIELD in response;
