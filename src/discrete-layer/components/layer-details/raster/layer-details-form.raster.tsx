@@ -155,13 +155,13 @@ export const InnerRasterForm = (
 
   const formValidationErrorItems = useMemo(() => {
     if (Object.keys(firstPhaseErrors).length > NONE && JSON.stringify(firstPhaseErrors) !== '{}') {
-      return formatErrors(Object.values(firstPhaseErrors).flat(), intl);
+      return formatErrors(intl, Object.values(firstPhaseErrors).flat());
     }
     if (
       (Object.keys(errors).length === NONE || JSON.stringify(errors) === '{}') &&
       vestValidationResults.errorCount > NONE
     ) {
-      return formatErrors(Object.values(vestValidationResults.getErrors()).flat(), intl);
+      return formatErrors(intl, Object.values(vestValidationResults.getErrors()).flat());
     }
     return [];
   }, [firstPhaseErrors, errors, vestValidationResults]);
@@ -270,7 +270,7 @@ export const InnerRasterForm = (
   }, [dirty]);
 
   const stateErrors = useMemo(() => {
-    const formatedErrors = formatErrors(state.context.errors, intl);
+    const formatedErrors = formatErrors(intl, state.context.errors);
     return formatedErrors;
   }, [state.context.errors]);
 

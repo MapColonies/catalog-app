@@ -133,8 +133,8 @@ export const PoiDialog: React.FC<PoiDialogProps> = ({
                 {!isEmpty(formik.errors) && (
                   <ErrorPresentor
                     errors={formatErrors(
-                      Object.values(getValidationErrors(formik.errors)).flat(),
-                      intl
+                      intl,
+                      Object.values(getValidationErrors(formik.errors)).flat()
                     )}
                   />
                 )}

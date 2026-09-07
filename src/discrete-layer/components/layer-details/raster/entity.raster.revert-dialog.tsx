@@ -288,7 +288,7 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
       const actualErrors = [metadataError, outerPerimeterError, mutationError].filter(
         (error): error is IGraphqlError => Boolean(error)
       );
-      return formatErrors(actualErrors, intl);
+      return formatErrors(intl, actualErrors);
     }, [metadataError, outerPerimeterError, mutationError, intl]);
 
     return (

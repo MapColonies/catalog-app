@@ -658,7 +658,7 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
                   )}
                 </Box>
                 <Box className="errorMessage">
-                  <ErrorPresentor errors={[...formatErrors(polygonPartsErrors ?? [], intl)]} />
+                  <ErrorPresentor errors={[...formatErrors(intl, polygonPartsErrors ?? [])]} />
                 </Box>
                 <Box className="actionsRow">
                   {!viewOnly && (

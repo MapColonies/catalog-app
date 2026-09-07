@@ -74,8 +74,8 @@ function createErrorItem(errorText: string, level?: ErrorLevel, code?: string): 
 }
 
 const getGraphqlErrorItem = (
-  error: IGraphqlError | undefined,
   intl: IntlShape,
+  error: IGraphqlError | undefined,
   level?: ErrorLevel,
   code?: string
 ): IError[] => {
@@ -125,12 +125,12 @@ export const formatError = (
   }
 
   // Also handles generic Error instances
-  return getGraphqlErrorItem(error as IGraphqlError, intl, level, code);
+  return getGraphqlErrorItem(intl, error as IGraphqlError, level, code);
 };
 
 export const formatErrors = (
-  errors: (FormattableError | undefined | null)[],
-  intl: IntlShape
+  intl: IntlShape,
+  errors: (FormattableError | undefined | null)[]
 ): IError[] => {
   return errors.flatMap((error) => formatError(intl, error) ?? []);
 };

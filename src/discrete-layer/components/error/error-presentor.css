@@ -1,6 +1,7 @@
 .errorContainer {
   display: flex;
   color: var(--mdc-theme-gc-error-high);
+  align-items: flex-start;
 }
 
 .errorIcon {

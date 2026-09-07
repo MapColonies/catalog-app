@@ -140,13 +140,13 @@ const InnerForm = (props: LayerDetailsFormCustomProps & FormikProps<FormValues>)
 
   const formValidationErrorItems = useMemo(() => {
     if (Object.keys(firstPhaseErrors).length > NONE && JSON.stringify(firstPhaseErrors) !== '{}') {
-      return formatErrors(Object.values(firstPhaseErrors).flat(), intl);
+      return formatErrors(intl, Object.values(firstPhaseErrors).flat());
     }
     if (
       (Object.keys(errors).length === NONE || JSON.stringify(errors) === '{}') &&
       vestValidationResults.errorCount > NONE
     ) {
-      return formatErrors(Object.values(vestValidationResults.getErrors()).flat(), intl);
+      return formatErrors(intl, Object.values(vestValidationResults.getErrors()).flat());
     }
     return [];
   }, [firstPhaseErrors, errors, vestValidationResults]);
@@ -255,7 +255,7 @@ const InnerForm = (props: LayerDetailsFormCustomProps & FormikProps<FormValues>)
           <Box className="messages">
             <ErrorPresentor
               errors={[
-                ...formatErrors(graphQLError ? [graphQLError] : [], intl),
+                ...formatErrors(intl, graphQLError ? [graphQLError] : []),
                 ...formValidationErrorItems,
               ]}
             />

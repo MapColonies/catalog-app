@@ -130,7 +130,7 @@ export const DestructiveActionDialog: React.FC<DestructiveActionDialogProps> = o
                         <ErrorPresentor
                           errors={[
                             ...(errors ?? []),
-                            ...formatErrors(Object.values(fieldErrors).flat(), intl),
+                            ...formatErrors(intl, Object.values(fieldErrors).flat()),
                           ]}
                         />
                       </Box>

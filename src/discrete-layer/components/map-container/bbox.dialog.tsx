@@ -259,14 +259,14 @@ export const BBoxDialog: React.FC<BBoxDialogProps> = ({
               <Box className="messages">
                 <ErrorPresentor
                   errors={formatErrors(
+                    intl,
                     Object.values(
                       getValidationErrors(
                         !isEmpty(formik.errors)
                           ? formik.errors
                           : (formErrors as Record<string, unknown>)
                       )
-                    ).flat(),
-                    intl
+                    ).flat()
                   )}
                 />
               </Box>
