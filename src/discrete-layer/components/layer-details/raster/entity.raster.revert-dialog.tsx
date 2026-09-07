@@ -222,14 +222,6 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
       () =>
         buildQueryExecutor(
           changedArea.overlapped as Feature<Geometry, GeoJsonProperties>,
-          // {
-          //   type: 'Feature',
-          //   properties: {},
-          //   geometry: {
-          //     type: 'Point',
-          //     coordinates: [29.3495189, 20.8378315],
-          //   },
-          // } as Feature<Geometry, GeoJsonProperties>,
           FeatureType.CHANGED_AREA_OVERLAPPED_PP
         ),
       [changedArea.overlapped]
@@ -313,7 +305,7 @@ export const EntityRevertRasterDialog: React.FC<ActionDialogProps> = observer(
         openRelatedJob={submitErrorJobId ? { jobId: submitErrorJobId } : undefined}
         errors={errors}
         onFieldsValidate={(): void => {
-          // setMutationError(undefined);
+          setMutationError(undefined);
         }}
         map={
           <OlLayerMap
