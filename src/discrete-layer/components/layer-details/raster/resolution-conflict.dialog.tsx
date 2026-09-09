@@ -409,23 +409,23 @@ const ResolutionConflictDialogComponent: React.FC<ResolutionConflictDialogProps>
     setSelectedItem(clickedFeature);
   };
 
-  const queryExecutor = async (
-    bbox: BBox,
-    _startIndex: number
-  ): Promise<IQueryExecutorResponse> => {
-    if (!api) {
-      return { features: [], pageSize: -1 };
-    }
-    const result = await api.query.method({
-      minX: bbox[0],
-      minY: bbox[1],
-      maxX: bbox[2],
-      maxY: bbox[3],
-    });
-    const fetchedFeatures = get(result, 'features', []);
-    const features = Array.isArray(fetchedFeatures) ? fetchedFeatures : [];
-    return { features, pageSize: -1 };
-  };
+  const queryExecutor = useCallback(
+    async (bbox: BBox, _startIndex: number): Promise<IQueryExecutorResponse> => {
+      if (!api) {
+        return { features: [], pageSize: -1 };
+      }
+      const result = await api.query.method({
+        minX: bbox[0],
+        minY: bbox[1],
+        maxX: bbox[2],
+        maxY: bbox[3],
+      });
+      const fetchedFeatures = get(result, 'features', []);
+      const features = Array.isArray(fetchedFeatures) ? fetchedFeatures : [];
+      return { features, pageSize: -1 };
+    },
+    [api]
+  );
 
   const isApproverFieldDisabled =
     isLoadingLowResolutionParts ||
