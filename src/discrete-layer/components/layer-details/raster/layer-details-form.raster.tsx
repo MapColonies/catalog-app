@@ -1,6 +1,6 @@
 // @ts-nocheck
 import React, { useMemo, useState, useEffect, useCallback } from 'react';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { withFormik, FormikProps, FormikErrors, Form, FormikHandlers, FormikBag } from 'formik';
 import { Feature, GeoJsonProperties, Geometry } from 'geojson';
 import { get } from 'lodash';
@@ -10,7 +10,7 @@ import { OptionalObjectSchema, TypeOfShape } from 'yup/lib/object';
 import { AnyObject } from 'yup/lib/types';
 import { Button, IconButton } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
-import { ValidationsError } from '../../../../common/components/error/validations.error-presentor';
+import { ErrorPresentor } from '../../error/error-presentor';
 import { mergeRecursive } from '../../../../common/helpers/object';
 import { Mode } from '../../../../common/models/mode.enum';
 import { UiDescriptorsTypeName } from '../../../../common/ui-descriptors/type';
@@ -31,7 +31,7 @@ import { Curtain } from '../../../../common/components/curtain/curtain.component
 import { IngestionFields } from './ingestion-fields.raster';
 import { JobInfo } from './job-info';
 import { PPIngestionMap } from './pp-map';
-import { StateError } from './state-error';
+import { formatErrors } from '../../helpers/errorUtils';
 import { RasterWorkflowContext } from './state-machine/context';
 import {
   hasActiveJob,
@@ -64,8 +64,6 @@ interface LayerDetailsFormCustomProps {
   layerRecord: LayerMetadataMixedUnion;
   vestValidationResults: DraftResult;
   closeDialog: () => void;
-  customErrorReset: () => void;
-  customError?: Record<string, string[]> | undefined;
 }
 
 export interface StatusError {
@@ -112,8 +110,6 @@ export const InnerRasterForm = (
     layerRecord,
     vestValidationResults,
     closeDialog,
-    customErrorReset,
-    customError,
   } = props;
 
   const status = props.status as StatusError | Record<string, unknown>;
@@ -127,6 +123,7 @@ export const InnerRasterForm = (
   const state = RasterWorkflowContext.useSelector((s) => s);
 
   const store = useStore();
+  const intl = useIntl();
 
   useEffect(() => {
     const { files } = state.context || {};
@@ -154,9 +151,21 @@ export const InnerRasterForm = (
   const getStatusErrors = useCallback((): StatusError | Record<string, unknown> => {
     return {
       ...(get(status, 'errors') as Record<string, string[]>),
-      ...customError,
     };
-  }, [status, customError]);
+  }, [status]);
+
+  const formValidationErrorItems = useMemo(() => {
+    if (Object.keys(firstPhaseErrors).length > NONE && JSON.stringify(firstPhaseErrors) !== '{}') {
+      return formatErrors(intl, Object.values(firstPhaseErrors).flat());
+    }
+    if (
+      (Object.keys(errors).length === NONE || JSON.stringify(errors) === '{}') &&
+      vestValidationResults.errorCount > NONE
+    ) {
+      return formatErrors(intl, Object.values(vestValidationResults.getErrors()).flat());
+    }
+    return [];
+  }, [firstPhaseErrors, errors, vestValidationResults, intl]);
 
   const getYupErrors = useCallback((): Record<string, string[]> => {
     const validationResults: Record<string, string[]> = {};
@@ -214,7 +223,6 @@ export const InnerRasterForm = (
         handleChange(e);
       },
       handleBlur: (e: React.FocusEvent<unknown>): void => {
-        customErrorReset();
         handleBlur(e);
         setIngestionFieldsCurtain(true);
       },
@@ -259,6 +267,11 @@ export const InnerRasterForm = (
       actorRef.send({ type: 'CLEAN_ERRORS' } satisfies Events);
     }
   }, [dirty]);
+
+  const stateErrors = useMemo(() => {
+    const formatedErrors = formatErrors(intl, state.context.errors);
+    return formatedErrors;
+  }, [state.context.errors, intl]);
 
   return (
     <Box id="layerDetailsFormRaster">
@@ -342,20 +355,7 @@ export const InnerRasterForm = (
         </Box>
         <Box className="footer">
           <Box className="messages">
-            <StateError errors={state.context.errors} />
-            {/* {
-              topLevelFieldsErrors && Object.keys(topLevelFieldsErrors).length > NONE &&
-              JSON.stringify(topLevelFieldsErrors) !== '{}' &&
-              <ValidationsError errors={topLevelFieldsErrors} />
-            } */}
-            {Object.keys(firstPhaseErrors).length > NONE &&
-              JSON.stringify(firstPhaseErrors) !== '{}' && (
-                <ValidationsError errors={firstPhaseErrors} />
-              )}
-            {(Object.keys(errors).length === NONE || JSON.stringify(errors) === '{}') &&
-              vestValidationResults.errorCount > NONE && (
-                <ValidationsError errors={vestValidationResults.getErrors()} />
-              )}
+            <ErrorPresentor errors={[...stateErrors, ...formValidationErrorItems]} />
           </Box>
           <Box className="buttons">
             {isGoToJobEnabled(state.context) && (
@@ -438,8 +438,6 @@ interface LayerDetailsFormProps {
   onSubmit: (values: Record<string, unknown>) => void;
   vestValidationResults: DraftResult;
   closeDialog: () => void;
-  customErrorReset: () => void;
-  customError?: Record<string, string[]> | undefined;
 }
 
 export default withFormik<LayerDetailsFormProps, FormValues>({

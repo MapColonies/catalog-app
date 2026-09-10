@@ -123,7 +123,7 @@ export const getFile = (
 
 export const buildError = (
   code: string,
-  message: string = '',
+  errText: string = '',
   source: ErrorSource = 'logic',
   level: ErrorLevel = 'error',
   addPolicy: AddPolicy = 'merge',
@@ -133,7 +133,7 @@ export const buildError = (
     source,
     level,
     code,
-    message,
+    errText,
     addPolicy,
     response,
   };

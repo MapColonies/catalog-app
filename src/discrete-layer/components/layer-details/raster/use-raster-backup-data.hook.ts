@@ -8,13 +8,14 @@ import {
 } from '../../../models';
 import { ILayerImage } from '../../../models/layerImage';
 import { RasterBackupParams } from '../../../models/RootStore.base';
+import { IGraphqlError } from '../../helpers/errorUtils';
 
 export interface RasterBackupData {
   backupMetadata: LayerRasterRecordModelType | undefined;
   outerPerimeter: GeojsonFeatureCollectionModelType | undefined;
   loading: boolean;
-  metadataError: unknown;
-  outerPerimeterError: unknown;
+  metadataError: IGraphqlError | undefined;
+  outerPerimeterError: IGraphqlError | undefined;
 }
 
 export const useRasterBackupData = (layerRecord: ILayerImage): RasterBackupData => {
