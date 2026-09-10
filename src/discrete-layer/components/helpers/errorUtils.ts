@@ -1,5 +1,6 @@
 import { IntlShape } from 'react-intl';
 import { isEmpty } from 'lodash';
+import { ClientError } from 'graphql-request';
 
 export type ErrorLevel = 'error' | 'warning';
 
@@ -35,7 +36,7 @@ export interface IGraphqlError {
   message?: string;
 }
 
-type FormattableError = IError | IGraphqlError | string;
+type FormattableError = Error | IError | IGraphqlError | string;
 
 const getServerErrorItemMessage = (intl: IntlShape, serverError: IServerError): string => {
   const status = serverError.serverResponse?.status ?? NONE;
@@ -128,7 +129,15 @@ export const formatError = (
     return [updateErrorItemMetadata(error, level, code)];
   }
 
-  // Also handles generic Error instances
+  if (error instanceof Error && !(error instanceof ClientError)) {
+    return [
+      {
+        level: 'error',
+        errText: error.message,
+      },
+    ];
+  }
+
   return getGraphqlErrorItem(intl, error as IGraphqlError, level, code);
 };
 
