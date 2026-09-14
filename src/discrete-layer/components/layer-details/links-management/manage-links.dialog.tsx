@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { observer } from 'mobx-react';
 import { DialogContent } from '@material-ui/core';
@@ -12,7 +12,14 @@ import {
   Tooltip,
   Typography,
 } from '@map-colonies/react-core';
-import { Box, CesiumMap, CesiumViewer, useCesiumMap } from '@map-colonies/react-components';
+import {
+  Box,
+  CesiumMap,
+  CesiumSceneMode,
+  CesiumViewer,
+  IBaseMaps,
+  useCesiumMap,
+} from '@map-colonies/react-components';
 import { GraphQLError } from '../../../../common/components/error/graphql.error-presentor';
 import { Hyperlink } from '../../../../common/components/hyperlink/hyperlink';
 import { LinkType } from '../../../../common/models/link-type.enum';
@@ -96,8 +103,26 @@ export const ManageLinksDialog: React.FC<ManageLinksDialogProps> = observer(
     const draftLinks = store.discreteLayersStore.draftLinks ?? {};
     const isDirty = Object.keys(draftLinks).length > 0;
 
-    // A fresh mount happens on every open (parent only renders this dialog while isOpen is true),
-    // so this guards against showing a draft captured for a previously opened layer.
+    const sceneMode =
+      layerRecord?.type === RecordType.RECORD_3D
+        ? CesiumSceneMode.SCENE3D
+        : CesiumSceneMode.SCENE2D;
+
+    const previewBaseMaps = useMemo<IBaseMaps | undefined>(() => {
+      const baseMaps = store.discreteLayersStore.baseMaps;
+      if (!baseMaps) return undefined;
+      return { ...baseMaps, maps: baseMaps.maps.map((map) => ({ ...map, isCurrent: false })) };
+    }, [store.discreteLayersStore.baseMaps]);
+
+    const previewLayerElement = useMemo(
+      () =>
+        layerRecord
+          ? generateLayerComponent(layerRecord, store.discreteLayersStore.capabilities)
+          : undefined,
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      [layerRecord?.id, store.discreteLayersStore.capabilities]
+    );
+
     useEffect(() => {
       store.discreteLayersStore.clearDraftLinks();
       // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -411,11 +436,12 @@ export const ManageLinksDialog: React.FC<ManageLinksDialogProps> = observer(
                 full
                 layerManagerMetaMapping={DEFAULT_LAYER_MANAGER_META_MAPPING}
                 baseLayerPicker={true}
+                baseMaps={previewBaseMaps}
+                sceneMode={sceneMode}
                 fullscreenButton={false}
               >
                 <PreviewViewerBridge viewerRef={previewViewerRef} />
-                {layerRecord &&
-                  generateLayerComponent(layerRecord, store.discreteLayersStore.capabilities)}
+                {previewLayerElement}
               </CesiumMap>
               {isComposingCapture && (
                 <CaptureAreaOverlay
