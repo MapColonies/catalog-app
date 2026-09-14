@@ -36,7 +36,7 @@ export interface IGraphqlError {
   message?: string;
 }
 
-type FormattableError = Error | IError | IGraphqlError | string;
+type FormattableError = Error | IError | IGraphqlError | ClientError | string;
 
 const getServerErrorItemMessage = (intl: IntlShape, serverError: IServerError): string => {
   const status = serverError.serverResponse?.status ?? NONE;
@@ -133,12 +133,12 @@ export const formatError = (
     return [
       {
         level: 'error',
-        errText: error.message,
+        errText: '[CatalogApp]: ' + error.message,
       },
     ];
   }
 
-  return getGraphqlErrorItem(intl, error as IGraphqlError, level, code);
+  return getGraphqlErrorItem(intl, error, level, code);
 };
 
 export const formatErrors = (
