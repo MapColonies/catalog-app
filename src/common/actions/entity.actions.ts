@@ -29,6 +29,7 @@ export enum CRUDAction {
   update = 'update',
   edit = 'edit',
   revert = 'revert',
+  manageLinks = 'manageLinks',
 }
 
 export interface IAction {
@@ -171,6 +172,14 @@ const ACTIONS_CONFIG: IEntityActions[] = [
             views: [TabViews.CATALOG, TabViews.SEARCH_RESULTS],
           },
           {
+            action: CRUDAction.manageLinks,
+            frequent: false,
+            symbol: { icon: 'photo_camera' },
+            title: { translationId: 'action.manageLinks.tooltip' },
+            dependentField: { field: 'layerURLMissing', expectedValue: false },
+            views: [TabViews.CATALOG, TabViews.SEARCH_RESULTS],
+          },
+          {
             action: CRUDAction.revert,
             frequent: false,
             symbol: { class: 'mc-icon-Refresh' },
@@ -204,6 +213,18 @@ const ACTIONS_CONFIG: IEntityActions[] = [
             frequent: true,
             symbol: { class: 'mc-icon-Edit1' },
             title: { translationId: 'action.edit.tooltip' },
+            dependentField: {
+              field: 'productStatus',
+              expectedValue: RecordStatus.BEING_DELETED,
+              operator: 'notEquals',
+            },
+            views: [TabViews.CATALOG, TabViews.SEARCH_RESULTS],
+          },
+          {
+            action: CRUDAction.manageLinks,
+            frequent: false,
+            symbol: { icon: 'photo_camera' },
+            title: { translationId: 'action.manageLinks.tooltip' },
             dependentField: {
               field: 'productStatus',
               expectedValue: RecordStatus.BEING_DELETED,

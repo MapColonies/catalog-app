@@ -34,6 +34,14 @@ import { ResultType } from './ResultTypeEnum';
 
 export type LayersImagesResponse = ILayerImage[];
 
+export interface IDraftLink {
+  protocol: LinkType;
+  dataUrl: string;
+  fileName?: string;
+}
+
+export type DraftLinksMap = Partial<Record<LinkType, IDraftLink>>;
+
 export interface SearchResult {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any;
@@ -68,6 +76,7 @@ const INITIAL_STATE = {
   polygonPartsInfo: [],
   isActiveLayersImages: false,
   enumsMap: {},
+  draftLinks: {},
 };
 
 export type PolygonPartsWfsFeatureInfo = GetFeatureModelType & Pick<WfsPolygonPartsGetFeatureParams, 'feature'>;
@@ -95,7 +104,8 @@ export const discreteLayersStore = ModelBase
     polygonPartsInfo: types.maybe(types.frozen<Feature<Geometry, GeoJsonProperties>[]>(INITIAL_STATE.polygonPartsInfo)),
     isActiveLayersImages: types.maybe(types.frozen<boolean>(INITIAL_STATE.isActiveLayersImages)),
     enumsMap: types.maybe(types.frozen<Record<string, unknown>>(INITIAL_STATE.enumsMap)),
-    
+    draftLinks: types.maybe(types.frozen<DraftLinksMap>(INITIAL_STATE.draftLinks)),
+
     // Don't forget to update INITIAL_STATE as well when adding new state value.
   })
   .views((self) => ({
@@ -275,6 +285,19 @@ export const discreteLayersStore = ModelBase
 
     function setSelectedLayerOperationMode(mode: Mode | undefined): void {
       self.selectedLayerOperationMode = mode;
+    }
+
+    function setDraftLink(protocol: LinkType, dataUrl: string, fileName?: string): void {
+      self.draftLinks = { ...self.draftLinks, [protocol]: { protocol, dataUrl, fileName } };
+    }
+
+    function removeDraftLink(protocol: LinkType): void {
+      const { [protocol]: _removed, ...rest } = self.draftLinks ?? {};
+      self.draftLinks = rest;
+    }
+
+    function clearDraftLinks(): void {
+      self.draftLinks = {};
     }
 
     function resetUpdateMode(): void {
@@ -704,6 +727,9 @@ export const discreteLayersStore = ModelBase
       resetPolygonParts,
       fetchAllCatalog,
       setEnumsMap,
+      setDraftLink,
+      removeDraftLink,
+      clearDraftLinks,
     };
   });
 

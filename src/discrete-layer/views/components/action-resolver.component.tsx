@@ -44,6 +44,7 @@ interface ActionResolverProps {
   handleFlyTo: () => void;
   handleTabViewChange: (tabView: TabViews) => void;
   handleOpenJobDialog: (open: boolean, data: JobModelType) => void;
+  handleOpenManageLinksDialog: (open: boolean) => void;
   activeTabView: TabViews;
 }
 
@@ -53,6 +54,7 @@ export const ActionResolver: React.FC<ActionResolverProps> = observer((props) =>
     handleFlyTo,
     handleTabViewChange,
     handleOpenJobDialog,
+    handleOpenManageLinksDialog,
     activeTabView,
   } = props;
 
@@ -304,6 +306,12 @@ export const ActionResolver: React.FC<ActionResolverProps> = observer((props) =>
           store.discreteLayersStore.setSelectedLayerOperationMode(Mode.REVERT);
           handleOpenEntityDialog(RecordType.RECORD_RASTER, true);
           break;
+        case 'LayerRasterRecord.manageLinks':
+          store.discreteLayersStore.selectLayer(
+            cleanUpEntity(data, LayerRasterRecordModelKeys) as unknown as LayerMetadataMixedUnion
+          );
+          handleOpenManageLinksDialog(true);
+          break;
         case 'Layer3DRecord.viewer':
           window.open(
             `${CONFIG.WEB_TOOLS_URL}/${CONFIG.MODEL_VIEWER_ROUTE}?model_ids=${data.productId}&token=${CONFIG.MODEL_VIEWER_TOKEN_VALUE}`
@@ -315,6 +323,12 @@ export const ActionResolver: React.FC<ActionResolverProps> = observer((props) =>
           );
           store.discreteLayersStore.setSelectedLayerOperationMode(Mode.DELETE);
           handleOpenEntityDialog(RecordType.RECORD_3D, true);
+          break;
+        case 'Layer3DRecord.manageLinks':
+          store.discreteLayersStore.selectLayer(
+            cleanUpEntity(data, Layer3DRecordModelKeys) as unknown as LayerMetadataMixedUnion
+          );
+          handleOpenManageLinksDialog(true);
           break;
         case 'LayerRasterRecord.viewer':
         case 'LayerDemRecord.viewer':

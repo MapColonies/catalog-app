@@ -805,6 +805,21 @@ export function downloadJSONToClient(jsonObj: Record<any, any>, fileName: string
   link.remove();
 }
 
+export function downloadBlobToClient(blob: Blob, fileName: string): void {
+  const url = URL.createObjectURL(blob);
+  try {
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', fileName);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
 export function importJSONFileFromClient(
   fileLoadCB: (ev: ProgressEvent<FileReader>) => void
 ): void {

@@ -51,6 +51,7 @@ import { LinkType } from '../../common/models/link-type.enum';
 import { Mode } from '../../common/models/mode.enum';
 import { ActiveLayersIcon } from '../../icons/4font/ActiveLayers';
 import { CatalogTreeComponent } from '../components/catalog-tree/catalog-tree';
+import { DEFAULT_LAYER_MANAGER_META_MAPPING } from '../components/helpers/generateLayerComponent';
 import ExportDrawingHandler from '../components/export-layer/export-drawing-handler.component';
 import { ExportLayerComponent } from '../components/export-layer/export-layer.component';
 import ExportPolygonsRenderer from '../components/export-layer/export-polygons-renderer.component';
@@ -76,6 +77,7 @@ import { PolygonSelectionUi } from '../components/map-container/polygon-selectio
 import { SelectedLayersContainer } from '../components/map-container/selected-layers-container';
 import { Terrain } from '../components/map-container/terrain';
 import { SystemCoreInfoDialog } from '../components/system-status/system-core-info/system-core-info.dialog';
+import { ManageLinksDialog } from '../components/layer-details/links-management/manage-links.dialog';
 import {
   JobModelType,
   LayerMetadataMixedUnion,
@@ -158,6 +160,7 @@ const DiscreteLayerView: React.FC = observer(() => {
   const [isRevertRasterDialogOpen, setIsRevertRasterDialogOpen] = useState<boolean>(false);
   const [isSystemsJobsDialogOpen, setIsSystemsJobsDialogOpen] = useState<boolean>(false);
   const [isSystemCoreInfoDialogOpen, setIsSystemCoreInfoDialogOpen] = useState<boolean>(false);
+  const [isManageLinksDialogOpen, setIsManageLinksDialogOpen] = useState<boolean>(false);
   const [isCreateEntityMenuOpen, setIsCreateEntityMenuOpen] = useState<boolean>(false);
   const [tabsPanelExpanded, setTabsPanelExpanded] = useState<boolean>(true);
   const [detailsPanelExpanded, setDetailsPanelExpanded] = useState<boolean>(false);
@@ -1018,17 +1021,7 @@ const DiscreteLayerView: React.FC = observer(() => {
   }, [activeTabView, actionsMenuDimensions]);
 
   const layerManagerMetaMapping = useMemo<ILayerManagerMetaMapping>(() => {
-    return {
-      layer: {
-        id: 'id',
-        name: 'layerRecord.productName',
-        footprint: 'layerRecord.footprint',
-      },
-      dataLayer: {
-        name: 'layerRecord.featureStructure.aliasLayerName',
-        fields: 'layerRecord.featureStructure.fields',
-      },
-    };
+    return DEFAULT_LAYER_MANAGER_META_MAPPING;
   }, []);
 
   const drapingLayerPredicate = useMemo<DrapingLayerPredicate | undefined>(() => {
@@ -1433,6 +1426,7 @@ const DiscreteLayerView: React.FC = observer(() => {
                   setJobToOpenJobManager({ id, resourceId, updated });
                   setIsSystemsJobsDialogOpen(open);
                 }}
+                handleOpenManageLinksDialog={setIsManageLinksDialogOpen}
               />
 
               <Terrain />
@@ -1578,6 +1572,13 @@ const DiscreteLayerView: React.FC = observer(() => {
           <SystemCoreInfoDialog
             isOpen={isSystemCoreInfoDialogOpen}
             onSetOpen={setIsSystemCoreInfoDialogOpen}
+          />
+        )}
+        {isManageLinksDialogOpen && (
+          <ManageLinksDialog
+            isOpen={isManageLinksDialogOpen}
+            onSetOpen={setIsManageLinksDialogOpen}
+            layerRecord={store.discreteLayersStore.selectedLayer}
           />
         )}
       </Box>

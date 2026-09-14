@@ -1,0 +1,153 @@
+#manageLinksDialog {
+  --modal-height: calc(100vh);
+  --modal-width: calc(100vw - 96px);
+}
+
+@media (min-width: 900px) {
+  #manageLinksDialog .mdc-dialog .mdc-dialog__surface {
+    width: var(--modal-width);
+    max-width: var(--modal-width);
+    height: var(--modal-height) !important;
+  }
+}
+
+#manageLinksDialog .closeIcon {
+  margin-left: auto;
+}
+
+body[dir='rtl'] #manageLinksDialog .closeIcon {
+  margin-left: unset;
+  margin-right: auto;
+}
+
+#manageLinksDialog .dialogBody {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  overflow: hidden;
+  padding: 0;
+}
+
+body[dir='rtl'] #manageLinksDialog .dialogBody {
+  flex-direction: row-reverse;
+}
+
+#manageLinksDialog .previewMapColumn {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+#manageLinksDialog .linkSectionsColumn {
+  flex: 0 0 360px;
+  overflow-y: auto;
+  padding: 8px 16px;
+  border-inline-start: 1px solid var(--mdc-theme-gc-border-on-surface, #ddd);
+}
+
+#manageLinksDialog .linkSection {
+  border-bottom: 1px solid var(--mdc-theme-gc-border-on-surface, #ddd);
+  padding: 8px 0;
+}
+
+#manageLinksDialog .linkSectionHeader {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+#manageLinksDialog .linkSectionBody {
+  padding: 8px 0;
+}
+
+#manageLinksDialog .thumbnailsRow {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+#manageLinksDialog .linkSlot {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+#manageLinksDialog .thumbnailSlot {
+  align-items: center;
+  width: 96px;
+}
+
+#manageLinksDialog .linkSlotPreview {
+  width: 96px;
+  height: 96px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed var(--mdc-theme-gc-border-on-surface, #ccc);
+  overflow: hidden;
+}
+
+#manageLinksDialog .linkSlotPreview img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: cover;
+}
+
+#manageLinksDialog .emptyState {
+  color: var(--mdc-theme-gc-content-secondary-on-surface, #888);
+  font-size: 12px;
+}
+
+#manageLinksDialog .fileName {
+  font-size: 13px;
+}
+
+#manageLinksDialog .statusChanged {
+  color: var(--mdc-theme-gc-warning-high, #d99000);
+  font-size: 11px;
+}
+
+#manageLinksDialog .statusSaved {
+  color: var(--mdc-theme-gc-success, #2e7d32);
+  font-size: 11px;
+}
+
+#manageLinksDialog .linkSlotActions {
+  display: flex;
+  gap: 4px;
+}
+
+#manageLinksDialog .hiddenFileInput {
+  display: none;
+}
+
+#manageLinksDialog .captureComposeControls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+#manageLinksDialog .captureComposeHint {
+  font-size: 12px;
+  color: var(--mdc-theme-gc-content-secondary-on-surface, #888);
+}
+
+#manageLinksDialog .captureSizeRadioGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+#manageLinksDialog .captureSizeRadio {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+#manageLinksDialog .errors {
+  margin: 4px;
+}
+
+#manageLinksDialog .loading {
+  display: flex;
+}
