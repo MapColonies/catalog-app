@@ -15,13 +15,14 @@ import {
   Typography,
 } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
-import { GraphQLError } from '../../../common/components/error/graphql.error-presentor';
 import { emphasizeByHTML } from '../../../common/helpers/formatters';
 import { isUnpublished } from '../../../common/helpers/style';
 import { RecordStatus, RecordType, useQuery, useStore } from '../../models';
 import { IDispatchAction } from '../../models/actionDispatcherStore';
 import { ILayerImage } from '../../models/layerImage';
 import { UserAction } from '../../models/userStore';
+import { formatError } from '../helpers/errorUtils';
+import { ErrorPresentor } from '../error/error-presentor';
 
 import './publish.dialog.css';
 
@@ -131,8 +132,7 @@ export const PublishDialog: React.FC<ContinueDialogProps> = observer(
           </DialogContent>
           <DialogActions>
             <Box className="errors">
-              {/* eslint-disable-next-line */}
-              <GraphQLError error={mutationQuery.error ?? {}} />
+              <ErrorPresentor errors={formatError(intl, mutationQuery.error, 'error')} />
             </Box>
             <Box>
               <Button

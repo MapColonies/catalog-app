@@ -420,9 +420,8 @@ export const EntityDialog: React.FC<EntityDialogProps> = observer((props: Entity
 
   const closeDialog = useCallback(() => {
     onSetOpen(false);
-    store.discreteLayersStore.resetUpdateMode();
     clearSyncWarnings();
-  }, [onSetOpen, store.discreteLayersStore]);
+  }, [onSetOpen]);
 
   useEffect(() => {
     const hasAnyQuerySucceeded = checkHasQueriesSucceeded();
@@ -435,13 +434,7 @@ export const EntityDialog: React.FC<EntityDialogProps> = observer((props: Entity
         data: inputValues as ILayerImage,
       });
     }
-  }, [
-    mutationQuery.data,
-    mutationQuery.loading,
-    closeDialog,
-    store.discreteLayersStore,
-    inputValues,
-  ]);
+  }, [mutationQuery.data, mutationQuery.loading, closeDialog, inputValues]);
 
   return (
     <div id="entityDialog" ref={dialogContainerRef}>

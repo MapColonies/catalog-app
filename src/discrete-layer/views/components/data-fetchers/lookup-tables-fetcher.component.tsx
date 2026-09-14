@@ -10,7 +10,7 @@ import { queue } from '../../../../discrete-layer/components/snackbar/notificati
 import {
   getResponseErrorMesssage,
   getResponseErrorURL,
-} from '../../../../common/helpers/server-error';
+} from '../../../components/helpers/errorUtils';
 
 export const HOT_AREAS_TABLES_KEY = 'hotAreas';
 
