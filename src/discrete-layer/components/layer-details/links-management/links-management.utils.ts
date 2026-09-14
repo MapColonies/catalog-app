@@ -1,5 +1,12 @@
-import type { ICaptureDimensions } from '@map-colonies/react-components';
+import type {
+  CesiumRectangle,
+  CesiumViewer,
+  ICaptureDimensions,
+} from '@map-colonies/react-components';
 import { LinkType } from '../../../../common/models/link-type.enum';
+import { RecordType } from '../../../models/RecordTypeEnum';
+import { ILayerImage } from '../../../models/layerImage';
+import { generateFactoredLayerRectangle } from '../../helpers/cesiumUtils';
 
 /**
  * Thumbnail size presets for Links Management. This is product-specific behavior for this
@@ -22,6 +29,37 @@ export const THUMBNAIL_SIZE_TO_PROTOCOL: Record<CaptureSize, LinkType> = {
   [CaptureSize.SMALL]: LinkType.THUMBNAIL_S,
   [CaptureSize.MEDIUM]: LinkType.THUMBNAIL_M,
   [CaptureSize.LARGE]: LinkType.THUMBNAIL_L,
+};
+
+export const computeInitialFlyToTarget = (layer: ILayerImage): CesiumRectangle | undefined => {
+  if (layer.type === RecordType.RECORD_3D) {
+    return undefined;
+  }
+  try {
+    return generateFactoredLayerRectangle(layer);
+  } catch (err) {
+    console.error('[links-management] failed to compute the preview fly-to target', err);
+    return undefined;
+  }
+};
+
+export const flyPreviewCameraTo = (
+  mapViewer: Pick<CesiumViewer, 'camera'>,
+  target: CesiumRectangle
+): void => {
+  try {
+    mapViewer.camera.flyTo({ destination: target });
+  } catch (err) {
+    console.error(
+      '[links-management] animated fly-to failed, falling back to an instant view',
+      err
+    );
+    try {
+      mapViewer.camera.setView({ destination: target });
+    } catch (fallbackErr) {
+      console.error('[links-management] failed to frame the preview on the layer', fallbackErr);
+    }
+  }
 };
 
 export const blobToDataUrl = (blob: Blob): Promise<string> => {

@@ -36,6 +36,8 @@ import { UserAction } from '../../../models/userStore';
 import {
   blobToDataUrl,
   CaptureSize,
+  computeInitialFlyToTarget,
+  flyPreviewCameraTo,
   THUMBNAIL_CAPTURE_DIMENSIONS,
   THUMBNAIL_SIZE_TO_PROTOCOL,
 } from './links-management.utils';
@@ -78,6 +80,18 @@ const PreviewViewerBridge: React.FC<{
   return null;
 };
 
+const PreviewInitialFlyTo: React.FC<{ layer: ILayerImage }> = ({ layer }) => {
+  const mapViewer = useCesiumMap();
+  useEffect(() => {
+    const target = computeInitialFlyToTarget(layer);
+    if (target) {
+      flyPreviewCameraTo(mapViewer, target);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  return null;
+};
+
 export const ManageLinksDialog: React.FC<ManageLinksDialogProps> = observer(
   ({ isOpen, onSetOpen, layerRecord }) => {
     const store = useStore();
@@ -117,7 +131,9 @@ export const ManageLinksDialog: React.FC<ManageLinksDialogProps> = observer(
     const previewLayerElement = useMemo(
       () =>
         layerRecord
-          ? generateLayerComponent(layerRecord, store.discreteLayersStore.capabilities)
+          ? generateLayerComponent(layerRecord, store.discreteLayersStore.capabilities, {
+              autoZoomTo3D: true,
+            })
           : undefined,
       // eslint-disable-next-line react-hooks/exhaustive-deps
       [layerRecord?.id, store.discreteLayersStore.capabilities]
@@ -441,6 +457,7 @@ export const ManageLinksDialog: React.FC<ManageLinksDialogProps> = observer(
                 fullscreenButton={false}
               >
                 <PreviewViewerBridge viewerRef={previewViewerRef} />
+                {layerRecord && <PreviewInitialFlyTo key={layerRecord.id} layer={layerRecord} />}
                 {previewLayerElement}
               </CesiumMap>
               {isComposingCapture && (

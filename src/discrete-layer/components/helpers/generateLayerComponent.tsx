@@ -44,6 +44,10 @@ const getUrlWithoutQueryParams = (url?: string): string | undefined => {
   return url.split('?')[0];
 };
 
+export interface IGenerateLayerComponentOptions {
+  autoZoomTo3D?: boolean;
+}
+
 /**
  * Builds the Cesium layer component for a single layer record, keyed off its link protocol.
  * Pure function of the layer (plus WMTS capability lookups) — safe to render into any
@@ -51,7 +55,8 @@ const getUrlWithoutQueryParams = (url?: string): string | undefined => {
  */
 export const generateLayerComponent = (
   layer: ILayerImage,
-  capabilities?: CapabilityModelType[]
+  capabilities?: CapabilityModelType[],
+  options?: IGenerateLayerComponentOptions
 ): JSX.Element | undefined => {
   const layerLink = getLayerLink(layer);
 
@@ -95,6 +100,7 @@ export const generateLayerComponent = (
           preloadFlightDestinations
           preferLeaves
           skipLevelOfDetail
+          isZoomTo={options?.autoZoomTo3D}
           key={layer.id}
           url={getTokenResource(
             layerLink.url as string,
