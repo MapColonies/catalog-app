@@ -35,6 +35,7 @@ import { ILayerImage } from '../../../models/layerImage';
 import { UserAction } from '../../../models/userStore';
 import {
   blobToDataUrl,
+  buildPreviewBaseMaps,
   CaptureSize,
   computeInitialFlyToTarget,
   flyPreviewCameraTo,
@@ -122,11 +123,14 @@ export const ManageLinksDialog: React.FC<ManageLinksDialogProps> = observer(
         ? CesiumSceneMode.SCENE3D
         : CesiumSceneMode.SCENE2D;
 
-    const previewBaseMaps = useMemo<IBaseMaps | undefined>(() => {
-      const baseMaps = store.discreteLayersStore.baseMaps;
-      if (!baseMaps) return undefined;
-      return { ...baseMaps, maps: baseMaps.maps.map((map) => ({ ...map, isCurrent: false })) };
-    }, [store.discreteLayersStore.baseMaps]);
+    const previewBaseMaps = useMemo<IBaseMaps | undefined>(
+      () =>
+        buildPreviewBaseMaps(
+          store.discreteLayersStore.baseMaps,
+          intl.formatMessage({ id: 'links-management.dialog.no-basemap.text' })
+        ),
+      [store.discreteLayersStore.baseMaps, intl]
+    );
 
     const previewLayerElement = useMemo(
       () =>

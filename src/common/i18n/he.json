@@ -189,6 +189,7 @@
   "links-management.dialog.empty-state.text": "לא הוגדר",
   "links-management.dialog.changed.text": "שונה",
   "links-management.dialog.saved.text": "נשמר",
+  "links-management.dialog.no-basemap.text": "ללא מפת בסיס",
   "links-management.dialog.capture-hint.text": "מקמו את המפה, בחרו גודל, ולאחר מכן צלמו.",
   "links-management.dialog.capture-thumbnail-btn.text": "צלם תמונה ממוזערת",
   "links-management.dialog.import-btn.text": "ייבוא",

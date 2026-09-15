@@ -335,6 +335,7 @@ const DiscreteLayerView: React.FC = observer(() => {
       REMOVE: intl.formatMessage({ id: 'active-layers.remove' }),
       BASE_MAP_TITLE: intl.formatMessage({ id: 'map-settings.base-map.title' }),
       TERRAIN_TITLE: intl.formatMessage({ id: 'record-type.record_quantized_mesh.label' }),
+      NONE: intl.formatMessage({ id: 'links-management.dialog.no-basemap.text' }),
       SHOW_FEATURE_ON_MAP: intl.formatMessage({ id: 'geocoder-panel.show-feature-on-map' }),
       IN_MAP_EXTENT: intl.formatMessage({ id: 'geocoder-panel.in-map-extent' }),
       SEARCH_PLACEHOLDER: intl.formatMessage({ id: 'general.search.placeholder' }),
