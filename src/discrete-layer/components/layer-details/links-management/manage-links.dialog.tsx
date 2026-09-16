@@ -15,7 +15,6 @@ import {
 import {
   Box,
   CesiumMap,
-  CesiumScreenshotMixin,
   CesiumSceneMode,
   CesiumViewer,
   IBaseMaps,
@@ -91,16 +90,6 @@ const PreviewInitialFlyTo: React.FC<{ layer: ILayerImage }> = ({ layer }) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  return null;
-};
-
-const PreviewScreenshotCapability: React.FC = () => {
-  const mapViewer = useCesiumMap();
-  useEffect(() => {
-    if (!mapViewer.screenshot) {
-      mapViewer.extend(CesiumScreenshotMixin);
-    }
-  }, [mapViewer]);
   return null;
 };
 
@@ -472,7 +461,6 @@ export const ManageLinksDialog: React.FC<ManageLinksDialogProps> = observer(
                 screenshotEnabled
               >
                 <PreviewViewerBridge viewerRef={previewViewerRef} />
-                <PreviewScreenshotCapability />
                 {layerRecord && <PreviewInitialFlyTo key={layerRecord.id} layer={layerRecord} />}
                 {previewLayerElement}
               </CesiumMap>
