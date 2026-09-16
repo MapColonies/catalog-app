@@ -469,6 +469,7 @@ export const ManageLinksDialog: React.FC<ManageLinksDialogProps> = observer(
                 baseMaps={previewBaseMaps}
                 sceneMode={sceneMode}
                 fullscreenButton={false}
+                screenshotEnabled
               >
                 <PreviewViewerBridge viewerRef={previewViewerRef} />
                 <PreviewScreenshotCapability />
