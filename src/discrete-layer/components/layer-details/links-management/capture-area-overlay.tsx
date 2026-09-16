@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Typography } from '@map-colonies/react-core';
-import { Box, calculateCoverCropRegion, ICaptureDimensions } from '@map-colonies/react-components';
+import {
+  Box,
+  calculateCenteredCropRegion,
+  ICaptureDimensions,
+} from '@map-colonies/react-components';
 
 import './capture-area-overlay.css';
 
@@ -14,12 +18,6 @@ interface ISize {
   height: number;
 }
 
-/**
- * Shows, on top of the live preview map, exactly the region a `capture({width,height})` call for
- * `targetDimensions` would crop — using the same {@link calculateCoverCropRegion} the actual
- * capture uses, so this can never visually drift from the real output. Purely decorative DOM: it
- * never touches Cesium, and `pointer-events: none` throughout keeps the map fully interactive.
- */
 export const CaptureAreaOverlay: React.FC<CaptureAreaOverlayProps> = ({
   containerRef,
   targetDimensions,
@@ -44,14 +42,17 @@ export const CaptureAreaOverlay: React.FC<CaptureAreaOverlayProps> = ({
     return null;
   }
 
-  const containerAspect = containerSize.width / containerSize.height;
-  const targetAspect = targetDimensions.width / targetDimensions.height;
-  const region = calculateCoverCropRegion(containerAspect, targetAspect);
+  const canvas = containerRef.current?.querySelector('canvas');
+  const pixelRatio = canvas && canvas.clientWidth > 0 ? canvas.width / canvas.clientWidth : 1;
 
-  const left = region.x * containerSize.width;
-  const top = region.y * containerSize.height;
-  const width = region.width * containerSize.width;
-  const height = region.height * containerSize.height;
+  const region = calculateCenteredCropRegion(
+    containerSize.width,
+    containerSize.height,
+    targetDimensions.width / pixelRatio,
+    targetDimensions.height / pixelRatio
+  );
+
+  const { x: left, y: top, width, height } = region;
 
   return (
     <Box className="captureAreaOverlay">
