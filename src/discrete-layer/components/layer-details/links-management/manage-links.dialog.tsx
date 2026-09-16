@@ -63,11 +63,6 @@ interface IMergedLink {
 
 const THUMBNAIL_SIZES = [CaptureSize.SMALL, CaptureSize.MEDIUM, CaptureSize.LARGE];
 
-/**
- * Invisible child of the dialog's own preview `<CesiumMap>` — the only way to reach
- * `useCesiumMap()` is from inside that provider's subtree, so this bridges the live viewer
- * instance back up to the dialog itself (which renders outside it, in the right-hand panel).
- */
 const PreviewViewerBridge: React.FC<{
   viewerRef: React.MutableRefObject<CesiumViewer | undefined>;
 }> = ({ viewerRef }) => {

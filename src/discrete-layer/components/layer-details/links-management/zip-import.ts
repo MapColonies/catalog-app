@@ -72,12 +72,6 @@ const readReferencedAsset = async (
   return blob;
 };
 
-/**
- * Parses and validates a Links Management resources ZIP (see `exportLayerResourcesZip` for the
- * matching structure), returning the resources it references as draft-ready entries. Never
- * touches app state itself — the caller stages these into the existing `draftLinks` mechanism,
- * same as a manual capture/upload, so imported state behaves exactly like normal edits.
- */
 export const parseLayerResourcesZip = async (
   archiveBuffer: ArrayBuffer
 ): Promise<IImportedResource[]> => {

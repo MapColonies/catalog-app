@@ -23,11 +23,6 @@ const THUMBNAIL_FILENAMES: Record<CaptureSize, string> = {
   [CaptureSize.LARGE]: 'large.png',
 };
 
-/**
- * A persisted link's `url` is either a real (token-authenticated) server URL, or — once a
- * Links Management capture/upload has been saved — a self-contained `data:` URL. Only the
- * former needs the app's auth token appended; appending it to a `data:` URL would corrupt it.
- */
 const resolveFetchableUrl = (rawUrl: string): string => {
   return rawUrl.startsWith('data:') ? rawUrl : `${rawUrl}${getTokenParam()}`;
 };
@@ -49,11 +44,6 @@ const extractFilename = (rawUrl: string, fallback: string): string => {
   return name && name.length > 0 ? name : fallback;
 };
 
-/**
- * Packages a layer's currently persisted Links Management resources (thumbnails, legend,
- * documentation) into a ZIP — reusing the same `links[]` model the rest of the app reads/writes,
- * not a second export-specific representation.
- */
 export const exportLayerResourcesZip = async (layerRecord: ILayerImage): Promise<Blob> => {
   const zip = new JSZip();
   const links = layerRecord.links ?? [];
