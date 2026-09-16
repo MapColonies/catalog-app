@@ -61,6 +61,16 @@ export const flyPreviewCameraTo = (
 
 export const NO_BASE_MAP_ID = '__links-management-no-basemap__';
 
+const NO_BASE_MAP_THUMBNAIL =
+  'data:image/svg+xml;utf8,' +
+  encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">' +
+      '<rect width="32" height="32" rx="4" fill="#2c3037"/>' +
+      '<path d="M16,5 L20,6 L18,11 L20,14 L17,17 L19,21 L17,26 L15,22 L12,17 L13,14 L11,9 L13,6 Z" ' +
+      'fill="none" stroke="#8fa3b3" stroke-width="1.2" stroke-linejoin="round"/>' +
+      '</svg>'
+  );
+
 export const buildPreviewBaseMaps = (
   baseMaps: IBaseMaps | undefined,
   noBaseMapTitle: string
@@ -73,6 +83,7 @@ export const buildPreviewBaseMaps = (
     title: noBaseMapTitle,
     isCurrent: true,
     baseRasterLayers: [],
+    thumbnail: NO_BASE_MAP_THUMBNAIL,
   };
   return {
     ...baseMaps,
