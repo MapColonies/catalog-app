@@ -466,7 +466,6 @@ export const ManageLinksDialog: React.FC<ManageLinksDialogProps> = observer(
               <CesiumMap
                 full
                 layerManagerMetaMapping={DEFAULT_LAYER_MANAGER_META_MAPPING}
-                baseLayerPicker={true}
                 baseMaps={previewBaseMaps}
                 sceneMode={sceneMode}
                 fullscreenButton={false}

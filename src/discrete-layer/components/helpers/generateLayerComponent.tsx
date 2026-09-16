@@ -12,19 +12,14 @@ import {
 } from '@map-colonies/react-components';
 import CONFIG from '../../../common/config';
 import { LinkType } from '../../../common/models/link-type.enum';
-import { ILayerImage } from '../../models/layerImage';
 import { Layer3DRecordModelType, LayerRasterRecordModelType, LinkModelType } from '../../models';
 import { CapabilityModelType } from '../../models/CapabilityModel';
-import { getLayerLink, getLinksArrWithTokens } from './layersUtils';
+import { ILayerImage } from '../../models/layerImage';
 import { generateLayerRectangle, getTokenResource, getCesiumWMTSOptions } from './cesiumUtils';
+import { getLayerLink, getLinksArrWithTokens } from './layersUtils';
 
 type SearchLayerPredicate = (layer: ICesiumImageryLayer, idx: number) => boolean;
 
-/**
- * Shared across every `<CesiumMap>` instance that renders layers via {@link generateLayerComponent}
- * (the main map and any isolated preview map, e.g. Links Management's embedded live map) — the
- * shape only depends on the `ILayerImage`/`layerRecord` fields, not on which viewer it's used in.
- */
 export const DEFAULT_LAYER_MANAGER_META_MAPPING: ILayerManagerMetaMapping = {
   layer: {
     id: 'id',
@@ -48,11 +43,6 @@ export interface IGenerateLayerComponentOptions {
   autoZoomTo3D?: boolean;
 }
 
-/**
- * Builds the Cesium layer component for a single layer record, keyed off its link protocol.
- * Pure function of the layer (plus WMTS capability lookups) — safe to render into any
- * `<CesiumMap>` instance, not just the app's main map.
- */
 export const generateLayerComponent = (
   layer: ILayerImage,
   capabilities?: CapabilityModelType[],

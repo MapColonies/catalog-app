@@ -100,7 +100,7 @@
   "action.saveMetadata.tooltip": "שמור קובץ מטא-דאטה",
   "action.flyTo.tooltip": "הצג מיקום",
   "action.update.tooltip": "עדכון",
-  "action.manageLinks.tooltip": "ניהול קישורים",
+  "action.manageLinks.tooltip": "קישורים",
   "action.expand.tooltip": "הרחבת תצוגה",
   "action.export.tooltip": "ייצוא שכבה",
   "action.collapse.tooltip": "צמצום תצוגה",

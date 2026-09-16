@@ -100,7 +100,7 @@
   "action.saveMetadata.tooltip": "Save Metadata",
   "action.flyTo.tooltip": "Fly To",
   "action.update.tooltip": "Update",
-  "action.manageLinks.tooltip": "Manage Links",
+  "action.manageLinks.tooltip": "Links",
   "action.expand.tooltip": "Expand",
   "action.export.tooltip": "Export",
   "action.collapse.tooltip": "Collapse",
