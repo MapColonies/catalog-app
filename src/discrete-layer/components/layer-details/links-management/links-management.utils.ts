@@ -76,7 +76,7 @@ export const buildPreviewBaseMaps = (
   const noBaseMapOption: IBaseMap = {
     id: NO_BASE_MAP_ID,
     title: noBaseMapTitle,
-    isCurrent: false,
+    isCurrent: true,
     baseRasterLayers: [],
   };
   return {
