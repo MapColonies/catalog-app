@@ -22,14 +22,10 @@ body[dir='rtl'] #manageLinksDialog .closeIcon {
 
 #manageLinksDialog .dialogBody {
   display: flex;
-  flex-direction: row;
+  flex-direction: row-reverse;
   height: 100%;
   overflow: hidden;
   padding: 0;
-}
-
-body[dir='rtl'] #manageLinksDialog .dialogBody {
-  flex-direction: row-reverse;
 }
 
 #manageLinksDialog .previewMapColumn {
