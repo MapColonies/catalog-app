@@ -17,7 +17,6 @@ import {
   CesiumMap,
   CesiumSceneMode,
   CesiumViewer,
-  IBaseMaps,
   useCesiumMap,
 } from '@map-colonies/react-components';
 import { GraphQLError } from '../../../../common/components/error/graphql.error-presentor';
@@ -35,7 +34,6 @@ import { ILayerImage } from '../../../models/layerImage';
 import { UserAction } from '../../../models/userStore';
 import {
   blobToDataUrl,
-  buildPreviewBaseMaps,
   CaptureSize,
   computeInitialFlyToTarget,
   flyPreviewCameraTo,
@@ -117,13 +115,9 @@ export const ManageLinksDialog: React.FC<ManageLinksDialogProps> = observer(
         ? CesiumSceneMode.SCENE3D
         : CesiumSceneMode.SCENE2D;
 
-    const previewBaseMaps = useMemo<IBaseMaps | undefined>(
-      () =>
-        buildPreviewBaseMaps(
-          store.discreteLayersStore.baseMaps,
-          intl.formatMessage({ id: 'links-management.dialog.no-basemap.text' })
-        ),
-      [store.discreteLayersStore.baseMaps, intl]
+    const previewLocale = useMemo(
+      () => ({ NONE: intl.formatMessage({ id: 'links-management.dialog.no-basemap.text' }) }),
+      [intl]
     );
 
     const previewLayerElement = useMemo(
@@ -346,10 +340,12 @@ export const ManageLinksDialog: React.FC<ManageLinksDialogProps> = observer(
               <CesiumMap
                 full
                 layerManagerMetaMapping={DEFAULT_LAYER_MANAGER_META_MAPPING}
-                baseMaps={previewBaseMaps}
+                baseMaps={store.discreteLayersStore.baseMaps}
+                locale={previewLocale}
                 sceneMode={sceneMode}
                 fullscreenButton={false}
                 screenshotEnabled
+                showDebuggerTool
               >
                 <PreviewViewerBridge viewerRef={previewViewerRef} />
                 {layerRecord && <PreviewInitialFlyTo key={layerRecord.id} layer={layerRecord} />}

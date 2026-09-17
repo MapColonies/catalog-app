@@ -1,8 +1,6 @@
 import type {
   CesiumRectangle,
   CesiumViewer,
-  IBaseMap,
-  IBaseMaps,
   ICaptureDimensions,
 } from '@map-colonies/react-components';
 import { LinkType } from '../../../../common/models/link-type.enum';
@@ -57,27 +55,6 @@ export const flyPreviewCameraTo = (
       console.error('[links-management] failed to frame the preview on the layer', fallbackErr);
     }
   }
-};
-
-export const NO_BASE_MAP_ID = '__links-management-no-basemap__';
-
-export const buildPreviewBaseMaps = (
-  baseMaps: IBaseMaps | undefined,
-  noBaseMapTitle: string
-): IBaseMaps | undefined => {
-  if (!baseMaps) {
-    return undefined;
-  }
-  const noBaseMapOption: IBaseMap = {
-    id: NO_BASE_MAP_ID,
-    title: noBaseMapTitle,
-    isCurrent: true,
-    baseRasterLayers: [],
-  };
-  return {
-    ...baseMaps,
-    maps: [noBaseMapOption, ...baseMaps.maps.map((map) => ({ ...map, isCurrent: false }))],
-  };
 };
 
 export const blobToDataUrl = (blob: Blob): Promise<string> => {
