@@ -1,6 +1,7 @@
 import type {
   CesiumRectangle,
   CesiumViewer,
+  IBaseMaps,
   ICaptureDimensions,
 } from '@map-colonies/react-components';
 import { LinkType } from '../../../../common/models/link-type.enum';
@@ -25,6 +26,9 @@ export const THUMBNAIL_SIZE_TO_PROTOCOL: Record<CaptureSize, LinkType> = {
   [CaptureSize.MEDIUM]: LinkType.THUMBNAIL_M,
   [CaptureSize.LARGE]: LinkType.THUMBNAIL_L,
 };
+
+export const withNoCurrentBasemap = (baseMaps: IBaseMaps | undefined): IBaseMaps | undefined =>
+  baseMaps && { ...baseMaps, maps: baseMaps.maps.map((map) => ({ ...map, isCurrent: false })) };
 
 export const computeInitialFlyToTarget = (layer: ILayerImage): CesiumRectangle | undefined => {
   if (layer.type === RecordType.RECORD_3D) {

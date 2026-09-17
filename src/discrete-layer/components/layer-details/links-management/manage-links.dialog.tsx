@@ -39,6 +39,7 @@ import {
   flyPreviewCameraTo,
   THUMBNAIL_CAPTURE_DIMENSIONS,
   THUMBNAIL_SIZE_TO_PROTOCOL,
+  withNoCurrentBasemap,
 } from './links-management.utils';
 import { CaptureAreaOverlay } from './capture-area-overlay';
 import { ThumbnailsSection } from './thumbnails-section';
@@ -118,6 +119,11 @@ export const ManageLinksDialog: React.FC<ManageLinksDialogProps> = observer(
     const previewLocale = useMemo(
       () => ({ NONE: intl.formatMessage({ id: 'links-management.dialog.no-basemap.text' }) }),
       [intl]
+    );
+
+    const previewBaseMaps = useMemo(
+      () => withNoCurrentBasemap(store.discreteLayersStore.baseMaps),
+      [store.discreteLayersStore.baseMaps]
     );
 
     const previewLayerElement = useMemo(
@@ -340,7 +346,7 @@ export const ManageLinksDialog: React.FC<ManageLinksDialogProps> = observer(
               <CesiumMap
                 full
                 layerManagerMetaMapping={DEFAULT_LAYER_MANAGER_META_MAPPING}
-                baseMaps={store.discreteLayersStore.baseMaps}
+                baseMaps={previewBaseMaps}
                 locale={previewLocale}
                 sceneMode={sceneMode}
                 fullscreenButton={false}
