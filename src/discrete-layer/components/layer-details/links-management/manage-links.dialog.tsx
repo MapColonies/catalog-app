@@ -43,6 +43,7 @@ import {
   THUMBNAIL_SIZE_TO_PROTOCOL,
 } from './links-management.utils';
 import { CaptureAreaOverlay } from './capture-area-overlay';
+import { ThumbnailsSection } from './thumbnails-section';
 import { exportLayerResourcesZip } from './zip-export';
 import { parseLayerResourcesZip, ZipImportError, ZipImportErrorCode } from './zip-import';
 
@@ -60,8 +61,6 @@ interface IMergedLink {
   name?: string;
   description?: string;
 }
-
-const THUMBNAIL_SIZES = [CaptureSize.SMALL, CaptureSize.MEDIUM, CaptureSize.LARGE];
 
 const PreviewViewerBridge: React.FC<{
   viewerRef: React.MutableRefObject<CesiumViewer | undefined>;
@@ -273,109 +272,6 @@ export const ManageLinksDialog: React.FC<ManageLinksDialogProps> = observer(
       );
     };
 
-    const renderThumbnailSlot = (size: CaptureSize): JSX.Element => {
-      const protocol = THUMBNAIL_SIZE_TO_PROTOCOL[size];
-      const draft = draftLinks[protocol];
-      const existingUrl = getLinkUrlWithToken(layerRecord?.links ?? [], protocol);
-      const previewUrl = draft?.dataUrl ?? existingUrl;
-      const { width, height } = THUMBNAIL_CAPTURE_DIMENSIONS[size];
-
-      return (
-        <Box key={size} className="linkSlot thumbnailSlot">
-          <Box className="linkSlotPreview">
-            {previewUrl ? (
-              <img src={previewUrl} alt={size} />
-            ) : (
-              <Typography tag="span" className="emptyState">
-                <FormattedMessage id="links-management.dialog.empty-state.text" />
-              </Typography>
-            )}
-          </Box>
-          <Typography tag="div" className="linkSlotLabel">
-            {`${size} (${width}×${height})`}
-          </Typography>
-          {(draft || existingUrl) && (
-            <Typography tag="div" className={draft ? 'statusChanged' : 'statusSaved'}>
-              <FormattedMessage
-                id={
-                  draft
-                    ? 'links-management.dialog.changed.text'
-                    : 'links-management.dialog.saved.text'
-                }
-              />
-            </Typography>
-          )}
-          {draft && (
-            <Box className="linkSlotActions">
-              <Button
-                type="button"
-                onClick={(): void => store.discreteLayersStore.removeDraftLink(protocol)}
-              >
-                <FormattedMessage id="links-management.dialog.remove-change-btn.text" />
-              </Button>
-            </Box>
-          )}
-        </Box>
-      );
-    };
-
-    const renderThumbnailsSection = (): JSX.Element => {
-      if (isComposingCapture) {
-        return (
-          <Box className="captureComposeControls">
-            <Typography tag="div" className="captureComposeHint">
-              <FormattedMessage id="links-management.dialog.capture-hint.text" />
-            </Typography>
-            <Box className="captureSizeRadioGroup">
-              {THUMBNAIL_SIZES.map((size) => {
-                const dims = THUMBNAIL_CAPTURE_DIMENSIONS[size];
-                return (
-                  <label key={size} className="captureSizeRadio">
-                    <input
-                      type="radio"
-                      name="captureSize"
-                      checked={selectedCaptureSize === size}
-                      onChange={(): void => setSelectedCaptureSize(size)}
-                    />
-                    <Typography tag="span">{`${size} (${dims.width}×${dims.height})`}</Typography>
-                  </label>
-                );
-              })}
-            </Box>
-            <Box className="linkSlotActions">
-              <Button
-                type="button"
-                disabled={isCapturing}
-                onClick={(): void => setIsComposingCapture(false)}
-              >
-                <FormattedMessage id="general.cancel-btn.text" />
-              </Button>
-              <Button
-                raised
-                type="button"
-                disabled={isCapturing}
-                onClick={(): void => void handleCaptureConfirm()}
-              >
-                {isCapturing ? (
-                  <CircularProgress className="loading" />
-                ) : (
-                  <FormattedMessage id="links-management.dialog.capture-btn.text" />
-                )}
-              </Button>
-            </Box>
-          </Box>
-        );
-      }
-      return (
-        <>
-          <Box className="thumbnailsRow">{THUMBNAIL_SIZES.map(renderThumbnailSlot)}</Box>
-          <Button type="button" onClick={(): void => setIsComposingCapture(true)}>
-            <FormattedMessage id="links-management.dialog.capture-thumbnail-btn.text" />
-          </Button>
-        </>
-      );
-    };
-
     const renderFileSlot = (
       protocol: LinkType,
       accept: string,
@@ -477,7 +373,22 @@ export const ManageLinksDialog: React.FC<ManageLinksDialogProps> = observer(
                   </Typography>
                 </Box>
                 {expandedSections.thumbnails && (
-                  <Box className="linkSectionBody">{renderThumbnailsSection()}</Box>
+                  <Box className="linkSectionBody">
+                    <ThumbnailsSection
+                      layerRecord={layerRecord}
+                      draftLinks={draftLinks}
+                      isComposingCapture={isComposingCapture}
+                      selectedCaptureSize={selectedCaptureSize}
+                      isCapturing={isCapturing}
+                      onEnterCaptureMode={(): void => setIsComposingCapture(true)}
+                      onCancelCapture={(): void => setIsComposingCapture(false)}
+                      onSelectCaptureSize={setSelectedCaptureSize}
+                      onCaptureConfirm={(): void => void handleCaptureConfirm()}
+                      onRemoveChange={(protocol): void =>
+                        store.discreteLayersStore.removeDraftLink(protocol)
+                      }
+                    />
+                  </Box>
                 )}
               </Box>
               <Box className="linkSection">
