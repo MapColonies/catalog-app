@@ -1393,6 +1393,7 @@ const DiscreteLayerView: React.FC = observer(() => {
                   imgText: intl.formatMessage({ id: 'map-legends.actions.img' }),
                 },
               }}
+              globeBaseColor={CesiumColor.WHITESMOKE}
               showDebuggerTool={CONFIG.MAP.SHOW_DEBUGGER_TOOL === true && isAdminUser}
               showActiveLayersTool={CONFIG.MAP.SHOW_ACTIVE_LAYERS_TOOL}
               {...(CONFIG.MAP.SHOW_GEOCODER_TOOL ? { geocoderPanel: GEOCODER_OPTIONS } : {})}
