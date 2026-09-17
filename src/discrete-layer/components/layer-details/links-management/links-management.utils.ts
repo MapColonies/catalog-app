@@ -9,7 +9,6 @@ import { LinkType } from '../../../../common/models/link-type.enum';
 import { RecordType } from '../../../models/RecordTypeEnum';
 import { ILayerImage } from '../../../models/layerImage';
 import { generateFactoredLayerRectangle } from '../../helpers/cesiumUtils';
-import NO_BASE_MAP_THUMBNAIL from './no-basemap-thumbnail.svg';
 
 export enum CaptureSize {
   SMALL = 'SMALL',
@@ -74,7 +73,6 @@ export const buildPreviewBaseMaps = (
     title: noBaseMapTitle,
     isCurrent: true,
     baseRasterLayers: [],
-    thumbnail: NO_BASE_MAP_THUMBNAIL,
   };
   return {
     ...baseMaps,
