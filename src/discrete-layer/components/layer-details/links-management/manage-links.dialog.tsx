@@ -41,7 +41,6 @@ import {
   THUMBNAIL_SIZE_TO_PROTOCOL,
   withNoCurrentBasemap,
 } from './links-management.utils';
-import { CaptureAreaOverlay } from './capture-area-overlay';
 import { ThumbnailsSection } from './thumbnails-section';
 import { exportLayerResourcesZip } from './zip-export';
 import { parseLayerResourcesZip, ZipImportError, ZipImportErrorCode } from './zip-import';
@@ -94,7 +93,6 @@ export const ManageLinksDialog: React.FC<ManageLinksDialogProps> = observer(
     const pendingMergedLinksRef = useRef<IMergedLink[] | null>(null);
     const legendFileInputRef = useRef<HTMLInputElement>(null);
     const documentationFileInputRef = useRef<HTMLInputElement>(null);
-    const mapContainerRef = useRef<HTMLDivElement>(null);
     const previewViewerRef = useRef<CesiumViewer | undefined>(undefined);
     const importInputRef = useRef<HTMLInputElement>(null);
     const [isComposingCapture, setIsComposingCapture] = useState(false);
@@ -159,6 +157,18 @@ export const ManageLinksDialog: React.FC<ManageLinksDialogProps> = observer(
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [mutationQuery.data]);
+
+    useEffect(() => {
+      const viewer = previewViewerRef.current;
+      if (!viewer?.screenshot) {
+        return;
+      }
+      if (isComposingCapture) {
+        viewer.screenshot.showCapturePreview(THUMBNAIL_CAPTURE_DIMENSIONS[selectedCaptureSize]);
+      } else {
+        viewer.screenshot.hideCapturePreview();
+      }
+    }, [isComposingCapture, selectedCaptureSize]);
 
     const toggleSection = (section: keyof typeof expandedSections): void => {
       setExpandedSections({ ...expandedSections, [section]: !expandedSections[section] });
@@ -342,7 +352,7 @@ export const ManageLinksDialog: React.FC<ManageLinksDialogProps> = observer(
             <IconButton className="closeIcon mc-icon-Close" label="CLOSE" onClick={handleCancel} />
           </DialogTitle>
           <DialogContent className="dialogBody">
-            <div className="previewMapColumn" ref={mapContainerRef}>
+            <div className="previewMapColumn">
               <CesiumMap
                 full
                 layerManagerMetaMapping={DEFAULT_LAYER_MANAGER_META_MAPPING}
@@ -357,12 +367,6 @@ export const ManageLinksDialog: React.FC<ManageLinksDialogProps> = observer(
                 {layerRecord && <PreviewInitialFlyTo key={layerRecord.id} layer={layerRecord} />}
                 {previewLayerElement}
               </CesiumMap>
-              {isComposingCapture && (
-                <CaptureAreaOverlay
-                  containerRef={mapContainerRef}
-                  targetDimensions={THUMBNAIL_CAPTURE_DIMENSIONS[selectedCaptureSize]}
-                />
-              )}
             </div>
             <Box className="linkSectionsColumn">
               <Box className="linkSection">
