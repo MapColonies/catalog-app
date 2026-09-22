@@ -15,7 +15,7 @@ type BaseMapsStackParamList = {
 
 const Stack = createStackNavigator<BaseMapsStackParamList>();
 
-export const BaseMapsRouter: React.FC = () => {
+export const BasemapsRouter: React.FC = () => {
   return (
     <NavigationIndependentTree>
       <NavigationContainer documentTitle={{ enabled: false }}>
