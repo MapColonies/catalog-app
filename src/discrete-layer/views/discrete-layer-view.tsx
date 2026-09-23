@@ -50,6 +50,7 @@ import { MenuDimensions } from '../../common/hooks/mapMenus/useGetMenuDimensions
 import { LinkType } from '../../common/models/link-type.enum';
 import { Mode } from '../../common/models/mode.enum';
 import { ActiveLayersIcon } from '../../icons/4font/ActiveLayers';
+import { BasemapsRouter } from '../navigation/base-maps-router.component';
 import { CatalogTreeComponent } from '../components/catalog-tree/catalog-tree';
 import ExportDrawingHandler from '../components/export-layer/export-drawing-handler.component';
 import { ExportLayerComponent } from '../components/export-layer/export-layer.component';
@@ -98,7 +99,7 @@ import { MapActionResolver } from './components/map-action-resolver.component';
 import { TabViewsSwitcher } from './components/tabs-views-switcher.component';
 import UserModeSwitch from './components/user-mode-switch/user-mode-switch.component';
 import { EntityDelete3DDialog } from '../components/layer-details/3D/entity.3d.delete-dialog';
-import { TabViews } from './tab-views';
+import { useTabViewsConfig, TabViews } from './tab-views';
 
 import '@material/tab-bar/dist/mdc.tab-bar.css';
 import '@material/tab/dist/mdc.tab.css';
@@ -135,6 +136,8 @@ const noDrawing: IDrawingObject = {
 };
 
 const getTimeStamp = (): string => new Date().getTime().toString();
+
+const TABS_WITH_SIDE_DETAILS_PANEL = [TabViews.CATALOG, TabViews.SEARCH_RESULTS];
 
 const DiscreteLayerView: React.FC = observer(() => {
   const [isFilterSearchLoading, setIsFilterSearchLoading] = useState(false);
@@ -654,23 +657,7 @@ const DiscreteLayerView: React.FC = observer(() => {
     store.discreteLayersStore.setSelectedLayerOperationMode(undefined);
   }, [store.discreteLayersStore.setSelectedLayerOperationMode]);
 
-  const tabViews = [
-    {
-      idx: TabViews.CATALOG,
-      title: 'tab-views.catalog',
-      iconClassName: 'mc-icon-Catalog',
-    },
-    {
-      idx: TabViews.SEARCH_RESULTS,
-      title: 'tab-views.search-results',
-      iconClassName: 'mc-icon-Search-History',
-    },
-    {
-      idx: TabViews.EXPORT_LAYER,
-      title: 'tab-views.export-layer',
-      iconClassName: isRtl(intl.locale) ? 'mc-icon-Export-Left' : 'mc-icon-Export',
-    },
-  ];
+  const tabViews = useTabViewsConfig(intl.locale);
 
   const permissions = useMemo(() => {
     return {
@@ -1177,6 +1164,8 @@ const DiscreteLayerView: React.FC = observer(() => {
     [intl]
   );
 
+  const showSideDetailsPanel = TABS_WITH_SIDE_DETAILS_PANEL.includes(activeTabView);
+
   return (
     <>
       <Box className={`headerContainer ${isUiDisabled ? 'curtainContainer' : ''}`}>
@@ -1313,12 +1302,7 @@ const DiscreteLayerView: React.FC = observer(() => {
             className="sidePanelContainer"
             style={{
               backgroundColor: theme.custom?.GC_ALTERNATIVE_SURFACE as string,
-              height:
-                activeTabView !== TabViews.EXPORT_LAYER
-                  ? detailsPanelExpanded
-                    ? '50%'
-                    : '75%'
-                  : '100%',
+              height: showSideDetailsPanel ? (detailsPanelExpanded ? '50%' : '75%') : '100%',
               display: tabsPanelExpanded ? 'block' : 'none',
             }}
           >
@@ -1355,8 +1339,14 @@ const DiscreteLayerView: React.FC = observer(() => {
                 />
               </Box>
             )}
+            {activeTabView === TabViews.BASEMAPS && (
+              <Box className="tabContentContainer">
+                {getActiveTabHeader(activeTabView, site)}
+                <BasemapsRouter />
+              </Box>
+            )}
           </Box>
-          {activeTabView !== TabViews.EXPORT_LAYER && (
+          {showSideDetailsPanel && (
             <Box
               className="sidePanelContainer sideDetailsPanel"
               style={{
@@ -1404,7 +1394,7 @@ const DiscreteLayerView: React.FC = observer(() => {
               {...(CONFIG.MAP.SHOW_GEOCODER_TOOL ? { geocoderPanel: GEOCODER_OPTIONS } : {})}
               {...(drapingLayerPredicate !== undefined ? { drapingLayerPredicate } : {})}
             >
-              {activeTabView !== TabViews.EXPORT_LAYER && (
+              {showSideDetailsPanel && (
                 <CesiumDrawingsDataSource
                   drawings={activeTabView === TabViews.SEARCH_RESULTS ? drawEntities : []}
                   drawingMaterial={DRAWING_MATERIAL_COLOR}

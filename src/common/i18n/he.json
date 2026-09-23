@@ -76,6 +76,7 @@
   "action.tab-views.search-results.tooltip": "טאב תוצאות חיפוש",
   "action.tab-views.create-best.tooltip": "טאב עריכת טיוטת BEST",
   "action.tab-views.export-layer.tooltip": "טאב ייצוא שכבה",
+  "action.tab-views.basemaps.tooltip": "טאב מפות בסיס",
 
   "action.point.tooltip": "חיפוש בקטלוג בעזרת קואורדינטות נקודת ציון",
   "action.box.tooltip": "חיפוש בקטלוג בעזרת מלבן חוסם",
@@ -207,6 +208,7 @@
   "tab-views.catalog.site.slave": "משני",
   "tab-views.create-best": "עריכת טיוטת BEST",
   "tab-views.export-layer": "ייצוא שכבה",
+  "tab-views.basemaps": "מפות בסיס",
 
   "tab-views.catalog.top-categories.unpublished": "לא מפורסמים",
   "tab-views.catalog.top-categories.bests": "BESTs",
