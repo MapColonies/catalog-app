@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [6.9.0](https://github.com/MapColonies/catalog-app/compare/v6.8.0...v6.9.0) (2026-09-23)
+
+
+### Features
+
+* add react-navigation (MAPCO-11773) ([#1049](https://github.com/MapColonies/catalog-app/issues/1049)) ([6b06e0d](https://github.com/MapColonies/catalog-app/commit/6b06e0d54b46a1fca5511cb1d36e2bc2242dd60e))
+
 ## [6.8.0](https://github.com/MapColonies/catalog-app/compare/v6.7.1...v6.8.0) (2026-09-14)
 
 
