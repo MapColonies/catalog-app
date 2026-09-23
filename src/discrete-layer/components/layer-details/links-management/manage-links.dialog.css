@@ -127,6 +127,10 @@ body[dir='rtl'] #manageLinksDialog .closeIcon {
   font-size: 11px;
 }
 
+#manageLinksDialog .linkSlotLabel {
+  text-align: center;
+}
+
 #manageLinksDialog .linkSlotActions {
   display: flex;
   gap: 4px;
