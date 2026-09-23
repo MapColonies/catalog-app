@@ -1191,7 +1191,9 @@ const DiscreteLayerView: React.FC = observer(() => {
             onPoiUpdate={onPoiSelection}
             poi={poi}
             corners={corners}
-            disabled={activeTabView === TabViews.EXPORT_LAYER}
+            disabled={
+              activeTabView === TabViews.EXPORT_LAYER || activeTabView === TabViews.BASEMAPS
+            }
           />
         </Box>
         <Box className="headerSystemAreaContainer">
