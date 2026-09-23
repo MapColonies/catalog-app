@@ -17,6 +17,7 @@ interface ThumbnailsSectionProps {
   isComposingCapture: boolean;
   selectedCaptureSize: CaptureSize;
   isCapturing: boolean;
+  isScreenshotContentLoading: boolean;
   onEnterCaptureMode: () => void;
   onCancelCapture: () => void;
   onSelectCaptureSize: (size: CaptureSize) => void;
@@ -30,6 +31,7 @@ export const ThumbnailsSection: React.FC<ThumbnailsSectionProps> = ({
   isComposingCapture,
   selectedCaptureSize,
   isCapturing,
+  isScreenshotContentLoading,
   onEnterCaptureMode,
   onCancelCapture,
   onSelectCaptureSize,
@@ -65,10 +67,19 @@ export const ThumbnailsSection: React.FC<ThumbnailsSectionProps> = ({
       </Box>
       {isComposingCapture ? (
         <Box className="linkSlotActions">
-          <Button type="button" disabled={isCapturing} onClick={onCancelCapture}>
+          <Button
+            type="button"
+            disabled={isCapturing || isScreenshotContentLoading}
+            onClick={onCancelCapture}
+          >
             <FormattedMessage id="general.cancel-btn.text" />
           </Button>
-          <Button raised type="button" disabled={isCapturing} onClick={onCaptureConfirm}>
+          <Button
+            raised
+            type="button"
+            disabled={isCapturing || isScreenshotContentLoading}
+            onClick={onCaptureConfirm}
+          >
             {isCapturing ? (
               <CircularProgress className="loading" />
             ) : (

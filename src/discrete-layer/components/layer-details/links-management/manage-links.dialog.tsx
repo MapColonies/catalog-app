@@ -98,6 +98,7 @@ export const ManageLinksDialog: React.FC<ManageLinksDialogProps> = observer(
     const [isComposingCapture, setIsComposingCapture] = useState(false);
     const [selectedCaptureSize, setSelectedCaptureSize] = useState<CaptureSize>(CaptureSize.SMALL);
     const [isCapturing, setIsCapturing] = useState(false);
+    const [isScreenshotContentLoading, setIsScreenshotContentLoading] = useState(false);
     const [isExporting, setIsExporting] = useState(false);
     const [importErrorCode, setImportErrorCode] = useState<ZipImportErrorCode | null>(null);
     const [expandedSections, setExpandedSections] = useState({
@@ -165,9 +166,10 @@ export const ManageLinksDialog: React.FC<ManageLinksDialogProps> = observer(
       }
       if (isComposingCapture) {
         viewer.screenshot.startCapturePreview(THUMBNAIL_CAPTURE_DIMENSIONS[selectedCaptureSize]);
-      } else {
-        viewer.screenshot.stopCapturePreview();
+        return viewer.screenshot.onLoadingChange(setIsScreenshotContentLoading);
       }
+      viewer.screenshot.stopCapturePreview();
+      setIsScreenshotContentLoading(false);
     }, [isComposingCapture, selectedCaptureSize]);
 
     const toggleSection = (section: keyof typeof expandedSections): void => {
@@ -182,7 +184,7 @@ export const ManageLinksDialog: React.FC<ManageLinksDialogProps> = observer(
       setIsCapturing(true);
       try {
         const dimensions = THUMBNAIL_CAPTURE_DIMENSIONS[selectedCaptureSize];
-        const blob = await viewer.screenshot.capture(dimensions);
+        const blob = await viewer.screenshot.capture({ ...dimensions, waitForTiles: true });
         const dataUrl = await blobToDataUrl(blob);
         store.discreteLayersStore.setDraftLink(
           THUMBNAIL_SIZE_TO_PROTOCOL[selectedCaptureSize],
@@ -386,6 +388,7 @@ export const ManageLinksDialog: React.FC<ManageLinksDialogProps> = observer(
                       isComposingCapture={isComposingCapture}
                       selectedCaptureSize={selectedCaptureSize}
                       isCapturing={isCapturing}
+                      isScreenshotContentLoading={isScreenshotContentLoading}
                       onEnterCaptureMode={(): void => setIsComposingCapture(true)}
                       onCancelCapture={(): void => setIsComposingCapture(false)}
                       onSelectCaptureSize={setSelectedCaptureSize}
