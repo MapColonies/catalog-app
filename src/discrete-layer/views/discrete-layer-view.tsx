@@ -101,7 +101,8 @@ import { MapActionResolver } from './components/map-action-resolver.component';
 import { TabViewsSwitcher } from './components/tabs-views-switcher.component';
 import UserModeSwitch from './components/user-mode-switch/user-mode-switch.component';
 import { EntityDelete3DDialog } from '../components/layer-details/3D/entity.3d.delete-dialog';
-import { useTabViewsConfig, TabViews } from './tab-views';
+import { TabViews } from './tab-views';
+import { useTabViewsConfig } from './useTabViewsConfig.hook';
 
 import '@material/tab-bar/dist/mdc.tab-bar.css';
 import '@material/tab/dist/mdc.tab.css';
@@ -1192,7 +1193,8 @@ const DiscreteLayerView: React.FC = observer(() => {
             poi={poi}
             corners={corners}
             disabled={
-              activeTabView === TabViews.EXPORT_LAYER || activeTabView === TabViews.BASEMAPS
+              activeTabView === TabViews.EXPORT_LAYER ||
+              activeTabView === TabViews.BASEMAPS_MANAGEMENT
             }
           />
         </Box>
@@ -1335,7 +1337,7 @@ const DiscreteLayerView: React.FC = observer(() => {
                 />
               </Box>
             )}
-            {activeTabView === TabViews.BASEMAPS && (
+            {activeTabView === TabViews.BASEMAPS_MANAGEMENT && (
               <Box className="tabContentContainer">
                 {getActiveTabHeader(activeTabView, site)}
                 <BasemapsRouter />

@@ -5,7 +5,8 @@ import { useIntl } from 'react-intl';
 import { Box } from '@map-colonies/react-components';
 import { IconButton, Tooltip, useTheme } from '@map-colonies/react-core';
 import { useStore } from '../../models/RootStore';
-import { ITabViewConfig, TabViews, useTabViewsConfig } from '../tab-views';
+import { ITabViewConfig, TabViews } from '../tab-views';
+import { useTabViewsConfig } from '../useTabViewsConfig.hook';
 
 import './tabs-views-switcher.component.css';
 
