@@ -164,9 +164,9 @@ export const ManageLinksDialog: React.FC<ManageLinksDialogProps> = observer(
         return;
       }
       if (isComposingCapture) {
-        viewer.screenshot.showCapturePreview(THUMBNAIL_CAPTURE_DIMENSIONS[selectedCaptureSize]);
+        viewer.screenshot.startCapturePreview(THUMBNAIL_CAPTURE_DIMENSIONS[selectedCaptureSize]);
       } else {
-        viewer.screenshot.hideCapturePreview();
+        viewer.screenshot.stopCapturePreview();
       }
     }, [isComposingCapture, selectedCaptureSize]);
 
