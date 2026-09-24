@@ -57,7 +57,7 @@ const INITIAL_STATE = {
   highlightedLayer: null,
   selectedLayer: null,
   selectedLayerOperationMode: undefined,
-  tabViews: [{idx: TabViews.CATALOG}, {idx: TabViews.SEARCH_RESULTS}, {idx: TabViews.EXPORT_LAYER}],
+  tabViews: [{idx: TabViews.CATALOG}, {idx: TabViews.SEARCH_RESULTS}, {idx: TabViews.EXPORT_LAYER}, {idx: TabViews.BASEMAPS_MANAGEMENT}],
   entityDescriptors: [],
   entityTooltipFields: new Map(),
   previewedLayers: [],

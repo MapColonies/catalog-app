@@ -19,6 +19,7 @@ export enum UserAction {
   SYSTEM_ACTION_FILTER = 'system_action.filter',
   SYSTEM_ACTION_FREETEXTSEARCH = 'system_action.freeTextSearch',
   SYSTEM_ACTION_SIDEBARCOLLAPSEEXPAND = 'system_action.sidebarCollapseExapnd',
+  SYSTEM_ACTION_BASEMAPS_MANAGEMENT = 'system_action.baseMapsManagement',
 
   ENTITY_ACTION_LAYERRASTERRECORD_CREATE = 'entity_action.LayerRasterRecord.create',
   ENTITY_ACTION_LAYER3DRECORD_CREATE = 'entity_action.Layer3DRecord.create',
@@ -110,6 +111,7 @@ const ROLES: IRole[] = [
       [UserAction.SYSTEM_ACTION_FILTER]: {enabled: false},
       [UserAction.SYSTEM_ACTION_FREETEXTSEARCH]: {enabled: true},
       [UserAction.SYSTEM_ACTION_SIDEBARCOLLAPSEEXPAND]: {enabled: true},
+      [UserAction.SYSTEM_ACTION_BASEMAPS_MANAGEMENT]: {enabled: true},
       [UserAction.ENTITY_ACTION_LAYERRASTERRECORD_CREATE]: {enabled: true},
       [UserAction.ENTITY_ACTION_LAYER3DRECORD_CREATE]: {enabled: true},
       [UserAction.ENTITY_ACTION_LAYERDEMRECORD_CREATE]: {enabled: false},
@@ -167,6 +169,7 @@ const ROLES: IRole[] = [
       [UserAction.SYSTEM_ACTION_FILTER]: {enabled: false},
       [UserAction.SYSTEM_ACTION_FREETEXTSEARCH]: {enabled: true},
       [UserAction.SYSTEM_ACTION_SIDEBARCOLLAPSEEXPAND]: {enabled: true},
+      [UserAction.SYSTEM_ACTION_BASEMAPS_MANAGEMENT]: {enabled: false},
       [UserAction.ENTITY_ACTION_LAYERRASTERRECORD_CREATE]: {enabled: false},
       [UserAction.ENTITY_ACTION_LAYER3DRECORD_CREATE]: {enabled: false},
       [UserAction.ENTITY_ACTION_LAYERDEMRECORD_CREATE]: {enabled: false},

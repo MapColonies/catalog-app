@@ -76,6 +76,7 @@
   "action.tab-views.search-results.tooltip": "Search results tab",
   "action.tab-views.create-best.tooltip": "BEST draft creation/edit tab",
   "action.tab-views.export-layer.tooltip": "Export layer tab",
+  "action.tab-views.basemaps.tooltip": "Basemaps tab",
 
   "action.point.tooltip": "Search by POI",
   "action.box.tooltip": "Search by bounding box",
@@ -207,6 +208,7 @@
   "tab-views.catalog.site.slave": "Secondary",
   "tab-views.create-best": "BEST edit",
   "tab-views.export-layer": "Export Layer",
+  "tab-views.basemaps": "Basemaps",
 
   "tab-views.catalog.top-categories.unpublished": "Unpublished",
   "tab-views.catalog.top-categories.bests": "BESTs",
