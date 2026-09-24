@@ -363,7 +363,7 @@ export const ManageLinksDialog: React.FC<ManageLinksDialogProps> = observer(
                 sceneMode={sceneMode}
                 fullscreenButton={false}
                 screenshotEnabled
-                showDebuggerTool
+                showDebugger
               >
                 <PreviewViewerBridge viewerRef={previewViewerRef} />
                 {layerRecord && <PreviewInitialFlyTo key={layerRecord.id} layer={layerRecord} />}
