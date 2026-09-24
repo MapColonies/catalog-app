@@ -40,11 +40,6 @@ export const ThumbnailsSection: React.FC<ThumbnailsSectionProps> = ({
 }) => {
   return (
     <>
-      {isComposingCapture && (
-        <Typography tag="div" className="captureComposeHint">
-          <FormattedMessage id="links-management.dialog.capture-hint.text" />
-        </Typography>
-      )}
       <Box className="thumbnailsRow">
         {THUMBNAIL_SIZES.map((size) => {
           const protocol = THUMBNAIL_SIZE_TO_PROTOCOL[size];

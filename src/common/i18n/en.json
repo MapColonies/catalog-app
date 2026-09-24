@@ -190,7 +190,6 @@
   "links-management.dialog.changed.text": "Changed",
   "links-management.dialog.saved.text": "Saved",
   "links-management.dialog.no-basemap.text": "No basemap",
-  "links-management.dialog.capture-hint.text": "Position the map, choose a size, then capture.",
   "links-management.dialog.capture-thumbnail-btn.text": "Capture thumbnail",
   "links-management.dialog.import-btn.text": "Import",
   "links-management.dialog.export-btn.text": "Export",

@@ -1994,6 +1994,14 @@
   dependencies:
     prop-types "^15.8.1"
 
+"@frillab/copc-adapter@^0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@frillab/copc-adapter/-/copc-adapter-0.4.0.tgz#bd683937e74f32935ae90e2b4931be87a152d863"
+  integrity sha512-uxqCsGum10QcpxcqwMYIkRtcseDe4omrdfJ911/lyERMT0JNuFL9dbR+/D+qK5bP9WABAfWNzqzv0i/I0nxISA==
+  dependencies:
+    copc "^0.0.9"
+    proj4 "^2.20.9"
+
 "@gar/promisify@^1.0.1":
   version "1.1.3"
   resolved "https://registry.yarnpkg.com/@gar/promisify/-/promisify-1.1.3.tgz#555193ab2e3bb3b6adc3d551c9c030d9e860daf6"
@@ -2467,11 +2475,14 @@
     lodash "^4.17.21"
     ngeohash "^0.6.3"
 
-"@map-colonies/react-components@file:../shared-components/packages/react-components":
-  version "4.17.3"
+"@map-colonies/react-components@^4.19.0":
+  version "4.19.0"
+  resolved "https://registry.yarnpkg.com/@map-colonies/react-components/-/react-components-4.19.0.tgz#5a646cdf8faad954d7adb9fd65016406b9804172"
+  integrity sha512-VSS9oh4gsweHDV2+cLEPpCTqLhy5EbAF+JEsHu687BI2kglXyWZEgmEWMMfZOWFS+2ShEGjt3uUTEecLaVUAkw==
   dependencies:
     "@cmcleese/cesium-navigation" "^4.0.7"
     "@date-io/date-fns" "^1.3.13"
+    "@frillab/copc-adapter" "^0.4.0"
     "@here/quantized-mesh-decoder" "^1.2.8"
     "@map-colonies/react-core" "^4.2.2"
     "@material-ui/core" "^4.11.0"
@@ -7897,6 +7908,14 @@ cookie@0.5.0:
   resolved "https://registry.yarnpkg.com/cookie/-/cookie-0.5.0.tgz#d1f5d71adec6558c58f389987c366aa47e994f8b"
   integrity sha512-YZ3GUyn/o8gfKJlnlX7g7xq4gyO6OSuhGPKaaGssGB2qgDUS0gPgtTvoyZLTt9Ab6dC4hfc9dV5arkvc/OCmrw==
 
+copc@^0.0.9:
+  version "0.0.9"
+  resolved "https://registry.yarnpkg.com/copc/-/copc-0.0.9.tgz#989283bdf9f639e939219a67bb192721d108f17b"
+  integrity sha512-10wWYz05hRuJ2um30fxCzumJzkBZUxMft2y7FGCv4RQfdA5gG22mKqb9VspEpXOdyRy1bRFSgIbDHOjWKNtHtw==
+  dependencies:
+    cross-fetch "^4.1.0"
+    laz-perf "^0.0.7"
+
 copy-descriptor@^0.1.0:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/copy-descriptor/-/copy-descriptor-0.1.1.tgz#676f6eb3c39997c2ee1ac3a924fd6124748f578d"
@@ -8042,6 +8061,13 @@ cross-env@7.0.2:
   integrity sha512-KZP/bMEOJEDCkDQAyRhu3RL2ZO/SUVrxQVI0G3YEQ+OLbRA3c6zgixe8Mq8a/z7+HKlNEjo8oiLUs8iRijY2Rw==
   dependencies:
     cross-spawn "^7.0.1"
+
+cross-fetch@^4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/cross-fetch/-/cross-fetch-4.1.0.tgz#8f69355007ee182e47fa692ecbaa37a52e43c3d2"
+  integrity sha512-uKm5PU+MHTootlWEY+mZ4vvXoCn4fLQxT9dSc1sXVMSFkINTJVN8cAQROpwcKm8bJ/c7rgZVIBWzH5T78sNZZw==
+  dependencies:
+    node-fetch "^2.7.0"
 
 cross-spawn@^6.0.0, cross-spawn@^6.0.5:
   version "6.0.5"
@@ -12522,6 +12548,11 @@ launch-editor@^2.6.0:
     picocolors "^1.0.0"
     shell-quote "^1.7.3"
 
+laz-perf@^0.0.7:
+  version "0.0.7"
+  resolved "https://registry.yarnpkg.com/laz-perf/-/laz-perf-0.0.7.tgz#949da3e04134e0a9fc56a0a3a909d84be484bf5a"
+  integrity sha512-2xRqm/f/2UqDS5qqkjOyDb6uVIjkVw6SGmQlMoTQliVWkZhPfIbUJTubUl3mTloaWqKcjlS/urmP1CYoxelsEg==
+
 left-pad@^1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/left-pad/-/left-pad-1.3.0.tgz#5b8a3a7765dfe001261dde915589e782f8c94d1e"
@@ -13497,7 +13528,7 @@ no-case@^3.0.4:
     lower-case "^2.0.2"
     tslib "^2.0.3"
 
-node-fetch@^2.2.1:
+node-fetch@^2.2.1, node-fetch@^2.7.0:
   version "2.7.0"
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.7.0.tgz#d0f0fa6e3e2dc1d27efcd8ad99d550bda94d187d"
   integrity sha512-c4FRfUm/dbcWZ7U+1Wq0AwCyFL+3nt2bEw05wfxSz+DWpWsitgmSgYmy2dQdWyKC1694ELPqMs/YzUSNozLt8A==
@@ -14857,6 +14888,14 @@ proj4@^2.1.4:
   dependencies:
     mgrs "1.0.0"
     wkt-parser "^1.3.1"
+
+proj4@^2.20.9:
+  version "2.22.0"
+  resolved "https://registry.yarnpkg.com/proj4/-/proj4-2.22.0.tgz#f4fa16ed0b158923be8713d67bf62e5e1400693f"
+  integrity sha512-MVvH09QrYm3A235rcX39WDiCKanrBiblu28l0KYIn/B2DofmYhvP/LLS43kE66jNDfx/P1l/nah3JmsAq8UgbQ==
+  dependencies:
+    mgrs "1.0.0"
+    wkt-parser "^1.5.5"
 
 promise-inflight@^1.0.1:
   version "1.0.1"
@@ -18145,6 +18184,11 @@ wkt-parser@^1.3.1:
   version "1.3.3"
   resolved "https://registry.yarnpkg.com/wkt-parser/-/wkt-parser-1.3.3.tgz#46b4e3032dd9c86907f7e630b57e3c6ea2bb772b"
   integrity sha512-ZnV3yH8/k58ZPACOXeiHaMuXIiaTk1t0hSUVisbO0t4RjA5wPpUytcxeyiN2h+LZRrmuHIh/1UlrR9e7DHDvTw==
+
+wkt-parser@^1.5.5:
+  version "1.5.6"
+  resolved "https://registry.yarnpkg.com/wkt-parser/-/wkt-parser-1.5.6.tgz#3a19521914b2a21b7a8203590f5b180b9dba8dfa"
+  integrity sha512-cqHU3lzGt/gt2OqIORP0uVy5yeOX43WABmgFkmJsmcqH3HhQo9PiJG6ftytwGKmpQUbegeX7+pQc2BuNCRfcrw==
 
 word-wrap@~1.2.3:
   version "1.2.3"
