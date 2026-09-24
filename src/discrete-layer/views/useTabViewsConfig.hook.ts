@@ -34,7 +34,7 @@ export const useTabViewsConfig = (locale: string): ITabViewConfig[] => {
         idx: TabViews.BASEMAPS_MANAGEMENT,
         title: 'tab-views.basemaps',
         iconClassName: 'mc-icon-Bests',
-        dependentValue: isBasemapsManagementAllowed ? user : undefined,
+        dependentValue: isBasemapsManagementAllowed ? { notInUse: '***notInUse***' } : undefined,
       },
     ],
     [locale, layerToExport, isBasemapsManagementAllowed, user]
