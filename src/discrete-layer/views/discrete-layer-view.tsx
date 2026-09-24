@@ -1399,8 +1399,8 @@ const DiscreteLayerView: React.FC = observer(() => {
                   imgText: intl.formatMessage({ id: 'map-legends.actions.img' }),
                 },
               }}
-              showDebuggerTool={CONFIG.MAP.SHOW_DEBUGGER_TOOL === true && isAdminUser}
-              showActiveLayersTool={CONFIG.MAP.SHOW_ACTIVE_LAYERS_TOOL}
+              showDebugger={CONFIG.MAP.SHOW_DEBUGGER_TOOL === true && isAdminUser}
+              showActiveLayers={CONFIG.MAP.SHOW_ACTIVE_LAYERS_TOOL}
               {...(CONFIG.MAP.SHOW_GEOCODER_TOOL ? { geocoderPanel: GEOCODER_OPTIONS } : {})}
               {...(drapingLayerPredicate !== undefined ? { drapingLayerPredicate } : {})}
             >

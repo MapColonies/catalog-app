@@ -4,6 +4,7 @@ export enum LinkType {
   XYZ_LAYER = 'XYZ_LAYER',
   THREE_D_LAYER = '3D_LAYER',
   THREE_D_TILES = '3DTiles',
+  COPC = 'COPC',
   TERRAIN_QMESH = 'TERRAIN_QMESH',
   WMTS = 'WMTS',
   WMS = 'WMS',
