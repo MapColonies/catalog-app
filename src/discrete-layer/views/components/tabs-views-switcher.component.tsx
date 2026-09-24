@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { isEmpty } from 'lodash';
 import { observer } from 'mobx-react-lite';
 import { useIntl } from 'react-intl';
@@ -25,19 +25,13 @@ export const TabViewsSwitcher: React.FC<TabViewsSwitcherComponentProps> = observ
 
   const tabViews: ITabViewConfig[] = useTabViewsConfig(intl.locale);
 
-  const [availableTabs, setAvailableTabs] = useState<ITabViewConfig[]>(tabViews);
+  const availableTabs = tabViews.filter((tab) => {
+    if ('dependentValue' in tab) {
+      return !isEmpty(tab.dependentValue);
+    }
 
-  useEffect(() => {
-    const dependentTabs = tabViews.filter((tab) => {
-      if ('dependentValue' in tab) {
-        return !isEmpty(tab.dependentValue);
-      }
-
-      return tab;
-    });
-
-    setAvailableTabs(dependentTabs);
-  }, [tabViews]);
+    return true;
+  });
 
   useEffect(() => {
     if (layerToExport !== undefined) {
