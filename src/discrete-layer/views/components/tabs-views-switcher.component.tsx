@@ -27,7 +27,7 @@ export const TabViewsSwitcher: React.FC<TabViewsSwitcherComponentProps> = observ
 
   const availableTabs = tabViews.filter((tab) => {
     if ('dependentValue' in tab) {
-      return !isEmpty(tab.dependentValue);
+      return !isEmpty(tab.dependentValue) || tab.dependentValue === true;
     }
 
     return true;
