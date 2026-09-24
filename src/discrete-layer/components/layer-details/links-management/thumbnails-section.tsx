@@ -1,7 +1,7 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
-import { Button, CircularProgress, Typography } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
+import { Button, CircularProgress } from '@map-colonies/react-core';
 import { LinkType } from '../../../../common/models/link-type.enum';
 import { DraftLinksMap } from '../../../models/discreteLayersStore';
 import { ILayerImage } from '../../../models/layerImage';
