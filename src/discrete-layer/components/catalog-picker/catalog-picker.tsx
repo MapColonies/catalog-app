@@ -158,56 +158,53 @@ export const CatalogPicker: React.FC<CatalogPickerProps> = observer(
     }
 
     return (
-      <Box className="catalogPicker">
-        {isLoading && <Loading />}
-        <Box
-          className="catalogContainer catalogPickerTree"
-          style={{
-            border: '1px solid var(--mdc-theme-gc-selection-background, #fff)',
-            borderRadius: '10px',
-          }}
-        >
-          {!isLoading && (
-            <TreeComponent
-              treeData={treeData}
-              onChange={(newTreeData): void => setTreeData(newTreeData)}
-              canDrag={(): boolean => false}
-              canDrop={(): boolean => false}
-              generateNodeProps={(rowInfo) => ({
-                onClick: (): void => handleRowClick(rowInfo),
-                className: rowInfo.node.isDisabled ? 'catalogPickerDisabled' : undefined,
-                style: rowInfo.node.isGroup ? {} : getTextStyle(rowInfo.node, 'color'),
-                icons: rowInfo.node.isGroup
-                  ? []
-                  : [
-                      <ProductTypeRenderer
-                        data={rowInfo.node as ILayerImage}
-                        thumbnailUrl={getLinkUrlWithToken(rowInfo.node.links, LinkType.THUMBNAIL_S)}
-                      />,
-                    ],
-              })}
+      <Box id="catalogPicker">
+        <Box className="catalogPickerBody">
+          <Box className="catalogContainer catalogPickerTree">
+            {isLoading ? (
+              <Loading />
+            ) : (
+              <TreeComponent
+                treeData={treeData}
+                onChange={(newTreeData): void => setTreeData(newTreeData)}
+                canDrag={(): boolean => false}
+                canDrop={(): boolean => false}
+                generateNodeProps={(rowInfo) => ({
+                  onClick: (): void => handleRowClick(rowInfo),
+                  className: rowInfo.node.isDisabled ? 'disabled' : undefined,
+                  style: rowInfo.node.isGroup ? {} : getTextStyle(rowInfo.node, 'color'),
+                  icons: rowInfo.node.isGroup
+                    ? []
+                    : [
+                        <ProductTypeRenderer
+                          data={rowInfo.node as ILayerImage}
+                          thumbnailUrl={getLinkUrlWithToken(
+                            rowInfo.node.links,
+                            LinkType.THUMBNAIL_S
+                          )}
+                        />,
+                      ],
+                })}
+              />
+            )}
+          </Box>
+          <Box className="catalogPickerSeparator" />
+          <Box
+            className="catalogPickerDetails"
+            style={{ backgroundColor: theme.custom?.GC_ALTERNATIVE_SURFACE as string }}
+          >
+            <LayersDetailsComponent
+              isSearchTab={true}
+              className="detailsPanelProductView"
+              entityDescriptors={
+                store.discreteLayersStore.entityDescriptors as EntityDescriptorModelType[]
+              }
+              layerRecord={selectedLayer}
+              isBrief={true}
+              mode={Mode.VIEW}
+              intl={intl}
             />
-          )}
-        </Box>
-        <Box
-          className="catalogPickerDetails"
-          style={{
-            backgroundColor: theme.custom?.GC_ALTERNATIVE_SURFACE as string,
-            border: '1px solid var(--mdc-theme-gc-selection-background, #fff)',
-            borderRadius: '10px',
-          }}
-        >
-          <LayersDetailsComponent
-            isSearchTab={true}
-            className="detailsPanelProductView"
-            entityDescriptors={
-              store.discreteLayersStore.entityDescriptors as EntityDescriptorModelType[]
-            }
-            layerRecord={selectedLayer}
-            isBrief={true}
-            mode={Mode.VIEW}
-            intl={intl}
-          />
+          </Box>
         </Box>
         <Box className="catalogPickerActions">
           <Button raised type="button" disabled={!selectedLayer} onClick={handleSelect}>

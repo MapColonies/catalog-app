@@ -1,42 +1,53 @@
-.catalogPicker {
+#catalogPicker {
   display: flex;
   flex-direction: column;
   height: 100%;
 }
 
-.catalogPicker .catalogPickerTree {
+#catalogPicker .catalogPickerBody {
   flex: 1;
-  margin: 0 12px 0 0;
-  padding: 12px 0 0 12px;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--mdc-theme-gc-selection-background, #fff);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-inline-end: 8px;
+  padding-inline-start: 8px;
 }
 
-.catalogPicker .catalogPickerDisabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-
-body[dir='rtl'] .catalogPicker .catalogPickerTree {
-  margin: 0 0 0 12px;
-  padding: 12px 12px 0 0;
-}
-
-.catalogPicker .catalogPickerDetails {
-  flex: 0 0 25%;
-  overflow: auto;
+#catalogPicker .catalogPickerTree {
+  flex: 1 1 0;
+  min-height: 0;
+  height: auto;
+  margin: 0;
   margin-top: 8px;
-  margin-right: 12px;
-  padding: 8px 8px 8px 20px;
 }
 
-body[dir='rtl'] .catalogPicker .catalogPickerDetails {
-  margin-right: 0;
-  margin-left: 12px;
-  padding: 8px 20px 8px 8px;
+#catalogPicker .disabled > * {
+  opacity: 0.5 !important;
 }
 
-.catalogPicker .catalogPickerActions {
+#catalogPicker .catalogPickerSeparator {
+  align-self: center;
+  width: 90%;
+  border-width: 1px 0 0 0;
+  border-top: 1px solid;
+  border-color: var(--mdc-theme-text-icon-on-dark);
+  margin: 16px;
+}
+
+#catalogPicker .catalogPickerDetails {
+  flex: 0 0 25%;
+  min-height: 0;
+  overflow: auto;
+  padding: 8px;
+  padding-inline-start: 20px;
+}
+
+#catalogPicker .catalogPickerActions {
   flex: 0 0 auto;
   display: flex;
   gap: 8px;
-  padding: 12px;
+  padding: 12px 12px 0 12px;
 }
