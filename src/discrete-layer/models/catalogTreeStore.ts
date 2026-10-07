@@ -29,6 +29,7 @@ import { LayerMetadataMixedUnion, RecordType } from './';
 const NONE = 0;
 const TOP_LEVEL_GROUP_BY_FIELD = 'region';
 const TITLE_PROPERTY = 'productName';
+const WITH_CAPABILITIES = [RecordType.RECORD_RASTER];
 
 const locale = CONFIG.I18N.DEFAULT_LANGUAGE;
 const intl = createIntl({ locale, messages: MESSAGES[locale] as Record<string, string> });
@@ -97,6 +98,65 @@ const buildParentTreeNode = (
 };
 
 const keyFromTreeIndex: GetNodeKeyFunction = ({ treeIndex }) => treeIndex;
+
+export type TreeRootName =
+  | 'catalog'
+  | 'bests'
+  | 'vector'
+  | 'unpublished';
+
+export interface TreeRootSection {
+  id: TreeRootName;
+  translationId: string;
+  order: number;
+  predicate: (item: ILayerImage) => boolean;
+  groupBy?: GroupBy;
+}
+
+const TREE_ROOT_SECTIONS: TreeRootSection[] = [
+  {
+    id: 'catalog',
+    translationId: 'tab-views.catalog.top-categories.catalog',
+    order: 1,
+    predicate: (item) => !isVector(item),
+    groupBy: { keys: [{ name: TOP_LEVEL_GROUP_BY_FIELD, predicate: (val) => val?.join(',') }] },
+  },
+  {
+    id: 'bests',
+    translationId: 'tab-views.catalog.top-categories.bests',
+    order: 2,
+    predicate: (item) => isBest(item),
+  },
+  {
+    id: 'vector',
+    translationId: 'tab-views.catalog.top-categories.vector',
+    order: 3,
+    predicate: (item) => isVector(item),
+  },
+  {
+    id: 'unpublished',
+    translationId: 'tab-views.catalog.top-categories.unpublished',
+    order: 4,
+    predicate: (item) => {
+      const itemObjectBag = item as unknown as Record<string, unknown>;
+      return existStatus(itemObjectBag) && isUnpublished(itemObjectBag);
+    },
+  },
+];
+
+export const getAllowedTreeRootSections = (isUserAdmin: boolean): TreeRootSection[] => {
+  const isRecordVectorServed = CONFIG.SERVED_ENTITY_TYPES.includes(RecordType.RECORD_VECTOR);
+  return TREE_ROOT_SECTIONS.filter((rootSection) => {
+    switch (rootSection.id) {
+      case 'vector':
+        return isRecordVectorServed;
+      case 'unpublished':
+        return isUserAdmin;
+      default:
+        return true;
+    }
+  });
+};
 
 /* eslint-enable */
 
@@ -199,96 +259,34 @@ export const catalogTreeStore = ModelBase.props({
       setCatalogTreeData([]);
     }
 
-    const createCatalogTree = (layersList: ILayerImage[], expanded: boolean = false): void => {
+    const createCatalogTree = (
+      layersList: ILayerImage[],
+      rootSections: TreeRootSection[],
+      expanded: boolean = false
+    ): TreeItem[] => {
+      return [...rootSections]
+        .sort((a, b) => a.order - b.order)
+        .map((rootSection) => {
+          const layers = layersList.filter(rootSection.predicate);
+          const title = intl.formatMessage({ id: rootSection.translationId });
 
-      // Get unpublished/new discretes
+          if (rootSection.groupBy) {
+            return buildParentTreeNode(layers, title, rootSection.groupBy, expanded);
+          }
 
-      const arrUnpublished = layersList.filter((item) => {
-        // @ts-ignore
-        const itemObjectBag = item as Record<string, unknown>;
-        return existStatus(itemObjectBag) && isUnpublished(itemObjectBag);
-      });
-      const parentUnpublished = {
-        title: intl.formatMessage({
-          id: 'tab-views.catalog.top-categories.unpublished',
-        }),
-        isGroup: true,
-        expanded,
-        children: [
-          ...arrUnpublished
-            .sort(alphabeticalSort())
-            .map((item) => ({
-              ...item,
-              title: getLayerTitle(item),
-              isSelected: false,
-            })),
-        ],
-      };
-
-      // Get BESTs shortcuts
-
-      const arrBests = layersList.filter(isBest);
-      const parentBests = {
-        title: intl.formatMessage({
-          id: 'tab-views.catalog.top-categories.bests',
-        }),
-        isGroup: true,
-        expanded,
-        children: [
-          ...arrBests
-            .sort(alphabeticalSort())
-            .map((item) => ({
-              ...item,
-              title: getLayerTitle(item),
-              isSelected: false,
-            })),
-        ],
-      };
-
-      // Get vector data layers
-
-      const arrVector = layersList.filter(isVector);
-      const vectorCatalog = {
-        title: intl.formatMessage({
-          id: 'tab-views.catalog.top-categories.vector',
-        }),
-        isGroup: true,
-        expanded,
-        children: [
-          ...arrVector
-            .sort(alphabeticalSort())
-            .map((item) => ({
-              ...item,
-              title: getLayerTitle(item),
-              isSelected: false,
-            })),
-        ],
-      };
-
-      // Whole catalog as is
-
-      const layersListWithoutVector = layersList.filter(layer => !isVector(layer));
-      const parentCatalog = buildParentTreeNode(
-        layersListWithoutVector,
-        intl.formatMessage({
-          id: 'tab-views.catalog.top-categories.catalog',
-        }),
-        /* eslint-disable */
-        { keys: [{ name: 'region', predicate: (val) => val?.join(',') }] },
-        /* eslint-enable */
-        expanded
-      );
-
-      const isUserAdmin = store.userStore.isUserAdmin();
-      const isRecordVectorServed = CONFIG.SERVED_ENTITY_TYPES.includes(RecordType.RECORD_VECTOR);
-
-      setCatalogTreeData([
-        parentCatalog,
-        parentBests,
-        ...(isRecordVectorServed ? [vectorCatalog] : []),
-        ...(isUserAdmin ? [parentUnpublished] : [])
-      ]);
-
+          return {
+            title,
+            isGroup: true,
+            expanded,
+            children: layers
+              .sort(alphabeticalSort())
+              .map((item) => ({
+                ...item,
+                title: getLayerTitle(item),
+                isSelected: false,
+              })),
+          };
+        });
     };
 
     /**
@@ -310,7 +308,7 @@ export const catalogTreeStore = ModelBase.props({
           ]
         }
 
-        const catalog = yield store.discreteLayersStore.fetchAllCatalog(catalogFilter);
+        const catalog = yield store.discreteLayersStore.fetchCatalogs(catalogFilter);
         return store.discreteLayersStore.setLayersImages(catalog, false);
       } catch (e) {
         setSearchError(e);
@@ -321,16 +319,42 @@ export const catalogTreeStore = ModelBase.props({
     });
 
     /***
+     * Fetch capabilities for the given layers without touching the store state
+     */
+    const fetchLayersCapabilities = async (
+      layers: LayerMetadataMixedUnion[]
+    ): Promise<CapabilityModelType[]> => {
+      const idList = WITH_CAPABILITIES.map((recordType) => ({
+        recordType,
+        idList: layers
+          .filter((layer) => layer.type === recordType)
+          .map((layer) => getLayerLink(layer).name ?? ''),
+      })).filter((item) => !isEmpty(item.idList));
+
+      if (isEmpty(idList)) {
+        return [];
+      }
+
+      const capabilitiesQuery = store.queryCapabilities({
+        params: { data: idList },
+      });
+
+      try {
+        const dataCapabilities = await capabilitiesQuery.refetch();
+        return (get(dataCapabilities, 'capabilities') ?? []) as CapabilityModelType[];
+      } catch (e) {
+        throw capabilitiesQuery.error ?? e;
+      }
+    };
+
+    /***
      * Fetch capabilities for the layers in the catalog
      */
-    const capabilitiesFetch = flow(function* capabilitiesFetchGen(layers?: LayerMetadataMixedUnion[]): Generator<
-      Promise<{ capabilities: CapabilityModelType[] }>,
+    const fetchAndSetCapabilities = flow(function* capabilitiesFetchGen(layers?: LayerMetadataMixedUnion[]): Generator<
+      Promise<CapabilityModelType[]>,
       CapabilityModelType[],
       CapabilityModelType[]
     > {
-      let capabilitiesQuery;
-      let capabilitiesList;
-
       // NOTE:
       // Calling getCapabilities() should happen after querySearch.data
       // It is being called only here in the catalog because the other two places (bestCatalog & searchByPolygon)
@@ -338,58 +362,19 @@ export const catalogTreeStore = ModelBase.props({
 
       const layersList = layers ?? store.discreteLayersStore.layersImages as LayerMetadataMixedUnion[];
 
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      const { RECORD_ALL, RECORD_RASTER } = RecordType;
-
       setErrorCapabilities(undefined);
       try {
-        const withCapabilities = [RECORD_RASTER];
+        let capabilitiesList: CapabilityModelType[] = [];
         if (
-          [RECORD_ALL, ...withCapabilities].includes(
-            store.discreteLayersStore.searchParams.recordType as RecordType
+          [RecordType.RECORD_ALL, ...WITH_CAPABILITIES].includes(
+            (store.discreteLayersStore.searchParams.recordType) as RecordType
           )
         ) {
-          const groupBy = <T, K extends keyof any>(
-            list: T[],
-            getKey: (item: T) => K,
-            setItem: (item: T) => any
-          ): Record<K, T[]> =>
-            list.reduce((previous, currentItem) => {
-              const group = getKey(currentItem);
-              // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-              if (!previous[group]) previous[group] = [];
-              previous[group].push(setItem(currentItem));
-              return previous;
-            }, {} as Record<K, T[]>);
-          const ids = groupBy(
-            layersList,
-            (l) => l.type as RecordType,
-            (l) => getLayerLink(l).name ?? ''
-          );
-          const idList = [];
-          for (const [key, value] of Object.entries(ids)) {
-            if (withCapabilities.includes(key as RecordType)) {
-              idList.push({
-                recordType: key,
-                idList: value,
-              });
-            }
-          }
-          capabilitiesQuery = store.queryCapabilities({
-            // @ts-ignore
-            params: { data: idList },
-          });
-
-          const dataCapabilities = yield capabilitiesQuery.refetch();
-
-          capabilitiesList = get(
-            dataCapabilities,
-            'capabilities'
-          ) as CapabilityModelType[];
+          capabilitiesList = yield fetchLayersCapabilities(layersList);
         }
-        return store.discreteLayersStore.setCapabilities(!isEmpty(capabilitiesList) ? capabilitiesList as CapabilityModelType[] : []);
+        return store.discreteLayersStore.setCapabilities(capabilitiesList);
       } catch (e) {
-        setErrorCapabilities(capabilitiesQuery?.error);
+        setErrorCapabilities(e);
         return store.discreteLayersStore.setCapabilities([]);
       }
     });
@@ -412,12 +397,14 @@ export const catalogTreeStore = ModelBase.props({
 
         if (typeof layersListResults !== 'undefined' && (layersListResults as ILayerImage[] | null) !== null) {
 
-          yield capabilitiesFetch();
+          yield fetchAndSetCapabilities();
 
           store.discreteLayersStore.setLayersImages(layersListResults, false);
           const layersList = store.discreteLayersStore.layersImages as ILayerImage[];
 
-          createCatalogTree(layersList);
+          setCatalogTreeData(
+            createCatalogTree(layersList, getAllowedTreeRootSections(store.userStore.isUserAdmin()))
+          );
 
           setIsDataLoading(false);
 
@@ -697,7 +684,9 @@ export const catalogTreeStore = ModelBase.props({
       setCatalogTreeData,
       resetCatalogTreeData,
       catalogSearch,
-      capabilitiesFetch,
+      fetchAndSetCapabilities,
+      fetchLayersCapabilities,
+      createCatalogTree,
       initTree,
       changeNodeByPath,
       findNodeByTitle,

@@ -1,0 +1,32 @@
+.basemapsHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.basemapsBreadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.basemapsBreadcrumbSeparator {
+  opacity: 0.6;
+}
+
+.basemapsBreadcrumbLink {
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  opacity: 0.7;
+  cursor: pointer;
+}
+
+.basemapsBreadcrumbLink:hover {
+  opacity: 1;
+  text-decoration: underline;
+}

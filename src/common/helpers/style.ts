@@ -25,6 +25,10 @@ export const isUnpublished = (data: Record<string, unknown>): boolean => {
   return get(data, STATUS) === RecordStatus.UNPUBLISHED && get(data, ID) !== DEFAULT_ID;
 };
 
+export const isPublished = (data: Record<string, unknown>): boolean => {
+  return get(data, STATUS) === RecordStatus.PUBLISHED;
+};
+
 export const isPolygonPartsShown = (data: Record<string, unknown>): boolean => {
   return get(data, POLYGON_PARTS_SHOWN) === true;
 };
