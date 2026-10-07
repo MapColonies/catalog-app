@@ -37,7 +37,7 @@ type BasemapsStackPanel = {
 
 type BasemapsRouteName = keyof BasemapsStackPanel;
 
-const SCREEN_IDS: Record<BasemapsRouteName, string> = {
+const PANELS_IDS: Record<BasemapsRouteName, string> = {
   BaseMapsList: 'basemaps.panels.base-maps-list',
   EditBaseMap: 'basemaps.panels.edit-base-map',
   AddLayer: 'basemaps.panels.add-layer',
@@ -53,7 +53,7 @@ const XXXBasemapsHeaderMOCKXXX: React.FC<StackHeaderProps> = ({ route, navigatio
     <Box className="basemapsHeader">
       <nav className="basemapsBreadcrumb">
         {trail.map(({ key, name }, index) => {
-          const label = intl.formatMessage({ id: SCREEN_IDS[name as BasemapsRouteName] });
+          const label = intl.formatMessage({ id: PANELS_IDS[name as BasemapsRouteName] });
           return (
             <React.Fragment key={key}>
               {index > 0 && <span className="basemapsBreadcrumbSeparator">/</span>}
@@ -73,11 +73,11 @@ const XXXBasemapsHeaderMOCKXXX: React.FC<StackHeaderProps> = ({ route, navigatio
         })}
       </nav>
       <Box style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
-        {(Object.keys(SCREEN_IDS) as BasemapsRouteName[])
+        {(Object.keys(PANELS_IDS) as BasemapsRouteName[])
           .filter((name) => name !== route.name)
           .map((name) => (
             <Button key={name} type="button" onClick={(): void => navigation.navigate(name)}>
-              {intl.formatMessage({ id: SCREEN_IDS[name] })}
+              {intl.formatMessage({ id: PANELS_IDS[name] })}
             </Button>
           ))}
       </Box>
