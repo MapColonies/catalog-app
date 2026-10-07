@@ -13,8 +13,7 @@ import { MOCK_DATA_IMAGERY_LAYERS_ISRAEL } from '../../__mocks-data__/search-res
 import { Mode } from '../../common/models/mode.enum';
 import CONFIG from '../../common/config';
 import { isUnpublished } from '../../common/helpers/style';
-import { LinkType } from '../../common/models/link-type.enum';
-import { getLayerLink } from '../components/helpers/layersUtils';
+import { getLayerLink, isLayerURLMissing } from '../components/helpers/layersUtils';
 import { LayerMetadataMixedUnionKeys, LayerRecordTypes, LayerRecordTypesKeys } from '../components/layer-details/entity-types-keys';
 import { extractDescriptorRelatedFieldNames, getFlatEntityDescriptors } from '../components/layer-details/utils';
 import { TabViews } from '../views/tab-views';
@@ -153,7 +152,7 @@ export const discreteLayersStore = ModelBase
       return self.capabilities?.find(item => layerLink.name === item.id);
     }
 
-    function getPreparedLayersImages(data: ILayerImage[], showFootprint = true): LayersImagesResponse {
+    function getPreparedLayersImages(data: ILayerImage[], showFootprint = true, capabilities = self.capabilities): LayersImagesResponse {
       // self.layersImages = filterBySearchParams(data).map(item => ({...item, footprintShown: true, layerImageShown: false, order: null}));
 
       // Filter out Unpublished entries on User premissions.
@@ -163,10 +162,7 @@ export const discreteLayersStore = ModelBase
       const preparedLayersImages = filteredLayersImages.map(item => {
         let additional = {};
         if (item.type === RecordType.RECORD_RASTER) {
-          const layerLink = getLayerLink(item);
-          const hasCapabilities = self.capabilities?.find(item => layerLink.name === item.id);
-          const hasWMTSUrl = layerLink.protocol === LinkType.WMTS;
-          additional = { layerURLMissing: !hasCapabilities && hasWMTSUrl };
+          additional = { layerURLMissing: isLayerURLMissing(item, capabilities) };
         }
         return {
           ...item,
@@ -600,18 +596,18 @@ export const discreteLayersStore = ModelBase
     };
 
     const buildCatalogsQueries = (
-      recordTypeToFetch: RecordType,
+      recordTypesToFetch: RecordType[],
       pageSize: number,
       filterFn: (type: RecordType) => FilterField[]
     ): Promise<{ search: CswCatalogsModelType }>[] => {
       const startIndex = 1;
-      if (recordTypeToFetch === RecordType.RECORD_ALL) {
-        return CONFIG.SERVED_ENTITY_TYPES.filter((type) => type !== RecordType.RECORD_ALL).map((type) =>
-          createQueryAndFetch(type as RecordType, startIndex, pageSize, filterFn)
-        );
-      }
+      const recordTypes = recordTypesToFetch.includes(RecordType.RECORD_ALL)
+        ? CONFIG.SERVED_ENTITY_TYPES.filter((type) => type !== RecordType.RECORD_ALL)
+        : recordTypesToFetch;
 
-      return [createQueryAndFetch(recordTypeToFetch, startIndex, pageSize, filterFn)];
+      return recordTypes.map((type) =>
+        createQueryAndFetch(type as RecordType, startIndex, pageSize, filterFn)
+      );
     };
 
     const buildRecordsPromises = (
@@ -647,18 +643,21 @@ export const discreteLayersStore = ModelBase
       return recordsPromises;
     };
 
-    const fetchAllCatalog = async (
-      filterFn: (type: RecordType) => FilterField[]
+    const fetchCatalogs = async (
+      filterFn: (type: RecordType) => FilterField[],
+      recordTypes: RecordType[] = self.searchParams.recordType ? [self.searchParams.recordType as RecordType] : []
     ) => {
-      const recordTypeToFetch = self.searchParams.recordType;
-      if (!recordTypeToFetch) {
+      const servedRecordTypes = recordTypes.filter(
+        (type) => type === RecordType.RECORD_ALL || CONFIG.SERVED_ENTITY_TYPES.includes(type)
+      );
+      if (servedRecordTypes.length === 0) {
         return [];
       }
 
       const pageSize = CONFIG.RUNNING_MODE.CSW_DEFAULT_PAGE_SIZE;
 
       const initialCatalogQueryPromises = buildCatalogsQueries(
-        recordTypeToFetch,
+        servedRecordTypes,
         pageSize,
         filterFn
       );
@@ -720,7 +719,7 @@ export const discreteLayersStore = ModelBase
       addPolygonPartsInfo,
       resetPolygonPartsInfo,
       resetPolygonParts,
-      fetchAllCatalog,
+      fetchCatalogs,
       setEnumsMap,
     };
   });

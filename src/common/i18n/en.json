@@ -765,6 +765,10 @@
   "map-settings.base-map.scene-mode.title": "Scene Mode",
   "map-settings.dialog.title": "Map Settings",
 
+  "basemaps.panels.base-maps-list": "Base maps list",
+  "basemaps.panels.edit-base-map": "Edit base map",
+  "basemaps.panels.add-layer": "Add layer",
+
   "map.scale.units.meters": "m",
   "map.scale.units.kilometers": "km",
 

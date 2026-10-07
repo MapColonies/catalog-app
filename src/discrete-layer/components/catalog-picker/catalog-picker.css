@@ -1,0 +1,42 @@
+.catalogPicker {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.catalogPicker .catalogPickerTree {
+  flex: 1;
+  margin: 0 12px 0 0;
+  padding: 12px 0 0 12px;
+}
+
+.catalogPicker .catalogPickerDisabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+body[dir='rtl'] .catalogPicker .catalogPickerTree {
+  margin: 0 0 0 12px;
+  padding: 12px 12px 0 0;
+}
+
+.catalogPicker .catalogPickerDetails {
+  flex: 0 0 25%;
+  overflow: auto;
+  margin-top: 8px;
+  margin-right: 12px;
+  padding: 8px 8px 8px 20px;
+}
+
+body[dir='rtl'] .catalogPicker .catalogPickerDetails {
+  margin-right: 0;
+  margin-left: 12px;
+  padding: 8px 20px 8px 8px;
+}
+
+.catalogPicker .catalogPickerActions {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 8px;
+  padding: 12px;
+}

@@ -224,6 +224,11 @@ body[dir='rtl'] .sideDetailsPanel {
   padding-right: 20px;
 }
 
+.panelContent {
+  height: calc(100% - 60px);
+  overflow: auto;
+}
+
 .version {
   margin: 0 16px;
 }
