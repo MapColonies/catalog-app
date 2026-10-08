@@ -51,13 +51,14 @@ import { LinkType } from '../../common/models/link-type.enum';
 import { Mode } from '../../common/models/mode.enum';
 import { ActiveLayersIcon } from '../../icons/4font/ActiveLayers';
 import { CatalogTreeComponent } from '../components/catalog-tree/catalog-tree';
-import { DEFAULT_LAYER_MANAGER_META_MAPPING } from '../components/helpers/generateLayerComponent';
 import ExportDrawingHandler from '../components/export-layer/export-drawing-handler.component';
 import { ExportLayerComponent } from '../components/export-layer/export-layer.component';
 import ExportPolygonsRenderer from '../components/export-layer/export-polygons-renderer.component';
 // import { Filters } from '../components/filters/filters';
+import { DEFAULT_LAYER_MANAGER_META_MAPPING } from '../components/helpers/generateLayerComponent';
 import { JobsDialog } from '../components/job-manager/jobs.dialog';
 import { EntityDialog } from '../components/layer-details/entity.dialog';
+import { ManageLinksDialog } from '../components/layer-details/links-management/manage-links.dialog';
 import { EntityRasterDialog } from '../components/layer-details/raster/entity.raster.dialog';
 import { LayersResults } from '../components/layers-results/layers-results';
 import { ActionsContextMenu } from '../components/map-container/contextMenus/actions.context-menu';
@@ -77,7 +78,6 @@ import { PolygonSelectionUi } from '../components/map-container/polygon-selectio
 import { SelectedLayersContainer } from '../components/map-container/selected-layers-container';
 import { Terrain } from '../components/map-container/terrain';
 import { SystemCoreInfoDialog } from '../components/system-status/system-core-info/system-core-info.dialog';
-import { ManageLinksDialog } from '../components/layer-details/links-management/manage-links.dialog';
 import {
   JobModelType,
   LayerMetadataMixedUnion,
