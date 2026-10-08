@@ -14,6 +14,8 @@ import { CatalogPicker } from '../../catalog-picker/catalog-picker';
 
 const LAYER_ROOTS_NAMES: TreeRootName[] = ['catalog', 'bests'];
 
+const CATALOGS_TO_FETCH = [RecordType.RECORD_RASTER];
+
 export enum BasemapActionSelector {
   CatalogResource,
   External_XYZ,
@@ -47,8 +49,9 @@ export const PickLayerPanel: React.FC<PickLayerPanelProps> = observer(
       <>
         {actionSelector === BasemapActionSelector.CatalogResource && (
           <CatalogPicker
-            catalogsToFetch={[RecordType.RECORD_RASTER]}
+            catalogsToFetch={CATALOGS_TO_FETCH}
             treeRootSections={filteredCatalogRoots}
+            // TODO: put a real value here
             disableItemsByUniqueness={undefined}
             setSelectedItem={setSelectedItem}
             onClose={onClose}
