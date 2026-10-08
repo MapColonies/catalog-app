@@ -1,8 +1,9 @@
 import React from 'react';
-import { FormattedMessage } from 'react-intl';
-import { Button, Typography } from '@map-colonies/react-core';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { IconButton, Tooltip, Typography } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
 import { CaptureSize, THUMBNAIL_CAPTURE_DIMENSIONS } from './links-management.utils';
+import { LinkStatusBadge } from './link-status-badge';
 
 interface ThumbnailSlotProps {
   size: CaptureSize;
@@ -25,46 +26,45 @@ export const ThumbnailSlot: React.FC<ThumbnailSlotProps> = ({
   onSelect,
   onRemoveChange,
 }) => {
+  const intl = useIntl();
   const { width, height } = THUMBNAIL_CAPTURE_DIMENSIONS[size];
+  const dimensionsLabel = `${width}×${height}`;
+  const removeChangeLabel = intl.formatMessage({
+    id: 'links-management.dialog.remove-change-btn.text',
+  });
 
   const content = (
     <>
       <Box className="linkSlotPreview">
         {previewUrl ? (
-          <img src={previewUrl} alt={size} />
+          <img src={previewUrl} alt={dimensionsLabel} />
         ) : (
           <Typography tag="span" className="emptyState">
             <FormattedMessage id="links-management.dialog.empty-state.text" />
           </Typography>
         )}
       </Box>
-      <Typography tag="div" className="linkSlotLabel">
-        {`${size} (${width}×${height})`}
-      </Typography>
-      {(hasDraft || hasExisting) && (
-        <Typography tag="div" className={hasDraft ? 'statusChanged' : 'statusSaved'}>
-          <FormattedMessage
-            id={
-              hasDraft
-                ? 'links-management.dialog.changed.text'
-                : 'links-management.dialog.saved.text'
-            }
-          />
-        </Typography>
-      )}
       {hasDraft && (
-        <Box className="linkSlotActions">
-          <Button
+        <Tooltip content={removeChangeLabel}>
+          <IconButton
+            className="revertButton"
             type="button"
+            icon={{ icon: 'undo', size: 'xsmall' }}
+            label={removeChangeLabel}
             onClick={(evt: React.MouseEvent): void => {
               evt.stopPropagation();
+              evt.preventDefault();
               onRemoveChange();
             }}
-          >
-            <FormattedMessage id="links-management.dialog.remove-change-btn.text" />
-          </Button>
-        </Box>
+          />
+        </Tooltip>
       )}
+      <Box className="thumbnailSlotFooter">
+        <Typography tag="span" className="linkSlotLabel" dir="ltr">
+          {dimensionsLabel}
+        </Typography>
+        {(hasDraft || hasExisting) && <LinkStatusBadge status={hasDraft ? 'changed' : 'saved'} />}
+      </Box>
     </>
   );
 

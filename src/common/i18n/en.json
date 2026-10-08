@@ -191,6 +191,7 @@
   "links-management.dialog.saved.text": "Saved",
   "links-management.dialog.no-basemap.text": "No basemap",
   "links-management.dialog.capture-thumbnail-btn.text": "Capture thumbnail",
+  "links-management.dialog.capture-hint.text": "Frame the layer on the map, pick a thumbnail size, then capture.",
   "links-management.dialog.import-btn.text": "Import",
   "links-management.dialog.export-btn.text": "Export",
   "links-management.dialog.export-disabled-dirty.tooltip": "Save or discard your changes before exporting",

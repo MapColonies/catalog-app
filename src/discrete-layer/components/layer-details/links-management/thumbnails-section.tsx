@@ -1,7 +1,7 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Box } from '@map-colonies/react-components';
-import { Button, CircularProgress } from '@map-colonies/react-core';
+import { Button, CircularProgress, Typography } from '@map-colonies/react-core';
 import { LinkType } from '../../../../common/models/link-type.enum';
 import { DraftLinksMap } from '../../../models/discreteLayersStore';
 import { ILayerImage } from '../../../models/layerImage';
@@ -61,31 +61,38 @@ export const ThumbnailsSection: React.FC<ThumbnailsSectionProps> = ({
         })}
       </Box>
       {isComposingCapture ? (
+        <>
+          <Typography tag="p" className="captureComposeHint">
+            <FormattedMessage id="links-management.dialog.capture-hint.text" />
+          </Typography>
+          <Box className="linkSlotActions">
+            <Button
+              type="button"
+              disabled={isCapturing || isScreenshotContentLoading}
+              onClick={onCancelCapture}
+            >
+              <FormattedMessage id="general.cancel-btn.text" />
+            </Button>
+            <Button
+              raised
+              type="button"
+              disabled={isCapturing || isScreenshotContentLoading}
+              onClick={onCaptureConfirm}
+            >
+              {isCapturing ? (
+                <CircularProgress className="loading" />
+              ) : (
+                <FormattedMessage id="links-management.dialog.capture-btn.text" />
+              )}
+            </Button>
+          </Box>
+        </>
+      ) : (
         <Box className="linkSlotActions">
-          <Button
-            type="button"
-            disabled={isCapturing || isScreenshotContentLoading}
-            onClick={onCancelCapture}
-          >
-            <FormattedMessage id="general.cancel-btn.text" />
-          </Button>
-          <Button
-            raised
-            type="button"
-            disabled={isCapturing || isScreenshotContentLoading}
-            onClick={onCaptureConfirm}
-          >
-            {isCapturing ? (
-              <CircularProgress className="loading" />
-            ) : (
-              <FormattedMessage id="links-management.dialog.capture-btn.text" />
-            )}
+          <Button outlined type="button" onClick={onEnterCaptureMode}>
+            <FormattedMessage id="links-management.dialog.capture-thumbnail-btn.text" />
           </Button>
         </Box>
-      ) : (
-        <Button type="button" onClick={onEnterCaptureMode}>
-          <FormattedMessage id="links-management.dialog.capture-thumbnail-btn.text" />
-        </Button>
       )}
     </>
   );

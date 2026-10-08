@@ -20,7 +20,6 @@ import {
   useCesiumMap,
 } from '@map-colonies/react-components';
 import { GraphQLError } from '../../../../common/components/error/graphql.error-presentor';
-import { Hyperlink } from '../../../../common/components/hyperlink/hyperlink';
 import { LinkType } from '../../../../common/models/link-type.enum';
 import { getLinkUrlWithToken } from '../../helpers/layersUtils';
 import { downloadBlobToClient } from '../utils';
@@ -41,6 +40,8 @@ import {
   THUMBNAIL_SIZE_TO_PROTOCOL,
   withNoCurrentBasemap,
 } from './links-management.utils';
+import { FileLinkSlot } from './file-link-slot';
+import { LinkSection } from './link-section';
 import { ThumbnailsSection } from './thumbnails-section';
 import { exportLayerResourcesZip } from './zip-export';
 import { parseLayerResourcesZip, ZipImportError, ZipImportErrorCode } from './zip-import';
@@ -59,6 +60,8 @@ interface IMergedLink {
   name?: string;
   description?: string;
 }
+
+const THUMBNAIL_PROTOCOLS = Object.values(THUMBNAIL_SIZE_TO_PROTOCOL);
 
 const PreviewViewerBridge: React.FC<{
   viewerRef: React.MutableRefObject<CesiumViewer | undefined>;
@@ -91,8 +94,6 @@ export const ManageLinksDialog: React.FC<ManageLinksDialogProps> = observer(
     const intl = useIntl();
     const mutationQuery = useQuery();
     const pendingMergedLinksRef = useRef<IMergedLink[] | null>(null);
-    const legendFileInputRef = useRef<HTMLInputElement>(null);
-    const documentationFileInputRef = useRef<HTMLInputElement>(null);
     const previewViewerRef = useRef<CesiumViewer | undefined>(undefined);
     const importInputRef = useRef<HTMLInputElement>(null);
     const [isComposingCapture, setIsComposingCapture] = useState(false);
@@ -101,14 +102,10 @@ export const ManageLinksDialog: React.FC<ManageLinksDialogProps> = observer(
     const [isScreenshotContentLoading, setIsScreenshotContentLoading] = useState(false);
     const [isExporting, setIsExporting] = useState(false);
     const [importErrorCode, setImportErrorCode] = useState<ZipImportErrorCode | null>(null);
-    const [expandedSections, setExpandedSections] = useState({
-      thumbnails: true,
-      legend: false,
-      documentation: false,
-    });
 
     const draftLinks = store.discreteLayersStore.draftLinks ?? {};
     const isDirty = Object.keys(draftLinks).length > 0;
+    const hasThumbnailDrafts = THUMBNAIL_PROTOCOLS.some((protocol) => !!draftLinks[protocol]);
 
     const sceneMode =
       layerRecord?.type === RecordType.RECORD_3D
@@ -171,10 +168,6 @@ export const ManageLinksDialog: React.FC<ManageLinksDialogProps> = observer(
       viewer.screenshot.stopCapturePreview();
       setIsScreenshotContentLoading(false);
     }, [isComposingCapture, selectedCaptureSize]);
-
-    const toggleSection = (section: keyof typeof expandedSections): void => {
-      setExpandedSections({ ...expandedSections, [section]: !expandedSections[section] });
-    };
 
     const handleCaptureConfirm = async (): Promise<void> => {
       const viewer = previewViewerRef.current;
@@ -287,64 +280,17 @@ export const ManageLinksDialog: React.FC<ManageLinksDialogProps> = observer(
     const renderFileSlot = (
       protocol: LinkType,
       accept: string,
-      inputRef: React.RefObject<HTMLInputElement>,
       showOpenLink: boolean
-    ): JSX.Element => {
-      const draft = draftLinks[protocol];
-      const existingUrl = getLinkUrlWithToken(layerRecord?.links ?? [], protocol);
-      const displayName =
-        draft?.fileName ?? (existingUrl ? existingUrl.split('/').pop() : undefined);
-
-      return (
-        <Box className="linkSlot fileSlot">
-          <input
-            ref={inputRef}
-            type="file"
-            accept={accept}
-            className="hiddenFileInput"
-            onChange={readFileAsDraft(protocol)}
-          />
-          {displayName ? (
-            <Typography tag="div" className="fileName" dir="ltr">
-              {displayName}
-            </Typography>
-          ) : (
-            <Typography tag="span" className="emptyState">
-              <FormattedMessage id="links-management.dialog.empty-state.text" />
-            </Typography>
-          )}
-          {(draft || existingUrl) && (
-            <Typography tag="div" className={draft ? 'statusChanged' : 'statusSaved'}>
-              <FormattedMessage
-                id={
-                  draft
-                    ? 'links-management.dialog.changed.text'
-                    : 'links-management.dialog.saved.text'
-                }
-              />
-            </Typography>
-          )}
-          <Box className="linkSlotActions">
-            {showOpenLink && existingUrl && !draft && (
-              <Hyperlink className="openLink" url={existingUrl}>
-                <FormattedMessage id="links-management.dialog.open-btn.text" />
-              </Hyperlink>
-            )}
-            <Button type="button" onClick={(): void => inputRef.current?.click()}>
-              <FormattedMessage id="links-management.dialog.replace-btn.text" />
-            </Button>
-            {draft && (
-              <Button
-                type="button"
-                onClick={(): void => store.discreteLayersStore.removeDraftLink(protocol)}
-              >
-                <FormattedMessage id="links-management.dialog.remove-change-btn.text" />
-              </Button>
-            )}
-          </Box>
-        </Box>
-      );
-    };
+    ): JSX.Element => (
+      <FileLinkSlot
+        accept={accept}
+        draft={draftLinks[protocol]}
+        existingUrl={getLinkUrlWithToken(layerRecord?.links ?? [], protocol)}
+        showOpenLink={showOpenLink}
+        onFileChange={readFileAsDraft(protocol)}
+        onRemoveChange={(): void => store.discreteLayersStore.removeDraftLink(protocol)}
+      />
+    );
 
     return (
       <Box id="manageLinksDialog">
@@ -354,7 +300,45 @@ export const ManageLinksDialog: React.FC<ManageLinksDialogProps> = observer(
             <IconButton className="closeIcon mc-icon-Close" label="CLOSE" onClick={handleCancel} />
           </DialogTitle>
           <DialogContent className="dialogBody">
-            <div className="previewMapColumn">
+            <Box className="linkSectionsColumn">
+              <LinkSection
+                titleId="links-management.dialog.thumbnails.section-title"
+                icon="image"
+                hasChanges={hasThumbnailDrafts}
+                defaultOpen
+              >
+                <ThumbnailsSection
+                  layerRecord={layerRecord}
+                  draftLinks={draftLinks}
+                  isComposingCapture={isComposingCapture}
+                  selectedCaptureSize={selectedCaptureSize}
+                  isCapturing={isCapturing}
+                  isScreenshotContentLoading={isScreenshotContentLoading}
+                  onEnterCaptureMode={(): void => setIsComposingCapture(true)}
+                  onCancelCapture={(): void => setIsComposingCapture(false)}
+                  onSelectCaptureSize={setSelectedCaptureSize}
+                  onCaptureConfirm={(): void => void handleCaptureConfirm()}
+                  onRemoveChange={(protocol): void =>
+                    store.discreteLayersStore.removeDraftLink(protocol)
+                  }
+                />
+              </LinkSection>
+              <LinkSection
+                titleId="links-management.dialog.legend.section-title"
+                icon="layers"
+                hasChanges={!!draftLinks[LinkType.LEGEND_IMG]}
+              >
+                {renderFileSlot(LinkType.LEGEND_IMG, '.png,.bmp,.jpeg,.jpg', false)}
+              </LinkSection>
+              <LinkSection
+                titleId="links-management.dialog.documentation.section-title"
+                icon="description"
+                hasChanges={!!draftLinks[LinkType.LEGEND_DOC]}
+              >
+                {renderFileSlot(LinkType.LEGEND_DOC, '.pdf', true)}
+              </LinkSection>
+            </Box>
+            <Box className="previewMapColumn">
               <CesiumMap
                 full
                 layerManagerMetaMapping={DEFAULT_LAYER_MANAGER_META_MAPPING}
@@ -369,69 +353,6 @@ export const ManageLinksDialog: React.FC<ManageLinksDialogProps> = observer(
                 {layerRecord && <PreviewInitialFlyTo key={layerRecord.id} layer={layerRecord} />}
                 {previewLayerElement}
               </CesiumMap>
-            </div>
-            <Box className="linkSectionsColumn">
-              <Box className="linkSection">
-                <Box
-                  className="linkSectionHeader"
-                  onClick={(): void => toggleSection('thumbnails')}
-                >
-                  <Typography tag="div">
-                    <FormattedMessage id="links-management.dialog.thumbnails.section-title" />
-                  </Typography>
-                </Box>
-                {expandedSections.thumbnails && (
-                  <Box className="linkSectionBody">
-                    <ThumbnailsSection
-                      layerRecord={layerRecord}
-                      draftLinks={draftLinks}
-                      isComposingCapture={isComposingCapture}
-                      selectedCaptureSize={selectedCaptureSize}
-                      isCapturing={isCapturing}
-                      isScreenshotContentLoading={isScreenshotContentLoading}
-                      onEnterCaptureMode={(): void => setIsComposingCapture(true)}
-                      onCancelCapture={(): void => setIsComposingCapture(false)}
-                      onSelectCaptureSize={setSelectedCaptureSize}
-                      onCaptureConfirm={(): void => void handleCaptureConfirm()}
-                      onRemoveChange={(protocol): void =>
-                        store.discreteLayersStore.removeDraftLink(protocol)
-                      }
-                    />
-                  </Box>
-                )}
-              </Box>
-              <Box className="linkSection">
-                <Box className="linkSectionHeader" onClick={(): void => toggleSection('legend')}>
-                  <Typography tag="div">
-                    <FormattedMessage id="links-management.dialog.legend.section-title" />
-                  </Typography>
-                </Box>
-                {expandedSections.legend && (
-                  <Box className="linkSectionBody">
-                    {renderFileSlot(
-                      LinkType.LEGEND_IMG,
-                      '.png,.bmp,.jpeg,.jpg',
-                      legendFileInputRef,
-                      false
-                    )}
-                  </Box>
-                )}
-              </Box>
-              <Box className="linkSection">
-                <Box
-                  className="linkSectionHeader"
-                  onClick={(): void => toggleSection('documentation')}
-                >
-                  <Typography tag="div">
-                    <FormattedMessage id="links-management.dialog.documentation.section-title" />
-                  </Typography>
-                </Box>
-                {expandedSections.documentation && (
-                  <Box className="linkSectionBody">
-                    {renderFileSlot(LinkType.LEGEND_DOC, '.pdf', documentationFileInputRef, true)}
-                  </Box>
-                )}
-              </Box>
             </Box>
           </DialogContent>
           <DialogActions>
@@ -439,14 +360,14 @@ export const ManageLinksDialog: React.FC<ManageLinksDialogProps> = observer(
               {/* eslint-disable-next-line */}
               <GraphQLError error={mutationQuery.error ?? {}} />
               {importErrorCode && (
-                <Typography tag="div" className="statusChanged">
+                <Typography tag="div" className="importError">
                   <FormattedMessage
                     id={`links-management.dialog.import-error.${importErrorCode}`}
                   />
                 </Typography>
               )}
             </Box>
-            <Box>
+            <Box className="dialogActionsButtons">
               <input
                 ref={importInputRef}
                 type="file"
@@ -454,7 +375,7 @@ export const ManageLinksDialog: React.FC<ManageLinksDialogProps> = observer(
                 className="hiddenFileInput"
                 onChange={handleImportFileChange}
               />
-              <Button type="button" onClick={(): void => importInputRef.current?.click()}>
+              <Button outlined type="button" onClick={(): void => importInputRef.current?.click()}>
                 <FormattedMessage id="links-management.dialog.import-btn.text" />
               </Button>
               <Tooltip
@@ -468,6 +389,7 @@ export const ManageLinksDialog: React.FC<ManageLinksDialogProps> = observer(
               >
                 <span>
                   <Button
+                    outlined
                     type="button"
                     disabled={isDirty || isExporting || !layerRecord}
                     onClick={(): void => void handleExport()}
@@ -480,6 +402,7 @@ export const ManageLinksDialog: React.FC<ManageLinksDialogProps> = observer(
                   </Button>
                 </span>
               </Tooltip>
+              <Box className="actionsSeparator" />
               <Button type="button" onClick={handleCancel}>
                 <FormattedMessage id="general.cancel-btn.text" />
               </Button>
