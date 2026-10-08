@@ -55,8 +55,10 @@ import ExportDrawingHandler from '../components/export-layer/export-drawing-hand
 import { ExportLayerComponent } from '../components/export-layer/export-layer.component';
 import ExportPolygonsRenderer from '../components/export-layer/export-polygons-renderer.component';
 // import { Filters } from '../components/filters/filters';
+import { DEFAULT_LAYER_MANAGER_META_MAPPING } from '../components/helpers/generateLayerComponent';
 import { JobsDialog } from '../components/job-manager/jobs.dialog';
 import { EntityDialog } from '../components/layer-details/entity.dialog';
+import { ManageLinksDialog } from '../components/layer-details/links-management/manage-links.dialog';
 import { EntityRasterDialog } from '../components/layer-details/raster/entity.raster.dialog';
 import { LayersResults } from '../components/layers-results/layers-results';
 import { ActionsContextMenu } from '../components/map-container/contextMenus/actions.context-menu';
@@ -158,6 +160,7 @@ const DiscreteLayerView: React.FC = observer(() => {
   const [isRevertRasterDialogOpen, setIsRevertRasterDialogOpen] = useState<boolean>(false);
   const [isSystemsJobsDialogOpen, setIsSystemsJobsDialogOpen] = useState<boolean>(false);
   const [isSystemCoreInfoDialogOpen, setIsSystemCoreInfoDialogOpen] = useState<boolean>(false);
+  const [isManageLinksDialogOpen, setIsManageLinksDialogOpen] = useState<boolean>(false);
   const [isCreateEntityMenuOpen, setIsCreateEntityMenuOpen] = useState<boolean>(false);
   const [tabsPanelExpanded, setTabsPanelExpanded] = useState<boolean>(true);
   const [detailsPanelExpanded, setDetailsPanelExpanded] = useState<boolean>(false);
@@ -332,6 +335,7 @@ const DiscreteLayerView: React.FC = observer(() => {
       REMOVE: intl.formatMessage({ id: 'active-layers.remove' }),
       BASE_MAP_TITLE: intl.formatMessage({ id: 'map-settings.base-map.title' }),
       TERRAIN_TITLE: intl.formatMessage({ id: 'record-type.record_quantized_mesh.label' }),
+      NONE: intl.formatMessage({ id: 'links-management.dialog.no-basemap.text' }),
       SHOW_FEATURE_ON_MAP: intl.formatMessage({ id: 'geocoder-panel.show-feature-on-map' }),
       IN_MAP_EXTENT: intl.formatMessage({ id: 'geocoder-panel.in-map-extent' }),
       SEARCH_PLACEHOLDER: intl.formatMessage({ id: 'general.search.placeholder' }),
@@ -1018,17 +1022,7 @@ const DiscreteLayerView: React.FC = observer(() => {
   }, [activeTabView, actionsMenuDimensions]);
 
   const layerManagerMetaMapping = useMemo<ILayerManagerMetaMapping>(() => {
-    return {
-      layer: {
-        id: 'id',
-        name: 'layerRecord.productName',
-        footprint: 'layerRecord.footprint',
-      },
-      dataLayer: {
-        name: 'layerRecord.featureStructure.aliasLayerName',
-        fields: 'layerRecord.featureStructure.fields',
-      },
-    };
+    return DEFAULT_LAYER_MANAGER_META_MAPPING;
   }, []);
 
   const drapingLayerPredicate = useMemo<DrapingLayerPredicate | undefined>(() => {
@@ -1434,6 +1428,7 @@ const DiscreteLayerView: React.FC = observer(() => {
                   setJobToOpenJobManager({ id, resourceId, updated });
                   setIsSystemsJobsDialogOpen(open);
                 }}
+                handleOpenManageLinksDialog={setIsManageLinksDialogOpen}
               />
 
               <Terrain />
@@ -1579,6 +1574,13 @@ const DiscreteLayerView: React.FC = observer(() => {
           <SystemCoreInfoDialog
             isOpen={isSystemCoreInfoDialogOpen}
             onSetOpen={setIsSystemCoreInfoDialogOpen}
+          />
+        )}
+        {isManageLinksDialogOpen && (
+          <ManageLinksDialog
+            isOpen={isManageLinksDialogOpen}
+            onSetOpen={setIsManageLinksDialogOpen}
+            layerRecord={store.discreteLayersStore.selectedLayer}
           />
         )}
       </Box>

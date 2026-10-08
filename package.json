@@ -161,6 +161,7 @@
     "graphql-request": "^7.4.0",
     "graphql-ws": "^6.0.8",
     "https-browserify": "^1.0.0",
+    "jszip": "^3.10.1",
     "jsum": "^2.0.0-alpha.4",
     "lodash": "4.17.20",
     "mobx": "6.2.0",
