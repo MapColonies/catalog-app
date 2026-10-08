@@ -20,7 +20,16 @@ module.exports = function override(config, env) {
     ...config.resolve.alias,
     'react-dnd': path.resolve(__dirname, './node_modules/react-dnd'),
     'react-dnd-html5-backend': path.resolve(__dirname, './node_modules/react-dnd-html5-backend'),
+    'react-native$': 'react-native-web',
   };
+
+  config.resolve.extensions = [
+    '.web.js',
+    '.web.jsx',
+    '.web.ts',
+    '.web.tsx',
+    ...(config.resolve.extensions || []),
+  ];
 
   config.plugins.push(
     new webpack.ProvidePlugin({

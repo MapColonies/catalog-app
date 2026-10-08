@@ -29,10 +29,7 @@ import CONFIG from '../../../common/config';
 import { getMax } from '../../../common/helpers/array';
 import { dateFormatter } from '../../../common/helpers/formatters';
 import { isPolygonPartsShown, isUnpublished } from '../../../common/helpers/style';
-import {
-  getResponseErrorMesssage,
-  getResponseErrorURL,
-} from '../../../common/helpers/server-error';
+import { getResponseErrorMesssage, getResponseErrorURL } from '../helpers/errorUtils';
 import {
   CRUDAction,
   getActionsWithDisable,

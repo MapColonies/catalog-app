@@ -1,5 +1,4 @@
 .errorContainer {
-  flex-grow: 1;
   display: flex;
   color: var(--mdc-theme-gc-error-high);
   align-items: flex-start;
@@ -13,6 +12,7 @@
 .errorsList {
   list-style: circle;
   margin: 0;
+  padding-left: 32px;
   height: 60px;
   min-width: 264px;
   overflow-y: auto;
@@ -24,4 +24,8 @@ body[dir='rtl'] .errorsList {
 
 body[dir='rtl'] .errorContainer {
   flex-direction: row-reverse;
+}
+
+.errorsList li {
+  text-align: start;
 }

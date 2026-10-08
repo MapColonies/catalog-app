@@ -12,8 +12,9 @@ import {
   TextField,
 } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
-import { ValidationsError } from '../../../common/components/error/validations.error-presentor';
+import { ErrorPresentor } from '../error/error-presentor';
 import { FieldLabelComponent } from '../../../common/components/form/field-label';
+import { formatErrors } from '../helpers/errorUtils';
 import { emphasizeByHTML } from '../../../common/helpers/formatters';
 
 import './poi.dialog.css';
@@ -130,7 +131,12 @@ export const PoiDialog: React.FC<PoiDialogProps> = ({
             <Box className="footer">
               <Box className="messages">
                 {!isEmpty(formik.errors) && (
-                  <ValidationsError errors={getValidationErrors(formik.errors)} />
+                  <ErrorPresentor
+                    errors={formatErrors(
+                      intl,
+                      Object.values(getValidationErrors(formik.errors)).flat()
+                    )}
+                  />
                 )}
               </Box>
               <Box className="buttons">

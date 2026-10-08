@@ -18,6 +18,7 @@ import { getLayerLink } from '../components/helpers/layersUtils';
 import { LayerMetadataMixedUnionKeys, LayerRecordTypes, LayerRecordTypesKeys } from '../components/layer-details/entity-types-keys';
 import { extractDescriptorRelatedFieldNames, getFlatEntityDescriptors } from '../components/layer-details/utils';
 import { TabViews } from '../views/tab-views';
+import { IError } from '../components/helpers/errorUtils';
 import { searchParams } from './search-params';
 import { IRootStore, RootStoreType } from './RootStore';
 import { ILayerImage } from './layerImage';
@@ -72,6 +73,7 @@ const INITIAL_STATE = {
   baseMaps: CONFIG.BASE_MAPS,
   mapViewerExtentPolygon: undefined,
   customValidationError: undefined,
+  serviceErrors: undefined,
   polygonPartsLayer: undefined,
   polygonPartsInfo: [],
   isActiveLayersImages: false,
@@ -99,7 +101,8 @@ export const discreteLayersStore = ModelBase
     capabilities: types.maybe(types.frozen<CapabilityModelType[]>(INITIAL_STATE.capabilities)),
     baseMaps: types.maybe(types.frozen<IBaseMaps>(INITIAL_STATE.baseMaps)),
     mapViewerExtentPolygon: types.maybe(types.frozen<Feature|undefined>(INITIAL_STATE.mapViewerExtentPolygon)),
-    customValidationError: types.maybe(types.frozen<Record<string,string[]>|undefined>(INITIAL_STATE.customValidationError)),
+    customValidationError: types.maybe(types.frozen<IError|undefined>(INITIAL_STATE.customValidationError)),
+    serviceErrors: types.maybe(types.frozen<Map<string, IError[]>|undefined>(INITIAL_STATE.serviceErrors)),
     polygonPartsLayer: types.maybe(types.frozen<ILayerImage>(INITIAL_STATE.polygonPartsLayer as unknown as ILayerImage)),
     polygonPartsInfo: types.maybe(types.frozen<Feature<Geometry, GeoJsonProperties>[]>(INITIAL_STATE.polygonPartsInfo)),
     isActiveLayersImages: types.maybe(types.frozen<boolean>(INITIAL_STATE.isActiveLayersImages)),
@@ -490,12 +493,30 @@ export const discreteLayersStore = ModelBase
       self.mapViewerExtentPolygon = cloneDeep(feature);
     }
 
-    function setCustomValidationError(err: Record<string, string[]> | undefined): void {
+    function setCustomValidationError(err: IError): void {
       self.customValidationError = cloneDeep(err);
     }
 
     function clearCustomValidationError(): void {
       self.customValidationError = undefined;
+    }
+
+    function setServiceError(key: string, err: IError[]): void {
+      const currentErrors = self.serviceErrors
+        ? new Map(self.serviceErrors)
+        : new Map<string, IError[]>();
+      currentErrors.set(key, err);
+      self.serviceErrors = currentErrors;
+    }
+
+    function clearServiceError(key: string): void {
+      if (!self.serviceErrors) {
+        return;
+      }
+
+      const currentErrors = new Map(self.serviceErrors);
+      currentErrors.delete(key);
+      self.serviceErrors = currentErrors.size > 0 ? currentErrors : undefined;
     }
 
     function setPolygonPartsLayer(layer: ILayerImage | undefined): void {
@@ -707,10 +728,11 @@ export const discreteLayersStore = ModelBase
       resetAppState,
       resetTabView,
       getFieldConfig,
-      resetUpdateMode,
       setMapViewerExtentPolygon,
       setCustomValidationError,
       clearCustomValidationError,
+      setServiceError,
+      clearServiceError,
       setPolygonPartsLayer,
       setPolygonPartsInfo,
       addPolygonPartsInfo,
