@@ -265,7 +265,7 @@ const DiscreteLayerView: React.FC = observer(() => {
       });
     }
 
-    void store.catalogTreeStore.capabilitiesFetch(fullCatalogLayers);
+    void store.catalogTreeStore.fetchAndSetCapabilities(fullCatalogLayers);
   }, [data]);
 
   useEffect(() => {
@@ -410,7 +410,7 @@ const DiscreteLayerView: React.FC = observer(() => {
   const fetchCatalog = async () => {
     try {
       setIsFilterSearchLoading(true);
-      const catalog = await store.discreteLayersStore.fetchAllCatalog(buildFilters);
+      const catalog = await store.discreteLayersStore.fetchCatalogs(buildFilters);
       setData(catalog);
       setIsFilterSearchLoading(false);
     } catch (error: any) {
@@ -1346,7 +1346,9 @@ const DiscreteLayerView: React.FC = observer(() => {
             {activeTabView === TabViews.BASEMAPS_MANAGEMENT && (
               <Box className="tabContentContainer">
                 {getActiveTabHeader(activeTabView, site)}
-                <BasemapsRouter />
+                <Box className="panelContent">
+                  <BasemapsRouter />
+                </Box>
               </Box>
             )}
           </Box>

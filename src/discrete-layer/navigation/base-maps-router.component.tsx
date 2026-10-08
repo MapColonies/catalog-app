@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useMemo } from 'react';
+import { useIntl } from 'react-intl';
 import { Button, useTheme } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
 import {
@@ -6,87 +7,82 @@ import {
   NavigationIndependentTree,
   NavigationContainer,
   createStackNavigator,
+  StackHeaderProps,
+  StackScreenProps,
 } from '../../common/navigation/react-navigation.proxy';
+import {
+  BasemapActionSelector,
+  PickLayerPanel,
+} from '../components/basemaps/add-layer/pick-layer.panel';
 
-interface BasemapsPanelProps {
-  navigation: {
-    navigate: (routeName: BasemapsRouteName) => void;
-  };
-}
-
-type PanelParams<T = {}> = BasemapsPanelProps & T;
+import './base-maps-router.css';
 
 type BasemapsStackPanel = {
-  BaseMapsList: PanelParams;
-  EditBaseMap: PanelParams;
-  AddLayer: PanelParams;
+  BaseMapsList: undefined;
+  EditBaseMap: undefined;
+  AddLayer: { actionSelector: BasemapActionSelector };
 };
 
 type BasemapsRouteName = keyof BasemapsStackPanel;
 
-//#region TODO: Should be deleted when real implementation is exist
-interface PlaceholderPanelProps extends BasemapsPanelProps {
-  currentScreen: BasemapsRouteName;
-  label: string;
-}
-const PlaceholderPanel: React.FC<PlaceholderPanelProps> = ({
-  currentScreen,
-  label,
-  navigation,
-}) => {
-  const STACK_SCREENS: Array<{ name: BasemapsRouteName; label: string }> = [
-    { name: 'BaseMapsList', label: 'Base maps list' },
-    { name: 'EditBaseMap', label: 'Edit base map' },
-    { name: 'AddLayer', label: 'Add layer' },
-  ];
+const PANELS_IDS: Record<BasemapsRouteName, string> = {
+  BaseMapsList: 'basemaps.panels.base-maps-list',
+  EditBaseMap: 'basemaps.panels.edit-base-map',
+  AddLayer: 'basemaps.panels.add-layer',
+};
+
+const XXXBasemapsHeaderMOCKXXX: React.FC<StackHeaderProps> = ({ route, navigation }) => {
+  const intl = useIntl();
+  const { routes } = navigation.getState();
+  // Each screen renders its own header, so only show the trail up to this screen
+  const trail = routes.slice(0, routes.findIndex(({ key }) => key === route.key) + 1);
 
   return (
-    <Box
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        width: '100%',
-        height: '100%',
-        gap: '1rem',
-        padding: '1rem',
-      }}
-    >
-      <Box>{label}</Box>
+    <Box className="basemapsHeader">
+      <nav className="basemapsBreadcrumb">
+        {trail.map(({ key, name }, index) => {
+          const label = intl.formatMessage({ id: PANELS_IDS[name as BasemapsRouteName] });
+          return (
+            <React.Fragment key={key}>
+              {index > 0 && <span className="basemapsBreadcrumbSeparator">/</span>}
+              {index < trail.length - 1 ? (
+                <button
+                  type="button"
+                  className="basemapsBreadcrumbLink"
+                  onClick={(): void => navigation.popTo(name)}
+                >
+                  {label}
+                </button>
+              ) : (
+                <span aria-current="page">{label}</span>
+              )}
+            </React.Fragment>
+          );
+        })}
+      </nav>
       <Box style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
-        {STACK_SCREENS.filter(({ name }) => name !== currentScreen).map(
-          ({ name, label: targetLabel }) => (
+        {(Object.keys(PANELS_IDS) as BasemapsRouteName[])
+          .filter((name) => name !== route.name)
+          .map((name) => (
             <Button key={name} type="button" onClick={(): void => navigation.navigate(name)}>
-              {targetLabel}
+              {intl.formatMessage({ id: PANELS_IDS[name] })}
             </Button>
-          )
-        )}
+          ))}
       </Box>
     </Box>
   );
 };
-//#endregion
 
-const BaseMapsListScreen: React.FC<BasemapsPanelProps> = ({ navigation }) => (
-  <PlaceholderPanel
-    currentScreen="BaseMapsList"
-    label="PLACEHOLDER_BASEMAPS"
-    navigation={navigation}
-  />
-);
+type BasemapsScreenProps<T extends BasemapsRouteName> = StackScreenProps<BasemapsStackPanel, T>;
 
-const EditBaseMapScreen: React.FC<BasemapsPanelProps> = ({ navigation }) => (
-  <PlaceholderPanel
-    currentScreen="EditBaseMap"
-    label="PLACEHOLDER_EDIT_BASEMAP"
-    navigation={navigation}
-  />
-);
+const BaseMapsListScreen: React.FC<BasemapsScreenProps<'BaseMapsList'>> = () => null;
 
-const AddLayerScreen: React.FC<BasemapsPanelProps> = ({ navigation }) => (
-  <PlaceholderPanel
-    currentScreen="AddLayer"
-    label="PLACEHOLDER_ADD_LAYER"
-    navigation={navigation}
+const EditBaseMapScreen: React.FC<BasemapsScreenProps<'EditBaseMap'>> = () => null;
+
+const AddLayerScreen: React.FC<BasemapsScreenProps<'AddLayer'>> = ({ navigation, route }) => (
+  <PickLayerPanel
+    actionSelector={route.params.actionSelector}
+    onClose={(): void => navigation.goBack()}
   />
 );
 
@@ -94,22 +90,35 @@ const Stack = createStackNavigator<BasemapsStackPanel>();
 
 export const BasemapsRouter: React.FC = () => {
   const theme = useTheme();
-  const navigationTheme = {
-    ...DefaultTheme,
-    colors: {
-      ...DefaultTheme.colors,
-      background: theme.custom?.GC_TAB_ACTIVE_BACKGROUND,
-    },
-  };
+  const navigationTheme = useMemo(
+    () => ({
+      ...DefaultTheme,
+      colors: {
+        ...DefaultTheme.colors,
+        background: theme.custom?.GC_ALTERNATIVE_SURFACE as string,
+      },
+    }),
+    [theme]
+  );
 
   return (
     <NavigationIndependentTree>
       <Box style={{ display: 'flex', flex: 1, width: '100%', height: '100%', minHeight: 0 }}>
         <NavigationContainer documentTitle={{ enabled: false }} theme={navigationTheme}>
-          <Stack.Navigator initialRouteName="BaseMapsList" screenOptions={{ headerShown: false }}>
+          <Stack.Navigator
+            initialRouteName="BaseMapsList"
+            screenOptions={{
+              header: (props): React.ReactNode => <XXXBasemapsHeaderMOCKXXX {...props} />,
+            }}
+          >
             <Stack.Screen name="BaseMapsList" component={BaseMapsListScreen} />
             <Stack.Screen name="EditBaseMap" component={EditBaseMapScreen} />
-            <Stack.Screen name="AddLayer" component={AddLayerScreen} />
+            <Stack.Screen
+              name="AddLayer"
+              component={AddLayerScreen}
+              // TODO: actionSelector should come from the caller once the other selectors land
+              initialParams={{ actionSelector: BasemapActionSelector.CatalogResource }}
+            />
           </Stack.Navigator>
         </NavigationContainer>
       </Box>

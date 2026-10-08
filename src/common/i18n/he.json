@@ -765,6 +765,10 @@
   "map-settings.base-map.scene-mode.title": "מצב תצוגה",
   "map-settings.dialog.title": "הגדרות מפה",
 
+  "basemaps.panels.base-maps-list": "רשימת מפות בסיס",
+  "basemaps.panels.edit-base-map": "עריכת מפת בסיס",
+  "basemaps.panels.add-layer": "הוספת שכבה",
+
   "map.scale.units.meters": "מ'",
   "map.scale.units.kilometers": "קמ'",
 
