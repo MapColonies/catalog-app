@@ -16,10 +16,7 @@ import { Loading } from '../../../common/components/tree/statuses/loading';
 import { getTextStyle, isUnpublished } from '../../../common/helpers/style';
 import { isValidLayerMetadata } from '../../../common/helpers/layer-url';
 import { LinkType } from '../../../common/models/link-type.enum';
-import {
-  getResponseErrorMesssage,
-  getResponseErrorURL,
-} from '../../../common/helpers/server-error';
+import { getResponseErrorMesssage, getResponseErrorURL } from '../helpers/errorUtils';
 import {
   CRUDAction,
   getActionsWithDisable,
