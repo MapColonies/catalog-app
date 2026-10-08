@@ -20,8 +20,9 @@ import {
   CesiumViewer,
   useCesiumMap,
 } from '@map-colonies/react-components';
-import { GraphQLError } from '../../../../common/components/error/graphql.error-presentor';
 import { LinkType } from '../../../../common/models/link-type.enum';
+import { ErrorPresentor } from '../../error/error-presentor';
+import { formatError } from '../../helpers/errorUtils';
 import { getLinkUrlWithToken } from '../../helpers/layersUtils';
 import { downloadBlobToClient } from '../utils';
 import {
@@ -359,8 +360,7 @@ export const ManageLinksDialog: React.FC<ManageLinksDialogProps> = observer(
           </DialogContent>
           <DialogActions>
             <Box className="errors">
-              {/* eslint-disable-next-line */}
-              <GraphQLError error={mutationQuery.error ?? {}} />
+              <ErrorPresentor errors={formatError(intl, mutationQuery.error, 'error')} />
               {importErrorCode && (
                 <Typography tag="div" className="importError">
                   <FormattedMessage
