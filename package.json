@@ -59,7 +59,8 @@
       "\\.(css|less)$": "<rootDir>/src/__mocks__/styleMock.js",
       "(map|collapsible-list|tooltip|icon|date-range-picker|date-range-picker.form-control|date-picker|autocomplete).css": "<rootDir>/src/__mocks__/styleMock.js",
       "(drawHelper|coordinates-tracker.tool|scale-tracker.tool|scene-modes|base-maps|settings|file-picker).css": "<rootDir>/src/__mocks__/styleMock.js",
-      "(ag-grid|ag-theme-alpine|ag-theme-alpine-dark).css": "<rootDir>/src/__mocks__/styleMock.js"
+      "(ag-grid|ag-theme-alpine|ag-theme-alpine-dark).css": "<rootDir>/src/__mocks__/styleMock.js",
+      "^@frillab/copc-adapter/cesium$": "<rootDir>/src/__mocks__/frillabCopcCesiumMock.js"
     },
     "snapshotSerializers": [
       "enzyme-to-json/serializer"
