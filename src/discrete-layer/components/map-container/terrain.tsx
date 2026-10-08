@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { useIntl } from 'react-intl';
 import {
   CesiumCesiumTerrainProvider,
-  CesiumColor,
   CesiumEllipsoidTerrainProvider,
   useCesiumMap,
 } from '@map-colonies/react-components';
@@ -20,7 +19,6 @@ export const Terrain: React.FC<TerrainProps> = () => {
   const intl = useIntl();
 
   mapViewer.scene.globe.depthTestAgainstTerrain = true;
-  mapViewer.scene.globe.baseColor = CesiumColor.WHITESMOKE;
 
   useEffect(() => {
     function isTerrainTileError(e: Record<string, unknown>): boolean {
