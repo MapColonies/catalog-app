@@ -546,11 +546,11 @@ export const discreteLayersStore = ModelBase
 
     type CswCatalogsKeys = '_3D' | '_DEM' | '_VECTOR' | '_RASTER';
 
-    const recordTypeToCswCatalogsKeyMap: Partial<Record<RecordType, CswCatalogsKeys>> = {
-      [RecordType.RECORD_3D]: '_3D',
-      [RecordType.RECORD_DEM]: '_DEM',
-      [RecordType.RECORD_VECTOR]: '_VECTOR',
-      [RecordType.RECORD_RASTER]: '_RASTER',
+    const cswCatalogsTypeToRecordTypeMap: Record<CswCatalogsKeys, RecordType> = {
+      _3D: RecordType.RECORD_3D,
+      _DEM: RecordType.RECORD_DEM,
+      _VECTOR: RecordType.RECORD_VECTOR,
+      _RASTER: RecordType.RECORD_RASTER,
     };
 
     const extractLayerImagesFromCswQueries = (
@@ -573,6 +573,16 @@ export const discreteLayersStore = ModelBase
       }
 
       return layersImages;
+    };
+
+    const findFirstCatalogWithRecords = (
+      cswCatalogs: CswCatalogsModelType
+    ): [keyof CswCatalogsModelType, CswCatalogModelType] | undefined => {
+      const entry = Object.entries(cswCatalogs).find(([_, value]) => {
+        return value !== undefined && value !== null && typeof value === 'object';
+      });
+
+      return entry as [keyof CswCatalogsModelType, CswCatalogModelType] | undefined;
     };
 
     const fetchCatalogsInParallel = async (
@@ -616,36 +626,39 @@ export const discreteLayersStore = ModelBase
       recordTypeToFetch: RecordType,
       pageSize: number,
       filterFn: (type: RecordType) => FilterField[]
-    ): { promise: Promise<{ search: CswCatalogsModelType }>; recordType: RecordType }[] => {
+    ): Promise<{ search: CswCatalogsModelType }>[] => {
       const startIndex = 1;
       if (recordTypeToFetch === RecordType.RECORD_ALL) {
-        return CONFIG.SERVED_ENTITY_TYPES.filter((type) => type !== RecordType.RECORD_ALL).map((type) => ({
-          promise: createQueryAndFetch(type as RecordType, startIndex, pageSize, filterFn),
-          recordType: type as RecordType,
-        }));
+        return CONFIG.SERVED_ENTITY_TYPES.filter((type) => type !== RecordType.RECORD_ALL).map((type) =>
+          createQueryAndFetch(type as RecordType, startIndex, pageSize, filterFn)
+        );
       }
 
-      return [{
-        promise: createQueryAndFetch(recordTypeToFetch, startIndex, pageSize, filterFn),
-        recordType: recordTypeToFetch,
-      }];
+      return [createQueryAndFetch(recordTypeToFetch, startIndex, pageSize, filterFn)];
     };
 
     const buildRecordsPromises = (
-      queriesWithType: { search: CswCatalogsModelType; recordType: RecordType }[],
+      firstQuery: { search: CswCatalogsModelType }[],
       filterFn: (type: RecordType) => FilterField[]
     ): Promise<{ search: CswCatalogsModelType }[]>[] => {
       const recordsPromises: Promise<{ search: CswCatalogsModelType }[]>[] = [];
 
-      queriesWithType.forEach(({ search, recordType }) => {
-        const key = recordTypeToCswCatalogsKeyMap[recordType];
-        const value = key ? search[key] : undefined;
+      firstQuery.forEach((query) => {
+        const entry = findFirstCatalogWithRecords(query.search) as [string, CswCatalogModelType];
+
+        if (!entry) {
+          return;
+        }
+
+        const [key, value] = entry;
 
         const total = value?.cswQuerySummary?.numberOfRecordsMatched;
         const pageSize = value?.cswQuerySummary?.numberOfRecordsReturned;
         const startIndex = value?.cswQuerySummary?.nextRecord;
 
-        if (!total || !pageSize || !startIndex || startIndex <= 0) {
+        const recordType = cswCatalogsTypeToRecordTypeMap[key as CswCatalogsKeys];
+
+        if (!total || !recordType || startIndex <= 0) {
           return;
         }
 
@@ -667,18 +680,14 @@ export const discreteLayersStore = ModelBase
 
       const pageSize = CONFIG.RUNNING_MODE.CSW_DEFAULT_PAGE_SIZE;
 
-      const initialCatalogQueries = buildCatalogsQueries(
+      const initialCatalogQueryPromises = buildCatalogsQueries(
         recordTypeToFetch,
         pageSize,
         filterFn
       );
-      const initialCatalogResults = await Promise.all(initialCatalogQueries.map((query) => query.promise));
-      const initialCatalogResultsWithType = initialCatalogQueries.map((query, index) => ({
-        search: initialCatalogResults[index].search,
-        recordType: query.recordType,
-      }));
+      const initialCatalogResults = await Promise.all(initialCatalogQueryPromises);
 
-      const fetchedRecordsPromises = buildRecordsPromises(initialCatalogResultsWithType, filterFn);
+      const fetchedRecordsPromises = buildRecordsPromises(initialCatalogResults, filterFn);
 
       const fetchedRecords = (await Promise.all(fetchedRecordsPromises)).flat();
 
