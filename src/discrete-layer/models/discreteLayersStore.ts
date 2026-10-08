@@ -303,10 +303,6 @@ export const discreteLayersStore = ModelBase
       self.draftLinks = {};
     }
 
-    function resetUpdateMode(): void {
-      self.customValidationError = undefined;
-    }
-
     function selectLayerByID(layerID: string): void {
       const layer = self.layersImages?.find(layer => layer.id === layerID);
       self.selectedLayer = layer ? cloneDeep(layer) : undefined;
