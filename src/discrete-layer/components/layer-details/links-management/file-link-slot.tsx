@@ -25,6 +25,7 @@ export const FileLinkSlot: React.FC<FileLinkSlotProps> = ({
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const displayName = draft?.fileName ?? (existingUrl ? existingUrl.split('/').pop() : undefined);
+  const hasValue = !!draft || !!existingUrl;
 
   return (
     <Box className="linkSlot fileSlot">
@@ -45,11 +46,17 @@ export const FileLinkSlot: React.FC<FileLinkSlotProps> = ({
             <FormattedMessage id="links-management.dialog.empty-state.text" />
           </Typography>
         )}
-        {(draft || existingUrl) && <LinkStatusBadge status={draft ? 'changed' : 'saved'} />}
+        {hasValue && <LinkStatusBadge status={draft ? 'changed' : 'saved'} />}
       </Box>
       <Box className="linkSlotActions">
         <Button outlined type="button" onClick={(): void => inputRef.current?.click()}>
-          <FormattedMessage id="links-management.dialog.replace-btn.text" />
+          <FormattedMessage
+            id={
+              hasValue
+                ? 'links-management.dialog.replace-btn.text'
+                : 'links-management.dialog.add-btn.text'
+            }
+          />
         </Button>
         {draft && (
           <Button type="button" onClick={onRemoveChange}>

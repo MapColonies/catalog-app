@@ -183,6 +183,7 @@
   "links-management.dialog.legend.section-title": "Legend",
   "links-management.dialog.documentation.section-title": "Documentation",
   "links-management.dialog.capture-btn.text": "Capture",
+  "links-management.dialog.add-btn.text": "Add",
   "links-management.dialog.replace-btn.text": "Replace",
   "links-management.dialog.remove-change-btn.text": "Remove change",
   "links-management.dialog.open-btn.text": "Open",

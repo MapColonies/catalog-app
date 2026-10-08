@@ -14,6 +14,7 @@ import {
 } from '@map-colonies/react-core';
 import {
   Box,
+  CesiumColor,
   CesiumMap,
   CesiumSceneMode,
   CesiumViewer,
@@ -346,6 +347,7 @@ export const ManageLinksDialog: React.FC<ManageLinksDialogProps> = observer(
                 locale={previewLocale}
                 sceneMode={sceneMode}
                 fullscreenButton={false}
+                globeBaseColor={CesiumColor.WHITESMOKE}
                 screenshotEnabled
                 showDebugger
               >
