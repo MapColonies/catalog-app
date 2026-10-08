@@ -2480,10 +2480,10 @@
     lodash "^4.17.21"
     ngeohash "^0.6.3"
 
-"@map-colonies/react-components@^4.19.0":
-  version "4.19.0"
-  resolved "https://registry.yarnpkg.com/@map-colonies/react-components/-/react-components-4.19.0.tgz#5a646cdf8faad954d7adb9fd65016406b9804172"
-  integrity sha512-VSS9oh4gsweHDV2+cLEPpCTqLhy5EbAF+JEsHu687BI2kglXyWZEgmEWMMfZOWFS+2ShEGjt3uUTEecLaVUAkw==
+"@map-colonies/react-components@^4.19.1":
+  version "4.19.1"
+  resolved "https://registry.yarnpkg.com/@map-colonies/react-components/-/react-components-4.19.1.tgz#269d49ee839a4af6dd3c4a50b9a47cff205d411a"
+  integrity sha512-3vIrPYPN+mCZRHIKEFtSoacTJWMzNT23I8tamrOy3mwzkps+cJc4sf4/RmL3urrhjsXPisIqPqDNbMUiTCe7dQ==
   dependencies:
     "@cmcleese/cesium-navigation" "^4.0.7"
     "@date-io/date-fns" "^1.3.13"
@@ -8137,6 +8137,13 @@ cross-env@7.0.2:
   integrity sha512-KZP/bMEOJEDCkDQAyRhu3RL2ZO/SUVrxQVI0G3YEQ+OLbRA3c6zgixe8Mq8a/z7+HKlNEjo8oiLUs8iRijY2Rw==
   dependencies:
     cross-spawn "^7.0.1"
+
+cross-fetch@^4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/cross-fetch/-/cross-fetch-4.1.0.tgz#8f69355007ee182e47fa692ecbaa37a52e43c3d2"
+  integrity sha512-uKm5PU+MHTootlWEY+mZ4vvXoCn4fLQxT9dSc1sXVMSFkINTJVN8cAQROpwcKm8bJ/c7rgZVIBWzH5T78sNZZw==
+  dependencies:
+    node-fetch "^2.7.0"
 
 cross-fetch@^4.1.0:
   version "4.1.0"
