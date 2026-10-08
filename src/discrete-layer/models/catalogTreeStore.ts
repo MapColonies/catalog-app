@@ -97,7 +97,7 @@ const buildParentTreeNode = (
   };
 };
 
-const keyFromTreeIndex: GetNodeKeyFunction = ({ treeIndex }) => treeIndex;
+export const keyFromTreeIndex: GetNodeKeyFunction = ({ treeIndex }) => treeIndex;
 
 export type TreeRootName =
   | 'catalog'

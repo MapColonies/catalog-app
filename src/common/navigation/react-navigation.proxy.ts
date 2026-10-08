@@ -5,4 +5,4 @@ export {
   NavigationContainer,
 } from '@react-navigation/native';
 export { createStackNavigator } from '@react-navigation/stack';
-export type { StackHeaderProps } from '@react-navigation/stack';
+export type { StackHeaderProps, StackScreenProps } from '@react-navigation/stack';

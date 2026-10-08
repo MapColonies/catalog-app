@@ -13,7 +13,7 @@ import { LinkType } from '../../../common/models/link-type.enum';
 import { Mode } from '../../../common/models/mode.enum';
 import { EntityDescriptorModelType, LayerMetadataMixedUnion } from '../../models';
 import { CapabilityModelType } from '../../models/CapabilityModel';
-import { TreeRootSection } from '../../models/catalogTreeStore';
+import { keyFromTreeIndex, TreeRootSection } from '../../models/catalogTreeStore';
 import { ILayerImage } from '../../models/layerImage';
 import { RecordType } from '../../models/RecordTypeEnum';
 import { useStore } from '../../models/RootStore';
@@ -25,9 +25,6 @@ import { queue } from '../snackbar/notification-queue';
 
 import '../catalog-tree/catalog-tree.css';
 import './catalog-picker.css';
-
-// @ts-ignore
-const keyFromTreeIndex = ({ treeIndex }) => treeIndex;
 
 const catalogFilter = (recordType: RecordType): FilterField[] => [
   {
@@ -87,13 +84,20 @@ export const CatalogPicker: React.FC<CatalogPickerProps> = observer(
     };
 
     useEffect(() => {
+      let isCancelled = false;
+
       const fetchCatalog = async (): Promise<void> => {
+        setIsLoading(true);
+        setError(undefined);
         try {
           const fetchedLayers = (await store.discreteLayersStore.fetchCatalogs(
             catalogFilter,
             catalogsToFetch
           )) as ILayerImage[];
           const layersCapabilities = await fetchCapabilities(fetchedLayers);
+          if (isCancelled) {
+            return;
+          }
           const layers = store.discreteLayersStore
             .getPreparedLayersImages(fetchedLayers, true, layersCapabilities)
             .map((layer) => ({
@@ -103,15 +107,23 @@ export const CatalogPicker: React.FC<CatalogPickerProps> = observer(
 
           setRecords(layers);
           setTreeData(store.catalogTreeStore.createCatalogTree(layers, treeRootSections));
-          setIsLoading(false);
         } catch (e) {
-          setIsLoading(false);
-          setError(e);
+          if (!isCancelled) {
+            setError(e);
+          }
+        } finally {
+          if (!isCancelled) {
+            setIsLoading(false);
+          }
         }
       };
 
       void fetchCatalog();
-    }, []);
+
+      return (): void => {
+        isCancelled = true;
+      };
+    }, [catalogsToFetch, treeRootSections, disableItemsByUniqueness]);
 
     const resetSelectedTreeData = (treeData: TreeItem[]) =>
       map({
@@ -177,6 +189,7 @@ export const CatalogPicker: React.FC<CatalogPickerProps> = observer(
                     ? []
                     : [
                         <ProductTypeRenderer
+                          key="productType"
                           data={rowInfo.node as ILayerImage}
                           thumbnailUrl={getLinkUrlWithToken(
                             rowInfo.node.links,

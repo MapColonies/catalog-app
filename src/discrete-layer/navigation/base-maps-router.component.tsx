@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import { Button, useTheme } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
@@ -8,6 +8,7 @@ import {
   NavigationContainer,
   createStackNavigator,
   StackHeaderProps,
+  StackScreenProps,
 } from '../../common/navigation/react-navigation.proxy';
 import {
   BasemapActionSelector,
@@ -16,23 +17,10 @@ import {
 
 import './base-maps-router.css';
 
-interface BasemapsPanelProps {
-  navigation: {
-    navigate: (routeName: BasemapsRouteName) => void;
-    goBack: () => void;
-  };
-}
-
-type PanelParams<T = {}> = BasemapsPanelProps & T;
-
-type AddLayer = {
-  actionSelector: BasemapActionSelector;
-};
-
 type BasemapsStackPanel = {
-  BaseMapsList: PanelParams;
-  EditBaseMap: PanelParams;
-  AddLayer: PanelParams<AddLayer>;
+  BaseMapsList: undefined;
+  EditBaseMap: undefined;
+  AddLayer: { actionSelector: BasemapActionSelector };
 };
 
 type BasemapsRouteName = keyof BasemapsStackPanel;
@@ -85,14 +73,15 @@ const XXXBasemapsHeaderMOCKXXX: React.FC<StackHeaderProps> = ({ route, navigatio
   );
 };
 
-const BaseMapsListScreen: React.FC<BasemapsPanelProps> = () => null;
+type BasemapsScreenProps<T extends BasemapsRouteName> = StackScreenProps<BasemapsStackPanel, T>;
 
-const EditBaseMapScreen: React.FC<BasemapsPanelProps> = () => null;
+const BaseMapsListScreen: React.FC<BasemapsScreenProps<'BaseMapsList'>> = () => null;
 
-const AddLayerScreen: React.FC<BasemapsPanelProps> = ({ navigation }) => (
-  // TODO: ActionSelector should be handled
+const EditBaseMapScreen: React.FC<BasemapsScreenProps<'EditBaseMap'>> = () => null;
+
+const AddLayerScreen: React.FC<BasemapsScreenProps<'AddLayer'>> = ({ navigation, route }) => (
   <PickLayerPanel
-    actionSelector={BasemapActionSelector.CatalogResource}
+    actionSelector={route.params.actionSelector}
     onClose={(): void => navigation.goBack()}
   />
 );
@@ -101,13 +90,16 @@ const Stack = createStackNavigator<BasemapsStackPanel>();
 
 export const BasemapsRouter: React.FC = () => {
   const theme = useTheme();
-  const navigationTheme = {
-    ...DefaultTheme,
-    colors: {
-      ...DefaultTheme.colors,
-      background: theme.custom?.GC_ALTERNATIVE_SURFACE as string,
-    },
-  };
+  const navigationTheme = useMemo(
+    () => ({
+      ...DefaultTheme,
+      colors: {
+        ...DefaultTheme.colors,
+        background: theme.custom?.GC_ALTERNATIVE_SURFACE as string,
+      },
+    }),
+    [theme]
+  );
 
   return (
     <NavigationIndependentTree>
@@ -121,7 +113,12 @@ export const BasemapsRouter: React.FC = () => {
           >
             <Stack.Screen name="BaseMapsList" component={BaseMapsListScreen} />
             <Stack.Screen name="EditBaseMap" component={EditBaseMapScreen} />
-            <Stack.Screen name="AddLayer" component={AddLayerScreen} />
+            <Stack.Screen
+              name="AddLayer"
+              component={AddLayerScreen}
+              // TODO: actionSelector should come from the caller once the other selectors land
+              initialParams={{ actionSelector: BasemapActionSelector.CatalogResource }}
+            />
           </Stack.Navigator>
         </NavigationContainer>
       </Box>
