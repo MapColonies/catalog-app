@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { observer } from 'mobx-react';
-import { changeNodeAtPath, ExtendedNodeData, map } from 'react-sortable-tree';
+import { ExtendedNodeData, find } from 'react-sortable-tree';
 import { Button, useTheme } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
 import { TreeComponent, TreeItem } from '../../../common/components/tree';
+import { toggleTreeSelection } from '../../../common/components/tree/selection';
 import { ProductTypeRenderer } from '../../../common/components/tree/icon-renderers/product-type.icon-renderer';
 import { Error } from '../../../common/components/tree/statuses/error';
 import { Loading } from '../../../common/components/tree/statuses/loading';
@@ -12,7 +13,6 @@ import { getTextStyle } from '../../../common/helpers/style';
 import { LinkType } from '../../../common/models/link-type.enum';
 import { Mode } from '../../../common/models/mode.enum';
 import { EntityDescriptorModelType, LayerMetadataMixedUnion } from '../../models';
-import { CapabilityModelType } from '../../models/CapabilityModel';
 import { keyFromTreeIndex, TreeRootSection } from '../../models/catalogTreeStore';
 import { ILayerImage } from '../../models/layerImage';
 import { RecordType } from '../../models/RecordTypeEnum';
@@ -21,7 +21,6 @@ import { FilterField } from '../../models/RootStore.base';
 import { getResponseErrorMesssage, getResponseErrorURL } from '../helpers/errorUtils';
 import { getLinkUrlWithToken } from '../helpers/layersUtils';
 import { LayersDetailsComponent } from '../layer-details/layer-details';
-import { queue } from '../snackbar/notification-queue';
 
 import '../catalog-tree/catalog-tree.css';
 import './catalog-picker.css';
@@ -37,12 +36,12 @@ interface CatalogPickerProps {
   catalogsToFetch: RecordType[];
   treeRootSections: TreeRootSection[];
   disableLayerPredicate: (layer: LayerMetadataMixedUnion) => boolean;
-  setSelectedLayer: (layer: LayerMetadataMixedUnion) => void;
+  handleSelection: (layers: LayerMetadataMixedUnion[]) => void;
   onClose: () => void;
 }
 
 export const CatalogPicker: React.FC<CatalogPickerProps> = observer(
-  ({ catalogsToFetch, treeRootSections, disableLayerPredicate, setSelectedLayer, onClose }) => {
+  ({ catalogsToFetch, treeRootSections, disableLayerPredicate, handleSelection, onClose }) => {
     const store = useStore();
     const intl = useIntl();
     const theme = useTheme();
@@ -74,7 +73,7 @@ export const CatalogPicker: React.FC<CatalogPickerProps> = observer(
             .map((layer) => ({
               ...layer,
               isDisabled: disableLayerPredicate(layer),
-            }));
+            })) as ILayerImage[];
 
           setRecords(layers);
           setTreeData(store.catalogTreeStore.createCatalogTree(layers, treeRootSections));
@@ -96,36 +95,26 @@ export const CatalogPicker: React.FC<CatalogPickerProps> = observer(
       };
     }, [catalogsToFetch, treeRootSections, disableLayerPredicate]);
 
-    const resetSelectedTreeData = (treeData: TreeItem[]) =>
-      map({
+    const selectedIds = new Set(
+      find({
         treeData,
         getNodeKey: keyFromTreeIndex,
-        ignoreCollapsed: false,
-        callback: ({ node }: { node: TreeItem }) =>
-          node.isSelected ? { ...node, isSelected: false } : node,
-      }) as TreeItem[];
+        searchMethod: ({ node }) => node.isSelected,
+      }).matches.map(({ node }) => node.id)
+    );
 
-    const handleRowClick = (rowInfo: ExtendedNodeData): void => {
+    const handleRowClick = (event: MouseEvent, rowInfo: ExtendedNodeData): void => {
       if (rowInfo.node.isGroup || rowInfo.node.isDisabled) {
         return;
       }
 
-      const clearedTreeData = resetSelectedTreeData(treeData);
-
-      setTreeData(
-        changeNodeAtPath({
-          treeData: clearedTreeData,
-          path: rowInfo.path,
-          getNodeKey: keyFromTreeIndex,
-          newNode: { ...rowInfo.node, isSelected: true },
-        })
-      );
+      setTreeData(toggleTreeSelection(treeData, rowInfo, false));
       setActiveLayer(records.find((record) => record.id === rowInfo.node.id));
     };
 
     const handleSelect = (): void => {
-      if (activeLayer) {
-        setSelectedLayer(activeLayer);
+      if (selectedIds.size > 0) {
+        handleSelection(records.filter((record) => selectedIds.has(record.id)));
         onClose();
       }
     };
@@ -153,7 +142,7 @@ export const CatalogPicker: React.FC<CatalogPickerProps> = observer(
                 canDrag={(): boolean => false}
                 canDrop={(): boolean => false}
                 generateNodeProps={(rowInfo) => ({
-                  onClick: (): void => handleRowClick(rowInfo),
+                  onClick: (event: MouseEvent): void => handleRowClick(event, rowInfo),
                   className: rowInfo.node.isDisabled ? 'disabled' : undefined,
                   style: rowInfo.node.isGroup ? {} : getTextStyle(rowInfo.node, 'color'),
                   icons: rowInfo.node.isGroup
@@ -191,7 +180,7 @@ export const CatalogPicker: React.FC<CatalogPickerProps> = observer(
           </Box>
         </Box>
         <Box className="catalogPickerActions">
-          <Button raised type="button" disabled={!activeLayer} onClick={handleSelect}>
+          <Button raised type="button" disabled={selectedIds.size === 0} onClick={handleSelect}>
             <FormattedMessage id="general.ok-btn.text" />
           </Button>
           <Button type="button" onClick={onClose}>
