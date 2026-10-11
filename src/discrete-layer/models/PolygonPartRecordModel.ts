@@ -55,4 +55,5 @@ export const PolygonPartRecordModel = PolygonPartRecordModelBase
     order: types.union(types.undefined, types.null, types.number),
     layerImageShown: types.union(types.undefined, types.null, types.boolean),
     resolutionDegreeMaxValue: types.union(types.undefined, types.string),
+    isDisabled: types.union(types.undefined, types.null, types.boolean),
   })

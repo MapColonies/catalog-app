@@ -163,7 +163,7 @@ export const discreteLayersStore = ModelBase
       return self.capabilities?.find(item => layerLink.name === item.id);
     }
 
-    function getPreparedLayersImages(data: ILayerImage[], showFootprint = true): LayersImagesResponse {
+    function getPreparedLayersImages(data: ILayerImage[], showFootprint = true, capabilities = self.capabilities): LayersImagesResponse {
       // self.layersImages = filterBySearchParams(data).map(item => ({...item, footprintShown: true, layerImageShown: false, order: null}));
 
       // Filter out Unpublished entries on User premissions.
@@ -623,18 +623,18 @@ export const discreteLayersStore = ModelBase
     };
 
     const buildCatalogsQueries = (
-      recordTypeToFetch: RecordType,
+      recordTypesToFetch: RecordType[],
       pageSize: number,
       filterFn: (type: RecordType) => FilterField[]
     ): Promise<{ search: CswCatalogsModelType }>[] => {
       const startIndex = 1;
-      if (recordTypeToFetch === RecordType.RECORD_ALL) {
-        return CONFIG.SERVED_ENTITY_TYPES.filter((type) => type !== RecordType.RECORD_ALL).map((type) =>
-          createQueryAndFetch(type as RecordType, startIndex, pageSize, filterFn)
-        );
-      }
+      const recordTypes = recordTypesToFetch.includes(RecordType.RECORD_ALL)
+        ? CONFIG.SERVED_ENTITY_TYPES.filter((type) => type !== RecordType.RECORD_ALL)
+        : recordTypesToFetch;
 
-      return [createQueryAndFetch(recordTypeToFetch, startIndex, pageSize, filterFn)];
+      return recordTypes.map((type) =>
+        createQueryAndFetch(type as RecordType, startIndex, pageSize, filterFn)
+      );
     };
 
     const buildRecordsPromises = (
@@ -670,18 +670,21 @@ export const discreteLayersStore = ModelBase
       return recordsPromises;
     };
 
-    const fetchAllCatalog = async (
-      filterFn: (type: RecordType) => FilterField[]
+    const fetchCatalogs = async (
+      filterFn: (type: RecordType) => FilterField[],
+      recordTypes: RecordType[] = [self.searchParams.recordType as RecordType]
     ) => {
-      const recordTypeToFetch = self.searchParams.recordType;
-      if (!recordTypeToFetch) {
-        return [];
-      }
+      const servedRecordTypes = recordTypes.filter((type) => {
+        if (!CONFIG.SERVED_ENTITY_TYPES.includes(type)) {
+          throw new Error(`[CatalogApp]: ${type} does not exist`);
+        }
+        return true;
+      });
 
       const pageSize = CONFIG.RUNNING_MODE.CSW_DEFAULT_PAGE_SIZE;
 
       const initialCatalogQueryPromises = buildCatalogsQueries(
-        recordTypeToFetch,
+        servedRecordTypes,
         pageSize,
         filterFn
       );
@@ -743,7 +746,7 @@ export const discreteLayersStore = ModelBase
       addPolygonPartsInfo,
       resetPolygonPartsInfo,
       resetPolygonParts,
-      fetchAllCatalog,
+      fetchCatalogs,
       setEnumsMap,
       setDraftLink,
       removeDraftLink,

@@ -69,6 +69,15 @@ export const getLayerLink = (layer: ILayerImage): LinkModelType => {
   return layerLink;
 };
 
+export const isLayerURLMissing = (
+  layer: ILayerImage,
+  capabilities: CapabilityModelType[] = []
+): boolean => {
+  const layerLink = getLayerLink(layer);
+  const hasCapabilities = capabilities.some((capability) => capability.id === layerLink.name);
+  return !hasCapabilities && layerLink.protocol === LinkType.WMTS;
+};
+
 export const getTokenParam = (): string => {
   // eslint-disable-next-line
   const { INJECTION_TYPE, ATTRIBUTE_NAME, TOKEN_VALUE } = CONFIG.ACCESS_TOKEN as {

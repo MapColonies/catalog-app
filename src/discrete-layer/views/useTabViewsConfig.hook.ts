@@ -10,7 +10,6 @@ export const useTabViewsConfig = (locale: string): ITabViewConfig[] => {
   const isBasemapsManagementAllowed = store.userStore.isActionAllowed(
     UserAction.SYSTEM_ACTION_BASEMAPS_MANAGEMENT
   );
-  const user = store.userStore.user;
 
   return useMemo(
     () => [
@@ -37,6 +36,6 @@ export const useTabViewsConfig = (locale: string): ITabViewConfig[] => {
         dependentValue: isBasemapsManagementAllowed,
       },
     ],
-    [locale, layerToExport, isBasemapsManagementAllowed, user]
+    [locale, layerToExport, isBasemapsManagementAllowed]
   );
 };

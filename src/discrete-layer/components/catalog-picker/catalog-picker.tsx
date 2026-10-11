@@ -1,0 +1,193 @@
+import React, { useEffect, useState } from 'react';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { observer } from 'mobx-react';
+import { ExtendedNodeData, find } from 'react-sortable-tree';
+import { Button, useTheme } from '@map-colonies/react-core';
+import { Box } from '@map-colonies/react-components';
+import { TreeComponent, TreeItem } from '../../../common/components/tree';
+import { toggleTreeSelection } from '../../../common/components/tree/selection';
+import { ProductTypeRenderer } from '../../../common/components/tree/icon-renderers/product-type.icon-renderer';
+import { Error } from '../../../common/components/tree/statuses/error';
+import { Loading } from '../../../common/components/tree/statuses/loading';
+import { getTextStyle } from '../../../common/helpers/style';
+import { LinkType } from '../../../common/models/link-type.enum';
+import { Mode } from '../../../common/models/mode.enum';
+import { EntityDescriptorModelType, LayerMetadataMixedUnion } from '../../models';
+import { keyFromTreeIndex, TreeRootSection } from '../../models/catalogTreeStore';
+import { ILayerImage } from '../../models/layerImage';
+import { RecordType } from '../../models/RecordTypeEnum';
+import { useStore } from '../../models/RootStore';
+import { FilterField } from '../../models/RootStore.base';
+import { getResponseErrorMesssage, getResponseErrorURL } from '../helpers/errorUtils';
+import { getLinkUrlWithToken } from '../helpers/layersUtils';
+import { LayersDetailsComponent } from '../layer-details/layer-details';
+
+import '../catalog-tree/catalog-tree.css';
+import './catalog-picker.css';
+
+const catalogFilter = (recordType: RecordType): FilterField[] => [
+  {
+    field: 'mc:type',
+    eq: recordType,
+  },
+];
+
+interface CatalogPickerProps {
+  catalogsToFetch: RecordType[];
+  treeRootSections: TreeRootSection[];
+  disableLayerPredicate: (layer: LayerMetadataMixedUnion) => boolean;
+  handleSelection: (layers: LayerMetadataMixedUnion[]) => void;
+  onClose: () => void;
+}
+
+export const CatalogPicker: React.FC<CatalogPickerProps> = observer(
+  ({ catalogsToFetch, treeRootSections, disableLayerPredicate, handleSelection, onClose }) => {
+    const store = useStore();
+    const intl = useIntl();
+    const theme = useTheme();
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [error, setError] = useState<any>();
+    const [records, setRecords] = useState<ILayerImage[]>([]);
+    const [treeData, setTreeData] = useState<TreeItem[]>([]);
+    const [activeLayer, setActiveLayer] = useState<ILayerImage>();
+
+    useEffect(() => {
+      let isCancelled = false;
+
+      const fetchCatalog = async (): Promise<void> => {
+        setIsLoading(true);
+        setError(undefined);
+        try {
+          const fetchedLayers = (await store.discreteLayersStore.fetchCatalogs(
+            catalogFilter,
+            catalogsToFetch
+          )) as ILayerImage[];
+          const layersCapabilities = await store.catalogTreeStore.fetchLayersCapabilities(
+            fetchedLayers
+          );
+          if (isCancelled) {
+            return;
+          }
+          const layers = store.discreteLayersStore
+            .getPreparedLayersImages(fetchedLayers, true, layersCapabilities)
+            .map((layer) => ({
+              ...layer,
+              isDisabled: disableLayerPredicate(layer),
+            })) as ILayerImage[];
+
+          setRecords(layers);
+          setTreeData(store.catalogTreeStore.createCatalogTree(layers, treeRootSections));
+        } catch (err) {
+          if (!isCancelled) {
+            setError(err);
+          }
+        } finally {
+          if (!isCancelled) {
+            setIsLoading(false);
+          }
+        }
+      };
+
+      void fetchCatalog();
+
+      return (): void => {
+        isCancelled = true;
+      };
+    }, [catalogsToFetch, treeRootSections, disableLayerPredicate]);
+
+    const selectedIds = new Set(
+      find({
+        treeData,
+        getNodeKey: keyFromTreeIndex,
+        searchMethod: ({ node }) => node.isSelected,
+      }).matches.map(({ node }) => node.id)
+    );
+
+    const handleRowClick = (event: MouseEvent, rowInfo: ExtendedNodeData): void => {
+      if (rowInfo.node.isGroup || rowInfo.node.isDisabled) {
+        return;
+      }
+
+      setTreeData(toggleTreeSelection(treeData, rowInfo, false));
+      setActiveLayer(records.find((record) => record.id === rowInfo.node.id));
+    };
+
+    const handleSelect = (): void => {
+      if (selectedIds.size > 0) {
+        handleSelection(records.filter((record) => selectedIds.has(record.id)));
+        onClose();
+      }
+    };
+
+    if (error) {
+      return (
+        <Error
+          className="errorMessage"
+          message={error.response ? getResponseErrorMesssage(error.response) : error.message}
+          details={error.response ? getResponseErrorURL(error.response) : undefined}
+        />
+      );
+    }
+
+    return (
+      <Box id="catalogPicker">
+        <Box className="catalogPickerBody">
+          <Box className="catalogContainer catalogPickerTree">
+            {isLoading ? (
+              <Loading />
+            ) : (
+              <TreeComponent
+                treeData={treeData}
+                onChange={(newTreeData): void => setTreeData(newTreeData)}
+                canDrag={(): boolean => false}
+                canDrop={(): boolean => false}
+                generateNodeProps={(rowInfo) => ({
+                  onClick: (event: MouseEvent): void => handleRowClick(event, rowInfo),
+                  className: rowInfo.node.isDisabled ? 'disabled' : undefined,
+                  style: rowInfo.node.isGroup ? {} : getTextStyle(rowInfo.node, 'color'),
+                  icons: rowInfo.node.isGroup
+                    ? []
+                    : [
+                        <ProductTypeRenderer
+                          key="productType"
+                          data={rowInfo.node as ILayerImage}
+                          thumbnailUrl={getLinkUrlWithToken(
+                            rowInfo.node.links,
+                            LinkType.THUMBNAIL_S
+                          )}
+                        />,
+                      ],
+                })}
+              />
+            )}
+          </Box>
+          <Box className="catalogPickerSeparator" />
+          <Box
+            className="catalogPickerDetails"
+            style={{ backgroundColor: theme.custom?.GC_ALTERNATIVE_SURFACE as string }}
+          >
+            <LayersDetailsComponent
+              isSearchTab={true}
+              className="detailsPanelProductView"
+              entityDescriptors={
+                store.discreteLayersStore.entityDescriptors as EntityDescriptorModelType[]
+              }
+              layerRecord={activeLayer}
+              isBrief={true}
+              mode={Mode.VIEW}
+              intl={intl}
+            />
+          </Box>
+        </Box>
+        <Box className="catalogPickerActions">
+          <Button raised type="button" disabled={selectedIds.size === 0} onClick={handleSelect}>
+            <FormattedMessage id="general.ok-btn.text" />
+          </Button>
+          <Button type="button" onClick={onClose}>
+            <FormattedMessage id="general.cancel-btn.text" />
+          </Button>
+        </Box>
+      </Box>
+    );
+  }
+);
