@@ -31,7 +31,7 @@ interface PickLayerPanelProps {
 export const PickLayerPanel: React.FC<PickLayerPanelProps> = observer(
   ({ actionSelector, existingLayers, onClose }) => {
     const store = useStore();
-    const [selectedItem, setSelectedItem] = useState<LayerMetadataMixedUnion>();
+    const [selectedItems, setSelectedItems] = useState<LayerMetadataMixedUnion[]>([]);
 
     const filteredCatalogRoots: TreeRootSection[] = useMemo(
       () =>
@@ -63,7 +63,7 @@ export const PickLayerPanel: React.FC<PickLayerPanelProps> = observer(
             catalogsToFetch={CATALOGS_TO_FETCH}
             treeRootSections={filteredCatalogRoots}
             disableLayerPredicate={isLayerDisabled}
-            setSelectedLayer={setSelectedItem}
+            handleSelection={setSelectedItems}
             onClose={onClose}
           />
         )}

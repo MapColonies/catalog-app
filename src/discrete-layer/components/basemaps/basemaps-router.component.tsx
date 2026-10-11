@@ -9,13 +9,10 @@ import {
   createStackNavigator,
   StackHeaderProps,
   StackScreenProps,
-} from '../../common/navigation/react-navigation.proxy';
-import {
-  BasemapActionSelector,
-  PickLayerPanel,
-} from '../components/basemaps/add-layer/pick-layer.panel';
+} from '../../../common/navigation/react-navigation.proxy';
+import { BasemapActionSelector, PickLayerPanel } from './add-layer/pick-layer.panel';
 
-import './base-maps-router.css';
+import './basemaps-router.css';
 
 type BasemapsStackPanel = {
   BaseMapsList: undefined;

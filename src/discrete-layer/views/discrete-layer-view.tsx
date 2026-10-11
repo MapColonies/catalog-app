@@ -50,7 +50,7 @@ import { MenuDimensions } from '../../common/hooks/mapMenus/useGetMenuDimensions
 import { LinkType } from '../../common/models/link-type.enum';
 import { Mode } from '../../common/models/mode.enum';
 import { ActiveLayersIcon } from '../../icons/4font/ActiveLayers';
-import { BasemapsRouter } from '../navigation/base-maps-router.component';
+import { BasemapsRouter } from '../components/basemaps/basemaps-router.component';
 import { CatalogTreeComponent } from '../components/catalog-tree/catalog-tree';
 import ExportDrawingHandler from '../components/export-layer/export-drawing-handler.component';
 import { ExportLayerComponent } from '../components/export-layer/export-layer.component';
