@@ -14,6 +14,7 @@ import { mapMenusManagerStore } from './mapMenusManagerStore';
 import { exportStore } from './exportStore';
 import { servicesAvailabilityStore } from './servicesAvailabilityStore';
 import { jobsStore } from './jobsStore';
+import { basemapsStore } from './basemapsStore';
 
 type FetchAction = (
   url: string,
@@ -49,6 +50,9 @@ export const baseRootStore = RootStoreBase
       state: ResponseState.IDLE,
     }),
     jobsStore: types.optional(jobsStore, {
+      state: ResponseState.IDLE,
+    }),
+    basemapsStore: types.optional(basemapsStore, {
       state: ResponseState.IDLE,
     }),
   })
