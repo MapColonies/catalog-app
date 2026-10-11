@@ -36,26 +36,13 @@ const catalogFilter = (recordType: RecordType): FilterField[] => [
 interface CatalogPickerProps {
   catalogsToFetch: RecordType[];
   treeRootSections: TreeRootSection[];
-  disableItemsByUniqueness: Record<string, unknown>[] | undefined;
-  setSelectedItem: (record: LayerMetadataMixedUnion) => void;
+  disableLayerPredicate: (layer: LayerMetadataMixedUnion) => boolean;
+  setSelectedLayer: (layer: LayerMetadataMixedUnion) => void;
   onClose: () => void;
 }
 
-const isLayerDisabled = (
-  layer: ILayerImage,
-  uniquenessCriteria: Record<string, unknown>[] | undefined
-): boolean => {
-  const layerFields = layer as unknown as Record<string, unknown>;
-  return (
-    uniquenessCriteria?.some((uniqueness) => {
-      const entries = Object.entries(uniqueness);
-      return entries.length > 0 && entries.every(([key, value]) => layerFields[key] === value);
-    }) ?? false
-  );
-};
-
 export const CatalogPicker: React.FC<CatalogPickerProps> = observer(
-  ({ catalogsToFetch, treeRootSections, disableItemsByUniqueness, setSelectedItem, onClose }) => {
+  ({ catalogsToFetch, treeRootSections, disableLayerPredicate, setSelectedLayer, onClose }) => {
     const store = useStore();
     const intl = useIntl();
     const theme = useTheme();
@@ -63,25 +50,7 @@ export const CatalogPicker: React.FC<CatalogPickerProps> = observer(
     const [error, setError] = useState<any>();
     const [records, setRecords] = useState<ILayerImage[]>([]);
     const [treeData, setTreeData] = useState<TreeItem[]>([]);
-    const [selectedLayer, setSelectedLayer] = useState<ILayerImage>();
-
-    const fetchCapabilities = async (layers: ILayerImage[]): Promise<CapabilityModelType[]> => {
-      try {
-        return await store.catalogTreeStore.fetchLayersCapabilities(layers);
-      } catch (e) {
-        const capabilitiesError = e as any;
-        queue.notify({
-          body: (
-            <Error
-              className="errorNotification"
-              message={getResponseErrorMesssage(capabilitiesError?.response)}
-              details={getResponseErrorURL(capabilitiesError?.response)}
-            />
-          ),
-        });
-        return [];
-      }
-    };
+    const [activeLayer, setActiveLayer] = useState<ILayerImage>();
 
     useEffect(() => {
       let isCancelled = false;
@@ -94,7 +63,9 @@ export const CatalogPicker: React.FC<CatalogPickerProps> = observer(
             catalogFilter,
             catalogsToFetch
           )) as ILayerImage[];
-          const layersCapabilities = await fetchCapabilities(fetchedLayers);
+          const layersCapabilities = await store.catalogTreeStore.fetchLayersCapabilities(
+            fetchedLayers
+          );
           if (isCancelled) {
             return;
           }
@@ -102,14 +73,14 @@ export const CatalogPicker: React.FC<CatalogPickerProps> = observer(
             .getPreparedLayersImages(fetchedLayers, true, layersCapabilities)
             .map((layer) => ({
               ...layer,
-              isDisabled: isLayerDisabled(layer, disableItemsByUniqueness),
+              isDisabled: disableLayerPredicate(layer),
             }));
 
           setRecords(layers);
           setTreeData(store.catalogTreeStore.createCatalogTree(layers, treeRootSections));
-        } catch (e) {
+        } catch (err) {
           if (!isCancelled) {
-            setError(e);
+            setError(err);
           }
         } finally {
           if (!isCancelled) {
@@ -123,7 +94,7 @@ export const CatalogPicker: React.FC<CatalogPickerProps> = observer(
       return (): void => {
         isCancelled = true;
       };
-    }, [catalogsToFetch, treeRootSections, disableItemsByUniqueness]);
+    }, [catalogsToFetch, treeRootSections, disableLayerPredicate]);
 
     const resetSelectedTreeData = (treeData: TreeItem[]) =>
       map({
@@ -149,12 +120,12 @@ export const CatalogPicker: React.FC<CatalogPickerProps> = observer(
           newNode: { ...rowInfo.node, isSelected: true },
         })
       );
-      setSelectedLayer(records.find((record) => record.id === rowInfo.node.id));
+      setActiveLayer(records.find((record) => record.id === rowInfo.node.id));
     };
 
     const handleSelect = (): void => {
-      if (selectedLayer) {
-        setSelectedItem(selectedLayer);
+      if (activeLayer) {
+        setSelectedLayer(activeLayer);
         onClose();
       }
     };
@@ -163,8 +134,8 @@ export const CatalogPicker: React.FC<CatalogPickerProps> = observer(
       return (
         <Error
           className="errorMessage"
-          message={getResponseErrorMesssage(error.response)}
-          details={getResponseErrorURL(error.response)}
+          message={error.response ? getResponseErrorMesssage(error.response) : error.message}
+          details={error.response ? getResponseErrorURL(error.response) : undefined}
         />
       );
     }
@@ -212,7 +183,7 @@ export const CatalogPicker: React.FC<CatalogPickerProps> = observer(
               entityDescriptors={
                 store.discreteLayersStore.entityDescriptors as EntityDescriptorModelType[]
               }
-              layerRecord={selectedLayer}
+              layerRecord={activeLayer}
               isBrief={true}
               mode={Mode.VIEW}
               intl={intl}
@@ -220,7 +191,7 @@ export const CatalogPicker: React.FC<CatalogPickerProps> = observer(
           </Box>
         </Box>
         <Box className="catalogPickerActions">
-          <Button raised type="button" disabled={!selectedLayer} onClick={handleSelect}>
+          <Button raised type="button" disabled={!activeLayer} onClick={handleSelect}>
             <FormattedMessage id="general.ok-btn.text" />
           </Button>
           <Button type="button" onClick={onClose}>

@@ -13,7 +13,8 @@ import { MOCK_DATA_IMAGERY_LAYERS_ISRAEL } from '../../__mocks-data__/search-res
 import { Mode } from '../../common/models/mode.enum';
 import CONFIG from '../../common/config';
 import { isUnpublished } from '../../common/helpers/style';
-import { getLayerLink, isLayerURLMissing } from '../components/helpers/layersUtils';
+import { LinkType } from '../../common/models/link-type.enum';
+import { getLayerLink } from '../components/helpers/layersUtils';
 import { LayerMetadataMixedUnionKeys, LayerRecordTypes, LayerRecordTypesKeys } from '../components/layer-details/entity-types-keys';
 import { extractDescriptorRelatedFieldNames, getFlatEntityDescriptors } from '../components/layer-details/utils';
 import { TabViews } from '../views/tab-views';
@@ -172,7 +173,10 @@ export const discreteLayersStore = ModelBase
       const preparedLayersImages = filteredLayersImages.map(item => {
         let additional = {};
         if (item.type === RecordType.RECORD_RASTER) {
-          additional = { layerURLMissing: isLayerURLMissing(item, capabilities) };
+          const layerLink = getLayerLink(item);
+          const hasCapabilities = self.capabilities?.find(item => layerLink.name === item.id);
+          const hasWMTSUrl = layerLink.protocol === LinkType.WMTS;
+          additional = { layerURLMissing: !hasCapabilities && hasWMTSUrl };
         }
         return {
           ...item,
@@ -668,14 +672,14 @@ export const discreteLayersStore = ModelBase
 
     const fetchCatalogs = async (
       filterFn: (type: RecordType) => FilterField[],
-      recordTypes: RecordType[] = self.searchParams.recordType ? [self.searchParams.recordType as RecordType] : []
+      recordTypes: RecordType[] = [self.searchParams.recordType as RecordType]
     ) => {
-      const servedRecordTypes = recordTypes.filter(
-        (type) => type === RecordType.RECORD_ALL || CONFIG.SERVED_ENTITY_TYPES.includes(type)
-      );
-      if (servedRecordTypes.length === 0) {
-        return [];
-      }
+      const servedRecordTypes = recordTypes.filter((type) => {
+        if (!CONFIG.SERVED_ENTITY_TYPES.includes(type)) {
+          throw new Error(`[CatalogApp]: ${type} does not exist`);
+        }
+        return true;
+      });
 
       const pageSize = CONFIG.RUNNING_MODE.CSW_DEFAULT_PAGE_SIZE;
 
