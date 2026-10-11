@@ -34,7 +34,6 @@ const PANELS_IDS: Record<BasemapsRouteName, string> = {
 const XXXBasemapsHeaderMOCKXXX: React.FC<StackHeaderProps> = ({ route, navigation }) => {
   const intl = useIntl();
   const { routes } = navigation.getState();
-  // Each screen renders its own header, so only show the trail up to this screen
   const trail = routes.slice(0, routes.findIndex(({ key }) => key === route.key) + 1);
 
   return (
@@ -73,15 +72,16 @@ const XXXBasemapsHeaderMOCKXXX: React.FC<StackHeaderProps> = ({ route, navigatio
   );
 };
 
-type BasemapsScreenProps<T extends BasemapsRouteName> = StackScreenProps<BasemapsStackPanel, T>;
+type BasemapsPanelProps<T extends BasemapsRouteName> = StackScreenProps<BasemapsStackPanel, T>;
 
-const BaseMapsListScreen: React.FC<BasemapsScreenProps<'BaseMapsList'>> = () => null;
+const BaseMapsListPanel: React.FC<BasemapsPanelProps<'BaseMapsList'>> = () => null;
 
-const EditBaseMapScreen: React.FC<BasemapsScreenProps<'EditBaseMap'>> = () => null;
+const EditBaseMapPanel: React.FC<BasemapsPanelProps<'EditBaseMap'>> = () => null;
 
-const AddLayerScreen: React.FC<BasemapsScreenProps<'AddLayer'>> = ({ navigation, route }) => (
+const AddLayerPanel: React.FC<BasemapsPanelProps<'AddLayer'>> = ({ navigation, route }) => (
   <PickLayerPanel
     actionSelector={route.params.actionSelector}
+    existingLayers={undefined}
     onClose={(): void => navigation.goBack()}
   />
 );
@@ -111,11 +111,11 @@ export const BasemapsRouter: React.FC = () => {
               header: (props): React.ReactNode => <XXXBasemapsHeaderMOCKXXX {...props} />,
             }}
           >
-            <Stack.Screen name="BaseMapsList" component={BaseMapsListScreen} />
-            <Stack.Screen name="EditBaseMap" component={EditBaseMapScreen} />
+            <Stack.Screen name="BaseMapsList" component={BaseMapsListPanel} />
+            <Stack.Screen name="EditBaseMap" component={EditBaseMapPanel} />
             <Stack.Screen
               name="AddLayer"
-              component={AddLayerScreen}
+              component={AddLayerPanel}
               // TODO: actionSelector should come from the caller once the other selectors land
               initialParams={{ actionSelector: BasemapActionSelector.CatalogResource }}
             />

@@ -24,11 +24,12 @@ export enum BasemapActionSelector {
 
 interface PickLayerPanelProps {
   actionSelector: BasemapActionSelector;
+  existingLayers?: Record<string, unknown>[];
   onClose: () => void;
 }
 
 export const PickLayerPanel: React.FC<PickLayerPanelProps> = observer(
-  ({ actionSelector, onClose }) => {
+  ({ actionSelector, existingLayers, onClose }) => {
     const store = useStore();
     const [selectedItem, setSelectedItem] = useState<LayerMetadataMixedUnion>();
 
@@ -45,15 +46,24 @@ export const PickLayerPanel: React.FC<PickLayerPanelProps> = observer(
       [store.userStore.user]
     );
 
+    const isLayerDisabled = (layer: ILayerImage): boolean => {
+      const layerRecord = layer as unknown as Record<string, unknown>;
+      return (
+        existingLayers?.some((existingLayer) => {
+          const entries = Object.entries(existingLayer);
+          return entries.length > 0 && entries.every(([key, value]) => layerRecord[key] === value);
+        }) ?? false
+      );
+    };
+
     return (
       <>
         {actionSelector === BasemapActionSelector.CatalogResource && (
           <CatalogPicker
             catalogsToFetch={CATALOGS_TO_FETCH}
             treeRootSections={filteredCatalogRoots}
-            // TODO: put a real value here
-            disableItemsByUniqueness={undefined}
-            setSelectedItem={setSelectedItem}
+            disableLayerPredicate={isLayerDisabled}
+            setSelectedLayer={setSelectedItem}
             onClose={onClose}
           />
         )}
