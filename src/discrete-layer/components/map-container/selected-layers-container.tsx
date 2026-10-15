@@ -121,39 +121,17 @@ export const SelectedLayersContainer: React.FC = observer(() => {
       case LinkType.COPC:
         return (
           <CopcWithInfoBox
-            infoBoxTitle="KUKU"
+            infoBoxTitle={layer.productName as string}
             key={layer.id}
             url={layerLink.url as string}
-            // url={getTokenResource(
-            //   layerLink.url as string,
-            //   (layer as Layer3DRecordModelType).productVersion as string
-            // ).url}
             colorMode="classification"
             meta={{
               id: layer.id,
               layerRecord: { ...layer },
             }}
-            // onPointPicked={setPickedPoint}
             hoverPixelSize={14}
+            extraDimensions="*"
           ></CopcWithInfoBox>
-          // <Cesium3DTileset
-          //   maximumScreenSpaceError={CONFIG.THREE_D_LAYER.MAXIMUM_SCREEN_SPACE_ERROR}
-          //   cullRequestsWhileMovingMultiplier={
-          //     CONFIG.THREE_D_LAYER.CULL_REQUESTS_WHILE_MOVING_MULTIPLIER
-          //   }
-          //   preloadFlightDestinations
-          //   preferLeaves
-          //   skipLevelOfDetail
-          //   key={layer.id}
-          //   url={getTokenResource(
-          //     layerLink.url as string,
-          //     (layer as Layer3DRecordModelType).productVersion as string
-          //   )}
-          //   meta={{
-          //     id: layer.id,
-          //     layerRecord: { ...layer },
-          //   }}
-          // />
         );
       case LinkType.WMTS_LAYER:
       case LinkType.WMTS: {
