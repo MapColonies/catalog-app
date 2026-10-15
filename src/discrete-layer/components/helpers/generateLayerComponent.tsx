@@ -15,6 +15,7 @@ import { LinkType } from '../../../common/models/link-type.enum';
 import { Layer3DRecordModelType, LayerRasterRecordModelType, LinkModelType } from '../../models';
 import { CapabilityModelType } from '../../models/CapabilityModel';
 import { ILayerImage } from '../../models/layerImage';
+import { CopcWithInfoBox } from '../map-container/copc-with-infobox.component';
 import { generateLayerRectangle, getTokenResource, getCesiumWMTSOptions } from './cesiumUtils';
 import { getLayerLink, getLinksArrWithTokens } from './layersUtils';
 
@@ -101,6 +102,21 @@ export const generateLayerComponent = (
             layerRecord: { ...layer },
           }}
         />
+      );
+    case LinkType.COPC:
+      return (
+        <CopcWithInfoBox
+          infoBoxTitle={layer.productName as string}
+          key={layer.id}
+          url={layerLink.url as string}
+          colorMode="classification"
+          meta={{
+            id: layer.id,
+            layerRecord: { ...layer },
+          }}
+          hoverPixelSize={14}
+          extraDimensions="*"
+        ></CopcWithInfoBox>
       );
     case LinkType.WMTS_LAYER:
     case LinkType.WMTS: {
