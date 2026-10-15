@@ -1,0 +1,78 @@
+.basemapsListPanel {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  margin: 12px;
+}
+
+.basemapsListPanelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 8px;
+}
+
+.basemapsListPanelHeaderActions {
+  display: flex;
+  gap: 16px;
+}
+
+.basemapsList {
+  overflow-y: auto;
+}
+
+.basemapListItem {
+  height: auto;
+  padding: 0.5rem 0;
+}
+
+.basemapsList .basemapListItem::before,
+.basemapsList .basemapListItem::after {
+  pointer-events: none;
+}
+
+.basemapThumbnail {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.basemapListItemText {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.basemapBadge {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+
+.basemapBadge::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.basemapListItemActions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.basemapEyeActive {
+  color: var(--mdc-theme-primary, inherit);
+}
+
+.basemapMenuItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}

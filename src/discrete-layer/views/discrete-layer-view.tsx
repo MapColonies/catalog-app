@@ -63,6 +63,7 @@ import { ManageLinksDialog } from '../components/layer-details/links-management/
 import { EntityRasterDialog } from '../components/layer-details/raster/entity.raster.dialog';
 import { LayersResults } from '../components/layers-results/layers-results';
 import { ActionsContextMenu } from '../components/map-container/contextMenus/actions.context-menu';
+import { BasemapPreviewLayer } from '../components/basemaps/basemap-preview-layer';
 import { BBoxCorners } from '../components/map-container/bbox.dialog';
 import ActionsMenuDimensionsContext from '../components/map-container/contextMenus/contexts/actionsMenuDimensionsContext';
 import { ExtentUpdater } from '../components/map-container/extent-updater';
@@ -354,6 +355,7 @@ const DiscreteLayerView: React.FC = observer(() => {
       <>
         <MapActionResolver />
         <SelectedLayersContainer />
+        <BasemapPreviewLayer />
         <HighlightedLayer />
         <LayersFootprints />
         <PolygonParts />
@@ -1337,14 +1339,15 @@ const DiscreteLayerView: React.FC = observer(() => {
                 />
               </Box>
             )}
-            {activeTabView === TabViews.BASEMAPS_MANAGEMENT && (
-              <Box className="tabContentContainer">
-                {getActiveTabHeader(activeTabView, site)}
-                <Box className="panelContent">
-                  <BasemapsRouter />
-                </Box>
+            <Box
+              className="tabContentContainer"
+              style={{ display: activeTabView === TabViews.BASEMAPS_MANAGEMENT ? 'block' : 'none' }}
+            >
+              {getActiveTabHeader(activeTabView, site)}
+              <Box className="panelContent">
+                <BasemapsRouter />
               </Box>
-            )}
+            </Box>
           </Box>
           {showSideDetailsPanel && (
             <Box

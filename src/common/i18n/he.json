@@ -799,6 +799,18 @@
   "basemaps.panels.edit-base-map": "עריכת מפת בסיס",
   "basemaps.panels.add-layer": "הוספת שכבה",
 
+  "basemaps.list.title": "מפות בסיס",
+  "basemaps.list.import": "ייבוא",
+  "basemaps.list.new": "חדש",
+  "basemaps.list.current-map": "מפה נוכחית",
+  "basemaps.list.preview-map": "מפת תצוגה מקדימה",
+  "basemaps.list.actions.view": "הצג מפת בסיס",
+  "basemaps.list.actions.edit": "ערוך מפת בסיס",
+  "basemaps.list.actions.export": "ייצוא",
+  "basemaps.list.actions.make-default": "הגדר כברירת מחדל",
+  "basemaps.edit.action-selector.catalog-resource": "משאב קטלוג",
+  "basemaps.edit.action-selector.external": "חיצוני",
+
   "map.scale.units.meters": "מ'",
   "map.scale.units.kilometers": "קמ'",
 

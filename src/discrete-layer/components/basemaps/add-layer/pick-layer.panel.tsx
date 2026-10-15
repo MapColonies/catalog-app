@@ -11,16 +11,11 @@ import { ILayerImage } from '../../../models/layerImage';
 import { RecordType } from '../../../models/RecordTypeEnum';
 import { useStore } from '../../../models/RootStore';
 import { CatalogPicker } from '../../catalog-picker/catalog-picker';
+import { BasemapActionSelector } from '../XXXbasemapMockXXX';
 
 const LAYER_ROOTS_NAMES: TreeRootName[] = ['catalog', 'bests'];
 
 const CATALOGS_TO_FETCH = [RecordType.RECORD_RASTER];
-
-export enum BasemapActionSelector {
-  CatalogResource,
-  External_XYZ,
-  External_WMTS,
-}
 
 interface PickLayerPanelProps {
   actionSelector: BasemapActionSelector;
