@@ -1,5 +1,6 @@
 const webpack = require('webpack');
 const path = require('path');
+const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
 
 module.exports = function override(config, env) {
   //do stuff with the webpack config...
@@ -39,6 +40,18 @@ module.exports = function override(config, env) {
     '.web.tsx',
     ...(config.resolve.extensions || []),
   ];
+
+  // CRA's ModuleScopePlugin rejects imports that resolve outside src/ unless the resolved package
+  // root is under node_modules. For these aliased absolute paths that check is environment
+  // dependent (it passed on a dev machine but failed in the Docker build), so allow the two
+  // binaries explicitly instead of relying on it.
+  const moduleScopePlugin = (config.resolve.plugins || []).find(
+    (plugin) => plugin instanceof ModuleScopePlugin
+  );
+  if (moduleScopePlugin) {
+    moduleScopePlugin.allowedFiles.add(path.join(copcAdapterDistDir, 'copc_wasm.wasm'));
+    moduleScopePlugin.allowedFiles.add(path.join(copcAdapterDistDir, 'laz-perf.wasm'));
+  }
 
   config.plugins.push(
     new webpack.NormalModuleReplacementPlugin(
