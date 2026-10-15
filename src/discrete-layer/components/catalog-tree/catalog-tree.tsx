@@ -3,10 +3,11 @@
 
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { observer } from 'mobx-react';
-import { changeNodeAtPath, getNodeAtPath, find, ExtendedNodeData } from 'react-sortable-tree';
+import { ExtendedNodeData } from 'react-sortable-tree';
 import { Box } from '@map-colonies/react-components';
 import { useTheme } from '@map-colonies/react-core';
 import { TreeComponent, TreeItem } from '../../../common/components/tree';
+import { toggleTreeSelection } from '../../../common/components/tree/selection';
 import { ActionsRenderer } from '../../../common/components/tree/icon-renderers/actions.button-renderer';
 import { FootprintRenderer } from '../../../common/components/tree/icon-renderers/footprint.icon-renderer';
 import { LayerImageRenderer } from '../../../common/components/tree/icon-renderers/layer-image.icon-renderer';
@@ -16,10 +17,7 @@ import { Loading } from '../../../common/components/tree/statuses/loading';
 import { getTextStyle, isUnpublished } from '../../../common/helpers/style';
 import { isValidLayerMetadata } from '../../../common/helpers/layer-url';
 import { LinkType } from '../../../common/models/link-type.enum';
-import {
-  getResponseErrorMesssage,
-  getResponseErrorURL,
-} from '../../../common/helpers/server-error';
+import { getResponseErrorMesssage, getResponseErrorURL } from '../helpers/errorUtils';
 import {
   CRUDAction,
   getActionsWithDisable,
@@ -38,8 +36,6 @@ import { queue } from '../snackbar/notification-queue';
 
 import './catalog-tree.css';
 
-// @ts-ignore
-const keyFromTreeIndex = ({ treeIndex }) => treeIndex;
 const actionDismissibleRegex = new RegExp('actionDismissible');
 const nodeOutRegex = new RegExp('toolbarButton|rowContents');
 
@@ -115,44 +111,7 @@ export const CatalogTreeComponent: React.FC<CatalogTreeComponentProps> = observe
     const handleRowClick = useCallback(
       (evt: MouseEvent, rowInfo: ExtendedNodeData) => {
         if (!rowInfo.node.isGroup) {
-          let newTreeData = currentTreeData;
-          if (!evt.ctrlKey) {
-            // Remove prev selection
-            const selection = find({
-              treeData: newTreeData,
-              getNodeKey: keyFromTreeIndex,
-              searchMethod: (data) => data.node.isSelected,
-            });
-
-            selection.matches.forEach((match) => {
-              const selRowInfo = getNodeAtPath({
-                treeData: newTreeData,
-                path: match.path,
-                getNodeKey: keyFromTreeIndex,
-                // ignoreCollapsed: false,
-              });
-
-              newTreeData = changeNodeAtPath({
-                treeData: newTreeData,
-                path: match.path,
-                newNode: {
-                  ...selRowInfo?.node,
-                  isSelected: false,
-                },
-                getNodeKey: keyFromTreeIndex,
-              });
-            });
-          }
-
-          newTreeData = changeNodeAtPath({
-            treeData: newTreeData,
-            path: rowInfo.path,
-            newNode: {
-              ...rowInfo.node,
-              isSelected: !rowInfo.node.isSelected,
-            },
-            getNodeKey: keyFromTreeIndex,
-          });
+          const newTreeData = toggleTreeSelection(currentTreeData, rowInfo, false /*evt.ctrlKey*/);
 
           // console.log('*** MOUSE ROW CLICK *****', (evt.target as any).className);
           if (evt.target !== null && actionDismissibleRegex.test((evt.target as any).className)) {

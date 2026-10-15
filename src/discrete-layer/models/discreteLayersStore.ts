@@ -18,6 +18,7 @@ import { getLayerLink } from '../components/helpers/layersUtils';
 import { LayerMetadataMixedUnionKeys, LayerRecordTypes, LayerRecordTypesKeys } from '../components/layer-details/entity-types-keys';
 import { extractDescriptorRelatedFieldNames, getFlatEntityDescriptors } from '../components/layer-details/utils';
 import { TabViews } from '../views/tab-views';
+import { IError } from '../components/helpers/errorUtils';
 import { searchParams } from './search-params';
 import { IRootStore, RootStoreType } from './RootStore';
 import { ILayerImage } from './layerImage';
@@ -33,6 +34,14 @@ import { CswCatalogModelType } from './CswCatalogModel';
 import { ResultType } from './ResultTypeEnum';
 
 export type LayersImagesResponse = ILayerImage[];
+
+export interface IDraftLink {
+  protocol: LinkType;
+  dataUrl: string;
+  fileName?: string;
+}
+
+export type DraftLinksMap = Partial<Record<LinkType, IDraftLink>>;
 
 export interface SearchResult {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -56,7 +65,7 @@ const INITIAL_STATE = {
   highlightedLayer: null,
   selectedLayer: null,
   selectedLayerOperationMode: undefined,
-  tabViews: [{idx: TabViews.CATALOG}, {idx: TabViews.SEARCH_RESULTS}, {idx: TabViews.EXPORT_LAYER}],
+  tabViews: [{idx: TabViews.CATALOG}, {idx: TabViews.SEARCH_RESULTS}, {idx: TabViews.EXPORT_LAYER}, {idx: TabViews.BASEMAPS_MANAGEMENT}],
   entityDescriptors: [],
   entityTooltipFields: new Map(),
   previewedLayers: [],
@@ -64,10 +73,12 @@ const INITIAL_STATE = {
   baseMaps: CONFIG.BASE_MAPS,
   mapViewerExtentPolygon: undefined,
   customValidationError: undefined,
+  serviceErrors: undefined,
   polygonPartsLayer: undefined,
   polygonPartsInfo: [],
   isActiveLayersImages: false,
   enumsMap: {},
+  draftLinks: {},
 };
 
 export type PolygonPartsWfsFeatureInfo = GetFeatureModelType & Pick<WfsPolygonPartsGetFeatureParams, 'feature'>;
@@ -90,12 +101,14 @@ export const discreteLayersStore = ModelBase
     capabilities: types.maybe(types.frozen<CapabilityModelType[]>(INITIAL_STATE.capabilities)),
     baseMaps: types.maybe(types.frozen<IBaseMaps>(INITIAL_STATE.baseMaps)),
     mapViewerExtentPolygon: types.maybe(types.frozen<Feature|undefined>(INITIAL_STATE.mapViewerExtentPolygon)),
-    customValidationError: types.maybe(types.frozen<Record<string,string[]>|undefined>(INITIAL_STATE.customValidationError)),
+    customValidationError: types.maybe(types.frozen<IError|undefined>(INITIAL_STATE.customValidationError)),
+    serviceErrors: types.maybe(types.frozen<Map<string, IError[]>|undefined>(INITIAL_STATE.serviceErrors)),
     polygonPartsLayer: types.maybe(types.frozen<ILayerImage>(INITIAL_STATE.polygonPartsLayer as unknown as ILayerImage)),
     polygonPartsInfo: types.maybe(types.frozen<Feature<Geometry, GeoJsonProperties>[]>(INITIAL_STATE.polygonPartsInfo)),
     isActiveLayersImages: types.maybe(types.frozen<boolean>(INITIAL_STATE.isActiveLayersImages)),
     enumsMap: types.maybe(types.frozen<Record<string, unknown>>(INITIAL_STATE.enumsMap)),
-    
+    draftLinks: types.maybe(types.frozen<DraftLinksMap>(INITIAL_STATE.draftLinks)),
+
     // Don't forget to update INITIAL_STATE as well when adding new state value.
   })
   .views((self) => ({
@@ -150,7 +163,7 @@ export const discreteLayersStore = ModelBase
       return self.capabilities?.find(item => layerLink.name === item.id);
     }
 
-    function getPreparedLayersImages(data: ILayerImage[], showFootprint = true): LayersImagesResponse {
+    function getPreparedLayersImages(data: ILayerImage[], showFootprint = true, capabilities = self.capabilities): LayersImagesResponse {
       // self.layersImages = filterBySearchParams(data).map(item => ({...item, footprintShown: true, layerImageShown: false, order: null}));
 
       // Filter out Unpublished entries on User premissions.
@@ -277,8 +290,17 @@ export const discreteLayersStore = ModelBase
       self.selectedLayerOperationMode = mode;
     }
 
-    function resetUpdateMode(): void {
-      self.customValidationError = undefined;
+    function setDraftLink(protocol: LinkType, dataUrl: string, fileName?: string): void {
+      self.draftLinks = { ...self.draftLinks, [protocol]: { protocol, dataUrl, fileName } };
+    }
+
+    function removeDraftLink(protocol: LinkType): void {
+      const { [protocol]: _removed, ...rest } = self.draftLinks ?? {};
+      self.draftLinks = rest;
+    }
+
+    function clearDraftLinks(): void {
+      self.draftLinks = {};
     }
 
     function selectLayerByID(layerID: string): void {
@@ -467,12 +489,30 @@ export const discreteLayersStore = ModelBase
       self.mapViewerExtentPolygon = cloneDeep(feature);
     }
 
-    function setCustomValidationError(err: Record<string, string[]> | undefined): void {
+    function setCustomValidationError(err: IError): void {
       self.customValidationError = cloneDeep(err);
     }
 
     function clearCustomValidationError(): void {
       self.customValidationError = undefined;
+    }
+
+    function setServiceError(key: string, err: IError[]): void {
+      const currentErrors = self.serviceErrors
+        ? new Map(self.serviceErrors)
+        : new Map<string, IError[]>();
+      currentErrors.set(key, err);
+      self.serviceErrors = currentErrors;
+    }
+
+    function clearServiceError(key: string): void {
+      if (!self.serviceErrors) {
+        return;
+      }
+
+      const currentErrors = new Map(self.serviceErrors);
+      currentErrors.delete(key);
+      self.serviceErrors = currentErrors.size > 0 ? currentErrors : undefined;
     }
 
     function setPolygonPartsLayer(layer: ILayerImage | undefined): void {
@@ -583,18 +623,18 @@ export const discreteLayersStore = ModelBase
     };
 
     const buildCatalogsQueries = (
-      recordTypeToFetch: RecordType,
+      recordTypesToFetch: RecordType[],
       pageSize: number,
       filterFn: (type: RecordType) => FilterField[]
     ): Promise<{ search: CswCatalogsModelType }>[] => {
       const startIndex = 1;
-      if (recordTypeToFetch === RecordType.RECORD_ALL) {
-        return CONFIG.SERVED_ENTITY_TYPES.filter((type) => type !== RecordType.RECORD_ALL).map((type) =>
-          createQueryAndFetch(type as RecordType, startIndex, pageSize, filterFn)
-        );
-      }
+      const recordTypes = recordTypesToFetch.includes(RecordType.RECORD_ALL)
+        ? CONFIG.SERVED_ENTITY_TYPES.filter((type) => type !== RecordType.RECORD_ALL)
+        : recordTypesToFetch;
 
-      return [createQueryAndFetch(recordTypeToFetch, startIndex, pageSize, filterFn)];
+      return recordTypes.map((type) =>
+        createQueryAndFetch(type as RecordType, startIndex, pageSize, filterFn)
+      );
     };
 
     const buildRecordsPromises = (
@@ -630,18 +670,21 @@ export const discreteLayersStore = ModelBase
       return recordsPromises;
     };
 
-    const fetchAllCatalog = async (
-      filterFn: (type: RecordType) => FilterField[]
+    const fetchCatalogs = async (
+      filterFn: (type: RecordType) => FilterField[],
+      recordTypes: RecordType[] = [self.searchParams.recordType as RecordType]
     ) => {
-      const recordTypeToFetch = self.searchParams.recordType;
-      if (!recordTypeToFetch) {
-        return [];
-      }
+      const servedRecordTypes = recordTypes.filter((type) => {
+        if (!CONFIG.SERVED_ENTITY_TYPES.includes(type)) {
+          throw new Error(`[CatalogApp]: ${type} does not exist`);
+        }
+        return true;
+      });
 
       const pageSize = CONFIG.RUNNING_MODE.CSW_DEFAULT_PAGE_SIZE;
 
       const initialCatalogQueryPromises = buildCatalogsQueries(
-        recordTypeToFetch,
+        servedRecordTypes,
         pageSize,
         filterFn
       );
@@ -693,17 +736,21 @@ export const discreteLayersStore = ModelBase
       resetAppState,
       resetTabView,
       getFieldConfig,
-      resetUpdateMode,
       setMapViewerExtentPolygon,
       setCustomValidationError,
       clearCustomValidationError,
+      setServiceError,
+      clearServiceError,
       setPolygonPartsLayer,
       setPolygonPartsInfo,
       addPolygonPartsInfo,
       resetPolygonPartsInfo,
       resetPolygonParts,
-      fetchAllCatalog,
+      fetchCatalogs,
       setEnumsMap,
+      setDraftLink,
+      removeDraftLink,
+      clearDraftLinks,
     };
   });
 

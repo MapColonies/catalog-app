@@ -138,6 +138,7 @@ body[dir='rtl'] .headerSystemAreaContainer {
   flex-direction: row;
   align-items: center;
   gap: 8px;
+  white-space: nowrap;
 }
 
 .tabTitle {
@@ -221,6 +222,11 @@ body[dir='rtl'] .tabContentContainer {
 body[dir='rtl'] .sideDetailsPanel {
   padding-left: unset;
   padding-right: 20px;
+}
+
+.panelContent {
+  height: calc(100% - 60px);
+  overflow: auto;
 }
 
 .version {

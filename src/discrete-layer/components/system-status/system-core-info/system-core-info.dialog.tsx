@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { observer } from 'mobx-react';
 import { cloneDeep } from 'lodash';
 import { Box } from '@map-colonies/react-components';
@@ -15,12 +15,13 @@ import {
   Button,
   TabBarOnActivateEventT,
 } from '@map-colonies/react-core';
-import { GraphQLError } from '../../../../common/components/error/graphql.error-presentor';
 import { useQuery, useStore } from '../../../models/RootStore';
 import { ExternalServiceModelType } from '../../../models';
 import { DeploymentWithServicesModelType } from '../../../models';
+import { formatError, IGraphqlError } from '../../helpers/errorUtils';
 import { ExternalServices } from './external-services/external-services';
 import { InternalService } from './internal-service/internal-service';
+import { ErrorPresentor } from '../../error/error-presentor';
 
 import './system-core-info.dialog.css';
 
@@ -45,19 +46,14 @@ const INTERNAL_SERVICES_QUERY = `name
 export const SystemCoreInfoDialog: React.FC<SystemCoreInfoDialogProps> = observer(
   ({ isOpen, onSetOpen }: SystemCoreInfoDialogProps) => {
     const store = useStore();
+    const intl = useIntl();
     const clusterServicesQuery = useQuery();
     const externalServicesQuery = useQuery();
 
     const [clusterServices, setClusterServices] = useState<DeploymentWithServicesModelType[]>([]);
     const [externalServices, setExternalServices] = useState<CategorizedServices>({});
-    const [clusterServicesError, setClusterServicesError] = useState<Record<
-      string,
-      unknown
-    > | null>(null);
-    const [externalServicesError, setExternalServicesError] = useState<Record<
-      string,
-      unknown
-    > | null>(null);
+    const [clusterServicesError, setClusterServicesError] = useState<IGraphqlError | null>(null);
+    const [externalServicesError, setExternalServicesError] = useState<IGraphqlError | null>(null);
     const [activeTab, setActiveTab] = useState<number>(EXTERNAL_SERVICES_TAB_INDEX);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -122,7 +118,9 @@ export const SystemCoreInfoDialog: React.FC<SystemCoreInfoDialogProps> = observe
       let renderContent;
 
       if (clusterServicesError) {
-        renderContent = <GraphQLError error={clusterServicesError} />;
+        renderContent = (
+          <ErrorPresentor errors={formatError(intl, clusterServicesError, 'error')} />
+        );
       } else {
         const sortedServicesByStatus = clusterServices.sort((a, b) => {
           const A_BEFORE_B = -1;
@@ -142,7 +140,9 @@ export const SystemCoreInfoDialog: React.FC<SystemCoreInfoDialogProps> = observe
       let renderContent;
 
       if (externalServicesError) {
-        renderContent = <GraphQLError error={externalServicesError} />;
+        renderContent = (
+          <ErrorPresentor errors={formatError(intl, externalServicesError, 'error')} />
+        );
       } else {
         renderContent = <ExternalServices services={externalServices} />;
       }

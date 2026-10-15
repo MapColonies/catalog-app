@@ -29,7 +29,16 @@ module.exports = function override(config, env) {
     'react-dnd-html5-backend': path.resolve(__dirname, './node_modules/react-dnd-html5-backend'),
     '__copc-wasm-binary__': path.join(copcAdapterDistDir, 'copc_wasm.wasm'),
     '__laz-perf-wasm-binary__': path.join(copcAdapterDistDir, 'laz-perf.wasm'),
+    'react-native$': 'react-native-web',
   };
+
+  config.resolve.extensions = [
+    '.web.js',
+    '.web.jsx',
+    '.web.ts',
+    '.web.tsx',
+    ...(config.resolve.extensions || []),
+  ];
 
   config.plugins.push(
     new webpack.NormalModuleReplacementPlugin(

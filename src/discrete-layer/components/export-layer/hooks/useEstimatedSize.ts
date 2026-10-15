@@ -5,7 +5,7 @@ import EnumsMapContext, {
   IEnumDescriptor,
   IEnumsMapType,
 } from '../../../../common/contexts/enumsMap.context';
-import { getResponseErrorMesssage } from '../../../../common/helpers/server-error';
+import { getResponseErrorMesssage } from '../../helpers/errorUtils';
 import { EstimatedSizeModelType, RecordType, useQuery, useStore } from '../../../models';
 import { GeojsonFeatureCollectionInput } from '../../../models/RootStore.base';
 

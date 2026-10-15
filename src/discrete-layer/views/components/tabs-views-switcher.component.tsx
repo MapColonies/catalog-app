@@ -1,25 +1,18 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect } from 'react';
 import { isEmpty } from 'lodash';
 import { observer } from 'mobx-react-lite';
 import { useIntl } from 'react-intl';
 import { Box } from '@map-colonies/react-components';
 import { IconButton, Tooltip, useTheme } from '@map-colonies/react-core';
-import { isRtl } from '../../../common/i18n/helpers';
 import { useStore } from '../../models/RootStore';
-import { TabViews } from '../tab-views';
+import { ITabViewConfig, TabViews } from '../tab-views';
+import { useTabViewsConfig } from '../useTabViewsConfig.hook';
 
 import './tabs-views-switcher.component.css';
 
 interface TabViewsSwitcherComponentProps {
   handleTabViewChange: (tabView: TabViews) => void;
   activeTabView: TabViews;
-}
-
-export interface ITabView {
-  idx: TabViews;
-  title: string;
-  iconClassName: string;
-  dependentValue?: unknown;
 }
 
 export const TabViewsSwitcher: React.FC<TabViewsSwitcherComponentProps> = observer((props) => {
@@ -30,46 +23,20 @@ export const TabViewsSwitcher: React.FC<TabViewsSwitcherComponentProps> = observ
 
   const layerToExport = store.exportStore.layerToExport;
 
-  const tabViews: ITabView[] = useMemo(
-    () => [
-      {
-        idx: TabViews.CATALOG,
-        title: 'tab-views.catalog',
-        iconClassName: 'mc-icon-Catalog',
-      },
-      {
-        idx: TabViews.SEARCH_RESULTS,
-        title: 'tab-views.search-results',
-        iconClassName: 'mc-icon-Search-History',
-      },
-      {
-        idx: TabViews.EXPORT_LAYER,
-        title: 'tab-views.export-layer',
-        iconClassName: isRtl(intl.locale) ? 'mc-icon-Export-Left' : 'mc-icon-Export',
-        dependentValue: store.exportStore.layerToExport,
-      },
-    ],
-    [layerToExport]
-  );
+  const tabViews: ITabViewConfig[] = useTabViewsConfig(intl.locale);
 
-  const [availableTabs, setAvailableTabs] = useState<ITabView[]>(tabViews);
+  const availableTabs = tabViews.filter((tab) => {
+    if ('dependentValue' in tab) {
+      return !isEmpty(tab.dependentValue) || tab.dependentValue === true;
+    }
 
-  useEffect(() => {
-    const dependentTabs = tabViews.filter((tab) => {
-      if ('dependentValue' in tab) {
-        return !isEmpty(tab.dependentValue);
-      }
-
-      return tab;
-    });
-
-    setAvailableTabs(dependentTabs);
-  }, [tabViews]);
+    return true;
+  });
 
   useEffect(() => {
     if (layerToExport !== undefined) {
       handleTabViewChange(TabViews.EXPORT_LAYER);
-    } else {
+    } else if (activeTabView === TabViews.EXPORT_LAYER) {
       handleTabViewChange(TabViews.CATALOG);
     }
   }, [layerToExport]);

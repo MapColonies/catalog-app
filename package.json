@@ -1,6 +1,6 @@
 {
   "name": "catalog-app",
-  "version": "6.7.1",
+  "version": "6.8.0",
   "bugs": {
     "url": "https://github.com/MapColonies/catalog-app/issues"
   },
@@ -59,7 +59,8 @@
       "\\.(css|less)$": "<rootDir>/src/__mocks__/styleMock.js",
       "(map|collapsible-list|tooltip|icon|date-range-picker|date-range-picker.form-control|date-picker|autocomplete).css": "<rootDir>/src/__mocks__/styleMock.js",
       "(drawHelper|coordinates-tracker.tool|scale-tracker.tool|scene-modes|base-maps|settings|file-picker).css": "<rootDir>/src/__mocks__/styleMock.js",
-      "(ag-grid|ag-theme-alpine|ag-theme-alpine-dark).css": "<rootDir>/src/__mocks__/styleMock.js"
+      "(ag-grid|ag-theme-alpine|ag-theme-alpine-dark).css": "<rootDir>/src/__mocks__/styleMock.js",
+      "^@frillab/copc-adapter/cesium$": "<rootDir>/src/__mocks__/frillabCopcCesiumMock.js"
     },
     "snapshotSerializers": [
       "enzyme-to-json/serializer"
@@ -96,6 +97,8 @@
     "@map-colonies/static-assets": "^0.5.1",
     "@map-colonies/types": "1.6.0",
     "@material-ui/core": "^4.11.0",
+    "@react-navigation/native": "^7.4.1",
+    "@react-navigation/stack": "^7.11.2",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -158,6 +161,7 @@
     "graphql-request": "^7.4.0",
     "graphql-ws": "^6.0.8",
     "https-browserify": "^1.0.0",
+    "jszip": "^3.10.1",
     "jsum": "^2.0.0-alpha.4",
     "lodash": "4.17.20",
     "mobx": "6.2.0",
@@ -182,6 +186,8 @@
     "react-hook-form": "6.15.8",
     "react-intl": "5.7.1",
     "react-loading-skeleton": "^3.5.0",
+    "react-native-safe-area-context": "^5.10.0",
+    "react-native-web": "^0.21.2",
     "react-scripts": "5.0.1",
     "react-sortable-tree": "^2.8.0",
     "react-virtualized": "^9.22.5",

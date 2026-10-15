@@ -50,13 +50,16 @@ import { MenuDimensions } from '../../common/hooks/mapMenus/useGetMenuDimensions
 import { LinkType } from '../../common/models/link-type.enum';
 import { Mode } from '../../common/models/mode.enum';
 import { ActiveLayersIcon } from '../../icons/4font/ActiveLayers';
+import { BasemapsRouter } from '../components/basemaps/basemaps-router.component';
 import { CatalogTreeComponent } from '../components/catalog-tree/catalog-tree';
 import ExportDrawingHandler from '../components/export-layer/export-drawing-handler.component';
 import { ExportLayerComponent } from '../components/export-layer/export-layer.component';
 import ExportPolygonsRenderer from '../components/export-layer/export-polygons-renderer.component';
 // import { Filters } from '../components/filters/filters';
+import { DEFAULT_LAYER_MANAGER_META_MAPPING } from '../components/helpers/generateLayerComponent';
 import { JobsDialog } from '../components/job-manager/jobs.dialog';
 import { EntityDialog } from '../components/layer-details/entity.dialog';
+import { ManageLinksDialog } from '../components/layer-details/links-management/manage-links.dialog';
 import { EntityRasterDialog } from '../components/layer-details/raster/entity.raster.dialog';
 import { LayersResults } from '../components/layers-results/layers-results';
 import { ActionsContextMenu } from '../components/map-container/contextMenus/actions.context-menu';
@@ -99,6 +102,7 @@ import { TabViewsSwitcher } from './components/tabs-views-switcher.component';
 import UserModeSwitch from './components/user-mode-switch/user-mode-switch.component';
 import { EntityDelete3DDialog } from '../components/layer-details/3D/entity.3d.delete-dialog';
 import { TabViews } from './tab-views';
+import { useTabViewsConfig } from './useTabViewsConfig.hook';
 
 import '@material/tab-bar/dist/mdc.tab-bar.css';
 import '@material/tab/dist/mdc.tab.css';
@@ -136,6 +140,8 @@ const noDrawing: IDrawingObject = {
 
 const getTimeStamp = (): string => new Date().getTime().toString();
 
+const TABS_WITH_SIDE_DETAILS_PANEL = [TabViews.CATALOG, TabViews.SEARCH_RESULTS];
+
 const DiscreteLayerView: React.FC = observer(() => {
   const [isFilterSearchLoading, setIsFilterSearchLoading] = useState(false);
   const [data, setData] = useState<LayerMetadataMixedUnion[] | undefined>();
@@ -158,6 +164,7 @@ const DiscreteLayerView: React.FC = observer(() => {
   const [isRevertRasterDialogOpen, setIsRevertRasterDialogOpen] = useState<boolean>(false);
   const [isSystemsJobsDialogOpen, setIsSystemsJobsDialogOpen] = useState<boolean>(false);
   const [isSystemCoreInfoDialogOpen, setIsSystemCoreInfoDialogOpen] = useState<boolean>(false);
+  const [isManageLinksDialogOpen, setIsManageLinksDialogOpen] = useState<boolean>(false);
   const [isCreateEntityMenuOpen, setIsCreateEntityMenuOpen] = useState<boolean>(false);
   const [tabsPanelExpanded, setTabsPanelExpanded] = useState<boolean>(true);
   const [detailsPanelExpanded, setDetailsPanelExpanded] = useState<boolean>(false);
@@ -261,7 +268,7 @@ const DiscreteLayerView: React.FC = observer(() => {
       });
     }
 
-    void store.catalogTreeStore.capabilitiesFetch(fullCatalogLayers);
+    void store.catalogTreeStore.fetchAndSetCapabilities(fullCatalogLayers);
   }, [data]);
 
   useEffect(() => {
@@ -332,6 +339,7 @@ const DiscreteLayerView: React.FC = observer(() => {
       REMOVE: intl.formatMessage({ id: 'active-layers.remove' }),
       BASE_MAP_TITLE: intl.formatMessage({ id: 'map-settings.base-map.title' }),
       TERRAIN_TITLE: intl.formatMessage({ id: 'record-type.record_quantized_mesh.label' }),
+      NONE: intl.formatMessage({ id: 'links-management.dialog.no-basemap.text' }),
       SHOW_FEATURE_ON_MAP: intl.formatMessage({ id: 'geocoder-panel.show-feature-on-map' }),
       IN_MAP_EXTENT: intl.formatMessage({ id: 'geocoder-panel.in-map-extent' }),
       SEARCH_PLACEHOLDER: intl.formatMessage({ id: 'general.search.placeholder' }),
@@ -406,7 +414,7 @@ const DiscreteLayerView: React.FC = observer(() => {
   const fetchCatalog = async () => {
     try {
       setIsFilterSearchLoading(true);
-      const catalog = await store.discreteLayersStore.fetchAllCatalog(buildFilters);
+      const catalog = await store.discreteLayersStore.fetchCatalogs(buildFilters);
       setData(catalog);
       setIsFilterSearchLoading(false);
     } catch (error: any) {
@@ -654,23 +662,7 @@ const DiscreteLayerView: React.FC = observer(() => {
     store.discreteLayersStore.setSelectedLayerOperationMode(undefined);
   }, [store.discreteLayersStore.setSelectedLayerOperationMode]);
 
-  const tabViews = [
-    {
-      idx: TabViews.CATALOG,
-      title: 'tab-views.catalog',
-      iconClassName: 'mc-icon-Catalog',
-    },
-    {
-      idx: TabViews.SEARCH_RESULTS,
-      title: 'tab-views.search-results',
-      iconClassName: 'mc-icon-Search-History',
-    },
-    {
-      idx: TabViews.EXPORT_LAYER,
-      title: 'tab-views.export-layer',
-      iconClassName: isRtl(intl.locale) ? 'mc-icon-Export-Left' : 'mc-icon-Export',
-    },
-  ];
+  const tabViews = useTabViewsConfig(intl.locale);
 
   const permissions = useMemo(() => {
     return {
@@ -1018,17 +1010,7 @@ const DiscreteLayerView: React.FC = observer(() => {
   }, [activeTabView, actionsMenuDimensions]);
 
   const layerManagerMetaMapping = useMemo<ILayerManagerMetaMapping>(() => {
-    return {
-      layer: {
-        id: 'id',
-        name: 'layerRecord.productName',
-        footprint: 'layerRecord.footprint',
-      },
-      dataLayer: {
-        name: 'layerRecord.featureStructure.aliasLayerName',
-        fields: 'layerRecord.featureStructure.fields',
-      },
-    };
+    return DEFAULT_LAYER_MANAGER_META_MAPPING;
   }, []);
 
   const drapingLayerPredicate = useMemo<DrapingLayerPredicate | undefined>(() => {
@@ -1177,6 +1159,8 @@ const DiscreteLayerView: React.FC = observer(() => {
     [intl]
   );
 
+  const showSideDetailsPanel = TABS_WITH_SIDE_DETAILS_PANEL.includes(activeTabView);
+
   return (
     <>
       <Box className={`headerContainer ${isUiDisabled ? 'curtainContainer' : ''}`}>
@@ -1208,7 +1192,10 @@ const DiscreteLayerView: React.FC = observer(() => {
             onPoiUpdate={onPoiSelection}
             poi={poi}
             corners={corners}
-            disabled={activeTabView === TabViews.EXPORT_LAYER}
+            disabled={
+              activeTabView === TabViews.EXPORT_LAYER ||
+              activeTabView === TabViews.BASEMAPS_MANAGEMENT
+            }
           />
         </Box>
         <Box className="headerSystemAreaContainer">
@@ -1313,12 +1300,7 @@ const DiscreteLayerView: React.FC = observer(() => {
             className="sidePanelContainer"
             style={{
               backgroundColor: theme.custom?.GC_ALTERNATIVE_SURFACE as string,
-              height:
-                activeTabView !== TabViews.EXPORT_LAYER
-                  ? detailsPanelExpanded
-                    ? '50%'
-                    : '75%'
-                  : '100%',
+              height: showSideDetailsPanel ? (detailsPanelExpanded ? '50%' : '75%') : '100%',
               display: tabsPanelExpanded ? 'block' : 'none',
             }}
           >
@@ -1355,8 +1337,16 @@ const DiscreteLayerView: React.FC = observer(() => {
                 />
               </Box>
             )}
+            {activeTabView === TabViews.BASEMAPS_MANAGEMENT && (
+              <Box className="tabContentContainer">
+                {getActiveTabHeader(activeTabView, site)}
+                <Box className="panelContent">
+                  <BasemapsRouter />
+                </Box>
+              </Box>
+            )}
           </Box>
-          {activeTabView !== TabViews.EXPORT_LAYER && (
+          {showSideDetailsPanel && (
             <Box
               className="sidePanelContainer sideDetailsPanel"
               style={{
@@ -1399,12 +1389,13 @@ const DiscreteLayerView: React.FC = observer(() => {
                   imgText: intl.formatMessage({ id: 'map-legends.actions.img' }),
                 },
               }}
+              globeBaseColor={CesiumColor.WHITESMOKE}
               showDebugger={CONFIG.MAP.SHOW_DEBUGGER_TOOL === true && isAdminUser}
               showActiveLayers={CONFIG.MAP.SHOW_ACTIVE_LAYERS_TOOL}
               {...(CONFIG.MAP.SHOW_GEOCODER_TOOL ? { geocoderPanel: GEOCODER_OPTIONS } : {})}
               {...(drapingLayerPredicate !== undefined ? { drapingLayerPredicate } : {})}
             >
-              {activeTabView !== TabViews.EXPORT_LAYER && (
+              {showSideDetailsPanel && (
                 <CesiumDrawingsDataSource
                   drawings={activeTabView === TabViews.SEARCH_RESULTS ? drawEntities : []}
                   drawingMaterial={DRAWING_MATERIAL_COLOR}
@@ -1433,6 +1424,7 @@ const DiscreteLayerView: React.FC = observer(() => {
                   setJobToOpenJobManager({ id, resourceId, updated });
                   setIsSystemsJobsDialogOpen(open);
                 }}
+                handleOpenManageLinksDialog={setIsManageLinksDialogOpen}
               />
 
               <Terrain />
@@ -1578,6 +1570,13 @@ const DiscreteLayerView: React.FC = observer(() => {
           <SystemCoreInfoDialog
             isOpen={isSystemCoreInfoDialogOpen}
             onSetOpen={setIsSystemCoreInfoDialogOpen}
+          />
+        )}
+        {isManageLinksDialogOpen && (
+          <ManageLinksDialog
+            isOpen={isManageLinksDialogOpen}
+            onSetOpen={setIsManageLinksDialogOpen}
+            layerRecord={store.discreteLayersStore.selectedLayer}
           />
         )}
       </Box>

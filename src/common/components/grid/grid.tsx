@@ -234,7 +234,7 @@ export const GridComponent: React.FC<GridComponentProps> = (props) => {
     if (!row) {
       handleFocusError?.({
         code: 'warning.row-not-found',
-        message: '',
+        errText: '',
         level: 'warning',
       });
       setIsRowFound?.(false);
