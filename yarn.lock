@@ -1999,10 +1999,10 @@
   dependencies:
     prop-types "^15.8.1"
 
-"@frillab/copc-adapter@^0.5.0":
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/@frillab/copc-adapter/-/copc-adapter-0.5.0.tgz#b6cbb662f1bbe701289505c1ccef3550c94536b8"
-  integrity sha512-5kq23aFye1CD2bFqbtRYyEn43nfbMEbfnLff3yMemQbcSLDDWEtknW/+zWTMUx8WBad2Y+J/d+Xs4Oa8+1ybKQ==
+"@frillab/copc-adapter@^0.5.3":
+  version "0.5.3"
+  resolved "https://registry.yarnpkg.com/@frillab/copc-adapter/-/copc-adapter-0.5.3.tgz#9438e720660d97881c0b605a0cc0970c26867923"
+  integrity sha512-3r2UQWqPae+GjZO+FsCByVWioc++ZZTYvCa3Tz0gcS/gRRIS+44toKiMlUzoR2f1JBNGNY/xVroiZNO0GOvIdg==
   dependencies:
     copc "^0.0.9"
     proj4 "^2.20.9"
@@ -2480,14 +2480,14 @@
     lodash "^4.17.21"
     ngeohash "^0.6.3"
 
-"@map-colonies/react-components@^4.20.0":
-  version "4.20.0"
-  resolved "https://registry.yarnpkg.com/@map-colonies/react-components/-/react-components-4.20.0.tgz#76d6f531c9ffc825eded4f06476b704e75d2d26e"
-  integrity sha512-u5TjMe4Uwms36vn//9q095R9dLWbfgZstvpZS2z9HAhZR/Fd3n4bCdS8gY81qu5JwhxK7NcSaaRHOIZlgboGcg==
+"@map-colonies/react-components@^4.20.1":
+  version "4.20.1"
+  resolved "https://registry.yarnpkg.com/@map-colonies/react-components/-/react-components-4.20.1.tgz#c4bfa4965863af8948baae9e889fda3c9edd3e1f"
+  integrity sha512-Cpvq86SAQYzfbiLWNN8zB9ygErIH6riLGQhBFisYJUGvqpHMa+GE+qsE4ZAJtn4LbIcp/6SWLpkoY7/v+d08YA==
   dependencies:
     "@cmcleese/cesium-navigation" "^4.0.7"
     "@date-io/date-fns" "^1.3.13"
-    "@frillab/copc-adapter" "^0.5.0"
+    "@frillab/copc-adapter" "^0.5.3"
     "@here/quantized-mesh-decoder" "^1.2.8"
     "@map-colonies/react-core" "^4.2.2"
     "@material-ui/core" "^4.11.0"
