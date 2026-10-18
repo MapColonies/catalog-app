@@ -32,8 +32,19 @@ export enum CRUDAction {
   manageLinks = 'manageLinks',
 }
 
+export enum BasemapAction {
+  makeDefault = 'makeDefault',
+}
+
 export interface IAction {
-  action: ContextActions | UserAction | ExportActions | GeneralAction | JobAction | CRUDAction;
+  action:
+    | ContextActions
+    | UserAction
+    | ExportActions
+    | GeneralAction
+    | JobAction
+    | CRUDAction
+    | BasemapAction;
   frequent: boolean;
   symbol: {
     icon?: string;
@@ -68,6 +79,8 @@ export enum EntityActionsTypes {
   JOB_ACTIONS = 'jobActions',
   EXPORT_ACTIONS = 'exportActions',
 }
+
+export const BASEMAP_ENTITY = 'Basemap';
 
 export const isDependentFieldWithValue = (
   dependentField?: DependentField
@@ -303,6 +316,39 @@ const ACTIONS_CONFIG: IEntityActions[] = [
             symbol: { class: 'mc-icon-Edit1' },
             title: { translationId: 'action.edit.tooltip' },
             views: [TabViews.CATALOG, TabViews.SEARCH_RESULTS],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    entity: BASEMAP_ENTITY,
+    actions: [
+      {
+        id: 0,
+        titleTranslationId: 'basemaps.list.title',
+        type: EntityActionsTypes.CRUD,
+        group: [
+          {
+            action: CRUDAction.edit,
+            frequent: true,
+            symbol: { class: 'mc-icon-Edit1' },
+            title: { translationId: 'basemaps.list.actions.edit' },
+            views: [],
+          },
+          {
+            action: GeneralAction.export,
+            frequent: false,
+            symbol: { class: 'mc-icon-Export' },
+            title: { translationId: 'basemaps.list.actions.export' },
+            views: [],
+          },
+          {
+            action: BasemapAction.makeDefault,
+            frequent: false,
+            symbol: {},
+            title: { translationId: 'basemaps.list.actions.make-default' },
+            views: [],
           },
         ],
       },

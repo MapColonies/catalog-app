@@ -17,9 +17,17 @@ import {
   Menu,
   MenuItem,
   MenuSurfaceAnchor,
-  Tooltip,
   Typography,
 } from '@map-colonies/react-core';
+import { shouldRenderSeparator } from '../../../common/helpers/actionsHelper';
+import {
+  BASEMAP_ENTITY,
+  BasemapAction,
+  CRUDAction,
+  GeneralAction,
+  IAction,
+  IActionGroup,
+} from '../../../common/actions/entity.actions';
 import { useStore } from '../../models';
 import { BasemapOutput } from './XXXbasemapMockXXX';
 
@@ -29,21 +37,28 @@ interface BasemapRowProps {
   basemap: BasemapOutput;
   isShown: boolean;
   onToggleShow: (id: string) => void;
-  onEdit: (id: string) => void;
-  onExport: (id: string) => void;
-  onMakeDefault: (id: string) => void;
+  actions: IActionGroup[];
+  onAction: (action: IAction['action'], id: string) => void;
 }
 
 const BasemapRow: React.FC<BasemapRowProps> = ({
   basemap,
   isShown,
   onToggleShow,
-  onEdit,
-  onExport,
-  onMakeDefault,
+  actions,
+  onAction,
 }) => {
   const intl = useIntl();
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
+  const frequentActions = actions.flatMap((actionGroup) =>
+    actionGroup.group.filter((action) => action.frequent)
+  );
+  const menuActions = actions
+    .map((actionGroup) => ({
+      ...actionGroup,
+      group: actionGroup.group.filter((action) => !action.frequent),
+    }))
+    .filter((actionGroup) => actionGroup.group.length > 0);
 
   return (
     <>
@@ -69,36 +84,52 @@ const BasemapRow: React.FC<BasemapRowProps> = ({
             className={isShown ? 'mc-icon-Show basemapEyeActive' : 'mc-icon-Hide'}
             onClick={(): void => onToggleShow(basemap.id)}
           />
-          <IconButton className="mc-icon-Edit1" onClick={(): void => onEdit(basemap.id)} />
-          {/* TODO: need to think about the real structure of the actions, maybe like in entity.actions. */}
-          <MenuSurfaceAnchor>
-            <Menu open={isMenuOpen} focusOnOpen={false} onClose={(): void => setIsMenuOpen(false)}>
-              <MenuItem
-                onClick={(): void => {
-                  onExport(basemap.id);
-                  setIsMenuOpen(false);
-                }}
+          {frequentActions.map((action) => (
+            <IconButton
+              key={action.action}
+              className={action.symbol.class}
+              onClick={(): void => onAction(action.action, basemap.id)}
+            />
+          ))}
+          {menuActions.length > 0 && (
+            <MenuSurfaceAnchor>
+              <Menu
+                open={isMenuOpen}
+                focusOnOpen={false}
+                onClose={(): void => setIsMenuOpen(false)}
               >
-                <Box className="basemapMenuItem">
-                  <IconButton className="mc-icon-Export" />
-                  <Typography tag="span">
-                    {intl.formatMessage({ id: 'basemaps.list.actions.export' })}
-                  </Typography>
-                </Box>
-              </MenuItem>
-              <MenuItem
-                onClick={(): void => {
-                  onMakeDefault(basemap.id);
-                  setIsMenuOpen(false);
-                }}
-              >
-                <Box className="basemapMenuItem">
-                  {intl.formatMessage({ id: 'basemaps.list.actions.make-default' })}
-                </Box>
-              </MenuItem>
-            </Menu>
-            <IconButton className="mc-icon-More" onClick={(): void => setIsMenuOpen(!isMenuOpen)} />
-          </MenuSurfaceAnchor>
+                {menuActions.map((actionGroup, groupIdx) => (
+                  <React.Fragment key={actionGroup.id}>
+                    {shouldRenderSeparator(actionGroup, groupIdx) && (
+                      <Box className="menuSeparator" />
+                    )}
+                    {actionGroup.group.map((action) => (
+                      <MenuItem
+                        key={action.action}
+                        onClick={(): void => {
+                          onAction(action.action, basemap.id);
+                          setIsMenuOpen(false);
+                        }}
+                      >
+                        <Box className="basemapMenuItem">
+                          {(action.symbol.class || action.symbol.icon) && (
+                            <IconButton className={action.symbol.class} icon={action.symbol.icon} />
+                          )}
+                          <Typography tag="span">
+                            {intl.formatMessage({ id: action.title.translationId })}
+                          </Typography>
+                        </Box>
+                      </MenuItem>
+                    ))}
+                  </React.Fragment>
+                ))}
+              </Menu>
+              <IconButton
+                className="mc-icon-More"
+                onClick={(): void => setIsMenuOpen(!isMenuOpen)}
+              />
+            </MenuSurfaceAnchor>
+          )}
         </ListItemMeta>
       </ListItem>
       <ListDivider />
@@ -111,6 +142,7 @@ export const BasemapsListPanel: React.FC<BasemapsPanelProps<'BasemapsList'>> = o
     const intl = useIntl();
     const store = useStore();
     const { basemapsStore } = store;
+    const basemapActions = store.actionDispatcherStore.getEntityActionGroups(BASEMAP_ENTITY);
 
     useEffect(() => {
       void basemapsStore.getBasemaps();
@@ -137,13 +169,24 @@ export const BasemapsListPanel: React.FC<BasemapsPanelProps<'BasemapsList'>> = o
               key={basemap.id}
               basemap={basemap}
               isShown={basemapsStore.shownBasemapId === basemap.id}
+              actions={basemapActions}
               onToggleShow={(id): void => basemapsStore.showBasemap(id)}
-              onEdit={(id): void => {
-                basemapsStore.editBasemap(id);
-                navigation.navigate('EditBasemap');
+              onAction={(action, id): void => {
+                switch (action) {
+                  case CRUDAction.edit:
+                    basemapsStore.editBasemap(id);
+                    navigation.navigate('EditBasemap');
+                    break;
+                  case GeneralAction.export:
+                    basemapsStore.exportBasemap(id);
+                    break;
+                  case BasemapAction.makeDefault:
+                    basemapsStore.makeDefaultBasemap(id);
+                    break;
+                  default:
+                    break;
+                }
               }}
-              onExport={(id): void => basemapsStore.exportBasemap(id)}
-              onMakeDefault={(id): void => basemapsStore.makeDefaultBasemap(id)}
             />
           ))}
         </List>
