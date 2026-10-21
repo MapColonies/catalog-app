@@ -23,8 +23,7 @@
 }
 
 .basemapListItem {
-  height: auto;
-  padding: 0.5rem 0;
+  height: 48px;
 }
 
 .basemapsList .basemapListItem::before,
@@ -35,14 +34,13 @@
 .basemapThumbnail {
   width: 40px;
   height: 40px;
-  object-fit: cover;
-  border-radius: 4px;
 }
 
 .basemapListItemText {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  height: 100%;
+  gap: 4px;
 }
 
 .basemapBadge {
@@ -55,24 +53,20 @@
 
 .basemapBadge::before {
   content: '';
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  background: currentColor;
+  background: var(--mdc-theme-gc-priority-normal);
 }
 
 .basemapListItemActions {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-}
-
-.basemapEyeActive {
-  color: var(--mdc-theme-primary, inherit);
+  gap: 12px;
 }
 
 .basemapMenuItem {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 4px;
 }

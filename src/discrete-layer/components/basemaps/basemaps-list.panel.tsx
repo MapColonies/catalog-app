@@ -17,6 +17,7 @@ import {
   Menu,
   MenuItem,
   MenuSurfaceAnchor,
+  Tooltip,
   Typography,
 } from '@map-colonies/react-core';
 import { shouldRenderSeparator } from '../../../common/helpers/actionsHelper';
@@ -39,6 +40,7 @@ interface BasemapRowProps {
   onToggleShow: (id: string) => void;
   actions: IActionGroup[];
   onAction: (action: IAction['action'], id: string) => void;
+  scrollTick: number;
 }
 
 const BasemapRow: React.FC<BasemapRowProps> = ({
@@ -47,9 +49,15 @@ const BasemapRow: React.FC<BasemapRowProps> = ({
   onToggleShow,
   actions,
   onAction,
+  scrollTick,
 }) => {
   const intl = useIntl();
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
+
+  useEffect(() => {
+    setIsMenuOpen(false);
+  }, [scrollTick]);
+
   const frequentActions = actions.flatMap((actionGroup) =>
     actionGroup.group.filter((action) => action.frequent)
   );
@@ -81,7 +89,7 @@ const BasemapRow: React.FC<BasemapRowProps> = ({
         </ListItemText>
         <ListItemMeta className="basemapListItemActions">
           <IconButton
-            className={isShown ? 'mc-icon-Show basemapEyeActive' : 'mc-icon-Hide'}
+            className={isShown ? 'mc-icon-Show' : 'mc-icon-Hide'}
             onClick={(): void => onToggleShow(basemap.id)}
           />
           {frequentActions.map((action) => (
@@ -94,6 +102,7 @@ const BasemapRow: React.FC<BasemapRowProps> = ({
           {menuActions.length > 0 && (
             <MenuSurfaceAnchor>
               <Menu
+                renderToPortal=".app-container"
                 open={isMenuOpen}
                 focusOnOpen={false}
                 onClose={(): void => setIsMenuOpen(false)}
@@ -143,6 +152,7 @@ export const BasemapsListPanel: React.FC<BasemapsPanelProps<'BasemapsList'>> = o
     const store = useStore();
     const { basemapsStore } = store;
     const basemapActions = store.actionDispatcherStore.getEntityActionGroups(BASEMAP_ENTITY);
+    const [scrollTick, setScrollTick] = useState<number>(0);
 
     useEffect(() => {
       void basemapsStore.getBasemaps();
@@ -155,21 +165,30 @@ export const BasemapsListPanel: React.FC<BasemapsPanelProps<'BasemapsList'>> = o
         <Box className="basemapsListPanelHeader">
           <Typography tag="h2">{intl.formatMessage({ id: 'basemaps.list.title' })}</Typography>
           <Box className="basemapsListPanelHeaderActions">
-            <Button type="button" outlined onClick={(): void => navigation.navigate('EditBasemap')}>
-              {intl.formatMessage({ id: 'basemaps.list.import' })}
-            </Button>
-            <Button type="button" raised onClick={(): void => navigation.navigate('EditBasemap')}>
-              {intl.formatMessage({ id: 'basemaps.list.new' })}
-            </Button>
+            <Tooltip content={intl.formatMessage({ id: 'basemaps.list.import' })}>
+              <Button
+                type="button"
+                outlined
+                onClick={(): void => navigation.navigate('EditBasemap')}
+              >
+                {intl.formatMessage({ id: 'basemaps.list.import' })}
+              </Button>
+            </Tooltip>
+            <Tooltip content={intl.formatMessage({ id: 'basemaps.list.new' })}>
+              <Button type="button" raised onClick={(): void => navigation.navigate('EditBasemap')}>
+                {intl.formatMessage({ id: 'basemaps.list.new' })}
+              </Button>
+            </Tooltip>
           </Box>
         </Box>
-        <List twoLine className="basemapsList">
+        <List className="basemapsList" onScroll={(): void => setScrollTick((tick) => tick + 1)}>
           {basemaps.map((basemap) => (
             <BasemapRow
               key={basemap.id}
               basemap={basemap}
               isShown={basemapsStore.shownBasemapId === basemap.id}
               actions={basemapActions}
+              scrollTick={scrollTick}
               onToggleShow={(id): void => basemapsStore.showBasemap(id)}
               onAction={(action, id): void => {
                 switch (action) {
