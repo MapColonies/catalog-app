@@ -102,6 +102,7 @@ import { MapActionResolver } from './components/map-action-resolver.component';
 import { TabViewsSwitcher } from './components/tabs-views-switcher.component';
 import UserModeSwitch from './components/user-mode-switch/user-mode-switch.component';
 import { EntityDelete3DDialog } from '../components/layer-details/3D/entity.3d.delete-dialog';
+import { BasemapSwitcher } from '../components/basemaps/basemap-switcher';
 import { TabViews } from './tab-views';
 import { useTabViewsConfig } from './useTabViewsConfig.hook';
 
@@ -1416,6 +1417,8 @@ const DiscreteLayerView: React.FC = observer(() => {
               {memoizedLayers}
 
               {activeTabView === TabViews.EXPORT_LAYER && <ExportDrawingHandler />}
+
+              <BasemapSwitcher activeTabView={activeTabView} />
 
               <ActionResolver
                 handleOpenEntityDialog={handleEntityDialogOpen}

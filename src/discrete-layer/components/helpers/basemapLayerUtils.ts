@@ -1,13 +1,13 @@
 import { IRasterLayer } from '@map-colonies/react-components';
 import { LinkType } from '../../../common/models/link-type.enum';
-import { CapabilityModelType } from '../../models';
+import { CapabilityModelType, LayerRasterRecordModelType } from '../../models';
 import { BasemapLayerOutput } from '../basemaps/XXXbasemapMockXXX';
-import { getCesiumWMTSOptions } from './cesiumUtils';
+import { generateLayerRectangle, getCesiumWMTSOptions } from './cesiumUtils';
 import { getLayerLink } from './layersUtils';
 
 export const buildRasterLayerFromBasemapLayer = (
   basemapLayer: BasemapLayerOutput,
-  capabilities: CapabilityModelType[] = []
+  capability?: CapabilityModelType
 ): IRasterLayer | undefined => {
   const { id, order, opacity, shouldBeUsedInModelDraping, source } = basemapLayer;
 
@@ -54,7 +54,6 @@ export const buildRasterLayerFromBasemapLayer = (
   }
 
   if (link.protocol === LinkType.WMTS_LAYER || link.protocol === LinkType.WMTS) {
-    const capability = capabilities.find((item) => item.id === link.name);
     return {
       id,
       type: LinkType.WMTS_LAYER,
@@ -62,7 +61,10 @@ export const buildRasterLayerFromBasemapLayer = (
       zIndex: order,
       show: true,
       shouldBeUsedInModelDraping,
-      options: getCesiumWMTSOptions(record, link.url as string, capability),
+      options: {
+        ...getCesiumWMTSOptions(record, link.url as string, capability),
+        rectangle: generateLayerRectangle(record as LayerRasterRecordModelType),
+      },
     };
   }
 
@@ -74,7 +76,11 @@ export const buildRasterLayerFromBasemapLayer = (
       zIndex: order,
       show: true,
       shouldBeUsedInModelDraping,
-      options: { url: link.url as string, layers: record.productId as string },
+      options: {
+        url: link.url as string,
+        layers: record.productId as string,
+        rectangle: generateLayerRectangle(record as LayerRasterRecordModelType),
+      },
     };
   }
 
