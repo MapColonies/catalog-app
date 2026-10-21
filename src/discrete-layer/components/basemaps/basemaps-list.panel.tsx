@@ -165,17 +165,23 @@ export const BasemapsListPanel: React.FC<BasemapsPanelProps<'BasemapsList'>> = o
         <Box className="basemapsListPanelHeader">
           <Typography tag="h2">{intl.formatMessage({ id: 'basemaps.list.title' })}</Typography>
           <Box className="basemapsListPanelHeaderActions">
-            <Tooltip content={intl.formatMessage({ id: 'basemaps.list.import' })}>
+            <Tooltip content={intl.formatMessage({ id: 'basemaps.list.import.tooltip' })}>
               <Button
                 type="button"
+                className="actionButton"
                 outlined
                 onClick={(): void => navigation.navigate('EditBasemap')}
               >
                 {intl.formatMessage({ id: 'basemaps.list.import' })}
               </Button>
             </Tooltip>
-            <Tooltip content={intl.formatMessage({ id: 'basemaps.list.new' })}>
-              <Button type="button" raised onClick={(): void => navigation.navigate('EditBasemap')}>
+            <Tooltip content={intl.formatMessage({ id: 'basemaps.list.new.tooltip' })}>
+              <Button
+                type="button"
+                className="actionButton"
+                raised
+                onClick={(): void => navigation.navigate('EditBasemap')}
+              >
                 {intl.formatMessage({ id: 'basemaps.list.new' })}
               </Button>
             </Tooltip>

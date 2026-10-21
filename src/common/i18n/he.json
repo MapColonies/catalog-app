@@ -801,7 +801,9 @@
 
   "basemaps.list.title": "מפות בסיס",
   "basemaps.list.import": "ייבוא",
+  "basemaps.list.import.tooltip": "ייבוא תבנית למפת בסיס",
   "basemaps.list.new": "חדש",
+  "basemaps.list.new.tooltip": "צור מפת בסיס",
   "basemaps.list.current-map": "מפה נוכחית",
   "basemaps.list.preview-map": "מפת תצוגה מקדימה",
   "basemaps.list.actions.view": "הצג מפת בסיס",

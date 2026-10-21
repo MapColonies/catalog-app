@@ -18,6 +18,10 @@
   gap: 16px;
 }
 
+.actionButton {
+  height: 32px;
+}
+
 .basemapsList {
   overflow-y: auto;
 }

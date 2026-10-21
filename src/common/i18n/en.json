@@ -801,7 +801,9 @@
 
   "basemaps.list.title": "Basemaps",
   "basemaps.list.import": "Import",
+  "basemaps.list.import.tooltip": "Import a template for a basemap",
   "basemaps.list.new": "New",
+  "basemaps.list.new.tooltip": "Create a basemap",
   "basemaps.list.current-map": "Current Map",
   "basemaps.list.preview-map": "Preview Map",
   "basemaps.list.actions.view": "View Basemap",
