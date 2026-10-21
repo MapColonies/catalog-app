@@ -31,6 +31,14 @@ module.exports = function override(config, env) {
     ...(config.resolve.extensions || []),
   ];
 
+  // @frillab/copc-adapter exposes its WASM binaries through Vite-only asset modules whose URLs
+  // resolve to `file:///...` under Webpack. See webpack/copc-adapter-wasm-asset.loader.js.
+  config.module.rules.push({
+    test: /@frillab[\\/]copc-adapter[\\/]dist[\\/][^\\/]*Asset\.js$/,
+    enforce: 'pre',
+    use: path.resolve(__dirname, './webpack/copc-adapter-wasm-asset.loader.js'),
+  });
+
   config.plugins.push(
     new webpack.ProvidePlugin({
       process: 'process/browser',
