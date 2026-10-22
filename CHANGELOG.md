@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [6.9.0](https://github.com/MapColonies/catalog-app/compare/v6.8.0...v6.9.0) (2026-10-22)
+
+
+### Features
+
+* add catalog picker (MAPCO-11752 picker part) ([#1052](https://github.com/MapColonies/catalog-app/issues/1052)) ([704090e](https://github.com/MapColonies/catalog-app/commit/704090e8c690e06528375dc584c9fe4362752c5e))
+* add react-navigation (MAPCO-11773) ([#1049](https://github.com/MapColonies/catalog-app/issues/1049)) ([6b06e0d](https://github.com/MapColonies/catalog-app/commit/6b06e0d54b46a1fca5511cb1d36e2bc2242dd60e))
+* copc 3d catalog integration ([#1056](https://github.com/MapColonies/catalog-app/issues/1056)) ([8eca5e4](https://github.com/MapColonies/catalog-app/commit/8eca5e48d40ba625c06f62f8c22696edf0b76f2b))
+* links management (MAPCO-11627) ([#1053](https://github.com/MapColonies/catalog-app/issues/1053)) ([fbcea8e](https://github.com/MapColonies/catalog-app/commit/fbcea8ecb1256244b8983ed60192f24381ba9fa5))
+
+
+### Bug Fixes
+
+* add basemaps tab (MAPCO-11747, MAPCO-11807) ([#1051](https://github.com/MapColonies/catalog-app/issues/1051)) ([d063fd8](https://github.com/MapColonies/catalog-app/commit/d063fd86a9c1b4d0a9cbcd8e3139ff5ed867c5a8))
+* copc s3 and wasm loading ([#1059](https://github.com/MapColonies/catalog-app/issues/1059)) ([90f5356](https://github.com/MapColonies/catalog-app/commit/90f5356dae7c242de3c2bf995ca1068d60d3d1b9))
+* move cesium globe baseColor configuration to shared-components (MAPCO-11965) ([#1054](https://github.com/MapColonies/catalog-app/issues/1054)) ([74585a7](https://github.com/MapColonies/catalog-app/commit/74585a7d003c51d03c5f08b48c6b7c86b09ce4f5))
+* use new protocolType and linkType enums ([#1060](https://github.com/MapColonies/catalog-app/issues/1060)) ([d51e371](https://github.com/MapColonies/catalog-app/commit/d51e3712663b48843853be07464c280fbd0f573d))
+
 ## [6.8.0](https://github.com/MapColonies/catalog-app/compare/v6.7.1...v6.8.0) (2026-09-14)
 
 
