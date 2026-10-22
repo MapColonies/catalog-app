@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import { Geometry } from 'geojson';
 import { observer } from 'mobx-react-lite';
 import { ICesiumImageryLayer, useCesiumMap } from '@map-colonies/react-components';
 import { useStore } from '../../models/RootStore';
