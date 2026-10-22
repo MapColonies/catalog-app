@@ -103,6 +103,7 @@ const BasemapRow: React.FC<BasemapRowProps> = ({
             <MenuSurfaceAnchor>
               <Menu
                 renderToPortal=".app-container"
+                fixed
                 open={isMenuOpen}
                 focusOnOpen={false}
                 onClose={(): void => setIsMenuOpen(false)}

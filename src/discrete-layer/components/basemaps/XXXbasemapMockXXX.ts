@@ -61,7 +61,7 @@ export const MOCK_SEARCH_RASTER_RECORD = {
   region: ['קפריסין'],
   productId: 'Cyprus_BACKUP_RESTORE',
   productVersion: '2.0',
-  productType: 'ORTHOPHOTO',
+  productType: 'ORTHOPHOTO' as ProductType,
   productSubType: null,
   srsName: 'WGS84GEO',
   maxResolutionDeg: 0.001373291015625,

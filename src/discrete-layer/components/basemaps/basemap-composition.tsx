@@ -6,7 +6,7 @@ import { LinkModelType } from '../../models';
 import { buildRasterLayerFromBasemapLayer } from '../helpers/basemapLayerUtils';
 import { getLinksArrWithTokens } from '../helpers/layersUtils';
 
-export const BasemapPreviewLayer: React.FC = observer(() => {
+export const BasemapComposition: React.FC = observer(() => {
   const mapViewer = useCesiumMap();
   const store = useStore();
 

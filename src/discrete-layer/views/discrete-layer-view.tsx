@@ -63,7 +63,7 @@ import { ManageLinksDialog } from '../components/layer-details/links-management/
 import { EntityRasterDialog } from '../components/layer-details/raster/entity.raster.dialog';
 import { LayersResults } from '../components/layers-results/layers-results';
 import { ActionsContextMenu } from '../components/map-container/contextMenus/actions.context-menu';
-import { BasemapPreviewLayer } from '../components/basemaps/basemap-preview-layer';
+import { BasemapComposition } from '../components/basemaps/basemap-composition';
 import { BBoxCorners } from '../components/map-container/bbox.dialog';
 import ActionsMenuDimensionsContext from '../components/map-container/contextMenus/contexts/actionsMenuDimensionsContext';
 import { ExtentUpdater } from '../components/map-container/extent-updater';
@@ -356,7 +356,7 @@ const DiscreteLayerView: React.FC = observer(() => {
       <>
         <MapActionResolver />
         <SelectedLayersContainer />
-        <BasemapPreviewLayer />
+        <BasemapComposition />
         <HighlightedLayer />
         <LayersFootprints />
         <PolygonParts />
