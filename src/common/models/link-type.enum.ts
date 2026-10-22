@@ -10,7 +10,6 @@ export const LinkType = {
   THUMBNAIL_L: 'THUMBNAIL_L',
   LEGEND_DOC: 'LEGEND_DOC',
   LEGEND_IMG: 'LEGEND_IMG',
-  LEGEND: 'LEGEND',
   WMTS: ProtocolType.WMTS,
   WMS: ProtocolType.WMS,
   WFS: ProtocolType.WFS,

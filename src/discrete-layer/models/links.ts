@@ -67,9 +67,4 @@ export const links: Partial<Record<LinkType, ILink>> = {
     editable: true,
     fileTypes: '.png,.bmp,.jpeg,.jpg'
   },
-  [LinkType.LEGEND]: {
-    linkAction: 'link',
-    editable: true,
-    fileTypes: '.json'
-  },
 };

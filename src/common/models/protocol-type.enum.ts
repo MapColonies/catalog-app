@@ -14,3 +14,5 @@ export const ProtocolType = {
 } as const;
 
 export type ProtocolType = (typeof ProtocolType)[keyof typeof ProtocolType];
+
+export const toProtocol = (val: string | undefined): ProtocolType => val as ProtocolType;

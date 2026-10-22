@@ -1,5 +1,6 @@
 import React from 'react';
-import { ProtocolType } from '../../../common/models/protocol-type.enum';
+import { TileLayer, TileWMTS, TileXYZ } from '@map-colonies/react-components';
+import { ProtocolType, toProtocol } from '../../../common/models/protocol-type.enum';
 import {
   LayerOptions,
   WMTSOptions,
@@ -11,15 +12,8 @@ import {
   LayerRasterRecordModelType,
   LinkModelType,
 } from '../../models';
-import {
-  getLayerLink,
-  getLinkUrlWithToken,
-  getWMTSConfigOptions,
-  isWMTSProtocol,
-  isXYZProtocol,
-} from '../helpers/layersUtils';
+import { getLayerLink, getLinkUrlWithToken, getWMTSConfigOptions } from '../helpers/layersUtils';
 import { getOLSourceOptions } from '../helpers/olUtils';
-import { TileLayer, TileWMTS, TileXYZ } from '@map-colonies/react-components';
 
 interface OlLayerProps {
   layerRecord: LayerMetadataMixedUnion;
@@ -36,8 +30,8 @@ export const OlLayer: React.FC<OlLayerProps> = React.memo((props) => {
     return undefined;
   }
 
-  switch (true) {
-    case isXYZProtocol(layerLink.protocol):
+  switch (toProtocol(layerLink.protocol)) {
+    case ProtocolType.XYZ:
       options = getOLSourceOptions(ProtocolType.XYZ, {
         options: { url: layerLink.url },
       });
@@ -46,7 +40,7 @@ export const OlLayer: React.FC<OlLayerProps> = React.memo((props) => {
       );
       break;
 
-    case isWMTSProtocol(layerLink.protocol): {
+    case ProtocolType.WMTS: {
       const resolved = getWMTSConfigOptions(
         props.layerOptions as LayerRasterRecordModelType,
         layerLink.url as string,

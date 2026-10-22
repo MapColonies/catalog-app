@@ -937,12 +937,7 @@ const DiscreteLayerView: React.FC = observer(() => {
     (layers: (ILayerImage & { meta: unknown })[]): IMapLegend[] => {
       const LEGEND_PDF_PROTOCOL = LinkType.LEGEND_DOC;
       const LEGEND_IMG_PROTOCOL = LinkType.LEGEND_IMG;
-      const LEGEND_OBJ_PROTOCOL = LinkType.LEGEND;
-      const legendsProtocols: LinkType[] = [
-        LEGEND_PDF_PROTOCOL,
-        LEGEND_IMG_PROTOCOL,
-        LEGEND_OBJ_PROTOCOL,
-      ];
+      const legendsProtocols: LinkType[] = [LEGEND_PDF_PROTOCOL, LEGEND_IMG_PROTOCOL];
 
       return layers.reduce((legendsList, cesiumLayer): IMapLegend[] => {
         if (typeof get(cesiumLayer.meta, 'layerRecord.links') !== 'undefined') {
