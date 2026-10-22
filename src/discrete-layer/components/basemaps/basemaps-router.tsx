@@ -123,7 +123,7 @@ export const BasemapsRouter: React.FC = () => {
 
   return (
     <NavigationIndependentTree>
-      <Box style={{ display: 'flex', flex: 1, width: '100%', height: '100%', minHeight: 0 }}>
+      <Box className="basemapsRouterContainer">
         <NavigationContainer documentTitle={{ enabled: false }} theme={navigationTheme}>
           <Stack.Navigator
             initialRouteName="BasemapsList"

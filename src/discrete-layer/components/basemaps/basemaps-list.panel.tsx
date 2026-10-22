@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { useIntl } from 'react-intl';
 import { Box } from '@map-colonies/react-components';
-import type { BasemapsPanelProps } from './basemaps-router.component';
+import type { BasemapsPanelProps } from './basemaps-router';
 import {
   Button,
   IconButton,
@@ -164,7 +164,6 @@ export const BasemapsListPanel: React.FC<BasemapsPanelProps<'BasemapsList'>> = o
     return (
       <Box className="basemapsListPanel">
         <Box className="basemapsListPanelHeader">
-          <Typography tag="h2">{intl.formatMessage({ id: 'basemaps.list.title' })}</Typography>
           <Box className="basemapsListPanelHeaderActions">
             <Tooltip content={intl.formatMessage({ id: 'basemaps.list.import.tooltip' })}>
               <Button
