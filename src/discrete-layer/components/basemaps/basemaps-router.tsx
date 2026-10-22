@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { useIntl } from 'react-intl';
-import { Button, useTheme } from '@map-colonies/react-core';
+import { MenuItem, Select, useTheme } from '@map-colonies/react-core';
 import { Box } from '@map-colonies/react-components';
 import {
   DefaultTheme,
@@ -10,21 +10,23 @@ import {
   StackHeaderProps,
   StackScreenProps,
 } from '../../../common/navigation/react-navigation.proxy';
-import { BasemapActionSelector, PickLayerPanel } from './add-layer/pick-layer.panel';
+import { BasemapsListPanel } from './basemaps-list.panel';
+import { PickLayerPanel } from './pick-layer.panel';
 
 import './basemaps-router.css';
+import { BasemapActionSelector } from './XXXbasemapMockXXX';
 
 type BasemapsStackPanel = {
-  BaseMapsList: undefined;
-  EditBaseMap: undefined;
+  BasemapsList: undefined;
+  EditBasemap: undefined;
   AddLayer: { actionSelector: BasemapActionSelector };
 };
 
 type BasemapsRouteName = keyof BasemapsStackPanel;
 
 const PANELS_IDS: Record<BasemapsRouteName, string> = {
-  BaseMapsList: 'basemaps.panels.base-maps-list',
-  EditBaseMap: 'basemaps.panels.edit-base-map',
+  BasemapsList: 'basemaps.panels.base-maps-list',
+  EditBasemap: 'basemaps.panels.edit-base-map',
   AddLayer: 'basemaps.panels.add-layer',
 };
 
@@ -56,24 +58,45 @@ const XXXBasemapsHeaderMOCKXXX: React.FC<StackHeaderProps> = ({ route, navigatio
           );
         })}
       </nav>
-      <Box style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
-        {(Object.keys(PANELS_IDS) as BasemapsRouteName[])
-          .filter((name) => name !== route.name)
-          .map((name) => (
-            <Button key={name} type="button" onClick={(): void => navigation.navigate(name)}>
-              {intl.formatMessage({ id: PANELS_IDS[name] })}
-            </Button>
-          ))}
-      </Box>
     </Box>
   );
 };
 
-type BasemapsPanelProps<T extends BasemapsRouteName> = StackScreenProps<BasemapsStackPanel, T>;
+export type BasemapsPanelProps<T extends BasemapsRouteName> = StackScreenProps<
+  BasemapsStackPanel,
+  T
+>;
 
-const BaseMapsListPanel: React.FC<BasemapsPanelProps<'BaseMapsList'>> = () => null;
+const BasemapComposer: React.FC<BasemapsPanelProps<'EditBasemap'>> = ({ navigation }) => {
+  const intl = useIntl();
 
-const EditBaseMapPanel: React.FC<BasemapsPanelProps<'EditBaseMap'>> = () => null;
+  return (
+    <Select
+      id="basemap-action-selector"
+      value=""
+      enhanced
+      outlined
+      onChange={(event: React.ChangeEvent<HTMLSelectElement>): void => {
+        const selectedValue = event.currentTarget.value;
+        if (selectedValue !== '') {
+          navigation.navigate('AddLayer', {
+            actionSelector: Number(selectedValue) as BasemapActionSelector,
+          });
+        }
+      }}
+    >
+      <MenuItem value="" disabled>
+        {intl.formatMessage({ id: PANELS_IDS.AddLayer })}
+      </MenuItem>
+      <MenuItem value={BasemapActionSelector.CatalogResource}>
+        {intl.formatMessage({ id: 'basemaps.edit.action-selector.catalog-resource' })}
+      </MenuItem>
+      <MenuItem value={BasemapActionSelector.External}>
+        {intl.formatMessage({ id: 'basemaps.edit.action-selector.external' })}
+      </MenuItem>
+    </Select>
+  );
+};
 
 const AddLayerPanel: React.FC<BasemapsPanelProps<'AddLayer'>> = ({ navigation, route }) => (
   <PickLayerPanel
@@ -100,22 +123,17 @@ export const BasemapsRouter: React.FC = () => {
 
   return (
     <NavigationIndependentTree>
-      <Box style={{ display: 'flex', flex: 1, width: '100%', height: '100%', minHeight: 0 }}>
+      <Box className="basemapsRouterContainer">
         <NavigationContainer documentTitle={{ enabled: false }} theme={navigationTheme}>
           <Stack.Navigator
-            initialRouteName="BaseMapsList"
+            initialRouteName="BasemapsList"
             screenOptions={{
               header: (props): React.ReactNode => <XXXBasemapsHeaderMOCKXXX {...props} />,
             }}
           >
-            <Stack.Screen name="BaseMapsList" component={BaseMapsListPanel} />
-            <Stack.Screen name="EditBaseMap" component={EditBaseMapPanel} />
-            <Stack.Screen
-              name="AddLayer"
-              component={AddLayerPanel}
-              // TODO: actionSelector should come from the caller once the other selectors land
-              initialParams={{ actionSelector: BasemapActionSelector.CatalogResource }}
-            />
+            <Stack.Screen name="BasemapsList" component={BasemapsListPanel} />
+            <Stack.Screen name="EditBasemap" component={BasemapComposer} />
+            <Stack.Screen name="AddLayer" component={AddLayerPanel} />
           </Stack.Navigator>
         </NavigationContainer>
       </Box>

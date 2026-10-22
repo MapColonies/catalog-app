@@ -50,7 +50,7 @@ import { MenuDimensions } from '../../common/hooks/mapMenus/useGetMenuDimensions
 import { LinkType } from '../../common/models/link-type.enum';
 import { Mode } from '../../common/models/mode.enum';
 import { ActiveLayersIcon } from '../../icons/4font/ActiveLayers';
-import { BasemapsRouter } from '../components/basemaps/basemaps-router.component';
+import { BasemapsRouter } from '../components/basemaps/basemaps-router';
 import { CatalogTreeComponent } from '../components/catalog-tree/catalog-tree';
 import ExportDrawingHandler from '../components/export-layer/export-drawing-handler.component';
 import { ExportLayerComponent } from '../components/export-layer/export-layer.component';
@@ -63,6 +63,7 @@ import { ManageLinksDialog } from '../components/layer-details/links-management/
 import { EntityRasterDialog } from '../components/layer-details/raster/entity.raster.dialog';
 import { LayersResults } from '../components/layers-results/layers-results';
 import { ActionsContextMenu } from '../components/map-container/contextMenus/actions.context-menu';
+import { BasemapComposition } from '../components/basemaps/basemap-composition';
 import { BBoxCorners } from '../components/map-container/bbox.dialog';
 import ActionsMenuDimensionsContext from '../components/map-container/contextMenus/contexts/actionsMenuDimensionsContext';
 import { ExtentUpdater } from '../components/map-container/extent-updater';
@@ -101,6 +102,7 @@ import { MapActionResolver } from './components/map-action-resolver.component';
 import { TabViewsSwitcher } from './components/tabs-views-switcher.component';
 import UserModeSwitch from './components/user-mode-switch/user-mode-switch.component';
 import { EntityDelete3DDialog } from '../components/layer-details/3D/entity.3d.delete-dialog';
+import { BasemapSwitcher } from '../components/basemaps/basemap-switcher';
 import { TabViews } from './tab-views';
 import { useTabViewsConfig } from './useTabViewsConfig.hook';
 
@@ -354,6 +356,7 @@ const DiscreteLayerView: React.FC = observer(() => {
       <>
         <MapActionResolver />
         <SelectedLayersContainer />
+        <BasemapComposition />
         <HighlightedLayer />
         <LayersFootprints />
         <PolygonParts />
@@ -1336,14 +1339,15 @@ const DiscreteLayerView: React.FC = observer(() => {
                 />
               </Box>
             )}
-            {activeTabView === TabViews.BASEMAPS_MANAGEMENT && (
-              <Box className="tabContentContainer">
-                {getActiveTabHeader(activeTabView, site)}
-                <Box className="panelContent">
-                  <BasemapsRouter />
-                </Box>
+            <Box
+              className="tabContentContainer"
+              style={{ display: activeTabView === TabViews.BASEMAPS_MANAGEMENT ? 'block' : 'none' }}
+            >
+              {getActiveTabHeader(activeTabView, site)}
+              <Box className="panelContent">
+                <BasemapsRouter />
               </Box>
-            )}
+            </Box>
           </Box>
           {showSideDetailsPanel && (
             <Box
@@ -1412,6 +1416,8 @@ const DiscreteLayerView: React.FC = observer(() => {
               {memoizedLayers}
 
               {activeTabView === TabViews.EXPORT_LAYER && <ExportDrawingHandler />}
+
+              <BasemapSwitcher activeTabView={activeTabView} />
 
               <ActionResolver
                 handleOpenEntityDialog={handleEntityDialogOpen}
