@@ -11,7 +11,7 @@ import {
   StackScreenProps,
 } from '../../../common/navigation/react-navigation.proxy';
 import { BasemapsListPanel } from './basemaps-list.panel';
-import { PickLayerPanel } from './add-layer/pick-layer.panel';
+import { PickLayerPanel } from './pick-layer.panel';
 
 import './basemaps-router.css';
 import { BasemapActionSelector } from './XXXbasemapMockXXX';
