@@ -3,9 +3,9 @@ import { Feature } from 'geojson';
 import bbox from '@turf/bbox';
 import bboxPolygon from '@turf/bbox-polygon';
 import booleanContains from '@turf/boolean-contains';
-import { LinkType } from '../../../common/models/link-type.enum';
 import { WMTSSourceOptions } from '../../../common/components/ol-map/layer.config.options-bridging';
 import CONFIG from '../../../common/config';
+import { ProtocolType } from '../../../common/models/protocol-type.enum';
 import { ResourceUrlModelType } from '../../models/ResourceUrlModel';
 import { ILayerImage } from '../../models/layerImage';
 import {
@@ -17,15 +17,14 @@ import {
   TileMatrixSetModelType,
 } from '../../models';
 
-export const isWMTSProtocol = (linkType?: string): boolean =>
-  linkType === LinkType.WMTS_LAYER || linkType === LinkType.WMTS;
+export const isWMTSProtocol = (protocol?: string): boolean => protocol === ProtocolType.WMTS;
 
-export const isXYZProtocol = (linkType?: string): boolean => linkType === LinkType.XYZ_LAYER;
+export const isXYZProtocol = (protocol?: string): boolean => protocol === ProtocolType.XYZ;
 
 export const hasWFSLink = (data: Record<string, unknown>): boolean => {
   return (
     (data.links as Array<Record<string, unknown>> | undefined)?.some(
-      (link) => link.protocol === LinkType.WFS
+      (link) => link.protocol === ProtocolType.WFS
     ) ?? false
   );
 };
@@ -50,15 +49,9 @@ export const getLinksArrWithTokens = (links: LinkModelType[]): LinkModelType[] =
 };
 
 export const findLayerLink = (layer: ILayerImage): LinkModelType | undefined => {
-  let wmtsLayer = layer.links?.find((link: LinkModelType) =>
-    [LinkType.WMTS_LAYER as string].includes(link.protocol as string)
-  ) as LinkModelType | undefined;
-  if (wmtsLayer === undefined) {
-    wmtsLayer = layer.links?.find((link: LinkModelType) =>
-      [LinkType.WMTS as string].includes(link.protocol as string)
-    ) as LinkModelType | undefined;
-  }
-  return wmtsLayer;
+  return layer.links?.find((link: LinkModelType) => link.protocol === ProtocolType.WMTS) as
+    | LinkModelType
+    | undefined;
 };
 
 export const getLayerLink = (layer: ILayerImage): LinkModelType => {
@@ -75,7 +68,7 @@ export const isLayerURLMissing = (
 ): boolean => {
   const layerLink = getLayerLink(layer);
   const hasCapabilities = capabilities.some((capability) => capability.id === layerLink.name);
-  return !hasCapabilities && layerLink.protocol === LinkType.WMTS;
+  return !hasCapabilities && layerLink.protocol === ProtocolType.WMTS;
 };
 
 export const getTokenParam = (): string => {

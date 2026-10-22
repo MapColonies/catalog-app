@@ -14,6 +14,7 @@ import { Mode } from '../../common/models/mode.enum';
 import CONFIG from '../../common/config';
 import { isUnpublished } from '../../common/helpers/style';
 import { LinkType } from '../../common/models/link-type.enum';
+import { ProtocolType } from '../../common/models/protocol-type.enum';
 import { getLayerLink } from '../components/helpers/layersUtils';
 import { LayerMetadataMixedUnionKeys, LayerRecordTypes, LayerRecordTypesKeys } from '../components/layer-details/entity-types-keys';
 import { extractDescriptorRelatedFieldNames, getFlatEntityDescriptors } from '../components/layer-details/utils';
@@ -175,7 +176,7 @@ export const discreteLayersStore = ModelBase
         if (item.type === RecordType.RECORD_RASTER) {
           const layerLink = getLayerLink(item);
           const hasCapabilities = self.capabilities?.find(item => layerLink.name === item.id);
-          const hasWMTSUrl = layerLink.protocol === LinkType.WMTS;
+          const hasWMTSUrl = layerLink.protocol === ProtocolType.WMTS;
           additional = { layerURLMissing: !hasCapabilities && hasWMTSUrl };
         }
         return {

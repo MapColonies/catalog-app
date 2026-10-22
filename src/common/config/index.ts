@@ -5,7 +5,7 @@ import {
   IBaseMaps,
   IBaseMap,
 } from '@map-colonies/react-components';
-import { LinkType } from '../models/link-type.enum';
+import { ProtocolType } from '../models/protocol-type.enum';
 import { IRasterIngestionFilesStructureConfig } from '../models/raster-ingestion-files-structure';
 
 /*eslint-disable */
@@ -70,7 +70,7 @@ function enrichBaseMaps(baseMaps: IBaseMaps): IBaseMaps {
             options: {
               ...rasterLayer.options,
               tilingScheme:
-                rasterLayer.type === LinkType.WMTS_LAYER
+                rasterLayer.type === ProtocolType.WMTS
                   ? new CesiumGeographicTilingScheme()
                   : undefined,
             },

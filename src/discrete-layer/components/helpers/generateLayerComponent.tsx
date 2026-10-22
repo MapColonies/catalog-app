@@ -11,7 +11,7 @@ import {
   isBaseMapLayer,
 } from '@map-colonies/react-components';
 import CONFIG from '../../../common/config';
-import { LinkType } from '../../../common/models/link-type.enum';
+import { ProtocolType } from '../../../common/models/protocol-type.enum';
 import { Layer3DRecordModelType, LayerRasterRecordModelType, LinkModelType } from '../../models';
 import { CapabilityModelType } from '../../models/CapabilityModel';
 import { ILayerImage } from '../../models/layerImage';
@@ -52,7 +52,7 @@ export const generateLayerComponent = (
   const layerLink = getLayerLink(layer);
 
   switch (layerLink.protocol) {
-    case LinkType.XYZ_LAYER:
+    case ProtocolType.XYZ:
       return (
         <CesiumXYZLayer
           key={layer.id}
@@ -80,8 +80,7 @@ export const generateLayerComponent = (
           options={{ url: getTokenResource(layerLink.url as string) }}
         />
       );
-    case LinkType.THREE_D_TILES:
-    case LinkType.THREE_D_LAYER:
+    case ProtocolType.THREE_D_TILES:
       return (
         <Cesium3DTileset
           maximumScreenSpaceError={CONFIG.THREE_D_LAYER.MAXIMUM_SCREEN_SPACE_ERROR}
@@ -103,7 +102,7 @@ export const generateLayerComponent = (
           }}
         />
       );
-    case LinkType.COPC:
+    case ProtocolType.COPC:
       return (
         <CopcWithInfoBox
           infoBoxTitle={layer.productName as string}
@@ -118,8 +117,7 @@ export const generateLayerComponent = (
           extraDimensions="*"
         ></CopcWithInfoBox>
       );
-    case LinkType.WMTS_LAYER:
-    case LinkType.WMTS: {
+    case ProtocolType.WMTS: {
       const capability = capabilities?.find((item) => layerLink.name === item.id);
       const optionsWMTS = {
         ...getCesiumWMTSOptions(
@@ -157,7 +155,7 @@ export const generateLayerComponent = (
         />
       );
     }
-    case LinkType.WFS: {
+    case ProtocolType.WFS: {
       const options = {
         url: layerLink.url ?? '',
         featureType: layerLink.name ?? '',
