@@ -1,5 +1,5 @@
 import React from 'react';
-import { LinkType } from '../../../common/models/link-type.enum';
+import { ProtocolType } from '../../../common/models/protocol-type.enum';
 import {
   LayerOptions,
   WMTSOptions,
@@ -38,7 +38,7 @@ export const OlLayer: React.FC<OlLayerProps> = React.memo((props) => {
 
   switch (true) {
     case isXYZProtocol(layerLink.protocol):
-      options = getOLSourceOptions(LinkType.XYZ_LAYER, {
+      options = getOLSourceOptions(ProtocolType.XYZ, {
         options: { url: layerLink.url },
       });
       tileComponent = (
@@ -53,7 +53,7 @@ export const OlLayer: React.FC<OlLayerProps> = React.memo((props) => {
         props.capability
       );
 
-      options = getOLSourceOptions(LinkType.WMTS_LAYER, {
+      options = getOLSourceOptions(ProtocolType.WMTS, {
         options: {
           ...resolved,
           url: getLinkUrlWithToken([

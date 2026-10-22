@@ -98,7 +98,9 @@ export const BaseMapsLegendsFetcher: React.FC = observer(() => {
               const layerFromCatalog = await GET_MOCK_LAYER_WITH_LINKS(rasterLayer.id);
               const legendsLinks = (layerFromCatalog.links as unknown as LinkModelType[]).filter(
                 (link) =>
-                  [LEGEND_PDF_PROTOCOL, LEGEND_IMG_PROTOCOL].includes(link.protocol as LinkType)
+                  ([LEGEND_PDF_PROTOCOL, LEGEND_IMG_PROTOCOL] as LinkType[]).includes(
+                    link.protocol as LinkType
+                  )
               );
 
               return {

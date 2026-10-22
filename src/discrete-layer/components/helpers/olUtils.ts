@@ -1,11 +1,11 @@
 import { getWMTSOptions, getXYZOptions } from '@map-colonies/react-components';
-import { LinkType } from '../../../common/models/link-type.enum';
 import {
   IOLConfigData,
   WMTSSourceOptions,
   WMTSOptions,
   XYZOptions,
 } from '../../../common/components/ol-map/layer.config.options-bridging';
+import { ProtocolType } from '../../../common/models/protocol-type.enum';
 
 export const DEFAULT_PROJECTION = 'EPSG:4326';
 
@@ -14,7 +14,7 @@ export const toOlSubdomainTemplate = (url: string): string => {
 };
 
 export function getOLSourceOptions(
-  protocol: LinkType,
+  protocol: ProtocolType,
   configData: IOLConfigData
 ): XYZOptions | WMTSOptions | null {
   const layerOptions = configData.options;
@@ -22,11 +22,11 @@ export function getOLSourceOptions(
   let url = toOlSubdomainTemplate(layerOptions.url as string);
 
   switch (protocol) {
-    case LinkType.XYZ_LAYER:
+    case ProtocolType.XYZ:
       resOptions = getXYZOptions({ url });
       break;
 
-    case LinkType.WMTS_LAYER:
+    case ProtocolType.WMTS:
       {
         const wmtsSourceOptions = layerOptions as WMTSSourceOptions;
         resOptions = getWMTSOptions({
