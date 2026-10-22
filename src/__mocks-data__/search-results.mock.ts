@@ -50,7 +50,7 @@ export const MOCK_DATA_IMAGERY_LAYERS_ISRAEL = [
     category: '',
     thumbnail: '',
     properties: {
-      protocol: 'XYZ_LAYER',
+      protocol: 'XYZ',
       url: 'https://tiles.openaerialmap.org/5a852c072553e6000ce5ac8d/0/7950e2de-5d9e-49aa-adec-6e92384be0b9/{z}/{x}/{y}.png',
       meta: 'http://oin-hotosm.s3.amazonaws.com/5a852c072553e6000ce5ac8d/0/7950e2de-5d9e-49aa-adec-6e92384be0b9_meta.json',
     },
@@ -80,7 +80,7 @@ export const MOCK_DATA_IMAGERY_LAYERS_ISRAEL = [
     category: '',
     thumbnail: '',
     properties: {
-      protocol: 'XYZ_LAYER',
+      protocol: 'XYZ',
       url: 'https://tiles.openaerialmap.org/5a9f90c42553e6000ce5ad6c/0/eee1a570-128e-4947-9ffa-1e69c1efab7c/{z}/{x}/{y}.png',
       meta: 'http://oin-hotosm.s3.amazonaws.com/5a9f90c42553e6000ce5ad6c/0/eee1a570-128e-4947-9ffa-1e69c1efab7c_meta.json',
     },
@@ -110,7 +110,7 @@ export const MOCK_DATA_IMAGERY_LAYERS_ISRAEL = [
     category: '',
     thumbnail: '',
     properties: {
-      protocol: 'XYZ_LAYER',
+      protocol: 'XYZ',
       url: 'https://tiles.openaerialmap.org/5a8316e22553e6000ce5ac7f/0/c3fcbe99-d339-41b6-8ec0-33d90ccca020/{z}/{x}/{y}.png',
       meta: 'http://oin-hotosm.s3.amazonaws.com/5a8316e22553e6000ce5ac7f/0/c3fcbe99-d339-41b6-8ec0-33d90ccca020_meta.json',
     },
@@ -140,7 +140,7 @@ export const MOCK_DATA_IMAGERY_LAYERS_ISRAEL = [
     category: '',
     thumbnail: '',
     properties: {
-      protocol: 'XYZ_LAYER',
+      protocol: 'XYZ',
       url: 'https://tiles.openaerialmap.org/5a831b4a2553e6000ce5ac80/0/d02ddc76-9c2e-4994-97d4-a623eb371456/{z}/{x}/{y}.png',
       meta: 'http://oin-hotosm.s3.amazonaws.com/5a831b4a2553e6000ce5ac80/0/d02ddc76-9c2e-4994-97d4-a623eb371456_meta.json',
     },
@@ -255,7 +255,7 @@ export const MOCK_DATA_IMAGERY_LAYERS_ISRAEL = [
     category: '',
     thumbnail: '',
     properties: {
-      protocol: 'XYZ_LAYER',
+      protocol: 'XYZ',
       url: 'https://tiles.openaerialmap.org/5b1388c02b6a08001185f4f3/0/5b1388c02b6a08001185f4f4/{z}/{x}/{y}.png',
       meta: 'http://oin-hotosm.s3.amazonaws.com/5b1388c02b6a08001185f4f3/0/5b1388c02b6a08001185f4f4_meta.json',
     },
@@ -377,7 +377,7 @@ export const MOCK_DATA_IMAGERY_LAYERS_ISRAEL = [
     category: '',
     thumbnail: '',
     properties: {
-      protocol: 'XYZ_LAYER',
+      protocol: 'XYZ',
       url: 'https://tiles.openaerialmap.org/5b25fa612b6a08001185f80f/0/5b25fa612b6a08001185f810/{z}/{x}/{y}.png',
       meta: 'http://oin-hotosm.s3.amazonaws.com/5b25fa612b6a08001185f80f/0/5b25fa612b6a08001185f810_meta.json',
     },
@@ -407,7 +407,7 @@ export const MOCK_DATA_IMAGERY_LAYERS_ISRAEL = [
     category: '',
     thumbnail: '',
     properties: {
-      protocol: '3D_LAYER',
+      protocol: '3DTiles',
       url: '/mock/Rehovot_solar_tileset/L16_31023/L16_31023.json',
       meta: 'NOT_DEFINED',
     },
@@ -437,7 +437,7 @@ export const MOCK_DATA_IMAGERY_LAYERS_ISRAEL = [
     category: '',
     thumbnail: '',
     properties: {
-      protocol: '3D_LAYER',
+      protocol: '3DTiles',
       url: '/mock/Rehovot_solar_tileset/L16_31023/L16_31023.json',
       meta: 'NOT_DEFINED',
     },

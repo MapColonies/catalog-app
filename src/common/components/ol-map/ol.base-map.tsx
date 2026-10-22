@@ -8,11 +8,7 @@ import {
   TileXYZ,
 } from '@map-colonies/react-components';
 import { getOLSourceOptions } from '../../../discrete-layer/components/helpers/olUtils';
-import {
-  isWMTSProtocol,
-  isXYZProtocol,
-} from '../../../discrete-layer/components/helpers/layersUtils';
-import { LinkType } from '../../models/link-type.enum';
+import { ProtocolType, toProtocol } from '../../models/protocol-type.enum';
 import { LayerOptions, WMTSOptions, XYZOptions } from './layer.config.options-bridging';
 
 interface OlTileLayerParams {
@@ -29,17 +25,17 @@ const OlBaseMapLayer: React.FC<OlTileLayerParams> = ({
   const tileOptions = { ...sourceOptions, crossOrigin: 'anonymous' };
   let tileComponent: JSX.Element | undefined = undefined;
 
-  switch (true) {
-    case isWMTSProtocol(layerType):
+  switch (toProtocol(layerType)) {
+    case ProtocolType.WMTS:
       tileComponent = <TileWMTS options={tileOptions as WMTSOptions} />;
       break;
-    case isXYZProtocol(layerType):
+    case ProtocolType.XYZ:
       tileComponent = <TileXYZ options={tileOptions as XYZOptions} />;
       break;
-    // case isOSMProtocol(layerType):
+    // case ProtocolType.OSM:
     //   tileComponent = <TileOSM options={tileOptions as OSMOptions} />;
     //   break;
-    // case isWMSProtocol(layerType):
+    // case ProtocolType.WMS:
     //   tileComponent = <TileWMS options={tileOptions as WMSOptions} />;
     //   break;
   }
@@ -61,7 +57,7 @@ export const OlBaseMap: React.FC<IBaseMaps> = React.memo((props): JSX.Element =>
   return (
     <>
       {baseMap.baseRasterLayers.map((layer) => {
-        const options = getOLSourceOptions(layer.type as unknown as LinkType, {
+        const options = getOLSourceOptions(layer.type, {
           options: layer.options,
         });
 
