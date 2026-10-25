@@ -41,9 +41,12 @@ const BasemapsBreadcrumb: React.FC<StackHeaderProps> = ({ route, navigation }) =
   return (
     <Box className="basemapsHeader">
       <Breadcrumb
-        stack={trail.map(({ name }) => getLabel(name as BasemapsRouteName))}
-        onCrumbClick={(label): void => {
-          const target = trail.find(({ name }) => getLabel(name as BasemapsRouteName) === label);
+        stack={trail.map(({ key, name }) => ({
+          key,
+          label: getLabel(name as BasemapsRouteName),
+        }))}
+        onCrumbClick={(key): void => {
+          const target = trail.find((item) => item.key === key);
           if (target) {
             navigation.popTo(target.name);
           }

@@ -5,8 +5,8 @@ import { Box } from '@map-colonies/react-components';
 import './breadcrumb.css';
 
 export interface BreadcrumbProps {
-  stack: string[];
-  onCrumbClick?: (label: string) => void;
+  stack: { key: string; label: string }[];
+  onCrumbClick?: (key: string) => void;
 }
 
 export const Breadcrumb: React.FC<BreadcrumbProps> = ({ stack, onCrumbClick }) => {
@@ -20,8 +20,8 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({ stack, onCrumbClick }) =
           </svg>
         }
       />
-      {stack.map((label, index) => (
-        <React.Fragment key={`${label}-${index}`}>
+      {stack.map(({ key, label }, index) => (
+        <React.Fragment key={key}>
           {index > 0 && (
             <Typography tag="span" className="breadcrumbSeparator" aria-hidden="true">
               /
@@ -31,7 +31,7 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({ stack, onCrumbClick }) =
             <Button
               type="button"
               className="breadcrumbLink"
-              onClick={(): void => onCrumbClick?.(label)}
+              onClick={(): void => onCrumbClick?.(key)}
             >
               {label}
             </Button>
