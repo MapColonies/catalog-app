@@ -1,6 +1,5 @@
+import { ProtocolType } from '../../../common/models/protocol-type.enum';
 import { LayerRasterRecordModelType, ProductType } from '../../models';
-
-export type Protocol = 'XYZ_LAYER' | 'WMTS_LAYER';
 
 export enum BasemapActionSelector {
   CatalogResource,
@@ -20,7 +19,7 @@ export type BasemapLayerOutput = {
     | {
         type: 'EXTERNAL';
         details: {
-          protocol: Protocol;
+          protocol: ProtocolType;
           name: string;
           url: string;
           [key: string]: unknown;
@@ -859,7 +858,7 @@ export const mockBasemaps: BasemapOutput[] = [
         source: {
           type: 'EXTERNAL',
           details: {
-            protocol: 'XYZ_LAYER',
+            protocol: ProtocolType.XYZ,
             name: 'OpenStreetMap Standard',
             url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
             attribution: '© OpenStreetMap contributors',
@@ -928,7 +927,7 @@ export const mockBasemaps: BasemapOutput[] = [
         source: {
           type: 'EXTERNAL',
           details: {
-            protocol: 'XYZ_LAYER',
+            protocol: ProtocolType.XYZ,
             name: 'OpenStreetMap Labels',
             url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
           },
@@ -954,7 +953,7 @@ export const mockBasemaps: BasemapOutput[] = [
         source: {
           type: 'EXTERNAL',
           details: {
-            protocol: 'XYZ_LAYER',
+            protocol: ProtocolType.XYZ,
             name: 'OpenTopoMap',
             url: 'https://tile.opentopomap.org/{z}/{x}/{y}.png',
             attribution: '© OpenTopoMap contributors',
@@ -981,7 +980,7 @@ export const mockBasemaps: BasemapOutput[] = [
         source: {
           type: 'EXTERNAL',
           details: {
-            protocol: 'XYZ_LAYER',
+            protocol: ProtocolType.XYZ,
             name: 'CartoDB Positron',
             url: 'https://basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
             attribution: '© OpenStreetMap contributors © CARTO',
@@ -1008,7 +1007,7 @@ export const mockBasemaps: BasemapOutput[] = [
         source: {
           type: 'EXTERNAL',
           details: {
-            protocol: 'XYZ_LAYER',
+            protocol: ProtocolType.XYZ,
             name: 'CartoDB Dark Matter',
             url: 'https://basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',
             attribution: '© OpenStreetMap contributors © CARTO',
@@ -1035,7 +1034,7 @@ export const mockBasemaps: BasemapOutput[] = [
         source: {
           type: 'EXTERNAL',
           details: {
-            protocol: 'XYZ_LAYER',
+            protocol: ProtocolType.XYZ,
             name: 'Esri World Street Map',
             url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
             attribution: 'Esri and its data providers',
@@ -1063,7 +1062,7 @@ export const mockBasemaps: BasemapOutput[] = [
         source: {
           type: 'EXTERNAL',
           details: {
-            protocol: 'XYZ_LAYER',
+            protocol: ProtocolType.XYZ,
             name: 'Esri World Imagery',
             url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
             attribution: 'Esri and its data providers',
@@ -1099,7 +1098,7 @@ export const mockBasemaps: BasemapOutput[] = [
         source: {
           type: 'EXTERNAL',
           details: {
-            protocol: 'XYZ_LAYER',
+            protocol: ProtocolType.XYZ,
             name: 'OpenTopoMap Overlay',
             url: 'https://tile.opentopomap.org/{z}/{x}/{y}.png',
           },
@@ -1148,7 +1147,7 @@ export const mockBasemaps: BasemapOutput[] = [
         source: {
           type: 'EXTERNAL',
           details: {
-            protocol: 'XYZ_LAYER',
+            protocol: ProtocolType.XYZ,
             name: 'Esri World Imagery',
             url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
           },
@@ -1161,7 +1160,7 @@ export const mockBasemaps: BasemapOutput[] = [
         source: {
           type: 'EXTERNAL',
           details: {
-            protocol: 'XYZ_LAYER',
+            protocol: ProtocolType.XYZ,
             name: 'Esri Reference Labels',
             url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',
           },
@@ -1187,7 +1186,7 @@ export const mockBasemaps: BasemapOutput[] = [
         source: {
           type: 'EXTERNAL',
           details: {
-            protocol: 'XYZ_LAYER',
+            protocol: ProtocolType.XYZ,
             name: 'Esri National Geographic',
             url: 'https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}',
           },
@@ -1213,7 +1212,7 @@ export const mockBasemaps: BasemapOutput[] = [
         source: {
           type: 'EXTERNAL',
           details: {
-            protocol: 'WMTS_LAYER',
+            protocol: ProtocolType.WMTS,
             name: 'Sample WMTS Layer',
             url: 'https://example.com/geoserver/gwc/service/wmts',
             layer: 'workspace:sample_layer',
@@ -1262,7 +1261,7 @@ export const mockBasemaps: BasemapOutput[] = [
         source: {
           type: 'EXTERNAL',
           details: {
-            protocol: 'XYZ_LAYER',
+            protocol: ProtocolType.XYZ,
             name: 'Street Overlay',
             url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
           },

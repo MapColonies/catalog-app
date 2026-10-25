@@ -1,4 +1,5 @@
 import { IRasterLayer } from '@map-colonies/react-components';
+import { ProtocolType } from '../../../common/models/protocol-type.enum';
 import { LinkType } from '../../../common/models/link-type.enum';
 import { CapabilityModelType, LayerRasterRecordModelType } from '../../models';
 import { BasemapLayerOutput } from '../basemaps/XXXbasemapMockXXX';
@@ -14,10 +15,10 @@ export const buildRasterLayerFromBasemapLayer = (
   if (source.type === 'EXTERNAL') {
     const { protocol, url, ...rest } = source.details;
 
-    if (protocol === LinkType.XYZ_LAYER) {
+    if (protocol === LinkType.XYZ) {
       return {
         id,
-        type: LinkType.XYZ_LAYER,
+        type: ProtocolType.XYZ,
         opacity,
         zIndex: order,
         show: true,
@@ -26,10 +27,10 @@ export const buildRasterLayerFromBasemapLayer = (
       };
     }
 
-    if (protocol === LinkType.WMTS_LAYER) {
+    if (protocol === LinkType.WMTS) {
       return {
         id,
-        type: LinkType.WMTS_LAYER,
+        type: ProtocolType.WMTS,
         opacity,
         zIndex: order,
         show: true,
@@ -53,10 +54,10 @@ export const buildRasterLayerFromBasemapLayer = (
     return undefined;
   }
 
-  if (link.protocol === LinkType.WMTS_LAYER || link.protocol === LinkType.WMTS) {
+  if (link.protocol === LinkType.WMTS) {
     return {
       id,
-      type: LinkType.WMTS_LAYER,
+      type: ProtocolType.WMTS,
       opacity,
       zIndex: order,
       show: true,
@@ -71,7 +72,7 @@ export const buildRasterLayerFromBasemapLayer = (
   if (link.protocol === LinkType.WMS) {
     return {
       id,
-      type: 'WMS_LAYER',
+      type: ProtocolType.WMS,
       opacity,
       zIndex: order,
       show: true,
