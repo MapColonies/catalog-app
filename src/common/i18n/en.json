@@ -799,6 +799,20 @@
   "basemaps.panels.edit-base-map": "Edit base map",
   "basemaps.panels.add-layer": "Add layer",
 
+  "basemaps.list.title": "Basemaps",
+  "basemaps.list.import": "Import",
+  "basemaps.list.import.tooltip": "Import a template for a basemap",
+  "basemaps.list.new": "New",
+  "basemaps.list.new.tooltip": "Create a basemap",
+  "basemaps.list.current-map": "Current Map",
+  "basemaps.list.preview-map": "Preview Map",
+  "basemaps.list.actions.view": "View Basemap",
+  "basemaps.list.actions.edit": "Edit Basemap",
+  "basemaps.list.actions.export": "Export",
+  "basemaps.list.actions.make-default": "Make Default",
+  "basemaps.edit.action-selector.catalog-resource": "Catalog resource",
+  "basemaps.edit.action-selector.external": "External",
+
   "map.scale.units.meters": "m",
   "map.scale.units.kilometers": "km",
 
