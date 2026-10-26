@@ -15,12 +15,14 @@ import { BasemapsListPanel } from './basemaps-list.panel';
 import { PickLayerPanel } from './pick-layer.panel';
 
 import './basemaps-router.css';
-import { BasemapActionSelector } from './XXXbasemapMockXXX';
+import { SourceTypeInput } from './XXXbasemapMockXXX';
 
 type BasemapsStackPanel = {
   BasemapsList: undefined;
   EditBasemap: undefined;
-  AddLayer: { actionSelector: BasemapActionSelector };
+  AddLayer: {
+    actionSelector: SourceTypeInput;
+  };
 };
 
 type BasemapsRouteName = keyof BasemapsStackPanel;
@@ -74,7 +76,7 @@ const BasemapComposer: React.FC<BasemapsPanelProps<'EditBasemap'>> = ({ navigati
         const selectedValue = event.currentTarget.value;
         if (selectedValue !== '') {
           navigation.navigate('AddLayer', {
-            actionSelector: Number(selectedValue) as BasemapActionSelector,
+            actionSelector: selectedValue as SourceTypeInput,
           });
         }
       }}
@@ -82,10 +84,10 @@ const BasemapComposer: React.FC<BasemapsPanelProps<'EditBasemap'>> = ({ navigati
       <MenuItem value="" disabled>
         {intl.formatMessage({ id: PANELS_IDS.AddLayer })}
       </MenuItem>
-      <MenuItem value={BasemapActionSelector.CatalogResource}>
+      <MenuItem value={SourceTypeInput.CATALOG_RESOURCE}>
         {intl.formatMessage({ id: 'basemaps.edit.action-selector.catalog-resource' })}
       </MenuItem>
-      <MenuItem value={BasemapActionSelector.External}>
+      <MenuItem value={SourceTypeInput.EXTERNAL}>
         {intl.formatMessage({ id: 'basemaps.edit.action-selector.external' })}
       </MenuItem>
     </Select>
