@@ -44,7 +44,7 @@ export const basemapsManagementStore = ModelBase
           const result: BasemapOutput[] = yield Promise.resolve(mockBasemaps);
           const layers = result.flatMap((basemap) =>
             basemap.layers.flatMap(({ source }) =>
-              source.type === 'RASTER_RESOLVED_RESOURCE' ? [source.layer] : []
+              source.type === 'RESOLVED_CATALOG_RESOURCE' ? [source.layer] : []
             )
           );
           const capabilities: CapabilityModelType[] =

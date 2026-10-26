@@ -22,7 +22,7 @@ export const BasemapComposition: React.FC = observer(() => {
         .forEach((basemapLayer) => {
           const rasterLayer = buildRasterLayerFromBasemapLayer(
             basemapLayer,
-            basemapLayer.source.type === 'RASTER_RESOLVED_RESOURCE'
+            basemapLayer.source.type === 'RESOLVED_CATALOG_RESOURCE'
               ? store.basemapsStore.getLayerCapability(basemapLayer.source.layer)
               : undefined
           );
@@ -31,7 +31,7 @@ export const BasemapComposition: React.FC = observer(() => {
               id: rasterLayer.id,
               searchLayerPredicate: (cesiumLayer: ICesiumImageryLayer): boolean =>
                 cesiumLayer.meta?.id === rasterLayer.id,
-              ...(basemapLayer.source.type === 'RASTER_RESOLVED_RESOURCE' && {
+              ...(basemapLayer.source.type === 'RESOLVED_CATALOG_RESOURCE' && {
                 layerRecord: {
                   ...basemapLayer.source.layer,
                   links: getLinksArrWithTokens([
