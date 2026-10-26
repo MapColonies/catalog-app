@@ -24,4 +24,5 @@ export const LinkType = {
   BING_MAPS: ProtocolType.BING_MAPS,
 } as const;
 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export type LinkType = (typeof LinkType)[keyof typeof LinkType];

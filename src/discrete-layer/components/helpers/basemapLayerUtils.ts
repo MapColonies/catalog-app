@@ -49,7 +49,7 @@ export const buildRasterLayerFromBasemapLayer = (
   }
 
   if (source.type === 'UNRESOLVED_CATALOG_RESOURCE') {
-    throw 'Unhandled unresolved catalog resource';
+    throw new Error('Unhandled unresolved catalog resource');
   }
 
   const record = source.layer;

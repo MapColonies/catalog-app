@@ -26,7 +26,7 @@ interface PickLayerPanelProps {
 export const PickLayerPanel: React.FC<PickLayerPanelProps> = observer(
   ({ actionSelector, existingLayers, onClose }) => {
     const store = useStore();
-    const [selectedItems, setSelectedItems] = useState<LayerMetadataMixedUnion[]>([]);
+    const [, setSelectedItems] = useState<LayerMetadataMixedUnion[]>([]);
 
     const filteredCatalogRoots: TreeRootSection[] = useMemo(
       () =>

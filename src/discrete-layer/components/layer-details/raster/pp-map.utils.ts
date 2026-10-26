@@ -34,6 +34,7 @@ export interface IStyleByProp {
   }[];
 }
 
+/*
 function createHatchPatternGISStyle(color: string, opacity = 0.45): CanvasPattern {
   const size = 20;
   const lineWidth = 1.5;
@@ -91,6 +92,7 @@ function createHatchPatternGISStyle(color: string, opacity = 0.45): CanvasPatter
 
   return pattern;
 }
+*/
 
 function createHatchPattern(
   color: string,
