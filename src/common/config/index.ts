@@ -163,30 +163,6 @@ const APP_CONFIG = {
     MAXIMUM_SCREEN_SPACE_ERROR: 5,
     CULL_REQUESTS_WHILE_MOVING_MULTIPLIER: 120,
   },
-  WMTS_LAYER: {
-    ATTRIBUTIONS: 'Tiles © <a href="http://basemap.nationalmap.gov">basemap</a>',
-    URL: `${MAP_SERVER}/${ACTIVE_LAYER_PROPERTIES.urlPattern}`,
-    LAYER: `${PUBLISH_POINT}`,
-    STYLE: `${ACTIVE_LAYER_PROPERTIES.urlPatternParams.style}`,
-    PROJECTION: `${ACTIVE_LAYER_PROPERTIES.urlPatternParams.projection}`,
-    FORMAT: `${ACTIVE_LAYER_PROPERTIES.urlPatternParams.format}`,
-    MATRIX_SET: `${ACTIVE_LAYER_PROPERTIES.urlPatternParams.matrixSet}`,
-    MAXIMUM_LEVEL: 19,
-  },
-  WMS_LAYER: {
-    ATTRIBUTIONS: `Tiles © <a href="${MAP_SERVER}">GEE</a>`,
-    URL: `${ACTIVE_LAYER_PROPERTIES.urlPattern}`,
-    PARAMS: { ...ACTIVE_LAYER_PROPERTIES.urlPatternParams },
-    SERVERTYPE: 'geoserver',
-    TRANSITION: 0.5,
-  },
-  XYZ_LAYER: {
-    ATTRIBUTIONS: `Tiles © <a href="${MAP_SERVER}">GEE</a>`,
-    URL: `${MAP_SERVER}/${PUBLISH_POINT}/query?request=${REQUEST}&channel=${CHANNEL}&version=${VERSION}&x={x}&y={y}&z={z}`,
-  },
-  OSM_LAYER: {
-    URL: `https://a.tile.openstreetmap.org/`,
-  },
   JOB_MANAGER: {
     POLLING_CYCLE_INTERVAL: JOB_MANAGER.pollingCycleInterval,
     FILTER_DAYS_TIME_SLOT: JOB_MANAGER.filterDaysTimeSlot,
