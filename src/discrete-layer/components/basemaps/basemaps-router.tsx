@@ -41,7 +41,7 @@ const BasemapsBreadcrumb: React.FC<StackHeaderProps> = ({ route, navigation }) =
   return (
     <Box className="basemapsHeader">
       <Breadcrumb
-        stack={trail.map(({ key, name }) => ({
+        items={trail.map(({ key, name }) => ({
           key,
           label: getLabel(name as BasemapsRouteName),
         }))}
