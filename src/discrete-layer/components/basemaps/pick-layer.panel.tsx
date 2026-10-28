@@ -1,7 +1,6 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { observer } from 'mobx-react';
 import { isPublished } from '../../../common/helpers/style';
-import { LayerMetadataMixedUnion } from '../../models';
 import {
   TreeRootSection,
   TreeRootName,
@@ -26,7 +25,6 @@ interface PickLayerPanelProps {
 export const PickLayerPanel: React.FC<PickLayerPanelProps> = observer(
   ({ actionSelector, existingLayers, onClose }) => {
     const store = useStore();
-    const [selectedItems, setSelectedItems] = useState<LayerMetadataMixedUnion[]>([]);
 
     const filteredCatalogRoots: TreeRootSection[] = useMemo(
       () =>
@@ -58,7 +56,7 @@ export const PickLayerPanel: React.FC<PickLayerPanelProps> = observer(
             catalogsToFetch={CATALOGS_TO_FETCH}
             treeRootSections={filteredCatalogRoots}
             disableLayerPredicate={isLayerDisabled}
-            handleSelection={setSelectedItems}
+            handleSelection={(items): void => void store.basemapsStore.addDraftLayers(items)}
             onClose={onClose}
           />
         )}

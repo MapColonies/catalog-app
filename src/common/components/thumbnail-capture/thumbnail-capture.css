@@ -1,0 +1,26 @@
+.thumbnailCapture {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.thumbnailCapturePreview {
+  display: flex;
+  box-sizing: content-box;
+  border: 1px solid var(--mdc-theme-text-hint-on-background, rgba(0, 0, 0, 0.38));
+}
+
+.thumbnailCaptureEmpty {
+  opacity: 0.6;
+  font: inherit;
+}
+
+.thumbnailCaptureLabel {
+  opacity: 0.6;
+}
+
+.thumbnailCaptureActions {
+  display: flex;
+  gap: 8px;
+}

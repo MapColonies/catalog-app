@@ -101,6 +101,7 @@ import { DetailsPanel } from './components/details-panel.component';
 import { MapActionResolver } from './components/map-action-resolver.component';
 import { TabViewsSwitcher } from './components/tabs-views-switcher.component';
 import UserModeSwitch from './components/user-mode-switch/user-mode-switch.component';
+import { MapViewerBridge } from '../components/map-container/cesium-map-viewer.bridge';
 import { EntityDelete3DDialog } from '../components/layer-details/3D/entity.3d.delete-dialog';
 import { BasemapSwitcher } from '../components/basemaps/basemap-switcher';
 import { TabViews } from './tab-views';
@@ -357,6 +358,7 @@ const DiscreteLayerView: React.FC = observer(() => {
         <MapActionResolver />
         <SelectedLayersContainer />
         <BasemapComposition />
+        <MapViewerBridge />
         <HighlightedLayer />
         <LayersFootprints />
         <PolygonParts />
@@ -1372,6 +1374,7 @@ const DiscreteLayerView: React.FC = observer(() => {
           >
             <CesiumMap
               key={`cesium-map-${isAdminUser ? 'admin' : 'user'}`}
+              screenshotEnabled
               mapMode2D={mapMode2D}
               projection={CONFIG.MAP.PROJECTION}
               center={CONFIG.MAP.CENTER}
