@@ -15,4 +15,17 @@ export const ProtocolType = {
 
 export type ProtocolType = (typeof ProtocolType)[keyof typeof ProtocolType];
 
+/** Protocols of imagery (raster) layers that Cesium can consume: a subset of `ProtocolType`. */
+export const ImageryProtocolType = {
+  WMS: ProtocolType.WMS,
+  WMTS: ProtocolType.WMTS,
+  XYZ: ProtocolType.XYZ,
+  // WCS: ProtocolType.WCS, //Basically it's an Imagery but for now days used in DEM/TERRAIN area
+  OSM: ProtocolType.OSM,
+  MAPBOX_STYLE: ProtocolType.MAPBOX_STYLE,
+  BING_MAPS: ProtocolType.BING_MAPS,
+} as const;
+
+export type ImageryProtocolType = (typeof ImageryProtocolType)[keyof typeof ImageryProtocolType];
+
 export const toProtocol = (val: string | undefined): ProtocolType => val as ProtocolType;
