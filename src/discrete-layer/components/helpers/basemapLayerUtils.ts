@@ -2,7 +2,7 @@ import { IRasterLayer } from '@map-colonies/react-components';
 import { ProtocolType } from '../../../common/models/protocol-type.enum';
 import { LinkType } from '../../../common/models/link-type.enum';
 import { CapabilityModelType, LayerRasterRecordModelType } from '../../models';
-import { BasemapLayerOutput } from '../basemaps/XXXbasemapMockXXX';
+import { BasemapLayerOutput, SourceTypeOutput } from '../basemaps/XXXbasemapMockXXX';
 import { generateLayerRectangle, getCesiumWMTSOptions } from './cesiumUtils';
 import { getLayerLink } from './layersUtils';
 
@@ -12,7 +12,7 @@ export const buildRasterLayerFromBasemapLayer = (
 ): IRasterLayer | undefined => {
   const { id, order, opacity, shouldBeUsedInModelDraping, source } = basemapLayer;
 
-  if (source.type === 'EXTERNAL') {
+  if (source.type === SourceTypeOutput.EXTERNAL) {
     const { protocol, url, ...rest } = source.details;
 
     if (protocol === LinkType.XYZ) {
@@ -48,8 +48,9 @@ export const buildRasterLayerFromBasemapLayer = (
     return undefined;
   }
 
-  if (source.type === 'UNRESOLVED_CATALOG_RESOURCE') {
-    throw new Error('Unhandled unresolved catalog resource');
+  if (source.type === SourceTypeOutput.UNRESOLVED_CATALOG_RESOURCE) {
+    // TODO: Should handle unresolved catalog layer
+    return;
   }
 
   const record = source.layer;

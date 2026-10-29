@@ -899,7 +899,7 @@ export const mockBasemaps: BasemapOutput[] = [
     id: 'basemap-01',
     name: 'OpenStreetMap',
     thumbnail: {
-      url: 'https://placehold.co/128x128?text=OSM',
+      url: '', // 'https://placehold.co/128x128?text=OSM',
       width: 128,
       height: 128,
     },
@@ -929,6 +929,20 @@ export const mockBasemaps: BasemapOutput[] = [
           type: SourceTypeOutput.RESOLVED_CATALOG_RESOURCE,
           domain: Domain.RASTER,
           layer: MOCK_SEARCH_RASTER_RECORD,
+        },
+      },
+      {
+        id: 'layer-03-01',
+        order: 0,
+        opacity: 1,
+        shouldBeUsedInModelDraping: true,
+        source: {
+          type: SourceTypeOutput.UNRESOLVED_CATALOG_RESOURCE,
+          domain: Domain.RASTER,
+          uniqueness: {
+            productId: 'NOT_EXISTING_LAYER',
+            productType: 'ORTHOPHOTO' as ProductType,
+          },
         },
       },
     ],
