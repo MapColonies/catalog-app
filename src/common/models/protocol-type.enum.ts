@@ -27,6 +27,7 @@ export const ImageryProtocolType = {
   BING_MAPS: ProtocolType.BING_MAPS,
 } as const;
 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export type ImageryProtocolType = (typeof ImageryProtocolType)[keyof typeof ImageryProtocolType];
 
 export const toProtocol = (val: string | undefined): ProtocolType => val as ProtocolType;
