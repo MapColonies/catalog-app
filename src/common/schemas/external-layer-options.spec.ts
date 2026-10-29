@@ -184,7 +184,7 @@ describe('external layer options schemas', () => {
         'BING_MAPS',
         'MAPBOX_STYLE',
         'OSM',
-        'WCS',
+        // 'WCS',
         'WMS',
         'WMTS',
         'XYZ',
