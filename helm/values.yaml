@@ -3,6 +3,8 @@ fullnameOverride:
 # --------------- common --------------
 commonLabels:
 commonAnnotations:
+mclabels:
+  component: frontend
 # ----------- initContainers ----------
 volumePermissions:
   enabled: false

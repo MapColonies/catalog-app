@@ -1,882 +1,36 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "required": [
+        "commonLabels",
+        "commonAnnotations",
+        "volumePermissions",
+        "persistence",
+        "diagnosticMode",
+        "configValues",
+        "serviceAccount"
+    ],
     "properties": {
         "commonAnnotations": {
-            "description": "Annotations to add for all k8s resources",
             "title": "commonAnnotations",
+            "description": "Annotations to add for all k8s resources",
             "type": [
                 "object",
                 "null"
             ]
         },
         "commonLabels": {
-            "description": "Labels to add for all k8s resources",
             "title": "commonLabels",
+            "description": "Labels to add for all k8s resources",
             "type": [
                 "object",
                 "null"
             ]
         },
         "configValues": {
+            "title": "configValues",
             "description": "Deployment configuration (MAIN_OBJECT_BLOCK)",
-            "properties": {
-                "affinity": {
-                    "description": "Affinity for pods assignment. NOTE: `podAffinityPreset`, `podAntiAffinityPreset`, and `nodeAffinityPreset` will be ignored when it's set",
-                    "properties": {},
-                    "title": "affinity",
-                    "type": [
-                        "object"
-                    ]
-                },
-                "args": {
-                    "description": "arguments for the containers that run in the Pod (diagnosticMode definition overrides it). https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container",
-                    "title": "args",
-                    "type": [
-                        "array",
-                        "null"
-                    ]
-                },
-                "autoscaling": {
-                    "description": "Autoscaling configuration https://kubernetes.io/docs/concepts/workloads/autoscaling/",
-                    "properties": {
-                        "enabled": {
-                            "default": false,
-                            "description": "Is autoscaling defined for pods (currently should be FALSE, TRUE still not tested)",
-                            "title": "autoscaling.enabled",
-                            "type": [
-                                "boolean"
-                            ]
-                        },
-                        "hpa": {
-                            "description": "HPA configuration for pods https://kubernetes.io/docs/tutorials/kubernetes-basics/scale/scale-intro/",
-                            "properties": {
-                                "enabled": {
-                                    "description": "Enable HPA for pods",
-                                    "title": "hpa.enabled",
-                                    "type": [
-                                        "boolean"
-                                    ]
-                                },
-                                "maxReplicas": {
-                                    "description": "Maximum number of replicas",
-                                    "title": "hpa.maxReplicas",
-                                    "type": [
-                                        "number"
-                                    ]
-                                },
-                                "minReplicas": {
-                                    "description": "Minimum number of replicas",
-                                    "title": "hpa.minReplicas",
-                                    "type": [
-                                        "number"
-                                    ]
-                                },
-                                "targetCPU": {
-                                    "description": "Target CPU utilization percentage",
-                                    "title": "hpa.targetCPU(targetCPUUtilizationPercentage)",
-                                    "type": [
-                                        "number"
-                                    ]
-                                },
-                                "targetMemory": {
-                                    "description": "Target Memory utilization percentage",
-                                    "title": "hpa.targetMemory(targetMemoryUtilizationPercentage)",
-                                    "type": [
-                                        "number",
-                                        "null"
-                                    ]
-                                }
-                            },
-                            "title": "hpa",
-                            "type": "object"
-                        },
-                        "vpa": {
-                            "description": "VPA configuration for pods https://kubernetes.io/docs/tasks/configure-pod-container/resize-container-resources/",
-                            "properties": {
-                                "annotations": {
-                                    "description": "Annotations for VPA resource",
-                                    "properties": {},
-                                    "title": "vpa.annotations",
-                                    "type": [
-                                        "object"
-                                    ]
-                                },
-                                "controlledResources": {
-                                    "description": "VPA List of resources that the vertical pod autoscaler can control. Defaults to cpu and memory",
-                                    "title": "vpa.controlledResources",
-                                    "type": [
-                                        "array"
-                                    ]
-                                },
-                                "enabled": {
-                                    "default": false,
-                                    "description": "Enable VPA for pods (currently should be FALSE, TRUE still not tested)",
-                                    "title": "vpa.enabled",
-                                    "type": [
-                                        "boolean"
-                                    ]
-                                },
-                                "maxAllowed": {
-                                    "description": "VPA Max allowed resources for the pod",
-                                    "properties": {},
-                                    "title": "vpa.maxAllowed",
-                                    "type": [
-                                        "object"
-                                    ]
-                                },
-                                "minAllowed": {
-                                    "description": "VPA Min allowed resources for the pod",
-                                    "properties": {},
-                                    "title": "vpa.minAllowed",
-                                    "type": [
-                                        "object"
-                                    ]
-                                },
-                                "updatePolicy": {
-                                    "description": "Autoscaling update policy",
-                                    "properties": {
-                                        "updateMode": {
-                                            "default": "Auto",
-                                            "description": "Specifies whether recommended updates are applied when a Pod is started and whether recommended updates are applied during the life of a Pod",
-                                            "enum": [
-                                                "Off",
-                                                "Initial",
-                                                "Recreate",
-                                                "Auto"
-                                            ],
-                                            "title": "vpa.updatePolicy.updateMode",
-                                            "type": "string"
-                                        }
-                                    },
-                                    "required": [
-                                        "updateMode"
-                                    ],
-                                    "title": "vpa.updatePolicy",
-                                    "type": [
-                                        "object"
-                                    ]
-                                }
-                            },
-                            "title": "vpa",
-                            "type": "object"
-                        }
-                    },
-                    "title": "autoscaling",
-                    "type": "object"
-                },
-                "command": {
-                    "description": "command for the containers that run in the Pod (diagnosticMode definition overrides it). https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container",
-                    "title": "command",
-                    "type": [
-                        "array",
-                        "null"
-                    ]
-                },
-                "containerPorts": {
-                    "description": "Define container ports",
-                    "properties": {
-                        "http": {
-                            "default": 8080,
-                            "description": "Define HTTP container port",
-                            "title": "containerPorts.http",
-                            "type": [
-                                "number"
-                            ]
-                        },
-                        "https": {
-                            "default": 443,
-                            "description": "Define HTTPS container port",
-                            "title": "containerPorts.https",
-                            "type": [
-                                "number"
-                            ]
-                        }
-                    },
-                    "required": [
-                        "http",
-                        "https"
-                    ],
-                    "title": "containerPorts",
-                    "type": [
-                        "object"
-                    ]
-                },
-                "containerSecurityContext": {
-                    "description": "Configure Container Security Context https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container",
-                    "properties": {
-                        "enabled": {
-                            "default": false,
-                            "description": "Enable Container Security Context",
-                            "title": "containerSecurityContext.enabled",
-                            "type": [
-                                "boolean"
-                            ]
-                        },
-                        "runAsNonRoot": {
-                            "default": true,
-                            "description": "Set runAsNonRoot in container' Security Context",
-                            "title": "containerSecurityContext.runAsNonRoot",
-                            "type": [
-                                "boolean"
-                            ]
-                        },
-                        "runAsUser": {
-                            "default": 1001,
-                            "description": "Set runAsUser in container' Security Context",
-                            "title": "containerSecurityContext.runAsUser",
-                            "type": [
-                                "number"
-                            ]
-                        }
-                    },
-                    "title": "containerSecurityContext",
-                    "type": [
-                        "object"
-                    ]
-                },
-                "customLivenessProbe": {
-                    "description": "Custom-livenessProbe that overrides the livenessProbe https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes",
-                    "properties": {},
-                    "title": "customLivenessProbe",
-                    "type": [
-                        "object"
-                    ]
-                },
-                "customReadinessProbe": {
-                    "description": "Custom-readinessProbe that overrides the readinessProbe https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes",
-                    "properties": {},
-                    "title": "customReadinessProbe",
-                    "type": [
-                        "object"
-                    ]
-                },
-                "customStartupProbe": {
-                    "description": "Custom-startupProbe that overrides the startupProbe https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/",
-                    "properties": {},
-                    "title": "customStartupProbe",
-                    "type": [
-                        "object"
-                    ]
-                },
-                "deploymentAnnotations": {
-                    "default": {},
-                    "description": "Annotations for deployment https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/",
-                    "properties": {},
-                    "title": "deploymentAnnotations",
-                    "type": [
-                        "object"
-                    ]
-                },
-                "extraEnvVars": {
-                    "description": "Set additional environment variables to the containers",
-                    "title": "extraEnvVars",
-                    "type": [
-                        "array",
-                        "null"
-                    ]
-                },
-                "extraEnvVarsCM": {
-                    "default": "'{{ template \"common.names.fullname\" . }}'",
-                    "description": "ConfigMap containing extra env vars to be added to all pods (evaluated as a template)",
-                    "title": "extraEnvVarsCM",
-                    "type": [
-                        "string"
-                    ]
-                },
-                "extraEnvVarsSecret": {
-                    "description": "Secret containing extra env vars to be added to all pods (evaluated as a template)",
-                    "title": "extraEnvVarsSecret",
-                    "type": [
-                        "string",
-                        "null"
-                    ]
-                },
-                "extraVolumeMounts": {
-                    "description": "Optionally specify extra list of additional volumeMounts for the containers",
-                    "title": "extraVolumeMounts",
-                    "type": [
-                        "array"
-                    ]
-                },
-                "extraVolumes": {
-                    "description": "Optionally specify extra list of additional volumes for the pods",
-                    "title": "extraVolumes",
-                    "type": [
-                        "array"
-                    ]
-                },
-                "hostAliases": {
-                    "description": "Pods host aliases",
-                    "title": "hostAliases",
-                    "type": [
-                        "array"
-                    ]
-                },
-                "image": {
-                    "description": "MapColonies image details",
-                    "properties": {
-                        "debug": {
-                            "default": false,
-                            "description": "Enable image debug mode",
-                            "title": "image.debug",
-                            "type": [
-                                "boolean"
-                            ]
-                        },
-                        "digest": {
-                            "description": "Image digest in the way sha256:aa.... Please note this parameter, if set, will override the image tag",
-                            "title": "image.digest",
-                            "type": [
-                                "string"
-                            ]
-                        },
-                        "pullPolicy": {
-                            "default": "IfNotPresent",
-                            "description": "Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'",
-                            "enum": [
-                                "IfNotPresent",
-                                "Always",
-                                "Never"
-                            ],
-                            "title": "image.pullPolicy",
-                            "type": "string"
-                        },
-                        "pullSecrets": {
-                            "description": "Image pull secrets. Secrets must be manually created in the namespace.",
-                            "title": "image.pullSecrets",
-                            "type": [
-                                "array"
-                            ]
-                        },
-                        "repository": {
-                            "default": "******** YOUR_REPO ********",
-                            "description": "Image repository",
-                            "title": "image.repository",
-                            "type": [
-                                "string"
-                            ]
-                        },
-                        "tag": {
-                            "default": "******** YOUR_REPO_TAG ********",
-                            "description": "Image tag (immutable tags are recommended)",
-                            "title": "image.tag",
-                            "type": [
-                                "string"
-                            ]
-                        }
-                    },
-                    "required": [
-                        "repository",
-                        "tag",
-                        "pullPolicy"
-                    ],
-                    "title": "image",
-                    "type": [
-                        "object"
-                    ]
-                },
-                "initContainers": {
-                    "description": "Add additional init containers to the pods https://kubernetes.io/docs/concepts/workloads/pods/init-containers/",
-                    "title": "initContainers",
-                    "type": [
-                        "array",
-                        "null"
-                    ]
-                },
-                "lifecycleHooks": {
-                    "description": "For containers to automate configuration before or after startup",
-                    "properties": {},
-                    "title": "lifecycleHooks",
-                    "type": [
-                        "object"
-                    ]
-                },
-                "livenessProbe": {
-                    "description": "livenessProbe https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes",
-                    "properties": {
-                        "enabled": {
-                            "default": true,
-                            "description": "Enable livenessProbe on containers",
-                            "title": "livenessProbe.enabled",
-                            "type": [
-                                "boolean"
-                            ]
-                        },
-                        "failureThreshold": {
-                            "default": 3,
-                            "description": "Failure threshold for livenessProbe",
-                            "title": "livenessProbe.failureThreshold",
-                            "type": [
-                                "number"
-                            ]
-                        },
-                        "initialDelaySeconds": {
-                            "default": 60,
-                            "description": "Initial delay seconds for livenessProbe",
-                            "title": "livenessProbe.initialDelaySeconds",
-                            "type": [
-                                "number"
-                            ]
-                        },
-                        "periodSeconds": {
-                            "default": 10,
-                            "description": "Period seconds for livenessProbe",
-                            "title": "livenessProbe.periodSeconds",
-                            "type": [
-                                "number"
-                            ]
-                        },
-                        "successThreshold": {
-                            "default": 1,
-                            "description": "Success threshold for livenessProbe",
-                            "title": "livenessProbe.successThreshold",
-                            "type": [
-                                "number"
-                            ]
-                        },
-                        "timeoutSeconds": {
-                            "default": 1,
-                            "description": "Timeout seconds for livenessProbe",
-                            "title": "livenessProbe.timeoutSeconds",
-                            "type": [
-                                "number"
-                            ]
-                        }
-                    },
-                    "title": "livenessProbe",
-                    "type": [
-                        "object"
-                    ]
-                },
-                "nodeAffinityPreset": {
-                    "description": "Node afinity preset https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#node-affinity",
-                    "properties": {},
-                    "title": "nodeAffinityPreset",
-                    "type": [
-                        "object"
-                    ]
-                },
-                "nodeSelector": {
-                    "description": "Recommended form of node selection constraint https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/",
-                    "properties": {},
-                    "title": "nodeSelector",
-                    "type": [
-                        "object"
-                    ]
-                },
-                "podAffinityPreset": {
-                    "description": "Pod affinity preset. NOTE: Ignored if `affinity` is set",
-                    "enum": [
-                        "soft",
-                        "hard",
-                        ""
-                    ],
-                    "title": "podAffinityPreset",
-                    "type": "string"
-                },
-                "podAnnotations": {
-                    "description": "Pod specific annotations",
-                    "properties": {
-                        "annotations": {
-                            "description": "Additional pod annotations",
-                            "properties": {},
-                            "title": "podAnnotations.annotations",
-                            "type": [
-                                "object",
-                                "null"
-                            ]
-                        },
-                        "enabled": {
-                            "default": true,
-                            "description": "Add build-in annotations (checksum / prometheus)",
-                            "title": "podAnnotations.enabled",
-                            "type": [
-                                "boolean"
-                            ]
-                        },
-                        "resetOnConfigChange": {
-                            "default": true,
-                            "description": "Relative annnotation for reset onConfig change",
-                            "title": "podAnnotations.resetOnConfigChange",
-                            "type": [
-                                "boolean"
-                            ]
-                        }
-                    },
-                    "title": "podAnnotations",
-                    "type": "object"
-                },
-                "podAntiAffinityPreset": {
-                    "description": "Pod affinity preset. NOTE: Ignored if `affinity` is set",
-                    "enum": [
-                        "soft",
-                        "hard",
-                        ""
-                    ],
-                    "title": "podAffinityPreset",
-                    "type": "string"
-                },
-                "podLabels": {
-                    "description": "Pod specific labels",
-                    "properties": {},
-                    "title": "podLabels",
-                    "type": [
-                        "object"
-                    ]
-                },
-                "podSecurityContext": {
-                    "description": "Configure Pods Security Context https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod",
-                    "properties": {
-                        "enabled": {
-                            "default": false,
-                            "description": "Enable pods' Security Context",
-                            "title": "podSecurityContext.enabled",
-                            "type": [
-                                "boolean"
-                            ]
-                        },
-                        "fsGroup": {
-                            "description": "Set fsGroup in pods' Security Context",
-                            "title": "podSecurityContext.fsGroup",
-                            "type": [
-                                "number"
-                            ]
-                        },
-                        "fsGroupChangePolicy": {
-                            "description": "Set filesystem group change policy for pods",
-                            "enum": [
-                                "Always",
-                                "OnRootMismatch"
-                            ],
-                            "title": "podSecurityContext.fsGroupChangePolicy",
-                            "type": "string"
-                        },
-                        "supplementalGroups": {
-                            "title": "podSecurityContext.supplementalGroups",
-                            "type": [
-                                "array"
-                            ]
-                        },
-                        "sysctls": {
-                            "title": "podSecurityContext.sysctls",
-                            "type": [
-                                "array"
-                            ]
-                        }
-                    },
-                    "title": "podSecurityContext",
-                    "type": [
-                        "object"
-                    ]
-                },
-                "priorityClassName": {
-                    "description": "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_create/kubectl_create_priorityclass/",
-                    "title": "priorityClassName",
-                    "type": [
-                        "string"
-                    ]
-                },
-                "prometheus": {
-                    "description": "Prometheus metrics configuration",
-                    "properties": {
-                        "params": {
-                            "description": "If the metrics endpoint uses query parameters then you can set any parameter (will be added as annotations)",
-                            "title": "prometheus.params",
-                            "type": [
-                                "array"
-                            ]
-                        },
-                        "path": {
-                            "description": "If the metrics path is not `/metrics` override it",
-                            "title": "prometheus.path",
-                            "type": [
-                                "string"
-                            ]
-                        },
-                        "port": {
-                            "description": "If the metrics are exposed on a different port to the service then set this appropriately",
-                            "title": "prometheus.port",
-                            "type": [
-                                "number"
-                            ]
-                        },
-                        "scheme": {
-                            "description": "If the metrics endpoint is secured then you will need to set this to `https` \u0026 most likely set the `tls_config` of the scrape config",
-                            "title": "prometheus.scheme",
-                            "type": [
-                                "string"
-                            ]
-                        },
-                        "scrape": {
-                            "description": "Flag for prometheus to scrape service metrics",
-                            "title": "prometheus.scrape",
-                            "type": [
-                                "boolean"
-                            ]
-                        }
-                    },
-                    "title": "prometheus",
-                    "type": "object"
-                },
-                "readinessProbe": {
-                    "description": "readinessProbe https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes",
-                    "properties": {
-                        "enabled": {
-                            "default": true,
-                            "description": "Enable readinessProbe on containers",
-                            "title": "readinessProbe.enabled",
-                            "type": [
-                                "boolean"
-                            ]
-                        },
-                        "failureThreshold": {
-                            "default": 3,
-                            "description": "Failure threshold for readinessProbe",
-                            "title": "readinessProbe.failureThreshold",
-                            "type": [
-                                "number"
-                            ]
-                        },
-                        "initialDelaySeconds": {
-                            "default": 60,
-                            "description": "Initial delay seconds for readinessProbe",
-                            "title": "readinessProbe.initialDelaySeconds",
-                            "type": [
-                                "number"
-                            ]
-                        },
-                        "periodSeconds": {
-                            "default": 10,
-                            "description": "Period seconds for readinessProbe",
-                            "title": "readinessProbe.periodSeconds",
-                            "type": [
-                                "number"
-                            ]
-                        },
-                        "successThreshold": {
-                            "default": 1,
-                            "description": "Success threshold for readinessProbe",
-                            "title": "readinessProbe.successThreshold",
-                            "type": [
-                                "number"
-                            ]
-                        },
-                        "timeoutSeconds": {
-                            "default": 1,
-                            "description": "Timeout seconds for readinessProbe",
-                            "title": "readinessProbe.timeoutSeconds",
-                            "type": [
-                                "number"
-                            ]
-                        }
-                    },
-                    "title": "readinessProbe",
-                    "type": [
-                        "object"
-                    ]
-                },
-                "replicaCount": {
-                    "default": 1,
-                    "description": "Number of replicas to deploy. Wiil be used if !hpa.enabled",
-                    "title": "replicaCount",
-                    "type": [
-                        "number"
-                    ]
-                },
-                "resources": {
-                    "description": "Set container requests and limits for different resources like CPU or memory (essential for production workloads) https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/",
-                    "properties": {},
-                    "title": "resources",
-                    "type": [
-                        "object"
-                    ]
-                },
-                "resourcesPreset": {
-                    "default": "nano",
-                    "description": "Resource requests and limits presets",
-                    "enum": [
-                        "none",
-                        "nano",
-                        "small",
-                        "medium",
-                        "large",
-                        "xlarge",
-                        "2xlarge"
-                    ],
-                    "title": "resourcesPreset",
-                    "type": "string"
-                },
-                "revisionHistoryLimit": {
-                    "default": 5,
-                    "description": "Number of revision to preserve",
-                    "title": "revisionHistoryLimit",
-                    "type": [
-                        "number"
-                    ]
-                },
-                "schedulerName": {
-                    "description": "https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/",
-                    "title": "schedulerName",
-                    "type": [
-                        "string"
-                    ]
-                },
-                "sidecars": {
-                    "description": "Add additional sidecar containers to the pods",
-                    "title": "sidecars",
-                    "type": [
-                        "array"
-                    ]
-                },
-                "startupProbe": {
-                    "description": "startupProbe https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/",
-                    "properties": {
-                        "enabled": {
-                            "default": false,
-                            "description": "Enable startupProbe on containers",
-                            "title": "startupProbe.enabled",
-                            "type": [
-                                "boolean"
-                            ]
-                        },
-                        "failureThreshold": {
-                            "default": 3,
-                            "description": "Failure threshold for startupProbe",
-                            "title": "startupProbe.failureThreshold",
-                            "type": [
-                                "number"
-                            ]
-                        },
-                        "initialDelaySeconds": {
-                            "default": 60,
-                            "description": "Initial delay seconds for startupProbe",
-                            "title": "startupProbe.initialDelaySeconds",
-                            "type": [
-                                "number"
-                            ]
-                        },
-                        "periodSeconds": {
-                            "default": 10,
-                            "description": "Period seconds for startupProbe",
-                            "title": "startupProbe.periodSeconds",
-                            "type": [
-                                "number"
-                            ]
-                        },
-                        "successThreshold": {
-                            "default": 1,
-                            "description": "Success threshold for startupProbe",
-                            "title": "startupProbe.successThreshold",
-                            "type": [
-                                "number"
-                            ]
-                        },
-                        "timeoutSeconds": {
-                            "default": 1,
-                            "description": "Timeout seconds for startupProbe",
-                            "title": "startupProbe.timeoutSeconds",
-                            "type": [
-                                "number"
-                            ]
-                        }
-                    },
-                    "title": "startupProbe",
-                    "type": [
-                        "object"
-                    ]
-                },
-                "terminationGracePeriodSeconds": {
-                    "description": "Seconds for pods need to terminate gracefully https://kubernetes.io/docs/concepts/workloads/pods/pod/#termination-of-pods",
-                    "title": "terminationGracePeriodSeconds",
-                    "type": [
-                        "string"
-                    ]
-                },
-                "tolerations": {
-                    "description": "Tolerations for pods assignment https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/",
-                    "title": "tolerations",
-                    "type": [
-                        "array"
-                    ]
-                },
-                "topologySpreadConstraints": {
-                    "description": "Topology Spread Constraints for pod assignment spread across your cluster among failure-domains https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/#spread-constraints-for-pods",
-                    "items": {
-                        "properties": {
-                            "labelSelector": {
-                                "properties": {
-                                    "matchLabels": {
-                                        "properties": {
-                                            "app.kubernetes.io/name": {
-                                                "type": "string"
-                                            }
-                                        },
-                                        "title": "topologySpreadConstraints.labelSelector.matchLabels",
-                                        "type": [
-                                            "object"
-                                        ]
-                                    }
-                                },
-                                "required": [
-                                    "matchLabels"
-                                ],
-                                "title": "topologySpreadConstraints.labelSelector",
-                                "type": [
-                                    "object"
-                                ]
-                            },
-                            "maxSkew": {
-                                "default": 1,
-                                "description": "Responsible on Pod placement between zones",
-                                "title": "topologySpreadConstraints.maxSkew",
-                                "type": [
-                                    "number"
-                                ]
-                            },
-                            "topologyKey": {
-                                "default": "topology.kubernetes.io/zone",
-                                "description": "is the key of node labels",
-                                "enum": [
-                                    "topology.kubernetes.io/region",
-                                    "topology.kubernetes.io/zone",
-                                    "topology.kubernetes.io/node"
-                                ],
-                                "title": "topologyKey",
-                                "type": "string"
-                            },
-                            "whenUnsatisfiable": {
-                                "default": "DoNotSchedule",
-                                "description": "Indicates how to deal with a Pod if it doesn't satisfy the spread constraint",
-                                "enum": [
-                                    "DoNotSchedule",
-                                    "ScheduleAnyway"
-                                ],
-                                "title": "whenUnsatisfiable",
-                                "type": "string"
-                            }
-                        },
-                        "required": [
-                            "maxSkew",
-                            "topologyKey",
-                            "labelSelector"
-                        ],
-                        "type": "object"
-                    },
-                    "title": "topologySpreadConstraints",
-                    "type": [
-                        "array",
-                        "null"
-                    ]
-                },
-                "updateStrategy": {
-                    "description": "Update strategy of deploy https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy",
-                    "properties": {},
-                    "title": "updateStrategy",
-                    "type": [
-                        "object"
-                    ]
-                }
-            },
+            "type": "object",
             "required": [
                 "deploymentAnnotations",
                 "autoscaling",
@@ -891,197 +45,728 @@
                 "readinessProbe",
                 "startupProbe"
             ],
-            "title": "configValues",
-            "type": "object"
-        },
-        "db": {
             "properties": {
-                "name": {
-                    "default": "******** YOUR_DB_NAME ********",
-                    "description": "db name. IMPORTANT: MUST BE OVERIDEN OR INJECTED DURING DEPLOYMENT PROCESS.",
-                    "title": "db.name",
+                "affinity": {
+                    "title": "affinity",
+                    "description": "Affinity for pods assignment. NOTE: `podAffinityPreset`, `podAntiAffinityPreset`, and `nodeAffinityPreset` will be ignored when it's set",
+                    "type": "object"
+                },
+                "args": {
+                    "title": "args",
+                    "description": "arguments for the containers that run in the Pod (diagnosticMode definition overrides it). https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container",
                     "type": [
-                        "string"
+                        "array",
+                        "null"
                     ]
                 },
-                "schema": {
-                    "default": "public",
-                    "description": "db schema name. IMPORTANT: MIGHT/MUST BE OVERIDEN OR INJECTED DURING DEPLOYMENT PROCESS.",
-                    "title": "db.schema",
+                "autoscaling": {
+                    "title": "autoscaling",
+                    "description": "Autoscaling configuration https://kubernetes.io/docs/concepts/workloads/autoscaling/",
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "title": "autoscaling.enabled",
+                            "description": "Is autoscaling defined for pods (currently should be FALSE, TRUE still not tested)",
+                            "default": false,
+                            "type": "boolean"
+                        },
+                        "hpa": {
+                            "title": "hpa",
+                            "description": "HPA configuration for pods https://kubernetes.io/docs/tutorials/kubernetes-basics/scale/scale-intro/",
+                            "type": "object",
+                            "properties": {
+                                "enabled": {
+                                    "title": "hpa.enabled",
+                                    "description": "Enable HPA for pods",
+                                    "type": "boolean"
+                                },
+                                "maxReplicas": {
+                                    "title": "hpa.maxReplicas",
+                                    "description": "Maximum number of replicas",
+                                    "type": "number"
+                                },
+                                "minReplicas": {
+                                    "title": "hpa.minReplicas",
+                                    "description": "Minimum number of replicas",
+                                    "type": "number"
+                                },
+                                "targetCPU": {
+                                    "title": "hpa.targetCPU(targetCPUUtilizationPercentage)",
+                                    "description": "Target CPU utilization percentage",
+                                    "type": "number"
+                                },
+                                "targetMemory": {
+                                    "title": "hpa.targetMemory(targetMemoryUtilizationPercentage)",
+                                    "description": "Target Memory utilization percentage",
+                                    "type": [
+                                        "number",
+                                        "null"
+                                    ]
+                                }
+                            }
+                        },
+                        "vpa": {
+                            "title": "vpa",
+                            "description": "VPA configuration for pods https://kubernetes.io/docs/tasks/configure-pod-container/resize-container-resources/",
+                            "type": "object",
+                            "properties": {
+                                "annotations": {
+                                    "title": "vpa.annotations",
+                                    "description": "Annotations for VPA resource",
+                                    "type": "object"
+                                },
+                                "controlledResources": {
+                                    "title": "vpa.controlledResources",
+                                    "description": "VPA List of resources that the vertical pod autoscaler can control. Defaults to cpu and memory",
+                                    "type": "array"
+                                },
+                                "enabled": {
+                                    "title": "vpa.enabled",
+                                    "description": "Enable VPA for pods (currently should be FALSE, TRUE still not tested)",
+                                    "default": false,
+                                    "type": "boolean"
+                                },
+                                "maxAllowed": {
+                                    "title": "vpa.maxAllowed",
+                                    "description": "VPA Max allowed resources for the pod",
+                                    "type": "object"
+                                },
+                                "minAllowed": {
+                                    "title": "vpa.minAllowed",
+                                    "description": "VPA Min allowed resources for the pod",
+                                    "type": "object"
+                                },
+                                "updatePolicy": {
+                                    "title": "vpa.updatePolicy",
+                                    "description": "Autoscaling update policy",
+                                    "type": "object",
+                                    "required": [
+                                        "updateMode"
+                                    ],
+                                    "properties": {
+                                        "updateMode": {
+                                            "title": "vpa.updatePolicy.updateMode",
+                                            "description": "Specifies whether recommended updates are applied when a Pod is started and whether recommended updates are applied during the life of a Pod",
+                                            "default": "Auto",
+                                            "type": "string",
+                                            "enum": [
+                                                "Off",
+                                                "Initial",
+                                                "Recreate",
+                                                "Auto"
+                                            ]
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "command": {
+                    "title": "command",
+                    "description": "command for the containers that run in the Pod (diagnosticMode definition overrides it). https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container",
                     "type": [
-                        "string"
+                        "array",
+                        "null"
                     ]
+                },
+                "containerPorts": {
+                    "title": "containerPorts",
+                    "description": "Define container ports",
+                    "type": "object",
+                    "required": [
+                        "http",
+                        "https"
+                    ],
+                    "properties": {
+                        "http": {
+                            "title": "containerPorts.http",
+                            "description": "Define HTTP container port",
+                            "default": 8080,
+                            "type": "number"
+                        },
+                        "https": {
+                            "title": "containerPorts.https",
+                            "description": "Define HTTPS container port",
+                            "default": 443,
+                            "type": "number"
+                        }
+                    }
+                },
+                "containerSecurityContext": {
+                    "title": "containerSecurityContext",
+                    "description": "Configure Container Security Context https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container",
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "title": "containerSecurityContext.enabled",
+                            "description": "Enable Container Security Context",
+                            "default": false,
+                            "type": "boolean"
+                        },
+                        "runAsNonRoot": {
+                            "title": "containerSecurityContext.runAsNonRoot",
+                            "description": "Set runAsNonRoot in container' Security Context",
+                            "default": true,
+                            "type": "boolean"
+                        },
+                        "runAsUser": {
+                            "title": "containerSecurityContext.runAsUser",
+                            "description": "Set runAsUser in container' Security Context",
+                            "default": 1001,
+                            "type": "number"
+                        }
+                    }
+                },
+                "customLivenessProbe": {
+                    "title": "customLivenessProbe",
+                    "description": "Custom-livenessProbe that overrides the livenessProbe https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes",
+                    "type": "object"
+                },
+                "customReadinessProbe": {
+                    "title": "customReadinessProbe",
+                    "description": "Custom-readinessProbe that overrides the readinessProbe https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes",
+                    "type": "object"
+                },
+                "customStartupProbe": {
+                    "title": "customStartupProbe",
+                    "description": "Custom-startupProbe that overrides the startupProbe https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/",
+                    "type": "object"
+                },
+                "deploymentAnnotations": {
+                    "title": "deploymentAnnotations",
+                    "description": "Annotations for deployment https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/",
+                    "default": {},
+                    "type": "object"
+                },
+                "extraEnvVars": {
+                    "title": "extraEnvVars",
+                    "description": "Set additional environment variables to the containers",
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "extraEnvVarsCM": {
+                    "title": "extraEnvVarsCM",
+                    "description": "ConfigMap containing extra env vars to be added to all pods (evaluated as a template)",
+                    "default": "'{{ template \"common.names.fullname\" . }}'",
+                    "type": "string"
+                },
+                "extraEnvVarsSecret": {
+                    "title": "extraEnvVarsSecret",
+                    "description": "Secret containing extra env vars to be added to all pods (evaluated as a template)",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "extraVolumeMounts": {
+                    "title": "extraVolumeMounts",
+                    "description": "Optionally specify extra list of additional volumeMounts for the containers",
+                    "type": "array"
+                },
+                "extraVolumes": {
+                    "title": "extraVolumes",
+                    "description": "Optionally specify extra list of additional volumes for the pods",
+                    "type": "array"
+                },
+                "hostAliases": {
+                    "title": "hostAliases",
+                    "description": "Pods host aliases",
+                    "type": "array"
+                },
+                "image": {
+                    "title": "image",
+                    "description": "MapColonies image details",
+                    "type": "object",
+                    "required": [
+                        "repository",
+                        "tag",
+                        "pullPolicy"
+                    ],
+                    "properties": {
+                        "debug": {
+                            "title": "image.debug",
+                            "description": "Enable image debug mode",
+                            "default": false,
+                            "type": "boolean"
+                        },
+                        "digest": {
+                            "title": "image.digest",
+                            "description": "Image digest in the way sha256:aa.... Please note this parameter, if set, will override the image tag",
+                            "type": "string"
+                        },
+                        "pullPolicy": {
+                            "title": "image.pullPolicy",
+                            "description": "Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'",
+                            "default": "IfNotPresent",
+                            "type": "string",
+                            "enum": [
+                                "IfNotPresent",
+                                "Always",
+                                "Never"
+                            ]
+                        },
+                        "pullSecrets": {
+                            "title": "image.pullSecrets",
+                            "description": "Image pull secrets. Secrets must be manually created in the namespace.",
+                            "type": "array"
+                        },
+                        "repository": {
+                            "title": "image.repository",
+                            "description": "Image repository",
+                            "default": "******** YOUR_REPO ********",
+                            "type": "string"
+                        },
+                        "tag": {
+                            "title": "image.tag",
+                            "description": "Image tag (immutable tags are recommended)",
+                            "default": "******** YOUR_REPO_TAG ********",
+                            "type": "string"
+                        }
+                    }
+                },
+                "initContainers": {
+                    "title": "initContainers",
+                    "description": "Add additional init containers to the pods https://kubernetes.io/docs/concepts/workloads/pods/init-containers/",
+                    "type": [
+                        "array",
+                        "null"
+                    ]
+                },
+                "lifecycleHooks": {
+                    "title": "lifecycleHooks",
+                    "description": "For containers to automate configuration before or after startup",
+                    "type": "object"
+                },
+                "livenessProbe": {
+                    "title": "livenessProbe",
+                    "description": "livenessProbe https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes",
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "title": "livenessProbe.enabled",
+                            "description": "Enable livenessProbe on containers",
+                            "default": true,
+                            "type": "boolean"
+                        },
+                        "failureThreshold": {
+                            "title": "livenessProbe.failureThreshold",
+                            "description": "Failure threshold for livenessProbe",
+                            "default": 3,
+                            "type": "number"
+                        },
+                        "initialDelaySeconds": {
+                            "title": "livenessProbe.initialDelaySeconds",
+                            "description": "Initial delay seconds for livenessProbe",
+                            "default": 60,
+                            "type": "number"
+                        },
+                        "periodSeconds": {
+                            "title": "livenessProbe.periodSeconds",
+                            "description": "Period seconds for livenessProbe",
+                            "default": 10,
+                            "type": "number"
+                        },
+                        "successThreshold": {
+                            "title": "livenessProbe.successThreshold",
+                            "description": "Success threshold for livenessProbe",
+                            "default": 1,
+                            "type": "number"
+                        },
+                        "timeoutSeconds": {
+                            "title": "livenessProbe.timeoutSeconds",
+                            "description": "Timeout seconds for livenessProbe",
+                            "default": 1,
+                            "type": "number"
+                        }
+                    }
+                },
+                "nodeAffinityPreset": {
+                    "title": "nodeAffinityPreset",
+                    "description": "Node afinity preset https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#node-affinity",
+                    "type": "object"
+                },
+                "nodeSelector": {
+                    "title": "nodeSelector",
+                    "description": "Recommended form of node selection constraint https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/",
+                    "type": "object"
+                },
+                "podAffinityPreset": {
+                    "title": "podAffinityPreset",
+                    "description": "Pod affinity preset. NOTE: Ignored if `affinity` is set",
+                    "type": "string",
+                    "enum": [
+                        "soft",
+                        "hard",
+                        ""
+                    ]
+                },
+                "podAnnotations": {
+                    "title": "podAnnotations",
+                    "description": "Pod specific annotations",
+                    "type": "object",
+                    "properties": {
+                        "annotations": {
+                            "title": "podAnnotations.annotations",
+                            "description": "Additional pod annotations",
+                            "type": [
+                                "object",
+                                "null"
+                            ]
+                        },
+                        "enabled": {
+                            "title": "podAnnotations.enabled",
+                            "description": "Add build-in annotations (checksum / prometheus)",
+                            "default": true,
+                            "type": "boolean"
+                        },
+                        "resetOnConfigChange": {
+                            "title": "podAnnotations.resetOnConfigChange",
+                            "description": "Relative annnotation for reset onConfig change",
+                            "default": true,
+                            "type": "boolean"
+                        }
+                    }
+                },
+                "podAntiAffinityPreset": {
+                    "title": "podAffinityPreset",
+                    "description": "Pod affinity preset. NOTE: Ignored if `affinity` is set",
+                    "type": "string",
+                    "enum": [
+                        "soft",
+                        "hard",
+                        ""
+                    ]
+                },
+                "podLabels": {
+                    "title": "podLabels",
+                    "description": "Pod specific labels",
+                    "type": "object"
+                },
+                "podSecurityContext": {
+                    "title": "podSecurityContext",
+                    "description": "Configure Pods Security Context https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod",
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "title": "podSecurityContext.enabled",
+                            "description": "Enable pods' Security Context",
+                            "default": false,
+                            "type": "boolean"
+                        },
+                        "fsGroup": {
+                            "title": "podSecurityContext.fsGroup",
+                            "description": "Set fsGroup in pods' Security Context",
+                            "type": "number"
+                        },
+                        "fsGroupChangePolicy": {
+                            "title": "podSecurityContext.fsGroupChangePolicy",
+                            "description": "Set filesystem group change policy for pods",
+                            "type": "string",
+                            "enum": [
+                                "Always",
+                                "OnRootMismatch"
+                            ]
+                        },
+                        "supplementalGroups": {
+                            "title": "podSecurityContext.supplementalGroups",
+                            "type": "array"
+                        },
+                        "sysctls": {
+                            "title": "podSecurityContext.sysctls",
+                            "type": "array"
+                        }
+                    }
+                },
+                "priorityClassName": {
+                    "title": "priorityClassName",
+                    "description": "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_create/kubectl_create_priorityclass/",
+                    "type": "string"
+                },
+                "prometheus": {
+                    "title": "prometheus",
+                    "description": "Prometheus metrics configuration",
+                    "type": "object",
+                    "properties": {
+                        "params": {
+                            "title": "prometheus.params",
+                            "description": "If the metrics endpoint uses query parameters then you can set any parameter (will be added as annotations)",
+                            "type": "array"
+                        },
+                        "path": {
+                            "title": "prometheus.path",
+                            "description": "If the metrics path is not `/metrics` override it",
+                            "type": "string"
+                        },
+                        "port": {
+                            "title": "prometheus.port",
+                            "description": "If the metrics are exposed on a different port to the service then set this appropriately",
+                            "type": "number"
+                        },
+                        "scheme": {
+                            "title": "prometheus.scheme",
+                            "description": "If the metrics endpoint is secured then you will need to set this to `https` \u0026 most likely set the `tls_config` of the scrape config",
+                            "type": "string"
+                        },
+                        "scrape": {
+                            "title": "prometheus.scrape",
+                            "description": "Flag for prometheus to scrape service metrics",
+                            "type": "boolean"
+                        }
+                    }
+                },
+                "readinessProbe": {
+                    "title": "readinessProbe",
+                    "description": "readinessProbe https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes",
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "title": "readinessProbe.enabled",
+                            "description": "Enable readinessProbe on containers",
+                            "default": true,
+                            "type": "boolean"
+                        },
+                        "failureThreshold": {
+                            "title": "readinessProbe.failureThreshold",
+                            "description": "Failure threshold for readinessProbe",
+                            "default": 3,
+                            "type": "number"
+                        },
+                        "initialDelaySeconds": {
+                            "title": "readinessProbe.initialDelaySeconds",
+                            "description": "Initial delay seconds for readinessProbe",
+                            "default": 60,
+                            "type": "number"
+                        },
+                        "periodSeconds": {
+                            "title": "readinessProbe.periodSeconds",
+                            "description": "Period seconds for readinessProbe",
+                            "default": 10,
+                            "type": "number"
+                        },
+                        "successThreshold": {
+                            "title": "readinessProbe.successThreshold",
+                            "description": "Success threshold for readinessProbe",
+                            "default": 1,
+                            "type": "number"
+                        },
+                        "timeoutSeconds": {
+                            "title": "readinessProbe.timeoutSeconds",
+                            "description": "Timeout seconds for readinessProbe",
+                            "default": 1,
+                            "type": "number"
+                        }
+                    }
+                },
+                "replicaCount": {
+                    "title": "replicaCount",
+                    "description": "Number of replicas to deploy. Wiil be used if !hpa.enabled",
+                    "default": 1,
+                    "type": "number"
+                },
+                "resources": {
+                    "title": "resources",
+                    "description": "Set container requests and limits for different resources like CPU or memory (essential for production workloads) https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/",
+                    "type": "object"
+                },
+                "resourcesPreset": {
+                    "title": "resourcesPreset",
+                    "description": "Resource requests and limits presets",
+                    "default": "nano",
+                    "type": "string",
+                    "enum": [
+                        "none",
+                        "nano",
+                        "small",
+                        "medium",
+                        "large",
+                        "xlarge",
+                        "2xlarge"
+                    ]
+                },
+                "revisionHistoryLimit": {
+                    "title": "revisionHistoryLimit",
+                    "description": "Number of revision to preserve",
+                    "default": 5,
+                    "type": "number"
+                },
+                "schedulerName": {
+                    "title": "schedulerName",
+                    "description": "https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/",
+                    "type": "string"
+                },
+                "sidecars": {
+                    "title": "sidecars",
+                    "description": "Add additional sidecar containers to the pods",
+                    "type": "array"
+                },
+                "startupProbe": {
+                    "title": "startupProbe",
+                    "description": "startupProbe https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/",
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "title": "startupProbe.enabled",
+                            "description": "Enable startupProbe on containers",
+                            "default": false,
+                            "type": "boolean"
+                        },
+                        "failureThreshold": {
+                            "title": "startupProbe.failureThreshold",
+                            "description": "Failure threshold for startupProbe",
+                            "default": 3,
+                            "type": "number"
+                        },
+                        "initialDelaySeconds": {
+                            "title": "startupProbe.initialDelaySeconds",
+                            "description": "Initial delay seconds for startupProbe",
+                            "default": 60,
+                            "type": "number"
+                        },
+                        "periodSeconds": {
+                            "title": "startupProbe.periodSeconds",
+                            "description": "Period seconds for startupProbe",
+                            "default": 10,
+                            "type": "number"
+                        },
+                        "successThreshold": {
+                            "title": "startupProbe.successThreshold",
+                            "description": "Success threshold for startupProbe",
+                            "default": 1,
+                            "type": "number"
+                        },
+                        "timeoutSeconds": {
+                            "title": "startupProbe.timeoutSeconds",
+                            "description": "Timeout seconds for startupProbe",
+                            "default": 1,
+                            "type": "number"
+                        }
+                    }
+                },
+                "terminationGracePeriodSeconds": {
+                    "title": "terminationGracePeriodSeconds",
+                    "description": "Seconds for pods need to terminate gracefully https://kubernetes.io/docs/concepts/workloads/pods/pod/#termination-of-pods",
+                    "type": "string"
+                },
+                "tolerations": {
+                    "title": "tolerations",
+                    "description": "Tolerations for pods assignment https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/",
+                    "type": "array"
+                },
+                "topologySpreadConstraints": {
+                    "title": "topologySpreadConstraints",
+                    "description": "Topology Spread Constraints for pod assignment spread across your cluster among failure-domains https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/#spread-constraints-for-pods",
+                    "type": [
+                        "array",
+                        "null"
+                    ],
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "maxSkew",
+                            "topologyKey",
+                            "labelSelector"
+                        ],
+                        "properties": {
+                            "labelSelector": {
+                                "title": "topologySpreadConstraints.labelSelector",
+                                "type": "object",
+                                "required": [
+                                    "matchLabels"
+                                ],
+                                "properties": {
+                                    "matchLabels": {
+                                        "title": "topologySpreadConstraints.labelSelector.matchLabels",
+                                        "type": "object",
+                                        "properties": {
+                                            "app.kubernetes.io/name": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "maxSkew": {
+                                "title": "topologySpreadConstraints.maxSkew",
+                                "description": "Responsible on Pod placement between zones",
+                                "default": 1,
+                                "type": "number"
+                            },
+                            "topologyKey": {
+                                "title": "topologyKey",
+                                "description": "is the key of node labels",
+                                "default": "topology.kubernetes.io/zone",
+                                "type": "string",
+                                "enum": [
+                                    "topology.kubernetes.io/region",
+                                    "topology.kubernetes.io/zone",
+                                    "topology.kubernetes.io/node"
+                                ]
+                            },
+                            "whenUnsatisfiable": {
+                                "title": "whenUnsatisfiable",
+                                "description": "Indicates how to deal with a Pod if it doesn't satisfy the spread constraint",
+                                "default": "DoNotSchedule",
+                                "type": "string",
+                                "enum": [
+                                    "DoNotSchedule",
+                                    "ScheduleAnyway"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "updateStrategy": {
+                    "title": "updateStrategy",
+                    "description": "Update strategy of deploy https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy",
+                    "type": "object"
                 }
-            },
+            }
+        },
+        "db": {
+            "type": "object",
             "required": [
                 "name",
                 "schema"
             ],
-            "type": "object"
+            "properties": {
+                "name": {
+                    "title": "db.name",
+                    "description": "db name. IMPORTANT: MUST BE OVERIDEN OR INJECTED DURING DEPLOYMENT PROCESS.",
+                    "default": "******** YOUR_DB_NAME ********",
+                    "type": "string"
+                },
+                "schema": {
+                    "title": "db.schema",
+                    "description": "db schema name. IMPORTANT: MIGHT/MUST BE OVERIDEN OR INJECTED DURING DEPLOYMENT PROCESS.",
+                    "default": "public",
+                    "type": "string"
+                }
+            }
         },
         "diagnosticMode": {
+            "title": "diagnosticMode",
+            "type": "object",
             "properties": {
                 "enabled": {
                     "type": "boolean"
                 }
-            },
-            "title": "diagnosticMode",
-            "type": [
-                "object"
-            ]
+            }
         },
         "fullnameOverride": {
-            "description": "Override fullname",
             "title": "fullnameOverride",
+            "description": "Override fullname",
             "type": [
                 "string",
                 "null"
             ]
         },
         "ingress": {
+            "title": "ingress",
             "description": "Ingress configuration https://kubernetes.io/docs/concepts/services-networking/ingress/",
-            "properties": {
-                "annotations": {
-                    "description": "Additional annotations for the Ingress resource https://cert-manager.io/docs/usage/ingress/#supported-annotations",
-                    "properties": {},
-                    "title": "ingress.annotations",
-                    "type": [
-                        "object"
-                    ]
-                },
-                "apiVersion": {
-                    "description": "Force Ingress API version (automatically detected if not set)",
-                    "title": "ingress.apiVersion",
-                    "type": [
-                        "string"
-                    ]
-                },
-                "cors": {
-                    "description": "CORS support on ingress nginx annotation principles",
-                    "properties": {
-                        "enabled": {
-                            "default": true,
-                            "description": "In enabled CORS support on ingress nginx annotation principles",
-                            "title": "cors.enabled",
-                            "type": [
-                                "boolean"
-                            ]
-                        },
-                        "origin": {
-                            "default": "'*'",
-                            "description": "CORS origin",
-                            "title": "cors.origin",
-                            "type": [
-                                "string"
-                            ]
-                        }
-                    },
-                    "required": [
-                        "enabled",
-                        "origin"
-                    ],
-                    "title": "ingress.cors",
-                    "type": [
-                        "object"
-                    ]
-                },
-                "enabled": {
-                    "default": true,
-                    "description": "Is ingress enabled for service",
-                    "title": "ingress.enabled",
-                    "type": [
-                        "boolean"
-                    ]
-                },
-                "extraHosts": {
-                    "description": "Array with additional hostname(s) to be covered with the ingress record",
-                    "title": "ingress.extraHosts",
-                    "type": [
-                        "array"
-                    ]
-                },
-                "extraPaths": {
-                    "description": "An array with additional arbitrary paths for main ingress rule that may need to be added to the ingress under the main host",
-                    "title": "ingress.extraPaths",
-                    "type": [
-                        "array"
-                    ]
-                },
-                "extraRules": {
-                    "description": "Additional rules to be covered with this ingress record https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-rules",
-                    "title": "ingress.extraRules",
-                    "type": [
-                        "array"
-                    ]
-                },
-                "extraTls": {
-                    "description": "TLS configuration for additional hostname(s) to be covered with this ingress record https://kubernetes.io/docs/concepts/services-networking/ingress/#tls",
-                    "title": "ingress.extraTls",
-                    "type": [
-                        "array"
-                    ]
-                },
-                "hostname": {
-                    "default": "YOUR_COMPONENT_NAME.local",
-                    "description": "Ingress host (if not defined, main rule will not be generated, only ingress.extraHosts )",
-                    "title": "ingress.hostname",
-                    "type": [
-                        "string"
-                    ]
-                },
-                "ingressClassName": {
-                    "description": "IngressClass that will be be used to implement the Ingress https://kubernetes.io/docs/concepts/services-networking/ingress/",
-                    "title": "ingress.ingressClassName",
-                    "type": [
-                        "string"
-                    ]
-                },
-                "path": {
-                    "default": "/YOUR_PATH",
-                    "description": "Default path for the ingress record",
-                    "title": "ingress.path",
-                    "type": [
-                        "string"
-                    ]
-                },
-                "pathType": {
-                    "default": "Prefix",
-                    "description": "Ingress path type https://kubernetes.io/docs/concepts/services-networking/ingress/",
-                    "enum": [
-                        "ImplementationSpecific",
-                        "Exact",
-                        "Prefix"
-                    ],
-                    "title": "ingress.pathType",
-                    "type": "string"
-                },
-                "selfSigned": {
-                    "default": false,
-                    "description": "Create a TLS secret(expired in 365 days) for this ingress record using self-signed certificates generated by Helm",
-                    "title": "ingress.selfSigned",
-                    "type": [
-                        "boolean"
-                    ]
-                },
-                "tls": {
-                    "default": true,
-                    "description": "Enable TLS configuration for the host defined at `ingress.hostname` parameter",
-                    "title": "ingress.tls",
-                    "type": [
-                        "boolean"
-                    ]
-                },
-                "type": {
-                    "default": "nginx-org",
-                    "description": "Ingress type supported by OS/K8S.",
-                    "enum": [
-                        "nginx-org",
-                        "nginx-kubernetes"
-                    ],
-                    "title": "ingress.type",
-                    "type": "string"
-                }
-            },
+            "type": "object",
             "required": [
                 "enabled",
                 "type",
@@ -1090,213 +775,215 @@
                 "tls",
                 "cors"
             ],
-            "title": "ingress",
-            "type": "object"
+            "properties": {
+                "annotations": {
+                    "title": "ingress.annotations",
+                    "description": "Additional annotations for the Ingress resource https://cert-manager.io/docs/usage/ingress/#supported-annotations",
+                    "type": "object"
+                },
+                "apiVersion": {
+                    "title": "ingress.apiVersion",
+                    "description": "Force Ingress API version (automatically detected if not set)",
+                    "type": "string"
+                },
+                "cors": {
+                    "title": "ingress.cors",
+                    "description": "CORS support on ingress nginx annotation principles",
+                    "type": "object",
+                    "required": [
+                        "enabled",
+                        "origin"
+                    ],
+                    "properties": {
+                        "enabled": {
+                            "title": "cors.enabled",
+                            "description": "In enabled CORS support on ingress nginx annotation principles",
+                            "default": true,
+                            "type": "boolean"
+                        },
+                        "origin": {
+                            "title": "cors.origin",
+                            "description": "CORS origin",
+                            "default": "'*'",
+                            "type": "string"
+                        }
+                    }
+                },
+                "enabled": {
+                    "title": "ingress.enabled",
+                    "description": "Is ingress enabled for service",
+                    "default": true,
+                    "type": "boolean"
+                },
+                "extraHosts": {
+                    "title": "ingress.extraHosts",
+                    "description": "Array with additional hostname(s) to be covered with the ingress record",
+                    "type": "array"
+                },
+                "extraPaths": {
+                    "title": "ingress.extraPaths",
+                    "description": "An array with additional arbitrary paths for main ingress rule that may need to be added to the ingress under the main host",
+                    "type": "array"
+                },
+                "extraRules": {
+                    "title": "ingress.extraRules",
+                    "description": "Additional rules to be covered with this ingress record https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-rules",
+                    "type": "array"
+                },
+                "extraTls": {
+                    "title": "ingress.extraTls",
+                    "description": "TLS configuration for additional hostname(s) to be covered with this ingress record https://kubernetes.io/docs/concepts/services-networking/ingress/#tls",
+                    "type": "array"
+                },
+                "hostname": {
+                    "title": "ingress.hostname",
+                    "description": "Ingress host (if not defined, main rule will not be generated, only ingress.extraHosts )",
+                    "default": "YOUR_COMPONENT_NAME.local",
+                    "type": "string"
+                },
+                "ingressClassName": {
+                    "title": "ingress.ingressClassName",
+                    "description": "IngressClass that will be be used to implement the Ingress https://kubernetes.io/docs/concepts/services-networking/ingress/",
+                    "type": "string"
+                },
+                "path": {
+                    "title": "ingress.path",
+                    "description": "Default path for the ingress record",
+                    "default": "/YOUR_PATH",
+                    "type": "string"
+                },
+                "pathType": {
+                    "title": "ingress.pathType",
+                    "description": "Ingress path type https://kubernetes.io/docs/concepts/services-networking/ingress/",
+                    "default": "Prefix",
+                    "type": "string",
+                    "enum": [
+                        "ImplementationSpecific",
+                        "Exact",
+                        "Prefix"
+                    ]
+                },
+                "selfSigned": {
+                    "title": "ingress.selfSigned",
+                    "description": "Create a TLS secret(expired in 365 days) for this ingress record using self-signed certificates generated by Helm",
+                    "default": false,
+                    "type": "boolean"
+                },
+                "tls": {
+                    "title": "ingress.tls",
+                    "description": "Enable TLS configuration for the host defined at `ingress.hostname` parameter",
+                    "default": true,
+                    "type": "boolean"
+                },
+                "type": {
+                    "title": "ingress.type",
+                    "description": "Ingress type supported by OS/K8S.",
+                    "default": "nginx-org",
+                    "type": "string",
+                    "enum": [
+                        "nginx-org",
+                        "nginx-kubernetes"
+                    ]
+                }
+            }
         },
         "kubeVersion": {
-            "description": "\u003e= 1.13.0 \u003c 1.15.0",
             "title": "kubeVersion",
+            "description": "\u003e= 1.13.0 \u003c 1.15.0",
             "type": [
                 "string",
                 "null"
             ]
         },
+        "mclabels": {
+            "title": "mclabels",
+            "description": "MapColonies labels rendered on all resources and Pod templates",
+            "type": [
+                "object",
+                "null"
+            ],
+            "properties": {
+                "component": {
+                    "title": "mclabels.component",
+                    "description": "Component type, e.g. frontend or backend",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "owner": {
+                    "title": "mclabels.owner",
+                    "description": "Owning team, overrides global.owner for this chart",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "partOf": {
+                    "title": "mclabels.partOf",
+                    "description": "Logical release grouping, overrides global.partOf for this chart",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                }
+            }
+        },
         "nameOverride": {
-            "description": "Override Chart name if needed",
             "title": "nameOverride",
+            "description": "Override Chart name if needed",
             "type": [
                 "string",
                 "null"
             ]
         },
         "persistence": {
-            "properties": {
-                "enabled": {
-                    "description": "Is \"shared\" persistance defined",
-                    "title": "persistence.enabled",
-                    "type": [
-                        "boolean"
-                    ]
-                }
-            },
+            "title": "persistence",
+            "type": "object",
             "required": [
                 "enabled"
             ],
-            "title": "persistence",
-            "type": [
-                "object"
-            ]
+            "properties": {
+                "enabled": {
+                    "title": "persistence.enabled",
+                    "description": "Is \"shared\" persistance defined",
+                    "type": "boolean"
+                }
+            }
         },
         "podSecurityPolicy": {
+            "title": "podSecurityPolicy",
             "description": "Relevant for Role deployment resource",
+            "type": "object",
             "properties": {
                 "enabled": {
-                    "description": "Specifies whether podSecurityPolicy should be enabled for Role",
                     "title": "podSecurityPolicy.enabled",
-                    "type": [
-                        "boolean"
-                    ]
+                    "description": "Specifies whether podSecurityPolicy should be enabled for Role",
+                    "type": "boolean"
                 }
-            },
-            "title": "podSecurityPolicy",
-            "type": "object"
+            }
         },
         "rbac": {
+            "title": "rbac",
             "description": "Relevant for Role and RoleBinding deployment resources",
+            "type": "object",
             "properties": {
                 "create": {
-                    "description": "Specifies whether RBAC resources should be created for Role and RoleBinding",
                     "title": "rbac.create",
-                    "type": [
-                        "boolean"
-                    ]
+                    "description": "Specifies whether RBAC resources should be created for Role and RoleBinding",
+                    "type": "boolean"
                 },
                 "rules": {
-                    "description": "RBAC rules to set for Role resource https://kubernetes.io/docs/reference/access-authn-authz/rbac",
                     "title": "rbac.rules",
-                    "type": [
-                        "array"
-                    ]
+                    "description": "RBAC rules to set for Role resource https://kubernetes.io/docs/reference/access-authn-authz/rbac",
+                    "type": "array"
                 }
-            },
-            "title": "rbac",
-            "type": "object"
+            }
         },
         "route": {
+            "title": "route",
             "description": "Route configuration https://docs.openshift.com/container-platform/3.11/architecture/networking/routes.html",
-            "properties": {
-                "annotations": {
-                    "description": "Additional custom annotations for route",
-                    "properties": {
-                        "haproxy.router.openshift.io/rewrite-target": {
-                            "default": "/",
-                            "description": "expcted to be",
-                            "title": "route.annotations",
-                            "type": [
-                                "string"
-                            ]
-                        }
-                    },
-                    "required": [
-                        "haproxy.router.openshift.io/rewrite-target"
-                    ],
-                    "title": "route.annotations",
-                    "type": [
-                        "object"
-                    ]
-                },
-                "enabled": {
-                    "default": true,
-                    "description": "Is route enabled for service",
-                    "title": "route.enabled",
-                    "type": [
-                        "boolean"
-                    ]
-                },
-                "extraRules": {
-                    "default": {},
-                    "description": "Custom additional route configurations according to https://docs.openshift.com/container-platform/3.11/architecture/networking/routes.html",
-                    "properties": {},
-                    "title": "route.extraRules",
-                    "type": [
-                        "object"
-                    ]
-                },
-                "routesMapping": {
-                    "description": "routesMapping for routes creation, hostname(s) should be a subset of hostnames used in GLOBAL TLS certificates",
-                    "title": "route.routesMapping",
-                    "type": [
-                        "array"
-                    ]
-                },
-                "targetPort": {
-                    "default": "http",
-                    "description": "Route target port",
-                    "title": "route.targetPort",
-                    "type": [
-                        "number",
-                        "string"
-                    ]
-                },
-                "timeout": {
-                    "description": "Define timeout for the route",
-                    "properties": {
-                        "duration": {
-                            "default": "30s",
-                            "description": "Timeout duration. Supported units (us, ms, s, m, h, d)",
-                            "title": "route.timeout.duration",
-                            "type": [
-                                "string"
-                            ]
-                        },
-                        "enabled": {
-                            "default": false,
-                            "description": "Is timeout enabled, should be different than default",
-                            "title": "route.timeout.enabled",
-                            "type": [
-                                "boolean"
-                            ]
-                        }
-                    },
-                    "required": [
-                        "duration"
-                    ],
-                    "title": "route.timeout",
-                    "type": "object"
-                },
-                "tls": {
-                    "description": "Route SSL configuration https://docs.openshift.com/container-platform/3.11/architecture/networking/routes.html",
-                    "properties": {
-                        "enabled": {
-                            "default": true,
-                            "description": "Is SSL route enabled for service",
-                            "title": "route.tls.enabled",
-                            "type": [
-                                "boolean"
-                            ]
-                        },
-                        "insecureEdgeTerminationPolicy": {
-                            "default": "Redirect",
-                            "description": "Edge-terminated routes can specify policy that enables traffic on insecure schemes (HTTP) to be disabled",
-                            "enum": [
-                                "",
-                                "None",
-                                "Allow",
-                                "Redirect"
-                            ],
-                            "title": "route.tls.insecureEdgeTerminationPolicy",
-                            "type": "string"
-                        },
-                        "termination": {
-                            "default": "edge",
-                            "description": "Secure routes provide the ability to use several types of TLS termination to serve certificates to the client",
-                            "enum": [
-                                "edge",
-                                "passthrough",
-                                "reencrypt"
-                            ],
-                            "title": "route.tls.termination",
-                            "type": "string"
-                        },
-                        "useCerts": {
-                            "default": true,
-                            "description": "Does SSL route use certificates",
-                            "title": "route.tls.useCerts",
-                            "type": [
-                                "boolean"
-                            ]
-                        }
-                    },
-                    "required": [
-                        "enabled",
-                        "useCerts",
-                        "termination",
-                        "insecureEdgeTerminationPolicy"
-                    ],
-                    "title": "route.tls",
-                    "type": "object"
-                }
-            },
+            "type": "object",
             "required": [
                 "enabled",
                 "annotations",
@@ -1304,240 +991,313 @@
                 "tls",
                 "timeout"
             ],
-            "title": "route",
-            "type": "object"
-        },
-        "s3": {
             "properties": {
-                "bucket": {
-                    "default": "******** YOUR_BUCKET ********",
-                    "description": "s3 bucket. IMPORTANT: MUST BE OVVERIDEN OR INJECTED DURING DEPLOYMENT PROCESS",
-                    "title": "s3.bucket",
+                "annotations": {
+                    "title": "route.annotations",
+                    "description": "Additional custom annotations for route",
+                    "type": "object",
+                    "required": [
+                        "haproxy.router.openshift.io/rewrite-target"
+                    ],
+                    "properties": {
+                        "haproxy.router.openshift.io/rewrite-target": {
+                            "title": "route.annotations",
+                            "description": "expcted to be",
+                            "default": "/",
+                            "type": "string"
+                        }
+                    }
+                },
+                "enabled": {
+                    "title": "route.enabled",
+                    "description": "Is route enabled for service",
+                    "default": true,
+                    "type": "boolean"
+                },
+                "extraRules": {
+                    "title": "route.extraRules",
+                    "description": "Custom additional route configurations according to https://docs.openshift.com/container-platform/3.11/architecture/networking/routes.html",
+                    "default": {},
+                    "type": "object"
+                },
+                "routesMapping": {
+                    "title": "route.routesMapping",
+                    "description": "routesMapping for routes creation, hostname(s) should be a subset of hostnames used in GLOBAL TLS certificates",
+                    "type": "array"
+                },
+                "targetPort": {
+                    "title": "route.targetPort",
+                    "description": "Route target port",
+                    "default": "http",
                     "type": [
+                        "number",
                         "string"
                     ]
+                },
+                "timeout": {
+                    "title": "route.timeout",
+                    "description": "Define timeout for the route",
+                    "type": "object",
+                    "required": [
+                        "duration"
+                    ],
+                    "properties": {
+                        "duration": {
+                            "title": "route.timeout.duration",
+                            "description": "Timeout duration. Supported units (us, ms, s, m, h, d)",
+                            "default": "30s",
+                            "type": "string"
+                        },
+                        "enabled": {
+                            "title": "route.timeout.enabled",
+                            "description": "Is timeout enabled, should be different than default",
+                            "default": false,
+                            "type": "boolean"
+                        }
+                    }
+                },
+                "tls": {
+                    "title": "route.tls",
+                    "description": "Route SSL configuration https://docs.openshift.com/container-platform/3.11/architecture/networking/routes.html",
+                    "type": "object",
+                    "required": [
+                        "enabled",
+                        "useCerts",
+                        "termination",
+                        "insecureEdgeTerminationPolicy"
+                    ],
+                    "properties": {
+                        "enabled": {
+                            "title": "route.tls.enabled",
+                            "description": "Is SSL route enabled for service",
+                            "default": true,
+                            "type": "boolean"
+                        },
+                        "insecureEdgeTerminationPolicy": {
+                            "title": "route.tls.insecureEdgeTerminationPolicy",
+                            "description": "Edge-terminated routes can specify policy that enables traffic on insecure schemes (HTTP) to be disabled",
+                            "default": "Redirect",
+                            "type": "string",
+                            "enum": [
+                                "",
+                                "None",
+                                "Allow",
+                                "Redirect"
+                            ]
+                        },
+                        "termination": {
+                            "title": "route.tls.termination",
+                            "description": "Secure routes provide the ability to use several types of TLS termination to serve certificates to the client",
+                            "default": "edge",
+                            "type": "string",
+                            "enum": [
+                                "edge",
+                                "passthrough",
+                                "reencrypt"
+                            ]
+                        },
+                        "useCerts": {
+                            "title": "route.tls.useCerts",
+                            "description": "Does SSL route use certificates",
+                            "default": true,
+                            "type": "boolean"
+                        }
+                    }
                 }
-            },
+            }
+        },
+        "s3": {
+            "type": "object",
             "required": [
                 "bucket"
             ],
-            "type": "object"
+            "properties": {
+                "bucket": {
+                    "title": "s3.bucket",
+                    "description": "s3 bucket. IMPORTANT: MUST BE OVVERIDEN OR INJECTED DURING DEPLOYMENT PROCESS",
+                    "default": "******** YOUR_BUCKET ********",
+                    "type": "string"
+                }
+            }
         },
         "service": {
+            "title": "service",
             "description": "Service configuration",
+            "type": "object",
+            "required": [
+                "protocol",
+                "ports"
+            ],
             "properties": {
                 "annotations": {
-                    "description": "Additional custom annotations for service",
-                    "properties": {},
                     "title": "service.annotations",
-                    "type": [
-                        "object"
-                    ]
+                    "description": "Additional custom annotations for service",
+                    "type": "object"
                 },
                 "clusterIP": {
-                    "description": "service Cluster IP. The string value None is a special case and is not the same as leaving the service.clusterIP field unset. https://kubernetes.io/docs/concepts/services-networking/service/#headless-services",
                     "title": "service.clusterIP",
-                    "type": [
-                        "string"
-                    ]
+                    "description": "service Cluster IP. The string value None is a special case and is not the same as leaving the service.clusterIP field unset. https://kubernetes.io/docs/concepts/services-networking/service/#headless-services",
+                    "type": "string"
                 },
                 "externalTrafficPolicy": {
+                    "title": "service.sessionAffinity",
                     "description": "service external traffic policy http://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip",
+                    "type": "string",
                     "enum": [
                         "Cluster",
                         "Local",
                         ""
-                    ],
-                    "title": "service.sessionAffinity",
-                    "type": "string"
+                    ]
                 },
                 "extraPorts": {
-                    "description": "Extra ports to expose in service (normally used with the `sidecars` value)",
                     "title": "service.extraPorts",
-                    "type": [
-                        "array"
-                    ]
+                    "description": "Extra ports to expose in service (normally used with the `sidecars` value)",
+                    "type": "array"
                 },
                 "loadBalancerIP": {
-                    "description": "service Load Balancer IP https://kubernetes.io/docs/concepts/services-networking/service/#type-loadbalancer",
                     "title": "service.loadBalancerIP",
-                    "type": [
-                        "string"
-                    ]
+                    "description": "service Load Balancer IP https://kubernetes.io/docs/concepts/services-networking/service/#type-loadbalancer",
+                    "type": "string"
                 },
                 "loadBalancerSourceRanges": {
-                    "description": "service Load Balancer sources (e.g. - 10.10.10.0/24) https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/#restrict-access-for-loadbalancer-service",
                     "title": "service.loadBalancerSourceRanges",
-                    "type": [
-                        "array"
-                    ]
+                    "description": "service Load Balancer sources (e.g. - 10.10.10.0/24) https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/#restrict-access-for-loadbalancer-service",
+                    "type": "array"
                 },
                 "nodePorts": {
+                    "title": "service.nodePorts",
                     "description": "Node ports to expose",
+                    "type": "object",
                     "properties": {
                         "http": {
-                            "description": "Node port for HTTP",
                             "title": "service.nodePorts.http",
+                            "description": "Node port for HTTP",
                             "type": [
                                 "number",
                                 "string"
                             ]
                         },
                         "https": {
-                            "description": "Node port for HTTPS",
                             "title": "service.nodePorts.https",
+                            "description": "Node port for HTTPS",
                             "type": [
                                 "number",
                                 "string"
                             ]
                         }
-                    },
-                    "title": "service.nodePorts",
-                    "type": [
-                        "object"
-                    ]
+                    }
                 },
                 "ports": {
+                    "title": "service.ports",
                     "description": "service ports",
-                    "properties": {
-                        "http": {
-                            "default": 80,
-                            "description": "service hhtp port",
-                            "title": "service.ports.http",
-                            "type": [
-                                "number",
-                                "string"
-                            ]
-                        },
-                        "https": {
-                            "description": "service https port",
-                            "title": "service.ports.https",
-                            "type": [
-                                "number",
-                                "string"
-                            ]
-                        }
-                    },
+                    "type": "object",
                     "required": [
                         "http"
                     ],
-                    "title": "service.ports",
-                    "type": [
-                        "object"
-                    ]
+                    "properties": {
+                        "http": {
+                            "title": "service.ports.http",
+                            "description": "service hhtp port",
+                            "default": 80,
+                            "type": [
+                                "number",
+                                "string"
+                            ]
+                        },
+                        "https": {
+                            "title": "service.ports.https",
+                            "description": "service https port",
+                            "type": [
+                                "number",
+                                "string"
+                            ]
+                        }
+                    }
                 },
                 "protocol": {
-                    "default": "TCP",
+                    "title": "service.protocol",
                     "description": "Protocol for service https://kubernetes.io/docs/reference/networking/service-protocols/",
+                    "default": "TCP",
+                    "type": "string",
                     "enum": [
                         "TCP",
                         "SCTP",
                         "UDP"
-                    ],
-                    "title": "service.protocol",
-                    "type": "string"
+                    ]
                 },
                 "sessionAffinity": {
+                    "title": "service.sessionAffinity",
                     "description": "Control where client requests go, to the same pod or round-robin https://jamesdefabia.github.io/docs/user-guide/services/",
+                    "type": "string",
                     "enum": [
                         "ClientIP",
                         "None",
                         ""
-                    ],
-                    "title": "service.sessionAffinity",
-                    "type": "string"
-                },
-                "sessionAffinityConfig": {
-                    "description": "Additional settings for the sessionAffinity. https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#sessionaffinityconfig-v1-core",
-                    "properties": {},
-                    "title": "service.sessionAffinityConfig",
-                    "type": [
-                        "object"
                     ]
                 },
+                "sessionAffinityConfig": {
+                    "title": "service.sessionAffinityConfig",
+                    "description": "Additional settings for the sessionAffinity. https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#sessionaffinityconfig-v1-core",
+                    "type": "object"
+                },
                 "type": {
-                    "default": "ClusterIP",
+                    "title": "service.type",
                     "description": "Service type",
+                    "default": "ClusterIP",
+                    "type": "string",
                     "enum": [
                         "NodePort",
                         "ClusterIP",
                         "LoadBalancer",
                         "ExternalName"
-                    ],
-                    "title": "service.type",
-                    "type": "string"
+                    ]
                 }
-            },
-            "required": [
-                "protocol",
-                "ports"
-            ],
-            "title": "service",
-            "type": "object"
+            }
         },
         "serviceAccount": {
+            "title": "serviceAccount",
             "description": "ServiceAccount configuration",
+            "type": "object",
+            "required": [
+                "create"
+            ],
             "properties": {
                 "annotations": {
-                    "description": "Additional Service Account annotations",
-                    "properties": {},
                     "title": "serviceAccount.annotations",
+                    "description": "Additional Service Account annotations",
                     "type": [
                         "object",
                         "null"
                     ]
                 },
                 "create": {
-                    "description": "Specifies whether a ServiceAccount should be created",
                     "title": "serviceAccount.create",
-                    "type": [
-                        "boolean"
-                    ]
+                    "description": "Specifies whether a ServiceAccount should be created",
+                    "type": "boolean"
                 },
                 "name": {
-                    "description": "The name of the ServiceAccount to use.",
                     "title": "serviceAccount.name",
+                    "description": "The name of the ServiceAccount to use.",
                     "type": [
                         "string",
                         "null"
                     ]
                 }
-            },
-            "required": [
-                "create"
-            ],
-            "title": "serviceAccount",
-            "type": [
-                "object"
-            ]
+            }
         },
         "volumePermissions": {
-            "properties": {
-                "enabled": {
-                    "description": "Is \"shared\" initContainers defined. Will be included if volumePermissions.enabled \u0026\u0026 persistence.enabled",
-                    "title": "volumePermissions.enabled",
-                    "type": [
-                        "boolean"
-                    ]
-                }
-            },
+            "title": "volumePermissions",
+            "type": "object",
             "required": [
                 "enabled"
             ],
-            "title": "volumePermissions",
-            "type": [
-                "object"
-            ]
+            "properties": {
+                "enabled": {
+                    "title": "volumePermissions.enabled",
+                    "description": "Is \"shared\" initContainers defined. Will be included if volumePermissions.enabled \u0026\u0026 persistence.enabled",
+                    "type": "boolean"
+                }
+            }
         }
-    },
-    "required": [
-        "commonLabels",
-        "commonAnnotations",
-        "volumePermissions",
-        "persistence",
-        "diagnosticMode",
-        "configValues",
-        "serviceAccount"
-    ],
-    "type": "object"
+    }
 }

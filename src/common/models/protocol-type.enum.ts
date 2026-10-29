@@ -13,6 +13,7 @@ export const ProtocolType = {
   TERRAIN_QMESH: 'TERRAIN_QMESH',
 } as const;
 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export type ProtocolType = (typeof ProtocolType)[keyof typeof ProtocolType];
 
 /** Protocols of imagery (raster) layers that Cesium can consume: a subset of `ProtocolType`. */

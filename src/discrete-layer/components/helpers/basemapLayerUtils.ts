@@ -48,6 +48,10 @@ export const buildRasterLayerFromBasemapLayer = (
     return undefined;
   }
 
+  if (source.type === 'UNRESOLVED_CATALOG_RESOURCE') {
+    throw new Error('Unhandled unresolved catalog resource');
+  }
+
   const record = source.layer;
   const link = getLayerLink(record);
   if (link === undefined) {

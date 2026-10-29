@@ -10,16 +10,19 @@ import {
   StackHeaderProps,
   StackScreenProps,
 } from '../../../common/navigation/react-navigation.proxy';
+import { Breadcrumb } from '../../../common/components/breadcrumb/breadcrumb';
 import { BasemapsListPanel } from './basemaps-list.panel';
 import { PickLayerPanel } from './pick-layer.panel';
 
 import './basemaps-router.css';
-import { BasemapActionSelector } from './XXXbasemapMockXXX';
+import { SourceTypeInput } from './XXXbasemapMockXXX';
 
 type BasemapsStackPanel = {
   BasemapsList: undefined;
   EditBasemap: undefined;
-  AddLayer: { actionSelector: BasemapActionSelector };
+  AddLayer: {
+    actionSelector: SourceTypeInput;
+  };
 };
 
 type BasemapsRouteName = keyof BasemapsStackPanel;
@@ -30,34 +33,27 @@ const PANELS_IDS: Record<BasemapsRouteName, string> = {
   AddLayer: 'basemaps.panels.add-layer',
 };
 
-const XXXBasemapsHeaderMOCKXXX: React.FC<StackHeaderProps> = ({ route, navigation }) => {
+const BasemapsBreadcrumb: React.FC<StackHeaderProps> = ({ route, navigation }) => {
   const intl = useIntl();
   const { routes } = navigation.getState();
   const trail = routes.slice(0, routes.findIndex(({ key }) => key === route.key) + 1);
+  const getLabel = (name: BasemapsRouteName): string =>
+    intl.formatMessage({ id: PANELS_IDS[name] });
 
   return (
     <Box className="basemapsHeader">
-      <nav className="basemapsBreadcrumb">
-        {trail.map(({ key, name }, index) => {
-          const label = intl.formatMessage({ id: PANELS_IDS[name as BasemapsRouteName] });
-          return (
-            <React.Fragment key={key}>
-              {index > 0 && <span className="basemapsBreadcrumbSeparator">/</span>}
-              {index < trail.length - 1 ? (
-                <button
-                  type="button"
-                  className="basemapsBreadcrumbLink"
-                  onClick={(): void => navigation.popTo(name)}
-                >
-                  {label}
-                </button>
-              ) : (
-                <span aria-current="page">{label}</span>
-              )}
-            </React.Fragment>
-          );
-        })}
-      </nav>
+      <Breadcrumb
+        items={trail.map(({ key, name }) => ({
+          key,
+          label: getLabel(name as BasemapsRouteName),
+        }))}
+        onCrumbClick={(key): void => {
+          const target = trail.find((item) => item.key === key);
+          if (target) {
+            navigation.popTo(target.name);
+          }
+        }}
+      />
     </Box>
   );
 };
@@ -80,7 +76,7 @@ const BasemapComposer: React.FC<BasemapsPanelProps<'EditBasemap'>> = ({ navigati
         const selectedValue = event.currentTarget.value;
         if (selectedValue !== '') {
           navigation.navigate('AddLayer', {
-            actionSelector: Number(selectedValue) as BasemapActionSelector,
+            actionSelector: selectedValue as SourceTypeInput,
           });
         }
       }}
@@ -88,10 +84,10 @@ const BasemapComposer: React.FC<BasemapsPanelProps<'EditBasemap'>> = ({ navigati
       <MenuItem value="" disabled>
         {intl.formatMessage({ id: PANELS_IDS.AddLayer })}
       </MenuItem>
-      <MenuItem value={BasemapActionSelector.CatalogResource}>
+      <MenuItem value={SourceTypeInput.CATALOG_RESOURCE}>
         {intl.formatMessage({ id: 'basemaps.edit.action-selector.catalog-resource' })}
       </MenuItem>
-      <MenuItem value={BasemapActionSelector.External}>
+      <MenuItem value={SourceTypeInput.EXTERNAL}>
         {intl.formatMessage({ id: 'basemaps.edit.action-selector.external' })}
       </MenuItem>
     </Select>
@@ -128,7 +124,7 @@ export const BasemapsRouter: React.FC = () => {
           <Stack.Navigator
             initialRouteName="BasemapsList"
             screenOptions={{
-              header: (props): React.ReactNode => <XXXBasemapsHeaderMOCKXXX {...props} />,
+              header: (props): React.ReactNode => <BasemapsBreadcrumb {...props} />,
             }}
           >
             <Stack.Screen name="BasemapsList" component={BasemapsListPanel} />
