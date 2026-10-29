@@ -200,7 +200,6 @@ export const BasemapsListPanel: React.FC<BasemapsPanelProps<'BasemapsList'>> = o
               onAction={(action, id): void => {
                 switch (action) {
                   case CRUDAction.edit:
-                    basemapsStore.editBasemap(id);
                     navigation.navigate('BasemapComposer', { id });
                     break;
                   case GeneralAction.export:

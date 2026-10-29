@@ -1,11 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { CesiumViewer, ICaptureDimensions } from '@map-colonies/react-components';
-import { blobToDataUrl } from './thumbnail-capture.utils';
 
-interface UseThumbnailCaptureOptions {
+interface UseThumbnailCaptureParams {
   mapViewer: CesiumViewer;
   dimensions: ICaptureDimensions;
-  onCaptured: (dataUrl: string) => void;
+  onCaptured: (blob: Blob) => void;
 }
 
 export interface ThumbnailCaptureState {
@@ -21,7 +20,7 @@ export const useThumbnailCapture = ({
   mapViewer,
   dimensions,
   onCaptured,
-}: UseThumbnailCaptureOptions): ThumbnailCaptureState => {
+}: UseThumbnailCaptureParams): ThumbnailCaptureState => {
   const [isPreviewing, setIsPreviewing] = useState(false);
   const [isCapturing, setIsCapturing] = useState(false);
   const [isPreviewLoading, setIsPreviewLoading] = useState(false);
@@ -51,7 +50,7 @@ export const useThumbnailCapture = ({
     setIsCapturing(true);
     try {
       const blob = await mapViewer.screenshot.capture({ width, height, waitForTiles: true });
-      onCaptured(await blobToDataUrl(blob));
+      onCaptured(blob);
       setIsPreviewing(false);
     } catch (err) {
       console.error(err);

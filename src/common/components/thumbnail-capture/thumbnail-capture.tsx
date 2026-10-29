@@ -3,7 +3,6 @@ import { FormattedMessage } from 'react-intl';
 import { Box, ICaptureDimensions } from '@map-colonies/react-components';
 import { Button, CircularProgress, Typography } from '@map-colonies/react-core';
 import { ThumbnailCaptureState } from './use-thumbnail-capture.hook';
-import { THUMBNAIL_128_DIMENSIONS } from './thumbnail-capture.utils';
 
 import './thumbnail-capture.css';
 
@@ -12,6 +11,8 @@ interface ThumbnailCaptureProps {
   capture: ThumbnailCaptureState;
   dimensions?: Readonly<ICaptureDimensions>;
 }
+
+export const THUMBNAIL_128_DIMENSIONS: Readonly<ICaptureDimensions> = { width: 128, height: 128 };
 
 export const ThumbnailCapture: React.FC<ThumbnailCaptureProps> = ({
   thumbnailUrl,

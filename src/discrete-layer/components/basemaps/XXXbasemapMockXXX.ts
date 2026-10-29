@@ -86,7 +86,7 @@ export type BasemapOutput = {
   id: string;
   name: string;
   thumbnail: {
-    url: string | undefined;
+    url: string;
     width: 128;
     height: 128;
   };
@@ -899,7 +899,7 @@ export const mockBasemaps: BasemapOutput[] = [
     id: 'basemap-01',
     name: 'OpenStreetMap',
     thumbnail: {
-      url: undefined, // 'https://placehold.co/128x128?text=OSM',
+      url: '', // 'https://placehold.co/128x128?text=OSM',
       width: 128,
       height: 128,
     },
