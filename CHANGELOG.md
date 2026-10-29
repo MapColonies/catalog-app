@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [6.9.0](https://github.com/MapColonies/catalog-app/compare/v6.8.0...v6.9.0) (2026-10-29)
+
+
+### Features
+
+* add basemaps list panel (MAPCO-11749) ([#1058](https://github.com/MapColonies/catalog-app/issues/1058)) ([e91440d](https://github.com/MapColonies/catalog-app/commit/e91440d23a81e807a874bc983ae57cef4d22b87c))
+* add catalog picker (MAPCO-11752 picker part) ([#1052](https://github.com/MapColonies/catalog-app/issues/1052)) ([704090e](https://github.com/MapColonies/catalog-app/commit/704090e8c690e06528375dc584c9fe4362752c5e))
+* add react-navigation (MAPCO-11773) ([#1049](https://github.com/MapColonies/catalog-app/issues/1049)) ([6b06e0d](https://github.com/MapColonies/catalog-app/commit/6b06e0d54b46a1fca5511cb1d36e2bc2242dd60e))
+* breadcrumb (MAPCO-11773) ([#1062](https://github.com/MapColonies/catalog-app/issues/1062)) ([8a70203](https://github.com/MapColonies/catalog-app/commit/8a702034ca88105666fa1893dcce4b87d5352738))
+* copc 3d catalog integration ([#1056](https://github.com/MapColonies/catalog-app/issues/1056)) ([8eca5e4](https://github.com/MapColonies/catalog-app/commit/8eca5e48d40ba625c06f62f8c22696edf0b76f2b))
+* layer options schemas and monaco editor ( MAPCO-11750 ) ([#1066](https://github.com/MapColonies/catalog-app/issues/1066)) ([cef4c65](https://github.com/MapColonies/catalog-app/commit/cef4c6599a6591e7f8c56e09f4012337f59f4594))
+* links management (MAPCO-11627) ([#1053](https://github.com/MapColonies/catalog-app/issues/1053)) ([fbcea8e](https://github.com/MapColonies/catalog-app/commit/fbcea8ecb1256244b8983ed60192f24381ba9fa5))
+
+
+### Bug Fixes
+
+* add basemaps tab (MAPCO-11747, MAPCO-11807) ([#1051](https://github.com/MapColonies/catalog-app/issues/1051)) ([d063fd8](https://github.com/MapColonies/catalog-app/commit/d063fd86a9c1b4d0a9cbcd8e3139ff5ed867c5a8))
+* cleanup app config layer ([#1061](https://github.com/MapColonies/catalog-app/issues/1061)) ([65e43a1](https://github.com/MapColonies/catalog-app/commit/65e43a12eb2fce7b3d8a03961f39b8f32aaa8b2a))
+* copc s3 and wasm loading ([#1059](https://github.com/MapColonies/catalog-app/issues/1059)) ([90f5356](https://github.com/MapColonies/catalog-app/commit/90f5356dae7c242de3c2bf995ca1068d60d3d1b9))
+* eslint ([#1063](https://github.com/MapColonies/catalog-app/issues/1063)) ([bd74a65](https://github.com/MapColonies/catalog-app/commit/bd74a65e52e0d6fd4d0bedbe7671f1a36d51bfc6))
+* move cesium globe baseColor configuration to shared-components (MAPCO-11965) ([#1054](https://github.com/MapColonies/catalog-app/issues/1054)) ([74585a7](https://github.com/MapColonies/catalog-app/commit/74585a7d003c51d03c5f08b48c6b7c86b09ce4f5))
+* support mclabels ([#1065](https://github.com/MapColonies/catalog-app/issues/1065)) ([4c4646e](https://github.com/MapColonies/catalog-app/commit/4c4646e728cd48aefb324fdd7706586b1c52ee4c))
+* use new protocolType and linkType enums ([#1060](https://github.com/MapColonies/catalog-app/issues/1060)) ([d51e371](https://github.com/MapColonies/catalog-app/commit/d51e3712663b48843853be07464c280fbd0f573d))
+
 ## [6.8.0](https://github.com/MapColonies/catalog-app/compare/v6.7.1...v6.8.0) (2026-09-14)
 
 
