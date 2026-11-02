@@ -27,7 +27,6 @@ export const basemapsManagementStore = ModelBase
     basemaps: types.maybe(types.frozen<BasemapOutput[]>([])),
     capabilities: types.optional(types.frozen<CapabilityModelType[]>(), []),
     shownBasemapId: types.maybe(types.string),
-    editedBasemap: types.maybe(types.frozen<BasemapOutput>()),
     draftBasemap: types.maybe(types.frozen<BasemapOutput>()),
   })
   .views((self) => ({
@@ -57,7 +56,11 @@ export const basemapsManagementStore = ModelBase
           const result: BasemapOutput[] = yield Promise.resolve(mockBasemaps);
           const layers = result.flatMap((basemap) =>
             basemap.layers.flatMap(({ source }) =>
-              source.type === 'RESOLVED_CATALOG_RESOURCE' ? [source.layer] : []
+              source.type === SourceType.CATALOG_RESOURCE &&
+              source.status === Status.RESOLVED &&
+              source.layer !== null
+                ? [source.layer]
+                : []
             )
           );
           const capabilities: CapabilityModelType[] =
@@ -76,14 +79,6 @@ export const basemapsManagementStore = ModelBase
       self.shownBasemapId = self.shownBasemapId === id ? undefined : id;
     };
 
-    const editBasemap = (id: string): void => {
-      const basemap = self.basemaps?.find((item) => item.id === id);
-
-      if (basemap) {
-        self.editedBasemap = {...basemap};
-      }
-    };
-
     const exportBasemap = (id: string): void => {
       console.log(`EXPORT basemap ${id}`);
     };
@@ -92,7 +87,12 @@ export const basemapsManagementStore = ModelBase
       console.log(`MAKE DEFAULT basemap ${id}`);
     };
 
-    const startDraft = (basemap?: BasemapOutput): void => {
+    const startDraft = (id?: string): void => {
+      const basemap = id === undefined ? undefined : self.basemaps?.find((item) => item.id === id);
+      if (id !== undefined && basemap === undefined) {
+        throw new Error(`Cannot start draft: basemap ${id} was not found`);
+      }
+      
       self.draftBasemap = cloneDeep(basemap) ?? {
         id: uuidv4(),
         name: '',
@@ -147,19 +147,17 @@ export const basemapsManagementStore = ModelBase
       setDraftLayers((self.draftBasemap?.layers ?? []).filter((layer) => layer.id !== layerId));
     };
 
-    // `fromIndex` / `toIndex` are positions in the top-first (descending `order`) list.
+    // `fromIndex` / `toIndex` are positions in the ascending `order` list.
     const moveDraftLayer = (fromIndex: number, toIndex: number): void => {
-      const topFirst = [...(self.draftBasemap?.layers ?? [])].sort(
-        (curr, next) => next.order - curr.order
+      const orderedLayers = [...(self.draftBasemap?.layers ?? [])].sort(
+        (curr, next) => curr.order - next.order
       );
-      const [moved] = topFirst.splice(fromIndex, 1);
+      const [moved] = orderedLayers.splice(fromIndex, 1);
       if (moved === undefined) {
         return;
       }
-      topFirst.splice(toIndex, 0, moved);
-      setDraftLayers(
-        topFirst.map((layer, index) => ({ ...layer, order: topFirst.length - 1 - index }))
-      );
+      orderedLayers.splice(toIndex, 0, moved);
+      setDraftLayers(orderedLayers.map((layer, index) => ({ ...layer, order: index })));
     };
 
     const addDraftLayers: (layers: LayerMetadataMixedUnion[]) => Promise<void> = flow(
@@ -195,8 +193,20 @@ export const basemapsManagementStore = ModelBase
     );
 
     // TODO: MOCK should be replaced by actual API calls
-    const saveBasemap = (): void => {
-      console.log('SAVE basemap', self.draftBasemap?.id);
+    const saveBasemap = async (thumbnail?: Blob): Promise<void> => {
+      if (!self.draftBasemap) {
+        throw new Error('Cannot save a basemap without a draft');
+      }
+      const input: BasemapInput = {
+        ...self.draftBasemap,
+        layers: self.draftBasemap.layers.map(toBasemapLayerInput),
+      };
+      if (thumbnail !== undefined) {
+        // TODO: Should be actual returned url.
+        const url = 'https://placehold.co/128x128?text=OSM'; // await mockUploadBasemapThumbnail(thumbnail);
+        input.thumbnail = { ...input.thumbnail, url };
+      }
+      console.log('SAVE basemap', input);
     };
 
     const exportDraftBasemap = (): void => {
@@ -216,7 +226,6 @@ export const basemapsManagementStore = ModelBase
       exportDraftBasemap,
       getBasemaps,
       showBasemap,
-      editBasemap,
       exportBasemap,
       makeDefaultBasemap,
     };

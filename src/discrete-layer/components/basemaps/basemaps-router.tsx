@@ -16,12 +16,12 @@ import { PickLayerPanel } from './pick-layer.panel';
 import { BasemapComposer } from './basemap-composer.panel';
 
 import './basemaps-router.css';
-import { SourceTypeInput } from './XXXbasemapMockXXX';
+import { SourceType } from './XXXbasemapMockXXX';
 
 type BasemapsStackPanel = {
   BasemapsList: undefined;
   BasemapComposer: { id?: string };
-  AddLayer: { actionSelector: SourceTypeInput };
+  AddLayer: { actionSelector: SourceType };
 };
 
 type BasemapsRouteName = keyof BasemapsStackPanel;

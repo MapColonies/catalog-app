@@ -10,14 +10,14 @@ import { ILayerImage } from '../../models/layerImage';
 import { RecordType } from '../../models/RecordTypeEnum';
 import { useStore } from '../../models/RootStore';
 import { CatalogPicker } from '../catalog-picker/catalog-picker';
-import { SourceTypeInput } from './XXXbasemapMockXXX';
+import { SourceType } from './XXXbasemapMockXXX';
 
 const LAYER_ROOTS_NAMES: TreeRootName[] = ['catalog', 'bests'];
 
 const CATALOGS_TO_FETCH = [RecordType.RECORD_RASTER];
 
 interface PickLayerPanelProps {
-  actionSelector: SourceTypeInput;
+  actionSelector: SourceType;
   existingLayers?: Record<string, unknown>[];
   onClose: () => void;
 }
@@ -51,7 +51,7 @@ export const PickLayerPanel: React.FC<PickLayerPanelProps> = observer(
 
     return (
       <>
-        {actionSelector === SourceTypeInput.CATALOG_RESOURCE && (
+        {actionSelector === SourceType.CATALOG_RESOURCE && (
           <CatalogPicker
             catalogsToFetch={CATALOGS_TO_FETCH}
             treeRootSections={filteredCatalogRoots}

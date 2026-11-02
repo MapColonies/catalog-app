@@ -27,7 +27,7 @@ import { isRtl } from '../../../common/i18n/helpers';
 import { useStore } from '../../models/RootStore';
 import type { CesiumViewer } from '@map-colonies/react-components';
 import type { BasemapsPanelProps } from './basemaps-router';
-import { BasemapLayerOutput, SourceTypeInput, SourceTypeOutput } from './XXXbasemapMockXXX';
+import { BasemapLayerOutput, SourceType, Status } from './XXXbasemapMockXXX';
 
 import './basemap-composer.panel.css';
 import { useMapViewer } from '../map-container/cesium-map-viewer.bridge';
@@ -40,22 +40,30 @@ interface LayerRow {
   isUnresolved: boolean;
 }
 
-const SOURCE_TYPE_LABEL_IDS: Record<SourceTypeOutput, string> = {
-  [SourceTypeOutput.RESOLVED_CATALOG_RESOURCE]: 'basemap.composer.layers.source.catalog-resolved',
-  [SourceTypeOutput.UNRESOLVED_CATALOG_RESOURCE]:
-    'basemap.composer.layers.source.catalog-unresolved',
-  [SourceTypeOutput.EXTERNAL]: 'basemap.composer.layers.source.external',
+const SOURCE_TYPE_LABEL_IDS = {
+  catalogResolved: 'basemap.composer.layers.source.catalog-resolved',
+  catalogUnresolved: 'basemap.composer.layers.source.catalog-unresolved',
+  external: 'basemap.composer.layers.source.external',
 };
 
 const getLayerName = (layer: BasemapLayerOutput): string => {
-  switch (layer.source.type) {
-    case SourceTypeOutput.RESOLVED_CATALOG_RESOURCE:
-      return layer.source.layer.productName ?? layer.id;
-    case SourceTypeOutput.UNRESOLVED_CATALOG_RESOURCE:
-      return layer.source.uniqueness.productId;
-    default:
-      return layer.source.details.name;
+  const { source } = layer;
+  if (source.type === SourceType.EXTERNAL) {
+    return source.details.name;
   }
+  return source.status === Status.RESOLVED
+    ? source.layer?.productName ?? layer.id
+    : source.uniqueness.productId;
+};
+
+const getSourceTypeLabelId = (layer: BasemapLayerOutput): string => {
+  const { source } = layer;
+  if (source.type === SourceType.EXTERNAL) {
+    return SOURCE_TYPE_LABEL_IDS.external;
+  }
+  return source.status === Status.RESOLVED
+    ? SOURCE_TYPE_LABEL_IDS.catalogResolved
+    : SOURCE_TYPE_LABEL_IDS.catalogUnresolved;
 };
 
 const clampPercent = (value: number): number => Math.min(100, Math.max(0, Math.round(value)));
@@ -118,9 +126,11 @@ export const BasemapComposer: React.FC<BasemapsPanelProps<'BasemapComposer'>> = 
     const rowData: LayerRow[] = orderedLayers.map((layer) => ({
       id: layer.id,
       name: getLayerName(layer),
-      source: intl.formatMessage({ id: SOURCE_TYPE_LABEL_IDS[layer.source.type] }),
+      source: intl.formatMessage({ id: getSourceTypeLabelId(layer) }),
       opacity: Math.round(layer.opacity * 100),
-      isUnresolved: layer.source.type === SourceTypeOutput.UNRESOLVED_CATALOG_RESOURCE,
+      isUnresolved:
+        layer.source.type === SourceType.CATALOG_RESOURCE &&
+        layer.source.status === Status.UNRESOLVED,
     }));
 
     const columnDefs: ColDef<LayerRow>[] = [
@@ -278,7 +288,7 @@ export const BasemapComposer: React.FC<BasemapsPanelProps<'BasemapComposer'>> = 
             const selectedValue = event.currentTarget.value;
             if (selectedValue !== '') {
               navigation.navigate('AddLayer', {
-                actionSelector: selectedValue as SourceTypeInput,
+                actionSelector: selectedValue as SourceType,
               });
             }
           }}
@@ -286,10 +296,10 @@ export const BasemapComposer: React.FC<BasemapsPanelProps<'BasemapComposer'>> = 
           <MenuItem value="" disabled>
             {intl.formatMessage({ id: 'basemap.composer.add-layer' })}
           </MenuItem>
-          <MenuItem value={SourceTypeInput.CATALOG_RESOURCE}>
+          <MenuItem value={SourceType.CATALOG_RESOURCE}>
             {intl.formatMessage({ id: 'basemap.composer.action-selector.catalog-resource' })}
           </MenuItem>
-          <MenuItem value={SourceTypeInput.EXTERNAL}>
+          <MenuItem value={SourceType.EXTERNAL}>
             {intl.formatMessage({ id: 'basemap.composer.action-selector.external' })}
           </MenuItem>
         </Select>
