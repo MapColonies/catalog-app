@@ -812,6 +812,11 @@
   "basemaps.list.actions.make-default": "Make Default",
   "basemaps.edit.action-selector.catalog-resource": "Catalog resource",
   "basemaps.edit.action-selector.external": "External",
+  "basemaps.options.field.url": "URL",
+  "basemaps.options.field.layer": "Layer",
+  "basemaps.options.field.layers": "Layers",
+  "basemaps.options.field.style": "Style",
+  "basemaps.options.field.tileMatrixSetID": "Tile matrix set",
 
   "map.scale.units.meters": "m",
   "map.scale.units.kilometers": "km",

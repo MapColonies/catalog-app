@@ -812,6 +812,11 @@
   "basemaps.list.actions.make-default": "הגדר כברירת מחדל",
   "basemaps.edit.action-selector.catalog-resource": "משאב קטלוג",
   "basemaps.edit.action-selector.external": "חיצוני",
+  "basemaps.options.field.url": "כתובת URL",
+  "basemaps.options.field.layer": "שכבה",
+  "basemaps.options.field.layers": "שכבות",
+  "basemaps.options.field.style": "סגנון",
+  "basemaps.options.field.tileMatrixSetID": "מערך אריחים",
 
   "map.scale.units.meters": "מ'",
   "map.scale.units.kilometers": "קמ'",

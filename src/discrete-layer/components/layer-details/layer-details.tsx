@@ -93,7 +93,7 @@ export const getValuePresentor = (
   intl?: IntlShape
 ): JSX.Element => {
   const { fieldName, lookupTable } = fieldInfo;
-  const fieldTypeName = isUiDescriptor(layerRecord) && get(fieldInfo, 'uiDescriptorFieldType');
+  const fieldTypeName = isUiDescriptor(layerRecord) ? fieldInfo.uiDescriptorFieldType : undefined;
   const basicType = getBasicType(
     fieldName as FieldInfoName,
     layerRecord.__typename,

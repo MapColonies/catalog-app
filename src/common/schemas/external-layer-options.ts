@@ -72,6 +72,12 @@ const fullJsonSchema = (type: ExternalLayerType, policy?: OptionsPolicy): JsonSc
     $refStrategy: 'none',
   }) as JsonSchemaObject;
 
+/** JSON Schema (full mode) of the options of the given link type; the source for form generation. */
+export const getFullOptionsJsonSchema = (
+  type: ExternalLayerType,
+  policy?: OptionsPolicy
+): JsonSchemaObject => fullJsonSchema(type, policy);
+
 /** Names of the mandatory options, derived from the schema (never hand-maintained). */
 export const getMandatoryKeys = (type: ExternalLayerType): string[] =>
   fullJsonSchema(type).required ?? [];
