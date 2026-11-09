@@ -6,10 +6,12 @@ import {
   TileLayer,
   TileWMTS,
   TileXYZ,
+  adaptToOlOptions,
+  LayerOptions,
+  WMTSOptions,
+  XYZOptions,
 } from '@map-colonies/react-components';
-import { getOLSourceOptions } from '../../../discrete-layer/components/helpers/olUtils';
 import { ProtocolType, toProtocol } from '../../models/protocol-type.enum';
-import { LayerOptions, WMTSOptions, XYZOptions } from './layer.config.options-bridging';
 
 interface OlTileLayerParams {
   layerType: LayerType;
@@ -57,9 +59,7 @@ export const OlBaseMap: React.FC<IBaseMaps> = React.memo((props): JSX.Element =>
   return (
     <>
       {baseMap.baseRasterLayers.map((layer) => {
-        const options = getOLSourceOptions(layer.type, {
-          options: layer.options,
-        });
+        const options = adaptToOlOptions(layer.type, layer.options);
 
         if (!options) {
           return null;

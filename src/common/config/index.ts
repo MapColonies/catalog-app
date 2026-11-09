@@ -1,10 +1,4 @@
-import {
-  CesiumGeographicTilingScheme,
-  Proj,
-  IRasterLayer,
-  IBaseMaps,
-  IBaseMap,
-} from '@map-colonies/react-components';
+import { Proj, IRasterLayer, IBaseMaps, IBaseMap } from '@map-colonies/react-components';
 import { ProtocolType } from '../models/protocol-type.enum';
 import { IRasterIngestionFilesStructureConfig } from '../models/raster-ingestion-files-structure';
 
@@ -69,10 +63,7 @@ function enrichBaseMaps(baseMaps: IBaseMaps): IBaseMaps {
             ...rasterLayer,
             options: {
               ...rasterLayer.options,
-              tilingScheme:
-                rasterLayer.type === ProtocolType.WMTS
-                  ? new CesiumGeographicTilingScheme()
-                  : undefined,
+              tilingScheme: rasterLayer.type === ProtocolType.WMTS ? 'geographic' : undefined,
             },
           };
         }),

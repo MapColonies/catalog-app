@@ -1,11 +1,14 @@
 import React from 'react';
-import { TileLayer, TileWMTS, TileXYZ } from '@map-colonies/react-components';
-import { ProtocolType, toProtocol } from '../../../common/models/protocol-type.enum';
 import {
+  TileLayer,
+  TileWMTS,
+  TileXYZ,
+  adaptToOlOptions,
   LayerOptions,
   WMTSOptions,
   XYZOptions,
-} from '../../../common/components/ol-map/layer.config.options-bridging';
+} from '@map-colonies/react-components';
+import { ProtocolType, toProtocol } from '../../../common/models/protocol-type.enum';
 import {
   CapabilityModelType,
   LayerMetadataMixedUnion,
@@ -13,7 +16,6 @@ import {
   LinkModelType,
 } from '../../models';
 import { getLayerLink, getLinkUrlWithToken, getWMTSConfigOptions } from '../helpers/layersUtils';
-import { getOLSourceOptions } from '../helpers/olUtils';
 
 interface OlLayerProps {
   layerRecord: LayerMetadataMixedUnion;
@@ -32,9 +34,7 @@ export const OlLayer: React.FC<OlLayerProps> = React.memo((props) => {
 
   switch (toProtocol(layerLink.protocol)) {
     case ProtocolType.XYZ:
-      options = getOLSourceOptions(ProtocolType.XYZ, {
-        options: { url: layerLink.url },
-      });
+      options = adaptToOlOptions(ProtocolType.XYZ, { url: layerLink.url });
       tileComponent = (
         <TileXYZ options={{ ...(options as XYZOptions), crossOrigin: 'anonymous' }} />
       );
@@ -47,13 +47,9 @@ export const OlLayer: React.FC<OlLayerProps> = React.memo((props) => {
         props.capability
       );
 
-      options = getOLSourceOptions(ProtocolType.WMTS, {
-        options: {
-          ...resolved,
-          url: getLinkUrlWithToken([
-            { ...layerLink, url: resolved.url } as LinkModelType,
-          ]) as string,
-        },
+      options = adaptToOlOptions(ProtocolType.WMTS, {
+        ...resolved,
+        url: getLinkUrlWithToken([{ ...layerLink, url: resolved.url } as LinkModelType]) as string,
       });
       tileComponent = (
         <TileWMTS options={{ ...(options as WMTSOptions), crossOrigin: 'anonymous' }} />
