@@ -1,7 +1,6 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { observer } from 'mobx-react';
 import { isPublished } from '../../../common/helpers/style';
-import { LayerMetadataMixedUnion } from '../../models';
 import {
   TreeRootSection,
   TreeRootName,
@@ -11,14 +10,14 @@ import { ILayerImage } from '../../models/layerImage';
 import { RecordType } from '../../models/RecordTypeEnum';
 import { useStore } from '../../models/RootStore';
 import { CatalogPicker } from '../catalog-picker/catalog-picker';
-import { SourceTypeInput } from './XXXbasemapMockXXX';
+import { SourceType } from './XXXbasemapMockXXX';
 
 const LAYER_ROOTS_NAMES: TreeRootName[] = ['catalog', 'bests'];
 
 const CATALOGS_TO_FETCH = [RecordType.RECORD_RASTER];
 
 interface PickLayerPanelProps {
-  actionSelector: SourceTypeInput;
+  actionSelector: SourceType;
   existingLayers?: Record<string, unknown>[];
   onClose: () => void;
 }
@@ -26,7 +25,6 @@ interface PickLayerPanelProps {
 export const PickLayerPanel: React.FC<PickLayerPanelProps> = observer(
   ({ actionSelector, existingLayers, onClose }) => {
     const store = useStore();
-    const [, setSelectedItems] = useState<LayerMetadataMixedUnion[]>([]);
 
     const filteredCatalogRoots: TreeRootSection[] = useMemo(
       () =>
@@ -53,12 +51,12 @@ export const PickLayerPanel: React.FC<PickLayerPanelProps> = observer(
 
     return (
       <>
-        {actionSelector === SourceTypeInput.CATALOG_RESOURCE && (
+        {actionSelector === SourceType.CATALOG_RESOURCE && (
           <CatalogPicker
             catalogsToFetch={CATALOGS_TO_FETCH}
             treeRootSections={filteredCatalogRoots}
             disableLayerPredicate={isLayerDisabled}
-            handleSelection={setSelectedItems}
+            handleSelection={(items): void => void store.basemapsStore.addDraftLayers(items)}
             onClose={onClose}
           />
         )}

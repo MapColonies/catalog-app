@@ -1,0 +1,34 @@
+.basemapComposerPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+  min-height: 0;
+  margin: 12px;
+  overflow-y: auto;
+}
+
+.basemapComposerSectionTitle {
+  font-weight: bold;
+}
+
+.basemapComposerOpenComprehensiveDropdown {
+  width: 100%;
+  /* justify-content: space-between; */
+}
+
+.basemapComposerComprehensiveChangeOpenBody {
+  display: flex;
+  flex-direction: column;
+  padding: 0 8px;
+}
+
+.basemapComposerFooter {
+  display: flex;
+  justify-content: space-between;
+  margin-top: auto;
+}
+
+.basemapComposerPanel .ag-row.basemapLayerUnresolved .ag-cell {
+  color: var(--mdc-theme-error, #d32f2f);
+}

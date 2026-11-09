@@ -170,7 +170,8 @@ export const BasemapsListPanel: React.FC<BasemapsPanelProps<'BasemapsList'>> = o
                 type="button"
                 className="actionButton"
                 outlined
-                onClick={(): void => navigation.navigate('EditBasemap')}
+                // TODO: import is not implemented yet
+                onClick={(): void => undefined}
               >
                 {intl.formatMessage({ id: 'basemaps.list.import' })}
               </Button>
@@ -180,7 +181,7 @@ export const BasemapsListPanel: React.FC<BasemapsPanelProps<'BasemapsList'>> = o
                 type="button"
                 className="actionButton"
                 raised
-                onClick={(): void => navigation.navigate('EditBasemap')}
+                onClick={(): void => navigation.navigate('BasemapComposer', { id: undefined })}
               >
                 {intl.formatMessage({ id: 'basemaps.list.new' })}
               </Button>
@@ -199,8 +200,7 @@ export const BasemapsListPanel: React.FC<BasemapsPanelProps<'BasemapsList'>> = o
               onAction={(action, id): void => {
                 switch (action) {
                   case CRUDAction.edit:
-                    basemapsStore.editBasemap(id);
-                    navigation.navigate('EditBasemap');
+                    navigation.navigate('BasemapComposer', { id });
                     break;
                   case GeneralAction.export:
                     basemapsStore.exportBasemap(id);

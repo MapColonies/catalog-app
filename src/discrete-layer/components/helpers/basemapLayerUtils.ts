@@ -1,18 +1,30 @@
 import { IRasterLayer } from '@map-colonies/react-components';
+import { adaptCapabilityToWmtsOptions } from '@map-colonies/react-components/bridge';
 import { ProtocolType } from '../../../common/models/protocol-type.enum';
 import { LinkType } from '../../../common/models/link-type.enum';
 import { CapabilityModelType, LayerRasterRecordModelType } from '../../models';
-import { BasemapLayerOutput } from '../basemaps/XXXbasemapMockXXX';
-import { generateLayerRectangle, getCesiumWMTSOptions } from './cesiumUtils';
-import { getLayerLink } from './layersUtils';
+import { BasemapLayerOutput, SourceType, Status } from '../basemaps/XXXbasemapMockXXX';
+import { generateLayerRectangle, generateLayerRectangleDeg, getTokenResource } from './cesiumUtils';
+import { getLayerLink, toAdapterCapability } from './layersUtils';
+
+type ResolvedCatalogSource = Extract<
+  BasemapLayerOutput['source'],
+  { type: SourceType.CATALOG_RESOURCE }
+> & { status: Status.RESOLVED; layer: LayerRasterRecordModelType };
+
+export const isResolvedCatalogSource = (
+  source: BasemapLayerOutput['source']
+): source is ResolvedCatalogSource =>
+  source.type === SourceType.CATALOG_RESOURCE &&
+  source.status === Status.RESOLVED &&
+  source.layer !== null;
 
 export const buildRasterLayerFromBasemapLayer = (
-  basemapLayer: BasemapLayerOutput,
-  capability?: CapabilityModelType
+  basemapLayer: BasemapLayerOutput
 ): IRasterLayer | undefined => {
   const { id, order, opacity, shouldBeUsedInModelDraping, source } = basemapLayer;
 
-  if (source.type === 'EXTERNAL') {
+  if (source.type === SourceType.EXTERNAL) {
     const { protocol, url, ...rest } = source.details;
 
     if (protocol === LinkType.XYZ) {
@@ -48,8 +60,13 @@ export const buildRasterLayerFromBasemapLayer = (
     return undefined;
   }
 
-  if (source.type === 'UNRESOLVED_CATALOG_RESOURCE') {
-    throw new Error('Unhandled unresolved catalog resource');
+  if (source.status === Status.UNRESOLVED) {
+    // TODO: Should handle unresolved catalog layer
+    return;
+  }
+
+  if (source.layer === null) {
+    return undefined;
   }
 
   const record = source.layer;
@@ -59,6 +76,10 @@ export const buildRasterLayerFromBasemapLayer = (
   }
 
   if (link.protocol === LinkType.WMTS) {
+    const options = adaptCapabilityToWmtsOptions(
+      toAdapterCapability(source.capabilities as CapabilityModelType)
+    );
+
     return {
       id,
       type: ProtocolType.WMTS,
@@ -67,8 +88,10 @@ export const buildRasterLayerFromBasemapLayer = (
       show: true,
       shouldBeUsedInModelDraping,
       options: {
-        ...getCesiumWMTSOptions(record, link.url as string, capability),
-        rectangle: generateLayerRectangle(record as LayerRasterRecordModelType),
+        ...options,
+        url: getTokenResource(options.url).url,
+        tilingScheme: 'geographic',
+        rectangle: generateLayerRectangleDeg(record),
       },
     };
   }
