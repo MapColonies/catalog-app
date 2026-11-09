@@ -1,10 +1,11 @@
 import { IRasterLayer } from '@map-colonies/react-components';
+import { adaptCapabilityToWmtsOptions } from '@map-colonies/react-components/bridge';
 import { ProtocolType } from '../../../common/models/protocol-type.enum';
 import { LinkType } from '../../../common/models/link-type.enum';
 import { CapabilityModelType, LayerRasterRecordModelType } from '../../models';
 import { BasemapLayerOutput, SourceType, Status } from '../basemaps/XXXbasemapMockXXX';
-import { generateLayerRectangle, getCesiumWMTSOptions } from './cesiumUtils';
-import { getLayerLink } from './layersUtils';
+import { generateLayerRectangle, generateLayerRectangleDeg, getTokenResource } from './cesiumUtils';
+import { getLayerLink, toAdapterCapability } from './layersUtils';
 
 type ResolvedCatalogSource = Extract<
   BasemapLayerOutput['source'],
@@ -19,8 +20,7 @@ export const isResolvedCatalogSource = (
   source.layer !== null;
 
 export const buildRasterLayerFromBasemapLayer = (
-  basemapLayer: BasemapLayerOutput,
-  capability?: CapabilityModelType
+  basemapLayer: BasemapLayerOutput
 ): IRasterLayer | undefined => {
   const { id, order, opacity, shouldBeUsedInModelDraping, source } = basemapLayer;
 
@@ -76,6 +76,10 @@ export const buildRasterLayerFromBasemapLayer = (
   }
 
   if (link.protocol === LinkType.WMTS) {
+    const options = adaptCapabilityToWmtsOptions(
+      toAdapterCapability(source.capabilities as CapabilityModelType)
+    );
+
     return {
       id,
       type: ProtocolType.WMTS,
@@ -84,8 +88,10 @@ export const buildRasterLayerFromBasemapLayer = (
       show: true,
       shouldBeUsedInModelDraping,
       options: {
-        ...getCesiumWMTSOptions(record, link.url as string, capability),
-        rectangle: generateLayerRectangle(record as LayerRasterRecordModelType),
+        ...options,
+        url: getTokenResource(options.url).url,
+        tilingScheme: 'geographic',
+        rectangle: generateLayerRectangleDeg(record),
       },
     };
   }

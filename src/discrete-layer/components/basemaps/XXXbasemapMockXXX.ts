@@ -890,6 +890,27 @@ export const MOCK_SEARCH_RASTER_RECORD = {
   ],
 } as unknown as LayerRasterRecordModelType;
 
+// Plain-object stand-in for the capabilities returned together with the basemaps (matched to MOCK_SEARCH_RASTER_RECORD)
+export const MOCK_CAPABILITY = {
+  id: 'Cyprus_BACKUP_RESTORE-Orthophoto',
+  style: [{ value: 'default', isDefault: 'true' }],
+  format: ['image/png'],
+  tileMatrixSet: [
+    {
+      tileMatrixSetID: 'WorldCRS84',
+      tileMatrixLabels: Array.from({ length: 21 }, (_, level) => String(level)),
+    },
+  ],
+  url: [
+    {
+      format: 'image/png',
+      resourceType: 'tile',
+      template:
+        'https://tiles-int.mapcolonies.net/api/raster/v1/wmts/Cyprus_BACKUP_RESTORE-Orthophoto/{TileMatrixSet}/{TileMatrix}/{TileCol}/{TileRow}.png',
+    },
+  ],
+} as unknown as CapabilityModelType;
+
 export const mockBasemaps: BasemapOutput[] = [
   {
     id: 'basemap-01',
@@ -930,7 +951,7 @@ export const mockBasemaps: BasemapOutput[] = [
             productId: MOCK_SEARCH_RASTER_RECORD.productId,
             productType: MOCK_SEARCH_RASTER_RECORD.productType,
           },
-          capabilities: null,
+          capabilities: MOCK_CAPABILITY,
           layer: MOCK_SEARCH_RASTER_RECORD,
         },
       },
@@ -977,7 +998,7 @@ export const mockBasemaps: BasemapOutput[] = [
             productId: MOCK_SEARCH_RASTER_RECORD.productId,
             productType: MOCK_SEARCH_RASTER_RECORD.productType,
           },
-          capabilities: null,
+          capabilities: MOCK_CAPABILITY,
           layer: MOCK_SEARCH_RASTER_RECORD,
         },
       },
@@ -1006,7 +1027,7 @@ export const mockBasemaps: BasemapOutput[] = [
             productId: MOCK_SEARCH_RASTER_RECORD.productId,
             productType: MOCK_SEARCH_RASTER_RECORD.productType,
           },
-          capabilities: null,
+          capabilities: MOCK_CAPABILITY,
           layer: MOCK_SEARCH_RASTER_RECORD,
         },
       },
@@ -1190,7 +1211,7 @@ export const mockBasemaps: BasemapOutput[] = [
             productId: MOCK_SEARCH_RASTER_RECORD.productId,
             productType: MOCK_SEARCH_RASTER_RECORD.productType,
           },
-          capabilities: null,
+          capabilities: MOCK_CAPABILITY,
           layer: MOCK_SEARCH_RASTER_RECORD,
         },
       },
@@ -1234,7 +1255,7 @@ export const mockBasemaps: BasemapOutput[] = [
             productId: MOCK_SEARCH_RASTER_RECORD.productId,
             productType: MOCK_SEARCH_RASTER_RECORD.productType,
           },
-          capabilities: null,
+          capabilities: MOCK_CAPABILITY,
           layer: MOCK_SEARCH_RASTER_RECORD,
         },
       },
@@ -1363,7 +1384,7 @@ export const mockBasemaps: BasemapOutput[] = [
             productId: MOCK_SEARCH_RASTER_RECORD.productId,
             productType: MOCK_SEARCH_RASTER_RECORD.productType,
           },
-          capabilities: null,
+          capabilities: MOCK_CAPABILITY,
           layer: MOCK_SEARCH_RASTER_RECORD,
         },
       },
@@ -1379,7 +1400,7 @@ export const mockBasemaps: BasemapOutput[] = [
             productId: MOCK_SEARCH_RASTER_RECORD.productId,
             productType: MOCK_SEARCH_RASTER_RECORD.productType,
           },
-          capabilities: null,
+          capabilities: MOCK_CAPABILITY,
           layer: MOCK_SEARCH_RASTER_RECORD,
         },
       },
@@ -1422,7 +1443,7 @@ export const mockBasemaps: BasemapOutput[] = [
             productId: MOCK_SEARCH_RASTER_RECORD.productId,
             productType: MOCK_SEARCH_RASTER_RECORD.productType,
           },
-          capabilities: null,
+          capabilities: MOCK_CAPABILITY,
           layer: MOCK_SEARCH_RASTER_RECORD,
         },
       },

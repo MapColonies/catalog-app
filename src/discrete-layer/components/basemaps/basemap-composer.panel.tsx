@@ -53,7 +53,7 @@ const getLayerName = (layer: BasemapLayerOutput): string => {
   }
   return source.status === Status.RESOLVED
     ? source.layer?.productName ?? layer.id
-    : source.uniqueness.productId;
+    : source.uniqueness.productId ?? layer.id;
 };
 
 const getSourceTypeLabelId = (layer: BasemapLayerOutput): string => {
@@ -234,6 +234,32 @@ export const BasemapComposer: React.FC<BasemapsPanelProps<'BasemapComposer'>> = 
           }
         />
 
+        <GridComponent gridOptions={gridOptions} rowData={rowData} style={{ width: '100%' }} />
+
+        <Select
+          id="basemap-action-selector"
+          enhanced
+          outlined
+          onChange={(event: React.ChangeEvent<HTMLSelectElement>): void => {
+            const selectedValue = event.currentTarget.value;
+            if (selectedValue !== '') {
+              navigation.navigate('AddLayer', {
+                actionSelector: selectedValue as SourceType,
+              });
+            }
+          }}
+        >
+          <MenuItem value="" disabled>
+            {intl.formatMessage({ id: 'basemap.composer.add-layer' })}
+          </MenuItem>
+          <MenuItem value={SourceType.CATALOG_RESOURCE}>
+            {intl.formatMessage({ id: 'basemap.composer.action-selector.catalog-resource' })}
+          </MenuItem>
+          <MenuItem value={SourceType.EXTERNAL}>
+            {intl.formatMessage({ id: 'basemap.composer.action-selector.external' })}
+          </MenuItem>
+        </Select>
+
         <Typography tag="span" className="basemapComposerSectionTitle">
           {intl.formatMessage({ id: 'basemap.composer.thumbnail.title' })}
         </Typography>
@@ -277,32 +303,6 @@ export const BasemapComposer: React.FC<BasemapsPanelProps<'BasemapComposer'>> = 
             </Box>
           )}
         </Box>
-
-        <GridComponent gridOptions={gridOptions} rowData={rowData} style={{ width: '100%' }} />
-
-        <Select
-          id="basemap-action-selector"
-          enhanced
-          outlined
-          onChange={(event: React.ChangeEvent<HTMLSelectElement>): void => {
-            const selectedValue = event.currentTarget.value;
-            if (selectedValue !== '') {
-              navigation.navigate('AddLayer', {
-                actionSelector: selectedValue as SourceType,
-              });
-            }
-          }}
-        >
-          <MenuItem value="" disabled>
-            {intl.formatMessage({ id: 'basemap.composer.add-layer' })}
-          </MenuItem>
-          <MenuItem value={SourceType.CATALOG_RESOURCE}>
-            {intl.formatMessage({ id: 'basemap.composer.action-selector.catalog-resource' })}
-          </MenuItem>
-          <MenuItem value={SourceType.EXTERNAL}>
-            {intl.formatMessage({ id: 'basemap.composer.action-selector.external' })}
-          </MenuItem>
-        </Select>
 
         <Box className="basemapComposerFooter">
           <Button type="button" outlined onClick={(): void => basemapsStore.exportDraftBasemap()}>

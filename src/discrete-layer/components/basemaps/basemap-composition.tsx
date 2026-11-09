@@ -15,7 +15,6 @@ export const BasemapComposition: React.FC = observer(() => {
   const mapViewer = useCesiumMap();
   const store = useStore();
   const renderedBasemap = useRef<BasemapOutput>();
-  const renderedCapabilities = useRef(store.basemapsStore.capabilities);
   const addedLayerIds = useRef<string[]>([]);
   const isUpdatingMap = useRef(false);
 
@@ -49,7 +48,6 @@ export const BasemapComposition: React.FC = observer(() => {
       previous !== undefined &&
       basemap !== undefined &&
       previous.id === basemap.id &&
-      renderedCapabilities.current === store.basemapsStore.capabilities &&
       isEqual(
         sortBy(
           previous.layers.map(({ order, opacity, ...layer }) => layer),
@@ -86,12 +84,7 @@ export const BasemapComposition: React.FC = observer(() => {
           .slice()
           .sort((curr, next) => curr.order - next.order)
           .forEach((basemapLayer) => {
-            const rasterLayer = buildRasterLayerFromBasemapLayer(
-              basemapLayer,
-              isResolvedCatalogSource(basemapLayer.source)
-                ? store.basemapsStore.getLayerCapability(basemapLayer.source.layer)
-                : undefined
-            );
+            const rasterLayer = buildRasterLayerFromBasemapLayer(basemapLayer);
             if (rasterLayer !== undefined) {
               const layerMetadata = {
                 id: rasterLayer.id,
@@ -114,7 +107,6 @@ export const BasemapComposition: React.FC = observer(() => {
           });
       }
       renderedBasemap.current = basemap;
-      renderedCapabilities.current = store.basemapsStore.capabilities;
     } finally {
       isUpdatingMap.current = false;
     }
@@ -123,7 +115,6 @@ export const BasemapComposition: React.FC = observer(() => {
     store.basemapsStore.shownBasemapId,
     store.basemapsStore.draftBasemap,
     store.basemapsStore.basemaps,
-    store.basemapsStore.capabilities,
   ]);
 
   return null;
