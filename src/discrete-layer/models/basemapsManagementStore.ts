@@ -5,10 +5,12 @@ import { ResponseState } from '../../common/models/response-state.enum';
 import { Domain } from '../../common/models/domain';
 import { ModelBase } from './ModelBase';
 import {
+  BasemapInput,
   BasemapLayerOutput,
   BasemapOutput,
   mockBasemaps,
-  SourceTypeOutput,
+  SourceType,
+  Status,
 } from '../components/basemaps/XXXbasemapMockXXX';
 import { getLayerLink } from '../components/helpers/layersUtils';
 import { CapabilityModelType } from './CapabilityModel';
@@ -16,6 +18,30 @@ import { LayerRasterRecordModelType } from './LayerRasterRecordModel';
 import { LayerMetadataMixedUnion } from './LayerMetadataMixedModelSelector';
 import { RecordType } from './RecordTypeEnum';
 import { IRootStore, RootStoreType } from './RootStore';
+
+const toBasemapLayerInput = (
+  layer: BasemapLayerOutput
+): BasemapInput['layers'][number] => {
+  const { source, ...rest } = layer;
+  if (source.type === SourceType.EXTERNAL) {
+    return {
+      ...rest,
+      source: {
+        type: source.type,
+        details: source.details,
+      },
+    };
+  }
+
+  return {
+    ...rest,
+    source: {
+      type: source.type,
+      domain: source.domain,
+      uniqueness: source.uniqueness,
+    },
+  };
+};
 
 export const basemapsManagementStore = ModelBase
   .props({
@@ -25,7 +51,6 @@ export const basemapsManagementStore = ModelBase
     ),
     // TODO: this should be taken from the global store it shouldn't be here at all!
     basemaps: types.maybe(types.frozen<BasemapOutput[]>([])),
-    capabilities: types.optional(types.frozen<CapabilityModelType[]>(), []),
     shownBasemapId: types.maybe(types.string),
     draftBasemap: types.maybe(types.frozen<BasemapOutput>()),
   })
@@ -42,10 +67,6 @@ export const basemapsManagementStore = ModelBase
     get displayedBasemap(): BasemapOutput | undefined {
       return self.draftBasemap ?? this.shownBasemap;
     },
-    getLayerCapability(layer: LayerRasterRecordModelType): CapabilityModelType | undefined {
-      const layerLink = getLayerLink(layer);
-      return self.capabilities.find((capability) => capability.id === layerLink?.name);
-    },
   }))
   .actions((self) => {
     const getBasemaps: () => Promise<void> = flow(
@@ -54,18 +75,6 @@ export const basemapsManagementStore = ModelBase
           self.state = ResponseState.PENDING;
           // TODO: MOCK should be replaced by actual API call
           const result: BasemapOutput[] = yield Promise.resolve(mockBasemaps);
-          const layers = result.flatMap((basemap) =>
-            basemap.layers.flatMap(({ source }) =>
-              source.type === SourceType.CATALOG_RESOURCE &&
-              source.status === Status.RESOLVED &&
-              source.layer !== null
-                ? [source.layer]
-                : []
-            )
-          );
-          const capabilities: CapabilityModelType[] =
-            yield self.root.catalogTreeStore.fetchLayersCapabilities(layers);
-          self.capabilities = cloneDeep(capabilities);
           self.basemaps = result;
           self.state = ResponseState.DONE;
         } catch (error) {
@@ -168,10 +177,13 @@ export const basemapsManagementStore = ModelBase
         if (rasterLayers.length === 0) {
           return;
         }
+        let capabilities: CapabilityModelType[] = [];
         try {
-          const capabilities: CapabilityModelType[] =
-            yield self.root.catalogTreeStore.fetchLayersCapabilities(rasterLayers);
-          self.capabilities = [...self.capabilities, ...cloneDeep(capabilities)];
+          capabilities = cloneDeep(
+            (yield self.root.catalogTreeStore.fetchLayersCapabilities(
+              rasterLayers
+            )) as CapabilityModelType[]
+          );
         } catch (error) {
           console.error(error);
         }
@@ -182,8 +194,16 @@ export const basemapsManagementStore = ModelBase
           order: topOrder + 1 + index,
           opacity: 1,
           source: {
-            type: SourceTypeOutput.RESOLVED_CATALOG_RESOURCE,
+            type: SourceType.CATALOG_RESOURCE,
             domain: Domain.RASTER,
+            status: Status.RESOLVED,
+            uniqueness: {
+              productId: layer.productId,
+              productType: layer.productType,
+            },
+            capabilities:
+              capabilities.find((capability) => capability.id === getLayerLink(layer)?.name) ??
+              null,
             // plain JSON copy: `frozen` cannot hold MST nodes
             layer: JSON.parse(JSON.stringify(layer)) as LayerRasterRecordModelType,
           },
