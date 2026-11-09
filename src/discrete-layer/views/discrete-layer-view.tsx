@@ -95,7 +95,6 @@ import { FilterField } from '../models/RootStore.base';
 import { UserAction, UserRole } from '../models/userStore';
 import { EntityDeleteRasterDialog } from '../components/layer-details/raster/entity.raster.delete-dialog';
 import { EntityRevertRasterDialog } from '../components/layer-details/raster/entity.raster.revert-dialog';
-import { getInjectedAuth } from '../components/helpers/cesiumUtils';
 import { ActionResolver } from './components/action-resolver.component';
 import AppTitle from './components/app-title/app-title.component';
 import { DetailsPanel } from './components/details-panel.component';
@@ -147,7 +146,6 @@ const getTimeStamp = (): string => new Date().getTime().toString();
 const TABS_WITH_SIDE_DETAILS_PANEL = [TabViews.CATALOG, TabViews.SEARCH_RESULTS];
 
 const DiscreteLayerView: React.FC = observer(() => {
-  const mapAuth = useMemo(() => getInjectedAuth(), []);
   const [isFilterSearchLoading, setIsFilterSearchLoading] = useState(false);
   const [data, setData] = useState<LayerMetadataMixedUnion[] | undefined>();
   const store = useStore();
@@ -1383,7 +1381,6 @@ const DiscreteLayerView: React.FC = observer(() => {
               zoom={CONFIG.MAP.ZOOM}
               sceneMode={CesiumSceneMode.SCENE2D}
               locale={mapSettingsLocale}
-              auth={mapAuth}
               baseMaps={store.discreteLayersStore.baseMaps}
               layerManagerMetaMapping={layerManagerMetaMapping}
               // @ts-ignore
