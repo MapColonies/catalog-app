@@ -41,6 +41,11 @@ export const FormInputTextFieldComponent: React.FC<FormInputTextFieldProps> = ({
   const isCopyable = fieldInfo.isCopyable ?? false;
   const isPreserveNewLine = fieldInfo.rows ?? false;
   const isDataError = fieldInfo.isRequired && !value;
+  // Opt-in (`uiShowError` of the field config): mark the input while the form reports an error for it, once it was left or has a value.
+  const fieldName = `${fieldNamePrefix ?? ''}${fieldInfo.fieldName as string}`;
+  const fieldMeta = fieldInfo.uiShowError === true ? formik?.getFieldMeta(fieldName) : undefined;
+  const isInvalid =
+    !!fieldMeta?.error && (fieldMeta.touched || String(fieldMeta.value ?? '') !== '');
   const [innerValue, handleOnChange] = useDebounceField(
     formik as EntityFormikHandlers,
     value ?? ''
@@ -113,7 +118,10 @@ export const FormInputTextFieldComponent: React.FC<FormInputTextFieldProps> = ({
               fieldInfo.isDisabled === true
             }
             placeholder={placeholder}
-            required={fieldInfo.isRequired === true}
+            // with `uiShowError` the form owns the invalid state; native `required` validation would leave the input marked after it's fixed
+            required={fieldInfo.isRequired === true && fieldMeta === undefined}
+            invalid={isInvalid}
+            autoComplete={fieldInfo.uiAutoComplete}
             {...validationProps}
             {...textAreaProps}
           />

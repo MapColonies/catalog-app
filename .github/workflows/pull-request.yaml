@@ -22,22 +22,13 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v5
-      - uses: actions/cache@v4
-        with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
       - name: Use Node.js 24
         uses: actions/setup-node@v5
         with:
           node-version: 24
-      - name: Install yarn
-        run: |
-          curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
-          echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-          sudo apt-get update
-          sudo apt-get install --no-install-recommends yarn
-      - name: Install dependecies
-        run: yarn
+          cache: 'yarn'
+      - name: Install dependencies
+        run: yarn install
       - name: TypeScript check
         run: yarn tsc --noEmit
       - name: ESLint

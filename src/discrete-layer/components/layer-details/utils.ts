@@ -189,7 +189,8 @@ export const getBasicType = (
 
   // Check if UiDexcriptorField
   if (fieldTypeName) {
-    typeString = fieldTypeName;
+    // The descriptor states its type explicitly, so the field-name heuristics below must not override it (e.g. an editable `url` input)
+    return fieldTypeName;
   } else {
     switch (layerTypeName) {
       case 'LayerDemRecord':
