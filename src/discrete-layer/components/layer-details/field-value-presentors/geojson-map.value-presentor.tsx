@@ -6,6 +6,7 @@ import { validateGeoJSONString } from '../../../../common/utils/geojson.validati
 import { Mode } from '../../../../common/models/mode.enum';
 import { IOLMapBaseMaps, OLMap } from '../../../../common/components/ol-map/ol-map';
 import { useStore } from '../../../models/RootStore';
+import { observer } from 'mobx-react-lite';
 
 interface GeoJsonMapValuePresentorProps {
   mode: Mode;
@@ -14,48 +15,45 @@ interface GeoJsonMapValuePresentorProps {
   fitOptions?: FitOptions | undefined;
 }
 
-export const GeoJsonMapValuePresentorComponent: React.FC<GeoJsonMapValuePresentorProps> = ({
-  mode,
-  jsonValue,
-  style,
-  fitOptions,
-}) => {
-  const [geoJsonValue, setGeoJsonValue] = useState();
-  const store = useStore();
+export const GeoJsonMapValuePresentorComponent: React.FC<GeoJsonMapValuePresentorProps> = observer(
+  ({ mode, jsonValue, style, fitOptions }) => {
+    const [geoJsonValue, setGeoJsonValue] = useState();
+    const store = useStore();
 
-  useEffect(() => {
-    if (jsonValue && validateGeoJSONString(jsonValue).valid) {
-      //Postpone feature generation till OL-viewer present in DOM
-      setTimeout(
-        () => {
-          setGeoJsonValue(JSON.parse(jsonValue as string));
-        },
-        [Mode.VIEW, Mode.EDIT].includes(mode) ? 300 : 0
-      );
-    } else {
-      setGeoJsonValue(undefined);
-    }
-  }, [mode, jsonValue]);
+    useEffect(() => {
+      if (jsonValue && validateGeoJSONString(jsonValue).valid) {
+        //Postpone feature generation till OL-viewer present in DOM
+        setTimeout(
+          () => {
+            setGeoJsonValue(JSON.parse(jsonValue as string));
+          },
+          [Mode.VIEW, Mode.EDIT].includes(mode) ? 300 : 0
+        );
+      } else {
+        setGeoJsonValue(undefined);
+      }
+    }, [mode, jsonValue]);
 
-  return (
-    <Box style={{ ...style, position: 'relative' }}>
-      <OLMap
-        baseMapsConfig={store.discreteLayersStore.baseMaps as unknown as IOLMapBaseMaps}
-        mapLoadingIndicator={false}
-        zoomLevelWidget={null}
-      >
-        {geoJsonValue && (
-          <VectorLayer>
-            <VectorSource>
-              <GeoJSONFeature
-                geometry={geoJsonValue as Geometry}
-                fitOptions={{ ...fitOptions }}
-                fit={true}
-              />
-            </VectorSource>
-          </VectorLayer>
-        )}
-      </OLMap>
-    </Box>
-  );
-};
+    return (
+      <Box style={{ ...style, position: 'relative' }}>
+        <OLMap
+          baseMapsConfig={{ basemaps: store.basemapsStore.basemaps ?? [] }}
+          mapLoadingIndicator={false}
+          zoomLevelWidget={null}
+        >
+          {geoJsonValue && (
+            <VectorLayer>
+              <VectorSource>
+                <GeoJSONFeature
+                  geometry={geoJsonValue as Geometry}
+                  fitOptions={{ ...fitOptions }}
+                  fit={true}
+                />
+              </VectorSource>
+            </VectorLayer>
+          )}
+        </OLMap>
+      </Box>
+    );
+  }
+);

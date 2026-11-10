@@ -3,6 +3,7 @@ import { MapMode2D } from 'cesium';
 import { Geometry, Feature, FeatureCollection, Polygon, Point } from 'geojson';
 import { find, get, isEmpty } from 'lodash';
 import { observer } from 'mobx-react-lite';
+import { toIBaseMaps } from '../components/helpers/basemapLayerUtils';
 import React, { useMemo, useState, useEffect, useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import bbox from '@turf/bbox';
@@ -151,6 +152,10 @@ const DiscreteLayerView: React.FC = observer(() => {
   const [isFilterSearchLoading, setIsFilterSearchLoading] = useState(false);
   const [data, setData] = useState<LayerMetadataMixedUnion[] | undefined>();
   const store = useStore();
+  const mapBaseMaps = useMemo(
+    () => toIBaseMaps(store.basemapsStore.basemaps),
+    [store.basemapsStore.basemaps]
+  );
   const theme = useTheme();
   const intl = useIntl();
   const [isDrawing, setIsDrawing] = useState<boolean>(false);
@@ -1384,7 +1389,7 @@ const DiscreteLayerView: React.FC = observer(() => {
               sceneMode={CesiumSceneMode.SCENE2D}
               locale={mapSettingsLocale}
               auth={mapAuth}
-              baseMaps={store.discreteLayersStore.baseMaps}
+              baseMaps={mapBaseMaps}
               layerManagerMetaMapping={layerManagerMetaMapping}
               // @ts-ignore
               imageryContextMenu={<ContextMenuByTab />}
