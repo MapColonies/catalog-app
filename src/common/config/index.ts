@@ -1,5 +1,4 @@
-import { Proj, IRasterLayer, IBaseMaps, IBaseMap } from '@map-colonies/react-components';
-import { ProtocolType } from '../models/protocol-type.enum';
+import { Proj } from '@map-colonies/react-components';
 import { IRasterIngestionFilesStructureConfig } from '../models/raster-ingestion-files-structure';
 
 /*eslint-disable */
@@ -19,7 +18,6 @@ const ACTIVE_LAYER_PROPERTIES = (window as any)._env_.ACTIVE_LAYER_PROPERTIES;
 const MAP = (window as any)._env_.MAP;
 const JOB_MANAGER = (window as any)._env_.JOB_MANAGER;
 const DEFAULT_USER = (window as any)._env_.DEFAULT_USER;
-const BASE_MAPS = JSON.parse((window as any)._env_.BASE_MAPS);
 const DEFAULT_TERRAIN_PROVIDER_URL = (window as any)._env_.DEFAULT_TERRAIN_PROVIDER_URL;
 const WEB_TOOLS_URL = (window as any)._env_.WEB_TOOLS_URL;
 const MODEL_VIEWER_ROUTE = (window as any)._env_.MODEL_VIEWER_ROUTE;
@@ -48,29 +46,6 @@ const POLYGON_PARTS = {
 const WFS = (window as any)._env_.WFS;
 const GEOCODER = (window as any)._env_.GEOCODER;
 const CHANGES_IN_SHAPE_FILES = (window as any)._env_.CHANGES_IN_SHAPE_FILES;
-
-function enrichBaseMaps(baseMaps: IBaseMaps): IBaseMaps {
-  return {
-    maps: baseMaps.maps.map((baseMap: IBaseMap) => {
-      return {
-        ...baseMap,
-        thumbnail:
-          baseMap.thumbnail && ACCESS_TOKEN.injectionType?.toLowerCase() === 'queryparam'
-            ? `${baseMap.thumbnail}?${ACCESS_TOKEN.attributeName}=${ACCESS_TOKEN.tokenValue}`
-            : baseMap.thumbnail,
-        baseRasterLayers: (baseMap.baseRasterLayers as IRasterLayer[]).map((rasterLayer) => {
-          return {
-            ...rasterLayer,
-            options: {
-              ...rasterLayer.options,
-              tilingScheme: rasterLayer.type === ProtocolType.WMTS ? 'geographic' : undefined,
-            },
-          };
-        }),
-      };
-    }),
-  };
-}
 
 const systemJobsPriorityOptions =
   // Priority is an integer
@@ -162,7 +137,6 @@ const APP_CONFIG = {
   DEFAULT_USER: {
     ROLE: DEFAULT_USER.role,
   },
-  BASE_MAPS: enrichBaseMaps(BASE_MAPS),
   DEFAULT_TERRAIN_PROVIDER_URL: DEFAULT_TERRAIN_PROVIDER_URL,
   WEB_TOOLS_URL: WEB_TOOLS_URL,
   MODEL_VIEWER_ROUTE: MODEL_VIEWER_ROUTE,

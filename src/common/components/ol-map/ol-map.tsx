@@ -1,12 +1,13 @@
 import React, { PropsWithChildren, useState } from 'react';
-import { IBaseMaps, Legend, LegendItem, Map, MapProps } from '@map-colonies/react-components';
+import { Legend, LegendItem, Map, MapProps } from '@map-colonies/react-components';
+import { BasemapOutput } from '../../../discrete-layer/components/basemaps/XXXbasemapMockXXX';
 import { OlBaseMap } from './ol.base-map';
 import { MapLoadingIndicator } from './map-loading-indicator';
 import { ToggleBaseMap } from './toggle-base-map';
 import { ZoomLevelIndicator } from './zoom-level-indicator';
 
-export interface IOLMapBaseMaps extends IBaseMaps {
-  // TODO: MAPCO-11365
+export interface IOLMapBaseMaps {
+  basemaps: BasemapOutput[];
   showBaseMap?: boolean;
   showToggleButton?: boolean;
 }
@@ -44,7 +45,7 @@ export const OLMap: React.FC<PropsWithChildren<IOLMapProps>> = ({
   return (
     <Map {...mapProps}>
       {mapLoadingIndicator && <MapLoadingIndicator />}
-      {baseMapsConfig && showBaseMap && <OlBaseMap maps={baseMapsConfig.maps} />}
+      {baseMapsConfig && showBaseMap && <OlBaseMap basemaps={baseMapsConfig.basemaps} />}
       {zoomLevelWidget && (
         <ZoomLevelIndicator
           indicateTillZoomLevel={zoomLevelWidget.indicateTillZoomLevel}

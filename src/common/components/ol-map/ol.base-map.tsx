@@ -1,7 +1,5 @@
 import React from 'react';
 import {
-  IBaseMap,
-  IBaseMaps,
   LayerType,
   TileLayer,
   TileWMTS,
@@ -12,6 +10,8 @@ import {
   XYZOptions,
 } from '@map-colonies/react-components';
 import { ProtocolType, toProtocol } from '../../models/protocol-type.enum';
+import { BasemapOutput } from '../../../discrete-layer/components/basemaps/XXXbasemapMockXXX';
+import { buildRasterLayerFromBasemapLayer } from '../../../discrete-layer/components/helpers/basemapLayerUtils';
 
 interface OlTileLayerParams {
   layerType: LayerType;
@@ -45,35 +45,41 @@ const OlBaseMapLayer: React.FC<OlTileLayerParams> = ({
   return <TileLayer options={layerOptions}>{tileComponent}</TileLayer>;
 };
 
-export const OlBaseMap: React.FC<IBaseMaps> = React.memo((props): JSX.Element => {
-  let baseMap = props.maps.find((map: IBaseMap) => map.isForPreview);
+interface OlBaseMapProps {
+  basemaps: BasemapOutput[];
+}
 
-  if (!baseMap) {
-    baseMap = props.maps.find((map: IBaseMap) => map.isCurrent);
-  }
+export const OlBaseMap: React.FC<OlBaseMapProps> = React.memo(({ basemaps }): JSX.Element => {
+  const basemap =
+    basemaps.find((item) => item.isForPreview) ?? basemaps.find((item) => item.isCurrent);
 
-  if (!baseMap) {
+  if (!basemap) {
     return <></>;
   }
 
   return (
     <>
-      {baseMap.baseRasterLayers.map((layer) => {
-        const options = adaptToOlOptions(layer.type, layer.options);
+      {basemap.layers
+        .slice()
+        .sort((curr, next) => curr.order - next.order)
+        .map((basemapLayer) => {
+          // The only place the basemap layer is converted to the map layer format, right before the OL source is built
+          const layer = buildRasterLayerFromBasemapLayer(basemapLayer);
+          const options = layer && adaptToOlOptions(layer.type, layer.options);
 
-        if (!options) {
-          return null;
-        }
+          if (!layer || !options) {
+            return null;
+          }
 
-        return (
-          <OlBaseMapLayer
-            key={layer.id}
-            layerType={layer.type}
-            sourceOptions={options}
-            layerOptions={{ opacity: layer.opacity }}
-          />
-        );
-      })}
+          return (
+            <OlBaseMapLayer
+              key={layer.id}
+              layerType={layer.type}
+              sourceOptions={options}
+              layerOptions={{ opacity: layer.opacity }}
+            />
+          );
+        })}
     </>
   );
 });

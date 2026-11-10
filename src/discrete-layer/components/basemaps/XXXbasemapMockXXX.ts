@@ -1449,4 +1449,161 @@ export const mockBasemaps: BasemapOutput[] = [
       },
     ],
   },
+  {
+    id: 'basemap-env-1',
+    name: '1st Map',
+    thumbnail: {
+      url: 'https://mt1.google.com/vt/lyrs=s&x=6&y=4&z=3',
+      width: 128,
+      height: 128,
+    },
+    // isCurrent was unset in env-config BASE_MAPS; kept false, another mock basemap is already the current one
+    isCurrent: false,
+    isForPreview: true,
+    layers: [
+      {
+        id: 'GOOGLE_TERRAIN-env-1',
+        order: 0,
+        opacity: 1,
+        source: {
+          type: SourceType.EXTERNAL,
+          status: Status.RESOLVED,
+          details: {
+            protocol: ProtocolType.XYZ,
+            name: 'GOOGLE_TERRAIN',
+            url: 'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
+            credit: 'GOOGLE',
+          },
+        },
+      },
+      {
+        id: 'INFRARED_RASTER-env-1',
+        order: 1,
+        opacity: 0.6,
+        source: {
+          type: SourceType.EXTERNAL,
+          status: Status.RESOLVED,
+          details: {
+            protocol: ProtocolType.WMS,
+            name: 'INFRARED_RASTER',
+            url: 'https://mesonet.agron.iastate.edu/cgi-bin/wms/goes/conus_ir.cgi?',
+            layers: 'goes_conus_ir',
+            credit: 'Infrared data courtesy Iowa Environmental Mesonet',
+            parameters: {
+              transparent: 'true',
+              format: 'image/png',
+            },
+          },
+        },
+      },
+    ],
+  },
+  {
+    id: 'basemap-env-2',
+    name: '2nd Map',
+    thumbnail: {
+      url: 'https://mt1.google.com/vt/lyrs=s&x=6&y=4&z=3',
+      width: 128,
+      height: 128,
+    },
+    // isCurrent was unset in env-config BASE_MAPS; kept false, another mock basemap is already the current one
+    isCurrent: false,
+    isForPreview: false,
+    layers: [
+      {
+        id: 'RADAR_RASTER-env-2',
+        order: 1,
+        opacity: 0.6,
+        source: {
+          type: SourceType.EXTERNAL,
+          status: Status.RESOLVED,
+          details: {
+            protocol: ProtocolType.WMS,
+            name: 'RADAR_RASTER',
+            url: 'https://mesonet.agron.iastate.edu/cgi-bin/wms/nexrad/n0r.cgi?',
+            layers: 'nexrad-n0r',
+            credit: 'Radar data courtesy Iowa Environmental Mesonet',
+            parameters: {
+              transparent: 'true',
+              format: 'image/png',
+            },
+          },
+        },
+      },
+      {
+        id: 'GOOGLE_TERRAIN-env-2',
+        order: 0,
+        opacity: 1,
+        source: {
+          type: SourceType.EXTERNAL,
+          status: Status.RESOLVED,
+          details: {
+            protocol: ProtocolType.XYZ,
+            name: 'GOOGLE_TERRAIN',
+            url: 'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
+            credit: 'GOOGLE',
+          },
+        },
+      },
+      {
+        id: 'VECTOR_TILES_GPS-env-2',
+        order: 2,
+        opacity: 1,
+        source: {
+          type: SourceType.EXTERNAL,
+          status: Status.RESOLVED,
+          details: {
+            protocol: ProtocolType.XYZ,
+            name: 'VECTOR_TILES_GPS',
+            url: 'https://gps.tile.openstreetmap.org/lines/{z}/{x}/{y}.png',
+            credit: 'openstreetmap',
+          },
+        },
+      },
+    ],
+  },
+  {
+    id: 'basemap-env-3',
+    name: '3rd Map',
+    thumbnail: {
+      url: 'https://a.tile.thunderforest.com/cycle/17/78208/53265.png',
+      width: 128,
+      height: 128,
+    },
+    // isCurrent was true in env-config BASE_MAPS; kept false, another mock basemap is already the current one
+    isCurrent: false,
+    isForPreview: false,
+    layers: [
+      {
+        id: 'VECTOR_TILES-env-3',
+        order: 0,
+        opacity: 1,
+        source: {
+          type: SourceType.EXTERNAL,
+          status: Status.RESOLVED,
+          details: {
+            protocol: ProtocolType.XYZ,
+            name: 'VECTOR_TILES',
+            url: 'https://{s}.tile.thunderforest.com/cycle/{z}/{x}/{y}.png?apikey=6170aad10dfd42a38d4d8c709a536f38',
+            credit: 'thunderforest',
+          },
+        },
+      },
+      {
+        id: 'VECTOR_TILES_GPS-env-3',
+        order: 1,
+        opacity: 1,
+        source: {
+          type: SourceType.EXTERNAL,
+          status: Status.RESOLVED,
+          details: {
+            protocol: ProtocolType.XYZ,
+            name: 'VECTOR_TILES_GPS',
+            url: 'https://gps.tile.openstreetmap.org/lines/{z}/{x}/{y}.png',
+            credit: 'openstreetmap',
+          },
+        },
+      },
+    ],
+  },
 ];
