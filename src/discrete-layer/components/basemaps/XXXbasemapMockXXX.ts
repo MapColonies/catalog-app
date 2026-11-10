@@ -2,98 +2,71 @@ import { Domain } from '../../../common/models/domain';
 import { ProtocolType } from '../../../common/models/protocol-type.enum';
 import { LayerRasterRecordModelType, ProductType } from '../../models';
 import { CapabilityModelType } from '../../models/CapabilityModel';
+import { getLayerLink } from '../helpers/layersUtils';
+import {
+  BasemapLayerOutput,
+  BasemapOutput,
+  ResolvedCatalogResourceLayerSourceOutput,
+  SourceType,
+  Status,
+} from './basemap.types';
 
-export enum SourceTypeInput {
-  CATALOG_RESOURCE = 'CATALOG_RESOURCE',
-  EXTERNAL = 'EXTERNAL',
-}
-
-export enum SourceTypeOutput {
-  RESOLVED_CATALOG_RESOURCE = 'RESOLVED_CATALOG_RESOURCE',
-  UNRESOLVED_CATALOG_RESOURCE = 'UNRESOLVED_CATALOG_RESOURCE',
-  EXTERNAL = 'EXTERNAL',
-}
-
-interface RasterUniqueness {
-  productId: string;
-  productType: ProductType;
-}
-
-interface BasemapLayerInput {
-  id: string;
-  order: number;
-  opacity: number;
-  shouldBeUsedInModelDraping?: boolean;
-  source:
-    | {
-        type: SourceTypeInput.CATALOG_RESOURCE;
-        domain: Domain.RASTER; //| Domain.VECTOR;
-        uniqueness: RasterUniqueness; //| VectorUniquness;
-      }
-    | {
-        type: SourceTypeInput.EXTERNAL;
-        details: {
-          protocol: ProtocolType;
-          name: string;
-          url: string;
-          [key: string]: unknown;
-        };
-      };
-}
-
-export interface BasemapInput {
-  id: string;
-  name: string;
-  thumbnail: {
-    url: string;
-    width: 128;
-    height: 128;
-  };
-  isCurrent: boolean;
-  isForPreview: boolean;
-  layers: BasemapLayerInput[];
-}
-
-export type BasemapLayerOutput = {
-  id: string;
-  order: number;
-  opacity: number;
-  shouldBeUsedInModelDraping?: boolean;
-  source:
-    | {
-        type: SourceTypeOutput.RESOLVED_CATALOG_RESOURCE;
-        domain: Domain.RASTER; //| Domain.VECTOR;
-        layer: LayerRasterRecordModelType;
-        capabilities?: CapabilityModelType;
-      }
-    | {
-        type: SourceTypeOutput.UNRESOLVED_CATALOG_RESOURCE;
-        domain: Domain.RASTER; //| Domain.VECTOR;
-        uniqueness: RasterUniqueness; //| VectorUniquness;
-      }
-    | {
-        type: SourceTypeOutput.EXTERNAL;
-        details: {
-          protocol: ProtocolType;
-          name: string;
-          url: string;
-          [key: string]: unknown;
-        };
-      };
+type MockCatalogSource = {
+  type: typeof SourceType.CATALOG_RESOURCE;
+  domain: typeof Domain.RASTER;
+  layer: LayerRasterRecordModelType;
 };
 
-export type BasemapOutput = {
-  id: string;
-  name: string;
-  thumbnail: {
-    url: string;
-    width: 128;
-    height: 128;
-  };
-  isCurrent: boolean;
-  isForPreview: boolean;
-  layers: BasemapLayerOutput[];
+type MockBasemapLayer = Omit<BasemapLayerOutput, 'source'> & {
+  source:
+    | Exclude<BasemapLayerOutput['source'], { type: typeof SourceType.CATALOG_RESOURCE }>
+    | MockCatalogSource;
 };
+
+export type MockBasemap = Omit<BasemapOutput, 'layers'> & { layers: MockBasemapLayer[] };
+
+export const resolveMockBasemaps = (
+  basemaps: MockBasemap[],
+  capabilities: CapabilityModelType[]
+): BasemapOutput[] =>
+  basemaps.map((basemap) => ({
+    ...basemap,
+    layers: basemap.layers.map((layer): BasemapLayerOutput => {
+      const { source } = layer;
+      if (source.type !== SourceType.CATALOG_RESOURCE) {
+        return { ...layer, source };
+      }
+      const uniqueness = {
+        productId: source.layer.productId as string,
+        productType: source.layer.productType as ProductType,
+      };
+      const domain = source.domain as unknown as ResolvedCatalogResourceLayerSourceOutput['domain'];
+      const capability = capabilities.find(({ id }) => id === getLayerLink(source.layer)?.name);
+      return capability
+        ? {
+            ...layer,
+            source: {
+              type: SourceType.CATALOG_RESOURCE,
+              domain,
+              status: Status.RESOLVED,
+              uniqueness,
+              layer: source.layer,
+              capabilities: capability,
+            },
+          }
+        : {
+            ...layer,
+            source: {
+              type: SourceType.CATALOG_RESOURCE,
+              domain,
+              status: Status.UNRESOLVED,
+              uniqueness,
+              layer: null,
+              capabilities: null,
+            },
+          };
+    }),
+  }));
 
 export const MOCK_SEARCH_RASTER_RECORD = {
   __typename: 'LayerRasterRecord',
@@ -894,7 +867,7 @@ export const MOCK_SEARCH_RASTER_RECORD = {
   ],
 } as unknown as LayerRasterRecordModelType;
 
-export const mockBasemaps: BasemapOutput[] = [
+export const mockBasemaps: MockBasemap[] = [
   {
     id: 'basemap-01',
     name: 'OpenStreetMap',
@@ -911,7 +884,8 @@ export const mockBasemaps: BasemapOutput[] = [
         order: 0,
         opacity: 1,
         source: {
-          type: SourceTypeOutput.EXTERNAL,
+          type: SourceType.EXTERNAL,
+          status: Status.RESOLVED,
           details: {
             protocol: ProtocolType.XYZ,
             name: 'OpenStreetMap Standard',
@@ -926,7 +900,7 @@ export const mockBasemaps: BasemapOutput[] = [
         opacity: 1,
         shouldBeUsedInModelDraping: true,
         source: {
-          type: SourceTypeOutput.RESOLVED_CATALOG_RESOURCE,
+          type: SourceType.CATALOG_RESOURCE,
           domain: Domain.RASTER,
           layer: MOCK_SEARCH_RASTER_RECORD,
         },
@@ -950,7 +924,7 @@ export const mockBasemaps: BasemapOutput[] = [
         opacity: 1,
         shouldBeUsedInModelDraping: true,
         source: {
-          type: SourceTypeOutput.RESOLVED_CATALOG_RESOURCE,
+          type: SourceType.CATALOG_RESOURCE,
           domain: Domain.RASTER,
           layer: MOCK_SEARCH_RASTER_RECORD,
         },
@@ -973,7 +947,7 @@ export const mockBasemaps: BasemapOutput[] = [
         order: 0,
         opacity: 1,
         source: {
-          type: SourceTypeOutput.RESOLVED_CATALOG_RESOURCE,
+          type: SourceType.CATALOG_RESOURCE,
           domain: Domain.RASTER,
           layer: MOCK_SEARCH_RASTER_RECORD,
         },
@@ -983,7 +957,8 @@ export const mockBasemaps: BasemapOutput[] = [
         order: 1,
         opacity: 0.9,
         source: {
-          type: SourceTypeOutput.EXTERNAL,
+          type: SourceType.EXTERNAL,
+          status: Status.RESOLVED,
           details: {
             protocol: ProtocolType.XYZ,
             name: 'OpenStreetMap Labels',
@@ -1009,7 +984,8 @@ export const mockBasemaps: BasemapOutput[] = [
         order: 0,
         opacity: 1,
         source: {
-          type: SourceTypeOutput.EXTERNAL,
+          type: SourceType.EXTERNAL,
+          status: Status.RESOLVED,
           details: {
             protocol: ProtocolType.XYZ,
             name: 'OpenTopoMap',
@@ -1036,7 +1012,8 @@ export const mockBasemaps: BasemapOutput[] = [
         order: 0,
         opacity: 1,
         source: {
-          type: SourceTypeOutput.EXTERNAL,
+          type: SourceType.EXTERNAL,
+          status: Status.RESOLVED,
           details: {
             protocol: ProtocolType.XYZ,
             name: 'CartoDB Positron',
@@ -1063,7 +1040,8 @@ export const mockBasemaps: BasemapOutput[] = [
         order: 0,
         opacity: 1,
         source: {
-          type: SourceTypeOutput.EXTERNAL,
+          type: SourceType.EXTERNAL,
+          status: Status.RESOLVED,
           details: {
             protocol: ProtocolType.XYZ,
             name: 'CartoDB Dark Matter',
@@ -1090,7 +1068,8 @@ export const mockBasemaps: BasemapOutput[] = [
         order: 0,
         opacity: 1,
         source: {
-          type: SourceTypeOutput.EXTERNAL,
+          type: SourceType.EXTERNAL,
+          status: Status.RESOLVED,
           details: {
             protocol: ProtocolType.XYZ,
             name: 'Esri World Street Map',
@@ -1118,7 +1097,8 @@ export const mockBasemaps: BasemapOutput[] = [
         opacity: 1,
         shouldBeUsedInModelDraping: true,
         source: {
-          type: SourceTypeOutput.EXTERNAL,
+          type: SourceType.EXTERNAL,
+          status: Status.RESOLVED,
           details: {
             protocol: ProtocolType.XYZ,
             name: 'Esri World Imagery',
@@ -1145,7 +1125,7 @@ export const mockBasemaps: BasemapOutput[] = [
         order: 0,
         opacity: 0.8,
         source: {
-          type: SourceTypeOutput.RESOLVED_CATALOG_RESOURCE,
+          type: SourceType.CATALOG_RESOURCE,
           domain: Domain.RASTER,
           layer: MOCK_SEARCH_RASTER_RECORD,
         },
@@ -1155,7 +1135,8 @@ export const mockBasemaps: BasemapOutput[] = [
         order: 1,
         opacity: 0.65,
         source: {
-          type: SourceTypeOutput.EXTERNAL,
+          type: SourceType.EXTERNAL,
+          status: Status.RESOLVED,
           details: {
             protocol: ProtocolType.XYZ,
             name: 'OpenTopoMap Overlay',
@@ -1182,7 +1163,7 @@ export const mockBasemaps: BasemapOutput[] = [
         opacity: 0.95,
         shouldBeUsedInModelDraping: true,
         source: {
-          type: SourceTypeOutput.RESOLVED_CATALOG_RESOURCE,
+          type: SourceType.CATALOG_RESOURCE,
           domain: Domain.RASTER,
           layer: MOCK_SEARCH_RASTER_RECORD,
         },
@@ -1205,7 +1186,8 @@ export const mockBasemaps: BasemapOutput[] = [
         order: 0,
         opacity: 1,
         source: {
-          type: SourceTypeOutput.EXTERNAL,
+          type: SourceType.EXTERNAL,
+          status: Status.RESOLVED,
           details: {
             protocol: ProtocolType.XYZ,
             name: 'Esri World Imagery',
@@ -1218,7 +1200,8 @@ export const mockBasemaps: BasemapOutput[] = [
         order: 1,
         opacity: 1,
         source: {
-          type: SourceTypeOutput.EXTERNAL,
+          type: SourceType.EXTERNAL,
+          status: Status.RESOLVED,
           details: {
             protocol: ProtocolType.XYZ,
             name: 'Esri Reference Labels',
@@ -1244,7 +1227,8 @@ export const mockBasemaps: BasemapOutput[] = [
         order: 0,
         opacity: 1,
         source: {
-          type: SourceTypeOutput.EXTERNAL,
+          type: SourceType.EXTERNAL,
+          status: Status.RESOLVED,
           details: {
             protocol: ProtocolType.XYZ,
             name: 'Esri National Geographic',
@@ -1270,7 +1254,8 @@ export const mockBasemaps: BasemapOutput[] = [
         order: 0,
         opacity: 0.85,
         source: {
-          type: SourceTypeOutput.EXTERNAL,
+          type: SourceType.EXTERNAL,
+          status: Status.RESOLVED,
           details: {
             protocol: ProtocolType.WMTS,
             name: 'Sample WMTS Layer',
@@ -1301,7 +1286,7 @@ export const mockBasemaps: BasemapOutput[] = [
         opacity: 0.75,
         shouldBeUsedInModelDraping: true,
         source: {
-          type: SourceTypeOutput.RESOLVED_CATALOG_RESOURCE,
+          type: SourceType.CATALOG_RESOURCE,
           domain: Domain.RASTER,
           layer: MOCK_SEARCH_RASTER_RECORD,
         },
@@ -1311,7 +1296,7 @@ export const mockBasemaps: BasemapOutput[] = [
         order: 1,
         opacity: 0.5,
         source: {
-          type: SourceTypeOutput.RESOLVED_CATALOG_RESOURCE,
+          type: SourceType.CATALOG_RESOURCE,
           domain: Domain.RASTER,
           layer: MOCK_SEARCH_RASTER_RECORD,
         },
@@ -1321,7 +1306,8 @@ export const mockBasemaps: BasemapOutput[] = [
         order: 2,
         opacity: 0.9,
         source: {
-          type: SourceTypeOutput.EXTERNAL,
+          type: SourceType.EXTERNAL,
+          status: Status.RESOLVED,
           details: {
             protocol: ProtocolType.XYZ,
             name: 'Street Overlay',
@@ -1347,7 +1333,7 @@ export const mockBasemaps: BasemapOutput[] = [
         order: 0,
         opacity: 0.4,
         source: {
-          type: SourceTypeOutput.RESOLVED_CATALOG_RESOURCE,
+          type: SourceType.CATALOG_RESOURCE,
           domain: Domain.RASTER,
           layer: MOCK_SEARCH_RASTER_RECORD,
         },

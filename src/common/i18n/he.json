@@ -806,6 +806,8 @@
   "basemaps.list.new.tooltip": "צור מפת בסיס",
   "basemaps.list.current-map": "מפה נוכחית",
   "basemaps.list.preview-map": "מפת תצוגה מקדימה",
+  "basemaps.list.unresolved-layers": "שכבות חסרות",
+  "basemaps.list.unresolved-layers.tooltip": "חלק משכבות הקטלוג של מפת הבסיס לא נמצאו בקטלוג או שאין להן יכולות שירות מפה. הן אינן מוצגות ויש לפתור או להסיר אותן לפני השמירה.",
   "basemaps.list.actions.view": "הצג מפת בסיס",
   "basemaps.list.actions.edit": "ערוך מפת בסיס",
   "basemaps.list.actions.export": "ייצוא",

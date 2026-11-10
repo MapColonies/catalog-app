@@ -63,6 +63,14 @@
   background: var(--mdc-theme-gc-priority-normal);
 }
 
+.basemapBadgeWarning {
+  color: var(--mdc-theme-gc-warning-high);
+}
+
+.basemapBadgeWarning::before {
+  background: var(--mdc-theme-gc-warning-high);
+}
+
 .basemapListItemActions {
   display: flex;
   align-items: center;

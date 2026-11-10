@@ -2565,16 +2565,17 @@
     "@commitlint/cli" "^9.1.1"
     "@commitlint/config-conventional" "^9.1.1"
 
-"@map-colonies/types@1.6.0":
-  version "1.6.0"
-  resolved "https://registry.yarnpkg.com/@map-colonies/types/-/types-1.6.0.tgz#46a8c1e57e34b6f4e93afdae4b30125b3c358048"
-  integrity sha512-51bHTX0K5L+vsKTi8KA25ie2OShZzJSM9CG1D/JYe6fO+w8owJCxZOZOZsxDmCCBacBzGpsiAnsCcyW3QQFQag==
+"@map-colonies/types@^1.12.3":
+  version "1.12.3"
+  resolved "https://registry.yarnpkg.com/@map-colonies/types/-/types-1.12.3.tgz#0fee30b657a61195d337e3933e26dcabcf666d67"
+  integrity sha512-SPjkbpxYyYoUbsQX8HWcYBJMqrTMxkLpNr9p75tPiPFjEzXDXHME+2uRPCw7+LKSv5Ja/C3zGjoKXOxjQbm49w==
   dependencies:
     "@types/geojson" "^7946.0.16"
     "@types/mime-types" "^2.1.1"
     copyfiles "^2.4.1"
     epsg-index "^1.3.0"
     ts-morph "^18.0.0"
+    zod "~3.25.76"
 
 "@mapbox/jsonlint-lines-primitives@~2.0.2":
   version "2.0.2"

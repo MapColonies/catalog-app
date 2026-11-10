@@ -806,6 +806,8 @@
   "basemaps.list.new.tooltip": "Create a basemap",
   "basemaps.list.current-map": "Current Map",
   "basemaps.list.preview-map": "Preview Map",
+  "basemaps.list.unresolved-layers": "Missing layers",
+  "basemaps.list.unresolved-layers.tooltip": "Some catalog layers of this basemap were not found in the catalog or have no map service capabilities. They are not displayed and must be resolved or removed before saving.",
   "basemaps.list.actions.view": "View Basemap",
   "basemaps.list.actions.edit": "Edit Basemap",
   "basemaps.list.actions.export": "Export",

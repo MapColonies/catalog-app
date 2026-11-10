@@ -1,11 +1,10 @@
 import { types, getParent, flow } from 'mobx-state-tree';
 import { cloneDeep } from 'lodash';
 import { ResponseState } from '../../common/models/response-state.enum';
-import { ModelBase } from './ModelBase';
-import { BasemapOutput, mockBasemaps } from '../components/basemaps/XXXbasemapMockXXX';
-import { getLayerLink } from '../components/helpers/layersUtils';
+import { BasemapOutput } from '../components/basemaps/basemap.types';
+import { MockBasemap, mockBasemaps, resolveMockBasemaps } from '../components/basemaps/XXXbasemapMockXXX';
 import { CapabilityModelType } from './CapabilityModel';
-import { LayerRasterRecordModelType } from './LayerRasterRecordModel';
+import { ModelBase } from './ModelBase';
 import { IRootStore, RootStoreType } from './RootStore';
 
 export const basemapsManagementStore = ModelBase
@@ -16,7 +15,6 @@ export const basemapsManagementStore = ModelBase
     ),
     // TODO: this should be taken from the global store it shouldn't be here at all!
     basemaps: types.maybe(types.frozen<BasemapOutput[]>([])),
-    capabilities: types.optional(types.frozen<CapabilityModelType[]>(), []),
     shownBasemapId: types.maybe(types.string),
     editedBasemap: types.maybe(types.frozen<BasemapOutput>()),
   })
@@ -30,27 +28,20 @@ export const basemapsManagementStore = ModelBase
     get shownBasemap(): BasemapOutput | undefined {
       return self.basemaps?.find((basemap) => basemap.id === self.shownBasemapId);
     },
-    getLayerCapability(layer: LayerRasterRecordModelType): CapabilityModelType | undefined {
-      const layerLink = getLayerLink(layer);
-      return self.capabilities.find((capability) => capability.id === layerLink?.name);
-    },
   }))
   .actions((self) => {
     const getBasemaps: () => Promise<void> = flow(
       function* getBasemaps() {
         try {
           self.state = ResponseState.PENDING;
-          // TODO: MOCK should be replaced by actual API call
-          const result: BasemapOutput[] = yield Promise.resolve(mockBasemaps);
-          const layers = result.flatMap((basemap) =>
-            basemap.layers.flatMap(({ source }) =>
-              source.type === 'RESOLVED_CATALOG_RESOURCE' ? [source.layer] : []
-            )
+          // TODO: MOCK should be replaced by the basemaps GraphQL query
+          const result: MockBasemap[] = yield Promise.resolve(mockBasemaps);
+          const records = result.flatMap((basemap) =>
+            basemap.layers.flatMap(({ source }) => ('layer' in source ? [source.layer] : []))
           );
           const capabilities: CapabilityModelType[] =
-            yield self.root.catalogTreeStore.fetchLayersCapabilities(layers);
-          self.capabilities = cloneDeep(capabilities);
-          self.basemaps = result;
+            yield self.root.catalogTreeStore.fetchLayersCapabilities(records);
+          self.basemaps = resolveMockBasemaps(result, cloneDeep(capabilities));
           self.state = ResponseState.DONE;
         } catch (error) {
           console.error(error);
@@ -64,7 +55,7 @@ export const basemapsManagementStore = ModelBase
     };
 
     const editBasemap = (id: string): void => {
-      const basemap = self.basemaps?.find(() => id);
+      const basemap = self.basemaps?.find((candidate) => candidate.id === id);
 
       if (basemap) {
         self.editedBasemap = {...basemap};

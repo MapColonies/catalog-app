@@ -11,11 +11,11 @@ import {
   StackScreenProps,
 } from '../../../common/navigation/react-navigation.proxy';
 import { Breadcrumb } from '../../../common/components/breadcrumb/breadcrumb';
+import { SourceTypeInput } from './basemap.types';
 import { BasemapsListPanel } from './basemaps-list.panel';
 import { PickLayerPanel } from './pick-layer.panel';
 
 import './basemaps-router.css';
-import { SourceTypeInput } from './XXXbasemapMockXXX';
 
 type BasemapsStackPanel = {
   BasemapsList: undefined;

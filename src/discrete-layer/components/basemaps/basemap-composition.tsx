@@ -4,6 +4,7 @@ import { ICesiumImageryLayer, useCesiumMap } from '@map-colonies/react-component
 import { useStore } from '../../models/RootStore';
 import { LinkModelType } from '../../models';
 import { buildRasterLayerFromBasemapLayer } from '../helpers/basemapLayerUtils';
+import { SourceType, Status } from './basemap.types';
 import { getLinksArrWithTokens } from '../helpers/layersUtils';
 
 export const BasemapComposition: React.FC = observer(() => {
@@ -20,25 +21,21 @@ export const BasemapComposition: React.FC = observer(() => {
         .slice()
         .sort((curr, next) => curr.order - next.order)
         .forEach((basemapLayer) => {
-          const rasterLayer = buildRasterLayerFromBasemapLayer(
-            basemapLayer,
-            basemapLayer.source.type === 'RESOLVED_CATALOG_RESOURCE'
-              ? store.basemapsStore.getLayerCapability(basemapLayer.source.layer)
-              : undefined
-          );
+          const rasterLayer = buildRasterLayerFromBasemapLayer(basemapLayer);
           if (rasterLayer !== undefined) {
             const layerMetadata = {
               id: rasterLayer.id,
               searchLayerPredicate: (cesiumLayer: ICesiumImageryLayer): boolean =>
                 cesiumLayer.meta?.id === rasterLayer.id,
-              ...(basemapLayer.source.type === 'RESOLVED_CATALOG_RESOURCE' && {
-                layerRecord: {
-                  ...basemapLayer.source.layer,
-                  links: getLinksArrWithTokens([
-                    ...(basemapLayer.source.layer.links as LinkModelType[]),
-                  ]),
-                },
-              }),
+              ...(basemapLayer.source.type === SourceType.CATALOG_RESOURCE &&
+                basemapLayer.source.status === Status.RESOLVED && {
+                  layerRecord: {
+                    ...basemapLayer.source.layer,
+                    links: getLinksArrWithTokens([
+                      ...(basemapLayer.source.layer.links as LinkModelType[]),
+                    ]),
+                  },
+                }),
             };
 
             layerManager?.addRasterLayer(rasterLayer, mapViewer.imageryLayers.length, '');
@@ -51,12 +48,7 @@ export const BasemapComposition: React.FC = observer(() => {
     return (): void => {
       addedLayerIds.forEach((id) => layerManager?.removeLayer(id));
     };
-  }, [
-    mapViewer,
-    store.basemapsStore.shownBasemapId,
-    store.basemapsStore.basemaps,
-    store.basemapsStore.capabilities,
-  ]);
+  }, [mapViewer, store.basemapsStore.shownBasemapId, store.basemapsStore.basemaps]);
 
   return null;
 });

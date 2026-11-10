@@ -30,7 +30,7 @@ import {
   IActionGroup,
 } from '../../../common/actions/entity.actions';
 import { useStore } from '../../models';
-import { BasemapOutput } from './XXXbasemapMockXXX';
+import { BasemapOutput, hasUnresolvedLayers } from './basemap.types';
 
 import './basemaps-list.panel.css';
 
@@ -85,6 +85,15 @@ const BasemapRow: React.FC<BasemapRowProps> = ({
             <ListItemSecondaryText className="basemapBadge basemapBadgePreview">
               {intl.formatMessage({ id: 'basemaps.list.preview-map' })}
             </ListItemSecondaryText>
+          )}
+          {hasUnresolvedLayers(basemap) && (
+            <Tooltip
+              content={intl.formatMessage({ id: 'basemaps.list.unresolved-layers.tooltip' })}
+            >
+              <ListItemSecondaryText className="basemapBadge basemapBadgeWarning">
+                {intl.formatMessage({ id: 'basemaps.list.unresolved-layers' })}
+              </ListItemSecondaryText>
+            </Tooltip>
           )}
         </ListItemText>
         <ListItemMeta className="basemapListItemActions">
