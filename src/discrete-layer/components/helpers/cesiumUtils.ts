@@ -1,13 +1,12 @@
 import bbox from '@turf/bbox';
 import area from '@turf/area';
 import {
-  CesiumGeographicTilingScheme,
   CesiumRectangle,
   CesiumResource,
   InjectedAuth,
   RCesiumWMTSLayerOptions,
-  adaptToCesiumWmtsOptions,
 } from '@map-colonies/react-components';
+import { adaptToCesiumWmtsOptions } from '@map-colonies/react-components/bridge';
 import CONFIG from '../../../common/config';
 import {
   CapabilityModelType,
@@ -23,6 +22,14 @@ export const generateLayerRectangle = (layer: LayerMetadataMixedUnion): CesiumRe
   // eslint-disable-next-line
   return CesiumRectangle.fromDegrees(...bbox(layer.footprint)) as CesiumRectangle;
 };
+
+export const degreesToCesiumRectangle = ({
+  west,
+  south,
+  east,
+  north,
+}: ReturnType<typeof generateLayerRectangleDeg>): CesiumRectangle =>
+  CesiumRectangle.fromDegrees(west, south, east, north);
 
 export const applyFactor = (rect: CesiumRectangle, factor = DEFAULT_RECTANGLE_FACTOR) => {
   rect.east = rect.east + rect.width * factor;

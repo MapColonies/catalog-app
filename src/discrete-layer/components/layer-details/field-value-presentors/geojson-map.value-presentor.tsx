@@ -4,7 +4,7 @@ import { Geometry } from 'geojson';
 import { FitOptions } from 'ol/View';
 import { validateGeoJSONString } from '../../../../common/utils/geojson.validation';
 import { Mode } from '../../../../common/models/mode.enum';
-import { IOLMapBaseMaps, OLMap } from '../../../../common/components/ol-map/ol-map';
+import { OLMap } from '../../../../common/components/ol-map/ol-map';
 import { useStore } from '../../../models/RootStore';
 import { observer } from 'mobx-react-lite';
 

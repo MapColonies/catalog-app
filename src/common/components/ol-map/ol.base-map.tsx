@@ -1,21 +1,19 @@
 import React from 'react';
+import { LayerType, TileLayer, TileWMS, TileWMTS, TileXYZ } from '@map-colonies/react-components';
 import {
-  LayerType,
-  TileLayer,
-  TileWMTS,
-  TileXYZ,
   adaptToOlOptions,
   LayerOptions,
+  WMSOptions,
   WMTSOptions,
   XYZOptions,
-} from '@map-colonies/react-components';
+} from '@map-colonies/react-components/bridge';
 import { ProtocolType, toProtocol } from '../../models/protocol-type.enum';
 import { BasemapOutput } from '../../../discrete-layer/components/basemaps/XXXbasemapMockXXX';
 import { buildRasterLayerFromBasemapLayer } from '../../../discrete-layer/components/helpers/basemapLayerUtils';
 
 interface OlTileLayerParams {
   layerType: LayerType;
-  sourceOptions: WMTSOptions | XYZOptions;
+  sourceOptions: WMTSOptions | XYZOptions | WMSOptions;
   layerOptions?: LayerOptions;
 }
 
@@ -34,11 +32,11 @@ const OlBaseMapLayer: React.FC<OlTileLayerParams> = ({
     case ProtocolType.XYZ:
       tileComponent = <TileXYZ options={tileOptions as XYZOptions} />;
       break;
+    case ProtocolType.WMS:
+      tileComponent = <TileWMS options={tileOptions as WMSOptions} />;
+      break;
     // case ProtocolType.OSM:
     //   tileComponent = <TileOSM options={tileOptions as OSMOptions} />;
-    //   break;
-    // case ProtocolType.WMS:
-    //   tileComponent = <TileWMS options={tileOptions as WMSOptions} />;
     //   break;
   }
 
