@@ -263,7 +263,7 @@ export const userStore = ModelBase
     function changeUserRole(role: UserRole): void {
       self.user = {...self.user, role} as IUser;
 
-      const PRESERVE_STATE_FOR_FIELDS = ['baseMaps', 'entityDescriptors', 'searchParams', 'mapViewerExtentPolygon'];
+      const PRESERVE_STATE_FOR_FIELDS = ['entityDescriptors', 'searchParams', 'mapViewerExtentPolygon'];
       store.discreteLayersStore.resetAppState(PRESERVE_STATE_FOR_FIELDS);
       void store.catalogTreeStore.initTree();
     }

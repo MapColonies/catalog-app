@@ -22,6 +22,7 @@ import { FlyTo } from '../../../../common/components/ol-map/fly-to';
 import { LayerRasterRecordModelType } from '../../../models';
 import { ILayerImage } from '../../../models/layerImage';
 import { useStore } from '../../../models/RootStore';
+import { observer } from 'mobx-react-lite';
 import { GeojsonFeatureInput } from '../../../models/RootStore.base';
 import { OlLayer } from '../../map-container/ol.layer';
 import useZoomLevelsTable from '../../export-layer/hooks/useZoomLevelsTable';
@@ -62,212 +63,210 @@ interface LayerMapProps {
 
 const CHILDREN_WITH_ZOOM_INDICATION = ['PolygonPartsExtentQueryVectorLayer'];
 
-export const OlLayerMap: React.FC<LayerMapProps> = ({
-  layerRecord,
-  showPolygonParts = {
-    value: false,
-    showCheckbox: true,
-  },
-  showLayer = true,
-  showBaseMap = {
-    value: true,
-    showToggleButton: false,
-  },
-  showFeaturePropertiesPopup = false,
-  showLabels = true,
-  style,
-  additionalLegends,
-  children,
-}) => {
-  const store = useStore();
-  const ENUMS = useEnums();
-  const intl = useIntl();
-  const ZOOM_LEVELS_TABLE = useZoomLevelsTable();
-  const [selectedFeature, setSelectedFeature] = useState<Feature | undefined>(undefined);
-  const [showExistingPolygonParts, setShowExistingPolygonParts] = useState<boolean>(
-    showPolygonParts.value
-  );
-  const [childrenWithZoomIndication, setChildrenWithZoomIndication] = useState<boolean>(false);
-  const [isOpenProperties, setIsOpenProperties] = useState<boolean>(true);
-
-  useEffect(() => {
-    const hasZoomIndicationChild = (nodes: React.ReactNode): boolean => {
-      return React.Children.toArray(nodes).some((child) => {
-        if (!React.isValidElement(child)) return false;
-
-        const typeName =
-          typeof child.type === 'string'
-            ? child.type
-            : (child.type as JSXElementConstructor<any>).name;
-
-        if (CHILDREN_WITH_ZOOM_INDICATION.includes(typeName)) {
-          return true;
-        }
-
-        return hasZoomIndicationChild(child.props?.children);
-      });
-    };
-    setChildrenWithZoomIndication(hasZoomIndicationChild(children));
-  }, [children]);
-
-  useEffect(() => {
-    setShowExistingPolygonParts(showPolygonParts.value);
-  }, [showPolygonParts.value]);
-
-  useEffect(() => {
-    if (selectedFeature) {
-      setIsOpenProperties(true);
-    } else {
-      setIsOpenProperties(false);
-    }
-  }, [selectedFeature]);
-
-  const closePropertiesPopup = useCallback((): void => {
-    setIsOpenProperties(false);
-  }, []);
-
-  const LegendsArray = useMemo(() => {
-    return [
-      {
-        title: intl.formatMessage({
-          id: `polygon-parts.map-preview-legend.${FeatureType.EXISTING_PP}`,
-        }) as string,
-        style: PPMapStyles.get(FeatureType.EXISTING_PP)?.style as Style,
-      },
-      ...(additionalLegends ?? []),
-    ];
-  }, [intl]);
-
-  const mapLocale = useMemo(
-    () => ({
-      ZOOM_LABEL: intl.formatMessage({ id: 'map.zoom.label' }),
-      LEGEND_TITLE: intl.formatMessage({ id: 'polygon-parts.map-preview-legend.title' }),
-      BASE_MAP_TOGGLE_ENABLE_LABEL: intl.formatMessage({
-        id: 'polygon-parts.map-preview.without.base-map',
-      }),
-      BASE_MAP_TOGGLE_DISABLE_LABEL: intl.formatMessage({
-        id: 'polygon-parts.map-preview.base-map',
-      }),
-    }),
-    [intl]
-  );
-
-  const queryExecutor = useCallback(
-    async (bbox: BBox, startIndex: number): Promise<IQueryExecutorResponse> => {
-      const result = await store.queryGetPolygonPartsFeature({
-        data: {
-          feature: bboxPolygon(bbox) as GeojsonFeatureInput,
-          typeName: getWFSFeatureTypeName(layerRecord as LayerRasterRecordModelType, ENUMS),
-          count: CONFIG.POLYGON_PARTS.MAX.WFS_FEATURES,
-          startIndex,
-        },
-      });
-      const fetchedFeatures = get(result, 'getPolygonPartsFeature.features', []);
-      const features = (Array.isArray(fetchedFeatures) ? fetchedFeatures : []).map((feature) => ({
-        ...feature,
-        properties: {
-          ...(feature?.properties ?? {}),
-          _featureType: FeatureType.EXISTING_PP,
-          _featureTitle: getText(feature, 4, FEATURE_LABEL_CONFIG.polygons, ZOOM_LEVELS_TABLE),
-        },
-      }));
-      return { features, pageSize: CONFIG.POLYGON_PARTS.MAX.WFS_FEATURES };
+export const OlLayerMap: React.FC<LayerMapProps> = observer(
+  ({
+    layerRecord,
+    showPolygonParts = {
+      value: false,
+      showCheckbox: true,
     },
-    [store, layerRecord, ENUMS, ZOOM_LEVELS_TABLE]
-  );
+    showLayer = true,
+    showBaseMap = {
+      value: true,
+      showToggleButton: false,
+    },
+    showFeaturePropertiesPopup = false,
+    showLabels = true,
+    style,
+    additionalLegends,
+    children,
+  }) => {
+    const store = useStore();
+    const ENUMS = useEnums();
+    const intl = useIntl();
+    const ZOOM_LEVELS_TABLE = useZoomLevelsTable();
+    const [selectedFeature, setSelectedFeature] = useState<Feature | undefined>(undefined);
+    const [showExistingPolygonParts, setShowExistingPolygonParts] = useState<boolean>(
+      showPolygonParts.value
+    );
+    const [childrenWithZoomIndication, setChildrenWithZoomIndication] = useState<boolean>(false);
+    const [isOpenProperties, setIsOpenProperties] = useState<boolean>(true);
 
-  const layerCapability = store.discreteLayersStore.getLayerCapability(layerRecord);
+    useEffect(() => {
+      const hasZoomIndicationChild = (nodes: React.ReactNode): boolean => {
+        return React.Children.toArray(nodes).some((child) => {
+          if (!React.isValidElement(child)) return false;
 
-  const olLayerOptions = useMemo(() => {
-    return {
-      extent: layerRecord.footprint?.bbox,
-      zIndex: START_RASTER_LAYER_ZINDEX,
-    };
-  }, [layerRecord.footprint?.bbox]);
+          const typeName =
+            typeof child.type === 'string'
+              ? child.type
+              : (child.type as JSXElementConstructor<any>).name;
 
-  const footprintFeature = useMemo(() => {
-    return {
-      type: 'Feature',
-      properties: {},
-      geometry: layerRecord.footprint,
-    } as Feature;
-  }, [layerRecord.footprint]);
+          if (CHILDREN_WITH_ZOOM_INDICATION.includes(typeName)) {
+            return true;
+          }
 
-  return (
-    <Box id="geoFeaturesMapContainer" style={{ ...style }}>
-      <OLMap
-        baseMapsConfig={
-          store.discreteLayersStore.baseMaps
-            ? {
-                maps: store.discreteLayersStore.baseMaps.maps,
-                showBaseMap: showBaseMap?.value ?? false,
-                showToggleButton: showBaseMap?.showToggleButton,
-              }
-            : undefined
-        }
-        zoomLevelWidget={{
-          indicateTillZoomLevel:
-            showExistingPolygonParts || childrenWithZoomIndication
-              ? CONFIG.POLYGON_PARTS.MAX.SHOW_FOOTPRINT_ZOOM_LEVEL
-              : undefined,
-        }}
-        legends={LegendsArray}
-        locale={mapLocale}
-      >
-        {showPolygonParts.showCheckbox && (
-          <Box className="checkbox">
-            <Checkbox
-              className="showOnMapContainer"
-              label={intl.formatMessage({ id: 'polygon-parts.show-exisitng-parts-on-map.label' })}
-              checked={showExistingPolygonParts}
-              onClick={(evt: React.MouseEvent<HTMLInputElement>): void => {
-                evt.preventDefault();
-                evt.stopPropagation();
-                const isChecked = evt.currentTarget.checked;
-                setShowExistingPolygonParts(isChecked);
+          return hasZoomIndicationChild(child.props?.children);
+        });
+      };
+      setChildrenWithZoomIndication(hasZoomIndicationChild(children));
+    }, [children]);
+
+    useEffect(() => {
+      setShowExistingPolygonParts(showPolygonParts.value);
+    }, [showPolygonParts.value]);
+
+    useEffect(() => {
+      if (selectedFeature) {
+        setIsOpenProperties(true);
+      } else {
+        setIsOpenProperties(false);
+      }
+    }, [selectedFeature]);
+
+    const closePropertiesPopup = useCallback((): void => {
+      setIsOpenProperties(false);
+    }, []);
+
+    const LegendsArray = useMemo(() => {
+      return [
+        {
+          title: intl.formatMessage({
+            id: `polygon-parts.map-preview-legend.${FeatureType.EXISTING_PP}`,
+          }) as string,
+          style: PPMapStyles.get(FeatureType.EXISTING_PP)?.style as Style,
+        },
+        ...(additionalLegends ?? []),
+      ];
+    }, [intl]);
+
+    const mapLocale = useMemo(
+      () => ({
+        ZOOM_LABEL: intl.formatMessage({ id: 'map.zoom.label' }),
+        LEGEND_TITLE: intl.formatMessage({ id: 'polygon-parts.map-preview-legend.title' }),
+        BASE_MAP_TOGGLE_ENABLE_LABEL: intl.formatMessage({
+          id: 'polygon-parts.map-preview.without.base-map',
+        }),
+        BASE_MAP_TOGGLE_DISABLE_LABEL: intl.formatMessage({
+          id: 'polygon-parts.map-preview.base-map',
+        }),
+      }),
+      [intl]
+    );
+
+    const queryExecutor = useCallback(
+      async (bbox: BBox, startIndex: number): Promise<IQueryExecutorResponse> => {
+        const result = await store.queryGetPolygonPartsFeature({
+          data: {
+            feature: bboxPolygon(bbox) as GeojsonFeatureInput,
+            typeName: getWFSFeatureTypeName(layerRecord as LayerRasterRecordModelType, ENUMS),
+            count: CONFIG.POLYGON_PARTS.MAX.WFS_FEATURES,
+            startIndex,
+          },
+        });
+        const fetchedFeatures = get(result, 'getPolygonPartsFeature.features', []);
+        const features = (Array.isArray(fetchedFeatures) ? fetchedFeatures : []).map((feature) => ({
+          ...feature,
+          properties: {
+            ...(feature?.properties ?? {}),
+            _featureType: FeatureType.EXISTING_PP,
+            _featureTitle: getText(feature, 4, FEATURE_LABEL_CONFIG.polygons, ZOOM_LEVELS_TABLE),
+          },
+        }));
+        return { features, pageSize: CONFIG.POLYGON_PARTS.MAX.WFS_FEATURES };
+      },
+      [store, layerRecord, ENUMS, ZOOM_LEVELS_TABLE]
+    );
+
+    const layerCapability = store.discreteLayersStore.getLayerCapability(layerRecord);
+
+    const olLayerOptions = useMemo(() => {
+      return {
+        extent: layerRecord.footprint?.bbox,
+        zIndex: START_RASTER_LAYER_ZINDEX,
+      };
+    }, [layerRecord.footprint?.bbox]);
+
+    const footprintFeature = useMemo(() => {
+      return {
+        type: 'Feature',
+        properties: {},
+        geometry: layerRecord.footprint,
+      } as Feature;
+    }, [layerRecord.footprint]);
+
+    return (
+      <Box id="geoFeaturesMapContainer" style={{ ...style }}>
+        <OLMap
+          baseMapsConfig={{
+            basemaps: store.basemapsStore.basemaps ?? [],
+            showBaseMap: showBaseMap?.value ?? false,
+            showToggleButton: showBaseMap?.showToggleButton,
+          }}
+          zoomLevelWidget={{
+            indicateTillZoomLevel:
+              showExistingPolygonParts || childrenWithZoomIndication
+                ? CONFIG.POLYGON_PARTS.MAX.SHOW_FOOTPRINT_ZOOM_LEVEL
+                : undefined,
+          }}
+          legends={LegendsArray}
+          locale={mapLocale}
+        >
+          {showPolygonParts.showCheckbox && (
+            <Box className="checkbox">
+              <Checkbox
+                className="showOnMapContainer"
+                label={intl.formatMessage({ id: 'polygon-parts.show-exisitng-parts-on-map.label' })}
+                checked={showExistingPolygonParts}
+                onClick={(evt: React.MouseEvent<HTMLInputElement>): void => {
+                  evt.preventDefault();
+                  evt.stopPropagation();
+                  const isChecked = evt.currentTarget.checked;
+                  setShowExistingPolygonParts(isChecked);
+                }}
+              />
+            </Box>
+          )}
+          {showExistingPolygonParts && (
+            <PolygonPartsExtentQueryVectorLayer
+              featureType={FeatureType.EXISTING_PP}
+              queryExecutor={queryExecutor}
+              showLabels={showLabels}
+              outerPerimeter={layerRecord?.footprint as Geometry | undefined}
+              options={{
+                properties: { id: FeatureType.EXISTING_PP },
+                zIndex: VectorLayerZIndex.EXISTING,
               }}
             />
-          </Box>
-        )}
-        {showExistingPolygonParts && (
-          <PolygonPartsExtentQueryVectorLayer
-            featureType={FeatureType.EXISTING_PP}
-            queryExecutor={queryExecutor}
-            showLabels={showLabels}
-            outerPerimeter={layerRecord?.footprint as Geometry | undefined}
+          )}
+          {children}
+          <MapFeatureClickHandler setSelectedFeature={setSelectedFeature} />
+          <SelectedFeatureVectorLayer
+            feature={selectedFeature}
+            fit={true}
             options={{
-              properties: { id: FeatureType.EXISTING_PP },
-              zIndex: VectorLayerZIndex.EXISTING,
+              properties: { id: 'SELECTED_PP' },
+              zIndex: VectorLayerZIndex.SELECTED,
             }}
           />
-        )}
-        {children}
-        <MapFeatureClickHandler setSelectedFeature={setSelectedFeature} />
-        <SelectedFeatureVectorLayer
-          feature={selectedFeature}
-          fit={true}
-          options={{
-            properties: { id: 'SELECTED_PP' },
-            zIndex: VectorLayerZIndex.SELECTED,
-          }}
-        />
-        {showFeaturePropertiesPopup && isOpenProperties && (
-          <FeaturePropertiesPopupComponent
-            selectedFeature={selectedFeature}
-            onClose={closePropertiesPopup}
-          />
-        )}
-        {showLayer && (
-          <>
-            <OlLayer
-              layerRecord={layerRecord}
-              capability={layerCapability}
-              layerOptions={olLayerOptions}
+          {showFeaturePropertiesPopup && isOpenProperties && (
+            <FeaturePropertiesPopupComponent
+              selectedFeature={selectedFeature}
+              onClose={closePropertiesPopup}
             />
-            <FlyTo feature={footprintFeature} flyOnce={true} />
-          </>
-        )}
-      </OLMap>
-    </Box>
-  );
-};
+          )}
+          {showLayer && (
+            <>
+              <OlLayer
+                layerRecord={layerRecord}
+                capability={layerCapability}
+                layerOptions={olLayerOptions}
+              />
+              <FlyTo feature={footprintFeature} flyOnce={true} />
+            </>
+          )}
+        </OLMap>
+      </Box>
+    );
+  }
+);

@@ -3,6 +3,7 @@ import { get } from 'lodash';
 import {
   Cesium3DTileset,
   CesiumWFSLayer,
+  CesiumWMSLayer,
   CesiumWMTSLayer,
   CesiumXYZLayer,
   getImageryProviderUrl,
@@ -10,13 +11,24 @@ import {
   ILayerManagerMetaMapping,
   isBaseMapLayer,
 } from '@map-colonies/react-components';
+import {
+  adaptToCesiumWmsOptions,
+  adaptToCesiumXyzOptions,
+} from '@map-colonies/react-components/bridge';
 import CONFIG from '../../../common/config';
 import { ProtocolType } from '../../../common/models/protocol-type.enum';
 import { Layer3DRecordModelType, LayerRasterRecordModelType, LinkModelType } from '../../models';
 import { CapabilityModelType } from '../../models/CapabilityModel';
 import { ILayerImage } from '../../models/layerImage';
 import { CopcWithInfoBox } from '../map-container/copc-with-infobox.component';
-import { generateLayerRectangle, getTokenResource, getCesiumWMTSOptions } from './cesiumUtils';
+import {
+  degreesToCesiumRectangle,
+  generateLayerRectangle,
+  generateLayerRectangleDeg,
+  getCesiumWMTSOptions,
+  getInjectedAuth,
+  getTokenResource,
+} from './cesiumUtils';
 import { getLayerLink, getLinksArrWithTokens } from './layersUtils';
 
 type SearchLayerPredicate = (layer: ICesiumImageryLayer, idx: number) => boolean;
@@ -40,6 +52,25 @@ const getUrlWithoutQueryParams = (url?: string): string | undefined => {
   return url.split('?')[0];
 };
 
+const getImageryLayerMeta = (layer: ILayerImage, layerLink: LinkModelType) => ({
+  id: layer.id,
+  searchLayerPredicate: ((cesiumLayer, idx) => {
+    const correctLinkByProtocol = (layer.links as LinkModelType[]).find(
+      (link) => link.protocol === layerLink.protocol
+    );
+    const linkUrl = getUrlWithoutQueryParams(correctLinkByProtocol?.url);
+    const cesiumLayerLinkUrl = getUrlWithoutQueryParams(getImageryProviderUrl(cesiumLayer));
+    if (!linkUrl || !cesiumLayerLinkUrl) {
+      return false;
+    }
+    return linkUrl === cesiumLayerLinkUrl;
+  }) as SearchLayerPredicate,
+  layerRecord: {
+    ...layer,
+    links: getLinksArrWithTokens([...(layer.links as LinkModelType[])]),
+  } as ILayerImage,
+});
+
 export interface IGenerateLayerComponentOptions {
   autoZoomTo3D?: boolean;
 }
@@ -52,34 +83,34 @@ export const generateLayerComponent = (
   const layerLink = getLayerLink(layer);
 
   switch (layerLink.protocol) {
-    case ProtocolType.XYZ:
+    case ProtocolType.XYZ: {
+      const rectangle = generateLayerRectangleDeg(layer as LayerRasterRecordModelType);
       return (
         <CesiumXYZLayer
           key={layer.id}
-          meta={{
-            id: layer.id,
-            searchLayerPredicate: ((cesiumLayer, idx) => {
-              const correctLinkByProtocol = (layer.links as LinkModelType[]).find(
-                (link) => link.protocol === layerLink.protocol
-              );
-              const linkUrl = getUrlWithoutQueryParams(correctLinkByProtocol?.url);
-              const cesiumLayerLinkUrl = getUrlWithoutQueryParams(
-                getImageryProviderUrl(cesiumLayer)
-              );
-              if (!linkUrl || !cesiumLayerLinkUrl) {
-                return false;
-              }
-              return linkUrl === cesiumLayerLinkUrl;
-            }) as SearchLayerPredicate,
-            layerRecord: {
-              ...layer,
-              links: getLinksArrWithTokens([...(layer.links as LinkModelType[])]),
-            } as ILayerImage,
-          }}
-          rectangle={generateLayerRectangle(layer as LayerRasterRecordModelType)}
-          options={{ url: getTokenResource(layerLink.url as string) }}
+          meta={getImageryLayerMeta(layer, layerLink)}
+          rectangle={degreesToCesiumRectangle(rectangle)}
+          options={adaptToCesiumXyzOptions(
+            { url: layerLink.url as string, rectangle },
+            getInjectedAuth()
+          )}
         />
       );
+    }
+    case ProtocolType.WMS: {
+      const rectangle = generateLayerRectangleDeg(layer as LayerRasterRecordModelType);
+      return (
+        <CesiumWMSLayer
+          key={layer.id}
+          meta={getImageryLayerMeta(layer, layerLink)}
+          rectangle={degreesToCesiumRectangle(rectangle)}
+          options={adaptToCesiumWmsOptions(
+            { url: layerLink.url as string, layers: layerLink.name as string, rectangle },
+            getInjectedAuth()
+          )}
+        />
+      );
+    }
     case ProtocolType.THREE_D_TILES:
       return (
         <Cesium3DTileset

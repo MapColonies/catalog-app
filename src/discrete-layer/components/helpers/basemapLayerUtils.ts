@@ -1,11 +1,16 @@
-import { IRasterLayer } from '@map-colonies/react-components';
+import { IBaseMaps, IRasterLayer } from '@map-colonies/react-components';
 import { adaptCapabilityToWmtsOptions } from '@map-colonies/react-components/bridge';
 import { ProtocolType } from '../../../common/models/protocol-type.enum';
 import { LinkType } from '../../../common/models/link-type.enum';
 import { CapabilityModelType, LayerRasterRecordModelType } from '../../models';
-import { BasemapLayerOutput, SourceType, Status } from '../basemaps/XXXbasemapMockXXX';
+import {
+  BasemapLayerOutput,
+  BasemapOutput,
+  SourceType,
+  Status,
+} from '../basemaps/XXXbasemapMockXXX';
 import { generateLayerRectangle, generateLayerRectangleDeg, getTokenResource } from './cesiumUtils';
-import { getLayerLink, toAdapterCapability } from './layersUtils';
+import { getLayerLink, getTokenParam, toAdapterCapability } from './layersUtils';
 
 type ResolvedCatalogSource = Extract<
   BasemapLayerOutput['source'],
@@ -25,7 +30,8 @@ export const buildRasterLayerFromBasemapLayer = (
   const { id, order, opacity, shouldBeUsedInModelDraping, source } = basemapLayer;
 
   if (source.type === SourceType.EXTERNAL) {
-    const { protocol, url, ...rest } = source.details;
+    // `name` is only a display name and `matrixSet` the legacy name of `tileMatrixSetID`, the rest are the layer options as they are
+    const { protocol, name, matrixSet, ...rest } = source.details;
 
     if (protocol === LinkType.XYZ) {
       return {
@@ -35,7 +41,7 @@ export const buildRasterLayerFromBasemapLayer = (
         zIndex: order,
         show: true,
         shouldBeUsedInModelDraping,
-        options: { url },
+        options: rest,
       };
     }
 
@@ -48,11 +54,14 @@ export const buildRasterLayerFromBasemapLayer = (
         show: true,
         shouldBeUsedInModelDraping,
         options: {
-          url,
+          ...rest,
           layer: rest.layer as string,
           style: (rest.style as string | undefined) ?? 'default',
           format: (rest.format as string | undefined) ?? 'image/png',
-          tileMatrixSetID: (rest.matrixSet as string | undefined) ?? 'EPSG:3857',
+          tileMatrixSetID:
+            (rest.tileMatrixSetID as string | undefined) ??
+            (matrixSet as string | undefined) ??
+            'EPSG:3857',
         },
       };
     }
@@ -114,3 +123,17 @@ export const buildRasterLayerFromBasemapLayer = (
 
   return undefined;
 };
+
+/** The only place `IBaseMaps` is built: it is the shape the Cesium/OL map components take, the app itself works with `BasemapOutput`. */
+export const toIBaseMaps = (basemaps: BasemapOutput[] | undefined): IBaseMaps => ({
+  maps: (basemaps ?? []).map((basemap) => ({
+    id: basemap.id,
+    title: basemap.name,
+    thumbnail: basemap.thumbnail.url ? `${basemap.thumbnail.url}${getTokenParam()}` : undefined,
+    isCurrent: basemap.isCurrent,
+    isForPreview: basemap.isForPreview,
+    baseRasterLayers: basemap.layers
+      .map(buildRasterLayerFromBasemapLayer)
+      .filter((layer): layer is IRasterLayer => layer !== undefined),
+  })),
+});

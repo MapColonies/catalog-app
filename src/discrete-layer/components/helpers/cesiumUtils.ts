@@ -1,11 +1,12 @@
 import bbox from '@turf/bbox';
 import area from '@turf/area';
 import {
-  CesiumGeographicTilingScheme,
   CesiumRectangle,
   CesiumResource,
+  InjectedAuth,
   RCesiumWMTSLayerOptions,
 } from '@map-colonies/react-components';
+import { adaptToCesiumWmtsOptions } from '@map-colonies/react-components/bridge';
 import CONFIG from '../../../common/config';
 import {
   CapabilityModelType,
@@ -21,6 +22,14 @@ export const generateLayerRectangle = (layer: LayerMetadataMixedUnion): CesiumRe
   // eslint-disable-next-line
   return CesiumRectangle.fromDegrees(...bbox(layer.footprint)) as CesiumRectangle;
 };
+
+export const degreesToCesiumRectangle = ({
+  west,
+  south,
+  east,
+  north,
+}: ReturnType<typeof generateLayerRectangleDeg>): CesiumRectangle =>
+  CesiumRectangle.fromDegrees(west, south, east, north);
 
 export const applyFactor = (rect: CesiumRectangle, factor = DEFAULT_RECTANGLE_FACTOR) => {
   rect.east = rect.east + rect.width * factor;
@@ -41,9 +50,7 @@ export const generateFactoredLayerRectangle = (
   return rectWithBuffers;
 };
 
-export const getTokenResource = (url: string, ver?: string): CesiumResource => {
-  const tokenProps: Record<string, unknown> = { url };
-
+export const getInjectedAuth = (): InjectedAuth => {
   // eslint-disable-next-line
   const { INJECTION_TYPE, ATTRIBUTE_NAME, TOKEN_VALUE } = CONFIG.ACCESS_TOKEN as {
     INJECTION_TYPE: string;
@@ -51,22 +58,26 @@ export const getTokenResource = (url: string, ver?: string): CesiumResource => {
     TOKEN_VALUE: string;
   };
 
-  if (INJECTION_TYPE && INJECTION_TYPE.toLowerCase() === 'header') {
-    tokenProps.headers = {
-      [ATTRIBUTE_NAME]: TOKEN_VALUE,
-    } as Record<string, unknown>;
-  } else if (INJECTION_TYPE && INJECTION_TYPE.toLowerCase() === 'queryparam') {
-    tokenProps.queryParameters = {
-      [ATTRIBUTE_NAME]: TOKEN_VALUE,
-    } as Record<string, unknown>;
+  switch (INJECTION_TYPE?.toLowerCase()) {
+    case 'header':
+      return { headers: { [ATTRIBUTE_NAME]: TOKEN_VALUE } };
+    case 'queryparam':
+      return { queryParameters: { [ATTRIBUTE_NAME]: TOKEN_VALUE } };
+    default:
+      return {};
   }
+};
 
-  tokenProps.queryParameters = {
-    ...(tokenProps.queryParameters as Record<string, unknown>),
-    // ...(typeof ver !== 'undefined' ? { ver } : {})
-  };
+export const getTokenResource = (url: string, ver?: string): CesiumResource => {
+  return new CesiumResource({ url, ...getInjectedAuth() });
+};
 
-  return new CesiumResource({ ...(tokenProps as unknown as CesiumResource) });
+/** Layer extent in degrees (the JSON-safe form expected by the react-components options schemas). */
+export const generateLayerRectangleDeg = (
+  layer: LayerMetadataMixedUnion
+): { west: number; south: number; east: number; north: number } => {
+  const [west, south, east, north] = bbox(layer.footprint);
+  return { west, south, east, north };
 };
 
 export const getCesiumWMTSOptions = (
@@ -74,15 +85,5 @@ export const getCesiumWMTSOptions = (
   url: string,
   capability: CapabilityModelType | undefined
 ): RCesiumWMTSLayerOptions => {
-  const resolved = getWMTSConfigOptions(layer, url, capability);
-  return {
-    url: getTokenResource(resolved.url as string, layer.productVersion as string),
-    layer: resolved.layer,
-    style: resolved.style,
-    format: resolved.format,
-    tileMatrixSetID: resolved.tileMatrixSetID,
-    // tileMatrixLabels: resolved.tileMatrixLabels,
-    maximumLevel: Math.max(...(resolved.tileMatrixLabels ?? []).map(Number)),
-    tilingScheme: new CesiumGeographicTilingScheme(),
-  };
+  return adaptToCesiumWmtsOptions(getWMTSConfigOptions(layer, url, capability));
 };

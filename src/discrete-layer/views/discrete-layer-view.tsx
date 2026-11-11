@@ -3,6 +3,7 @@ import { MapMode2D } from 'cesium';
 import { Geometry, Feature, FeatureCollection, Polygon, Point } from 'geojson';
 import { find, get, isEmpty } from 'lodash';
 import { observer } from 'mobx-react-lite';
+import { toIBaseMaps } from '../components/helpers/basemapLayerUtils';
 import React, { useMemo, useState, useEffect, useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import bbox from '@turf/bbox';
@@ -95,6 +96,7 @@ import { FilterField } from '../models/RootStore.base';
 import { UserAction, UserRole } from '../models/userStore';
 import { EntityDeleteRasterDialog } from '../components/layer-details/raster/entity.raster.delete-dialog';
 import { EntityRevertRasterDialog } from '../components/layer-details/raster/entity.raster.revert-dialog';
+import { getInjectedAuth } from '../components/helpers/cesiumUtils';
 import { ActionResolver } from './components/action-resolver.component';
 import AppTitle from './components/app-title/app-title.component';
 import { DetailsPanel } from './components/details-panel.component';
@@ -146,9 +148,14 @@ const getTimeStamp = (): string => new Date().getTime().toString();
 const TABS_WITH_SIDE_DETAILS_PANEL = [TabViews.CATALOG, TabViews.SEARCH_RESULTS];
 
 const DiscreteLayerView: React.FC = observer(() => {
+  const mapAuth = useMemo(() => getInjectedAuth(), []);
   const [isFilterSearchLoading, setIsFilterSearchLoading] = useState(false);
   const [data, setData] = useState<LayerMetadataMixedUnion[] | undefined>();
   const store = useStore();
+  const mapBaseMaps = useMemo(
+    () => toIBaseMaps(store.basemapsStore.basemaps),
+    [store.basemapsStore.basemaps]
+  );
   const theme = useTheme();
   const intl = useIntl();
   const [isDrawing, setIsDrawing] = useState<boolean>(false);
@@ -1381,7 +1388,8 @@ const DiscreteLayerView: React.FC = observer(() => {
               zoom={CONFIG.MAP.ZOOM}
               sceneMode={CesiumSceneMode.SCENE2D}
               locale={mapSettingsLocale}
-              baseMaps={store.discreteLayersStore.baseMaps}
+              auth={mapAuth}
+              baseMaps={mapBaseMaps}
               layerManagerMetaMapping={layerManagerMetaMapping}
               // @ts-ignore
               imageryContextMenu={<ContextMenuByTab />}
