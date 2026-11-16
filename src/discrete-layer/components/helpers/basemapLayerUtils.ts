@@ -87,7 +87,6 @@ export const buildRasterLayerFromBasemapLayer = (
         noAuth: true,
         options: {
           ...rest,
-          tilingScheme: 'geographic',
         },
       };
     }
@@ -106,11 +105,6 @@ export const buildRasterLayerFromBasemapLayer = (
           layer: rest.layer as string,
           style: (rest.style as string | undefined) ?? 'default',
           format: (rest.format as string | undefined) ?? 'image/png',
-          tilingScheme: 'geographic',
-          tileMatrixSetID:
-            (rest.tileMatrixSetID as string | undefined) ??
-            (matrixSet as string | undefined) ??
-            'EPSG:3857',
         },
       };
     }
