@@ -892,21 +892,53 @@ export const MOCK_SEARCH_RASTER_RECORD = {
 
 // Plain-object stand-in for the capabilities returned together with the basemaps (matched to MOCK_SEARCH_RASTER_RECORD)
 export const MOCK_CAPABILITY = {
+  __typename: 'Capability',
   id: 'Cyprus_BACKUP_RESTORE-Orthophoto',
-  style: [{ value: 'default', isDefault: 'true' }],
+  style: [
+    {
+      __typename: 'Style',
+      value: 'default',
+      isDefault: 'true',
+    },
+  ],
   format: ['image/png'],
   tileMatrixSet: [
     {
+      __typename: 'TileMatrixSet',
       tileMatrixSetID: 'WorldCRS84',
-      tileMatrixLabels: Array.from({ length: 21 }, (_, level) => String(level)),
+      tileMatrixLabels: [
+        '00',
+        '01',
+        '02',
+        '03',
+        '04',
+        '05',
+        '06',
+        '07',
+        '08',
+        '09',
+        '10',
+        '11',
+        '12',
+        '13',
+        '14',
+        '15',
+        '16',
+        '17',
+        '18',
+        '19',
+        '20',
+        '21',
+      ],
     },
   ],
   url: [
     {
+      __typename: 'ResourceURL',
       format: 'image/png',
       resourceType: 'tile',
       template:
-        'https://tiles-int.mapcolonies.net/api/raster/v1/wmts/Cyprus_BACKUP_RESTORE-Orthophoto/{TileMatrixSet}/{TileMatrix}/{TileCol}/{TileRow}.png',
+        'https://raster-serving-mapproxy-nginx-route-manual-integration.apps.j1lk3njp.eastus.aroapp.io/api/raster/v1/wmts/Cyprus_BACKUP_RESTORE-Orthophoto/{TileMatrixSet}/{TileMatrix}/{TileCol}/{TileRow}.png',
     },
   ],
 } as unknown as CapabilityModelType;
@@ -921,7 +953,7 @@ export const mockBasemaps: BasemapOutput[] = [
       height: 128,
     },
     isCurrent: true,
-    isForPreview: false,
+    isForPreview: true,
     layers: [
       {
         id: 'layer-01-01',
@@ -1197,7 +1229,7 @@ export const mockBasemaps: BasemapOutput[] = [
       height: 128,
     },
     isCurrent: false,
-    isForPreview: true,
+    isForPreview: false,
     layers: [
       {
         id: 'layer-09-01',
@@ -1459,7 +1491,7 @@ export const mockBasemaps: BasemapOutput[] = [
     },
     // isCurrent was unset in env-config BASE_MAPS; kept false, another mock basemap is already the current one
     isCurrent: false,
-    isForPreview: true,
+    isForPreview: false,
     layers: [
       {
         id: 'GOOGLE_TERRAIN-env-1',

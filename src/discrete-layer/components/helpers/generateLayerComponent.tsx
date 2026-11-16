@@ -10,8 +10,10 @@ import {
   ICesiumImageryLayer,
   ILayerManagerMetaMapping,
   isBaseMapLayer,
+  RCesiumWMTSLayerOptions,
 } from '@map-colonies/react-components';
 import {
+  adaptToCesiumOptions,
   adaptToCesiumWmsOptions,
   adaptToCesiumXyzOptions,
 } from '@map-colonies/react-components/bridge';
@@ -25,10 +27,10 @@ import {
   degreesToCesiumRectangle,
   generateLayerRectangle,
   generateLayerRectangleDeg,
-  getCesiumWMTSOptions,
   getInjectedAuth,
   getTokenResource,
 } from './cesiumUtils';
+import { buildRasterLayerFromRecord } from './basemapLayerUtils';
 import { getLayerLink, getLinksArrWithTokens } from './layersUtils';
 
 type SearchLayerPredicate = (layer: ICesiumImageryLayer, idx: number) => boolean;
@@ -83,6 +85,7 @@ export const generateLayerComponent = (
   const layerLink = getLayerLink(layer);
 
   switch (layerLink.protocol) {
+    // Map-Colonies still does not support XYZ protocol.
     case ProtocolType.XYZ: {
       const rectangle = generateLayerRectangleDeg(layer as LayerRasterRecordModelType);
       return (
@@ -97,6 +100,7 @@ export const generateLayerComponent = (
         />
       );
     }
+    // Map-Colonies supports WMS, but it is not currently in use.
     case ProtocolType.WMS: {
       const rectangle = generateLayerRectangleDeg(layer as LayerRasterRecordModelType);
       return (
@@ -150,13 +154,23 @@ export const generateLayerComponent = (
       );
     case ProtocolType.WMTS: {
       const capability = capabilities?.find((item) => layerLink.name === item.id);
-      const optionsWMTS = {
-        ...getCesiumWMTSOptions(
-          layer as LayerRasterRecordModelType,
-          layerLink.url as string,
-          capability
-        ),
-      };
+      const rasterLayer = buildRasterLayerFromRecord(
+        layer as LayerRasterRecordModelType,
+        capability,
+        {
+          id: layer.id,
+          opacity: 1,
+          zIndex: 0,
+        }
+      );
+      if (rasterLayer === undefined) {
+        return undefined;
+      }
+      const optionsWMTS = adaptToCesiumOptions(
+        rasterLayer.type,
+        rasterLayer.options,
+        getInjectedAuth()
+      ) as RCesiumWMTSLayerOptions;
       return (
         <CesiumWMTSLayer
           key={layer.id}

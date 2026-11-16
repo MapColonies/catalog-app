@@ -1,6 +1,5 @@
 import { IBaseMaps, IRasterLayer } from '@map-colonies/react-components';
-import { adaptCapabilityToWmtsOptions } from '@map-colonies/react-components/bridge';
-import { ProtocolType } from '../../../common/models/protocol-type.enum';
+import { ProtocolType, toProtocol } from '../../../common/models/protocol-type.enum';
 import { LinkType } from '../../../common/models/link-type.enum';
 import { CapabilityModelType, LayerRasterRecordModelType } from '../../models';
 import {
@@ -9,8 +8,8 @@ import {
   SourceType,
   Status,
 } from '../basemaps/XXXbasemapMockXXX';
-import { generateLayerRectangle, generateLayerRectangleDeg, getTokenResource } from './cesiumUtils';
-import { getLayerLink, getTokenParam, toAdapterCapability } from './layersUtils';
+import { generateLayerRectangleDeg } from './cesiumUtils';
+import { getLayerLink, getTokenParam, getWMTSConfigOptions } from './layersUtils';
 
 type ResolvedCatalogSource = Extract<
   BasemapLayerOutput['source'],
@@ -23,6 +22,50 @@ export const isResolvedCatalogSource = (
   source.type === SourceType.CATALOG_RESOURCE &&
   source.status === Status.RESOLVED &&
   source.layer !== null;
+
+type RasterLayerProps = Pick<
+  IRasterLayer,
+  'id' | 'opacity' | 'zIndex' | 'shouldBeUsedInModelDraping'
+>;
+
+export const buildRasterLayerFromRecord = (
+  record: LayerRasterRecordModelType,
+  capability: CapabilityModelType | null | undefined,
+  layerProps: RasterLayerProps
+): IRasterLayer | undefined => {
+  const link = getLayerLink(record);
+  if (link?.url === undefined) {
+    return undefined;
+  }
+
+  const base = { ...layerProps, show: true, tilingScheme: 'geographic' };
+  const rectangle = generateLayerRectangleDeg(record);
+
+  switch (toProtocol(link.protocol)) {
+    case ProtocolType.WMTS:
+      // Without the capability the tile matrix set is unknown: the layer url must not be used instead
+      return !capability
+        ? undefined
+        : {
+            ...base,
+            type: ProtocolType.WMTS,
+            options: { ...getWMTSConfigOptions(record, capability, link.url), rectangle },
+          };
+
+    case ProtocolType.WMS:
+      return {
+        ...base,
+        type: ProtocolType.WMS,
+        options: { url: link.url, layers: record.productId as string, rectangle },
+      };
+
+    case ProtocolType.XYZ:
+      return { ...base, type: ProtocolType.XYZ, options: { url: link.url, rectangle } };
+
+    default:
+      return undefined;
+  }
+};
 
 export const buildRasterLayerFromBasemapLayer = (
   basemapLayer: BasemapLayerOutput
@@ -41,7 +84,11 @@ export const buildRasterLayerFromBasemapLayer = (
         zIndex: order,
         show: true,
         shouldBeUsedInModelDraping,
-        options: rest,
+        noAuth: true,
+        options: {
+          ...rest,
+          tilingScheme: 'geographic',
+        },
       };
     }
 
@@ -53,11 +100,13 @@ export const buildRasterLayerFromBasemapLayer = (
         zIndex: order,
         show: true,
         shouldBeUsedInModelDraping,
+        noAuth: true,
         options: {
           ...rest,
           layer: rest.layer as string,
           style: (rest.style as string | undefined) ?? 'default',
           format: (rest.format as string | undefined) ?? 'image/png',
+          tilingScheme: 'geographic',
           tileMatrixSetID:
             (rest.tileMatrixSetID as string | undefined) ??
             (matrixSet as string | undefined) ??
@@ -78,50 +127,12 @@ export const buildRasterLayerFromBasemapLayer = (
     return undefined;
   }
 
-  const record = source.layer;
-  const link = getLayerLink(record);
-  if (link === undefined) {
-    return undefined;
-  }
-
-  if (link.protocol === LinkType.WMTS) {
-    const options = adaptCapabilityToWmtsOptions(
-      toAdapterCapability(source.capabilities as CapabilityModelType)
-    );
-
-    return {
-      id,
-      type: ProtocolType.WMTS,
-      opacity,
-      zIndex: order,
-      show: true,
-      shouldBeUsedInModelDraping,
-      options: {
-        ...options,
-        url: getTokenResource(options.url).url,
-        tilingScheme: 'geographic',
-        rectangle: generateLayerRectangleDeg(record),
-      },
-    };
-  }
-
-  if (link.protocol === LinkType.WMS) {
-    return {
-      id,
-      type: ProtocolType.WMS,
-      opacity,
-      zIndex: order,
-      show: true,
-      shouldBeUsedInModelDraping,
-      options: {
-        url: link.url as string,
-        layers: record.productId as string,
-        rectangle: generateLayerRectangle(record as LayerRasterRecordModelType),
-      },
-    };
-  }
-
-  return undefined;
+  return buildRasterLayerFromRecord(source.layer, source.capabilities, {
+    id,
+    opacity,
+    zIndex: order,
+    shouldBeUsedInModelDraping,
+  });
 };
 
 /** The only place `IBaseMaps` is built: it is the shape the Cesium/OL map components take, the app itself works with `BasemapOutput`. */
@@ -133,7 +144,7 @@ export const toIBaseMaps = (basemaps: BasemapOutput[] | undefined): IBaseMaps =>
     isCurrent: basemap.isCurrent,
     isForPreview: basemap.isForPreview,
     baseRasterLayers: basemap.layers
-      .map(buildRasterLayerFromBasemapLayer)
+      .map((layer) => buildRasterLayerFromBasemapLayer(layer))
       .filter((layer): layer is IRasterLayer => layer !== undefined),
   })),
 });

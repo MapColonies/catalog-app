@@ -1,53 +1,17 @@
 import React from 'react';
-import { LayerType, TileLayer, TileWMS, TileWMTS, TileXYZ } from '@map-colonies/react-components';
-import {
-  adaptToOlOptions,
-  LayerOptions,
-  WMSOptions,
-  WMTSOptions,
-  XYZOptions,
-} from '@map-colonies/react-components/bridge';
-import { ProtocolType, toProtocol } from '../../models/protocol-type.enum';
+import { useMap } from '@map-colonies/react-components';
+import { adaptToOlLayerExtent, adaptToOlOptions } from '@map-colonies/react-components/bridge';
+import { OlTileLayer } from './ol.tile-layer';
 import { BasemapOutput } from '../../../discrete-layer/components/basemaps/XXXbasemapMockXXX';
+import { getInjectedAuth } from '../../../discrete-layer/components/helpers/cesiumUtils';
 import { buildRasterLayerFromBasemapLayer } from '../../../discrete-layer/components/helpers/basemapLayerUtils';
-
-interface OlTileLayerParams {
-  layerType: LayerType;
-  sourceOptions: WMTSOptions | XYZOptions | WMSOptions;
-  layerOptions?: LayerOptions;
-}
-
-const OlBaseMapLayer: React.FC<OlTileLayerParams> = ({
-  layerType,
-  sourceOptions,
-  layerOptions,
-}): JSX.Element => {
-  const tileOptions = { ...sourceOptions, crossOrigin: 'anonymous' };
-  let tileComponent: JSX.Element | undefined = undefined;
-
-  switch (toProtocol(layerType)) {
-    case ProtocolType.WMTS:
-      tileComponent = <TileWMTS options={tileOptions as WMTSOptions} />;
-      break;
-    case ProtocolType.XYZ:
-      tileComponent = <TileXYZ options={tileOptions as XYZOptions} />;
-      break;
-    case ProtocolType.WMS:
-      tileComponent = <TileWMS options={tileOptions as WMSOptions} />;
-      break;
-    // case ProtocolType.OSM:
-    //   tileComponent = <TileOSM options={tileOptions as OSMOptions} />;
-    //   break;
-  }
-
-  return <TileLayer options={layerOptions}>{tileComponent}</TileLayer>;
-};
 
 interface OlBaseMapProps {
   basemaps: BasemapOutput[];
 }
 
 export const OlBaseMap: React.FC<OlBaseMapProps> = React.memo(({ basemaps }): JSX.Element => {
+  const viewProjection = useMap().getView().getProjection().getCode();
   const basemap =
     basemaps.find((item) => item.isForPreview) ?? basemaps.find((item) => item.isCurrent);
 
@@ -61,20 +25,29 @@ export const OlBaseMap: React.FC<OlBaseMapProps> = React.memo(({ basemaps }): JS
         .slice()
         .sort((curr, next) => curr.order - next.order)
         .map((basemapLayer) => {
-          // The only place the basemap layer is converted to the map layer format, right before the OL source is built
           const layer = buildRasterLayerFromBasemapLayer(basemapLayer);
-          const options = layer && adaptToOlOptions(layer.type, layer.options);
+          const options =
+            layer &&
+            adaptToOlOptions(
+              layer.type,
+              layer.options,
+              layer.noAuth ? undefined : getInjectedAuth()
+            );
 
           if (!layer || !options) {
             return null;
           }
 
           return (
-            <OlBaseMapLayer
+            <OlTileLayer
               key={layer.id}
               layerType={layer.type}
               sourceOptions={options}
-              layerOptions={{ opacity: layer.opacity }}
+              layerOptions={{
+                opacity: layer.opacity,
+                zIndex: layer.zIndex,
+                extent: adaptToOlLayerExtent(layer.options, viewProjection),
+              }}
             />
           );
         })}

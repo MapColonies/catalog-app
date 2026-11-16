@@ -102,19 +102,13 @@ export const getLinkUrlWithToken = (
   }
 };
 
-// MST model fields are optional; the adapter falls back to defaults for whatever is missing
-export const toAdapterCapability = (
-  capability?: CapabilityModelType
-): Parameters<typeof adaptCapabilityToWmtsOptions>[0] =>
-  capability as unknown as Parameters<typeof adaptCapabilityToWmtsOptions>[0];
-
 export const getWMTSConfigOptions = (
   layer: LayerRasterRecordModelType,
-  url: string,
-  capability?: CapabilityModelType
+  capability?: CapabilityModelType,
+  defaultUrl?: string
 ): WmtsOptions =>
   adaptCapabilityToWmtsOptions(
-    toAdapterCapability(capability),
+    capability as unknown as Parameters<typeof adaptCapabilityToWmtsOptions>[0],
     { layer: `${layer.productId as string}-${layer.productVersion as string}` },
-    { url }
+    { url: defaultUrl }
   );

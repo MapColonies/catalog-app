@@ -1,19 +1,8 @@
 import bbox from '@turf/bbox';
 import area from '@turf/area';
-import {
-  CesiumRectangle,
-  CesiumResource,
-  InjectedAuth,
-  RCesiumWMTSLayerOptions,
-} from '@map-colonies/react-components';
-import { adaptToCesiumWmtsOptions } from '@map-colonies/react-components/bridge';
+import { CesiumRectangle, CesiumResource, InjectedAuth } from '@map-colonies/react-components';
 import CONFIG from '../../../common/config';
-import {
-  CapabilityModelType,
-  LayerMetadataMixedUnion,
-  LayerRasterRecordModelType,
-} from '../../models';
-import { getWMTSConfigOptions } from './layersUtils';
+import { LayerMetadataMixedUnion } from '../../models';
 
 const DEFAULT_RECTANGLE_FACTOR = 0.2;
 const EARTH_AREA = 509000000; //whole EARTH surface, in square km
@@ -78,12 +67,4 @@ export const generateLayerRectangleDeg = (
 ): { west: number; south: number; east: number; north: number } => {
   const [west, south, east, north] = bbox(layer.footprint);
   return { west, south, east, north };
-};
-
-export const getCesiumWMTSOptions = (
-  layer: LayerRasterRecordModelType,
-  url: string,
-  capability: CapabilityModelType | undefined
-): RCesiumWMTSLayerOptions => {
-  return adaptToCesiumWmtsOptions(getWMTSConfigOptions(layer, url, capability));
 };
