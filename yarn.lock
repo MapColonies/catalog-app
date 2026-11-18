@@ -2529,8 +2529,10 @@
     lodash "^4.17.21"
     ngeohash "^0.6.3"
 
-"@map-colonies/react-components@file:../shared-components/packages/react-components":
-  version "4.21.0"
+"@map-colonies/react-components@^4.22.1":
+  version "4.22.1"
+  resolved "https://registry.yarnpkg.com/@map-colonies/react-components/-/react-components-4.22.1.tgz#6bc8e341cb60a2f7a167a3bd1292dc059cd3bcd0"
+  integrity sha512-RNAoadkDyqr88jdpCR8LsNPMj6deanOumZRzk/Wvy6HwlV6S5o95LLqrSsKSiHoahGWFyknkrH86kunkAnkyuQ==
   dependencies:
     "@cmcleese/cesium-navigation" "^4.0.7"
     "@date-io/date-fns" "^1.3.13"
@@ -10247,21 +10249,21 @@ fast-sort@^2.2.0:
   resolved "https://registry.yarnpkg.com/fast-sort/-/fast-sort-2.2.0.tgz#20903763531fbcbb41c9df5ab1bf5f2cefc8476a"
   integrity sha512-W7zqnn2zsYoQA87FKmYtgOsbJohOrh7XrtZrCVHN5XZKqTBTv5UG+rSS3+iWbg/nepRQUOu+wnas8BwtK8kiCg==
 
-fast-xml-builder@^1.3.1:
-  version "1.3.1"
-  resolved "https://registry.yarnpkg.com/fast-xml-builder/-/fast-xml-builder-1.3.1.tgz#ef05b353b45597483dfb09d450a062a2baec3a82"
-  integrity sha512-pIM/1n3ntFXKYrUZwW7QCK0gAW7XY+wzj1YMIV3tLDvPj/V+zTGJK5e3/4WJfwj0qWw2ElNXiTixda/R+3YSug==
+fast-xml-builder@^1.3.2:
+  version "1.3.2"
+  resolved "https://registry.yarnpkg.com/fast-xml-builder/-/fast-xml-builder-1.3.2.tgz#08837335066983b7659f342ce1559869c068192e"
+  integrity sha512-OX91VSlShLPDgRZV7tk/YQ4l8tT75QziF5Ixg8g4PFbCVPjuTWwN+yQfAxLJ0dufJpprdOd6HlM74Jhd39TcBQ==
   dependencies:
     path-expression-matcher "^1.6.2"
     xml-naming "^0.3.0"
 
 fast-xml-parser@^5.11.2:
-  version "5.12.0"
-  resolved "https://registry.yarnpkg.com/fast-xml-parser/-/fast-xml-parser-5.12.0.tgz#f8212b65fa5f7d227e67c387e874c7857751fa64"
-  integrity sha512-/pXxRBtwxY9w8z7YbgsvIPPcPvFDsTbIkWwTQJhzNJPokj+TbN6ftmcv4j/pEQDvOCNnKGDzuk5Bo2oogIOiFg==
+  version "5.12.1"
+  resolved "https://registry.yarnpkg.com/fast-xml-parser/-/fast-xml-parser-5.12.1.tgz#a0f3ebed7a1107db9456c0dd0ed233cbc00ae709"
+  integrity sha512-wR8dO/fx+z8C5exuem1e7BKOWvjsuzvjS/tvA/Xu3Z1zQqJGcXrPzXbcAiaMgp2KjreEROcTkmnnisrcmJ2hYQ==
   dependencies:
     "@nodable/entities" "^3.1.0"
-    fast-xml-builder "^1.3.1"
+    fast-xml-builder "^1.3.2"
     is-unsafe "^2.0.3"
     path-expression-matcher "^1.6.2"
     strnum "^2.5.1"
@@ -17835,9 +17837,9 @@ strip-json-comments@^3.1.0, strip-json-comments@^3.1.1:
   integrity sha512-6fPc+R4ihwqP6N/aIv2f1gMH8lOVtWQHoqC4yK6oSDVVocumAsfCqjkXnqiYMhmMwS/mEHLp7Vehlt3ql6lEig==
 
 strip-json-comments@^5.0.3:
-  version "5.0.3"
-  resolved "https://registry.yarnpkg.com/strip-json-comments/-/strip-json-comments-5.0.3.tgz#b7304249dd402ee67fd518ada993ab3593458bcf"
-  integrity sha512-1tB5mhVo7U+ETBKNf92xT4hrQa3pm0MZ0PQvuDnWgAAGHDsfp4lPSpiS6psrSiet87wyGPh9ft6wmhOMQ0hDiw==
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/strip-json-comments/-/strip-json-comments-5.1.0.tgz#f66b505ae80936a4654377a05a7e5d44139f7fc0"
+  integrity sha512-ErcwpJBYr8EfX/Br7JauOIGXoRE92w0hVtuS9j92UFgbATxA+WRSIZksSUDzEeItfWB/0QCEprTZT55RSINUHQ==
 
 strnum@^2.5.1:
   version "2.5.1"
