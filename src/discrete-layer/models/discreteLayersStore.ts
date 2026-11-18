@@ -175,7 +175,7 @@ export const discreteLayersStore = ModelBase
         let additional = {};
         if (item.type === RecordType.RECORD_RASTER) {
           const layerLink = getLayerLink(item);
-          const hasCapabilities = self.capabilities?.find(item => layerLink.name === item.id);
+          const hasCapabilities = capabilities?.find(item => layerLink.name === item.id);
           const hasWMTSUrl = layerLink.protocol === ProtocolType.WMTS;
           additional = { layerURLMissing: !hasCapabilities && hasWMTSUrl };
         }
