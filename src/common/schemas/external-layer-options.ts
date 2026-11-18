@@ -1,9 +1,6 @@
 import {
-  WmtsOptionsSchema,
   createWmtsOptionsSchema,
-  WmsOptionsSchema,
   createWmsOptionsSchema,
-  XyzOptionsSchema,
   createXyzOptionsSchema,
 } from '@map-colonies/react-components/schemas';
 import type { ZodTypeAny } from 'zod';
@@ -19,15 +16,9 @@ export type ExternalLayerType = ImageryProtocolType;
 const buildRegistry = (
   allowUrlCredentials: boolean
 ): Partial<Record<ExternalLayerType, ZodTypeAny>> => ({
-  [ImageryProtocolType.WMTS]: allowUrlCredentials
-    ? createWmtsOptionsSchema({ allowUrlCredentials })
-    : WmtsOptionsSchema,
-  [ImageryProtocolType.WMS]: allowUrlCredentials
-    ? createWmsOptionsSchema({ allowUrlCredentials })
-    : WmsOptionsSchema,
-  [ImageryProtocolType.XYZ]: allowUrlCredentials
-    ? createXyzOptionsSchema({ allowUrlCredentials })
-    : XyzOptionsSchema,
+  [ImageryProtocolType.WMTS]: createWmtsOptionsSchema({ allowUrlCredentials }),
+  [ImageryProtocolType.WMS]: createWmsOptionsSchema({ allowUrlCredentials }),
+  [ImageryProtocolType.XYZ]: createXyzOptionsSchema({ allowUrlCredentials }),
 });
 
 /** Imagery protocols whose options schema is already available; the rest are added one by one. */

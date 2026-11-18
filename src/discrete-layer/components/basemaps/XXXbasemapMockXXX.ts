@@ -892,21 +892,53 @@ export const MOCK_SEARCH_RASTER_RECORD = {
 
 // Plain-object stand-in for the capabilities returned together with the basemaps (matched to MOCK_SEARCH_RASTER_RECORD)
 export const MOCK_CAPABILITY = {
+  __typename: 'Capability',
   id: 'Cyprus_BACKUP_RESTORE-Orthophoto',
-  style: [{ value: 'default', isDefault: 'true' }],
+  style: [
+    {
+      __typename: 'Style',
+      value: 'default',
+      isDefault: 'true',
+    },
+  ],
   format: ['image/png'],
   tileMatrixSet: [
     {
+      __typename: 'TileMatrixSet',
       tileMatrixSetID: 'WorldCRS84',
-      tileMatrixLabels: Array.from({ length: 21 }, (_, level) => String(level)),
+      tileMatrixLabels: [
+        '00',
+        '01',
+        '02',
+        '03',
+        '04',
+        '05',
+        '06',
+        '07',
+        '08',
+        '09',
+        '10',
+        '11',
+        '12',
+        '13',
+        '14',
+        '15',
+        '16',
+        '17',
+        '18',
+        '19',
+        '20',
+        '21',
+      ],
     },
   ],
   url: [
     {
+      __typename: 'ResourceURL',
       format: 'image/png',
       resourceType: 'tile',
       template:
-        'https://tiles-int.mapcolonies.net/api/raster/v1/wmts/Cyprus_BACKUP_RESTORE-Orthophoto/{TileMatrixSet}/{TileMatrix}/{TileCol}/{TileRow}.png',
+        'https://raster-serving-mapproxy-nginx-route-manual-integration.apps.j1lk3njp.eastus.aroapp.io/api/raster/v1/wmts/Cyprus_BACKUP_RESTORE-Orthophoto/{TileMatrixSet}/{TileMatrix}/{TileCol}/{TileRow}.png',
     },
   ],
 } as unknown as CapabilityModelType;
@@ -921,7 +953,7 @@ export const mockBasemaps: BasemapOutput[] = [
       height: 128,
     },
     isCurrent: true,
-    isForPreview: false,
+    isForPreview: true,
     layers: [
       {
         id: 'layer-01-01',
@@ -934,7 +966,7 @@ export const mockBasemaps: BasemapOutput[] = [
             protocol: ProtocolType.XYZ,
             name: 'OpenStreetMap Standard',
             url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-            attribution: '© OpenStreetMap contributors',
+            credit: '© OpenStreetMap contributors',
           },
         },
       },
@@ -1069,7 +1101,7 @@ export const mockBasemaps: BasemapOutput[] = [
             protocol: ProtocolType.XYZ,
             name: 'OpenTopoMap',
             url: 'https://tile.opentopomap.org/{z}/{x}/{y}.png',
-            attribution: '© OpenTopoMap contributors',
+            credit: '© OpenTopoMap contributors',
           },
         },
       },
@@ -1097,7 +1129,7 @@ export const mockBasemaps: BasemapOutput[] = [
             protocol: ProtocolType.XYZ,
             name: 'CartoDB Positron',
             url: 'https://basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
-            attribution: '© OpenStreetMap contributors © CARTO',
+            credit: '© OpenStreetMap contributors © CARTO',
           },
         },
       },
@@ -1125,7 +1157,7 @@ export const mockBasemaps: BasemapOutput[] = [
             protocol: ProtocolType.XYZ,
             name: 'CartoDB Dark Matter',
             url: 'https://basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',
-            attribution: '© OpenStreetMap contributors © CARTO',
+            credit: '© OpenStreetMap contributors © CARTO',
           },
         },
       },
@@ -1153,7 +1185,7 @@ export const mockBasemaps: BasemapOutput[] = [
             protocol: ProtocolType.XYZ,
             name: 'Esri World Street Map',
             url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
-            attribution: 'Esri and its data providers',
+            credit: 'Esri and its data providers',
           },
         },
       },
@@ -1182,7 +1214,7 @@ export const mockBasemaps: BasemapOutput[] = [
             protocol: ProtocolType.XYZ,
             name: 'Esri World Imagery',
             url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-            attribution: 'Esri and its data providers',
+            credit: 'Esri and its data providers',
           },
         },
       },
@@ -1197,7 +1229,7 @@ export const mockBasemaps: BasemapOutput[] = [
       height: 128,
     },
     isCurrent: false,
-    isForPreview: true,
+    isForPreview: false,
     layers: [
       {
         id: 'layer-09-01',
@@ -1445,6 +1477,163 @@ export const mockBasemaps: BasemapOutput[] = [
           },
           capabilities: MOCK_CAPABILITY,
           layer: MOCK_SEARCH_RASTER_RECORD,
+        },
+      },
+    ],
+  },
+  {
+    id: 'basemap-env-1',
+    name: '1st Map',
+    thumbnail: {
+      url: 'https://mt1.google.com/vt/lyrs=s&x=6&y=4&z=3',
+      width: 128,
+      height: 128,
+    },
+    // isCurrent was unset in env-config BASE_MAPS; kept false, another mock basemap is already the current one
+    isCurrent: false,
+    isForPreview: false,
+    layers: [
+      {
+        id: 'GOOGLE_TERRAIN-env-1',
+        order: 0,
+        opacity: 1,
+        source: {
+          type: SourceType.EXTERNAL,
+          status: Status.RESOLVED,
+          details: {
+            protocol: ProtocolType.XYZ,
+            name: 'GOOGLE_TERRAIN',
+            url: 'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
+            credit: 'GOOGLE',
+          },
+        },
+      },
+      {
+        id: 'INFRARED_RASTER-env-1',
+        order: 1,
+        opacity: 0.6,
+        source: {
+          type: SourceType.EXTERNAL,
+          status: Status.RESOLVED,
+          details: {
+            protocol: ProtocolType.WMS,
+            name: 'INFRARED_RASTER',
+            url: 'https://mesonet.agron.iastate.edu/cgi-bin/wms/goes/conus_ir.cgi?',
+            layers: 'goes_conus_ir',
+            credit: 'Infrared data courtesy Iowa Environmental Mesonet',
+            parameters: {
+              transparent: 'true',
+              format: 'image/png',
+            },
+          },
+        },
+      },
+    ],
+  },
+  {
+    id: 'basemap-env-2',
+    name: '2nd Map',
+    thumbnail: {
+      url: 'https://mt1.google.com/vt/lyrs=s&x=6&y=4&z=3',
+      width: 128,
+      height: 128,
+    },
+    // isCurrent was unset in env-config BASE_MAPS; kept false, another mock basemap is already the current one
+    isCurrent: false,
+    isForPreview: false,
+    layers: [
+      {
+        id: 'RADAR_RASTER-env-2',
+        order: 1,
+        opacity: 0.6,
+        source: {
+          type: SourceType.EXTERNAL,
+          status: Status.RESOLVED,
+          details: {
+            protocol: ProtocolType.WMS,
+            name: 'RADAR_RASTER',
+            url: 'https://mesonet.agron.iastate.edu/cgi-bin/wms/nexrad/n0r.cgi?',
+            layers: 'nexrad-n0r',
+            credit: 'Radar data courtesy Iowa Environmental Mesonet',
+            parameters: {
+              transparent: 'true',
+              format: 'image/png',
+            },
+          },
+        },
+      },
+      {
+        id: 'GOOGLE_TERRAIN-env-2',
+        order: 0,
+        opacity: 1,
+        source: {
+          type: SourceType.EXTERNAL,
+          status: Status.RESOLVED,
+          details: {
+            protocol: ProtocolType.XYZ,
+            name: 'GOOGLE_TERRAIN',
+            url: 'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
+            credit: 'GOOGLE',
+          },
+        },
+      },
+      {
+        id: 'VECTOR_TILES_GPS-env-2',
+        order: 2,
+        opacity: 1,
+        source: {
+          type: SourceType.EXTERNAL,
+          status: Status.RESOLVED,
+          details: {
+            protocol: ProtocolType.XYZ,
+            name: 'VECTOR_TILES_GPS',
+            url: 'https://gps.tile.openstreetmap.org/lines/{z}/{x}/{y}.png',
+            credit: 'openstreetmap',
+          },
+        },
+      },
+    ],
+  },
+  {
+    id: 'basemap-env-3',
+    name: '3rd Map',
+    thumbnail: {
+      url: 'https://a.tile.thunderforest.com/cycle/17/78208/53265.png',
+      width: 128,
+      height: 128,
+    },
+    // isCurrent was true in env-config BASE_MAPS; kept false, another mock basemap is already the current one
+    isCurrent: false,
+    isForPreview: false,
+    layers: [
+      {
+        id: 'VECTOR_TILES-env-3',
+        order: 0,
+        opacity: 1,
+        source: {
+          type: SourceType.EXTERNAL,
+          status: Status.RESOLVED,
+          details: {
+            protocol: ProtocolType.XYZ,
+            name: 'VECTOR_TILES',
+            url: 'https://{s}.tile.thunderforest.com/cycle/{z}/{x}/{y}.png?apikey=6170aad10dfd42a38d4d8c709a536f38',
+            credit: 'thunderforest',
+          },
+        },
+      },
+      {
+        id: 'VECTOR_TILES_GPS-env-3',
+        order: 1,
+        opacity: 1,
+        source: {
+          type: SourceType.EXTERNAL,
+          status: Status.RESOLVED,
+          details: {
+            protocol: ProtocolType.XYZ,
+            name: 'VECTOR_TILES_GPS',
+            url: 'https://gps.tile.openstreetmap.org/lines/{z}/{x}/{y}.png',
+            credit: 'openstreetmap',
+          },
         },
       },
     ],

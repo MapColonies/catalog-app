@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { observer } from 'mobx-react-lite';
+import { observer } from 'mobx-react';
 import { useIntl } from 'react-intl';
 import { Box } from '@map-colonies/react-components';
 import {

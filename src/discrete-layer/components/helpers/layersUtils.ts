@@ -3,19 +3,19 @@ import { Feature } from 'geojson';
 import bbox from '@turf/bbox';
 import bboxPolygon from '@turf/bbox-polygon';
 import booleanContains from '@turf/boolean-contains';
-import { WMTSSourceOptions } from '../../../common/components/ol-map/layer.config.options-bridging';
+import { IRasterLayer } from '@map-colonies/react-components';
+import { adaptCapabilityToWmtsOptions } from '@map-colonies/react-components/bridge';
+import type { WmtsOptions } from '@map-colonies/react-components/schemas';
 import CONFIG from '../../../common/config';
-import { ProtocolType } from '../../../common/models/protocol-type.enum';
-import { ResourceUrlModelType } from '../../models/ResourceUrlModel';
+import { ProtocolType, toProtocol } from '../../../common/models/protocol-type.enum';
 import { ILayerImage } from '../../models/layerImage';
 import {
   CapabilityModelType,
   LayerMetadataMixedUnion,
   LayerRasterRecordModelType,
   LinkModelType,
-  StyleModelType,
-  TileMatrixSetModelType,
 } from '../../models';
+import { generateLayerRectangleDeg } from './cesiumUtils';
 
 export const isWMTSProtocol = (protocol?: string): boolean => protocol === ProtocolType.WMTS;
 
@@ -104,67 +104,51 @@ export const getLinkUrlWithToken = (
   }
 };
 
-export const getWMTSConfigOptions = (
-  layer: LayerRasterRecordModelType,
-  url: string,
-  capability?: CapabilityModelType
-): WMTSSourceOptions => {
-  let style = 'default';
-  let format = 'image/jpeg';
-  let { tileMatrixSetID, tileMatrixLabels } = {
-    tileMatrixSetID: 'newGrids',
-    tileMatrixLabels: [
-      '0',
-      '1',
-      '2',
-      '3',
-      '4',
-      '5',
-      '6',
-      '7',
-      '8',
-      '9',
-      '10',
-      '11',
-      '12',
-      '13',
-      '14',
-      '15',
-      '16',
-      '17',
-      '18',
-      '19',
-      '20',
-    ],
-  };
-  if (capability) {
-    const defaultStyle = (capability.style as StyleModelType[]).find(
-      (s: StyleModelType) => s.isDefault !== undefined && s.isDefault === 'true'
-    )?.value;
-    style =
-      defaultStyle !== undefined
-        ? defaultStyle
-        : ((get(capability, 'style[0]') as StyleModelType).value as string);
-    // TODO: format should be taken from layer record from new Transparent/Opaque field if exists in capabilities, otherwise - take first (format[0])
-    format = get(capability, 'format[0]') as string; // (!IMPORTANT) derived from raster implementation: there is only ONE surved tiles format
-    const tileMatrixSet = get(capability, 'tileMatrixSet[0]') as TileMatrixSetModelType; // (!IMPORTANT) derived from raster implementation: there is only ONE surved tile matrix set
-    if (tileMatrixSet.tileMatrixSetID !== undefined) {
-      tileMatrixSetID = tileMatrixSet.tileMatrixSetID;
-    }
-    if (tileMatrixSet.tileMatrixLabels !== undefined) {
-      tileMatrixLabels = tileMatrixSet.tileMatrixLabels;
-    }
-    url =
-      (capability.url as ResourceUrlModelType[]).find(
-        (u: ResourceUrlModelType) => u.format === format
-      )?.template ?? url;
+export const getWMTSConfigOptions = (capability: CapabilityModelType): WmtsOptions =>
+  adaptCapabilityToWmtsOptions(
+    capability as unknown as Parameters<typeof adaptCapabilityToWmtsOptions>[0]
+  );
+
+type RasterLayerHydrationProps = Pick<
+  IRasterLayer,
+  'opacity' | 'zIndex' | 'show' | 'shouldBeUsedInModelDraping'
+>;
+
+export const buildRasterLayerFromRecord = (
+  record: LayerRasterRecordModelType,
+  capability: CapabilityModelType | null | undefined,
+  layerProps: RasterLayerHydrationProps
+): IRasterLayer | undefined => {
+  const link = getLayerLink(record);
+  if (link?.url === undefined) {
+    return undefined;
   }
-  return {
-    url,
-    layer: `${layer.productId as string}-${layer.productVersion as string}`,
-    style,
-    format,
-    tileMatrixSetID,
-    tileMatrixLabels,
-  };
+
+  const base = { id: record.id, show: true, ...layerProps };
+  const rectangle = generateLayerRectangleDeg(record);
+
+  switch (toProtocol(link.protocol)) {
+    case ProtocolType.WMTS:
+      // Without the capability the tile matrix set is unknown: the layer url must not be used instead
+      return !capability
+        ? undefined
+        : {
+            ...base,
+            type: ProtocolType.WMTS,
+            options: { ...getWMTSConfigOptions(capability), rectangle },
+          };
+
+    case ProtocolType.WMS:
+      return {
+        ...base,
+        type: ProtocolType.WMS,
+        options: { url: link.url, layers: record.productId as string, rectangle },
+      };
+
+    case ProtocolType.XYZ:
+      return { ...base, type: ProtocolType.XYZ, options: { url: link.url, rectangle } };
+
+    default:
+      return undefined;
+  }
 };

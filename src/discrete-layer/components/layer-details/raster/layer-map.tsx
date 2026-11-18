@@ -196,15 +196,11 @@ export const OlLayerMap: React.FC<LayerMapProps> = ({
   return (
     <Box id="geoFeaturesMapContainer" style={{ ...style }}>
       <OLMap
-        baseMapsConfig={
-          store.discreteLayersStore.baseMaps
-            ? {
-                maps: store.discreteLayersStore.baseMaps.maps,
-                showBaseMap: showBaseMap?.value ?? false,
-                showToggleButton: showBaseMap?.showToggleButton,
-              }
-            : undefined
-        }
+        baseMapsConfig={{
+          basemaps: store.basemapsStore.basemaps ?? [],
+          showBaseMap: showBaseMap?.value ?? false,
+          showToggleButton: showBaseMap?.showToggleButton,
+        }}
         zoomLevelWidget={{
           indicateTillZoomLevel:
             showExistingPolygonParts || childrenWithZoomIndication

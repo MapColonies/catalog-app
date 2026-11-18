@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { observer } from 'mobx-react-lite';
+import { observer } from 'mobx-react';
 import { useIntl } from 'react-intl';
 import { Box } from '@map-colonies/react-components';
 import type { BasemapsPanelProps } from './basemaps-router';
@@ -154,10 +154,6 @@ export const BasemapsListPanel: React.FC<BasemapsPanelProps<'BasemapsList'>> = o
     const { basemapsStore } = store;
     const basemapActions = store.actionDispatcherStore.getEntityActionGroups(BASEMAP_ENTITY);
     const [scrollTick, setScrollTick] = useState<number>(0);
-
-    useEffect(() => {
-      void basemapsStore.getBasemaps();
-    }, [basemapsStore]);
 
     const basemaps = basemapsStore.basemaps ?? [];
 

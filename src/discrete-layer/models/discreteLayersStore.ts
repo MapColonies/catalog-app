@@ -6,7 +6,6 @@ import lineStringToPolygon from '@turf/linestring-to-polygon';
 import intersect from '@turf/intersect';
 import bboxPolygon from '@turf/bbox-polygon';
 import bbox from '@turf/bbox';
-import { IBaseMaps } from '@map-colonies/react-components';
 import { ApiHttpResponse } from '../../common/models/api-response';
 import { ResponseState } from '../../common/models/response-state.enum';
 import { MOCK_DATA_IMAGERY_LAYERS_ISRAEL } from '../../__mocks-data__/search-results.mock';
@@ -71,7 +70,6 @@ const INITIAL_STATE = {
   entityTooltipFields: new Map(),
   previewedLayers: [],
   capabilities: [],
-  baseMaps: CONFIG.BASE_MAPS,
   mapViewerExtentPolygon: undefined,
   customValidationError: undefined,
   serviceErrors: undefined,
@@ -100,7 +98,6 @@ export const discreteLayersStore = ModelBase
     entityTooltipFields: types.maybe(types.frozen<Map<LayerRecordTypes, FieldConfigModelType[]>>(INITIAL_STATE.entityTooltipFields)),
     previewedLayers: types.maybe(types.frozen<string[]>(INITIAL_STATE.previewedLayers)),
     capabilities: types.maybe(types.frozen<CapabilityModelType[]>(INITIAL_STATE.capabilities)),
-    baseMaps: types.maybe(types.frozen<IBaseMaps>(INITIAL_STATE.baseMaps)),
     mapViewerExtentPolygon: types.maybe(types.frozen<Feature|undefined>(INITIAL_STATE.mapViewerExtentPolygon)),
     customValidationError: types.maybe(types.frozen<IError|undefined>(INITIAL_STATE.customValidationError)),
     serviceErrors: types.maybe(types.frozen<Map<string, IError[]>|undefined>(INITIAL_STATE.serviceErrors)),
@@ -419,10 +416,6 @@ export const discreteLayersStore = ModelBase
       return self.capabilities;
     }
 
-    function setBaseMaps(baseMaps: IBaseMaps): void {
-      self.baseMaps = cloneDeep(baseMaps);
-    }
-
     function getEditablePartialObject(layerImage: ILayerImage, extraNonDescriptorFields?: string[]): Record<string, unknown> {
       const flatDescriptors = getFlatEntityDescriptors(layerImage.__typename, self.entityDescriptors as EntityDescriptorModelType[]);
       const filteredLayer: Record<string, unknown> = {};
@@ -732,7 +725,6 @@ export const discreteLayersStore = ModelBase
       removePreviewedLayer,
       isPreviewedLayer,
       setCapabilities,
-      setBaseMaps,
       getEditablePartialObject,
       resetAppState,
       resetTabView,
