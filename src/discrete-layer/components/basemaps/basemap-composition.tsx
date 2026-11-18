@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { observer } from 'mobx-react-lite';
+import { observer } from 'mobx-react';
 import { isEqual, sortBy } from 'lodash';
 import { ICesiumImageryLayer, useCesiumMap } from '@map-colonies/react-components';
 import { useStore } from '../../models/RootStore';

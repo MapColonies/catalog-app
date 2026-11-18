@@ -3,10 +3,11 @@ import { Feature } from 'geojson';
 import bbox from '@turf/bbox';
 import bboxPolygon from '@turf/bbox-polygon';
 import booleanContains from '@turf/boolean-contains';
+import { IRasterLayer } from '@map-colonies/react-components';
 import { adaptCapabilityToWmtsOptions } from '@map-colonies/react-components/bridge';
-import type { WmtsOptions } from '@map-colonies/react-components/dist/schemas';
+import type { WmtsOptions } from '@map-colonies/react-components/schemas';
 import CONFIG from '../../../common/config';
-import { ProtocolType } from '../../../common/models/protocol-type.enum';
+import { ProtocolType, toProtocol } from '../../../common/models/protocol-type.enum';
 import { ILayerImage } from '../../models/layerImage';
 import {
   CapabilityModelType,
@@ -14,6 +15,7 @@ import {
   LayerRasterRecordModelType,
   LinkModelType,
 } from '../../models';
+import { generateLayerRectangleDeg } from './cesiumUtils';
 
 export const isWMTSProtocol = (protocol?: string): boolean => protocol === ProtocolType.WMTS;
 
@@ -102,13 +104,51 @@ export const getLinkUrlWithToken = (
   }
 };
 
-export const getWMTSConfigOptions = (
-  layer: LayerRasterRecordModelType,
-  capability?: CapabilityModelType,
-  defaultUrl?: string
-): WmtsOptions =>
+export const getWMTSConfigOptions = (capability: CapabilityModelType): WmtsOptions =>
   adaptCapabilityToWmtsOptions(
-    capability as unknown as Parameters<typeof adaptCapabilityToWmtsOptions>[0],
-    { layer: `${layer.productId as string}-${layer.productVersion as string}` },
-    { url: defaultUrl }
+    capability as unknown as Parameters<typeof adaptCapabilityToWmtsOptions>[0]
   );
+
+type RasterLayerHydrationProps = Pick<
+  IRasterLayer,
+  'opacity' | 'zIndex' | 'show' | 'shouldBeUsedInModelDraping'
+>;
+
+export const buildRasterLayerFromRecord = (
+  record: LayerRasterRecordModelType,
+  capability: CapabilityModelType | null | undefined,
+  layerProps: RasterLayerHydrationProps
+): IRasterLayer | undefined => {
+  const link = getLayerLink(record);
+  if (link?.url === undefined) {
+    return undefined;
+  }
+
+  const base = { id: record.id, show: true, ...layerProps };
+  const rectangle = generateLayerRectangleDeg(record);
+
+  switch (toProtocol(link.protocol)) {
+    case ProtocolType.WMTS:
+      // Without the capability the tile matrix set is unknown: the layer url must not be used instead
+      return !capability
+        ? undefined
+        : {
+            ...base,
+            type: ProtocolType.WMTS,
+            options: { ...getWMTSConfigOptions(capability), rectangle },
+          };
+
+    case ProtocolType.WMS:
+      return {
+        ...base,
+        type: ProtocolType.WMS,
+        options: { url: link.url, layers: record.productId as string, rectangle },
+      };
+
+    case ProtocolType.XYZ:
+      return { ...base, type: ProtocolType.XYZ, options: { url: link.url, rectangle } };
+
+    default:
+      return undefined;
+  }
+};

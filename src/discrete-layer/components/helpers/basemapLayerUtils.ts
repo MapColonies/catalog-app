@@ -1,15 +1,14 @@
 import { IBaseMaps, IRasterLayer } from '@map-colonies/react-components';
-import { ProtocolType, toProtocol } from '../../../common/models/protocol-type.enum';
+import { ProtocolType } from '../../../common/models/protocol-type.enum';
 import { LinkType } from '../../../common/models/link-type.enum';
-import { CapabilityModelType, LayerRasterRecordModelType } from '../../models';
+import { LayerRasterRecordModelType } from '../../models';
 import {
   BasemapLayerOutput,
   BasemapOutput,
   SourceType,
   Status,
 } from '../basemaps/XXXbasemapMockXXX';
-import { generateLayerRectangleDeg } from './cesiumUtils';
-import { getLayerLink, getTokenParam, getWMTSConfigOptions } from './layersUtils';
+import { buildRasterLayerFromRecord, getTokenParam } from './layersUtils';
 
 type ResolvedCatalogSource = Extract<
   BasemapLayerOutput['source'],
@@ -22,50 +21,6 @@ export const isResolvedCatalogSource = (
   source.type === SourceType.CATALOG_RESOURCE &&
   source.status === Status.RESOLVED &&
   source.layer !== null;
-
-type RasterLayerProps = Pick<
-  IRasterLayer,
-  'id' | 'opacity' | 'zIndex' | 'shouldBeUsedInModelDraping'
->;
-
-export const buildRasterLayerFromRecord = (
-  record: LayerRasterRecordModelType,
-  capability: CapabilityModelType | null | undefined,
-  layerProps: RasterLayerProps
-): IRasterLayer | undefined => {
-  const link = getLayerLink(record);
-  if (link?.url === undefined) {
-    return undefined;
-  }
-
-  const base = { ...layerProps, show: true, tilingScheme: 'geographic' };
-  const rectangle = generateLayerRectangleDeg(record);
-
-  switch (toProtocol(link.protocol)) {
-    case ProtocolType.WMTS:
-      // Without the capability the tile matrix set is unknown: the layer url must not be used instead
-      return !capability
-        ? undefined
-        : {
-            ...base,
-            type: ProtocolType.WMTS,
-            options: { ...getWMTSConfigOptions(record, capability, link.url), rectangle },
-          };
-
-    case ProtocolType.WMS:
-      return {
-        ...base,
-        type: ProtocolType.WMS,
-        options: { url: link.url, layers: record.productId as string, rectangle },
-      };
-
-    case ProtocolType.XYZ:
-      return { ...base, type: ProtocolType.XYZ, options: { url: link.url, rectangle } };
-
-    default:
-      return undefined;
-  }
-};
 
 export const buildRasterLayerFromBasemapLayer = (
   basemapLayer: BasemapLayerOutput
@@ -122,7 +77,6 @@ export const buildRasterLayerFromBasemapLayer = (
   }
 
   return buildRasterLayerFromRecord(source.layer, source.capabilities, {
-    id,
     opacity,
     zIndex: order,
     shouldBeUsedInModelDraping,

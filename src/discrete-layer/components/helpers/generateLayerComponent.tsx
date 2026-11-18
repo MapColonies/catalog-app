@@ -30,8 +30,7 @@ import {
   getInjectedAuth,
   getTokenResource,
 } from './cesiumUtils';
-import { buildRasterLayerFromRecord } from './basemapLayerUtils';
-import { getLayerLink, getLinksArrWithTokens } from './layersUtils';
+import { buildRasterLayerFromRecord, getLayerLink, getLinksArrWithTokens } from './layersUtils';
 
 type SearchLayerPredicate = (layer: ICesiumImageryLayer, idx: number) => boolean;
 
@@ -158,7 +157,6 @@ export const generateLayerComponent = (
         layer as LayerRasterRecordModelType,
         capability,
         {
-          id: layer.id,
           opacity: 1,
           zIndex: 0,
         }

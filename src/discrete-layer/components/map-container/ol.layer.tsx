@@ -11,7 +11,7 @@ import {
   LayerMetadataMixedUnion,
   LayerRasterRecordModelType,
 } from '../../models';
-import { buildRasterLayerFromRecord } from '../helpers/basemapLayerUtils';
+import { buildRasterLayerFromRecord } from '../helpers/layersUtils';
 import { getInjectedAuth } from '../helpers/cesiumUtils';
 
 interface OlLayerProps {
@@ -26,7 +26,7 @@ export const OlLayer: React.FC<OlLayerProps> = React.memo((props) => {
   const rasterLayer = buildRasterLayerFromRecord(
     props.layerRecord as LayerRasterRecordModelType,
     props.capability,
-    { id: props.layerRecord.id, opacity: 1, zIndex: 0 }
+    { opacity: 1, zIndex: 0 }
   );
   const sourceOptions =
     rasterLayer && adaptToOlOptions(rasterLayer.type, rasterLayer.options, getInjectedAuth());
