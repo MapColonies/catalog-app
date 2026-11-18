@@ -30,12 +30,12 @@ import {
   IActionGroup,
 } from '../../../common/actions/entity.actions';
 import { useStore } from '../../models';
-import { BasemapOutput } from './XXXbasemapMockXXX';
+import { BasemapModelType } from '../../models/BasemapModel';
 
 import './basemaps-list.panel.css';
 
 interface BasemapRowProps {
-  basemap: BasemapOutput;
+  basemap: BasemapModelType;
   isShown: boolean;
   onToggleShow: (id: string) => void;
   actions: IActionGroup[];

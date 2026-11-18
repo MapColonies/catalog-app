@@ -2,15 +2,22 @@ import { IRasterLayer } from '@map-colonies/react-components';
 import { ProtocolType } from '../../../common/models/protocol-type.enum';
 import { LinkType } from '../../../common/models/link-type.enum';
 import { CapabilityModelType, LayerRasterRecordModelType } from '../../models';
-import { BasemapLayerOutput } from '../basemaps/XXXbasemapMockXXX';
+import { BasemapLayerModelType } from '../../models/BasemapLayerModel';
 import { generateLayerRectangle, getCesiumWMTSOptions } from './cesiumUtils';
 import { getLayerLink } from './layersUtils';
 
 export const buildRasterLayerFromBasemapLayer = (
-  basemapLayer: BasemapLayerOutput,
+  basemapLayer: BasemapLayerModelType,
   capability?: CapabilityModelType
 ): IRasterLayer | undefined => {
-  const { id, order, opacity, shouldBeUsedInModelDraping, source } = basemapLayer;
+  // `id`/`order`/`opacity` are non-nullable in the GraphQL schema, and `shouldBeUsedInModelDraping` is
+  // selected explicitly - mst-gql still types every field as possibly-undefined (its generic generated
+  // defensive typing), so these are narrowed once here rather than cast at every return below.
+  const { source } = basemapLayer;
+  const id = basemapLayer.id as string;
+  const order = basemapLayer.order as number;
+  const opacity = basemapLayer.opacity as number;
+  const shouldBeUsedInModelDraping = basemapLayer.shouldBeUsedInModelDraping ?? undefined;
 
   if (source.type === 'EXTERNAL') {
     const { protocol, url, ...rest } = source.details;
@@ -48,7 +55,7 @@ export const buildRasterLayerFromBasemapLayer = (
     return undefined;
   }
 
-  if (source.type === 'UNRESOLVED_CATALOG_RESOURCE') {
+  if (source.status === 'UNRESOLVED' || source.layer == null) {
     throw new Error('Unhandled unresolved catalog resource');
   }
 
