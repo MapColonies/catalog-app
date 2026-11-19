@@ -4,14 +4,11 @@ import { v4 as uuidv4 } from 'uuid';
 import { ResponseState } from '../../common/models/response-state.enum';
 import { Domain } from '../../common/models/domain';
 import { ModelBase } from './ModelBase';
-import {
-  BasemapInput,
-  BasemapLayerOutput,
-  BasemapOutput,
-  mockBasemaps,
-  SourceType,
-  Status,
-} from '../components/basemaps/XXXbasemapMockXXX';
+import { BasemapModelType } from './BasemapModel';
+import { BasemapLayerModelType } from './BasemapLayerModel';
+import { SourceType } from './SourceTypeEnum';
+import { ResourceResolutionStatus } from './ResourceResolutionStatusEnum';
+import { BasemapLayerInput } from './RootStore.base';
 import { getLayerLink } from '../components/helpers/layersUtils';
 import { CapabilityModelType } from './CapabilityModel';
 import { LayerRasterRecordModelType } from './LayerRasterRecordModel';
@@ -19,28 +16,64 @@ import { LayerMetadataMixedUnion } from './LayerMetadataMixedModelSelector';
 import { RecordType } from './RecordTypeEnum';
 import { IRootStore, RootStoreType } from './RootStore';
 
+// Requests the full basemap entity against `catalog-web-app-bff`'s `basemaps` query, including both
+// `BasemapLayerSource` union branches - a plain string selector, since the union's inline fragments
+// aren't worth building through the generated selector classes here.
+const BASEMAPS_QUERY_SELECTOR = `
+  id name isCurrent isForPreview
+  thumbnail { url width height }
+  layers {
+    id order opacity shouldBeUsedInModelDraping
+    source {
+      __typename
+      ... on CatalogResourceSource {
+        type domain status
+        uniqueness { productId productType }
+        layer {
+          __typename
+          id productId productType productName description srs srsName classification producerName
+          region sensors imagingTimeBeginUTC imagingTimeEndUTC updateDateUTC creationDateUTC ingestionDate
+          minResolutionDeg maxResolutionDeg minResolutionMeter maxResolutionMeter
+          minHorizontalAccuracyCE90 maxHorizontalAccuracyCE90 transparency productBoundingBox
+          productSubType rms scale insertDate keywords footprint
+          links { name description protocol url }
+        }
+        capabilities {
+          id format
+          style { value isDefault }
+          tileMatrixSet { tileMatrixSetID tileMatrixLabels }
+          url { format resourceType template }
+        }
+      }
+      ... on ExternalLayerSource {
+        type status
+        details { protocol name url }
+      }
+    }
+  }
+`;
 const toBasemapLayerInput = (
-  layer: BasemapLayerOutput
-): BasemapInput['layers'][number] => {
+  layer: BasemapLayerModelType
+): BasemapLayerInput => {
   const { source, ...rest } = layer;
-  if (source.type === SourceType.EXTERNAL) {
+  if (source?.__typename === 'ExternalLayerSource') {
     return {
       ...rest,
       source: {
         type: source.type,
         details: source.details,
       },
-    };
+    } as BasemapLayerInput;
   }
 
   return {
     ...rest,
     source: {
-      type: source.type,
-      domain: source.domain,
-      uniqueness: source.uniqueness,
+      type: source?.type,
+      domain: source?.domain,
+      uniqueness: source?.uniqueness,
     },
-  };
+  } as BasemapLayerInput;
 };
 
 export const basemapsManagementStore = ModelBase
@@ -50,9 +83,9 @@ export const basemapsManagementStore = ModelBase
       Object.values(ResponseState)
     ),
     // TODO: this should be taken from the global store it shouldn't be here at all!
-    basemaps: types.maybe(types.frozen<BasemapOutput[]>([])),
+    basemaps: types.maybe(types.frozen<BasemapModelType[]>([])),
     shownBasemapId: types.maybe(types.string),
-    draftBasemap: types.maybe(types.frozen<BasemapOutput>()),
+    draftBasemap: types.maybe(types.frozen<BasemapModelType>()),
   })
   .views((self) => ({
     get store(): IRootStore {
@@ -61,10 +94,10 @@ export const basemapsManagementStore = ModelBase
     get root(): IRootStore {
       return getParent(self);
     },
-    get shownBasemap(): BasemapOutput | undefined {
+    get shownBasemap(): BasemapModelType | undefined {
       return self.basemaps?.find((basemap) => basemap.id === self.shownBasemapId);
     },
-    get displayedBasemap(): BasemapOutput | undefined {
+    get displayedBasemap(): BasemapModelType | undefined {
       return self.draftBasemap ?? this.shownBasemap;
     },
   }))
@@ -73,9 +106,10 @@ export const basemapsManagementStore = ModelBase
       function* getBasemaps() {
         try {
           self.state = ResponseState.PENDING;
-          // TODO: MOCK should be replaced by actual API call
-          const result: BasemapOutput[] = yield Promise.resolve(mockBasemaps);
-          self.basemaps = result;
+          const response: { basemaps: BasemapModelType[] } = yield self.root
+            .queryBasemaps({}, BASEMAPS_QUERY_SELECTOR)
+            .refetch();
+          self.basemaps = cloneDeep(response.basemaps);
           self.state = ResponseState.DONE;
         } catch (error) {
           console.error(error);
@@ -102,27 +136,28 @@ export const basemapsManagementStore = ModelBase
         throw new Error(`Cannot start draft: basemap ${id} was not found`);
       }
       
-      self.draftBasemap = cloneDeep(basemap) ?? {
+      self.draftBasemap = cloneDeep(basemap) ?? ({
+        __typename: 'Basemap',
         id: uuidv4(),
         name: '',
         thumbnail: { url: '', width: 128, height: 128 },
         isCurrent: false,
         isForPreview: false,
         layers: [],
-      };
+      } as unknown as BasemapModelType);
     };
 
     const clearDraft = (): void => {
       self.draftBasemap = undefined;
     };
 
-    const updateDraft = (patch: Partial<Omit<BasemapOutput, 'id'>>): void => {
+    const updateDraft = (patch: Partial<Omit<BasemapModelType, 'id'>>): void => {
       if (self.draftBasemap) {
         self.draftBasemap = { ...self.draftBasemap, ...patch };
       }
     };
 
-    const setDraftLayers = (layers: BasemapLayerOutput[]): void => {
+    const setDraftLayers = (layers: BasemapLayerModelType[]): void => {
       updateDraft({ layers });
     };
 
@@ -132,7 +167,7 @@ export const basemapsManagementStore = ModelBase
       if (layers === undefined) {
         return;
       }
-      const orderedLayers = [...layers].sort((curr, next) => curr.order - next.order);
+      const orderedLayers = [...layers].sort((curr, next) => (curr.order ?? 0) - (next.order ?? 0));
       const draftLayerIds = new Set(layers.map((layer) => layer.id));
       const mapLayerIds = layerIds.filter((id) => draftLayerIds.has(id));
       const displayedIds = new Set(mapLayerIds);
@@ -159,7 +194,7 @@ export const basemapsManagementStore = ModelBase
     // `fromIndex` / `toIndex` are positions in the ascending `order` list.
     const moveDraftLayer = (fromIndex: number, toIndex: number): void => {
       const orderedLayers = [...(self.draftBasemap?.layers ?? [])].sort(
-        (curr, next) => curr.order - next.order
+        (curr, next) => (curr.order ?? 0) - (next.order ?? 0)
       );
       const [moved] = orderedLayers.splice(fromIndex, 1);
       if (moved === undefined) {
@@ -188,15 +223,16 @@ export const basemapsManagementStore = ModelBase
           console.error(error);
         }
         const currentLayers = self.draftBasemap?.layers ?? [];
-        const topOrder = currentLayers.reduce((max, layer) => Math.max(max, layer.order), -1);
-        const newLayers: BasemapLayerOutput[] = rasterLayers.map((layer, index) => ({
+        const topOrder = currentLayers.reduce((max, layer) => Math.max(max, layer.order ?? 0), -1);
+        const newLayers = rasterLayers.map((layer, index) => ({
           id: uuidv4(),
           order: topOrder + 1 + index,
           opacity: 1,
           source: {
+            __typename: 'CatalogResourceSource',
             type: SourceType.CATALOG_RESOURCE,
             domain: Domain.RASTER,
-            status: Status.RESOLVED,
+            status: ResourceResolutionStatus.RESOLVED,
             uniqueness: {
               productId: layer.productId,
               productType: layer.productType,
@@ -207,7 +243,7 @@ export const basemapsManagementStore = ModelBase
             // plain JSON copy: `frozen` cannot hold MST nodes
             layer: JSON.parse(JSON.stringify(layer)) as LayerRasterRecordModelType,
           },
-        }));
+        })) as unknown as BasemapLayerModelType[];
         setDraftLayers([...currentLayers, ...newLayers]);
       }
     );
@@ -217,9 +253,9 @@ export const basemapsManagementStore = ModelBase
       if (!self.draftBasemap) {
         throw new Error('Cannot save a basemap without a draft');
       }
-      const input: BasemapInput = {
+      const input = {
         ...self.draftBasemap,
-        layers: self.draftBasemap.layers.map(toBasemapLayerInput),
+        layers: (self.draftBasemap.layers ?? []).map(toBasemapLayerInput),
       };
       if (thumbnail !== undefined) {
         // TODO: Should be actual returned url.

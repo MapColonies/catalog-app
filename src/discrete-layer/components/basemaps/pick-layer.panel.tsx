@@ -10,7 +10,7 @@ import { ILayerImage } from '../../models/layerImage';
 import { RecordType } from '../../models/RecordTypeEnum';
 import { useStore } from '../../models/RootStore';
 import { CatalogPicker } from '../catalog-picker/catalog-picker';
-import { SourceType } from './XXXbasemapMockXXX';
+import { SourceType } from '../../models/SourceTypeEnum';
 
 const LAYER_ROOTS_NAMES: TreeRootName[] = ['catalog', 'bests'];
 

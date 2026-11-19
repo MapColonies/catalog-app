@@ -7,6 +7,7 @@ import { IRasterLayer } from '@map-colonies/react-components';
 import { adaptCapabilityToWmtsOptions } from '@map-colonies/react-components/bridge';
 import type { WmtsOptions } from '@map-colonies/react-components/schemas';
 import CONFIG from '../../../common/config';
+import { omitDeep } from '../../../common/helpers/object';
 import { ProtocolType, toProtocol } from '../../../common/models/protocol-type.enum';
 import { ILayerImage } from '../../models/layerImage';
 import {
@@ -119,13 +120,14 @@ export const buildRasterLayerFromRecord = (
   capability: CapabilityModelType | null | undefined,
   layerProps: RasterLayerHydrationProps
 ): IRasterLayer | undefined => {
-  const link = getLayerLink(record);
+  const cleanRecord = omitDeep(record, ['__typename']);
+  const link = getLayerLink(cleanRecord);
   if (link?.url === undefined) {
     return undefined;
   }
 
-  const base = { id: record.id, show: true, ...layerProps };
-  const rectangle = generateLayerRectangleDeg(record);
+  const base = { id: cleanRecord.id, show: true, ...layerProps };
+  const rectangle = generateLayerRectangleDeg(cleanRecord);
 
   switch (toProtocol(link.protocol)) {
     case ProtocolType.WMTS:
@@ -142,7 +144,7 @@ export const buildRasterLayerFromRecord = (
       return {
         ...base,
         type: ProtocolType.WMS,
-        options: { url: link.url, layers: record.productId as string, rectangle },
+        options: { url: link.url, layers: cleanRecord.productId as string, rectangle },
       };
 
     case ProtocolType.XYZ:

@@ -16,7 +16,7 @@ import { PickLayerPanel } from './pick-layer.panel';
 import { BasemapComposer } from './basemap-composer.panel';
 
 import './basemaps-router.css';
-import { SourceType } from './XXXbasemapMockXXX';
+import { SourceType } from '../../models/SourceTypeEnum';
 
 type BasemapsStackPanel = {
   BasemapsList: undefined;

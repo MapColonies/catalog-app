@@ -119,9 +119,37 @@ import { DummyForTypesOnClientModel, DummyForTypesOnClientModelType } from "./Du
 import { dummyForTypesOnClientModelPrimitives, DummyForTypesOnClientModelSelector } from "./DummyForTypesOnClientModel.base"
 import { RasterIngestionModel, RasterIngestionModelType } from "./RasterIngestionModel"
 import { rasterIngestionModelPrimitives, RasterIngestionModelSelector } from "./RasterIngestionModel.base"
+import { BasemapModel, BasemapModelType } from "./BasemapModel"
+import { basemapModelPrimitives, BasemapModelSelector } from "./BasemapModel.base"
+import { BasemapThumbnailModel, BasemapThumbnailModelType } from "./BasemapThumbnailModel"
+import { basemapThumbnailModelPrimitives, BasemapThumbnailModelSelector } from "./BasemapThumbnailModel.base"
+import { BasemapLayerModel, BasemapLayerModelType } from "./BasemapLayerModel"
+import { basemapLayerModelPrimitives, BasemapLayerModelSelector } from "./BasemapLayerModel.base"
+import { CatalogResourceSourceModel, CatalogResourceSourceModelType } from "./CatalogResourceSourceModel"
+import { catalogResourceSourceModelPrimitives, CatalogResourceSourceModelSelector } from "./CatalogResourceSourceModel.base"
+import { RasterUniquenessModel, RasterUniquenessModelType } from "./RasterUniquenessModel"
+import { rasterUniquenessModelPrimitives, RasterUniquenessModelSelector } from "./RasterUniquenessModel.base"
+import { ExternalLayerSourceModel, ExternalLayerSourceModelType } from "./ExternalLayerSourceModel"
+import { externalLayerSourceModelPrimitives, ExternalLayerSourceModelSelector } from "./ExternalLayerSourceModel.base"
+import { ExternalLayerDetailsModel, ExternalLayerDetailsModelType } from "./ExternalLayerDetailsModel"
+import { externalLayerDetailsModelPrimitives, ExternalLayerDetailsModelSelector } from "./ExternalLayerDetailsModel.base"
+import { BasemapExportPackageModel, BasemapExportPackageModelType } from "./BasemapExportPackageModel"
+import { basemapExportPackageModelPrimitives, BasemapExportPackageModelSelector } from "./BasemapExportPackageModel.base"
+import { ImportReviewModel, ImportReviewModelType } from "./ImportReviewModel"
+import { importReviewModelPrimitives, ImportReviewModelSelector } from "./ImportReviewModel.base"
+import { ImportReviewRoleConflictModel, ImportReviewRoleConflictModelType } from "./ImportReviewRoleConflictModel"
+import { importReviewRoleConflictModelPrimitives, ImportReviewRoleConflictModelSelector } from "./ImportReviewRoleConflictModel.base"
+import { ImportReviewThumbnailModel, ImportReviewThumbnailModelType } from "./ImportReviewThumbnailModel"
+import { importReviewThumbnailModelPrimitives, ImportReviewThumbnailModelSelector } from "./ImportReviewThumbnailModel.base"
+import { ImportReviewLayerModel, ImportReviewLayerModelType } from "./ImportReviewLayerModel"
+import { importReviewLayerModelPrimitives, ImportReviewLayerModelSelector } from "./ImportReviewLayerModel.base"
 
 import { layerMetadataMixedModelPrimitives, LayerMetadataMixedModelSelector , LayerMetadataMixedUnion } from "./"
+import { basemapLayerSourceModelPrimitives, BasemapLayerSourceModelSelector , BasemapLayerSourceUnion } from "./"
 
+import { SourceType } from "./SourceTypeEnum"
+import { Domain } from "./DomainEnum"
+import { ResourceResolutionStatus } from "./ResourceResolutionStatusEnum"
 import { RecordType } from "./RecordTypeEnum"
 import { ProductType } from "./ProductTypeEnum"
 import { RecordStatus } from "./RecordStatusEnum"
@@ -286,6 +314,44 @@ export type SourceValidationParams = {
 export type SourceGpkgValidationParams = {
   gpkgFilesPath: string[]
   type: RecordType
+}
+export type CreateBasemapInput = {
+  name: string
+  isCurrent: boolean
+  isForPreview: boolean
+  layers: BasemapLayerInput[]
+  thumbnailBase64: string
+  thumbnailContentType: string
+}
+export type BasemapLayerInput = {
+  id: string
+  order: number
+  opacity: number
+  shouldBeUsedInModelDraping?: (boolean | null)
+  source: BasemapLayerSourceInput
+}
+export type BasemapLayerSourceInput = {
+  type: SourceType
+  domain?: (Domain | null)
+  uniqueness?: (RasterUniquenessInput | null)
+  details?: (ExternalLayerDetailsInput | null)
+}
+export type RasterUniquenessInput = {
+  productId?: (string | null)
+  productType?: (string | null)
+}
+export type ExternalLayerDetailsInput = {
+  protocol: string
+  name: string
+  url: string
+}
+export type UpdateBasemapInput = {
+  name: string
+  isCurrent: boolean
+  isForPreview: boolean
+  layers: BasemapLayerInput[]
+  thumbnailBase64?: (string | null)
+  thumbnailContentType?: (string | null)
 }
 export type RecordUpdatePartial = {
   id: string
@@ -479,7 +545,8 @@ type Refs = {
   entityDescriptors: ObservableMap<string, EntityDescriptorModelType>,
   vectorBestRecords: ObservableMap<string, VectorBestRecordModelType>,
   quantizedMeshBestRecords: ObservableMap<string, QuantizedMeshBestRecordModelType>,
-  polygonPartRecords: ObservableMap<string, PolygonPartRecordModelType>
+  polygonPartRecords: ObservableMap<string, PolygonPartRecordModelType>,
+  basemaps: ObservableMap<string, BasemapModelType>
 }
 
 
@@ -487,6 +554,9 @@ type Refs = {
 * Enums for the names of base graphql actions
 */
 export enum RootStoreBaseQueries {
+queryBasemaps="queryBasemaps",
+queryBasemap="queryBasemap",
+queryExportBasemap="queryExportBasemap",
 queryCapabilities="queryCapabilities",
 querySearch="querySearch",
 querySearchById="querySearchById",
@@ -526,6 +596,10 @@ queryValidateGPKGSource="queryValidateGPKGSource",
 queryDummyForTypesOnClient="queryDummyForTypesOnClient"
 }
 export enum RootStoreBaseMutations {
+mutateCreateBasemap="mutateCreateBasemap",
+mutateUpdateBasemap="mutateUpdateBasemap",
+mutateDeleteBasemap="mutateDeleteBasemap",
+mutateValidateBasemapImport="mutateValidateBasemapImport",
 mutateUpdateStatus="mutateUpdateStatus",
 mutateUpdateMetadata="mutateUpdateMetadata",
 mutateStartRasterIngestion="mutateStartRasterIngestion",
@@ -546,7 +620,7 @@ mutateRevertRasterLayer="mutateRevertRasterLayer"
 */
 export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
   .named("RootStore")
-  .extend(configureStoreMixin([['Capability', () => CapabilityModel], ['Style', () => StyleModel], ['TileMatrixSet', () => TileMatrixSetModel], ['ResourceURL', () => ResourceUrlModel], ['CSWCatalogs', () => CswCatalogsModel], ['CSWCatalog', () => CswCatalogModel], ['Layer3DRecord', () => Layer3DRecordModel], ['Link', () => LinkModel], ['LayerRasterRecord', () => LayerRasterRecordModel], ['LayerDemRecord', () => LayerDemRecordModel], ['VectorBestRecord', () => VectorBestRecordModel], ['VectorFeatureTypeStructure', () => VectorFeatureTypeStructureModel], ['FieldFeatureType', () => FieldFeatureTypeModel], ['QuantizedMeshBestRecord', () => QuantizedMeshBestRecordModel], ['CSWQuerySummary', () => CswQuerySummaryModel], ['StringArrayObjectType', () => StringArrayObjectTypeModel], ['EntityDescriptor', () => EntityDescriptorModel], ['CategoryConfig', () => CategoryConfigModel], ['FieldConfig', () => FieldConfigModel], ['FilterableFieldConfig', () => FilterableFieldConfigModel], ['FilterFieldValidation', () => FilterFieldValidationModel], ['BriefFieldConfig', () => BriefFieldConfigModel], ['Autocompletion', () => AutocompletionModel], ['ValidationConfig', () => ValidationConfigModel], ['EnumAspects', () => EnumAspectsModel], ['UpdateRules', () => UpdateRulesModel], ['UpdateRulesValue', () => UpdateRulesValueModel], ['UpdateRulesOperation', () => UpdateRulesOperationModel], ['LookupTableBinding', () => LookupTableBindingModel], ['DependentField', () => DependentFieldModel], ['ShapeMapping', () => ShapeMappingModel], ['MCEnums', () => McEnumsModel], ['PolygonPartRecord', () => PolygonPartRecordModel], ['EstimatedSize', () => EstimatedSizeModel], ['FreeDiskSpace', () => FreeDiskSpaceModel], ['TriggerExportTask', () => TriggerExportTaskModel], ['ExternalService', () => ExternalServiceModel], ['Job', () => JobModel], ['AvailableActions', () => AvailableActionsModel], ['LookupTableData', () => LookupTableDataModel], ['DeploymentWithServices', () => DeploymentWithServicesModel], ['K8sService', () => K8SServiceModel], ['File', () => FileModel], ['DecryptedId', () => DecryptedIdModel], ['TasksGroup', () => TasksGroupModel], ['Task', () => TaskModel], ['GetFeature', () => GetFeatureModel], ['WfsFeature', () => WfsFeatureModel], ['GetFeatureTypes', () => GetFeatureTypesModel], ['PositionsWithHeights', () => PositionsWithHeightsModel], ['PositionWithHeight', () => PositionWithHeightModel], ['GeojsonFeatureCollection', () => GeojsonFeatureCollectionModel], ['GeojsonFeature', () => GeojsonFeatureModel], ['UserLogin', () => UserLoginModel], ['SourceValidation', () => SourceValidationModel], ['DummyForTypesOnClient', () => DummyForTypesOnClientModel], ['RasterIngestion', () => RasterIngestionModel]], ['LayerRasterRecord', 'Layer3DRecord', 'LayerDemRecord', 'EntityDescriptor', 'VectorBestRecord', 'QuantizedMeshBestRecord', 'PolygonPartRecord'], "js"))
+  .extend(configureStoreMixin([['Capability', () => CapabilityModel], ['Style', () => StyleModel], ['TileMatrixSet', () => TileMatrixSetModel], ['ResourceURL', () => ResourceUrlModel], ['CSWCatalogs', () => CswCatalogsModel], ['CSWCatalog', () => CswCatalogModel], ['Layer3DRecord', () => Layer3DRecordModel], ['Link', () => LinkModel], ['LayerRasterRecord', () => LayerRasterRecordModel], ['LayerDemRecord', () => LayerDemRecordModel], ['VectorBestRecord', () => VectorBestRecordModel], ['VectorFeatureTypeStructure', () => VectorFeatureTypeStructureModel], ['FieldFeatureType', () => FieldFeatureTypeModel], ['QuantizedMeshBestRecord', () => QuantizedMeshBestRecordModel], ['CSWQuerySummary', () => CswQuerySummaryModel], ['StringArrayObjectType', () => StringArrayObjectTypeModel], ['EntityDescriptor', () => EntityDescriptorModel], ['CategoryConfig', () => CategoryConfigModel], ['FieldConfig', () => FieldConfigModel], ['FilterableFieldConfig', () => FilterableFieldConfigModel], ['FilterFieldValidation', () => FilterFieldValidationModel], ['BriefFieldConfig', () => BriefFieldConfigModel], ['Autocompletion', () => AutocompletionModel], ['ValidationConfig', () => ValidationConfigModel], ['EnumAspects', () => EnumAspectsModel], ['UpdateRules', () => UpdateRulesModel], ['UpdateRulesValue', () => UpdateRulesValueModel], ['UpdateRulesOperation', () => UpdateRulesOperationModel], ['LookupTableBinding', () => LookupTableBindingModel], ['DependentField', () => DependentFieldModel], ['ShapeMapping', () => ShapeMappingModel], ['MCEnums', () => McEnumsModel], ['PolygonPartRecord', () => PolygonPartRecordModel], ['EstimatedSize', () => EstimatedSizeModel], ['FreeDiskSpace', () => FreeDiskSpaceModel], ['TriggerExportTask', () => TriggerExportTaskModel], ['ExternalService', () => ExternalServiceModel], ['Job', () => JobModel], ['AvailableActions', () => AvailableActionsModel], ['LookupTableData', () => LookupTableDataModel], ['DeploymentWithServices', () => DeploymentWithServicesModel], ['K8sService', () => K8SServiceModel], ['File', () => FileModel], ['DecryptedId', () => DecryptedIdModel], ['TasksGroup', () => TasksGroupModel], ['Task', () => TaskModel], ['GetFeature', () => GetFeatureModel], ['WfsFeature', () => WfsFeatureModel], ['GetFeatureTypes', () => GetFeatureTypesModel], ['PositionsWithHeights', () => PositionsWithHeightsModel], ['PositionWithHeight', () => PositionWithHeightModel], ['GeojsonFeatureCollection', () => GeojsonFeatureCollectionModel], ['GeojsonFeature', () => GeojsonFeatureModel], ['UserLogin', () => UserLoginModel], ['SourceValidation', () => SourceValidationModel], ['DummyForTypesOnClient', () => DummyForTypesOnClientModel], ['Basemap', () => BasemapModel], ['BasemapThumbnail', () => BasemapThumbnailModel], ['BasemapLayer', () => BasemapLayerModel], ['CatalogResourceSource', () => CatalogResourceSourceModel], ['RasterUniqueness', () => RasterUniquenessModel], ['ExternalLayerSource', () => ExternalLayerSourceModel], ['ExternalLayerDetails', () => ExternalLayerDetailsModel], ['BasemapExportPackage', () => BasemapExportPackageModel], ['ImportReview', () => ImportReviewModel], ['ImportReviewRoleConflict', () => ImportReviewRoleConflictModel], ['ImportReviewThumbnail', () => ImportReviewThumbnailModel], ['ImportReviewLayer', () => ImportReviewLayerModel], ['RasterIngestion', () => RasterIngestionModel]], ['LayerRasterRecord', 'Layer3DRecord', 'LayerDemRecord', 'EntityDescriptor', 'VectorBestRecord', 'QuantizedMeshBestRecord', 'PolygonPartRecord', 'Basemap'], "js"))
   .props({
     layerRasterRecords: types.optional(types.map(types.late((): any => LayerRasterRecordModel)), {}),
     layer3DRecords: types.optional(types.map(types.late((): any => Layer3DRecordModel)), {}),
@@ -554,9 +628,25 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
     entityDescriptors: types.optional(types.map(types.late((): any => EntityDescriptorModel)), {}),
     vectorBestRecords: types.optional(types.map(types.late((): any => VectorBestRecordModel)), {}),
     quantizedMeshBestRecords: types.optional(types.map(types.late((): any => QuantizedMeshBestRecordModel)), {}),
-    polygonPartRecords: types.optional(types.map(types.late((): any => PolygonPartRecordModel)), {})
+    polygonPartRecords: types.optional(types.map(types.late((): any => PolygonPartRecordModel)), {}),
+    basemaps: types.optional(types.map(types.late((): any => BasemapModel)), {})
   })
   .actions(self => ({
+    queryBasemaps(variables?: {  }, resultSelector: string | ((qb: BasemapModelSelector) => BasemapModelSelector) = basemapModelPrimitives.toString(), options: QueryOptions = {}) {
+      return self.query<{ basemaps: BasemapModelType[] }>(`query basemaps { basemaps {
+        ${typeof resultSelector === "function" ? resultSelector(new BasemapModelSelector()).toString() : resultSelector}
+      } }`, variables, options)
+    },
+    queryBasemap(variables: { id: string }, resultSelector: string | ((qb: BasemapModelSelector) => BasemapModelSelector) = basemapModelPrimitives.toString(), options: QueryOptions = {}) {
+      return self.query<{ basemap: BasemapModelType }>(`query basemap($id: String!) { basemap(id: $id) {
+        ${typeof resultSelector === "function" ? resultSelector(new BasemapModelSelector()).toString() : resultSelector}
+      } }`, variables, options)
+    },
+    queryExportBasemap(variables: { id: string }, resultSelector: string | ((qb: BasemapExportPackageModelSelector) => BasemapExportPackageModelSelector) = basemapExportPackageModelPrimitives.toString(), options: QueryOptions = {}) {
+      return self.query<{ exportBasemap: BasemapExportPackageModelType }>(`query exportBasemap($id: String!) { exportBasemap(id: $id) {
+        ${typeof resultSelector === "function" ? resultSelector(new BasemapExportPackageModelSelector()).toString() : resultSelector}
+      } }`, variables, options)
+    },
     queryCapabilities(variables: { params: CapabilitiesLayersSearchParams }, resultSelector: string | ((qb: CapabilityModelSelector) => CapabilityModelSelector) = capabilityModelPrimitives.toString(), options: QueryOptions = {}) {
       return self.query<{ capabilities: CapabilityModelType[] }>(`query capabilities($params: CapabilitiesLayersSearchParams!) { capabilities(params: $params) {
         ${typeof resultSelector === "function" ? resultSelector(new CapabilityModelSelector()).toString() : resultSelector}
@@ -739,6 +829,24 @@ export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
       return self.query<{ dummyForTypesOnClient: DummyForTypesOnClientModelType }>(`query dummyForTypesOnClient { dummyForTypesOnClient {
         ${typeof resultSelector === "function" ? resultSelector(new DummyForTypesOnClientModelSelector()).toString() : resultSelector}
       } }`, variables, options)
+    },
+    mutateCreateBasemap(variables: { data: CreateBasemapInput }, resultSelector: string | ((qb: BasemapModelSelector) => BasemapModelSelector) = basemapModelPrimitives.toString(), optimisticUpdate?: () => void) {
+      return self.mutate<{ createBasemap: BasemapModelType }>(`mutation createBasemap($data: CreateBasemapInput!) { createBasemap(data: $data) {
+        ${typeof resultSelector === "function" ? resultSelector(new BasemapModelSelector()).toString() : resultSelector}
+      } }`, variables, optimisticUpdate)
+    },
+    mutateUpdateBasemap(variables: { data: UpdateBasemapInput, id: string }, resultSelector: string | ((qb: BasemapModelSelector) => BasemapModelSelector) = basemapModelPrimitives.toString(), optimisticUpdate?: () => void) {
+      return self.mutate<{ updateBasemap: BasemapModelType }>(`mutation updateBasemap($data: UpdateBasemapInput!, $id: String!) { updateBasemap(data: $data, id: $id) {
+        ${typeof resultSelector === "function" ? resultSelector(new BasemapModelSelector()).toString() : resultSelector}
+      } }`, variables, optimisticUpdate)
+    },
+    mutateDeleteBasemap(variables: { id: string }, optimisticUpdate?: () => void) {
+      return self.mutate<{ deleteBasemap: string }>(`mutation deleteBasemap($id: String!) { deleteBasemap(id: $id) }`, variables, optimisticUpdate)
+    },
+    mutateValidateBasemapImport(variables: { filename: string, fileBase64: string }, resultSelector: string | ((qb: ImportReviewModelSelector) => ImportReviewModelSelector) = importReviewModelPrimitives.toString(), optimisticUpdate?: () => void) {
+      return self.mutate<{ validateBasemapImport: ImportReviewModelType }>(`mutation validateBasemapImport($filename: String!, $fileBase64: String!) { validateBasemapImport(filename: $filename, fileBase64: $fileBase64) {
+        ${typeof resultSelector === "function" ? resultSelector(new ImportReviewModelSelector()).toString() : resultSelector}
+      } }`, variables, optimisticUpdate)
     },
     mutateUpdateStatus(variables: { data: RecordUpdatePartial }, optimisticUpdate?: () => void) {
       return self.mutate<{ updateStatus: string }>(`mutation updateStatus($data: RecordUpdatePartial!) { updateStatus(data: $data) }`, variables, optimisticUpdate)

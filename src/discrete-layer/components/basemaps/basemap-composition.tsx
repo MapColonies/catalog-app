@@ -4,17 +4,17 @@ import { isEqual, sortBy } from 'lodash';
 import { ICesiumImageryLayer, useCesiumMap } from '@map-colonies/react-components';
 import { useStore } from '../../models/RootStore';
 import { LinkModelType } from '../../models';
+import { BasemapModelType } from '../../models/BasemapModel';
 import {
   buildRasterLayerFromBasemapLayer,
   isResolvedCatalogSource,
 } from '../helpers/basemapLayerUtils';
 import { getLinksArrWithTokens } from '../helpers/layersUtils';
-import { BasemapOutput } from './XXXbasemapMockXXX';
 
 export const BasemapComposition: React.FC = observer(() => {
   const mapViewer = useCesiumMap();
   const store = useStore();
-  const renderedBasemap = useRef<BasemapOutput>();
+  const renderedBasemap = useRef<BasemapModelType>();
   const addedLayerIds = useRef<string[]>([]);
   const isUpdatingMap = useRef(false);
 
@@ -50,26 +50,26 @@ export const BasemapComposition: React.FC = observer(() => {
       previous.id === basemap.id &&
       isEqual(
         sortBy(
-          previous.layers.map(({ order, opacity, ...layer }) => layer),
+          (previous.layers ?? []).map(({ order, opacity, ...layer }) => layer),
           'id'
         ),
         sortBy(
-          basemap.layers.map(({ order, opacity, ...layer }) => layer),
+          (basemap.layers ?? []).map(({ order, opacity, ...layer }) => layer),
           'id'
         )
       );
 
     isUpdatingMap.current = true;
     try {
-      if (onlyOrderOrOpacityChanged) {
-        basemap.layers
+      if (onlyOrderOrOpacityChanged && basemap !== undefined) {
+        (basemap.layers ?? [])
           .slice()
-          .sort((curr, next) => next.order - curr.order)
-          .filter((layer) => addedLayerIds.current.includes(layer.id))
+          .sort((curr, next) => (next.order ?? 0) - (curr.order ?? 0))
+          .filter((layer) => addedLayerIds.current.includes(layer.id as string))
           .forEach((layer) => {
-            const imageryLayer = layerManager?.get(layer.id);
+            const imageryLayer = layerManager?.get(layer.id as string);
             if (imageryLayer !== undefined) {
-              imageryLayer.alpha = layer.opacity;
+              imageryLayer.alpha = layer.opacity as number;
               mapViewer.imageryLayers.lowerToBottom(imageryLayer);
             }
           });
@@ -80,17 +80,18 @@ export const BasemapComposition: React.FC = observer(() => {
       addedLayerIds.current.forEach((id) => layerManager?.removeLayer(id));
       addedLayerIds.current = [];
       if (basemap !== undefined) {
-        basemap.layers
+        (basemap.layers ?? [])
           .slice()
-          .sort((curr, next) => curr.order - next.order)
+          .sort((curr, next) => (curr.order ?? 0) - (next.order ?? 0))
           .forEach((basemapLayer) => {
+            const isResolvedCatalogResource = isResolvedCatalogSource(basemapLayer.source);
             const rasterLayer = buildRasterLayerFromBasemapLayer(basemapLayer);
             if (rasterLayer !== undefined) {
               const layerMetadata = {
                 id: rasterLayer.id,
                 searchLayerPredicate: (cesiumLayer: ICesiumImageryLayer): boolean =>
                   cesiumLayer.meta?.id === rasterLayer.id,
-                ...(isResolvedCatalogSource(basemapLayer.source) && {
+                ...(isResolvedCatalogResource && {
                   layerRecord: {
                     ...basemapLayer.source.layer,
                     links: getLinksArrWithTokens([

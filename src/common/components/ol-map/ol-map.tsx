@@ -1,13 +1,13 @@
 import React, { PropsWithChildren, useState } from 'react';
 import { Legend, LegendItem, Map, MapProps } from '@map-colonies/react-components';
-import { BasemapOutput } from '../../../discrete-layer/components/basemaps/XXXbasemapMockXXX';
+import { BasemapModelType } from '../../../discrete-layer/models/BasemapModel';
 import { OlBaseMap } from './ol.base-map';
 import { MapLoadingIndicator } from './map-loading-indicator';
 import { ToggleBaseMap } from './toggle-base-map';
 import { ZoomLevelIndicator } from './zoom-level-indicator';
 
 export interface IOLMapBaseMaps {
-  basemaps: BasemapOutput[];
+  basemaps: BasemapModelType[];
   showBaseMap?: boolean;
   showToggleButton?: boolean;
 }

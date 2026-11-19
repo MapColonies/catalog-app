@@ -27,10 +27,13 @@ import { isRtl } from '../../../common/i18n/helpers';
 import { useStore } from '../../models/RootStore';
 import type { CesiumViewer } from '@map-colonies/react-components';
 import type { BasemapsPanelProps } from './basemaps-router';
-import { BasemapLayerOutput, SourceType, Status } from './XXXbasemapMockXXX';
+import { BasemapLayerModelType } from '../../models/BasemapLayerModel';
+import { SourceType } from '../../models/SourceTypeEnum';
+import { ResourceResolutionStatus } from '../../models/ResourceResolutionStatusEnum';
 
 import './basemap-composer.panel.css';
 import { useMapViewer } from '../map-container/cesium-map-viewer.bridge';
+import { isCatalogSource, isExternalSource } from '../helpers/basemapLayerUtils';
 
 interface LayerRow {
   id: string;
@@ -46,30 +49,30 @@ const SOURCE_TYPE_LABEL_IDS = {
   external: 'basemap.composer.layers.source.external',
 };
 
-const getLayerName = (layer: BasemapLayerOutput): string => {
+const getLayerName = (layer: BasemapLayerModelType): string => {
   const { source } = layer;
-  if (source.type === SourceType.EXTERNAL) {
-    return source.details.name;
+  if (isExternalSource(source)) {
+    return source.details?.name ?? layer.id ?? '';
   }
-  return source.status === Status.RESOLVED
-    ? source.layer?.productName ?? layer.id
-    : source.uniqueness.productId ?? layer.id;
+  return source?.status === ResourceResolutionStatus.RESOLVED
+    ? source.layer?.productName ?? layer.id ?? ''
+    : source?.uniqueness?.productId ?? layer.id ?? '';
 };
 
-const getSourceTypeLabelId = (layer: BasemapLayerOutput): string => {
+const getSourceTypeLabelId = (layer: BasemapLayerModelType): string => {
   const { source } = layer;
-  if (source.type === SourceType.EXTERNAL) {
+  if (isExternalSource(source)) {
     return SOURCE_TYPE_LABEL_IDS.external;
   }
-  return source.status === Status.RESOLVED
+  return source?.status === ResourceResolutionStatus.RESOLVED
     ? SOURCE_TYPE_LABEL_IDS.catalogResolved
     : SOURCE_TYPE_LABEL_IDS.catalogUnresolved;
 };
 
 const clampPercent = (value: number): number => Math.min(100, Math.max(0, Math.round(value)));
 
-const sortLayersByOrder = (layers: readonly BasemapLayerOutput[]): BasemapLayerOutput[] =>
-  [...layers].sort((curr, next) => curr.order - next.order);
+const sortLayersByOrder = (layers: readonly BasemapLayerModelType[]): BasemapLayerModelType[] =>
+  [...layers].sort((curr, next) => (curr.order ?? 0) - (next.order ?? 0));
 
 const BasemapThumbnail: React.FC<{
   mapViewer: CesiumViewer;
@@ -96,7 +99,7 @@ const BasemapThumbnail: React.FC<{
   });
   return (
     <ThumbnailCapture
-      thumbnailUrl={thumbnailUrl ?? (basemapsStore.draftBasemap?.thumbnail.url || undefined)}
+      thumbnailUrl={thumbnailUrl ?? (basemapsStore.draftBasemap?.thumbnail?.url || undefined)}
       capture={capture}
     />
   );
@@ -124,13 +127,13 @@ export const BasemapComposer: React.FC<BasemapsPanelProps<'BasemapComposer'>> = 
     }, [draft?.layers]);
 
     const rowData: LayerRow[] = orderedLayers.map((layer) => ({
-      id: layer.id,
+      id: layer.id as string,
       name: getLayerName(layer),
       source: intl.formatMessage({ id: getSourceTypeLabelId(layer) }),
-      opacity: Math.round(layer.opacity * 100),
+      opacity: Math.round((layer.opacity ?? 0) * 100),
       isUnresolved:
-        layer.source.type === SourceType.CATALOG_RESOURCE &&
-        layer.source.status === Status.UNRESOLVED,
+        isCatalogSource(layer.source) &&
+        layer.source.status === ResourceResolutionStatus.UNRESOLVED,
     }));
 
     const columnDefs: ColDef<LayerRow>[] = [
@@ -228,7 +231,7 @@ export const BasemapComposer: React.FC<BasemapsPanelProps<'BasemapComposer'>> = 
         <TextField
           outlined
           placeholder={intl.formatMessage({ id: 'basemap.composer.new-basemap-name' })}
-          value={draft.name}
+          value={draft.name ?? ''}
           onChange={(event: React.ChangeEvent<HTMLInputElement>): void =>
             basemapsStore.updateDraft({ name: event.currentTarget.value })
           }
@@ -288,14 +291,14 @@ export const BasemapComposer: React.FC<BasemapsPanelProps<'BasemapComposer'>> = 
               </Typography>
               <Checkbox
                 label={intl.formatMessage({ id: 'basemap.composer.comprehensive-change.current' })}
-                checked={draft.isCurrent}
+                checked={draft.isCurrent ?? false}
                 onChange={(event: React.ChangeEvent<HTMLInputElement>): void =>
                   basemapsStore.updateDraft({ isCurrent: event.currentTarget.checked })
                 }
               />
               <Checkbox
                 label={intl.formatMessage({ id: 'basemap.composer.comprehensive-change.preview' })}
-                checked={draft.isForPreview}
+                checked={draft.isForPreview ?? false}
                 onChange={(event: React.ChangeEvent<HTMLInputElement>): void =>
                   basemapsStore.updateDraft({ isForPreview: event.currentTarget.checked })
                 }
