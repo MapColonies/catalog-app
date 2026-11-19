@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { observer } from 'mobx-react-lite';
+import { observer } from 'mobx-react';
 import { useIntl } from 'react-intl';
 import { Box } from '@map-colonies/react-components';
 import type { BasemapsPanelProps } from './basemaps-router';
@@ -155,10 +155,6 @@ export const BasemapsListPanel: React.FC<BasemapsPanelProps<'BasemapsList'>> = o
     const basemapActions = store.actionDispatcherStore.getEntityActionGroups(BASEMAP_ENTITY);
     const [scrollTick, setScrollTick] = useState<number>(0);
 
-    useEffect(() => {
-      void basemapsStore.getBasemaps();
-    }, [basemapsStore]);
-
     const basemaps = basemapsStore.basemaps ?? [];
 
     return (
@@ -170,7 +166,8 @@ export const BasemapsListPanel: React.FC<BasemapsPanelProps<'BasemapsList'>> = o
                 type="button"
                 className="actionButton"
                 outlined
-                onClick={(): void => navigation.navigate('EditBasemap')}
+                // TODO: import is not implemented yet
+                onClick={(): void => undefined}
               >
                 {intl.formatMessage({ id: 'basemaps.list.import' })}
               </Button>
@@ -180,7 +177,7 @@ export const BasemapsListPanel: React.FC<BasemapsPanelProps<'BasemapsList'>> = o
                 type="button"
                 className="actionButton"
                 raised
-                onClick={(): void => navigation.navigate('EditBasemap')}
+                onClick={(): void => navigation.navigate('BasemapComposer', { id: undefined })}
               >
                 {intl.formatMessage({ id: 'basemaps.list.new' })}
               </Button>
@@ -199,8 +196,7 @@ export const BasemapsListPanel: React.FC<BasemapsPanelProps<'BasemapsList'>> = o
               onAction={(action, id): void => {
                 switch (action) {
                   case CRUDAction.edit:
-                    basemapsStore.editBasemap(id);
-                    navigation.navigate('EditBasemap');
+                    navigation.navigate('BasemapComposer', { id });
                     break;
                   case GeneralAction.export:
                     basemapsStore.exportBasemap(id);

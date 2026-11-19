@@ -21,6 +21,10 @@ export const StaticDataFetcher: React.FC = () => {
     store.servicesAvailabilityStore.servicesAvailability,
   ]);
 
+  useEffect(() => {
+    void store.basemapsStore.getBasemaps();
+  }, []);
+
   return (
     <>
       <EntityDescriptorsFetcher />

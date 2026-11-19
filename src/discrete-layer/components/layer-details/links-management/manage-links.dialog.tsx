@@ -46,6 +46,7 @@ import { FileLinkSlot } from './file-link-slot';
 import { LinkSection } from './link-section';
 import { ThumbnailsSection } from './thumbnails-section';
 import { exportLayerResourcesZip } from './zip-export';
+import { toIBaseMaps } from '../../helpers/basemapLayerUtils';
 import { parseLayerResourcesZip, ZipImportError, ZipImportErrorCode } from './zip-import';
 
 import './manage-links.dialog.css';
@@ -120,8 +121,8 @@ export const ManageLinksDialog: React.FC<ManageLinksDialogProps> = observer(
     );
 
     const previewBaseMaps = useMemo(
-      () => withNoCurrentBasemap(store.discreteLayersStore.baseMaps),
-      [store.discreteLayersStore.baseMaps]
+      () => withNoCurrentBasemap(toIBaseMaps(store.basemapsStore.basemaps)),
+      [store.basemapsStore.basemaps]
     );
 
     const previewLayerElement = useMemo(

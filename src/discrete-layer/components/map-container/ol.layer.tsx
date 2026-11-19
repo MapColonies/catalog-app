@@ -1,19 +1,18 @@
 import React from 'react';
-import { TileLayer, TileWMTS, TileXYZ } from '@map-colonies/react-components';
-import { ProtocolType, toProtocol } from '../../../common/models/protocol-type.enum';
+import { useMap } from '@map-colonies/react-components';
 import {
+  adaptToOlLayerExtent,
+  adaptToOlOptions,
   LayerOptions,
-  WMTSOptions,
-  XYZOptions,
-} from '../../../common/components/ol-map/layer.config.options-bridging';
+} from '@map-colonies/react-components/bridge';
+import { OlTileLayer } from '../../../common/components/ol-map/ol.tile-layer';
 import {
   CapabilityModelType,
   LayerMetadataMixedUnion,
   LayerRasterRecordModelType,
-  LinkModelType,
 } from '../../models';
-import { getLayerLink, getLinkUrlWithToken, getWMTSConfigOptions } from '../helpers/layersUtils';
-import { getOLSourceOptions } from '../helpers/olUtils';
+import { buildRasterLayerFromRecord } from '../helpers/layersUtils';
+import { getInjectedAuth } from '../helpers/cesiumUtils';
 
 interface OlLayerProps {
   layerRecord: LayerMetadataMixedUnion;
@@ -22,49 +21,28 @@ interface OlLayerProps {
 }
 
 export const OlLayer: React.FC<OlLayerProps> = React.memo((props) => {
-  let options: XYZOptions | WMTSOptions | null = null;
-  let tileComponent: JSX.Element | undefined = undefined;
+  const viewProjection = useMap().getView().getProjection().getCode();
 
-  const layerLink = getLayerLink(props.layerRecord);
-  if (!layerLink?.url) {
-    return undefined;
+  const rasterLayer = buildRasterLayerFromRecord(
+    props.layerRecord as LayerRasterRecordModelType,
+    props.capability,
+    { opacity: 1, zIndex: 0 }
+  );
+  const sourceOptions =
+    rasterLayer && adaptToOlOptions(rasterLayer.type, rasterLayer.options, getInjectedAuth());
+
+  if (!rasterLayer || !sourceOptions) {
+    return null;
   }
 
-  switch (toProtocol(layerLink.protocol)) {
-    case ProtocolType.XYZ:
-      options = getOLSourceOptions(ProtocolType.XYZ, {
-        options: { url: layerLink.url },
-      });
-      tileComponent = (
-        <TileXYZ options={{ ...(options as XYZOptions), crossOrigin: 'anonymous' }} />
-      );
-      break;
-
-    case ProtocolType.WMTS: {
-      const resolved = getWMTSConfigOptions(
-        props.layerOptions as LayerRasterRecordModelType,
-        layerLink.url as string,
-        props.capability
-      );
-
-      options = getOLSourceOptions(ProtocolType.WMTS, {
-        options: {
-          ...resolved,
-          url: getLinkUrlWithToken([
-            { ...layerLink, url: resolved.url } as LinkModelType,
-          ]) as string,
-        },
-      });
-      tileComponent = (
-        <TileWMTS options={{ ...(options as WMTSOptions), crossOrigin: 'anonymous' }} />
-      );
-      break;
-    }
-  }
-
-  if (!options || !tileComponent) {
-    return;
-  }
-
-  return <TileLayer options={props.layerOptions}>{tileComponent}</TileLayer>;
+  return (
+    <OlTileLayer
+      layerType={rasterLayer.type}
+      sourceOptions={sourceOptions}
+      layerOptions={{
+        ...props.layerOptions,
+        extent: adaptToOlLayerExtent(rasterLayer.options, viewProjection),
+      }}
+    />
+  );
 });

@@ -221,13 +221,9 @@ export const PPIngestionMap: React.FC<PPIngestionMapProps> = ({
   return (
     <Box id="geoFeaturesMapContainer" style={{ ...style }}>
       <OLMap
-        baseMapsConfig={
-          store.discreteLayersStore.baseMaps
-            ? {
-                maps: store.discreteLayersStore.baseMaps.maps,
-              }
-            : undefined
-        }
+        baseMapsConfig={{
+          basemaps: store.basemapsStore.basemaps ?? [],
+        }}
         zoomLevelWidget={{
           indicateTillZoomLevel:
             showExistingPolygonParts || childrenWithZoomIndication

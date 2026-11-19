@@ -1,4 +1,4 @@
-import { isObject, cloneDeep } from 'lodash';
+import { isObject, isPlainObject, cloneDeep } from 'lodash';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export function hasOwnProperty<X extends {}, Y extends PropertyKey>(
@@ -42,3 +42,26 @@ export const removePropertiesWithPrefix = (obj: any, prefix: string): any => {
   }
   return obj;
 };
+
+const stripKeysDeep = (value: unknown, keys: string[]): unknown => {
+  if (Array.isArray(value)) {
+    return value.map((item) => stripKeysDeep(item, keys));
+  }
+  if (isPlainObject(value)) {
+    return Object.fromEntries(
+      Object.entries(value as Record<string, unknown>)
+        .filter(([key]) => !keys.includes(key))
+        .map(([key, val]) => [key, stripKeysDeep(val, keys)])
+    );
+  }
+  return value;
+};
+
+/**
+ * Recursively removes the given keys (e.g. GraphQL's `__typename`) from a value, at every nesting
+ * level of plain objects/arrays. `cloneDeep`s first so this is safe to call with a live mst-gql model
+ * instance: its props are its own plain enumerable fields, but its views/actions (e.g. `store`) live
+ * on the prototype and aren't cloned, so the result is just the plain data with the keys stripped.
+ */
+export const omitDeep = <T>(value: T, keys: string[]): T =>
+  stripKeysDeep(cloneDeep(value), keys) as T;
