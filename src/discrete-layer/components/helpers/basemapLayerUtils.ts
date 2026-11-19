@@ -1,32 +1,38 @@
 import { IBaseMaps, IRasterLayer } from '@map-colonies/react-components';
-import { omitDeep } from '../../../common/helpers/object';
 import { ProtocolType } from '../../../common/models/protocol-type.enum';
 import { LinkType } from '../../../common/models/link-type.enum';
-import { LayerRasterRecordModelType } from '../../models';
+import { LayerRasterRecordModelType, SourceType } from '../../models';
 import { BasemapLayerModelType } from '../../models/BasemapLayerModel';
 import { BasemapModelType } from '../../models/BasemapModel';
+import { CatalogResourceSourceModelType } from '../../models/CatalogResourceSourceModel';
+import { ExternalLayerDetailsModelType } from '../../models/ExternalLayerDetailsModel';
+import { ExternalLayerSourceModelType } from '../../models/ExternalLayerSourceModel';
 import { ResourceResolutionStatus } from '../../models/ResourceResolutionStatusEnum';
 import { buildRasterLayerFromRecord, getTokenParam } from './layersUtils';
+import { WmtsOptionsInput, XyzOptionsInput } from '@map-colonies/react-components/dist/schemas';
+import { omitDeep } from '../../../common/helpers/object';
 
-type ResolvedCatalogResourceSource = Extract<
-  NonNullable<BasemapLayerModelType['source']>,
-  { __typename: 'CatalogResourceSource' }
-> & { layer: LayerRasterRecordModelType };
+// mst-gql generates `source` as `any` (union members are wrapped in `types.late((): any => ...)`), so the real union is spelled out here.
+export type BasemapLayerSource = CatalogResourceSourceModelType | ExternalLayerSourceModelType;
+
+type ResolvedCatalogResourceSource = CatalogResourceSourceModelType & {
+  layer: LayerRasterRecordModelType;
+};
 
 export const isResolvedCatalogSource = (
-  source: BasemapLayerModelType['source']
+  source?: BasemapLayerSource
 ): source is ResolvedCatalogResourceSource =>
   source?.__typename === 'CatalogResourceSource' &&
   source.status === ResourceResolutionStatus.RESOLVED &&
   source.layer != null;
 
-export const isCatalogSource = (source?: BasemapLayerModelType['source']): boolean => {
-  return source && source.__typename === 'CatalogResourceSource';
-};
+export const isCatalogSource = (
+  source?: BasemapLayerSource
+): source is CatalogResourceSourceModelType => source?.type === SourceType.CATALOG_RESOURCE;
 
-export const isExternalSource = (source?: BasemapLayerModelType['source']): boolean => {
-  return source && source.__typename === 'ExternalLayerSource';
-};
+export const isExternalSource = (
+  source?: BasemapLayerSource
+): source is ExternalLayerSourceModelType => source?.type === SourceType.EXTERNAL;
 
 export const buildRasterLayerFromBasemapLayer = (
   basemapLayer: BasemapLayerModelType
@@ -34,7 +40,7 @@ export const buildRasterLayerFromBasemapLayer = (
   // `id`/`order`/`opacity` are non-nullable in the GraphQL schema, and `shouldBeUsedInModelDraping` is
   // selected explicitly - mst-gql still types every field as possibly-undefined (its generic generated
   // defensive typing), so these are narrowed once here rather than cast at every return below.
-  const { source } = basemapLayer;
+  const source = basemapLayer.source as BasemapLayerSource | undefined;
   const id = basemapLayer.id as string;
   const order = basemapLayer.order as number;
   const opacity = basemapLayer.opacity as number;
@@ -45,12 +51,13 @@ export const buildRasterLayerFromBasemapLayer = (
     // The generated `ExternalLayerDetails` type only declares `protocol`/`name`/`url` - widen to allow the extra WMTS/XYZ option fields
     // (`matrixSet`, `layer`, `style`, `format`, `credit`, ...) that aren't part of the GraphQL schema yet. `details` can itself carry a
     // `__typename` (and so could any of those extra fields, were they ever objects), so strip recursively before it's spread into `options`.
-    const details = omitDeep(source.details ?? {}, ['__typename']) as {
-      protocol?: string;
-      name?: string;
-      url?: string;
-    } & Record<string, unknown>;
-    const { protocol, name, matrixSet, ...rest } = details;
+    const rawDetails: Partial<ExternalLayerDetailsModelType> = source.details ?? {};
+    const details = omitDeep(rawDetails, ['__typename']) as Pick<
+      ExternalLayerDetailsModelType,
+      'protocol' | 'name' | 'url'
+    > &
+      Record<string, unknown>;
+    const { protocol, name, url, ...rest } = details;
 
     if (protocol === LinkType.XYZ) {
       return {
@@ -63,8 +70,8 @@ export const buildRasterLayerFromBasemapLayer = (
         noAuth: true,
         options: {
           ...rest,
-          url: rest.url as string,
-        },
+          url: url as string,
+        } satisfies XyzOptionsInput,
       };
     }
 
@@ -81,10 +88,11 @@ export const buildRasterLayerFromBasemapLayer = (
           ...rest,
           url: rest.url as string,
           layer: rest.layer as string,
-          tileMatrixSetID: matrixSet as string,
           style: (rest.style as string | undefined) ?? 'default',
           format: (rest.format as string | undefined) ?? 'image/png',
-        },
+          tileMatrixSetID:
+            (rest.tileMatrixSetID as string | undefined) ?? 'XXX_DEFAULT_tileMatrixSetID_XXX',
+        } satisfies WmtsOptionsInput,
       };
     }
 
