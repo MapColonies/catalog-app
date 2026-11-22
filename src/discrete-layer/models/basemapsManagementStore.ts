@@ -1,7 +1,6 @@
 import { types, getParent, flow } from 'mobx-state-tree';
 import { cloneDeep } from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
-import { ResponseState } from '../../common/models/response-state.enum';
 import { Domain } from '../../common/models/domain';
 import { ModelBase } from './ModelBase';
 import { BasemapModelType } from './BasemapModel';
@@ -64,8 +63,6 @@ const normalizeLayersOrder = (layers: BasemapLayerModelType[]): BasemapLayerMode
     });
 };
 
-export type DraftLayerMove = 'up' | 'down' | 'top' | 'bottom';
-
 const toBasemapLayerInput = (
   layer: BasemapLayerModelType
 ): BasemapLayerInput => {
@@ -92,10 +89,6 @@ const toBasemapLayerInput = (
 
 export const basemapsManagementStore = ModelBase
   .props({
-    state: types.enumeration<ResponseState>(
-      'State',
-      Object.values(ResponseState)
-    ),
     basemaps: types.maybe(types.frozen<BasemapModelType[]>([])),
     shownBasemapId: types.maybe(types.string),
     draftBasemap: types.maybe(types.frozen<BasemapModelType>()),
@@ -118,15 +111,14 @@ export const basemapsManagementStore = ModelBase
     const getBasemaps: () => Promise<void> = flow(
       function* getBasemaps() {
         try {
-          self.state = ResponseState.PENDING;
           const response: { basemaps: BasemapModelType[] } = yield self.root
             .queryBasemaps({}, BASEMAPS_QUERY_SELECTOR)
             .refetch();
-          self.basemaps = cloneDeep(response.basemaps);
-          self.state = ResponseState.DONE;
+          self.basemaps = cloneDeep(response.basemaps).map((basemap) => {
+            return { ...basemap, layers: normalizeLayersOrder([...(basemap.layers ?? [])]) };
+          });
         } catch (error) {
           console.error(error);
-          self.state = ResponseState.ERROR;
         }
       }
     );
@@ -175,6 +167,26 @@ export const basemapsManagementStore = ModelBase
       updateDraft({ layers: normalizeLayersOrder(layers) });
     };
 
+    // Called when the order was changed on the map. `layerIds` are ordered bottom to top and may include
+    // map layers that are not part of the draft. Draft layers that are not on the map keep their slot.
+    const syncDraftLayerOrder = (layerIds: string[]): void => {
+      const layers = self.draftBasemap?.layers;
+      if (layers === undefined) {
+        return;
+      }
+      const layersById = new Map(layers.map((layer) => [layer.id, layer]));
+      const mappedLayers = layerIds.flatMap((id) => layersById.get(id) ?? []);
+      const mappedIds = new Set(mappedLayers.map((layer) => layer.id));
+      let nextMappedIndex = 0;
+      const reorderedLayers = layers.map((layer) => {
+        return mappedIds.has(layer.id) ? mappedLayers[nextMappedIndex++] : layer;
+      });
+      if (reorderedLayers.every((layer, index) => layer === layers[index])) {
+        return;
+      }
+      setDraftLayers(reorderedLayers);
+    };
+
     const setDraftLayerOpacity = (layerId: string, opacity: number): void => {
       setDraftLayers(
         (self.draftBasemap?.layers ?? []).map((layer) =>
@@ -196,24 +208,6 @@ export const basemapsManagementStore = ModelBase
       }
       layers.splice(toIndex, 0, moved);
       setDraftLayers(layers.map((layer, index) => ({ ...layer, order: index })));
-    };
-
-    // Returns false when `layerId` is not a draft layer, so the caller can handle it as a regular map layer.
-    const moveDraftLayerById = (layerId: string, move: DraftLayerMove): boolean => {
-      const layers = self.draftBasemap?.layers ?? [];
-      const fromIndex = layers.findIndex((layer) => layer.id === layerId);
-      if (fromIndex < 0) {
-        return false;
-      }
-      const lastIndex = layers.length - 1;
-      const targets: Record<DraftLayerMove, number> = {
-        up: Math.min(fromIndex + 1, lastIndex),
-        down: Math.max(fromIndex - 1, 0),
-        top: lastIndex,
-        bottom: 0,
-      };
-      moveDraftLayer(fromIndex, targets[move]);
-      return true;
     };
 
     const addDraftLayers: (layers: LayerMetadataMixedUnion[]) => Promise<void> = flow(
@@ -287,7 +281,7 @@ export const basemapsManagementStore = ModelBase
       setDraftLayerOpacity,
       removeDraftLayer,
       moveDraftLayer,
-      moveDraftLayerById,
+      syncDraftLayerOrder,
       addDraftLayers,
       saveBasemap,
       exportDraftBasemap,

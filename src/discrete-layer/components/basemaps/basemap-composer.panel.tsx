@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { observer } from 'mobx-react';
 import { useIntl } from 'react-intl';
 import { Box } from '@map-colonies/react-components';
@@ -71,10 +71,6 @@ const getSourceTypeLabelId = (layer: BasemapLayerModelType): string => {
 
 const clampPercent = (value: number): number => Math.min(100, Math.max(0, Math.round(value)));
 
-// Bottom-most layer first, matching the map's active layers panel (Cesium collection order).
-const sortLayersByOrder = (layers: readonly BasemapLayerModelType[]): BasemapLayerModelType[] =>
-  [...layers].sort((curr, next) => (curr.order ?? 0) - (next.order ?? 0));
-
 const BasemapThumbnail: React.FC<{
   mapViewer: CesiumViewer;
   thumbnailBlob?: Blob;
@@ -123,11 +119,7 @@ export const BasemapComposer: React.FC<BasemapsPanelProps<'BasemapComposer'>> = 
 
     const draft = basemapsStore.draftBasemap;
 
-    const orderedLayers = useMemo(() => {
-      return sortLayersByOrder(draft?.layers ?? []);
-    }, [draft?.layers]);
-
-    const rowData: LayerRow[] = orderedLayers.map((layer) => ({
+    const rowData: LayerRow[] = (draft?.layers ?? []).map((layer) => ({
       id: layer.id as string,
       name: getLayerName(layer),
       source: intl.formatMessage({ id: getSourceTypeLabelId(layer) }),
@@ -215,7 +207,7 @@ export const BasemapComposer: React.FC<BasemapsPanelProps<'BasemapComposer'>> = 
       columnDefs,
       // gridOptions are applied by the grid once, so read fresh store state here
       onRowDragEnd: ({ node, overIndex }: GridRowDragEndEvent): void => {
-        const currentOrderedLayers = sortLayersByOrder(basemapsStore.draftBasemap?.layers ?? []);
+        const currentOrderedLayers = basemapsStore.draftBasemap?.layers ?? [];
         const fromIndex = currentOrderedLayers.findIndex(({ id }) => id === node.data?.id);
         if (fromIndex >= 0 && overIndex >= 0 && fromIndex !== overIndex) {
           basemapsStore.moveDraftLayer(fromIndex, overIndex);

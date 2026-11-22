@@ -52,9 +52,7 @@ export const baseRootStore = RootStoreBase
     jobsStore: types.optional(jobsStore, {
       state: ResponseState.IDLE,
     }),
-    basemapsStore: types.optional(basemapsManagementStore, {
-      state: ResponseState.IDLE,
-    }),
+    basemapsStore: types.optional(basemapsManagementStore, {}),
   })
   .views((self) => ({
     get fetch(): FetchAction {

@@ -32,14 +32,6 @@ const isOnlyOrderOrOpacityChanged = (
   );
 };
 
-const sortLayersByOrder = (layers: BasemapModelType['layers']): BasemapLayer[] => {
-  const direction = 'asc';
-  const sign = direction === 'asc' ? 1 : -1;
-  return (layers ?? []).slice().sort((curr, next) => {
-    return sign * ((curr.order ?? 0) - (next.order ?? 0));
-  });
-};
-
 const buildLayerMetadata = (
   rasterLayerId: string,
   basemapLayer: BasemapLayer
@@ -75,23 +67,33 @@ export const BasemapComposition: React.FC = observer(() => {
 
   // Layers already on the map: only sync opacity and stacking order.
   const updateLayersOrderAndOpacity = (basemap: BasemapModelType): void => {
-    const addedLayers = sortLayersByOrder(basemap.layers).filter((layer) => {
+    const addedLayers = (basemap.layers ?? []).filter((layer) => {
       return addedLayerIds.current.includes(layer.id as string);
     });
     addedLayers.forEach((layer) => {
       mapViewer.layersManager?.setLayerOpacity(layer.id as string, layer.opacity as number);
     });
-    mapViewer.layersManager?.setLayersOrder(
-      addedLayers.map((layer) => {
-        return layer.id as string;
+
+    // Reorder only if the map is behind the store (e.g. a grid drag). After a move made on the map it already matches.
+    const orderedIds = addedLayers.map((layer) => {
+      return layer.id as string;
+    });
+    const mapIds = (mapViewer.layersManager?.layerList ?? [])
+      .map((layer) => {
+        return layer.meta?.id;
       })
-    );
+      .filter((id): id is string => {
+        return id !== undefined && orderedIds.includes(id);
+      });
+    if (!isEqual(mapIds, orderedIds)) {
+      mapViewer.layersManager?.setLayersOrder(orderedIds);
+    }
   };
 
   // Remove everything previously added and add the basemap layers from scratch.
   const rebuildLayers = (basemap: BasemapModelType | undefined, withMeta: boolean): void => {
     removeAddedLayers();
-    sortLayersByOrder(basemap?.layers).forEach((basemapLayer) => {
+    (basemap?.layers ?? []).forEach((basemapLayer) => {
       const rasterLayer = buildRasterLayerFromBasemapLayer(basemapLayer);
       if (rasterLayer === undefined) {
         return;
@@ -108,9 +110,15 @@ export const BasemapComposition: React.FC = observer(() => {
     });
   };
 
-  // The store is the only writer of the layers order, the map just renders it.
+  // Keep the draft order in the store in sync when the user reorders layers on the map.
   useEffect(() => {
+    const removeListener = mapViewer.layersManager?.layersOrderChanged.addEventListener(
+      (layerIds: string[]) => {
+        store.basemapsStore.syncDraftLayerOrder(layerIds);
+      }
+    );
     return (): void => {
+      removeListener?.();
       removeAddedLayers();
       renderedBasemap.current = undefined;
       renderedWithMeta.current = false;
