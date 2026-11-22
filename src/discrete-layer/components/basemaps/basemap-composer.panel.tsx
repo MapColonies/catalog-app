@@ -71,6 +71,7 @@ const getSourceTypeLabelId = (layer: BasemapLayerModelType): string => {
 
 const clampPercent = (value: number): number => Math.min(100, Math.max(0, Math.round(value)));
 
+// Bottom-most layer first, matching the map's active layers panel (Cesium collection order).
 const sortLayersByOrder = (layers: readonly BasemapLayerModelType[]): BasemapLayerModelType[] =>
   [...layers].sort((curr, next) => (curr.order ?? 0) - (next.order ?? 0));
 

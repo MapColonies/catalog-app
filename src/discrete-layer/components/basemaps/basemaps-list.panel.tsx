@@ -192,11 +192,12 @@ export const BasemapsListPanel: React.FC<BasemapsPanelProps<'BasemapsList'>> = o
               isShown={basemapsStore.shownBasemapId === basemap.id}
               actions={basemapActions}
               scrollTick={scrollTick}
-              onToggleShow={(id): void => basemapsStore.showBasemap(id)}
+              onToggleShow={(id): void => basemapsStore.toggleBasemap(id)}
               onAction={(action, id): void => {
                 switch (action) {
                   case CRUDAction.edit:
                     navigation.navigate('BasemapComposer', { id });
+                    basemapsStore.toggleBasemap(undefined);
                     break;
                   case GeneralAction.export:
                     basemapsStore.exportBasemap(id);

@@ -52,6 +52,20 @@ const BASEMAPS_QUERY_SELECTOR = `
     }
   }
 `;
+// The position in the array is the single definition of layer order (bottom to top): `order` is always
+// rewritten from it, so it is contiguous (0..n-1) and can never have ties or gaps.
+const normalizeLayersOrder = (layers: BasemapLayerModelType[]): BasemapLayerModelType[] => {
+  return [...layers]
+    .sort((curr, next) => {
+      return (curr.order ?? 0) - (next.order ?? 0);
+    })
+    .map((layer, index) => {
+      return { ...layer, order: index };
+    });
+};
+
+export type DraftLayerMove = 'up' | 'down' | 'top' | 'bottom';
+
 const toBasemapLayerInput = (
   layer: BasemapLayerModelType
 ): BasemapLayerInput => {
@@ -82,7 +96,6 @@ export const basemapsManagementStore = ModelBase
       'State',
       Object.values(ResponseState)
     ),
-    // TODO: this should be taken from the global store it shouldn't be here at all!
     basemaps: types.maybe(types.frozen<BasemapModelType[]>([])),
     shownBasemapId: types.maybe(types.string),
     draftBasemap: types.maybe(types.frozen<BasemapModelType>()),
@@ -118,7 +131,7 @@ export const basemapsManagementStore = ModelBase
       }
     );
 
-    const showBasemap = (id: string): void => {
+    const toggleBasemap = (id: string | undefined): void => {
       self.shownBasemapId = self.shownBasemapId === id ? undefined : id;
     };
 
@@ -136,7 +149,7 @@ export const basemapsManagementStore = ModelBase
         throw new Error(`Cannot start draft: basemap ${id} was not found`);
       }
       
-      self.draftBasemap = cloneDeep(basemap) ?? ({
+      const draftBasemap = cloneDeep(basemap) ?? ({
         __typename: 'Basemap',
         id: uuidv4(),
         name: '',
@@ -145,6 +158,7 @@ export const basemapsManagementStore = ModelBase
         isForPreview: false,
         layers: [],
       } as unknown as BasemapModelType);
+      self.draftBasemap = { ...draftBasemap, layers: normalizeLayersOrder([...(draftBasemap.layers ?? [])]) };
     };
 
     const clearDraft = (): void => {
@@ -158,25 +172,7 @@ export const basemapsManagementStore = ModelBase
     };
 
     const setDraftLayers = (layers: BasemapLayerModelType[]): void => {
-      updateDraft({ layers });
-    };
-
-    // IDs are supplied bottom-first, matching Cesium's imagery collection.
-    const syncDraftLayerOrder = (layerIds: string[]): void => {
-      const layers = self.draftBasemap?.layers;
-      if (layers === undefined) {
-        return;
-      }
-      const orderedLayers = [...layers].sort((curr, next) => (curr.order ?? 0) - (next.order ?? 0));
-      const draftLayerIds = new Set(layers.map((layer) => layer.id));
-      const mapLayerIds = layerIds.filter((id) => draftLayerIds.has(id));
-      const displayedIds = new Set(mapLayerIds);
-      const displayedLayers = orderedLayers.filter((layer) => displayedIds.has(layer.id));
-      if (displayedLayers.every((layer, index) => layer.id === mapLayerIds[index])) {
-        return;
-      }
-      const orders = new Map(mapLayerIds.map((id, index) => [id, displayedLayers[index].order]));
-      setDraftLayers(layers.map((layer) => ({ ...layer, order: orders.get(layer.id) ?? layer.order })));
+      updateDraft({ layers: normalizeLayersOrder(layers) });
     };
 
     const setDraftLayerOpacity = (layerId: string, opacity: number): void => {
@@ -191,17 +187,33 @@ export const basemapsManagementStore = ModelBase
       setDraftLayers((self.draftBasemap?.layers ?? []).filter((layer) => layer.id !== layerId));
     };
 
-    // `fromIndex` / `toIndex` are positions in the ascending `order` list.
+    // `fromIndex` / `toIndex` are positions in the draft layers list, bottom to top.
     const moveDraftLayer = (fromIndex: number, toIndex: number): void => {
-      const orderedLayers = [...(self.draftBasemap?.layers ?? [])].sort(
-        (curr, next) => (curr.order ?? 0) - (next.order ?? 0)
-      );
-      const [moved] = orderedLayers.splice(fromIndex, 1);
+      const layers = [...(self.draftBasemap?.layers ?? [])];
+      const [moved] = layers.splice(fromIndex, 1);
       if (moved === undefined) {
         return;
       }
-      orderedLayers.splice(toIndex, 0, moved);
-      setDraftLayers(orderedLayers.map((layer, index) => ({ ...layer, order: index })));
+      layers.splice(toIndex, 0, moved);
+      setDraftLayers(layers.map((layer, index) => ({ ...layer, order: index })));
+    };
+
+    // Returns false when `layerId` is not a draft layer, so the caller can handle it as a regular map layer.
+    const moveDraftLayerById = (layerId: string, move: DraftLayerMove): boolean => {
+      const layers = self.draftBasemap?.layers ?? [];
+      const fromIndex = layers.findIndex((layer) => layer.id === layerId);
+      if (fromIndex < 0) {
+        return false;
+      }
+      const lastIndex = layers.length - 1;
+      const targets: Record<DraftLayerMove, number> = {
+        up: Math.min(fromIndex + 1, lastIndex),
+        down: Math.max(fromIndex - 1, 0),
+        top: lastIndex,
+        bottom: 0,
+      };
+      moveDraftLayer(fromIndex, targets[move]);
+      return true;
     };
 
     const addDraftLayers: (layers: LayerMetadataMixedUnion[]) => Promise<void> = flow(
@@ -223,10 +235,9 @@ export const basemapsManagementStore = ModelBase
           console.error(error);
         }
         const currentLayers = self.draftBasemap?.layers ?? [];
-        const topOrder = currentLayers.reduce((max, layer) => Math.max(max, layer.order ?? 0), -1);
         const newLayers = rasterLayers.map((layer, index) => ({
           id: uuidv4(),
-          order: topOrder + 1 + index,
+          order: currentLayers.length + index,
           opacity: 1,
           source: {
             __typename: 'CatalogResourceSource',
@@ -276,12 +287,12 @@ export const basemapsManagementStore = ModelBase
       setDraftLayerOpacity,
       removeDraftLayer,
       moveDraftLayer,
-      syncDraftLayerOrder,
+      moveDraftLayerById,
       addDraftLayers,
       saveBasemap,
       exportDraftBasemap,
       getBasemaps,
-      showBasemap,
+      toggleBasemap,
       exportBasemap,
       makeDefaultBasemap,
     };

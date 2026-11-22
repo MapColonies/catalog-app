@@ -105,11 +105,15 @@ export const buildRasterLayerFromBasemapLayer = (
   }
 
   // `buildRasterLayerFromRecord` strips `__typename` recursively from `record` itself; `source.layer` is passed through as-is.
-  return buildRasterLayerFromRecord(source.layer, source.capabilities, {
+  const rasterLayer = buildRasterLayerFromRecord(source.layer, source.capabilities, {
     opacity,
     zIndex: order,
     shouldBeUsedInModelDraping,
   });
+
+  // The map layer id must be the basemap layer id (as for external layers), not the catalog record id:
+  // the record id is not unique per basemap layer and does not match the ids used by the store and the composer.
+  return rasterLayer && { ...rasterLayer, id };
 };
 
 /** The only place `IBaseMaps` is built: it is the shape the Cesium/OL map components take, the app itself works with `BasemapModelType`. */
