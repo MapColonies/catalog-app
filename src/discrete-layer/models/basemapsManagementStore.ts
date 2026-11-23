@@ -53,14 +53,18 @@ const BASEMAPS_QUERY_SELECTOR = `
 `;
 // The position in the array is the single definition of layer order (bottom to top): `order` is always
 // rewritten from it, so it is contiguous (0..n-1) and can never have ties or gaps.
+const assignLayersOrder = (layers: BasemapLayerModelType[]): BasemapLayerModelType[] => {
+  return layers.map((layer, index) => {
+    return { ...layer, order: index };
+  });
+};
+
+// Only for layers coming from the server, where `order` is the input and the array position is not trusted.
 const normalizeLayersOrder = (layers: BasemapLayerModelType[]): BasemapLayerModelType[] => {
-  return [...layers]
-    .sort((curr, next) => {
-      return (curr.order ?? 0) - (next.order ?? 0);
-    })
-    .map((layer, index) => {
-      return { ...layer, order: index };
-    });
+  const sortedLayers = [...layers].sort((curr, next) => {
+    return (curr.order ?? 0) - (next.order ?? 0);
+  });
+  return assignLayersOrder(sortedLayers);
 };
 
 const toBasemapLayerInput = (
@@ -150,7 +154,7 @@ export const basemapsManagementStore = ModelBase
         isForPreview: false,
         layers: [],
       } as unknown as BasemapModelType);
-      self.draftBasemap = { ...draftBasemap, layers: normalizeLayersOrder([...(draftBasemap.layers ?? [])]) };
+      self.draftBasemap = draftBasemap;
     };
 
     const clearDraft = (): void => {
@@ -164,7 +168,7 @@ export const basemapsManagementStore = ModelBase
     };
 
     const setDraftLayers = (layers: BasemapLayerModelType[]): void => {
-      updateDraft({ layers: normalizeLayersOrder(layers) });
+      updateDraft({ layers: assignLayersOrder(layers) });
     };
 
     // Called when the order was changed on the map. `layerIds` are ordered bottom to top and may include
@@ -207,7 +211,7 @@ export const basemapsManagementStore = ModelBase
         return;
       }
       layers.splice(toIndex, 0, moved);
-      setDraftLayers(layers.map((layer, index) => ({ ...layer, order: index })));
+      setDraftLayers(layers);
     };
 
     const addDraftLayers: (layers: LayerMetadataMixedUnion[]) => Promise<void> = flow(
@@ -229,9 +233,9 @@ export const basemapsManagementStore = ModelBase
           console.error(error);
         }
         const currentLayers = self.draftBasemap?.layers ?? [];
-        const newLayers = rasterLayers.map((layer, index) => ({
+        const newLayers = rasterLayers.map((layer) => ({
           id: uuidv4(),
-          order: currentLayers.length + index,
+          order: currentLayers.length,
           opacity: 1,
           source: {
             __typename: 'CatalogResourceSource',
