@@ -86,8 +86,8 @@ export const buildRasterLayerFromBasemapLayer = (
         noAuth: true,
         options: {
           ...rest,
-          url: rest.url as string,
-          layer: rest.layer as string,
+          url: url as string,
+          layer: (rest.layer as string | undefined) ?? 'XXX_DEFAULT_layer_XXX',
           style: (rest.style as string | undefined) ?? 'default',
           format: (rest.format as string | undefined) ?? 'image/png',
           tileMatrixSetID:

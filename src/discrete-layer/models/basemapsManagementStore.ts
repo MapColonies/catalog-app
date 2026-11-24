@@ -1,6 +1,7 @@
 import { types, getParent, flow } from 'mobx-state-tree';
 import { cloneDeep } from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
+import { ResponseState } from '../../common/models/response-state.enum';
 import { Domain } from '../../common/models/domain';
 import { ModelBase } from './ModelBase';
 import { BasemapModelType } from './BasemapModel';
@@ -59,14 +60,6 @@ const assignLayersOrder = (layers: BasemapLayerModelType[]): BasemapLayerModelTy
   });
 };
 
-// Only for layers coming from the server, where `order` is the input and the array position is not trusted.
-const normalizeLayersOrder = (layers: BasemapLayerModelType[]): BasemapLayerModelType[] => {
-  const sortedLayers = [...layers].sort((curr, next) => {
-    return (curr.order ?? 0) - (next.order ?? 0);
-  });
-  return assignLayersOrder(sortedLayers);
-};
-
 const toBasemapLayerInput = (
   layer: BasemapLayerModelType
 ): BasemapLayerInput => {
@@ -93,6 +86,10 @@ const toBasemapLayerInput = (
 
 export const basemapsManagementStore = ModelBase
   .props({
+    state: types.enumeration<ResponseState>(
+      'State',
+      Object.values(ResponseState)
+    ),
     basemaps: types.maybe(types.frozen<BasemapModelType[]>([])),
     shownBasemapId: types.maybe(types.string),
     draftBasemap: types.maybe(types.frozen<BasemapModelType>()),
@@ -119,7 +116,7 @@ export const basemapsManagementStore = ModelBase
             .queryBasemaps({}, BASEMAPS_QUERY_SELECTOR)
             .refetch();
           self.basemaps = cloneDeep(response.basemaps).map((basemap) => {
-            return { ...basemap, layers: normalizeLayersOrder([...(basemap.layers ?? [])]) };
+            return { ...basemap, layers: [...(basemap.layers ?? [])] };
           });
         } catch (error) {
           console.error(error);
@@ -144,7 +141,7 @@ export const basemapsManagementStore = ModelBase
       if (id !== undefined && basemap === undefined) {
         throw new Error(`Cannot start draft: basemap ${id} was not found`);
       }
-      
+
       const draftBasemap = cloneDeep(basemap) ?? ({
         __typename: 'Basemap',
         id: uuidv4(),
