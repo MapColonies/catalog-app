@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [6.9.1](https://github.com/MapColonies/catalog-app/compare/v6.9.0...v6.9.1) (2026-11-25)
+
+
+### Bug Fixes
+
+* external layer details with extras object prop ([#1075](https://github.com/MapColonies/catalog-app/issues/1075)) ([50101b4](https://github.com/MapColonies/catalog-app/commit/50101b4becc616fb70617067ace2735aca22c7ed))
+
 ## [6.9.0](https://github.com/MapColonies/catalog-app/compare/v6.8.0...v6.9.0) (2026-11-19)
 
 
