@@ -48,16 +48,16 @@ export const buildRasterLayerFromBasemapLayer = (
 
   if (isExternalSource(source)) {
     // `name` is only a display name and `matrixSet` the legacy name of `tileMatrixSetID`, the rest are the layer options as they are.
-    // The generated `ExternalLayerDetails` type only declares `protocol`/`name`/`url` - widen to allow the extra WMTS/XYZ option fields
-    // (`matrixSet`, `layer`, `style`, `format`, `credit`, ...) that aren't part of the GraphQL schema yet. `details` can itself carry a
-    // `__typename` (and so could any of those extra fields, were they ever objects), so strip recursively before it's spread into `options`.
+    // Provider-specific WMTS/XYZ option fields (`matrixSet`, `layer`, `style`, `format`, `credit`, ...) that aren't part of the fixed
+    // `protocol`/`name`/`url` fields live under `details.extras`. `details`/`extras` can themselves carry a `__typename` (and so could
+    // any of those extra fields, were they ever objects), so strip recursively before it's spread into `options`.
     const rawDetails: Partial<ExternalLayerDetailsModelType> = source.details ?? {};
     const details = omitDeep(rawDetails, ['__typename']) as Pick<
       ExternalLayerDetailsModelType,
-      'protocol' | 'name' | 'url'
-    > &
-      Record<string, unknown>;
-    const { protocol, name, url, ...rest } = details;
+      'protocol' | 'url' | 'extras'
+    >;
+    const { protocol, url, extras } = details;
+    const rest = (extras ?? {}) as Record<string, unknown>;
 
     if (protocol === LinkType.XYZ) {
       return {
