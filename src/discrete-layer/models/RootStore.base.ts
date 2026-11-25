@@ -344,6 +344,7 @@ export type ExternalLayerDetailsInput = {
   protocol: string
   name: string
   url: string
+  extras?: (any | null)
 }
 export type UpdateBasemapInput = {
   name: string

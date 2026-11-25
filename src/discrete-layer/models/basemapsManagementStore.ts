@@ -47,7 +47,7 @@ const BASEMAPS_QUERY_SELECTOR = `
       }
       ... on ExternalLayerSource {
         type status
-        details { protocol name url }
+        details { protocol name url extras }
       }
     }
   }

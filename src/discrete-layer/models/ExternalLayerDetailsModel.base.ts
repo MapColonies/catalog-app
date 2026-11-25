@@ -19,6 +19,7 @@ export const ExternalLayerDetailsModelBase = ModelBase
     protocol: types.union(types.undefined, types.string),
     name: types.union(types.undefined, types.string),
     url: types.union(types.undefined, types.string),
+    extras: types.union(types.undefined, types.frozen()),
   })
   .views(self => ({
     get store() {
@@ -30,9 +31,10 @@ export class ExternalLayerDetailsModelSelector extends QueryBuilder {
   get protocol() { return this.__attr(`protocol`) }
   get name() { return this.__attr(`name`) }
   get url() { return this.__attr(`url`) }
+  get extras() { return this.__attr(`extras`) }
 }
 export function selectFromExternalLayerDetails() {
   return new ExternalLayerDetailsModelSelector()
 }
 
-export const externalLayerDetailsModelPrimitives = selectFromExternalLayerDetails().protocol.name.url
+export const externalLayerDetailsModelPrimitives = selectFromExternalLayerDetails().protocol.name.url.extras
