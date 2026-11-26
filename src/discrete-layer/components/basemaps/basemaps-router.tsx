@@ -13,7 +13,7 @@ import {
 import { Breadcrumb } from '../../../common/components/breadcrumb/breadcrumb';
 import { BasemapsListPanel } from './basemaps-list.panel';
 import { PickLayerPanel } from './pick-layer.panel';
-import { BasemapComposer } from './basemap-composer.panel';
+import { BasemapComposer } from './composer/basemap-composer.panel';
 
 import './basemaps-router.css';
 import { SourceType } from '../../models/SourceTypeEnum';

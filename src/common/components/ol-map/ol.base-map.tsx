@@ -34,7 +34,7 @@ export const OlBaseMap: React.FC<OlBaseMapProps> = React.memo(({ basemaps }): JS
               layer.noAuth ? undefined : getInjectedAuth()
             );
 
-          if (!layer || !options) {
+          if (!layer || !options || layer.show === false) {
             return null;
           }
 

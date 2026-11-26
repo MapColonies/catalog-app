@@ -2,18 +2,9 @@ import { types, getParent, flow } from 'mobx-state-tree';
 import { cloneDeep } from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 import { ResponseState } from '../../common/models/response-state.enum';
-import { Domain } from '../../common/models/domain';
 import { ModelBase } from './ModelBase';
 import { BasemapModelType } from './BasemapModel';
-import { BasemapLayerModelType } from './BasemapLayerModel';
-import { SourceType } from './SourceTypeEnum';
-import { ResourceResolutionStatus } from './ResourceResolutionStatusEnum';
 import { BasemapLayerInput } from './RootStore.base';
-import { getLayerLink } from '../components/helpers/layersUtils';
-import { CapabilityModelType } from './CapabilityModel';
-import { LayerRasterRecordModelType } from './LayerRasterRecordModel';
-import { LayerMetadataMixedUnion } from './LayerMetadataMixedModelSelector';
-import { RecordType } from './RecordTypeEnum';
 import { IRootStore, RootStoreType } from './RootStore';
 
 // Requests the full basemap entity against `catalog-web-app-bff`'s `basemaps` query, including both
@@ -52,38 +43,6 @@ const BASEMAPS_QUERY_SELECTOR = `
     }
   }
 `;
-// The position in the array is the single definition of layer order (bottom to top): `order` is always
-// rewritten from it, so it is contiguous (0..n-1) and can never have ties or gaps.
-const assignLayersOrder = (layers: BasemapLayerModelType[]): BasemapLayerModelType[] => {
-  return layers.map((layer, index) => {
-    return { ...layer, order: index };
-  });
-};
-
-const toBasemapLayerInput = (
-  layer: BasemapLayerModelType
-): BasemapLayerInput => {
-  const { source, ...rest } = layer;
-  if (source?.__typename === 'ExternalLayerSource') {
-    return {
-      ...rest,
-      source: {
-        type: source.type,
-        details: source.details,
-      },
-    } as BasemapLayerInput;
-  }
-
-  return {
-    ...rest,
-    source: {
-      type: source?.type,
-      domain: source?.domain,
-      uniqueness: source?.uniqueness,
-    },
-  } as BasemapLayerInput;
-};
-
 export const basemapsManagementStore = ModelBase
   .props({
     state: types.enumeration<ResponseState>(
@@ -92,7 +51,8 @@ export const basemapsManagementStore = ModelBase
     ),
     basemaps: types.maybe(types.frozen<BasemapModelType[]>([])),
     shownBasemapId: types.maybe(types.string),
-    draftBasemap: types.maybe(types.frozen<BasemapModelType>()),
+    // Set while the composer is open. The layers being composed live on the map's `layersManager`, not here.
+    composingBasemapId: types.maybe(types.string),
   })
   .views((self) => ({
     get store(): IRootStore {
@@ -104,8 +64,8 @@ export const basemapsManagementStore = ModelBase
     get shownBasemap(): BasemapModelType | undefined {
       return self.basemaps?.find((basemap) => basemap.id === self.shownBasemapId);
     },
-    get displayedBasemap(): BasemapModelType | undefined {
-      return self.draftBasemap ?? this.shownBasemap;
+    get composingBasemap(): BasemapModelType | undefined {
+      return self.basemaps?.find((basemap) => basemap.id === self.composingBasemapId);
     },
   }))
   .actions((self) => {
@@ -136,132 +96,38 @@ export const basemapsManagementStore = ModelBase
       console.log(`MAKE DEFAULT basemap ${id}`);
     };
 
-    const startDraft = (id?: string): void => {
-      const basemap = id === undefined ? undefined : self.basemaps?.find((item) => item.id === id);
-      if (id !== undefined && basemap === undefined) {
-        throw new Error(`Cannot start draft: basemap ${id} was not found`);
+    // A new basemap (no `id`) gets a fresh id.
+    const startComposing = (id?: string): void => {
+      if (id !== undefined && self.basemaps?.find((basemap) => basemap.id === id) === undefined) {
+        throw new Error(`Cannot start composing: basemap ${id} was not found`);
       }
-
-      const draftBasemap = cloneDeep(basemap) ?? ({
-        __typename: 'Basemap',
-        id: uuidv4(),
-        name: '',
-        thumbnail: { url: '', width: 128, height: 128 },
-        isCurrent: false,
-        isForPreview: false,
-        layers: [],
-      } as unknown as BasemapModelType);
-      self.draftBasemap = draftBasemap;
+      // the composer puts its own layers on the map, so the shown basemap must not stay on it
+      self.shownBasemapId = undefined;
+      self.composingBasemapId = id ?? uuidv4();
     };
 
-    const clearDraft = (): void => {
-      self.draftBasemap = undefined;
+    // Leaving the composer (cancel or save) leaves no basemap on the map.
+    const stopComposing = (): void => {
+      self.composingBasemapId = undefined;
+      self.shownBasemapId = undefined;
     };
 
-    const updateDraft = (patch: Partial<Omit<BasemapModelType, 'id'>>): void => {
-      if (self.draftBasemap) {
-        self.draftBasemap = { ...self.draftBasemap, ...patch };
+    const saveBasemap = async (
+      details: Pick<BasemapModelType, 'name' | 'isCurrent' | 'isForPreview'>,
+      layers: BasemapLayerInput[],
+      thumbnail?: Blob
+    ): Promise<void> => {
+      if (self.composingBasemapId === undefined) {
+        throw new Error('Cannot save a basemap that is not being composed');
       }
-    };
-
-    const setDraftLayers = (layers: BasemapLayerModelType[]): void => {
-      updateDraft({ layers: assignLayersOrder(layers) });
-    };
-
-    // Called when the order was changed on the map. `layerIds` are ordered bottom to top and may include
-    // map layers that are not part of the draft. Draft layers that are not on the map keep their slot.
-    const syncDraftLayerOrder = (layerIds: string[]): void => {
-      const layers = self.draftBasemap?.layers;
-      if (layers === undefined) {
-        return;
-      }
-      const layersById = new Map(layers.map((layer) => [layer.id, layer]));
-      const mappedLayers = layerIds.flatMap((id) => layersById.get(id) ?? []);
-      const mappedIds = new Set(mappedLayers.map((layer) => layer.id));
-      let nextMappedIndex = 0;
-      const reorderedLayers = layers.map((layer) => {
-        return mappedIds.has(layer.id) ? mappedLayers[nextMappedIndex++] : layer;
-      });
-      if (reorderedLayers.every((layer, index) => layer === layers[index])) {
-        return;
-      }
-      setDraftLayers(reorderedLayers);
-    };
-
-    const setDraftLayerOpacity = (layerId: string, opacity: number): void => {
-      setDraftLayers(
-        (self.draftBasemap?.layers ?? []).map((layer) =>
-          layer.id === layerId ? { ...layer, opacity } : layer
-        )
-      );
-    };
-
-    const removeDraftLayer = (layerId: string): void => {
-      setDraftLayers((self.draftBasemap?.layers ?? []).filter((layer) => layer.id !== layerId));
-    };
-
-    // `fromIndex` / `toIndex` are positions in the draft layers list, bottom to top.
-    const moveDraftLayer = (fromIndex: number, toIndex: number): void => {
-      const layers = [...(self.draftBasemap?.layers ?? [])];
-      const [moved] = layers.splice(fromIndex, 1);
-      if (moved === undefined) {
-        return;
-      }
-      layers.splice(toIndex, 0, moved);
-      setDraftLayers(layers);
-    };
-
-    const addDraftLayers: (layers: LayerMetadataMixedUnion[]) => Promise<void> = flow(
-      function* addDraftLayers(layers: LayerMetadataMixedUnion[]) {
-        const rasterLayers = layers.filter(
-          (layer) => layer.type === RecordType.RECORD_RASTER
-        ) as LayerRasterRecordModelType[];
-        if (rasterLayers.length === 0) {
-          return;
-        }
-        let capabilities: CapabilityModelType[] = [];
-        try {
-          capabilities = cloneDeep(
-            (yield self.root.catalogTreeStore.fetchLayersCapabilities(
-              rasterLayers
-            )) as CapabilityModelType[]
-          );
-        } catch (error) {
-          console.error(error);
-        }
-        const currentLayers = self.draftBasemap?.layers ?? [];
-        const newLayers = rasterLayers.map((layer) => ({
-          id: uuidv4(),
-          order: currentLayers.length,
-          opacity: 1,
-          source: {
-            __typename: 'CatalogResourceSource',
-            type: SourceType.CATALOG_RESOURCE,
-            domain: Domain.RASTER,
-            status: ResourceResolutionStatus.RESOLVED,
-            uniqueness: {
-              productId: layer.productId,
-              productType: layer.productType,
-            },
-            capabilities:
-              capabilities.find((capability) => capability.id === getLayerLink(layer)?.name) ??
-              null,
-            // plain JSON copy: `frozen` cannot hold MST nodes
-            layer: JSON.parse(JSON.stringify(layer)) as LayerRasterRecordModelType,
-          },
-        })) as unknown as BasemapLayerModelType[];
-        setDraftLayers([...currentLayers, ...newLayers]);
-      }
-    );
-
-    // TODO: MOCK should be replaced by actual API calls
-    const saveBasemap = async (thumbnail?: Blob): Promise<void> => {
-      if (!self.draftBasemap) {
-        throw new Error('Cannot save a basemap without a draft');
-      }
+      const savedThumbnail = self.basemaps?.find((basemap) => {
+        return basemap.id === self.composingBasemapId;
+      })?.thumbnail;
       const input = {
-        ...self.draftBasemap,
-        layers: (self.draftBasemap.layers ?? []).map(toBasemapLayerInput),
+        ...details,
+        id: self.composingBasemapId,
+        thumbnail: savedThumbnail ?? { url: '', width: 128, height: 128 },
+        layers,
       };
       if (thumbnail !== undefined) {
         // TODO: Should be actual returned url.
@@ -271,21 +137,15 @@ export const basemapsManagementStore = ModelBase
       console.log('SAVE basemap', input);
     };
 
-    const exportDraftBasemap = (): void => {
-      console.log('EXPORT draft basemap', self.draftBasemap?.id);
+    const exportComposedBasemap = (): void => {
+      console.log('EXPORT composed basemap', self.composingBasemapId);
     };
 
     return {
-      startDraft,
-      clearDraft,
-      updateDraft,
-      setDraftLayerOpacity,
-      removeDraftLayer,
-      moveDraftLayer,
-      syncDraftLayerOrder,
-      addDraftLayers,
+      startComposing,
+      stopComposing,
       saveBasemap,
-      exportDraftBasemap,
+      exportComposedBasemap,
       getBasemaps,
       toggleBasemap,
       exportBasemap,

@@ -1,16 +1,18 @@
 import { IBaseMaps, IRasterLayer } from '@map-colonies/react-components';
 import { ProtocolType } from '../../../common/models/protocol-type.enum';
 import { LinkType } from '../../../common/models/link-type.enum';
-import { LayerRasterRecordModelType, SourceType } from '../../models';
+import { LayerRasterRecordModelType, LinkModelType, SourceType } from '../../models';
 import { BasemapLayerModelType } from '../../models/BasemapLayerModel';
 import { BasemapModelType } from '../../models/BasemapModel';
 import { CatalogResourceSourceModelType } from '../../models/CatalogResourceSourceModel';
 import { ExternalLayerDetailsModelType } from '../../models/ExternalLayerDetailsModel';
 import { ExternalLayerSourceModelType } from '../../models/ExternalLayerSourceModel';
 import { ResourceResolutionStatus } from '../../models/ResourceResolutionStatusEnum';
-import { buildRasterLayerFromRecord, getTokenParam } from './layersUtils';
+import { buildRasterLayerFromRecord, getLinksArrWithTokens, getTokenParam } from './layersUtils';
 import { WmtsOptionsInput, XyzOptionsInput } from '@map-colonies/react-components/dist/schemas';
 import { omitDeep } from '../../../common/helpers/object';
+
+const UNRESOLVED_PLACEHOLDER_URL = 'about:blank?{z}/{x}/{y}';
 
 // mst-gql generates `source` as `any` (union members are wrapped in `types.late((): any => ...)`), so the real union is spelled out here.
 export type BasemapLayerSource = CatalogResourceSourceModelType | ExternalLayerSourceModelType;
@@ -68,6 +70,7 @@ export const buildRasterLayerFromBasemapLayer = (
         show: true,
         shouldBeUsedInModelDraping,
         noAuth: true,
+        layerRecord: { productName: name },
         options: {
           ...rest,
           url: url as string,
@@ -84,6 +87,7 @@ export const buildRasterLayerFromBasemapLayer = (
         show: true,
         shouldBeUsedInModelDraping,
         noAuth: true,
+        layerRecord: { productName: name },
         options: {
           ...rest,
           url: url as string,
@@ -100,8 +104,21 @@ export const buildRasterLayerFromBasemapLayer = (
   }
 
   if (!isResolvedCatalogSource(source)) {
-    // TODO: Should handle unresolved catalog layer
-    return undefined;
+    // An unresolved catalog layer cannot be drawn, but must survive editing and saving: it stays as a hidden
+    // placeholder (never requests tiles) that only carries the data, so the map remains the single source.
+    return isCatalogSource(source)
+      ? {
+          id,
+          type: ProtocolType.XYZ,
+          opacity,
+          zIndex: order,
+          show: false,
+          skipRelevancyCheck: true,
+          shouldBeUsedInModelDraping,
+          noAuth: true,
+          options: { url: UNRESOLVED_PLACEHOLDER_URL } satisfies XyzOptionsInput,
+        }
+      : undefined;
   }
 
   // `buildRasterLayerFromRecord` strips `__typename` recursively from `record` itself; `source.layer` is passed through as-is.
@@ -113,7 +130,17 @@ export const buildRasterLayerFromBasemapLayer = (
 
   // The map layer id must be the basemap layer id (as for external layers), not the catalog record id:
   // the record id is not unique per basemap layer and does not match the ids used by the store and the composer.
-  return rasterLayer && { ...rasterLayer, id };
+  // `layerRecord` is what the map reads the layer's name (Active Layers), legend and links from.
+  return (
+    rasterLayer && {
+      ...rasterLayer,
+      id,
+      layerRecord: {
+        ...source.layer,
+        links: getLinksArrWithTokens([...(source.layer.links as LinkModelType[])]),
+      },
+    }
+  );
 };
 
 /** The only place `IBaseMaps` is built: it is the shape the Cesium/OL map components take, the app itself works with `BasemapModelType`. */
