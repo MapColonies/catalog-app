@@ -29,11 +29,8 @@ import { useStore } from '../../../models/RootStore';
 import { SourceType } from '../../../models/SourceTypeEnum';
 import { useMapViewer } from '../../map-container/cesium-map-viewer.bridge';
 import type { BasemapsPanelProps } from '../basemaps-router';
-import {
-  ComposerLayer,
-  useBasemapComposition,
-  useLoadComposedBasemap,
-} from './basemap-composition.hook';
+import { addBasemapLayerToMap } from '../basemap-map-layers.utils';
+import { ComposerLayer, useBasemapManager } from './basemap-composition.hook';
 
 import './basemap-composer.panel.css';
 
@@ -93,12 +90,11 @@ export const BasemapComposer: React.FC<BasemapsPanelProps<'BasemapComposer'>> = 
     const mapViewer = useMapViewer();
     const basemapId = route.params?.id;
 
-    useLoadComposedBasemap();
-    const composition = useBasemapComposition();
+    const basemapManager = useBasemapManager();
     // `gridOptions` are applied by the grid once, so its callbacks read the latest composition from here
-    const compositionRef = useRef(composition);
-    compositionRef.current = composition;
-    const savedBasemap = basemapsStore.composingBasemap;
+    const compositionRef = useRef(basemapManager);
+    compositionRef.current = basemapManager;
+    const originalBasemap = basemapsStore.composingBasemap;
 
     useEffect(() => {
       setThumbnailBlob(undefined);
@@ -109,17 +105,36 @@ export const BasemapComposer: React.FC<BasemapsPanelProps<'BasemapComposer'>> = 
       };
     }, [basemapsStore, basemapId]);
 
+    const initialBasemapLayers = (): void => {
+      const layersManager = mapViewer?.layersManager;
+      const composerId = basemapsStore.composingBasemapId;
+      if (layersManager === undefined || composerId === undefined) {
+        return;
+      }
+      (originalBasemap?.layers ?? []).forEach((basemapLayer) => {
+        addBasemapLayerToMap(layersManager, basemapLayer, { composerId });
+      });
+      basemapManager.refreshLayers();
+    };
+
+    useEffect(() => {
+      initialBasemapLayers();
+      return (): void => {
+        compositionRef.current.clear();
+      };
+    }, [mapViewer?.layersManager, basemapsStore.composingBasemapId, originalBasemap]);
+
     const formik = useFormik({
       enableReinitialize: true,
       initialValues: {
-        name: savedBasemap?.name ?? '',
-        isCurrent: savedBasemap?.isCurrent ?? false,
-        isForPreview: savedBasemap?.isForPreview ?? false,
+        name: originalBasemap?.name ?? '',
+        isCurrent: originalBasemap?.isCurrent ?? false,
+        isForPreview: originalBasemap?.isForPreview ?? false,
       },
       onSubmit: async (values): Promise<void> => {
         try {
-          await basemapsStore.saveBasemap(values, composition.buildInput(), thumbnailBlob);
-          composition.clear();
+          await basemapsStore.saveBasemap(values, basemapManager.buildInput(), thumbnailBlob);
+          basemapManager.clear();
           await basemapsStore.getBasemaps();
           basemapsStore.stopComposing();
           navigation.goBack();
@@ -129,7 +144,7 @@ export const BasemapComposer: React.FC<BasemapsPanelProps<'BasemapComposer'>> = 
       },
     });
 
-    const rowData: LayerRow[] = composition.layers.map((layer: ComposerLayer) => ({
+    const rowData: LayerRow[] = basemapManager.layers.map((layer: ComposerLayer) => ({
       id: layer.id,
       name: layer.name,
       source: intl.formatMessage({
@@ -269,7 +284,7 @@ export const BasemapComposer: React.FC<BasemapsPanelProps<'BasemapComposer'>> = 
           <BasemapThumbnail
             mapViewer={mapViewer}
             thumbnailBlob={thumbnailBlob}
-            savedThumbnailUrl={savedBasemap?.thumbnail?.url}
+            savedThumbnailUrl={originalBasemap?.thumbnail?.url}
             onCaptured={setThumbnailBlob}
           />
         )}
@@ -316,7 +331,7 @@ export const BasemapComposer: React.FC<BasemapsPanelProps<'BasemapComposer'>> = 
           <Button
             type="button"
             raised
-            disabled={formik.values.name.trim() === '' || composition.layers.length === 0}
+            disabled={formik.values.name.trim() === '' || basemapManager.layers.length === 0}
             onClick={(): void => {
               void formik.submitForm();
             }}

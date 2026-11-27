@@ -65,34 +65,9 @@ const toComposerLayer = (layer: ICesiumImageryLayer): ComposerLayer => {
   };
 };
 
-/**
- * Puts the saved layers of the composed basemap on the map, tagged as composer layers - from then on the map is
- * where the edits happen. Call it once, from the composer panel: edits do not re-run it, only a new saved version.
- */
-export const useLoadComposedBasemap = (): void => {
-  const store = useStore();
-  const mapViewer = useMapViewer();
-  const layersManager = mapViewer?.layersManager;
-  const composerId = store.basemapsStore.composingBasemapId;
-  const savedBasemap = store.basemapsStore.composingBasemap;
-
-  useEffect(() => {
-    if (layersManager === undefined || composerId === undefined) {
-      return;
-    }
-    (savedBasemap?.layers ?? []).forEach((basemapLayer) => {
-      addBasemapLayerToMap(layersManager, basemapLayer, { composerId });
-    });
-    return (): void => {
-      getComposerLayers(layersManager, composerId).forEach((layer) => {
-        layersManager.removeLayer(layer.meta?.id as string);
-      });
-    };
-  }, [layersManager, composerId, savedBasemap]);
-};
-
-export const useBasemapComposition = (): {
+export const useBasemapManager = (): {
   layers: ComposerLayer[];
+  refreshLayers: () => void;
   addLayers: (layers: LayerMetadataMixedUnion[]) => Promise<void>;
   removeLayer: (layerId: string) => void;
   setOpacity: (layerId: string, opacity: number) => void;
@@ -103,38 +78,28 @@ export const useBasemapComposition = (): {
   const store = useStore();
   const mapViewer = useMapViewer();
   const layersManager = mapViewer?.layersManager;
-  const composerId = store.basemapsStore.composingBasemapId;
-  const [, setVersion] = useState(0);
+  const composingBasemapId = store.basemapsStore.composingBasemapId;
+  const [layers, setLayers] = useState<ComposerLayer[]>([]);
+
+  // Re-reads the composer layers from the map. Call it after every change made to them.
+  const refreshLayers = useCallback((): void => {
+    setLayers(getComposerLayers(layersManager, composingBasemapId).map(toComposerLayer));
+  }, [layersManager, composingBasemapId]);
 
   useEffect(() => {
-    if (layersManager === undefined) {
-      return;
-    }
-    const refresh = (): void => {
-      setVersion((version) => version + 1);
-    };
-    const removeListeners = [
-      layersManager.layerUpdated.addEventListener(refresh),
-      layersManager.layersOrderChanged.addEventListener(refresh),
-      layersManager.layerRemoved.addEventListener(refresh),
-      layersManager.layerOpacityChanged.addEventListener(refresh),
-    ];
-    refresh();
-    return (): void => {
-      removeListeners.forEach((removeListener) => {
-        removeListener();
-      });
-    };
-  }, [layersManager, composerId]);
-
-  const composerLayers = getComposerLayers(layersManager, composerId);
+    refreshLayers();
+  }, [refreshLayers]);
 
   const addLayers = useCallback(
     async (layers: LayerMetadataMixedUnion[]): Promise<void> => {
       const rasterLayers = layers.filter((layer) => {
         return layer.type === RecordType.RECORD_RASTER;
       }) as LayerRasterRecordModelType[];
-      if (layersManager === undefined || mapViewer === undefined || composerId === undefined) {
+      if (
+        layersManager === undefined ||
+        mapViewer === undefined ||
+        composingBasemapId === undefined
+      ) {
         return;
       }
       if (rasterLayers.length === 0) {
@@ -153,7 +118,7 @@ export const useBasemapComposition = (): {
       rasterLayers.forEach((layer) => {
         const basemapLayer = {
           id: uuidv4(),
-          order: mapViewer.imageryLayers.length,
+          order: mapViewer.layersManager?.layerList.length,
           opacity: 1,
           source: {
             __typename: 'CatalogResourceSource',
@@ -171,29 +136,32 @@ export const useBasemapComposition = (): {
             layer: JSON.parse(JSON.stringify(layer)) as LayerRasterRecordModelType,
           },
         } as unknown as BasemapLayerModelType;
-        addBasemapLayerToMap(layersManager, basemapLayer, { composerId });
+        addBasemapLayerToMap(layersManager, basemapLayer, { composerId: composingBasemapId });
       });
+      refreshLayers();
     },
-    [layersManager, mapViewer, composerId, store.catalogTreeStore]
+    [layersManager, mapViewer, composingBasemapId, store.catalogTreeStore, refreshLayers]
   );
 
   const removeLayer = useCallback(
     (layerId: string): void => {
       layersManager?.removeLayer(layerId);
+      refreshLayers();
     },
-    [layersManager]
+    [layersManager, refreshLayers]
   );
 
   const setOpacity = useCallback(
     (layerId: string, opacity: number): void => {
       layersManager?.setLayerOpacity(layerId, opacity);
+      refreshLayers();
     },
-    [layersManager]
+    [layersManager, refreshLayers]
   );
 
   // `toIndex` is a position in the composer layers list, bottom to top.
   const moveLayer = (layerId: string, toIndex: number): void => {
-    const orderedIds = composerLayers.map((layer) => {
+    const orderedIds = getComposerLayers(layersManager, composingBasemapId).map((layer) => {
       return layer.meta?.id as string;
     });
     const fromIndex = orderedIds.indexOf(layerId);
@@ -203,10 +171,11 @@ export const useBasemapComposition = (): {
     orderedIds.splice(fromIndex, 1);
     orderedIds.splice(toIndex, 0, layerId);
     layersManager?.setLayersOrder(orderedIds);
+    refreshLayers();
   };
 
   const buildInput = (): BasemapLayerInput[] => {
-    return composerLayers.map((layer, index) => {
+    return getComposerLayers(layersManager, composingBasemapId).map((layer, index) => {
       return {
         id: layer.meta?.id as string,
         order: index,
@@ -218,13 +187,15 @@ export const useBasemapComposition = (): {
   };
 
   const clear = useCallback((): void => {
-    getComposerLayers(layersManager, composerId).forEach((layer) => {
+    getComposerLayers(layersManager, composingBasemapId).forEach((layer) => {
       layersManager?.removeLayer(layer.meta?.id as string);
     });
-  }, [layersManager, composerId]);
+    refreshLayers();
+  }, [layersManager, composingBasemapId, refreshLayers]);
 
   return {
-    layers: composerLayers.map(toComposerLayer),
+    layers,
+    refreshLayers,
     addLayers,
     removeLayer,
     setOpacity,

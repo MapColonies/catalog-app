@@ -1012,6 +1012,9 @@ const DiscreteLayerView: React.FC = observer(() => {
   }, [jobToOpenRasterEntity]);
 
   const ContextMenuByTab: React.FC<IContextMenuData> = (props) => {
+    if (activeTabView === TabViews.BASEMAPS_MANAGEMENT) {
+      return null;
+    }
     // Should add global flag or find the proper condition to whether show the context menu or not.
     return <ActionsContextMenu {...props} />;
   };
