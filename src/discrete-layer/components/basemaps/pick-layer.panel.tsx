@@ -10,6 +10,7 @@ import { ILayerImage } from '../../models/layerImage';
 import { RecordType } from '../../models/RecordTypeEnum';
 import { useStore } from '../../models/RootStore';
 import { CatalogPicker } from '../catalog-picker/catalog-picker';
+import { useBasemapManager } from './composer/basemap-composition.hook';
 import { SourceType } from '../../models/SourceTypeEnum';
 
 const LAYER_ROOTS_NAMES: TreeRootName[] = ['catalog', 'bests'];
@@ -25,6 +26,7 @@ interface PickLayerPanelProps {
 export const PickLayerPanel: React.FC<PickLayerPanelProps> = observer(
   ({ actionSelector, existingLayers, onClose }) => {
     const store = useStore();
+    const { addLayers } = useBasemapManager();
 
     const filteredCatalogRoots: TreeRootSection[] = useMemo(
       () =>
@@ -56,7 +58,7 @@ export const PickLayerPanel: React.FC<PickLayerPanelProps> = observer(
             catalogsToFetch={CATALOGS_TO_FETCH}
             treeRootSections={filteredCatalogRoots}
             disableLayerPredicate={isLayerDisabled}
-            handleSelection={(items): void => void store.basemapsStore.addDraftLayers(items)}
+            handleSelection={(items): void => void addLayers(items)}
             onClose={onClose}
           />
         )}

@@ -1,7 +1,8 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { observer } from 'mobx-react';
+import { useFormik } from 'formik';
 import { useIntl } from 'react-intl';
-import { Box } from '@map-colonies/react-components';
+import { Box, CesiumViewer } from '@map-colonies/react-components';
 import {
   Button,
   Checkbox,
@@ -16,24 +17,22 @@ import {
   GridComponent,
   GridComponentOptions,
   GridRowDragEndEvent,
-} from '../../../common/components/grid';
+} from '../../../../common/components/grid';
 import {
   THUMBNAIL_128_DIMENSIONS,
   ThumbnailCapture,
   useThumbnailCapture,
-} from '../../../common/components/thumbnail-capture';
-import CONFIG from '../../../common/config';
-import { isRtl } from '../../../common/i18n/helpers';
-import { useStore } from '../../models/RootStore';
-import type { CesiumViewer } from '@map-colonies/react-components';
-import type { BasemapsPanelProps } from './basemaps-router';
-import { BasemapLayerModelType } from '../../models/BasemapLayerModel';
-import { SourceType } from '../../models/SourceTypeEnum';
-import { ResourceResolutionStatus } from '../../models/ResourceResolutionStatusEnum';
+} from '../../../../common/components/thumbnail-capture';
+import CONFIG from '../../../../common/config';
+import { isRtl } from '../../../../common/i18n/helpers';
+import { useStore } from '../../../models/RootStore';
+import { SourceType } from '../../../models/SourceTypeEnum';
+import { useMapViewer } from '../../map-container/cesium-map-viewer.bridge';
+import type { BasemapsPanelProps } from '../basemaps-router';
+import { addBasemapLayerToMap } from '../basemap-map-layers.utils';
+import { ComposerLayer, useBasemapManager } from './basemap-composition.hook';
 
 import './basemap-composer.panel.css';
-import { useMapViewer } from '../map-container/cesium-map-viewer.bridge';
-import { isCatalogSource, isExternalSource } from '../helpers/basemapLayerUtils';
 
 interface LayerRow {
   id: string;
@@ -43,43 +42,20 @@ interface LayerRow {
   isUnresolved: boolean;
 }
 
-const SOURCE_TYPE_LABEL_IDS = {
-  catalogResolved: 'basemap.composer.layers.source.catalog-resolved',
-  catalogUnresolved: 'basemap.composer.layers.source.catalog-unresolved',
-  external: 'basemap.composer.layers.source.external',
+const SOURCE_TYPE_LABEL_IDS: Record<SourceType, string> = {
+  [SourceType.CATALOG_RESOURCE]: 'basemap.composer.layers.source.catalog-resolved',
+  [SourceType.EXTERNAL]: 'basemap.composer.layers.source.external',
 };
-
-const getLayerName = (layer: BasemapLayerModelType): string => {
-  const { source } = layer;
-  if (isExternalSource(source)) {
-    return source.details?.name ?? layer.id ?? '';
-  }
-  return source?.status === ResourceResolutionStatus.RESOLVED
-    ? source.layer?.productName ?? layer.id ?? ''
-    : source?.uniqueness?.productId ?? layer.id ?? '';
-};
-
-const getSourceTypeLabelId = (layer: BasemapLayerModelType): string => {
-  const { source } = layer;
-  if (isExternalSource(source)) {
-    return SOURCE_TYPE_LABEL_IDS.external;
-  }
-  return source?.status === ResourceResolutionStatus.RESOLVED
-    ? SOURCE_TYPE_LABEL_IDS.catalogResolved
-    : SOURCE_TYPE_LABEL_IDS.catalogUnresolved;
-};
+const UNRESOLVED_LABEL_ID = 'basemap.composer.layers.source.catalog-unresolved';
 
 const clampPercent = (value: number): number => Math.min(100, Math.max(0, Math.round(value)));
-
-const sortLayersByOrder = (layers: readonly BasemapLayerModelType[]): BasemapLayerModelType[] =>
-  [...layers].sort((curr, next) => (curr.order ?? 0) - (next.order ?? 0));
 
 const BasemapThumbnail: React.FC<{
   mapViewer: CesiumViewer;
   thumbnailBlob?: Blob;
+  savedThumbnailUrl?: string;
   onCaptured: (blob: Blob) => void;
-}> = observer(({ mapViewer, thumbnailBlob, onCaptured }) => {
-  const { basemapsStore } = useStore();
+}> = ({ mapViewer, thumbnailBlob, savedThumbnailUrl, onCaptured }) => {
   const [thumbnailUrl, setThumbnailUrl] = useState<string>();
 
   useEffect(() => {
@@ -99,11 +75,11 @@ const BasemapThumbnail: React.FC<{
   });
   return (
     <ThumbnailCapture
-      thumbnailUrl={thumbnailUrl ?? (basemapsStore.draftBasemap?.thumbnail?.url || undefined)}
+      thumbnailUrl={thumbnailUrl ?? (savedThumbnailUrl || undefined)}
       capture={capture}
     />
   );
-});
+};
 
 export const BasemapComposer: React.FC<BasemapsPanelProps<'BasemapComposer'>> = observer(
   ({ navigation, route }) => {
@@ -114,26 +90,68 @@ export const BasemapComposer: React.FC<BasemapsPanelProps<'BasemapComposer'>> = 
     const mapViewer = useMapViewer();
     const basemapId = route.params?.id;
 
+    const basemapManager = useBasemapManager();
+    // `gridOptions` are applied by the grid once, so its callbacks read the latest composition from here
+    const compositionRef = useRef(basemapManager);
+    compositionRef.current = basemapManager;
+    const originalBasemap = basemapsStore.composingBasemap;
+
     useEffect(() => {
       setThumbnailBlob(undefined);
-      basemapsStore.startDraft(basemapId);
-      return (): void => basemapsStore.clearDraft();
+      basemapsStore.startComposing(basemapId);
+      return (): void => {
+        compositionRef.current.clear();
+        basemapsStore.stopComposing();
+      };
     }, [basemapsStore, basemapId]);
 
-    const draft = basemapsStore.draftBasemap;
+    const initialBasemapLayers = (): void => {
+      const layersManager = mapViewer?.layersManager;
+      const composerId = basemapsStore.composingBasemapId;
+      if (layersManager === undefined || composerId === undefined) {
+        return;
+      }
+      (originalBasemap?.layers ?? []).forEach((basemapLayer) => {
+        addBasemapLayerToMap(layersManager, basemapLayer, { composerId });
+      });
+      basemapManager.refreshLayers();
+    };
 
-    const orderedLayers = useMemo(() => {
-      return sortLayersByOrder(draft?.layers ?? []);
-    }, [draft?.layers]);
+    useEffect(() => {
+      initialBasemapLayers();
+      return (): void => {
+        compositionRef.current.clear();
+      };
+    }, [mapViewer?.layersManager, basemapsStore.composingBasemapId, originalBasemap]);
 
-    const rowData: LayerRow[] = orderedLayers.map((layer) => ({
-      id: layer.id as string,
-      name: getLayerName(layer),
-      source: intl.formatMessage({ id: getSourceTypeLabelId(layer) }),
-      opacity: Math.round((layer.opacity ?? 0) * 100),
-      isUnresolved:
-        isCatalogSource(layer.source) &&
-        layer.source.status === ResourceResolutionStatus.UNRESOLVED,
+    const formik = useFormik({
+      enableReinitialize: true,
+      initialValues: {
+        name: originalBasemap?.name ?? '',
+        isCurrent: originalBasemap?.isCurrent ?? false,
+        isForPreview: originalBasemap?.isForPreview ?? false,
+      },
+      onSubmit: async (values): Promise<void> => {
+        try {
+          await basemapsStore.saveBasemap(values, basemapManager.buildInput(), thumbnailBlob);
+          basemapManager.clear();
+          await basemapsStore.getBasemaps();
+          basemapsStore.stopComposing();
+          navigation.goBack();
+        } catch (error) {
+          console.error(error);
+        }
+      },
+    });
+
+    const rowData: LayerRow[] = basemapManager.layers.map((layer: ComposerLayer) => ({
+      id: layer.id,
+      name: layer.name,
+      source: intl.formatMessage({
+        id: layer.isUnresolved ? UNRESOLVED_LABEL_ID : SOURCE_TYPE_LABEL_IDS[layer.sourceType],
+      }),
+      opacity: Math.round(layer.opacity * 100),
+      isUnresolved: layer.isUnresolved,
     }));
 
     const columnDefs: ColDef<LayerRow>[] = [
@@ -168,9 +186,9 @@ export const BasemapComposer: React.FC<BasemapsPanelProps<'BasemapComposer'>> = 
         valueSetter: ({ data, newValue }: ValueSetterParams<LayerRow>): boolean => {
           const percent = Number(newValue);
           if (!Number.isNaN(percent)) {
-            basemapsStore.setDraftLayerOpacity(data.id, clampPercent(percent) / 100);
+            compositionRef.current.setOpacity(data.id, clampPercent(percent) / 100);
           }
-          // rows are re-fed from the store; the grid must not mutate its own copy
+          // rows are re-read from the map; the grid must not mutate its own copy
           return false;
         },
       },
@@ -182,7 +200,7 @@ export const BasemapComposer: React.FC<BasemapsPanelProps<'BasemapComposer'>> = 
             title={intl.formatMessage({ id: 'basemap.composer.layers.remove' })}
             onClick={(): void => {
               if (data) {
-                basemapsStore.removeDraftLayer(data.id);
+                compositionRef.current.removeLayer(data.id);
               }
             }}
           />
@@ -212,17 +230,14 @@ export const BasemapComposer: React.FC<BasemapsPanelProps<'BasemapComposer'>> = 
       },
       getRowId: ({ data }): string => (data as LayerRow).id,
       columnDefs,
-      // gridOptions are applied by the grid once, so read fresh store state here
       onRowDragEnd: ({ node, overIndex }: GridRowDragEndEvent): void => {
-        const currentOrderedLayers = sortLayersByOrder(basemapsStore.draftBasemap?.layers ?? []);
-        const fromIndex = currentOrderedLayers.findIndex(({ id }) => id === node.data?.id);
-        if (fromIndex >= 0 && overIndex >= 0 && fromIndex !== overIndex) {
-          basemapsStore.moveDraftLayer(fromIndex, overIndex);
+        if (node.data !== undefined && overIndex >= 0) {
+          compositionRef.current.moveLayer(node.data.id, overIndex);
         }
       },
     };
 
-    if (draft === undefined) {
+    if (basemapsStore.composingBasemapId === undefined) {
       return null;
     }
 
@@ -231,10 +246,9 @@ export const BasemapComposer: React.FC<BasemapsPanelProps<'BasemapComposer'>> = 
         <TextField
           outlined
           placeholder={intl.formatMessage({ id: 'basemap.composer.new-basemap-name' })}
-          value={draft.name ?? ''}
-          onChange={(event: React.ChangeEvent<HTMLInputElement>): void =>
-            basemapsStore.updateDraft({ name: event.currentTarget.value })
-          }
+          name="name"
+          value={formik.values.name}
+          onChange={formik.handleChange}
         />
 
         <GridComponent gridOptions={gridOptions} rowData={rowData} style={{ width: '100%' }} />
@@ -270,6 +284,7 @@ export const BasemapComposer: React.FC<BasemapsPanelProps<'BasemapComposer'>> = 
           <BasemapThumbnail
             mapViewer={mapViewer}
             thumbnailBlob={thumbnailBlob}
+            savedThumbnailUrl={originalBasemap?.thumbnail?.url}
             onCaptured={setThumbnailBlob}
           />
         )}
@@ -291,35 +306,34 @@ export const BasemapComposer: React.FC<BasemapsPanelProps<'BasemapComposer'>> = 
               </Typography>
               <Checkbox
                 label={intl.formatMessage({ id: 'basemap.composer.comprehensive-change.current' })}
-                checked={draft.isCurrent ?? false}
-                onChange={(event: React.ChangeEvent<HTMLInputElement>): void =>
-                  basemapsStore.updateDraft({ isCurrent: event.currentTarget.checked })
-                }
+                name="isCurrent"
+                checked={formik.values.isCurrent}
+                onChange={formik.handleChange}
               />
               <Checkbox
                 label={intl.formatMessage({ id: 'basemap.composer.comprehensive-change.preview' })}
-                checked={draft.isForPreview ?? false}
-                onChange={(event: React.ChangeEvent<HTMLInputElement>): void =>
-                  basemapsStore.updateDraft({ isForPreview: event.currentTarget.checked })
-                }
+                name="isForPreview"
+                checked={formik.values.isForPreview}
+                onChange={formik.handleChange}
               />
             </Box>
           )}
         </Box>
 
         <Box className="basemapComposerFooter">
-          <Button type="button" outlined onClick={(): void => basemapsStore.exportDraftBasemap()}>
+          <Button
+            type="button"
+            outlined
+            onClick={(): void => basemapsStore.exportComposedBasemap()}
+          >
             {intl.formatMessage({ id: 'basemap.composer.export' })}
           </Button>
           <Button
             type="button"
             raised
-            onClick={async (): Promise<void> => {
-              try {
-                await basemapsStore.saveBasemap(thumbnailBlob);
-              } catch (error) {
-                console.error(error);
-              }
+            disabled={formik.values.name.trim() === '' || basemapManager.layers.length === 0}
+            onClick={(): void => {
+              void formik.submitForm();
             }}
           >
             {intl.formatMessage({ id: 'general.save-btn.text' })}
